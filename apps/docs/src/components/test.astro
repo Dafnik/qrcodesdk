@@ -1,0 +1,10 @@
+---
+import { Code } from 'astro/components';
+import AngularTest, { content as contentSelfclosing } from './angular-test.ts?includeContent';
+
+---
+
+<Code lang="angular-ts" code={contentSelfclosing} />
+
+Component:
+<AngularTest />

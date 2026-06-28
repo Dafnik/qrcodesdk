@@ -1,28 +1,32 @@
 {
   "name": "docs",
-  "version": "0.1.0",
   "type": "module",
-  "private": true,
+  "version": "0.0.1",
   "scripts": {
-    "dev": "next dev --port 3001",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit"
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check-types": "astro check",
+    "astro": "astro",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .astro"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
-    "next": "16.2.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
-  },
-  "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "@types/node": "^22.15.3",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
-    "eslint": "^9.39.1",
-    "typescript": "5.9.2"
+    "@analogjs/astro-angular": "2.6.2",
+    "@angular/build": "catalog:",
+    "@angular/common": "catalog:",
+    "@angular/compiler": "catalog:",
+    "@angular/compiler-cli": "catalog:",
+    "@angular/core": "catalog:",
+    "@angular/language-service": "catalog:",
+    "@angular/platform-browser": "catalog:",
+    "@angular/platform-server": "catalog:",
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/starlight": "^0.41.1",
+    "@qrcodesdk/angular": "workspace:*",
+    "astro": "^7.0.2",
+    "rxjs": "catalog:",
+    "sharp": "^0.34.5",
+    "tslib": "catalog:",
+    "typescript": "~6.0.3"
   }
 }
