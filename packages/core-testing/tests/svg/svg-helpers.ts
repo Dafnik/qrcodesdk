@@ -9,6 +9,16 @@ export type SvgRect = {
   attrs: Record<string, string>;
 };
 
+type RGBColor = {
+  red: number;
+  green: number;
+  blue: number;
+};
+
+type RGBAPixel = RGBColor & {
+  alpha: number;
+};
+
 export function extractSvgAttrs(svg: string): Record<string, string> {
   const match = svg.match(/<svg\b([\s\S]*?)>/);
   if (!match) throw new Error('SVG root element was not found');
@@ -43,11 +53,7 @@ export function renderSvgRectsToPng(svg: string): PNG {
 
     for (let row = y; row < Math.min(y + rectHeight, height); row++) {
       for (let column = x; column < Math.min(x + rectWidth, width); column++) {
-        const index = (width * row + column) << 2;
-        png.data[index] = fill.red;
-        png.data[index + 1] = fill.green;
-        png.data[index + 2] = fill.blue;
-        png.data[index + 3] = 0xff;
+        setPngPixel(png, column, row, {...fill, alpha: 0xff});
       }
     }
   }
@@ -88,7 +94,7 @@ export function parseAttrs(rawAttrs: string): Record<string, string> {
   );
 }
 
-function parseHexColor(value: string | undefined): {red: number; green: number; blue: number} {
+function parseHexColor(value: string | undefined): RGBColor {
   if (!value) throw new Error('SVG rect is missing a fill attribute');
 
   const match = value.match(/^#([0-9a-f]{6})$/i);
@@ -99,4 +105,12 @@ function parseHexColor(value: string | undefined): {red: number; green: number; 
     green: Number.parseInt(match[1].slice(2, 4), 16),
     blue: Number.parseInt(match[1].slice(4, 6), 16),
   };
+}
+
+function setPngPixel(png: PNG, x: number, y: number, pixel: RGBAPixel): void {
+  const index = (png.width * y + x) << 2;
+  png.data[index] = pixel.red;
+  png.data[index + 1] = pixel.green;
+  png.data[index + 2] = pixel.blue;
+  png.data[index + 3] = pixel.alpha;
 }

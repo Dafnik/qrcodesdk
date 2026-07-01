@@ -80,6 +80,15 @@ export type QRCodeStylingOptions = {
   };
 };
 
+export type ParsedQRCodeStylingOptions = {
+  size: number;
+  margin: number;
+  colors: {
+    colorLight: ColorValueHex;
+    colorDark: ColorValueHex;
+  };
+};
+
 export type QRCodeAccessibilityOptions = {
   alt?: string;
   ariaLabel?: string;

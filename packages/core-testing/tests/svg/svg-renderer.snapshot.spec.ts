@@ -5,7 +5,7 @@ import {describe, test} from 'vitest';
 import {QRCodeMatrix, SVGQRCodeRenderer} from '@qrcodesdk/core';
 
 import {QR_CODE_TEST_FIXTURES} from '../../src';
-import {renderFixtureSvg} from './svg-fixture.spec';
+import {renderFixtureSvg} from './svg-fixture';
 import {expectSvgToMatchFileSnapshot} from './svg-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/svg', import.meta.url));

@@ -1,7 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
 import {QR_CODE_TEST_FIXTURES} from '../../src';
-import {renderFixtureSvg} from './svg-fixture.spec';
+import {renderFixtureSvg} from './svg-fixture';
 import {decodeSvgQRCode} from './svg-helpers';
 
 describe('SVG QR roundtrips', () => {
