@@ -1,3 +1,4 @@
+import type {QRCodeErrorCorrectionLevelValue, QRCodeModeIndicator, QRCodeVersion} from '../types';
 import {MODE_ALPHANUMERIC, MODE_KANJI, MODE_NUMERIC, MODE_OCTET} from './const';
 import {getNumberOfAvailableBitsForData} from './get-number-of-available-bits-for-data';
 import {getNumberOfBitsOfData} from './get-number-of-bits-of-data';
@@ -10,7 +11,11 @@ import {getNumberOfBitsOfData} from './get-number-of-bits-of-data';
  * @param {number} eccLevel - The error correction level.
  * @returns {number} The maximum length of data possible.
  */
-export function getMaxDataLength(ver: number, mode: number, eccLevel: number): number {
+export function getMaxDataLength(
+  ver: QRCodeVersion,
+  mode: QRCodeModeIndicator,
+  eccLevel: QRCodeErrorCorrectionLevelValue,
+): number {
   const numberOfBits =
     getNumberOfAvailableBitsForData(ver, eccLevel) - 4 - getNumberOfBitsOfData(ver, mode); // 4 for mode bits
   switch (mode) {
@@ -25,5 +30,4 @@ export function getMaxDataLength(ver: number, mode: number, eccLevel: number): n
     case MODE_KANJI:
       return (numberOfBits / 13) | 0;
   }
-  return -100;
 }

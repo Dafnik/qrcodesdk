@@ -1,18 +1,26 @@
+import type {
+  QRCodeCodewords,
+  QRCodeMatrix,
+  QRCodeModule,
+  QRCodeMutableMatrix,
+  QRCodeReservedMatrix,
+} from '../types';
+
 /**
  * Fills the data portion (i.e., unmarked in reserved) of the matrix with given
  * code words. The size of code words should be no more than available bits,
  * and remaining bits are padded to 0 (cf. JIS X 0510:2004 sec 8.7.3).
  *
- * @param {number[][]} matrix - The matrix to be filled with data.
- * @param {number[][]} reserved - The reserved portion of the matrix.
- * @param {number[]} buffer - The code words to be filled into the matrix.
- * @returns {number[][]} The matrix with data filled in.
+ * @param {QRCodeMutableMatrix} matrix - The matrix to be filled with data.
+ * @param {QRCodeReservedMatrix} reserved - The reserved portion of the matrix.
+ * @param {QRCodeCodewords} buffer - The code words to be filled into the matrix.
+ * @returns {QRCodeMatrix} The matrix with data filled in.
  */
 export function fillDataInMatrix(
-  matrix: number[][],
-  reserved: number[][],
-  buffer: number[],
-): number[][] {
+  matrix: QRCodeMutableMatrix,
+  reserved: QRCodeReservedMatrix,
+  buffer: QRCodeCodewords,
+): QRCodeMatrix {
   const n = matrix.length;
   let k = 0,
     dir = -1;
@@ -24,7 +32,7 @@ export function fillDataInMatrix(
         if (!reserved[jj][ii]) {
           // may overflow, but (undefined >> x)
           // is 0, so it will auto-pad to zero.
-          matrix[jj][ii] = (buffer[k >> 3] >> (~k & 7)) & 1;
+          matrix[jj][ii] = ((buffer[k >> 3] >> (~k & 7)) & 1) as QRCodeModule;
           ++k;
         }
       }
@@ -32,5 +40,5 @@ export function fillDataInMatrix(
     }
     dir = -dir;
   }
-  return matrix;
+  return matrix as QRCodeMatrix;
 }

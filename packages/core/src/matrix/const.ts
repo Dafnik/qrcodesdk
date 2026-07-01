@@ -1,3 +1,13 @@
+import type {
+  QRCodeCodewords,
+  QRCodeErrorCorrectionLevel,
+  QRCodeErrorCorrectionLevelValue,
+  QRCodeMode,
+  QRCodeModeIndicator,
+  QRCodePolynomial,
+  QRCodeSupportedModeIndicator,
+} from '../types';
+
 export const VERSIONS = [
   null,
   [[10, 7, 17, 13], [1, 1, 1, 1], []],
@@ -201,17 +211,17 @@ export const VERSIONS = [
 export const MODE_NUMERIC = 1,
   MODE_ALPHANUMERIC = 2,
   MODE_OCTET = 4,
-  MODE_KANJI = 8;
+  MODE_KANJI = 8 satisfies QRCodeModeIndicator;
 
 // ECC levels (cf. Table 22 in JIS X 0510:2004 p. 45)
 export const ECC_LEVEL_L = 1,
   ECC_LEVEL_M = 0,
   ECC_LEVEL_Q = 3,
-  ECC_LEVEL_H = 2;
+  ECC_LEVEL_H = 2 satisfies QRCodeErrorCorrectionLevelValue;
 
 // mode constants (cf. Table 2 in JIS X 0510:2004 p. 16)
 export const MODE_TERMINATOR = 0;
-export const MODES_MAP: {[x: string]: number} = {
+export const MODES_MAP: Record<QRCodeMode, QRCodeSupportedModeIndicator> = {
   numeric: MODE_NUMERIC,
   alphanumeric: MODE_ALPHANUMERIC,
   octet: MODE_OCTET,
@@ -221,7 +231,7 @@ export const MODES_MAP: {[x: string]: number} = {
 export const NUMERIC_REGEXP = /^\d*$/;
 export const ALPHANUMERIC_REGEXP = /^[A-Z0-9 $%*+\-./:_]*$/;
 
-export const ECC_LEVELS_MAP: {[x: string]: number} = {
+export const ECC_LEVELS_MAP: Record<QRCodeErrorCorrectionLevel, QRCodeErrorCorrectionLevelValue> = {
   L: ECC_LEVEL_L,
   M: ECC_LEVEL_M,
   Q: ECC_LEVEL_Q,
@@ -235,14 +245,14 @@ export const ECC_LEVELS_MAP: {[x: string]: number} = {
 // ..., (x-\alpha^(K-1)). by convention, we omit the K-th coefficient (always 1)
 // from the result; also other coefficients are written in terms of the exponent
 // to \alpha to avoid the redundant calculation. (see also calculateecc below.)
-export const GF256_GEN_POLY: number[][] = [[]];
+export const GF256_GEN_POLY: QRCodePolynomial[] = [[]];
 
 // alphanumeric character mapping (cf. Table 5 in JIS X 0510:2004 p. 19)
 export const ALPHANUMERIC_MAP: {[x: string]: number} = {};
 
 // GF(2^8)-to-integer mapping with a reducing polynomial x^8+x^4+x^3+x^2+1
 // invariant: GF256_MAP[GF256_INVMAP[i]] == i for all i in [1,256]
-export const GF256_MAP: number[] = [],
+export const GF256_MAP: QRCodeCodewords = [],
   GF256_INVENTORY_MAP = [-1];
 
 for (let i = 0, v = 1; i < 255; i++) {
@@ -253,7 +263,7 @@ for (let i = 0, v = 1; i < 255; i++) {
 
 for (let i = 0; i < 30; i++) {
   const prevpoly = GF256_GEN_POLY[i],
-    poly: number[] = [];
+    poly: QRCodePolynomial = [];
   for (let j = 0; j <= i; j++) {
     const a = j < i ? GF256_MAP[prevpoly[j]] : 0;
     const b = GF256_MAP[(i + (prevpoly[j - 1] || 0)) % 255];
@@ -266,9 +276,11 @@ for (let i = 0; i < 45; i++) {
   ALPHANUMERIC_MAP['0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'.charAt(i)] = i;
 }
 
+type QRCodeMaskFunction = (row: number, column: number) => boolean;
+
 // mask functions in terms of row # and column #
 // (cf. Table 20 in JIS X 0510:2004 p. 42)
-export const MASK_FUNCTIONS: ((i: number, j: number) => boolean)[] = [
+export const MASK_FUNCTIONS: QRCodeMaskFunction[] = [
   (i: number, j: number): boolean => (i + j) % 2 === 0,
   (i: number): boolean => i % 2 === 0,
   (i: number, j: number): boolean => j % 3 === 0,

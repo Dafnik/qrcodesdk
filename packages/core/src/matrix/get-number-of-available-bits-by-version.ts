@@ -1,3 +1,4 @@
+import type {QRCodeVersion} from '../types';
 import {VERSIONS} from './const';
 import {needsVersionInfo} from './needs-version-info';
 
@@ -7,7 +8,7 @@ import {needsVersionInfo} from './needs-version-info';
  * @param {number} version - The version number of the QR code.
  * @returns {number} The number of bits available for code words in this version.
  */
-export function getNumberOfAvailableBitsByVersion(version: number): number {
+export function getNumberOfAvailableBitsByVersion(version: QRCodeVersion): number {
   /*
    * |<--------------- n --------------->|
    * |        |<----- n-17 ---->|        |

@@ -1,3 +1,4 @@
+import type {QRCodeMatrix} from '../types';
 import {evaluateGroup} from './evaluate-group';
 
 // N2 points for each 2x2 block of same-colored modules.
@@ -19,10 +20,10 @@ const PENALTY_DENSITY = 10;
  * Note: ZXing seems to use the same procedure and in many cases its choice
  * agrees with ours, but sometimes it does not. Practically it doesn't matter.
  *
- * @param {number[][]} matrix - The matrix to be evaluated.
+ * @param {QRCodeMatrix} matrix - The matrix to be evaluated.
  * @returns {number} The score of the matrix evaluation (lower is better).
  */
-export function evaluateMatrix(matrix: number[][]): number {
+export function evaluateMatrix(matrix: QRCodeMatrix): number {
   const matrixLength = matrix.length;
   let score = 0,
     numberOfBlackSquares = 0;

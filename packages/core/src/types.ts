@@ -1,4 +1,18 @@
-export type QRCodeMatrix = number[][];
+export type QRCodeInputData = string | number;
+
+export type QRCodeModule = 0 | 1;
+export type QRCodeMatrix = QRCodeModule[][];
+export type QRCodeMutableMatrix = Array<Array<QRCodeModule | undefined>>;
+export type QRCodeReservedMatrix = Array<Array<QRCodeModule | undefined>>;
+
+export type QRCodeCodeword = number;
+export type QRCodeCodewords = QRCodeCodeword[];
+export type QRCodePolynomial = QRCodeCodeword[];
+export type QRCodeEncodedData = string | QRCodeCodewords;
+
+export type QRCodeModeIndicator = 1 | 2 | 4 | 8;
+export type QRCodeSupportedModeIndicator = 1 | 2 | 4;
+export type QRCodeErrorCorrectionLevelValue = 0 | 1 | 2 | 3;
 
 export type QRCodeVersion =
   | 1

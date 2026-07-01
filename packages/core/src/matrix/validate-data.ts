@@ -1,3 +1,4 @@
+import type {QRCodeEncodedData, QRCodeInputData, QRCodeSupportedModeIndicator} from '../types';
 import {
   ALPHANUMERIC_REGEXP,
   MODE_ALPHANUMERIC,
@@ -13,11 +14,14 @@ import {
  * This function does not check the length of data; it is the duty of
  * the encode function (as it depends on the version and ECC level too).
  *
- * @param {number} mode - The encoding mode (numeric, alphanumeric, octet).
- * @param {string | number} data - The data to be validated and converted.
- * @returns {string | number[] | undefined} The validated and converted data, or undefined if not valid.
+ * @param {QRCodeSupportedModeIndicator} mode - The encoding mode.
+ * @param {QRCodeInputData} data - The data to be validated and converted.
+ * @returns {QRCodeEncodedData | undefined} The validated and converted data, or undefined if not valid.
  */
-export function validateData(mode: number, data: string | number): string | number[] | undefined {
+export function validateData(
+  mode: QRCodeSupportedModeIndicator,
+  data: QRCodeInputData,
+): QRCodeEncodedData | undefined {
   const stringData = data as string;
   switch (mode) {
     case MODE_NUMERIC:

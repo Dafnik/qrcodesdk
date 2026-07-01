@@ -1,3 +1,4 @@
+import type {QRCodeModeIndicator, QRCodeVersion} from '../types';
 import {MODE_ALPHANUMERIC, MODE_KANJI, MODE_NUMERIC, MODE_OCTET} from './const';
 
 /**
@@ -9,8 +10,8 @@ import {MODE_ALPHANUMERIC, MODE_KANJI, MODE_NUMERIC, MODE_OCTET} from './const';
  * @returns {number} The number of bits required for the length of data.
  */
 export function getNumberOfBitsOfData(
-  ver: number,
-  mode: number,
+  ver: QRCodeVersion,
+  mode: QRCodeModeIndicator,
 ): 10 | 12 | 14 | 9 | 11 | 13 | 8 | 16 | -100 {
   switch (mode) {
     case MODE_NUMERIC:
@@ -22,5 +23,4 @@ export function getNumberOfBitsOfData(
     case MODE_KANJI:
       return ver < 10 ? 8 : ver < 27 ? 10 : 12;
   }
-  return -100;
 }

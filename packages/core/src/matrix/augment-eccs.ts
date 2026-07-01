@@ -1,3 +1,4 @@
+import type {QRCodeCodewords, QRCodePolynomial} from '../types';
 import {calculateECC} from './calculate-ecc';
 
 /**
@@ -14,11 +15,15 @@ import {calculateECC} from './calculate-ecc';
  * @param {number[]} genPoly - The generator polynomial used for calculating ECC words.
  * @returns {number[]} The augmented array of code words ready for encoding in the matrix.
  */
-export function augmentECCs(poly: number[], blockNumber: number, genPoly: number[]): number[] {
+export function augmentECCs(
+  poly: QRCodeCodewords,
+  blockNumber: number,
+  genPoly: QRCodePolynomial,
+): QRCodeCodewords {
   const subSizes: number[] = [],
     subSize: number = (poly.length / blockNumber) | 0,
     pivot: number = blockNumber - (poly.length % blockNumber),
-    eccs: number[][] = [];
+    eccs: QRCodeCodewords[] = [];
 
   let subSize0 = 0;
 
@@ -36,7 +41,7 @@ export function augmentECCs(poly: number[], blockNumber: number, genPoly: number
     eccs.push(calculateECC(poly.slice(subSizes[i], subSizes[i + 1]), genPoly));
   }
 
-  const result: number[] = [];
+  const result: QRCodeCodewords = [];
   const numberOfItemsPerBlock = (poly.length / blockNumber) | 0;
   for (let i = 0; i < numberOfItemsPerBlock; i++) {
     for (let j = 0; j < blockNumber; j++) {

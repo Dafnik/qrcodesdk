@@ -1,3 +1,9 @@
+import type {
+  QRCodeCodewords,
+  QRCodeEncodedData,
+  QRCodeSupportedModeIndicator,
+  QRCodeVersion,
+} from '../types';
 import {
   ALPHANUMERIC_MAP,
   MODE_ALPHANUMERIC,
@@ -12,19 +18,19 @@ import {getNumberOfBitsOfData} from './get-number-of-bits-of-data';
  * Requires data to be preprocessed by `validateData`. No length check is
  * performed, and everything has to be checked before calling this function.
  *
- * @param {number} version - The version number of the QR code.
- * @param {number} mode - The mode of encoding (numeric, alphanumeric, octet).
- * @param {string | number[]} data - The data to encode.
+ * @param {QRCodeVersion} version - The version number of the QR code.
+ * @param {QRCodeSupportedModeIndicator} mode - The mode of encoding.
+ * @param {QRCodeEncodedData} data - The data to encode.
  * @param {number} maxBufferLength - The maximum buffer length.
- * @returns {number[]} The code words for the given data.
+ * @returns {QRCodeCodewords} The code words for the given data.
  */
 export function encode(
-  version: number,
-  mode: number,
-  data: string | number[],
+  version: QRCodeVersion,
+  mode: QRCodeSupportedModeIndicator,
+  data: QRCodeEncodedData,
   maxBufferLength: number,
-): number[] {
-  const buffer: number[] = [];
+): QRCodeCodewords {
+  const buffer: QRCodeCodewords = [];
   let bits = 0,
     remaining = 8;
   const dataLength = data.length;

@@ -1,3 +1,4 @@
+import type {QRCodeCodewords, QRCodePolynomial} from '../types';
 import {GF256_INVENTORY_MAP, GF256_MAP} from './const';
 
 /**
@@ -13,7 +14,7 @@ import {GF256_INVENTORY_MAP, GF256_MAP} from './const';
  * @param {number[]} genPoly - The generator polynomial used for ECC calculation.
  * @returns {number[]} The array of calculated ECC code words.
  */
-export function calculateECC(poly: number[], genPoly: number[]): number[] {
+export function calculateECC(poly: QRCodeCodewords, genPoly: QRCodePolynomial): QRCodeCodewords {
   const modulus = poly.slice(0),
     polyLength = poly.length,
     genPolyLength = genPoly.length;

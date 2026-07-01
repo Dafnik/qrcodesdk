@@ -1,3 +1,4 @@
+import type {QRCodeErrorCorrectionLevelValue, QRCodeVersion} from '../types';
 import {VERSIONS} from './const';
 import {getNumberOfAvailableBitsByVersion} from './get-number-of-available-bits-by-version';
 
@@ -9,7 +10,10 @@ import {getNumberOfAvailableBitsByVersion} from './get-number-of-available-bits-
  * @param {number} eccLevel - The error correction level.
  * @returns {number} The number of bits available for data portions.
  */
-export function getNumberOfAvailableBitsForData(version: number, eccLevel: number): number {
+export function getNumberOfAvailableBitsForData(
+  version: QRCodeVersion,
+  eccLevel: QRCodeErrorCorrectionLevelValue,
+): number {
   let numberOfAvailableBits = getNumberOfAvailableBitsByVersion(version) & ~7; // no sub-octet code words
   const v = VERSIONS[version] ?? [[-100]];
   numberOfAvailableBits -= 8 * v[0][eccLevel] * v[1][eccLevel]; // ecc bits

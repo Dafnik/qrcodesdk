@@ -1,7 +1,19 @@
+import type {
+  QRCodeCodewords,
+  QRCodeModule,
+  QRCodeMutableMatrix,
+  QRCodeReservedMatrix,
+  QRCodeVersion,
+} from '../types';
 import {augmentBCH} from './augment-bch';
 import {VERSIONS} from './const';
 import {getSizeByVersion} from './get-size-by-version';
 import {needsVersionInfo} from './needs-version-info';
+
+type QRCodeMatrixBuildState = {
+  matrix: QRCodeMutableMatrix;
+  reserved: QRCodeReservedMatrix;
+};
 
 /**
  * Creates the base matrix for a given version of the QR code. It returns two matrices,
@@ -12,24 +24,24 @@ import {needsVersionInfo} from './needs-version-info';
  * intentional (no initialization needed!), and `fillDataInMatrix` will fill
  * the remaining ones.
  *
- * @param {number} version - The version number of the QR code.
- * @returns {{ matrix: number[][], reserved: number[][] }} The base matrix and the reserved portion matrix.
+ * @param {QRCodeVersion} version - The version number of the QR code.
+ * @returns {QRCodeMatrixBuildState} The base matrix and the reserved portion matrix.
  */
-export function createBaseMatrix(version: number): {matrix: number[][]; reserved: number[][]} {
+export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState {
   const v = VERSIONS[version] ?? [[-100]],
     sizeOfVersion = getSizeByVersion(version),
-    matrix: number[][] = [],
-    reserved: number[][] = [];
+    matrix: QRCodeMutableMatrix = [],
+    reserved: QRCodeReservedMatrix = [];
 
   for (let i = 0; i < sizeOfVersion; i++) {
     matrix.push([]);
     reserved.push([]);
   }
 
-  const blit = function (y: number, x: number, h: number, w: number, bits: number[]): void {
+  const blit = function (y: number, x: number, h: number, w: number, bits: QRCodeCodewords): void {
     for (let i = 0; i < h; i++) {
       for (let j = 0; j < w; j++) {
-        matrix[y + i][x + j] = (bits[i] >> j) & 1;
+        matrix[y + i][x + j] = ((bits[i] >> j) & 1) as QRCodeModule;
         reserved[y + i][x + j] = 1;
       }
     }
@@ -43,7 +55,7 @@ export function createBaseMatrix(version: number): {matrix: number[][]; reserved
 
   // the rest of timing patterns
   for (let i = 9; i < sizeOfVersion - 8; i++) {
-    matrix[6][i] = matrix[i][6] = ~i & 1;
+    matrix[6][i] = matrix[i][6] = (~i & 1) as QRCodeModule;
     reserved[6][i] = reserved[i][6] = 1;
   }
 
@@ -65,7 +77,8 @@ export function createBaseMatrix(version: number): {matrix: number[][]; reserved
     let k = 0;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 3; j++) {
-        matrix[i][sizeOfVersion - 11 + j] = matrix[sizeOfVersion - 11 + j][i] = (code >> k++) & 1;
+        matrix[i][sizeOfVersion - 11 + j] = matrix[sizeOfVersion - 11 + j][i] = ((code >> k++) &
+          1) as QRCodeModule;
         reserved[i][sizeOfVersion - 11 + j] = reserved[sizeOfVersion - 11 + j][i] = 1;
       }
     }
