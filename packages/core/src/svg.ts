@@ -28,7 +28,7 @@ export function SVGQRCodeRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
       options?.alt ? `alt="${options.alt}"` : undefined,
       options?.ariaLabel ? `aria-label="${options.ariaLabel}"` : undefined,
       options?.title ? `title="${options.title}"` : undefined,
-    ].filter(attr => attr !== undefined);
+    ].filter((attr) => attr !== undefined);
 
     return [
       `<svg ${attrs.join(' ')}>`,
