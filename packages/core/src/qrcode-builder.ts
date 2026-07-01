@@ -1,6 +1,7 @@
 import {buildQRCodeMatrix} from './matrix';
 import type {
   QRCodeErrorCorrectionLevel,
+  QRCodeMask,
   QRCodeMatrix,
   QRCodeMatrixOptions,
   QRCodeMode,
@@ -9,7 +10,11 @@ import type {
 } from './types';
 
 type NoData = {readonly hasData: false; readonly _data: undefined};
-type HasData = {readonly hasData: true; readonly _data: string};
+type HasData = {readonly hasData: true; readonly _data: string | number};
+
+type BuilderData<D> = D extends HasData ? string | number : undefined;
+type BuilderRenderer<R> =
+  R extends HasRenderer<infer TOutput> ? QRCodeRenderer<TOutput> : undefined;
 
 type NoRenderer = {readonly hasRenderer: false};
 type HasRenderer<TOutput> = {
@@ -22,14 +27,16 @@ export class QRCodeBuilder<
   R extends NoRenderer | HasRenderer<unknown>,
 > {
   private constructor(
-    private readonly _data: string | number | undefined,
+    private readonly _data: BuilderData<D>,
     private readonly config: QRCodeMatrixOptions,
-    private readonly currentRenderer?: QRCodeRenderer<unknown>,
+    private readonly currentRenderer: BuilderRenderer<R>,
   ) {}
 
-  static create(data?: string | number): QRCodeBuilder<NoData, NoRenderer>;
-  static create(data: string): QRCodeBuilder<HasData, NoRenderer>;
-  static create(data?: string | number) {
+  static create(): QRCodeBuilder<NoData, NoRenderer>;
+  static create(data: string | number): QRCodeBuilder<HasData, NoRenderer>;
+  static create(
+    data?: string | number,
+  ): QRCodeBuilder<NoData, NoRenderer> | QRCodeBuilder<HasData, NoRenderer> {
     return new QRCodeBuilder(
       data,
       {
@@ -76,6 +83,17 @@ export class QRCodeBuilder<
     );
   }
 
+  mask(mask: QRCodeMask): QRCodeBuilder<D, R> {
+    return new QRCodeBuilder(
+      this._data,
+      {
+        ...this.config,
+        mask,
+      },
+      this.currentRenderer,
+    );
+  }
+
   renderer<TOutput>(renderer: QRCodeRenderer<TOutput>): QRCodeBuilder<D, HasRenderer<TOutput>> {
     return new QRCodeBuilder(this._data, this.config, renderer);
   }
@@ -84,19 +102,25 @@ export class QRCodeBuilder<
     return buildQRCodeMatrix(this._data, this.config);
   }
 
-  render<TOutput>(this: QRCodeBuilder<HasData, HasRenderer<TOutput>>): TOutput {
-    const matrix = buildQRCodeMatrix(this._data, this.config);
+  render<TOutput>(this: QRCodeBuilder<HasData, R>, renderer: QRCodeRenderer<TOutput>): TOutput;
+  render<TOutput>(this: QRCodeBuilder<HasData, HasRenderer<TOutput>>): TOutput;
+  render<TOutput>(
+    this: QRCodeBuilder<HasData, R | HasRenderer<TOutput>>,
+    renderer?: QRCodeRenderer<TOutput>,
+  ): TOutput {
+    const selectedRenderer = renderer ?? this.currentRenderer;
 
-    if (!this.currentRenderer) {
-      throw new Error('Renderer is missing');
+    if (!selectedRenderer) {
+      throw 'QRCode: Renderer missing';
     }
 
-    return this.currentRenderer.render(matrix) as TOutput;
+    const matrix = buildQRCodeMatrix(this._data, this.config);
+    return selectedRenderer(matrix) as TOutput;
   }
 }
 
 export function qrcode(): QRCodeBuilder<NoData, NoRenderer>;
 export function qrcode(data: string | number): QRCodeBuilder<HasData, NoRenderer>;
 export function qrcode(data?: string | number) {
-  return QRCodeBuilder.create(data);
+  return data === undefined ? QRCodeBuilder.create() : QRCodeBuilder.create(data);
 }

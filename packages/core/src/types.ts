@@ -48,9 +48,7 @@ export type QRCodeMask = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type ColorValueHex = `#${string}`;
 
-export interface QRCodeRenderer<TOutput> {
-  render(matrix: QRCodeMatrix): TOutput;
-}
+export type QRCodeRenderer<TOutput> = (matrix: QRCodeMatrix) => TOutput;
 
 export type QRCodeMatrixOptions = {
   version?: QRCodeVersion;
@@ -59,7 +57,7 @@ export type QRCodeMatrixOptions = {
   mask?: QRCodeMask;
 };
 
-export type generateOptions = QRCodeMatrixOptions & {
+export type QRCodeStylingOptions = {
   size?: number;
   margin?: number;
   colors?: {
@@ -68,7 +66,7 @@ export type generateOptions = QRCodeMatrixOptions & {
   };
 };
 
-export type generateWithAccessibleOptions = {
+export type QRCodeAccessibilityOptions = {
   alt?: string;
   ariaLabel?: string;
   title?: string;

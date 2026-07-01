@@ -1,14 +1,14 @@
 import {describe, expect, test} from 'vitest';
 
 import {buildQRCodeMatrix} from '../src/matrix';
-import {generateQRCodeSVGString} from '../src/svg';
+import {qrcode} from '../src/qrcode-builder';
+import {SVGQRCodeRenderer} from '../src/svg';
 
 export const s_stripWhitespace = (text: string): string => text.trim().replace(/\s/g, '') ?? '';
 
 describe('QRCode', () => {
   test('generate correct Numeric qrcode svg', () => {
-    const test = generateQRCodeSVGString('123456798', {mode: 'numeric', mask: 1});
-    console.log(test);
+    const test = qrcode('123456798').mode('numeric').renderer(SVGQRCodeRenderer()).render();
     expect(s_stripWhitespace(test)).toEqual(
       s_stripWhitespace(`<svg xmlns="http://www.w3.org/2000/svg"
     width="145" height="145"   >
@@ -239,7 +239,7 @@ describe('QRCode', () => {
     );
   });
   test('generate correct Numeric qrcode matrix', () => {
-    expect(buildQRCodeMatrix('123456798', {mode: 'numeric', mask: 1})).toStrictEqual([
+    expect(qrcode('123456789').mode('numeric').matrix()).toStrictEqual([
       [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
@@ -264,7 +264,7 @@ describe('QRCode', () => {
     ]);
   });
   test('generate correct alpha numeric qrcode matrix', () => {
-    expect(buildQRCodeMatrix('AT123456798', {mode: 'alphanumeric', mask: 1})).toStrictEqual([
+    expect(qrcode('AT123456798').mode('alphanumeric')).toStrictEqual([
       [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
