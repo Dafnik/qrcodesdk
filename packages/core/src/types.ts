@@ -1,3 +1,5 @@
+export type QRCodeMatrix = number[][];
+
 export type QRCodeVersion =
   | 1
   | 2
@@ -46,14 +48,18 @@ export type QRCodeMask = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type ColorValueHex = `#${string}`;
 
-export type generateMatrixOptions = {
+export interface QRCodeRenderer<TOutput> {
+  render(matrix: QRCodeMatrix): TOutput;
+}
+
+export type QRCodeMatrixOptions = {
   version?: QRCodeVersion;
   mode?: QRCodeMode;
   errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
   mask?: QRCodeMask;
 };
 
-export type generateOptions = generateMatrixOptions & {
+export type generateOptions = QRCodeMatrixOptions & {
   size?: number;
   margin?: number;
   colors?: {

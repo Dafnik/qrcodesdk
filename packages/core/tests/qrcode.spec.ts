@@ -1,13 +1,13 @@
 import {describe, expect, test} from 'vitest';
 
-import {generateQrCodeMatrix} from '../src/matrix';
-import {generateQrCodeSVGString} from '../src/svg';
+import {buildQRCodeMatrix} from '../src/matrix';
+import {generateQRCodeSVGString} from '../src/svg';
 
 export const s_stripWhitespace = (text: string): string => text.trim().replace(/\s/g, '') ?? '';
 
 describe('QRCode', () => {
   test('generate correct Numeric qrcode svg', () => {
-    const test = generateQrCodeSVGString('123456798', {mode: 'numeric', mask: 1});
+    const test = generateQRCodeSVGString('123456798', {mode: 'numeric', mask: 1});
     console.log(test);
     expect(s_stripWhitespace(test)).toEqual(
       s_stripWhitespace(`<svg xmlns="http://www.w3.org/2000/svg"
@@ -239,7 +239,7 @@ describe('QRCode', () => {
     );
   });
   test('generate correct Numeric qrcode matrix', () => {
-    expect(generateQrCodeMatrix('123456798', {mode: 'numeric', mask: 1})).toStrictEqual([
+    expect(buildQRCodeMatrix('123456798', {mode: 'numeric', mask: 1})).toStrictEqual([
       [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
@@ -264,7 +264,7 @@ describe('QRCode', () => {
     ]);
   });
   test('generate correct alpha numeric qrcode matrix', () => {
-    expect(generateQrCodeMatrix('AT123456798', {mode: 'alphanumeric', mask: 1})).toStrictEqual([
+    expect(buildQRCodeMatrix('AT123456798', {mode: 'alphanumeric', mask: 1})).toStrictEqual([
       [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
@@ -289,7 +289,7 @@ describe('QRCode', () => {
     ]);
   });
   test('generate correct byte qrcode matrix', () => {
-    expect(generateQrCodeMatrix('AT123456798!!ww:', {mode: 'octet', mask: 1})).toStrictEqual([
+    expect(buildQRCodeMatrix('AT123456798!!ww:', {mode: 'octet', mask: 1})).toStrictEqual([
       [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
@@ -314,7 +314,7 @@ describe('QRCode', () => {
     ]);
   });
   test('generate correct auto detected Numeric qrcode matrix', () => {
-    expect(generateQrCodeMatrix('123456798', {mask: 1})).toStrictEqual([
+    expect(buildQRCodeMatrix('123456798', {mask: 1})).toStrictEqual([
       [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
@@ -339,7 +339,7 @@ describe('QRCode', () => {
     ]);
   });
   test('generate correct auto detected alpha numeric qrcode matrix', () => {
-    expect(generateQrCodeMatrix('AT123456798', {mask: 1})).toStrictEqual([
+    expect(buildQRCodeMatrix('AT123456798', {mask: 1})).toStrictEqual([
       [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
@@ -364,7 +364,7 @@ describe('QRCode', () => {
     ]);
   });
   test('generate correct auto detected byte qrcode matrix', () => {
-    expect(generateQrCodeMatrix('AT123456798!!ww:', {mask: 1})).toStrictEqual([
+    expect(buildQRCodeMatrix('AT123456798!!ww:', {mask: 1})).toStrictEqual([
       [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
       [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
@@ -390,39 +390,39 @@ describe('QRCode', () => {
   });
 
   test('auto selects mask when omitted', () => {
-    expect(generateQrCodeMatrix('123456798')).toHaveLength(21);
+    expect(buildQRCodeMatrix('123456798')).toHaveLength(21);
   });
 
   test('accepts mask values from 0 through 7', () => {
     for (const mask of [0, 1, 2, 3, 4, 5, 6, 7] as const) {
-      expect(generateQrCodeMatrix('123456798', {mask})).toHaveLength(21);
+      expect(buildQRCodeMatrix('123456798', {mask})).toHaveLength(21);
     }
   });
 
   test('rejects invalid mask values from plain JavaScript callers', () => {
-    expect(() => generateQrCodeMatrix('123456798', {mask: -1} as never)).toThrow(
-      'QrCode: Invalid mask',
+    expect(() => buildQRCodeMatrix('123456798', {mask: -1} as never)).toThrow(
+      'QRCode: Invalid mask',
     );
-    expect(() => generateQrCodeMatrix('123456798', {mask: 8} as never)).toThrow(
-      'QrCode: Invalid mask',
+    expect(() => buildQRCodeMatrix('123456798', {mask: 8} as never)).toThrow(
+      'QRCode: Invalid mask',
     );
   });
 
   test('auto selects version when omitted', () => {
-    expect(generateQrCodeMatrix('123456798', {mask: 1})).toHaveLength(21);
+    expect(buildQRCodeMatrix('123456798', {mask: 1})).toHaveLength(21);
   });
 
   test('accepts version values from 1 through 40', () => {
-    expect(generateQrCodeMatrix('123456798', {version: 1, mask: 1})).toHaveLength(21);
-    expect(generateQrCodeMatrix('123456798', {version: 40, mask: 1})).toHaveLength(177);
+    expect(buildQRCodeMatrix('123456798', {version: 1, mask: 1})).toHaveLength(21);
+    expect(buildQRCodeMatrix('123456798', {version: 40, mask: 1})).toHaveLength(177);
   });
 
   test('rejects invalid version values from plain JavaScript callers', () => {
-    expect(() => generateQrCodeMatrix('123456798', {version: -1} as never)).toThrow(
-      'QrCode: Invalid version',
+    expect(() => buildQRCodeMatrix('123456798', {version: -1} as never)).toThrow(
+      'QRCode: Invalid version',
     );
-    expect(() => generateQrCodeMatrix('123456798', {version: 0} as never)).toThrow(
-      'QrCode: Invalid version',
+    expect(() => buildQRCodeMatrix('123456798', {version: 0} as never)).toThrow(
+      'QRCode: Invalid version',
     );
   });
 });

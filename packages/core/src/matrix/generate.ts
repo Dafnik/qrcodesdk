@@ -1,4 +1,4 @@
-import type {QRCodeMask, generateMatrixOptions} from '../types';
+import type {QRCodeMask, QRCodeMatrixOptions} from '../types';
 import {augmentECCs} from './augment-eccs';
 import {
   ALPHANUMERIC_REGEXP,
@@ -22,7 +22,7 @@ import {maskMatrixData} from './mask-matrix-data';
 import {validateData} from './validate-data';
 
 type EncodedData = string | number[];
-type QrMode = typeof MODE_NUMERIC | typeof MODE_ALPHANUMERIC | typeof MODE_OCTET;
+type QRMode = typeof MODE_NUMERIC | typeof MODE_ALPHANUMERIC | typeof MODE_OCTET;
 
 const QR_CODE_MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
 const AUTO_MASK_CANDIDATES = [1, 2, 3, 4, 5, 6, 7] as const;
@@ -31,7 +31,7 @@ const AUTO_MASK_CANDIDATES = [1, 2, 3, 4, 5, 6, 7] as const;
  * Generates a QR code matrix for the given data and options.
  *
  * @param {string | number} data - The data to be encoded.
- * @param {generateMatrixOptions} options - The options for generating the QR code matrix.
+ * @param {QRCodeMatrixOptions} options - The options for generating the QR code matrix.
  * @returns {number[][]} The QR code matrix.
  * @throws {string} Throws an error if:
  *
@@ -41,13 +41,13 @@ const AUTO_MASK_CANDIDATES = [1, 2, 3, 4, 5, 6, 7] as const;
  *                   - The version is invalid.
  *                   - The mask is invalid.
  */
-export function generateQrCodeMatrix(
+export function buildQRCodeMatrix(
   data: string | number,
-  options: generateMatrixOptions = {},
+  options: QRCodeMatrixOptions = {},
 ): number[][] {
   const mode = resolveMode(data, options.mode);
   const newData = validateData(mode, data);
-  if (newData === undefined) throw 'QrCode: Invalid data format';
+  if (newData === undefined) throw 'QRCode: Invalid data format';
 
   const eccLevel = resolveEccLevel(options.errorCorrectionLevel);
   const version = resolveVersion(options.version, newData.length, mode, eccLevel);
@@ -56,10 +56,10 @@ export function generateQrCodeMatrix(
   return generate(newData, version, mode, eccLevel, mask);
 }
 
-function resolveMode(data: string | number, requestedMode: generateMatrixOptions['mode']): QrMode {
+function resolveMode(data: string | number, requestedMode: QRCodeMatrixOptions['mode']): QRMode {
   if (requestedMode !== undefined) {
     const mode = MODES_MAP[requestedMode];
-    if (!isQrMode(mode)) throw 'QrCode: Invalid mode';
+    if (!isQRMode(mode)) throw 'QRCode: Invalid mode';
     return mode;
   }
 
@@ -70,27 +70,27 @@ function resolveMode(data: string | number, requestedMode: generateMatrixOptions
   return MODE_OCTET;
 }
 
-function isQrMode(mode: number | undefined): mode is QrMode {
+function isQRMode(mode: number | undefined): mode is QRMode {
   return mode === MODE_NUMERIC || mode === MODE_ALPHANUMERIC || mode === MODE_OCTET;
 }
 
 function resolveEccLevel(
-  errorCorrectionLevel: generateMatrixOptions['errorCorrectionLevel'],
+  errorCorrectionLevel: QRCodeMatrixOptions['errorCorrectionLevel'],
 ): number {
   const eccLevel = ECC_LEVELS_MAP[errorCorrectionLevel ?? 'L'];
   if (!Number.isInteger(eccLevel) || eccLevel < 0 || eccLevel > 3)
-    throw 'QrCode: Invalid ECC level';
+    throw 'QRCode: Invalid ECC level';
   return eccLevel;
 }
 
 function resolveVersion(
-  requestedVersion: generateMatrixOptions['version'],
+  requestedVersion: QRCodeMatrixOptions['version'],
   dataLength: number,
-  mode: QrMode,
+  mode: QRMode,
   eccLevel: number,
 ): number {
   if (requestedVersion !== undefined) {
-    if (requestedVersion < 1 || requestedVersion > 40) throw 'QrCode: Invalid version';
+    if (requestedVersion < 1 || requestedVersion > 40) throw 'QRCode: Invalid version';
     return requestedVersion;
   }
 
@@ -98,12 +98,12 @@ function resolveVersion(
     if (dataLength <= getMaxDataLength(version, mode, eccLevel)) return version;
   }
 
-  throw 'QrCode: Data to large';
+  throw 'QRCode: Data to large';
 }
 
-function resolveMask(mask: generateMatrixOptions['mask']): QRCodeMask | undefined {
+function resolveMask(mask: QRCodeMatrixOptions['mask']): QRCodeMask | undefined {
   if (mask === undefined) return undefined;
-  if (!QR_CODE_MASKS.includes(mask)) throw 'QrCode: Invalid mask';
+  if (!QR_CODE_MASKS.includes(mask)) throw 'QRCode: Invalid mask';
   return mask;
 }
 
@@ -121,7 +121,7 @@ function resolveMask(mask: generateMatrixOptions['mask']): QRCodeMask | undefine
 function generate(
   data: EncodedData,
   version: number,
-  mode: QrMode,
+  mode: QRMode,
   eccLevel: number,
   mask?: QRCodeMask,
 ): number[][] {

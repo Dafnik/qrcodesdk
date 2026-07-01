@@ -1,11 +1,11 @@
-import {generateQrCodeMatrix} from './matrix';
+import {buildQRCodeMatrix} from './matrix';
 import type {generateOptions, generateWithAccessibleOptions} from './types';
 
-export function generateQrCodeSVGString(
+export function generateQRCodeSVGString(
   data: string | number,
   options: generateOptions & generateWithAccessibleOptions = {},
 ): string {
-  const matrix = generateQrCodeMatrix(data, options);
+  const matrix = buildQRCodeMatrix(data, options);
   const modSize = options.size ?? 5;
   const margin = options.margin ?? 4;
   const fgColor = options.colors?.colorLight ?? '#ffffff';
