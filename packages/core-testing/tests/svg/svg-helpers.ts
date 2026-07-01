@@ -1,22 +1,12 @@
 import jsQR from 'jsqr';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname} from 'node:path';
-import {PNG} from 'pngjs';
+import sharp from 'sharp';
 import {expect} from 'vitest';
 
 export type SvgRect = {
   tag: string;
   attrs: Record<string, string>;
-};
-
-type RGBColor = {
-  red: number;
-  green: number;
-  blue: number;
-};
-
-type RGBAPixel = RGBColor & {
-  alpha: number;
 };
 
 export function extractSvgAttrs(svg: string): Record<string, string> {
@@ -32,42 +22,16 @@ export function extractRects(svg: string): SvgRect[] {
   }));
 }
 
-export function renderSvgRectsToPng(svg: string): PNG {
-  const svgAttrs = extractSvgAttrs(svg);
-  const width = Number(svgAttrs.width);
-  const height = Number(svgAttrs.height);
-
-  if (!Number.isInteger(width) || !Number.isInteger(height)) {
-    throw new Error(`SVG width and height must be integers, received ${width}x${height}`);
-  }
-
-  const png = new PNG({width, height});
-  png.data.fill(0xff);
-
-  for (const rect of extractRects(svg)) {
-    const fill = parseHexColor(rect.attrs.fill);
-    const x = Math.floor(Number(rect.attrs.x ?? 0));
-    const y = Math.floor(Number(rect.attrs.y ?? 0));
-    const rectWidth = Math.ceil(Number(rect.attrs.width));
-    const rectHeight = Math.ceil(Number(rect.attrs.height));
-
-    for (let row = y; row < Math.min(y + rectHeight, height); row++) {
-      for (let column = x; column < Math.min(x + rectWidth, width); column++) {
-        setPngPixel(png, column, row, {...fill, alpha: 0xff});
-      }
-    }
-  }
-
-  return png;
-}
-
-export function decodeSvgQRCode(svg: string): string {
-  const png = renderSvgRectsToPng(svg);
-  const imageData = new Uint8ClampedArray(png.data.buffer, png.data.byteOffset, png.data.length);
-  const result = jsQR(imageData, png.width, png.height, {inversionAttempts: 'dontInvert'});
+export async function decodeSvgQRCode(svg: string): Promise<string> {
+  const {data, info} = await sharp(Buffer.from(svg))
+    .ensureAlpha()
+    .raw()
+    .toBuffer({resolveWithObject: true});
+  const imageData = new Uint8ClampedArray(data.buffer, data.byteOffset, data.length);
+  const result = jsQR(imageData, info.width, info.height, {inversionAttempts: 'dontInvert'});
 
   if (!result) {
-    throw new Error(`Unable to decode SVG QR code rendered to ${png.width}x${png.height} PNG`);
+    throw new Error(`Unable to decode SVG QR code rendered to ${info.width}x${info.height} PNG`);
   }
 
   return result.data;
@@ -92,25 +56,4 @@ export function parseAttrs(rawAttrs: string): Record<string, string> {
   return Object.fromEntries(
     Array.from(rawAttrs.matchAll(/([\w:-]+)="([^"]*)"/g), ([, key, value]) => [key, value]),
   );
-}
-
-function parseHexColor(value: string | undefined): RGBColor {
-  if (!value) throw new Error('SVG rect is missing a fill attribute');
-
-  const match = value.match(/^#([0-9a-f]{6})$/i);
-  if (!match) throw new Error(`Only 6-digit hex colors are supported, received ${value}`);
-
-  return {
-    red: Number.parseInt(match[1].slice(0, 2), 16),
-    green: Number.parseInt(match[1].slice(2, 4), 16),
-    blue: Number.parseInt(match[1].slice(4, 6), 16),
-  };
-}
-
-function setPngPixel(png: PNG, x: number, y: number, pixel: RGBAPixel): void {
-  const index = (png.width * y + x) << 2;
-  png.data[index] = pixel.red;
-  png.data[index + 1] = pixel.green;
-  png.data[index + 2] = pixel.blue;
-  png.data[index + 3] = pixel.alpha;
 }
