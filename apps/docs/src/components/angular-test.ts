@@ -1,8 +1,9 @@
-import { Component } from "@angular/core";
-import { Angular } from "@qrcodesdk/angular";
+import {Component} from '@angular/core';
+
+import {Angular} from '@qrcodesdk/angular';
 
 @Component({
-  selector: "AngularTest",
+  selector: 'AngularTest',
   imports: [Angular],
   template: `
     Angular test compoennt

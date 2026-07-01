@@ -1,18 +1,18 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "./base.json",
-  "compileOnSave": false,
-  "compilerOptions": {
-    "paths": {
-      "angular": ["./dist/angular"]
-    },
-    "experimentalDecorators": true,
-    "moduleResolution": "bundler",
-    "module": "preserve"
-  },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true
-  }
+  },
+  "compileOnSave": false,
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "paths": {
+      "angular": ["./dist/angular"]
+    }
+  },
+  "extends": "./base.json"
 }
