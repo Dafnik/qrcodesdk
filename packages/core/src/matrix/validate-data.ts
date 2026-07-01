@@ -30,25 +30,7 @@ export function validateData(mode: number, data: string | number): string | numb
       return stringData.toUpperCase();
 
     case MODE_OCTET: {
-      const newData: number[] = [];
-      for (let i = 0; i < stringData.length; i++) {
-        const char = stringData.charCodeAt(i);
-        if (char < 0x80) {
-          newData.push(char);
-        } else if (char < 0x800) {
-          newData.push(0xc0 | (char >> 6), 0x80 | (char & 0x3f));
-        } else if (char < 0x10000) {
-          newData.push(0xe0 | (char >> 12), 0x80 | ((char >> 6) & 0x3f), 0x80 | (char & 0x3f));
-        } else {
-          newData.push(
-            0xf0 | (char >> 18),
-            0x80 | ((char >> 12) & 0x3f),
-            0x80 | ((char >> 6) & 0x3f),
-            0x80 | (char & 0x3f),
-          );
-        }
-      }
-      return newData;
+      return [...new TextEncoder().encode(String(data))];
     }
   }
   return undefined;

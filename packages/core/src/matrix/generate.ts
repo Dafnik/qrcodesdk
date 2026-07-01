@@ -1,7 +1,7 @@
-import type {generateMatrixOptions} from '../types';
+import type {QRCodeMask, generateMatrixOptions} from '../types';
 import {augmentECCs} from './augment-eccs';
 import {
-  ALPHANUMERIC_OUT_REGEXP,
+  ALPHANUMERIC_REGEXP,
   ECC_LEVELS_MAP,
   GF256_GEN_POLY,
   MODES_MAP,
@@ -21,6 +21,12 @@ import {getNumberOfAvailableBitsForData} from './get-number-of-available-bits-fo
 import {maskMatrixData} from './mask-matrix-data';
 import {validateData} from './validate-data';
 
+type EncodedData = string | number[];
+type QrMode = typeof MODE_NUMERIC | typeof MODE_ALPHANUMERIC | typeof MODE_OCTET;
+
+const QR_CODE_MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
+const AUTO_MASK_CANDIDATES = [1, 2, 3, 4, 5, 6, 7] as const;
+
 /**
  * Generates a QR code matrix for the given data and options.
  *
@@ -29,7 +35,7 @@ import {validateData} from './validate-data';
  * @returns {number[][]} The QR code matrix.
  * @throws {string} Throws an error if:
  *
- *                   - The data format is invalid.
+ *                   - The mode or data format is invalid.
  *                   - The ECC level is invalid.
  *                   - The data is too large for the specified version and ECC level.
  *                   - The version is invalid.
@@ -39,60 +45,85 @@ export function generateQrCodeMatrix(
   data: string | number,
   options: generateMatrixOptions = {},
 ): number[][] {
-  const eccLevel = ECC_LEVELS_MAP[options.errorCorrectionLevel ?? 'L'],
-    mask = options.mask ?? 1;
-  let mode = options.mode ? MODES_MAP[options.mode] : -1,
-    ver = options.version ?? -1;
-
-  if (mode < 0) {
-    if (typeof data === 'number' || data.match(NUMERIC_REGEXP)) {
-      mode = MODE_NUMERIC;
-    } else if (data.match(ALPHANUMERIC_OUT_REGEXP)) {
-      // while encode supports case-insensitive
-      // encoding, we restrict the data to be
-      // uppercased when auto-selecting the mode.
-      mode = MODE_ALPHANUMERIC;
-    } else {
-      mode = MODE_OCTET;
-    }
-  }
-
+  const mode = resolveMode(data, options.mode);
   const newData = validateData(mode, data);
   if (newData === undefined) throw 'QrCode: Invalid data format';
 
-  if (eccLevel < 0 || eccLevel > 3) throw 'QrCode: Invalid ECC level';
+  const eccLevel = resolveEccLevel(options.errorCorrectionLevel);
+  const version = resolveVersion(options.version, newData.length, mode, eccLevel);
+  const mask = resolveMask(options.mask);
 
-  if (ver < 0) {
-    for (ver = 1; ver <= 40; ver++) {
-      if (newData.length <= getMaxDataLength(ver, mode, eccLevel)) break;
-    }
-    if (ver > 40) throw 'QrCode: Data to large';
-  } else if (ver < 1 || ver > 40) {
-    throw 'QrCode: Invalid version';
+  return generate(newData, version, mode, eccLevel, mask);
+}
+
+function resolveMode(data: string | number, requestedMode: generateMatrixOptions['mode']): QrMode {
+  if (requestedMode !== undefined) {
+    const mode = MODES_MAP[requestedMode];
+    if (!isQrMode(mode)) throw 'QrCode: Invalid mode';
+    return mode;
   }
 
-  if (mask != -1 && (mask < 0 || mask > 8)) throw 'QrCode: Invalid mask';
+  if (typeof data === 'number' || data.match(NUMERIC_REGEXP)) return MODE_NUMERIC;
 
-  return generate(newData, ver, mode, eccLevel, mask);
+  if (data.match(ALPHANUMERIC_REGEXP)) return MODE_ALPHANUMERIC;
+
+  return MODE_OCTET;
+}
+
+function isQrMode(mode: number | undefined): mode is QrMode {
+  return mode === MODE_NUMERIC || mode === MODE_ALPHANUMERIC || mode === MODE_OCTET;
+}
+
+function resolveEccLevel(
+  errorCorrectionLevel: generateMatrixOptions['errorCorrectionLevel'],
+): number {
+  const eccLevel = ECC_LEVELS_MAP[errorCorrectionLevel ?? 'L'];
+  if (!Number.isInteger(eccLevel) || eccLevel < 0 || eccLevel > 3)
+    throw 'QrCode: Invalid ECC level';
+  return eccLevel;
+}
+
+function resolveVersion(
+  requestedVersion: generateMatrixOptions['version'],
+  dataLength: number,
+  mode: QrMode,
+  eccLevel: number,
+): number {
+  if (requestedVersion !== undefined) {
+    if (requestedVersion < 1 || requestedVersion > 40) throw 'QrCode: Invalid version';
+    return requestedVersion;
+  }
+
+  for (let version = 1; version <= 40; version++) {
+    if (dataLength <= getMaxDataLength(version, mode, eccLevel)) return version;
+  }
+
+  throw 'QrCode: Data to large';
+}
+
+function resolveMask(mask: generateMatrixOptions['mask']): QRCodeMask | undefined {
+  if (mask === undefined) return undefined;
+  if (!QR_CODE_MASKS.includes(mask)) throw 'QrCode: Invalid mask';
+  return mask;
 }
 
 /**
  * Returns the fully encoded QR code matrix which contains the given data.
- * It also chooses the best mask automatically when the mask is -1.
+ * It also chooses the best mask automatically when the mask is omitted.
  *
  * @param {string | number[]} data - The data to be encoded.
  * @param {number} version - The QR code version.
  * @param {number} mode - The encoding mode (numeric, alphanumeric, octet).
  * @param {number} eccLevel - The error correction level.
- * @param {number} mask - The mask to be applied (-1 for automatic selection).
+ * @param {number} mask - The mask to be applied (omitted for automatic selection).
  * @returns {number[][]} The fully encoded QR code matrix.
  */
 function generate(
-  data: string | number[],
+  data: EncodedData,
   version: number,
-  mode: number,
+  mode: QrMode,
   eccLevel: number,
-  mask: number,
+  mask?: QRCodeMask,
 ): number[][] {
   const v = VERSIONS[version] ?? [[-100]];
   let buffer = encode(version, mode, data, getNumberOfAvailableBitsForData(version, eccLevel) >> 3);
@@ -104,30 +135,32 @@ function generate(
 
   fillDataInMatrix(matrix, reserved, buffer);
 
-  if (mask < 0) {
+  let selectedMask = mask;
+
+  if (selectedMask === undefined) {
     // find the best mask
     maskMatrixData(matrix, reserved, 0);
     fillFormatInformationInMatrix(matrix, eccLevel, 0);
 
-    let bestMask = 0,
+    let bestMask: QRCodeMask = 0,
       bestScore = evaluateMatrix(matrix);
 
     maskMatrixData(matrix, reserved, 0);
 
-    for (mask = 1; mask < 8; mask++) {
-      maskMatrixData(matrix, reserved, mask);
-      fillFormatInformationInMatrix(matrix, eccLevel, mask);
+    for (const candidateMask of AUTO_MASK_CANDIDATES) {
+      maskMatrixData(matrix, reserved, candidateMask);
+      fillFormatInformationInMatrix(matrix, eccLevel, candidateMask);
       const score = evaluateMatrix(matrix);
       if (bestScore > score) {
         bestScore = score;
-        bestMask = mask;
+        bestMask = candidateMask;
       }
-      maskMatrixData(matrix, reserved, mask);
+      maskMatrixData(matrix, reserved, candidateMask);
     }
-    mask = bestMask;
+    selectedMask = bestMask;
   }
 
-  maskMatrixData(matrix, reserved, mask);
-  fillFormatInformationInMatrix(matrix, eccLevel, mask);
+  maskMatrixData(matrix, reserved, selectedMask);
+  fillFormatInformationInMatrix(matrix, eccLevel, selectedMask);
   return matrix;
 }

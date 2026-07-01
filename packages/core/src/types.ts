@@ -1,6 +1,4 @@
 export type QRCodeVersion =
-  | -1
-  | 0
   | 1
   | 2
   | 3
@@ -44,6 +42,7 @@ export type QRCodeVersion =
 
 export type QRCodeErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 export type QRCodeMode = 'numeric' | 'alphanumeric' | 'octet';
+export type QRCodeMask = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type ColorValueHex = `#${string}`;
 
@@ -51,7 +50,7 @@ export type generateMatrixOptions = {
   version?: QRCodeVersion;
   mode?: QRCodeMode;
   errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
-  mask?: number;
+  mask?: QRCodeMask;
 };
 
 export type generateOptions = generateMatrixOptions & {

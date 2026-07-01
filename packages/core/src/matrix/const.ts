@@ -219,8 +219,7 @@ export const MODES_MAP: {[x: string]: number} = {
 
 // validation regexps
 export const NUMERIC_REGEXP = /^\d*$/;
-export const ALPHANUMERIC_REGEXP = /^[A-Za-z0-9 $%*+\-./:_]*$/;
-export const ALPHANUMERIC_OUT_REGEXP = /^[A-Z0-9 $%*+\-./:_]*$/;
+export const ALPHANUMERIC_REGEXP = /^[A-Z0-9 $%*+\-./:_]*$/;
 
 export const ECC_LEVELS_MAP: {[x: string]: number} = {
   L: ECC_LEVEL_L,
