@@ -156,6 +156,9 @@ importers:
       '@angular/compiler-cli':
         specifier: 'catalog:'
         version: 22.0.4(@angular/compiler@22.0.4)(typescript@6.0.3)
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       jsdom:
         specifier: 'catalog:'
         version: 28.0.0

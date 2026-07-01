@@ -23,6 +23,7 @@
     "tslib": "catalog:"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
     "@angular/build": "catalog:",
     "@angular/cli": "catalog:",
     "@angular/compiler-cli": "catalog:",
