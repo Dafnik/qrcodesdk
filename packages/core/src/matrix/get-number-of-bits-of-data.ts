@@ -23,4 +23,5 @@ export function getNumberOfBitsOfData(
     case MODE_KANJI:
       return ver < 10 ? 8 : ver < 27 ? 10 : 12;
   }
+  return -100;
 }

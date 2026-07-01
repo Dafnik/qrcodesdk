@@ -1,12 +1,12 @@
 import {describe, expect, test} from 'vitest';
 
-import {ECC_LEVEL_Q} from '../src/matrix/const';
-import {createBaseMatrix} from '../src/matrix/create-base-matrix';
-import {evaluateGroup} from '../src/matrix/evaluate-group';
-import {evaluateMatrix} from '../src/matrix/evaluate-matrix';
-import {fillDataInMatrix} from '../src/matrix/fill-data-in-matrix';
-import {fillFormatInformationInMatrix} from '../src/matrix/fill-format-information-in-matrix';
-import {maskMatrixData} from '../src/matrix/mask-matrix-data';
+import {ECC_LEVEL_Q} from '../../src/matrix/const';
+import {createBaseMatrix} from '../../src/matrix/create-base-matrix';
+import {evaluateGroup} from '../../src/matrix/evaluate-group';
+import {evaluateMatrix} from '../../src/matrix/evaluate-matrix';
+import {fillDataInMatrix} from '../../src/matrix/fill-data-in-matrix';
+import {fillFormatInformationInMatrix} from '../../src/matrix/fill-format-information-in-matrix';
+import {maskMatrixData} from '../../src/matrix/mask-matrix-data';
 import {formatBitsMatch} from './helpers';
 
 describe('matrix construction and mutation helpers', () => {

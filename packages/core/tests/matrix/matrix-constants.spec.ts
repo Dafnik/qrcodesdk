@@ -15,7 +15,7 @@ import {
   MODE_ALPHANUMERIC,
   MODE_NUMERIC,
   MODE_OCTET,
-} from '../src/matrix/const';
+} from '../../src/matrix/const';
 
 describe('matrix constants', () => {
   test('exposes QR mode and ECC maps', () => {

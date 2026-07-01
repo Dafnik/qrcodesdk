@@ -30,4 +30,5 @@ export function getMaxDataLength(
     case MODE_KANJI:
       return (numberOfBits / 13) | 0;
   }
+  return -100;
 }

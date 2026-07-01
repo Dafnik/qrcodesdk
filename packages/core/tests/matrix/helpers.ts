@@ -1,8 +1,13 @@
 import {create} from 'qrcode';
 import {expect} from 'vitest';
 
-import {augmentBCH} from '../src/matrix/augment-bch';
-import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeMatrix, QRCodeMode} from '../src/types';
+import {augmentBCH} from '../../src/matrix/augment-bch';
+import type {
+  QRCodeErrorCorrectionLevel,
+  QRCodeMask,
+  QRCodeMatrix,
+  QRCodeMode,
+} from '../../src/types';
 
 export const ECC_LEVELS: QRCodeErrorCorrectionLevel[] = ['L', 'M', 'Q', 'H'];
 export const MASKS: QRCodeMask[] = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -43,7 +48,7 @@ export function referenceMatrix(
 
   return Array.from({length: qr.modules.size}, (_, row) =>
     Array.from({length: qr.modules.size}, (_, column) => Number(qr.modules.get(row, column))),
-  );
+  ) as QRCodeMatrix;
 }
 
 export function expectSquareBinaryMatrix(matrix: QRCodeMatrix, size: number): void {

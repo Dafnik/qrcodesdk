@@ -9,13 +9,13 @@ import {
   MODE_KANJI,
   MODE_NUMERIC,
   MODE_OCTET,
-} from '../src/matrix/const';
-import {getMaxDataLength} from '../src/matrix/get-max-data-length';
-import {getNumberOfAvailableBitsByVersion} from '../src/matrix/get-number-of-available-bits-by-version';
-import {getNumberOfAvailableBitsForData} from '../src/matrix/get-number-of-available-bits-for-data';
-import {getNumberOfBitsOfData} from '../src/matrix/get-number-of-bits-of-data';
-import {getSizeByVersion} from '../src/matrix/get-size-by-version';
-import {needsVersionInfo} from '../src/matrix/needs-version-info';
+} from '../../src/matrix/const';
+import {getMaxDataLength} from '../../src/matrix/get-max-data-length';
+import {getNumberOfAvailableBitsByVersion} from '../../src/matrix/get-number-of-available-bits-by-version';
+import {getNumberOfAvailableBitsForData} from '../../src/matrix/get-number-of-available-bits-for-data';
+import {getNumberOfBitsOfData} from '../../src/matrix/get-number-of-bits-of-data';
+import {getSizeByVersion} from '../../src/matrix/get-size-by-version';
+import {needsVersionInfo} from '../../src/matrix/needs-version-info';
 
 describe('capacity helpers', () => {
   test('returns QR sizes and version-info boundaries', () => {

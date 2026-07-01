@@ -6,9 +6,9 @@ import {
   MODE_KANJI,
   MODE_NUMERIC,
   MODE_OCTET,
-} from '../src/matrix/const';
-import {encode} from '../src/matrix/encode';
-import {validateData} from '../src/matrix/validate-data';
+} from '../../src/matrix/const';
+import {encode} from '../../src/matrix/encode';
+import {validateData} from '../../src/matrix/validate-data';
 import {bitsToBytes} from './helpers';
 
 describe('data validation and encoding', () => {

@@ -1,9 +1,9 @@
 import {describe, expect, test} from 'vitest';
 
-import {ECC_LEVELS_MAP} from '../src/matrix/const';
-import {buildQRCodeMatrix} from '../src/matrix/generate';
-import {qrcode} from '../src/qrcode-builder';
-import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeMode} from '../src/types';
+import {ECC_LEVELS_MAP} from '../../src/matrix/const';
+import {buildQRCodeMatrix} from '../../src/matrix/generate';
+import {qrcode} from '../../src/qrcode-builder';
+import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeMode} from '../../src/types';
 import {
   ECC_LEVELS,
   MASKS,

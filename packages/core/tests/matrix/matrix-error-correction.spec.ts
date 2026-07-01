@@ -1,9 +1,9 @@
 import {describe, expect, test} from 'vitest';
 
-import {augmentBCH} from '../src/matrix/augment-bch';
-import {augmentECCs} from '../src/matrix/augment-eccs';
-import {calculateECC} from '../src/matrix/calculate-ecc';
-import {GF256_GEN_POLY} from '../src/matrix/const';
+import {augmentBCH} from '../../src/matrix/augment-bch';
+import {augmentECCs} from '../../src/matrix/augment-eccs';
+import {calculateECC} from '../../src/matrix/calculate-ecc';
+import {GF256_GEN_POLY} from '../../src/matrix/const';
 
 describe('error correction helpers', () => {
   test('augments BCH format and version codes', () => {
