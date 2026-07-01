@@ -13,29 +13,56 @@ export function SVGQRCodeRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     const styling = parseQRCodeStylingOptions(options);
     const modSize = styling.size;
     const margin = styling.margin;
-    const fgColor = styling.colors.colorLight;
-    const bgColor = styling.colors.colorDark;
+    const colorLight = styling.colors.colorLight;
+    const colorDark = styling.colors.colorDark;
     const n = matrix.length;
-    const size = modSize * (n + 2 * margin);
+    const qrSize = n + 2 * margin;
+    const size = modSize * qrSize;
+    const darkPath = matrixToPath(matrix, margin);
+    const attrs = [
+      'xmlns="http://www.w3.org/2000/svg"',
+      `width="${size}"`,
+      `height="${size}"`,
+      `viewBox="0 0 ${qrSize} ${qrSize}"`,
+      'shape-rendering="crispEdges"',
+      options?.alt ? `alt="${options.alt}"` : undefined,
+      options?.ariaLabel ? `aria-label="${options.ariaLabel}"` : undefined,
+      options?.title ? `title="${options.title}"` : undefined,
+    ].filter(attr => attr !== undefined);
 
-    const xml = [
-      '<svg xmlns="http://www.w3.org/2000/svg"',
-      `width="${size}" height="${size}" ${options?.alt ? `alt="${options.alt}"` : ''} ${options?.ariaLabel ? `aria-label="${options.ariaLabel}"` : ''} ${options?.title ? `title="${options.title}"` : ''}>`,
-    ];
-    xml.push(`<rect width="${size}" height="${size}" fill="${fgColor}" />`);
-
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        if (matrix[i][j]) {
-          xml.push(
-            `<rect x="${modSize * (margin + j)}" y="${modSize * (margin + i)}" width="${modSize + 0.3}" height="${modSize + 0.3}" fill="${bgColor}" />`,
-          );
-        }
-      }
-    }
-
-    xml.push('</svg>');
-
-    return xml.join('\n');
+    return [
+      `<svg ${attrs.join(' ')}>`,
+      `<path fill="${colorLight}" d="M0 0h${qrSize}v${qrSize}H0z"/>`,
+      darkPath ? `<path stroke="${colorDark}" d="${darkPath}"/>` : '',
+      '</svg>',
+    ].join('');
   };
+}
+
+function matrixToPath(matrix: QRCodeMatrix, margin: number): string {
+  const path: string[] = [];
+
+  for (let row = 0; row < matrix.length; row++) {
+    let lastRunEnd: number | undefined;
+
+    for (let column = 0; column < matrix[row].length; column++) {
+      if (!matrix[row][column]) continue;
+
+      const start = column;
+      while (column + 1 < matrix[row].length && matrix[row][column + 1]) {
+        column++;
+      }
+
+      const runLength = column - start + 1;
+      if (lastRunEnd === undefined) {
+        path.push(`M${margin + start} ${margin + row + 0.5}`);
+      } else {
+        path.push(`m${start - lastRunEnd} 0`);
+      }
+      path.push(`h${runLength}`);
+      lastRunEnd = column + 1;
+    }
+  }
+
+  return path.join('');
 }

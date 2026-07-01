@@ -4,7 +4,7 @@ import {dirname} from 'node:path';
 import sharp from 'sharp';
 import {expect} from 'vitest';
 
-export type SvgRect = {
+export type SvgPath = {
   tag: string;
   attrs: Record<string, string>;
 };
@@ -15,8 +15,8 @@ export function extractSvgAttrs(svg: string): Record<string, string> {
   return parseAttrs(match[1]);
 }
 
-export function extractRects(svg: string): SvgRect[] {
-  return Array.from(svg.matchAll(/<rect\b([^>]*)\/>/g), ([tag, attrs]) => ({
+export function extractPaths(svg: string): SvgPath[] {
+  return Array.from(svg.matchAll(/<path\b([^>]*)\/>/g), ([tag, attrs]) => ({
     tag,
     attrs: parseAttrs(attrs),
   }));
