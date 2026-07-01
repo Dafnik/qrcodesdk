@@ -1,15 +1,16 @@
 import {describe, expect, test} from 'vitest';
 
-import {SVG_QR_FIXTURES, renderFixtureSvg} from './svg-fixtures';
+import {QR_CODE_TEST_FIXTURES} from '../../src';
+import {renderFixtureSvg} from './svg-fixture.spec';
 import {decodeSvgQRCode} from './svg-helpers';
 
 describe('SVG QR roundtrips', () => {
-  test.each(SVG_QR_FIXTURES)('decodes $name SVG output', (fixture) => {
+  test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', (fixture) => {
     expect(decodeSvgQRCode(renderFixtureSvg(fixture))).toBe(fixture.data);
   });
 
   test('decodes custom high-contrast color SVG output', () => {
-    const svg = renderFixtureSvg(SVG_QR_FIXTURES[1], {
+    const svg = renderFixtureSvg(QR_CODE_TEST_FIXTURES[1], {
       size: 8,
       margin: 4,
       colors: {
@@ -18,6 +19,6 @@ describe('SVG QR roundtrips', () => {
       },
     });
 
-    expect(decodeSvgQRCode(svg)).toBe(SVG_QR_FIXTURES[1].data);
+    expect(decodeSvgQRCode(svg)).toBe(QR_CODE_TEST_FIXTURES[1].data);
   });
 });

@@ -1,7 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
-import {SVGQRCodeRenderer} from '../../src/svg';
-import type {QRCodeMatrix} from '../../src/types';
+import {QRCodeMatrix, SVGQRCodeRenderer} from '@qrcodesdk/core';
+
 import {extractRects, extractSvgAttrs} from './svg-helpers';
 
 function countDarkModules(matrix: QRCodeMatrix): number {

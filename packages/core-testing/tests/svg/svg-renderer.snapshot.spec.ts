@@ -2,16 +2,16 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
 
-import {SVGQRCodeRenderer} from '../../src/svg';
-import type {QRCodeMatrix} from '../../src/types';
-import {SVG_QR_FIXTURES, renderFixtureSvg} from './svg-fixtures';
+import {QRCodeMatrix, SVGQRCodeRenderer} from '@qrcodesdk/core';
+
+import {QR_CODE_TEST_FIXTURES} from '../../src';
+import {renderFixtureSvg} from './svg-fixture.spec';
 import {expectSvgToMatchFileSnapshot} from './svg-helpers';
 
-// @ts-expect-error IDE
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/svg', import.meta.url));
 
 describe('SVGQRCodeRenderer snapshots', () => {
-  test.each(SVG_QR_FIXTURES)('matches %s generated QR SVG snapshot', (fixture) => {
+  test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR SVG snapshot', (fixture) => {
     expectSvgToMatchFileSnapshot(
       renderFixtureSvg(fixture),
       join(SNAPSHOT_DIR, `${fixture.name}.svg`),

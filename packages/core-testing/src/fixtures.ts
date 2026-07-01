@@ -1,8 +1,6 @@
-import {qrcode} from '../../src/qrcode-builder';
-import {type QRCodeSVGRendererOptions, SVGQRCodeRenderer} from '../../src/svg';
-import type {QRCodeMask, QRCodeMode, QRCodeVersion} from '../../src/types';
+import type {QRCodeMask, QRCodeMode, QRCodeVersion} from '@qrcodesdk/core';
 
-export type SVGQRCodeFixture = {
+export type QRCodeTestFixture = {
   name: string;
   data: string;
   mode: QRCodeMode;
@@ -10,7 +8,7 @@ export type SVGQRCodeFixture = {
   mask: QRCodeMask;
 };
 
-export const SVG_QR_FIXTURES: SVGQRCodeFixture[] = [
+export const QR_CODE_TEST_FIXTURES: QRCodeTestFixture[] = [
   {
     name: 'numeric',
     data: '1234567890',
@@ -103,15 +101,3 @@ export const SVG_QR_FIXTURES: SVGQRCodeFixture[] = [
     mask: 4,
   },
 ];
-
-export function renderFixtureSvg(
-  fixture: SVGQRCodeFixture,
-  options: QRCodeSVGRendererOptions = {size: 8, margin: 4},
-): string {
-  return qrcode(fixture.data)
-    .mode(fixture.mode)
-    .version(fixture.version)
-    .mask(fixture.mask)
-    .renderer(SVGQRCodeRenderer(options))
-    .render();
-}
