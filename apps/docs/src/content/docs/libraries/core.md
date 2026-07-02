@@ -6,6 +6,7 @@ description: Generate QR code matrices and render them with the runtime-neutral 
 `@qrcodesdk/core` is the foundation of the package family. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, or any custom output.
 
 ## Builder API
+
 Start with `qrcode()` and chain the options you need.
 
 ```ts

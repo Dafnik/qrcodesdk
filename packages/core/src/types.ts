@@ -89,6 +89,14 @@ export type ParsedQRCodeStylingOptions = {
   };
 };
 
+export type ResolvedQRCodeMatrixOptions = {
+  data: QRCodeEncodedData;
+  mode: QRCodeSupportedModeIndicator;
+  errorCorrectionLevel: QRCodeErrorCorrectionLevelValue;
+  version: QRCodeVersion;
+  mask: QRCodeMask | undefined;
+};
+
 export type QRCodeAccessibilityOptions = {
   alt?: string;
   ariaLabel?: string;

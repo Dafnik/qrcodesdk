@@ -1,20 +1,19 @@
 import {describe, expect, test} from 'vitest';
 
 import {
-  ALPHANUMERIC_MAP,
   ECC_LEVELS_MAP,
   ECC_LEVEL_H,
   ECC_LEVEL_L,
   ECC_LEVEL_M,
   ECC_LEVEL_Q,
-  GF256_GEN_POLY,
-  GF256_INVENTORY_MAP,
-  GF256_MAP,
   MASK_FUNCTIONS,
   MODES_MAP,
   MODE_ALPHANUMERIC,
   MODE_NUMERIC,
   MODE_OCTET,
+  getAlphanumericMap,
+  getGF256GeneratorPolynomials,
+  getGF256LookupTables,
 } from '../../src/matrix/const';
 
 describe('matrix constants', () => {
@@ -33,24 +32,35 @@ describe('matrix constants', () => {
   });
 
   test('maps alphanumeric characters to QR table indexes', () => {
-    expect(ALPHANUMERIC_MAP['0']).toBe(0);
-    expect(ALPHANUMERIC_MAP['9']).toBe(9);
-    expect(ALPHANUMERIC_MAP.A).toBe(10);
-    expect(ALPHANUMERIC_MAP.Z).toBe(35);
-    expect(ALPHANUMERIC_MAP[' ']).toBe(36);
-    expect(ALPHANUMERIC_MAP[':']).toBe(44);
+    const alphanumericMap = getAlphanumericMap();
+
+    expect(alphanumericMap['0']).toBe(0);
+    expect(alphanumericMap['9']).toBe(9);
+    expect(alphanumericMap.A).toBe(10);
+    expect(alphanumericMap.Z).toBe(35);
+    expect(alphanumericMap[' ']).toBe(36);
+    expect(alphanumericMap[':']).toBe(44);
   });
 
   test('builds GF256 lookup tables and generator polynomial degrees', () => {
-    expect(GF256_MAP).toHaveLength(255);
-    expect(GF256_INVENTORY_MAP[0]).toBe(-1);
+    const {exponents, logarithms} = getGF256LookupTables();
+    const generatorPolynomials = getGF256GeneratorPolynomials();
+
+    expect(exponents).toHaveLength(255);
+    expect(logarithms[0]).toBe(-1);
     for (let value = 1; value < 256; value++) {
-      expect(GF256_MAP[GF256_INVENTORY_MAP[value]]).toBe(value);
+      expect(exponents[logarithms[value]]).toBe(value);
     }
-    expect(GF256_GEN_POLY).toHaveLength(31);
-    expect(GF256_GEN_POLY.map((polynomial) => polynomial.length)).toEqual(
+    expect(generatorPolynomials).toHaveLength(31);
+    expect(generatorPolynomials.map((polynomial) => polynomial.length)).toEqual(
       Array.from({length: 31}, (_, degree) => degree),
     );
+  });
+
+  test('caches generated lookup tables', () => {
+    expect(getAlphanumericMap()).toBe(getAlphanumericMap());
+    expect(getGF256LookupTables()).toBe(getGF256LookupTables());
+    expect(getGF256GeneratorPolynomials()).toBe(getGF256GeneratorPolynomials());
   });
 
   test('implements all QR mask predicates', () => {

@@ -1,7 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
 import {ECC_LEVELS_MAP} from '../../src/matrix/const';
-import {buildQRCodeMatrix} from '../../src/matrix/generate';
 import {qrcode} from '../../src/qrcode-builder';
 import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeMode} from '../../src/types';
 import {
@@ -12,10 +11,10 @@ import {
   referenceMatrix,
 } from './helpers';
 
-describe('buildQRCodeMatrix', () => {
+describe('qrcode().matrix()', () => {
   test('generates square binary matrices with expected sizes', () => {
-    expectSquareBinaryMatrix(buildQRCodeMatrix('123456789', {version: 1, mask: 1}), 21);
-    expectSquareBinaryMatrix(buildQRCodeMatrix('123456789', {version: 40, mask: 1}), 177);
+    expectSquareBinaryMatrix(qrcode('123456789').version(1).mask(1).matrix(), 21);
+    expectSquareBinaryMatrix(qrcode('123456789').version(40).mask(1).matrix(), 177);
   });
 
   test('matches reference matrices for explicit modes, ECC levels, versions, and masks', () => {
@@ -47,12 +46,12 @@ describe('buildQRCodeMatrix', () => {
 
     for (const options of cases) {
       expect(
-        buildQRCodeMatrix(options.data, {
-          mode: options.mode,
-          version: options.version as never,
-          errorCorrectionLevel: options.errorCorrectionLevel,
-          mask: options.mask,
-        }),
+        qrcode(options.data)
+          .mode(options.mode)
+          .version(options.version as never)
+          .errorCorrection(options.errorCorrectionLevel)
+          .mask(options.mask)
+          .matrix(),
       ).toEqual(referenceMatrix(options.data, options));
     }
   });
@@ -60,7 +59,9 @@ describe('buildQRCodeMatrix', () => {
   test('matches reference matrices for every mask and ECC level', () => {
     for (const errorCorrectionLevel of ECC_LEVELS) {
       for (const mask of MASKS) {
-        expect(buildQRCodeMatrix('MASK TEST 123', {errorCorrectionLevel, mask})).toEqual(
+        expect(
+          qrcode('MASK TEST 123').errorCorrection(errorCorrectionLevel).mask(mask).matrix(),
+        ).toEqual(
           referenceMatrix('MASK TEST 123', {
             mode: 'alphanumeric',
             errorCorrectionLevel,
@@ -72,24 +73,24 @@ describe('buildQRCodeMatrix', () => {
   });
 
   test('auto-detects modes and versions', () => {
-    expect(buildQRCodeMatrix('123456789', {mask: 1})).toEqual(
-      buildQRCodeMatrix('123456789', {mode: 'numeric', mask: 1}),
+    expect(qrcode('123456789').mask(1).matrix()).toEqual(
+      qrcode('123456789').mode('numeric').mask(1).matrix(),
     );
-    expect(buildQRCodeMatrix('HELLO WORLD', {mask: 1})).toEqual(
-      buildQRCodeMatrix('HELLO WORLD', {mode: 'alphanumeric', mask: 1}),
+    expect(qrcode('HELLO WORLD').mask(1).matrix()).toEqual(
+      qrcode('HELLO WORLD').mode('alphanumeric').mask(1).matrix(),
     );
-    expect(buildQRCodeMatrix('hello world', {mask: 1})).toEqual(
-      buildQRCodeMatrix('hello world', {mode: 'octet', mask: 1}),
+    expect(qrcode('hello world').mask(1).matrix()).toEqual(
+      qrcode('hello world').mode('octet').mask(1).matrix(),
     );
-    expect(buildQRCodeMatrix('1'.repeat(42), {mask: 1})).toHaveLength(25);
+    expect(qrcode('1'.repeat(42)).mask(1).matrix()).toHaveLength(25);
   });
 
   test('auto-selects one of the reference mask matrices and writes matching format bits', () => {
-    const matrix = buildQRCodeMatrix('AUTO MASK 12345', {
-      mode: 'alphanumeric',
-      errorCorrectionLevel: 'M',
-      version: 2,
-    });
+    const matrix = qrcode('AUTO MASK 12345')
+      .mode('alphanumeric')
+      .errorCorrection('M')
+      .version(2)
+      .matrix();
 
     const selectedMask = MASKS.find((mask) =>
       matrix.every((row, rowIndex) =>
@@ -114,11 +115,7 @@ describe('buildQRCodeMatrix', () => {
     const matrix = qrcode('123456789').mode('numeric').mask(1).matrix();
 
     expect(matrix).toEqual(
-      buildQRCodeMatrix('123456789', {
-        mode: 'numeric',
-        errorCorrectionLevel: 'M',
-        mask: 1,
-      }),
+      qrcode('123456789').mode('numeric').errorCorrection('M').mask(1).matrix(),
     );
     expect(
       qrcode('123456789')
@@ -131,26 +128,36 @@ describe('buildQRCodeMatrix', () => {
   });
 
   test('rejects invalid public options and incompatible data', () => {
-    expect(() => buildQRCodeMatrix('ABC', {mode: 'numeric'})).toThrow(
+    expect(() => qrcode('ABC').mode('numeric').matrix()).toThrow('QRCode: Invalid data format');
+    expect(() => qrcode('abc').mode('alphanumeric').matrix()).toThrow(
       'QRCode: Invalid data format',
     );
-    expect(() => buildQRCodeMatrix('abc', {mode: 'alphanumeric'})).toThrow(
-      'QRCode: Invalid data format',
-    );
-    expect(() => buildQRCodeMatrix('123', {mode: 'kanji'} as never)).toThrow(
-      'QRCode: Invalid mode',
-    );
-    expect(() => buildQRCodeMatrix('123', {errorCorrectionLevel: 'X'} as never)).toThrow(
-      'QRCode: Invalid ECC level',
-    );
-    expect(() => buildQRCodeMatrix('123', {version: 0} as never)).toThrow(
-      'QRCode: Invalid version',
-    );
-    expect(() => buildQRCodeMatrix('123', {version: 41} as never)).toThrow(
-      'QRCode: Invalid version',
-    );
-    expect(() => buildQRCodeMatrix('123', {mask: 8} as never)).toThrow('QRCode: Invalid mask');
-    expect(() => buildQRCodeMatrix('1'.repeat(7_090), {mode: 'numeric'})).toThrow(
+    expect(() =>
+      qrcode('123')
+        .mode('kanji' as never)
+        .matrix(),
+    ).toThrow('QRCode: Invalid mode');
+    expect(() =>
+      qrcode('123')
+        .errorCorrection('X' as never)
+        .matrix(),
+    ).toThrow('QRCode: Invalid ECC level');
+    expect(() =>
+      qrcode('123')
+        .version(0 as never)
+        .matrix(),
+    ).toThrow('QRCode: Invalid version');
+    expect(() =>
+      qrcode('123')
+        .version(41 as never)
+        .matrix(),
+    ).toThrow('QRCode: Invalid version');
+    expect(() =>
+      qrcode('123')
+        .mask(8 as never)
+        .matrix(),
+    ).toThrow('QRCode: Invalid mask');
+    expect(() => qrcode('1'.repeat(7_090)).mode('numeric').matrix()).toThrow(
       'QRCode: Data to large',
     );
   });

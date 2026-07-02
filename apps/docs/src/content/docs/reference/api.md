@@ -7,8 +7,6 @@ description: Public API exported by @qrcodesdk/core and @qrcodesdk/node.
 
 ### qrcode
 
-
-
 ### SVGQRCodeRenderer
 
 Creates a renderer that returns an SVG string.

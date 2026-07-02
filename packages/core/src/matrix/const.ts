@@ -245,35 +245,68 @@ export const ECC_LEVELS_MAP: Record<QRCodeErrorCorrectionLevel, QRCodeErrorCorre
 // ..., (x-\alpha^(K-1)). by convention, we omit the K-th coefficient (always 1)
 // from the result; also other coefficients are written in terms of the exponent
 // to \alpha to avoid the redundant calculation. (see also calculateecc below.)
-export const GF256_GEN_POLY: QRCodePolynomial[] = [[]];
+type GF256LookupTables = {
+  exponents: QRCodeCodewords;
+  logarithms: QRCodeCodewords;
+};
+
+let cachedAlphanumericMap: Record<string, number> | undefined;
+let cachedGF256LookupTables: GF256LookupTables | undefined;
+let cachedGF256GeneratorPolynomials: QRCodePolynomial[] | undefined;
 
 // alphanumeric character mapping (cf. Table 5 in JIS X 0510:2004 p. 19)
-export const ALPHANUMERIC_MAP: {[x: string]: number} = {};
+export function getAlphanumericMap(): Record<string, number> {
+  cachedAlphanumericMap ??= createAlphanumericMap();
+  return cachedAlphanumericMap;
+}
 
 // GF(2^8)-to-integer mapping with a reducing polynomial x^8+x^4+x^3+x^2+1
-// invariant: GF256_MAP[GF256_INVMAP[i]] == i for all i in [1,256]
-export const GF256_MAP: QRCodeCodewords = [],
-  GF256_INVENTORY_MAP = [-1];
-
-for (let i = 0, v = 1; i < 255; i++) {
-  GF256_MAP.push(v);
-  GF256_INVENTORY_MAP[v] = i;
-  v = (v * 2) ^ (v >= 128 ? 0x11d : 0);
+// invariant: exponents[logarithms[i]] == i for all i in [1,256]
+export function getGF256LookupTables(): GF256LookupTables {
+  cachedGF256LookupTables ??= createGF256LookupTables();
+  return cachedGF256LookupTables;
 }
 
-for (let i = 0; i < 30; i++) {
-  const prevpoly = GF256_GEN_POLY[i],
-    poly: QRCodePolynomial = [];
-  for (let j = 0; j <= i; j++) {
-    const a = j < i ? GF256_MAP[prevpoly[j]] : 0;
-    const b = GF256_MAP[(i + (prevpoly[j - 1] || 0)) % 255];
-    poly.push(GF256_INVENTORY_MAP[a ^ b]);
+export function getGF256GeneratorPolynomials(): QRCodePolynomial[] {
+  cachedGF256GeneratorPolynomials ??= createGF256GeneratorPolynomials(getGF256LookupTables());
+  return cachedGF256GeneratorPolynomials;
+}
+
+function createAlphanumericMap(): Record<string, number> {
+  const map: Record<string, number> = {};
+  for (let i = 0; i < 45; i++) {
+    map['0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'.charAt(i)] = i;
   }
-  GF256_GEN_POLY.push(poly);
+  return map;
 }
 
-for (let i = 0; i < 45; i++) {
-  ALPHANUMERIC_MAP['0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'.charAt(i)] = i;
+function createGF256LookupTables(): GF256LookupTables {
+  const exponents: QRCodeCodewords = [];
+  const logarithms: QRCodeCodewords = [-1];
+  for (let i = 0, v = 1; i < 255; i++) {
+    exponents.push(v);
+    logarithms[v] = i;
+    v = (v * 2) ^ (v >= 128 ? 0x11d : 0);
+  }
+  return {exponents, logarithms};
+}
+
+function createGF256GeneratorPolynomials({
+  exponents,
+  logarithms,
+}: GF256LookupTables): QRCodePolynomial[] {
+  const polynomials: QRCodePolynomial[] = [[]];
+  for (let i = 0; i < 30; i++) {
+    const previousPolynomial = polynomials[i];
+    const polynomial: QRCodePolynomial = [];
+    for (let j = 0; j <= i; j++) {
+      const a = j < i ? exponents[previousPolynomial[j]] : 0;
+      const b = exponents[(i + (previousPolynomial[j - 1] || 0)) % 255];
+      polynomial.push(logarithms[a ^ b]);
+    }
+    polynomials.push(polynomial);
+  }
+  return polynomials;
 }
 
 type QRCodeMaskFunction = (row: number, column: number) => boolean;

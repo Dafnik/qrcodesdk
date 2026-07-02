@@ -1,5 +1,5 @@
 import type {QRCodeCodewords, QRCodePolynomial} from '../types';
-import {GF256_INVENTORY_MAP, GF256_MAP} from './const';
+import {getGF256LookupTables} from './const';
 
 /**
  * Calculates ECC code words for given code words and generator polynomial.
@@ -15,6 +15,7 @@ import {GF256_INVENTORY_MAP, GF256_MAP} from './const';
  * @returns {number[]} The array of calculated ECC code words.
  */
 export function calculateECC(poly: QRCodeCodewords, genPoly: QRCodePolynomial): QRCodeCodewords {
+  const {exponents, logarithms} = getGF256LookupTables();
   const modulus = poly.slice(0),
     polyLength = poly.length,
     genPolyLength = genPoly.length;
@@ -24,10 +25,10 @@ export function calculateECC(poly: QRCodeCodewords, genPoly: QRCodePolynomial): 
   }
 
   for (let i = 0; i < polyLength;) {
-    const quotient = GF256_INVENTORY_MAP[modulus[i++]];
+    const quotient = logarithms[modulus[i++]];
     if (quotient >= 0) {
       for (let j = 0; j < genPolyLength; j++) {
-        modulus[i + j] ^= GF256_MAP[(quotient + genPoly[j]) % 255];
+        modulus[i + j] ^= exponents[(quotient + genPoly[j]) % 255];
       }
     }
   }

@@ -2,15 +2,9 @@ import type {QRCodeMask, QRCodeMatrix, QRCodeModule, QRCodeReservedMatrix} from 
 import {MASK_FUNCTIONS} from './const';
 
 /**
- * XOR-masks the data portion of the matrix. Repeating the call with the same
- * arguments will revert the prior call (convenient in the matrix evaluation).
- *
- * @param {QRCodeMatrix} matrix - The matrix whose data portion needs to be masked.
- * @param {QRCodeReservedMatrix} reserved - The reserved portion of the matrix.
- * @param {QRCodeMask} mask - The mask pattern to be applied.
- * @returns {QRCodeMatrix} The matrix with masked data portion.
+ * Applies a QR mask to the data portion of a matrix.
  */
-export function maskMatrixData(
+export function applyMaskToMatrix(
   matrix: QRCodeMatrix,
   reserved: QRCodeReservedMatrix,
   mask: QRCodeMask,

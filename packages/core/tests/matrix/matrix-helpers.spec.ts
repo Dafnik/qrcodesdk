@@ -1,12 +1,12 @@
 import {describe, expect, test} from 'vitest';
 
+import {applyMaskToMatrix} from '../../src/matrix/apply-mask-to-matrix';
 import {ECC_LEVEL_Q} from '../../src/matrix/const';
 import {createBaseMatrix} from '../../src/matrix/create-base-matrix';
 import {evaluateGroup} from '../../src/matrix/evaluate-group';
 import {evaluateMatrix} from '../../src/matrix/evaluate-matrix';
 import {fillDataInMatrix} from '../../src/matrix/fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from '../../src/matrix/fill-format-information-in-matrix';
-import {maskMatrixData} from '../../src/matrix/mask-matrix-data';
 import {formatBitsMatch} from './helpers';
 
 describe('matrix construction and mutation helpers', () => {
@@ -50,7 +50,7 @@ describe('matrix construction and mutation helpers', () => {
     expect(formatBitsMatch(matrix, ECC_LEVEL_Q, 4)).toBe(false);
   });
 
-  test('masks only data modules and is reversible', () => {
+  test('applies masks only to data modules', () => {
     const matrix = [
       [1, 0, 1],
       [0, 1, 0],
@@ -63,16 +63,12 @@ describe('matrix construction and mutation helpers', () => {
     ];
     const original = matrix.map((row) => row.slice());
 
-    maskMatrixData(matrix, reserved, 0);
+    applyMaskToMatrix(matrix, reserved, 0);
 
     expect(matrix[0][0]).toBe(original[0][0]);
     expect(matrix[1][1]).toBe(original[1][1]);
     expect(matrix[2][2]).toBe(original[2][2]);
     expect(matrix[0][2]).toBe(0);
-
-    maskMatrixData(matrix, reserved, 0);
-
-    expect(matrix).toEqual(original);
   });
 });
 

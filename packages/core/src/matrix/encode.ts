@@ -5,11 +5,11 @@ import type {
   QRCodeVersion,
 } from '../types';
 import {
-  ALPHANUMERIC_MAP,
   MODE_ALPHANUMERIC,
   MODE_NUMERIC,
   MODE_OCTET,
   MODE_TERMINATOR,
+  getAlphanumericMap,
 } from './const';
 import {getNumberOfBitsOfData} from './get-number-of-bits-of-data';
 
@@ -30,6 +30,7 @@ export function encode(
   data: QRCodeEncodedData,
   maxBufferLength: number,
 ): QRCodeCodewords {
+  const alphanumericMap = getAlphanumericMap();
   const buffer: QRCodeCodewords = [];
   let bits = 0,
     remaining = 8;
@@ -65,12 +66,12 @@ export function encode(
       let i = 1;
       for (; i < dataLength; i += 2) {
         pack(
-          ALPHANUMERIC_MAP[stringData.charAt(i - 1)] * 45 + ALPHANUMERIC_MAP[stringData.charAt(i)],
+          alphanumericMap[stringData.charAt(i - 1)] * 45 + alphanumericMap[stringData.charAt(i)],
           11,
         );
       }
       if (dataLength % 2 == 1) {
-        pack(ALPHANUMERIC_MAP[stringData.charAt(i - 1)], 6);
+        pack(alphanumericMap[stringData.charAt(i - 1)], 6);
       }
       break;
     }
