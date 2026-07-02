@@ -1,5 +1,5 @@
 // @ts-check
-import analogjsangular from '@analogjs/astro-angular';
+import angular from '@analogjs/astro-angular';
 import starlight from '@astrojs/starlight';
 import {defineConfig} from 'astro/config';
 import {readFileSync} from 'fs';
@@ -84,9 +84,6 @@ export default defineConfig({
     },
   },
   vite: {
-    ssr: {
-      noExternal: ['@angular/common', '@angular/core', '@angular/core/rxjs-interop'],
-    },
     esbuild: {
       jsxDev: true,
     },
@@ -94,22 +91,49 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: 'My Docs',
-      social: [{icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight'}],
+      title: 'QRCodeSDK',
       sidebar: [
         {
-          label: 'Guides',
+          label: 'Getting Started',
           items: [
-            // Each item here is one entry in the navigation menu.
-            {label: 'Example Guide', slug: 'guides/example'},
+            {label: 'Overview', slug: ''},
+            {label: 'Installation', slug: 'guides/installation'},
+          ],
+        },
+        {
+          label: 'Libraries',
+          items: [
+            {label: 'Core', slug: 'libraries/core'},
+            {label: 'Node', slug: 'libraries/node'},
+          ],
+        },
+        {
+          label: 'Renderers',
+          items: [
+            {label: 'Overview', slug: 'renderers'},
+            {
+              label: 'Core',
+              items: [
+                {label: 'SVG', slug: 'renderers/core/svg'},
+                {label: 'Text', slug: 'renderers/core/text'},
+              ],
+            },
+            {label: 'Node', items: [{label: 'PNG', slug: 'renderers/node/png'}]},
           ],
         },
         {
           label: 'Reference',
-          items: [{autogenerate: {directory: 'reference'}}],
+          items: [{label: 'API Reference', slug: 'reference/api'}],
         },
       ],
     }),
-    analogjsangular({useAngularHydration: true}),
+    angular({
+      useAngularHydration: true,
+      vite: {
+        transformFilter: (_code, id) => {
+          return id.includes('src/components'); // <- only transform Angular TypeScript files
+        },
+      },
+    }),
   ],
 });

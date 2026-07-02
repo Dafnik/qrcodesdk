@@ -11,31 +11,27 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
 
     validateTextGeometry(modSize, margin);
 
-    return renderCompactText(matrix, modSize, margin);
-  };
-}
+    const moduleCount = matrix.length + 2 * margin;
+    const scaledSize = moduleCount * modSize;
+    const rows: string[] = [];
 
-function renderCompactText(matrix: QRCodeMatrix, modSize: number, margin: number): string {
-  const moduleCount = matrix.length + 2 * margin;
-  const scaledSize = moduleCount * modSize;
-  const rows: string[] = [];
+    for (let row = 0; row < scaledSize; row += 2) {
+      const line: string[] = [];
 
-  for (let row = 0; row < scaledSize; row += 2) {
-    const line: string[] = [];
+      for (let column = 0; column < scaledSize; column++) {
+        line.push(
+          compactModuleCharacter(
+            isScaledModuleDark(matrix, row, column, margin, modSize),
+            isScaledModuleDark(matrix, row + 1, column, margin, modSize),
+          ),
+        );
+      }
 
-    for (let column = 0; column < scaledSize; column++) {
-      line.push(
-        compactModuleCharacter(
-          isScaledModuleDark(matrix, row, column, margin, modSize),
-          isScaledModuleDark(matrix, row + 1, column, margin, modSize),
-        ),
-      );
+      rows.push(line.join(''));
     }
 
-    rows.push(line.join(''));
-  }
-
-  return rows.join('\n');
+    return rows.join('\n');
+  };
 }
 
 function isScaledModuleDark(

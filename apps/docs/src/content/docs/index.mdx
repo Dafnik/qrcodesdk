@@ -1,43 +1,128 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: QRCodeSDK
+description: A modular TypeScript QR code package family with runtime-neutral core renderers and Node.js output.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
+  tagline: Generate QR codes from one builder, then render them as SVG, terminal text, PNG, or your own custom output.
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Get started
+      link: /guides/installation/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
+    - text: API reference
+      link: /reference/api/
+      icon: document
       variant: minimal
 ---
 
-import {Card, CardGrid} from '@astrojs/starlight/components';
+import {Card, CardGrid, LinkCard} from '@astrojs/starlight/components';
 
-import Test from '../../components/test.astro';
+## One builder, focused renderers
 
-## Next steps
+QRCodeSDK is organized as a small package family. The core package generates QR matrices and includes renderers that work in any JavaScript runtime. The Node package adds server-side renderers for output that depends on Node APIs.
 
-<Test />
+<CardGrid>
+  <Card title="@qrcodesdk/core" icon="seti:typescript">
+    Generate QR matrices and render SVG strings or terminal text strings in browser, server, CLI,
+    and test environments.
+  </Card>
+  <Card title="@qrcodesdk/node" icon="seti:nodejs">
+    Render PNG buffers in Node.js using the same builder and styling options as the core renderers.
+  </Card>
+</CardGrid>
 
-<CardGrid stagger>
-  <Card title="Update content" icon="pencil">
-    Edit `src/content/docs/index.mdx` to see this page change.
-  </Card>
-  <Card title="Change page layout" icon="document">
-    Delete `template: splash` in `src/content/docs/index.mdx` to display a sidebar on this page.
-  </Card>
-  <Card title="Add new content" icon="add-document">
-    Add Markdown or MDX files to `src/content/docs` to create new pages.
-  </Card>
-  <Card title="Configure your site" icon="setting">
-    Edit your `sidebar` and other config in `astro.config.mjs`.
-  </Card>
-  <Card title="Read the docs" icon="open-book">
-    Learn more in [the Starlight Docs](https://starlight.astro.build/).
-  </Card>
+## Quick start
+
+1. Install the core package.
+
+   ```sh
+   pnpm add @qrcodesdk/core
+   ```
+
+2. Render your first SVG.
+
+   ```ts
+   import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+
+   const svg = qrcode('https://qrcodesdk.dev')
+     .renderer(SVGQRCodeRenderer({size: 6, margin: 4}))
+     .render();
+   ```
+
+3. Add Node output when you need PNG files.
+
+   ```sh
+   pnpm add @qrcodesdk/node
+   ```
+
+## Render where you need it
+
+### SVG
+
+```ts
+import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+
+const svg = qrcode('https://qrcodesdk.dev')
+  .renderer(
+    SVGQRCodeRenderer({
+      colors: {
+        colorLight: '#ffffff',
+        colorDark: '#111111',
+      },
+      ariaLabel: 'Open QRCodeSDK',
+    }),
+  )
+  .render();
+```
+
+### Terminal
+
+```ts
+import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
+
+const output = qrcode('HELLO WORLD')
+  .mode('alphanumeric')
+  .renderer(QRCodeTextRenderer({size: 1, margin: 2}))
+  .render();
+
+console.log(output);
+```
+
+### PNG
+
+```ts
+import {writeFileSync} from 'node:fs';
+
+import {qrcode} from '@qrcodesdk/core';
+import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+
+const png = qrcode('https://qrcodesdk.dev')
+  .renderer(PNGQRCodeRenderer({size: 8, margin: 4}))
+  .render();
+
+writeFileSync('qr.png', png);
+```
+
+## Learn the packages
+
+<CardGrid>
+  <LinkCard
+    title="Installation"
+    href="/guides/installation/"
+    description="Install the package family and render SVG, terminal text, and PNG output."
+  />
+  <LinkCard
+    title="Core Library"
+    href="/core/library/"
+    description="Use the builder, matrix output, QR modes, versions, masks, and custom renderers."
+  />
+  <LinkCard
+    title="Core Renderers"
+    href="/core/renderers/"
+    description="Render runtime-neutral SVG and terminal text output from @qrcodesdk/core."
+  />
+  <LinkCard
+    title="Node Renderers"
+    href="/node/renderers/"
+    description="Render PNG buffers and write QR code images from Node.js."
+  />
 </CardGrid>

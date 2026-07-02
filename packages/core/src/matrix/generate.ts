@@ -84,7 +84,7 @@ function isQRMode(mode: number | undefined): mode is QRCodeSupportedModeIndicato
 function resolveEccLevel(
   errorCorrectionLevel: QRCodeMatrixOptions['errorCorrectionLevel'],
 ): QRCodeErrorCorrectionLevelValue {
-  const eccLevel = ECC_LEVELS_MAP[(errorCorrectionLevel ?? 'L') as keyof typeof ECC_LEVELS_MAP];
+  const eccLevel = ECC_LEVELS_MAP[(errorCorrectionLevel ?? 'M') as keyof typeof ECC_LEVELS_MAP];
   if (!Number.isInteger(eccLevel) || eccLevel < 0 || eccLevel > 3)
     throw 'QRCode: Invalid ECC level';
   return eccLevel;

@@ -1,23 +1,65 @@
-# tsdown-starter
+# @qrcodesdk/node
 
-A starter for creating a TypeScript package.
+Node.js renderers for QRCodeSDK.
 
-## Development
+`@qrcodesdk/node` extends `@qrcodesdk/core` with renderers that depend on Node.js packages or server-side APIs. Today it provides PNG output as a Node `Buffer`.
 
-- Install dependencies:
+## Install
 
-```bash
-npm install
+```sh
+pnpm add @qrcodesdk/core @qrcodesdk/node
 ```
 
-- Run the unit tests:
+## Render a PNG
 
-```bash
-npm run test
+```ts
+import {writeFileSync} from 'node:fs';
+
+import {qrcode} from '@qrcodesdk/core';
+import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+
+const png = qrcode('https://qrcodesdk.dev')
+  .renderer(
+    PNGQRCodeRenderer({
+      size: 8,
+      margin: 4,
+      colors: {
+        colorLight: '#ffffff',
+        colorDark: '#111111',
+      },
+    }),
+  )
+  .render();
+
+writeFileSync('qrcode.png', png);
 ```
 
-- Build the library:
+## Output type
 
-```bash
-npm run build
+`PNGQRCodeRenderer()` returns a renderer whose output is a Node `Buffer`.
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+
+const png: Buffer = qrcode('buffer output').render(PNGQRCodeRenderer());
+```
+
+## Options
+
+The PNG renderer uses the shared QRCodeSDK styling shape.
+
+| Option              | Default     | Description                                                         |
+| ------------------- | ----------- | ------------------------------------------------------------------- |
+| `size`              | `5`         | Pixel size for each QR module. Must be a positive integer.          |
+| `margin`            | `4`         | Light modules around the QR matrix. Must be a non-negative integer. |
+| `colors.colorLight` | `'#ffffff'` | Background pixel color.                                             |
+| `colors.colorDark`  | `'#000000'` | Foreground module pixel color.                                      |
+
+Colors must be six-digit hex values such as `#ffffff` or `#111111`.
+
+## Public API
+
+```ts
+import {PNGQRCodeRenderer, type QRCodePNGRendererOptions} from '@qrcodesdk/node';
 ```
