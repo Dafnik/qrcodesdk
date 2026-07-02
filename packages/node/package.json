@@ -34,6 +34,7 @@
     "pngjs": "7.0.0"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
     "@qrcodesdk/core-testing": "workspace:*",
     "@types/node": "^25.6.2",
     "@types/pngjs": "6.0.5",

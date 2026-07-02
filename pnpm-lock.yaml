@@ -185,6 +185,9 @@ importers:
 
   packages/core:
     devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@types/node':
         specifier: ^25.6.2
         version: 25.9.4
@@ -225,6 +228,9 @@ importers:
         specifier: workspace:*
         version: link:../core
     devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@types/node':
         specifier: ^25.6.2
         version: 25.9.4
@@ -295,6 +301,9 @@ importers:
       '@qrcodesdk/core-testing':
         specifier: workspace:*
         version: link:../core-testing
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@types/node':
         specifier: ^25.6.2
         version: 25.9.4

@@ -21,6 +21,7 @@
     "@qrcodesdk/core": "workspace:*"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "^25.6.2",
     "@typescript/native-preview": "7.0.0-dev.20260509.2",
     "jsqr": "1.4.0",
