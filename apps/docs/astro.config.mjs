@@ -118,6 +118,13 @@ export default defineConfig({
                 {label: 'Text', slug: 'renderers/core/text'},
               ],
             },
+            {
+              label: 'Browser',
+              items: [
+                {label: 'Canvas', slug: 'renderers/browser/canvas'},
+                {label: 'Image', slug: 'renderers/browser/image'},
+              ],
+            },
             {label: 'Node', items: [{label: 'PNG', slug: 'renderers/node/png'}]},
           ],
         },
