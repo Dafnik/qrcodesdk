@@ -1,5 +1,6 @@
 export type {
   ParsedQRCodeStylingOptions,
+  QRCodeAccessibilityOptions,
   QRCodeMask,
   QRCodeMatrix,
   QRCodeMode,

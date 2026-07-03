@@ -31,13 +31,9 @@
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^25.6.2",
-    "@types/pngjs": "6.0.5",
     "@types/qrcode": "1.5.6",
     "@typescript/native-preview": "7.0.0-dev.20260509.2",
     "bumpp": "^11.1.0",
-    "jsqr": "1.4.0",
-    "pngjs": "7.0.0",
     "qrcode": "1.5.4",
     "tsdown": "^0.22.0",
     "typescript": "^6.0.3",

@@ -1,5 +1,5 @@
 {
-  "name": "@qrcodesdk/node",
+  "name": "@qrcodesdk/browser",
   "type": "module",
   "version": "0.0.0",
   "description": "A starter for creating a TypeScript package.",
@@ -32,17 +32,14 @@
   "peerDependencies": {
     "@qrcodesdk/core": "workspace:*"
   },
-  "dependencies": {
-    "pngjs": "7.0.0"
-  },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@qrcodesdk/core-testing": "workspace:*",
-    "@types/node": "^25.6.2",
-    "@types/pngjs": "6.0.5",
+    "@vitest/browser-playwright": "^4.1.9",
     "@typescript/native-preview": "7.0.0-dev.20260509.2",
     "bumpp": "^11.1.0",
     "jsqr": "1.4.0",
+    "playwright": "^1.57.0",
     "tsdown": "^0.22.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5"

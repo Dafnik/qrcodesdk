@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "types": ["node"]
+    "lib": ["es2023", "DOM", "DOM.Iterable"],
+    "types": []
   },
   "extends": "@repo/typescript-config/ts-library.json",
   "include": ["src"]
