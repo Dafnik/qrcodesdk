@@ -25,6 +25,7 @@ describe('qrcode().matrix()', () => {
       errorCorrectionLevel: QRCodeErrorCorrectionLevel;
       mask: QRCodeMask;
     }> = [
+      {data: '123456789', mode: 'numeric', version: 30, errorCorrectionLevel: 'H', mask: 0},
       {data: '123456789', mode: 'numeric', version: 1, errorCorrectionLevel: 'L', mask: 1},
       {data: 'HELLO WORLD', mode: 'alphanumeric', version: 1, errorCorrectionLevel: 'M', mask: 2},
       {data: 'hello, 世界', mode: 'octet', version: 2, errorCorrectionLevel: 'Q', mask: 3},
