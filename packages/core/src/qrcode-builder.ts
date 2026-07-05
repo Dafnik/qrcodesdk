@@ -122,7 +122,7 @@ export class QRCodeBuilder<
     const selectedRenderer = renderer ?? this.currentRenderer;
 
     if (!selectedRenderer) {
-      throw 'QRCode: Renderer missing';
+      throw new Error('QRCode: Renderer missing');
     }
 
     return selectedRenderer(this.matrix()) as TOutput;

@@ -2,19 +2,24 @@
   "name": "@qrcodesdk/core",
   "type": "module",
   "version": "0.0.0",
-  "description": "A starter for creating a TypeScript package.",
-  "author": "Author Name <author.name@mail.com>",
+  "description": "Runtime-neutral QR code generation and renderers for TypeScript.",
+  "author": "Dafnik",
   "license": "MIT",
-  "homepage": "https://github.com/author/library#readme",
+  "homepage": "https://github.com/Dafnik/qrcodesdk#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/author/library.git"
+    "url": "git+https://github.com/Dafnik/qrcodesdk.git",
+    "directory": "packages/core"
   },
   "bugs": {
-    "url": "https://github.com/author/library/issues"
+    "url": "https://github.com/Dafnik/qrcodesdk/issues"
   },
+  "types": "./dist/index.d.mts",
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -26,17 +31,19 @@
     "test": "vitest",
     "check-types": "tsc --noEmit",
     "release": "bumpp",
-    "clean": "rm -rf .turbo && rm -rf node_modules",
+    "lint": "eslint src tests --max-warnings 0",
+    "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/qrcode": "1.5.6",
-    "@typescript/native-preview": "7.0.0-dev.20260509.2",
-    "bumpp": "^11.1.0",
-    "qrcode": "1.5.4",
-    "tsdown": "^0.22.0",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.5"
+    "@types/qrcode": "catalog:",
+    "@typescript/native-preview": "catalog:",
+    "bumpp": "catalog:",
+    "qrcode": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

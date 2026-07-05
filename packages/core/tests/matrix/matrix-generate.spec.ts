@@ -159,7 +159,12 @@ describe('qrcode().matrix()', () => {
         .matrix(),
     ).toThrow('QRCode: Invalid mask');
     expect(() => qrcode('1'.repeat(7_090)).mode('numeric').matrix()).toThrow(
-      'QRCode: Data to large',
+      'QRCode: Data too large',
     );
+  });
+
+  test('throws Error instances for invalid runtime usage', () => {
+    expect(() => qrcode('123456789').render()).toThrow(Error);
+    expect(() => qrcode('ABC').mode('numeric').matrix()).toThrow(Error);
   });
 });

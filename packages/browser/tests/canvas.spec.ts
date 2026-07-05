@@ -1,11 +1,7 @@
+import {type QRCodeTestFixture, QR_CODE_TEST_FIXTURES, renderFixture} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import type {QRCodeMatrix} from '@qrcodesdk/core';
-import {
-  type QRCodeTestFixture,
-  QR_CODE_TEST_FIXTURES,
-  renderFixture,
-} from '@qrcodesdk/core-testing';
 
 import {CanvasQRCodeRenderer, type QRCodeCanvasRendererOptions} from '../src';
 import {BLACK, WHITE, decodeCanvasQRCode, expectPixel, getCanvasContext} from './helper';

@@ -6,6 +6,7 @@ description: Install QRCodeSDK packages and render your first QR codes.
 qrcodesdk is split into small packages.
 
 - @qrcodesdk/core (QRCodeBuilder, SVG & Text Renderer)
+- @qrcodesdk/browser (Browser Canvas & Image Renderers)
 - @qrcodesdk/node (Node PNG Buffer Renderer)
 
 **Install only the runtime and renderers your app needs.**
@@ -34,9 +35,23 @@ yarn add @qrcodesdk/core @qrcodesdk/node
 bun add @qrcodesdk/core @qrcodesdk/node
 ```
 
+## Install browser renderers
+
+Use `@qrcodesdk/browser` when you need browser DOM output such as canvas or image elements.
+
+**Install it alongside `@qrcodesdk/core`.**
+
+```sh
+pnpm add @qrcodesdk/core @qrcodesdk/browser
+npm install @qrcodesdk/core @qrcodesdk/browser
+yarn add @qrcodesdk/core @qrcodesdk/browser
+bun add @qrcodesdk/core @qrcodesdk/browser
+```
+
 ## Choose a package
 
-| Package           | Use it for                                                                | Renderers                                         |
-| ----------------- | ------------------------------------------------------------------------- | ------------------------------------------------- |
-| `@qrcodesdk/core` | Runtime-neutral QR code generation in browsers, servers, CLIs, and tests. | SVG strings, terminal text strings, raw matrices. |
-| `@qrcodesdk/node` | Node.js output that depends on Node or native server APIs.                | PNG `Buffer` output.                              |
+| Package              | Use it for                                                                | Renderers                                         |
+| -------------------- | ------------------------------------------------------------------------- | ------------------------------------------------- |
+| `@qrcodesdk/core`    | Runtime-neutral QR code generation in browsers, servers, CLIs, and tests. | SVG strings, terminal text strings, raw matrices. |
+| `@qrcodesdk/browser` | Browser DOM output.                                                       | Canvas and image elements.                        |
+| `@qrcodesdk/node`    | Node.js output that depends on Node or native server APIs.                | PNG `Buffer` output.                              |

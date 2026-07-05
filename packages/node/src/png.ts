@@ -22,8 +22,8 @@ export function PNGQRCodeRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
     const margin = styling.margin;
     validatePngGeometry(modSize, margin);
 
-    const fgColor = parseHexColor(styling.colors.colorLight);
-    const bgColor = parseHexColor(styling.colors.colorDark);
+    const lightColor = parseHexColor(styling.colors.colorLight);
+    const darkColor = parseHexColor(styling.colors.colorDark);
     const n = matrix.length;
     const imageSize = modSize * (n + 2 * margin);
 
@@ -32,7 +32,7 @@ export function PNGQRCodeRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
     }
 
     const png = new PNG({width: imageSize, height: imageSize});
-    fillRect(png, 0, 0, imageSize, imageSize, fgColor);
+    fillRect(png, 0, 0, imageSize, imageSize, lightColor);
 
     for (let row = 0; row < n; row++) {
       for (let column = 0; column < n; column++) {
@@ -43,7 +43,7 @@ export function PNGQRCodeRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
             modSize * (margin + row),
             modSize,
             modSize,
-            bgColor,
+            darkColor,
           );
         }
       }

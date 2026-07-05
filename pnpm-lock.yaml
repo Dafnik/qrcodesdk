@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@analogjs/astro-angular':
+      specifier: 2.6.2
+      version: 2.6.2
     '@angular/build':
       specifier: 22.0.4
       version: 22.0.4
@@ -39,52 +42,228 @@ catalogs:
     '@angular/router':
       specifier: 22.0.4
       version: 22.0.4
+    '@astrojs/check':
+      specifier: ^0.9.9
+      version: 0.9.9
+    '@astrojs/starlight':
+      specifier: ^0.41.1
+      version: 0.41.1
+    '@eslint/js':
+      specifier: ^9.39.1
+      version: 9.39.4
+    '@next/eslint-plugin-next':
+      specifier: ^16.2.0
+      version: 16.2.9
+    '@trivago/prettier-plugin-sort-imports':
+      specifier: ^6.0.2
+      version: 6.0.2
+    '@types/node':
+      specifier: ^25.6.2
+      version: 25.9.4
+    '@types/pngjs':
+      specifier: 6.0.5
+      version: 6.0.5
+    '@types/qrcode':
+      specifier: 1.5.6
+      version: 1.5.6
+    '@types/react':
+      specifier: 19.2.2
+      version: 19.2.2
+    '@types/react-dom':
+      specifier: 19.2.2
+      version: 19.2.2
+    '@typescript/native-preview':
+      specifier: 7.0.0-dev.20260509.2
+      version: 7.0.0-dev.20260509.2
+    '@vitest/browser-playwright':
+      specifier: ^4.1.9
+      version: 4.1.9
+    astro:
+      specifier: ^7.0.2
+      version: 7.0.3
+    bumpp:
+      specifier: ^11.1.0
+      version: 11.1.0
+    eslint:
+      specifier: ^9.39.1
+      version: 9.39.4
+    eslint-config-prettier:
+      specifier: ^10.1.1
+      version: 10.1.8
+    eslint-plugin-only-warn:
+      specifier: ^1.1.0
+      version: 1.2.1
+    eslint-plugin-react:
+      specifier: ^7.37.5
+      version: 7.37.5
+    eslint-plugin-react-hooks:
+      specifier: ^5.2.0
+      version: 5.2.0
+    eslint-plugin-turbo:
+      specifier: ^2.7.1
+      version: 2.10.0
+    globals:
+      specifier: ^16.5.0
+      version: 16.5.0
     jsdom:
       specifier: 28.0.0
       version: 28.0.0
+    jsqr:
+      specifier: 1.4.0
+      version: 1.4.0
     ng-packagr:
       specifier: 22.0.0
       version: 22.0.0
+    playwright:
+      specifier: ^1.57.0
+      version: 1.61.1
+    pngjs:
+      specifier: 7.0.0
+      version: 7.0.0
+    prettier:
+      specifier: ^3.7.4
+      version: 3.9.0
+    prettier-plugin-organize-attributes:
+      specifier: ^1.0.0
+      version: 1.0.0
+    prettier-plugin-sort-json:
+      specifier: ^4.2.0
+      version: 4.2.0
+    prettier-plugin-tailwindcss:
+      specifier: ^0.8.0
+      version: 0.8.0
+    qrcode:
+      specifier: 1.5.4
+      version: 1.5.4
+    react:
+      specifier: ^19.2.0
+      version: 19.2.7
+    react-dom:
+      specifier: ^19.2.0
+      version: 19.2.7
     rxjs:
       specifier: 7.8.0
       version: 7.8.0
+    sharp:
+      specifier: ^0.34.5
+      version: 0.34.5
+    tsdown:
+      specifier: ^0.22.0
+      version: 0.22.3
     tslib:
       specifier: ^2.8.1
       version: 2.8.1
+    turbo:
+      specifier: ^2.10.0
+      version: 2.10.0
+    typescript:
+      specifier: ^6.0.3
+      version: 6.0.3
+    typescript-eslint:
+      specifier: ^8.50.0
+      version: 8.62.0
+    vitest:
+      specifier: ^4.1.5
+      version: 4.1.9
 
 importers:
   .:
     devDependencies:
       '@trivago/prettier-plugin-sort-imports':
-        specifier: ^6.0.2
+        specifier: 'catalog:'
         version: 6.0.2(prettier@3.9.0)
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.4(jiti@2.7.0)
       prettier:
-        specifier: ^3.7.4
+        specifier: 'catalog:'
         version: 3.9.0
       prettier-plugin-organize-attributes:
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0(prettier@3.9.0)
       prettier-plugin-sort-json:
-        specifier: ^4.2.0
+        specifier: 'catalog:'
         version: 4.2.0(prettier@3.9.0)
       prettier-plugin-tailwindcss:
-        specifier: ^0.8.0
+        specifier: 'catalog:'
         version: 0.8.0(@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.9.0))(prettier-plugin-organize-attributes@1.0.0(prettier@3.9.0))(prettier@3.9.0)
       turbo:
-        specifier: ^2.10.0
+        specifier: 'catalog:'
         version: 2.10.0
       typescript:
-        specifier: 5.9.2
-        version: 5.9.2
+        specifier: 'catalog:'
+        version: 6.0.3
 
   apps/docs:
     dependencies:
+      '@angular/common':
+        specifier: 'catalog:'
+        version: 22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0)
+      '@angular/core':
+        specifier: 'catalog:'
+        version: 22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)
+      '@angular/platform-browser':
+        specifier: 'catalog:'
+        version: 22.0.4(@angular/animations@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)))(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))
+      '@angular/platform-server':
+        specifier: 'catalog:'
+        version: 22.0.4(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0))(@angular/compiler@22.0.4)(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(@angular/platform-browser@22.0.4(@angular/animations@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)))(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)))(rxjs@7.8.0)
+      '@qrcodesdk/angular':
+        specifier: workspace:*
+        version: link:../../packages/angular
+      rxjs:
+        specifier: 'catalog:'
+        version: 7.8.0
+      tslib:
+        specifier: 'catalog:'
+        version: 2.8.1
+    devDependencies:
       '@analogjs/astro-angular':
-        specifier: 2.6.2
+        specifier: 'catalog:'
         version: 2.6.2(53d34b055eb82bf414c68c8f14f3db36)
       '@angular/build':
         specifier: 'catalog:'
         version: 22.0.4(0df47d85a0ec6b2a0402f19a3366b31e)
+      '@angular/compiler':
+        specifier: 'catalog:'
+        version: 22.0.4
+      '@angular/compiler-cli':
+        specifier: 'catalog:'
+        version: 22.0.4(@angular/compiler@22.0.4)(typescript@6.0.3)
+      '@angular/language-service':
+        specifier: 'catalog:'
+        version: 22.0.4
+      '@astrojs/check':
+        specifier: 'catalog:'
+        version: 0.9.9(prettier@3.9.0)(typescript@6.0.3)
+      '@astrojs/starlight':
+        specifier: 'catalog:'
+        version: 0.41.1(@astrojs/markdown-remark@7.2.0)(astro@7.0.3(@astrojs/markdown-remark@7.2.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(jiti@2.7.0)(less@4.6.7)(rollup@4.62.2)(sass@1.99.0)(yaml@2.9.0))(typescript@6.0.3)
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      astro:
+        specifier: 'catalog:'
+        version: 7.0.3(@astrojs/markdown-remark@7.2.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(jiti@2.7.0)(less@4.6.7)(rollup@4.62.2)(sass@1.99.0)(yaml@2.9.0)
+      sharp:
+        specifier: 'catalog:'
+        version: 0.34.5
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
+  packages/angular:
+    dependencies:
+      tslib:
+        specifier: 'catalog:'
+        version: 2.8.1
+    devDependencies:
+      '@angular/build':
+        specifier: 'catalog:'
+        version: 22.0.4(0df47d85a0ec6b2a0402f19a3366b31e)
+      '@angular/cli':
+        specifier: 'catalog:'
+        version: 22.0.4(@types/node@25.9.4)(chokidar@5.0.0)
       '@angular/common':
         specifier: 'catalog:'
         version: 22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0)
@@ -94,51 +273,6 @@ importers:
       '@angular/compiler-cli':
         specifier: 'catalog:'
         version: 22.0.4(@angular/compiler@22.0.4)(typescript@6.0.3)
-      '@angular/core':
-        specifier: 'catalog:'
-        version: 22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)
-      '@angular/language-service':
-        specifier: 'catalog:'
-        version: 22.0.4
-      '@angular/platform-browser':
-        specifier: 'catalog:'
-        version: 22.0.4(@angular/animations@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)))(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))
-      '@angular/platform-server':
-        specifier: 'catalog:'
-        version: 22.0.4(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0))(@angular/compiler@22.0.4)(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(@angular/platform-browser@22.0.4(@angular/animations@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)))(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)))(rxjs@7.8.0)
-      '@astrojs/check':
-        specifier: ^0.9.9
-        version: 0.9.9(prettier@3.9.0)(typescript@6.0.3)
-      '@astrojs/starlight':
-        specifier: ^0.41.1
-        version: 0.41.1(@astrojs/markdown-remark@7.2.0)(astro@7.0.3(@astrojs/markdown-remark@7.2.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(jiti@2.7.0)(less@4.6.7)(rollup@4.62.2)(sass@1.99.0)(yaml@2.9.0))(typescript@6.0.3)
-      '@qrcodesdk/angular':
-        specifier: workspace:*
-        version: link:../../packages/angular
-      astro:
-        specifier: ^7.0.2
-        version: 7.0.3(@astrojs/markdown-remark@7.2.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.4)(jiti@2.7.0)(less@4.6.7)(rollup@4.62.2)(sass@1.99.0)(yaml@2.9.0)
-      rxjs:
-        specifier: 'catalog:'
-        version: 7.8.0
-      sharp:
-        specifier: ^0.34.5
-        version: 0.34.5
-      tslib:
-        specifier: 'catalog:'
-        version: 2.8.1
-      typescript:
-        specifier: ~6.0.3
-        version: 6.0.3
-
-  packages/angular:
-    dependencies:
-      '@angular/common':
-        specifier: 'catalog:'
-        version: 22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0)
-      '@angular/compiler':
-        specifier: 'catalog:'
-        version: 22.0.4
       '@angular/core':
         specifier: 'catalog:'
         version: 22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)
@@ -151,22 +285,9 @@ importers:
       '@angular/router':
         specifier: 'catalog:'
         version: 22.0.4(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(@angular/platform-browser@22.0.4(@angular/animations@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)))(@angular/common@22.0.4(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0))(rxjs@7.8.0))(@angular/core@22.0.4(@angular/compiler@22.0.4)(rxjs@7.8.0)))(rxjs@7.8.0)
-      rxjs:
-        specifier: 'catalog:'
-        version: 7.8.0
-      tslib:
-        specifier: 'catalog:'
-        version: 2.8.1
-    devDependencies:
-      '@angular/build':
-        specifier: 'catalog:'
-        version: 22.0.4(0df47d85a0ec6b2a0402f19a3366b31e)
-      '@angular/cli':
-        specifier: 'catalog:'
-        version: 22.0.4(@types/node@25.9.4)(chokidar@5.0.0)
-      '@angular/compiler-cli':
-        specifier: 'catalog:'
-        version: 22.0.4(@angular/compiler@22.0.4)(typescript@6.0.3)
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -176,11 +297,14 @@ importers:
       ng-packagr:
         specifier: 'catalog:'
         version: 22.0.0(@angular/compiler-cli@22.0.4(@angular/compiler@22.0.4)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
+      rxjs:
+        specifier: 'catalog:'
+        version: 7.8.0
       typescript:
-        specifier: ~6.0.2
+        specifier: 'catalog:'
         version: 6.0.3
       vitest:
-        specifier: ^4.0.8
+        specifier: 'catalog:'
         version: 4.1.9(@types/node@25.9.4)(@vitest/browser-playwright@4.1.9)(jsdom@28.0.0)(vite@8.1.0(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass@1.101.0)(yaml@2.9.0))
 
   packages/browser:
@@ -189,62 +313,68 @@ importers:
         specifier: workspace:*
         version: link:../core
     devDependencies:
-      '@qrcodesdk/core-testing':
+      '@repo/core-testing':
         specifier: workspace:*
         version: link:../core-testing
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260509.2
+        specifier: 'catalog:'
         version: 7.0.0-dev.20260509.2
       '@vitest/browser-playwright':
-        specifier: ^4.1.9
+        specifier: 'catalog:'
         version: 4.1.9(playwright@1.61.1)(vite@8.1.0(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass@1.101.0)(yaml@2.9.0))(vitest@4.1.9)
       bumpp:
-        specifier: ^11.1.0
+        specifier: 'catalog:'
         version: 11.1.0
       jsqr:
-        specifier: 1.4.0
+        specifier: 'catalog:'
         version: 1.4.0
       playwright:
-        specifier: ^1.57.0
+        specifier: 'catalog:'
         version: 1.61.1
       tsdown:
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.3(@typescript/native-preview@7.0.0-dev.20260509.2)(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vitest:
-        specifier: ^4.1.5
+        specifier: 'catalog:'
         version: 4.1.9(@types/node@25.9.4)(@vitest/browser-playwright@4.1.9)(jsdom@28.0.0)(vite@8.1.0(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass@1.101.0)(yaml@2.9.0))
 
   packages/core:
     devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@types/qrcode':
-        specifier: 1.5.6
+        specifier: 'catalog:'
         version: 1.5.6
       '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260509.2
+        specifier: 'catalog:'
         version: 7.0.0-dev.20260509.2
       bumpp:
-        specifier: ^11.1.0
+        specifier: 'catalog:'
         version: 11.1.0
       qrcode:
-        specifier: 1.5.4
+        specifier: 'catalog:'
         version: 1.5.4
       tsdown:
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.3(@typescript/native-preview@7.0.0-dev.20260509.2)(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vitest:
-        specifier: ^4.1.5
+        specifier: 'catalog:'
         version: 4.1.9(@types/node@25.9.4)(@vitest/browser-playwright@4.1.9)(jsdom@28.0.0)(vite@8.1.0(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass@1.101.0)(yaml@2.9.0))
 
   packages/core-testing:
@@ -253,66 +383,69 @@ importers:
         specifier: workspace:*
         version: link:../core
     devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@types/node':
-        specifier: ^25.6.2
+        specifier: 'catalog:'
         version: 25.9.4
       '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260509.2
+        specifier: 'catalog:'
         version: 7.0.0-dev.20260509.2
       jsqr:
-        specifier: 1.4.0
+        specifier: 'catalog:'
         version: 1.4.0
       sharp:
-        specifier: ^0.34.5
+        specifier: 'catalog:'
         version: 0.34.5
       tsdown:
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.3(@typescript/native-preview@7.0.0-dev.20260509.2)(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vitest:
-        specifier: ^4.1.5
+        specifier: 'catalog:'
         version: 4.1.9(@types/node@25.9.4)(@vitest/browser-playwright@4.1.9)(jsdom@28.0.0)(vite@8.1.0(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass@1.101.0)(yaml@2.9.0))
 
   packages/eslint-config:
     devDependencies:
       '@eslint/js':
-        specifier: ^9.39.1
+        specifier: 'catalog:'
         version: 9.39.4
       '@next/eslint-plugin-next':
-        specifier: ^16.2.0
+        specifier: 'catalog:'
         version: 16.2.9
       eslint:
-        specifier: ^9.39.1
+        specifier: 'catalog:'
         version: 9.39.4(jiti@2.7.0)
       eslint-config-prettier:
-        specifier: ^10.1.1
+        specifier: 'catalog:'
         version: 10.1.8(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-only-warn:
-        specifier: ^1.1.0
+        specifier: 'catalog:'
         version: 1.2.1
       eslint-plugin-react:
-        specifier: ^7.37.5
+        specifier: 'catalog:'
         version: 7.37.5(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-react-hooks:
-        specifier: ^5.2.0
+        specifier: 'catalog:'
         version: 5.2.0(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-turbo:
-        specifier: ^2.7.1
+        specifier: 'catalog:'
         version: 2.10.0(eslint@9.39.4(jiti@2.7.0))(turbo@2.10.0)
       globals:
-        specifier: ^16.5.0
+        specifier: 'catalog:'
         version: 16.5.0
       typescript:
-        specifier: ^5.9.2
-        version: 5.9.2
+        specifier: 'catalog:'
+        version: 6.0.3
       typescript-eslint:
-        specifier: ^8.50.0
-        version: 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
+        specifier: 'catalog:'
+        version: 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
 
   packages/node:
     dependencies:
@@ -320,38 +453,41 @@ importers:
         specifier: workspace:*
         version: link:../core
       pngjs:
-        specifier: 7.0.0
+        specifier: 'catalog:'
         version: 7.0.0
     devDependencies:
-      '@qrcodesdk/core-testing':
+      '@repo/core-testing':
         specifier: workspace:*
         version: link:../core-testing
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@types/node':
-        specifier: ^25.6.2
+        specifier: 'catalog:'
         version: 25.9.4
       '@types/pngjs':
-        specifier: 6.0.5
+        specifier: 'catalog:'
         version: 6.0.5
       '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260509.2
+        specifier: 'catalog:'
         version: 7.0.0-dev.20260509.2
       bumpp:
-        specifier: ^11.1.0
+        specifier: 'catalog:'
         version: 11.1.0
       jsqr:
-        specifier: 1.4.0
+        specifier: 'catalog:'
         version: 1.4.0
       tsdown:
-        specifier: ^0.22.0
+        specifier: 'catalog:'
         version: 0.22.3(@typescript/native-preview@7.0.0-dev.20260509.2)(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vitest:
-        specifier: ^4.1.5
+        specifier: 'catalog:'
         version: 4.1.9(@types/node@25.9.4)(@vitest/browser-playwright@4.1.9)(jsdom@28.0.0)(vite@8.1.0(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(less@4.6.7)(sass@1.101.0)(yaml@2.9.0))
 
   packages/typescript-config: {}
@@ -359,10 +495,10 @@ importers:
   packages/ui:
     dependencies:
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@repo/eslint-config':
@@ -372,20 +508,20 @@ importers:
         specifier: workspace:*
         version: link:../typescript-config
       '@types/node':
-        specifier: ^22.15.3
-        version: 22.20.0
+        specifier: 'catalog:'
+        version: 25.9.4
       '@types/react':
-        specifier: 19.2.2
+        specifier: 'catalog:'
         version: 19.2.2
       '@types/react-dom':
-        specifier: 19.2.2
+        specifier: 'catalog:'
         version: 19.2.2(@types/react@19.2.2)
       eslint:
-        specifier: ^9.39.1
+        specifier: 'catalog:'
         version: 9.39.4(jiti@2.7.0)
       typescript:
-        specifier: 5.9.2
-        version: 5.9.2
+        specifier: 'catalog:'
+        version: 6.0.3
 
 packages:
   '@acemir/cssom@0.9.31':
@@ -4139,12 +4275,6 @@ packages:
     resolution:
       {
         integrity: sha512-vSYNSDe6Ix3q+6Z7ri9lyWqgGhJTmzRjZRqyq15N0Z/1/UnVsno9G/N40NBijoYx2seFDIl0+B2mgAb9mezUCA==,
-      }
-
-  '@types/node@22.20.0':
-    resolution:
-      {
-        integrity: sha512-QWlFW2wf3nTjC13/DqRnBpR4ZO36VJH/JVBkA/vcnmbTBNQIlnObqyqZE1tUR7+Ni23Lda8R1BxMfbXRpCUx5g==,
       }
 
   '@types/node@24.13.2':
@@ -9921,14 +10051,6 @@ packages:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  typescript@5.9.2:
-    resolution:
-      {
-        integrity: sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==,
-      }
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@6.0.3:
     resolution:
       {
@@ -9972,12 +10094,6 @@ packages:
     resolution:
       {
         integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==,
-      }
-
-  undici-types@6.21.0:
-    resolution:
-      {
-        integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==,
       }
 
   undici-types@7.18.2:
@@ -12975,10 +13091,6 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
-  '@types/node@22.20.0':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@24.13.2':
     dependencies:
       undici-types: 7.18.2
@@ -13011,40 +13123,40 @@ snapshots:
 
   '@types/unist@3.0.3': {}
 
-  '@typescript-eslint/eslint-plugin@8.62.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)':
+  '@typescript-eslint/eslint-plugin@8.62.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
+      '@typescript-eslint/parser': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       '@typescript-eslint/scope-manager': 8.62.0
-      '@typescript-eslint/type-utils': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
+      '@typescript-eslint/type-utils': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       '@typescript-eslint/visitor-keys': 8.62.0
       eslint: 9.39.4(jiti@2.7.0)
       ignore: 7.0.5
       natural-compare: 1.4.0
-      ts-api-utils: 2.5.0(typescript@5.9.2)
-      typescript: 5.9.2
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)':
+  '@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.62.0
       '@typescript-eslint/types': 8.62.0
-      '@typescript-eslint/typescript-estree': 8.62.0(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.62.0(typescript@6.0.3)
       '@typescript-eslint/visitor-keys': 8.62.0
       debug: 4.4.3
       eslint: 9.39.4(jiti@2.7.0)
-      typescript: 5.9.2
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.62.0(typescript@5.9.2)':
+  '@typescript-eslint/project-service@8.62.0(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.62.0(typescript@5.9.2)
+      '@typescript-eslint/tsconfig-utils': 8.62.0(typescript@6.0.3)
       '@typescript-eslint/types': 8.62.0
       debug: 4.4.3
-      typescript: 5.9.2
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -13053,47 +13165,47 @@ snapshots:
       '@typescript-eslint/types': 8.62.0
       '@typescript-eslint/visitor-keys': 8.62.0
 
-  '@typescript-eslint/tsconfig-utils@8.62.0(typescript@5.9.2)':
+  '@typescript-eslint/tsconfig-utils@8.62.0(typescript@6.0.3)':
     dependencies:
-      typescript: 5.9.2
+      typescript: 6.0.3
 
-  '@typescript-eslint/type-utils@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)':
+  '@typescript-eslint/type-utils@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/types': 8.62.0
-      '@typescript-eslint/typescript-estree': 8.62.0(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.62.0(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       debug: 4.4.3
       eslint: 9.39.4(jiti@2.7.0)
-      ts-api-utils: 2.5.0(typescript@5.9.2)
-      typescript: 5.9.2
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@8.62.0': {}
 
-  '@typescript-eslint/typescript-estree@8.62.0(typescript@5.9.2)':
+  '@typescript-eslint/typescript-estree@8.62.0(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/project-service': 8.62.0(typescript@5.9.2)
-      '@typescript-eslint/tsconfig-utils': 8.62.0(typescript@5.9.2)
+      '@typescript-eslint/project-service': 8.62.0(typescript@6.0.3)
+      '@typescript-eslint/tsconfig-utils': 8.62.0(typescript@6.0.3)
       '@typescript-eslint/types': 8.62.0
       '@typescript-eslint/visitor-keys': 8.62.0
       debug: 4.4.3
       minimatch: 10.2.5
       semver: 7.8.5
       tinyglobby: 0.2.17
-      ts-api-utils: 2.5.0(typescript@5.9.2)
-      typescript: 5.9.2
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)':
+  '@typescript-eslint/utils@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@2.7.0))
       '@typescript-eslint/scope-manager': 8.62.0
       '@typescript-eslint/types': 8.62.0
-      '@typescript-eslint/typescript-estree': 8.62.0(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.62.0(typescript@6.0.3)
       eslint: 9.39.4(jiti@2.7.0)
-      typescript: 5.9.2
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -17257,9 +17369,9 @@ snapshots:
 
   trough@2.2.0: {}
 
-  ts-api-utils@2.5.0(typescript@5.9.2):
+  ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:
-      typescript: 5.9.2
+      typescript: 6.0.3
 
   ts-morph@21.0.1:
     dependencies:
@@ -17359,18 +17471,16 @@ snapshots:
     dependencies:
       semver: 7.8.5
 
-  typescript-eslint@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2):
+  typescript-eslint@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.62.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
-      '@typescript-eslint/parser': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
-      '@typescript-eslint/typescript-estree': 8.62.0(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.2)
+      '@typescript-eslint/eslint-plugin': 8.62.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/parser': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/typescript-estree': 8.62.0(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       eslint: 9.39.4(jiti@2.7.0)
-      typescript: 5.9.2
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
-
-  typescript@5.9.2: {}
 
   typescript@6.0.3: {}
 
@@ -17399,8 +17509,6 @@ snapshots:
       unconfig-core: 7.5.0
 
   uncrypto@0.1.3: {}
-
-  undici-types@6.21.0: {}
 
   undici-types@7.18.2: {}
 

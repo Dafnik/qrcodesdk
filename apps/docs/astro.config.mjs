@@ -75,6 +75,8 @@ function includeContentPlugin() {
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://qrcodesdk.dev',
+  cacheDir: process.env.ASTRO_CACHE_DIR ?? './node_modules/.astro',
   markdown: {
     shikiConfig: {
       themes: {
@@ -84,9 +86,7 @@ export default defineConfig({
     },
   },
   vite: {
-    esbuild: {
-      jsxDev: true,
-    },
+    cacheDir: process.env.VITE_CACHE_DIR ?? './node_modules/.vite',
     plugins: [includeContentPlugin()],
   },
   integrations: [

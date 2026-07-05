@@ -1,4 +1,4 @@
-import {type QRCodeTestFixture, renderFixture} from '@qrcodesdk/core-testing';
+import {type QRCodeTestFixture, renderFixture} from '@repo/core-testing';
 
 import {PNGQRCodeRenderer, type QRCodePNGRendererOptions} from '../../src';
 

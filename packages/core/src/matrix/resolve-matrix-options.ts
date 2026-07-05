@@ -19,7 +19,7 @@ export function resolveQRCodeMatrixOptions(
 ): ResolvedQRCodeMatrixOptions {
   const mode = resolveMode(data, options.mode);
   const encodedData = validateData(mode, data);
-  if (encodedData === undefined) throw 'QRCode: Invalid data format';
+  if (encodedData === undefined) throw new Error('QRCode: Invalid data format');
 
   const errorCorrectionLevel = resolveErrorCorrectionLevel(options.errorCorrectionLevel);
   const version = resolveVersion(options.version, encodedData.length, mode, errorCorrectionLevel);
@@ -34,7 +34,7 @@ function resolveMode(
 ): QRCodeSupportedModeIndicator {
   if (requestedMode !== undefined) {
     const mode = MODES_MAP[requestedMode];
-    if (!isSupportedMode(mode)) throw 'QRCode: Invalid mode';
+    if (!isSupportedMode(mode)) throw new Error('QRCode: Invalid mode');
     return mode;
   }
 
@@ -52,7 +52,7 @@ function resolveErrorCorrectionLevel(
 ): QRCodeErrorCorrectionLevelValue {
   const eccLevel = ECC_LEVELS_MAP[(errorCorrectionLevel ?? 'M') as keyof typeof ECC_LEVELS_MAP];
   if (!Number.isInteger(eccLevel) || eccLevel < 0 || eccLevel > 3)
-    throw 'QRCode: Invalid ECC level';
+    throw new Error('QRCode: Invalid ECC level');
   return eccLevel;
 }
 
@@ -63,7 +63,7 @@ function resolveVersion(
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
 ): QRCodeVersion {
   if (requestedVersion !== undefined) {
-    if (requestedVersion < 1 || requestedVersion > 40) throw 'QRCode: Invalid version';
+    if (requestedVersion < 1 || requestedVersion > 40) throw new Error('QRCode: Invalid version');
     return requestedVersion;
   }
 
@@ -72,11 +72,11 @@ function resolveVersion(
     if (dataLength <= getMaxDataLength(qrVersion, mode, errorCorrectionLevel)) return qrVersion;
   }
 
-  throw 'QRCode: Data to large';
+  throw new Error('QRCode: Data too large');
 }
 
 function resolveMask(mask: QRCodeMatrixOptions['mask']): QRCodeMask | undefined {
   if (mask === undefined) return undefined;
-  if (!QR_CODE_MASKS.includes(mask)) throw 'QRCode: Invalid mask';
+  if (!QR_CODE_MASKS.includes(mask)) throw new Error('QRCode: Invalid mask');
   return mask;
 }

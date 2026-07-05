@@ -18,7 +18,7 @@ import {Card, CardGrid, LinkCard} from '@astrojs/starlight/components';
 
 ## One builder, focused renderers
 
-QRCodeSDK is organized as a small package family. The core package generates QR matrices and includes renderers that work in any JavaScript runtime. The Node package adds server-side renderers for output that depends on Node APIs.
+QRCodeSDK is organized as a small package family. The core package generates QR matrices and includes renderers that work in any JavaScript runtime. The browser package adds DOM renderers, and the Node package adds server-side renderers for output that depends on Node APIs.
 
 <CardGrid>
   <Card title="@qrcodesdk/core" icon="seti:typescript">
@@ -27,6 +27,9 @@ QRCodeSDK is organized as a small package family. The core package generates QR 
   </Card>
   <Card title="@qrcodesdk/node" icon="seti:nodejs">
     Render PNG buffers in Node.js using the same builder and styling options as the core renderers.
+  </Card>
+  <Card title="@qrcodesdk/browser" icon="seti:html">
+    Render canvas and image elements in browser apps using the same builder API.
   </Card>
 </CardGrid>
 
@@ -48,10 +51,11 @@ QRCodeSDK is organized as a small package family. The core package generates QR 
      .render();
    ```
 
-3. Add Node output when you need PNG files.
+3. Add runtime-specific output when needed.
 
    ```sh
    pnpm add @qrcodesdk/node
+   pnpm add @qrcodesdk/browser
    ```
 
 ## Render where you need it
@@ -102,6 +106,21 @@ const png = qrcode('https://qrcodesdk.dev')
 writeFileSync('qr.png', png);
 ```
 
+### Browser image
+
+```ts
+import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const image = qrcode('https://qrcodesdk.dev').render(
+  ImageQRCodeRenderer({
+    alt: 'Open QRCodeSDK',
+  }),
+);
+
+document.body.append(image);
+```
+
 ## Learn the packages
 
 <CardGrid>
@@ -112,17 +131,17 @@ writeFileSync('qr.png', png);
   />
   <LinkCard
     title="Core Library"
-    href="/core/library/"
+    href="/libraries/core/"
     description="Use the builder, matrix output, QR modes, versions, masks, and custom renderers."
   />
   <LinkCard
     title="Core Renderers"
-    href="/core/renderers/"
+    href="/renderers/"
     description="Render runtime-neutral SVG and terminal text output from @qrcodesdk/core."
   />
   <LinkCard
     title="Node Renderers"
-    href="/node/renderers/"
+    href="/renderers/node/png/"
     description="Render PNG buffers and write QR code images from Node.js."
   />
 </CardGrid>

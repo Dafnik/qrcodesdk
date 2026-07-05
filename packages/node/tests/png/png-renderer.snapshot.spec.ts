@@ -1,9 +1,9 @@
+import {QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
 
 import type {QRCodeMatrix} from '@qrcodesdk/core';
-import {QR_CODE_TEST_FIXTURES} from '@qrcodesdk/core-testing';
 
 import {PNGQRCodeRenderer} from '../../src';
 import {renderFixturePng} from './png-fixture';

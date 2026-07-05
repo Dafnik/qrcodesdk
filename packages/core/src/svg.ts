@@ -25,9 +25,9 @@ export function SVGQRCodeRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
       `height="${size}"`,
       `viewBox="0 0 ${qrSize} ${qrSize}"`,
       'shape-rendering="crispEdges"',
-      options?.alt ? `alt="${options.alt}"` : undefined,
-      options?.ariaLabel ? `aria-label="${options.ariaLabel}"` : undefined,
-      options?.title ? `title="${options.title}"` : undefined,
+      options?.alt ? `alt="${escapeAttributeValue(options.alt)}"` : undefined,
+      options?.ariaLabel ? `aria-label="${escapeAttributeValue(options.ariaLabel)}"` : undefined,
+      options?.title ? `title="${escapeAttributeValue(options.title)}"` : undefined,
     ].filter((attr) => attr !== undefined);
 
     return [
@@ -37,6 +37,14 @@ export function SVGQRCodeRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
       '</svg>',
     ].join('');
   };
+}
+
+function escapeAttributeValue(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 function matrixToPath(matrix: QRCodeMatrix, margin: number): string {

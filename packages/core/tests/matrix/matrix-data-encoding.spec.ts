@@ -2,7 +2,6 @@ import {describe, expect, test} from 'vitest';
 
 import {
   MODE_ALPHANUMERIC,
-  MODE_KANJI,
   MODE_NUMERIC,
   MODE_OCTET,
   getAlphanumericMap,

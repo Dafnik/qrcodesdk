@@ -2,14 +2,15 @@
 
 A modular TypeScript package family for generating QR codes and rendering them in the format your runtime needs.
 
-`@qrcodesdk/core` builds QR code matrices and includes runtime-neutral SVG and terminal text renderers. `@qrcodesdk/node` adds Node.js PNG output on top of the same builder API.
+`@qrcodesdk/core` builds QR code matrices and includes runtime-neutral SVG and terminal text renderers. `@qrcodesdk/browser` adds DOM element renderers, and `@qrcodesdk/node` adds Node.js PNG output on top of the same builder API.
 
 ## Packages
 
-| Package           | Purpose                                                               | Renderers                                         |
-| ----------------- | --------------------------------------------------------------------- | ------------------------------------------------- |
-| `@qrcodesdk/core` | Runtime-neutral QR generation for browsers, servers, CLIs, and tests. | SVG strings, terminal text strings, raw matrices. |
-| `@qrcodesdk/node` | Node-specific QR output.                                              | PNG `Buffer` output.                              |
+| Package              | Purpose                                                               | Renderers                                         |
+| -------------------- | --------------------------------------------------------------------- | ------------------------------------------------- |
+| `@qrcodesdk/core`    | Runtime-neutral QR generation for browsers, servers, CLIs, and tests. | SVG strings, terminal text strings, raw matrices. |
+| `@qrcodesdk/browser` | Browser-specific DOM output.                                          | Canvas and image elements.                        |
+| `@qrcodesdk/node`    | Node-specific QR output.                                              | PNG `Buffer` output.                              |
 
 ## Install
 
@@ -21,6 +22,12 @@ Install the Node renderer package when you need PNG output:
 
 ```sh
 pnpm add @qrcodesdk/core @qrcodesdk/node
+```
+
+Install the browser renderer package when you need DOM output:
+
+```sh
+pnpm add @qrcodesdk/core @qrcodesdk/browser
 ```
 
 ## Quick examples
@@ -73,6 +80,21 @@ const png = qrcode('https://qrcodesdk.dev')
 writeFileSync('qrcode.png', png);
 ```
 
+### Browser image
+
+```ts
+import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const image = qrcode('https://qrcodesdk.dev').render(
+  ImageQRCodeRenderer({
+    alt: 'QRCodeSDK documentation',
+  }),
+);
+
+document.body.append(image);
+```
+
 ## Core concepts
 
 QRCodeSDK separates generation from rendering. The builder creates a QR matrix, and renderers convert that matrix into an output type.
@@ -95,9 +117,10 @@ Defaults are designed for readable output:
 
 ## Documentation
 
-- [Installation](apps/docs/src/content/docs/guides/installation/core.md)
+- [Installation](apps/docs/src/content/docs/guides/installation.md)
 - [Core library](apps/docs/src/content/docs/libraries/core.md)
-- [Core renderers](apps/docs/src/content/docs/core/renderers.md)
+- [Renderers](apps/docs/src/content/docs/renderers/index.md)
+- [Browser library](apps/docs/src/content/docs/libraries/browser.md)
 - [Node renderers](apps/docs/src/content/docs/libraries/node.md)
 - [API reference](apps/docs/src/content/docs/reference/api.md)
 

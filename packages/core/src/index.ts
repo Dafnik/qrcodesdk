@@ -1,8 +1,11 @@
 export type {
   ParsedQRCodeStylingOptions,
   QRCodeAccessibilityOptions,
+  QRCodeErrorCorrectionLevel,
+  QRCodeInputData,
   QRCodeMask,
   QRCodeMatrix,
+  QRCodeMatrixOptions,
   QRCodeMode,
   QRCodeRenderer,
   QRCodeStylingOptions,

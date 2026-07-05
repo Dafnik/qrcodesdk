@@ -1,10 +1,17 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "globalEnv": [
+    "ASTRO_CACHE_DIR",
+    "UPDATE_PNG_SNAPSHOTS",
+    "UPDATE_SVG_SNAPSHOTS",
+    "UPDATE_TEXT_SNAPSHOTS",
+    "VITE_CACHE_DIR"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "outputs": ["dist/**", "!.turbo/**", "!.astro-cache/**"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
@@ -20,7 +27,7 @@
       "persistent": true
     },
     "test": {
-      "dependsOn": ["^test"]
+      "dependsOn": ["^build", "^test"]
     }
   },
   "ui": "tui"

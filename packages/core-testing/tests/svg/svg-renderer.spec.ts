@@ -70,6 +70,18 @@ describe('SVGQRCodeRenderer', () => {
     });
   });
 
+  test('escapes SVG accessibility attribute values', () => {
+    const svg = SVGQRCodeRenderer({
+      alt: 'Scan "A&B" <now>',
+      ariaLabel: 'Open "docs" & examples',
+      title: 'QR <title>',
+    })([[1]]);
+
+    expect(svg).toContain('alt="Scan &quot;A&amp;B&quot; &lt;now&gt;"');
+    expect(svg).toContain('aria-label="Open &quot;docs&quot; &amp; examples"');
+    expect(svg).toContain('title="QR &lt;title&gt;"');
+  });
+
   test('renders only a background path when the matrix has no dark modules', () => {
     const svg = SVGQRCodeRenderer({size: 2, margin: 0})([
       [0, 0],

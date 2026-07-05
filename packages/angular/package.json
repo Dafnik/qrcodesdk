@@ -1,35 +1,65 @@
 {
   "name": "@qrcodesdk/angular",
   "version": "0.0.0",
-  "main": "./dist/angular/fesm2022/angular.mjs",
-  "types": "./dist/angular/types/angular.d.ts",
+  "description": "Placeholder Angular adapter package for QRCodeSDK.",
+  "author": "Dafnik",
+  "license": "MIT",
+  "homepage": "https://github.com/Dafnik/qrcodesdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dafnik/qrcodesdk.git",
+    "directory": "packages/angular"
+  },
+  "bugs": {
+    "url": "https://github.com/Dafnik/qrcodesdk/issues"
+  },
+  "main": "./dist/angular/fesm2022/qrcodesdk-angular.mjs",
+  "types": "./dist/angular/types/qrcodesdk-angular.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/angular/types/qrcodesdk-angular.d.ts",
+      "default": "./dist/angular/fesm2022/qrcodesdk-angular.mjs"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "ng": "ng",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .angular"
+    "check-types": "ng build",
+    "lint": "eslint projects --max-warnings 0",
+    "clean": "rm -rf .turbo dist .angular"
   },
   "private": true,
-  "packageManager": "pnpm@9.0.0",
-  "dependencies": {
+  "packageManager": "pnpm@11.7.0",
+  "peerDependencies": {
     "@angular/common": "catalog:",
-    "@angular/compiler": "catalog:",
     "@angular/core": "catalog:",
     "@angular/forms": "catalog:",
     "@angular/platform-browser": "catalog:",
     "@angular/router": "catalog:",
-    "rxjs": "catalog:",
+    "rxjs": "catalog:"
+  },
+  "dependencies": {
     "tslib": "catalog:"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
     "@angular/build": "catalog:",
     "@angular/cli": "catalog:",
+    "@angular/common": "catalog:",
+    "@angular/compiler": "catalog:",
     "@angular/compiler-cli": "catalog:",
+    "@angular/core": "catalog:",
+    "@angular/forms": "catalog:",
+    "@angular/platform-browser": "catalog:",
+    "@angular/router": "catalog:",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "jsdom": "catalog:",
     "ng-packagr": "catalog:",
-    "typescript": "~6.0.2",
-    "vitest": "^4.0.8"
+    "rxjs": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

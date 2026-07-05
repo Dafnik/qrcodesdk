@@ -1,6 +1,5 @@
+import {QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
-
-import {QR_CODE_TEST_FIXTURES} from '@qrcodesdk/core-testing';
 
 import {renderFixturePng} from './png-fixture';
 import {decodePngQRCode} from './png-helpers';

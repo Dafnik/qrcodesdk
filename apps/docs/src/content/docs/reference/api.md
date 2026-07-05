@@ -1,6 +1,6 @@
 ---
 title: API Reference
-description: Public API exported by @qrcodesdk/core and @qrcodesdk/node.
+description: Public API exported by @qrcodesdk/core, @qrcodesdk/browser, and @qrcodesdk/node.
 ---
 
 ## @qrcodesdk/core
@@ -43,14 +43,48 @@ The core package exports these public types:
 
 ```ts
 type ParsedQRCodeStylingOptions;
+type QRCodeErrorCorrectionLevel;
+type QRCodeInputData;
 type QRCodeMask;
 type QRCodeMatrix;
+type QRCodeMatrixOptions;
 type QRCodeMode;
 type QRCodeRenderer;
 type QRCodeStylingOptions;
 type QRCodeTextRendererOptions;
 type QRCodeSVGRendererOptions;
 type QRCodeVersion;
+```
+
+## @qrcodesdk/browser
+
+### CanvasQRCodeRenderer
+
+Creates a renderer that returns an `HTMLCanvasElement`.
+
+```ts
+CanvasQRCodeRenderer(options?);
+```
+
+Options use the shared styling shape: `size`, `margin`, `colors.colorLight`, and `colors.colorDark`.
+
+### ImageQRCodeRenderer
+
+Creates a renderer that returns an `HTMLImageElement` with a PNG data URL.
+
+```ts
+ImageQRCodeRenderer(options?);
+```
+
+Options include shared styling plus image accessibility attributes: `alt`, `ariaLabel`, and `title`.
+
+### Types
+
+The browser package exports:
+
+```ts
+type QRCodeCanvasRendererOptions;
+type QRCodeImageRendererOptions;
 ```
 
 ## @qrcodesdk/node
