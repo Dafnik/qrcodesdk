@@ -1,11 +1,11 @@
 ---
-title: SVG Renderer
-description: The SVG renderer outputs a QR code as an SVG string. SVG is the best default when you want a crisp, scalable image that stays sharp at any size. It works well in web apps, dashboards, emails, documentation pages, server-rendered routes, and generated static assets.
+title: Render SVG
+description: Render a QR code as a scalable SVG string from @qrcodesdk/core.
 ---
 
-The SVG renderer outputs a QR code as an SVG string.
+Use this when you need a crisp, scalable QR code for web apps, dashboards, emails, documentation pages, server-rendered routes, or generated static assets.
 
-SVG is the best default when you want a crisp, scalable image that stays sharp at any size. It works well in web apps, dashboards, emails, documentation pages, server-rendered routes, and generated static assets.
+SVG is the best default for most user-facing QR codes because it stays sharp at any size and works in any JavaScript runtime.
 
 ## Minimal example
 
@@ -15,7 +15,9 @@ import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
 ```
 
-## Styling options
+The returned value is an SVG string.
+
+## Common options
 
 You can customize the rendered SVG by passing options to `SVGQRCodeRenderer`.
 
@@ -34,8 +36,6 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-### Options
-
 | Option              |     Type |     Default | Description                                       |
 | ------------------- | -------: | ----------: | ------------------------------------------------- |
 | `size`              | `number` |         `5` | Pixel size of each QR module.                     |
@@ -48,9 +48,11 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
-## Accessibility
+## Common recipes
 
-For user-facing QR codes, provide a meaningful label so assistive technologies can describe what the code points to.
+### Add accessibility labels
+
+For user-facing QR codes, provide a meaningful label so assistive technologies can describe the destination or action.
 
 ```ts
 import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
@@ -62,8 +64,6 @@ const svg = qrcode('https://qrcodesdk.dev').render(
   }),
 );
 ```
-
-## Node.js examples
 
 ### Save to disk
 
@@ -95,49 +95,7 @@ app.get('/qrcode.svg', (_req, res) => {
 app.listen(3000);
 ```
 
-### Serve with Fastify
-
-```ts
-import Fastify from 'fastify';
-
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
-
-const fastify = Fastify();
-
-fastify.get('/qrcode.svg', async (_request, reply) => {
-  const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
-
-  return reply.type('image/svg+xml').send(svg);
-});
-
-await fastify.listen({port: 3000});
-```
-
-### Serve with Hono
-
-```ts
-import {serve} from '@hono/node-server';
-import {Hono} from 'hono';
-
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
-
-const app = new Hono();
-
-app.get('/qrcode.svg', (c) => {
-  const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
-
-  return c.body(svg, 200, {
-    'Content-Type': 'image/svg+xml',
-  });
-});
-
-serve({
-  fetch: app.fetch,
-  port: 3000,
-});
-```
-
-## Inline in HTML
+### Inline in HTML
 
 ```ts
 import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
@@ -158,8 +116,6 @@ const html = `
   </html>
 `;
 ```
-
-## Browser examples
 
 ### Insert into the DOM
 
@@ -182,3 +138,26 @@ if (container) {
 ```html
 <div id="qrcode"></div>
 ```
+
+## Output details
+
+The SVG renderer generates:
+
+- A square `<svg>` string
+- A light background path using `colors.colorLight`
+- A dark module path using `colors.colorDark`
+- A `viewBox` measured in QR modules
+- Pixel `width` and `height` values derived from `size`, matrix size, and `margin`
+- Optional `alt`, `aria-label`, and `title` attributes
+
+The final pixel size is calculated as:
+
+```ts
+const imageSize = size * (moduleCount + 2 * margin);
+```
+
+## Related pages
+
+- [Customize QR Codes](/guides/customize/)
+- [Render PNG in Node.js](/renderers/node/png/)
+- [Render to an Image Element](/renderers/browser/image/)

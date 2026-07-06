@@ -1,9 +1,9 @@
 ---
 title: QRCodeSDK
-description: A modular TypeScript QR code package family with runtime-neutral core renderers and Node.js output.
+description: Generate QR codes from one TypeScript builder and render them as SVG, PNG, Canvas, Image elements, terminal text, or custom output.
 template: splash
 hero:
-  tagline: Generate QR codes from one builder, then render them as SVG, terminal text, PNG, or your own custom output.
+  tagline: Generate QR codes from one TypeScript builder, then choose the output format your app needs.
   actions:
     - text: Get started
       link: /guides/installation/
@@ -14,134 +14,106 @@ hero:
       variant: minimal
 ---
 
-import {Card, CardGrid, LinkCard} from '@astrojs/starlight/components';
+import {CardGrid, LinkCard} from '@astrojs/starlight/components';
 
-## One builder, focused renderers
+QRCodeSDK separates QR code generation from output. Start with `qrcode()`, then render SVG, PNG, Canvas, Image elements, terminal text, matrix data, or your own custom format.
 
-QRCodeSDK is organized as a small package family. The core package generates QR matrices and includes renderers that work in any JavaScript runtime. The browser package adds DOM renderers, and the Node package adds server-side renderers for output that depends on Node APIs.
+## Install and render SVG
 
-<CardGrid>
-  <Card title="@qrcodesdk/core" icon="seti:typescript">
-    Generate QR matrices and render SVG strings or terminal text strings in browser, server, CLI,
-    and test environments.
-  </Card>
-  <Card title="@qrcodesdk/node" icon="seti:nodejs">
-    Render PNG buffers in Node.js using the same builder and styling options as the core renderers.
-  </Card>
-  <Card title="@qrcodesdk/browser" icon="seti:html">
-    Render canvas and image elements in browser apps using the same builder API.
-  </Card>
-</CardGrid>
-
-## Quick start
-
-1. Install the core package.
+1. Install `@qrcodesdk/core`.
 
    ```sh
    pnpm add @qrcodesdk/core
    ```
 
-2. Render your first SVG.
+2. Render your first QR code.
 
    ```ts
    import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
-   const svg = qrcode('https://qrcodesdk.dev')
-     .renderer(SVGQRCodeRenderer({size: 6, margin: 4}))
-     .render();
+   const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
    ```
 
-3. Add runtime-specific output when needed.
+SVG is the best default for most user-facing QR codes because it stays sharp at any size and works in browsers, servers, emails, and static assets.
 
-   ```sh
-   pnpm add @qrcodesdk/node
-   pnpm add @qrcodesdk/browser
-   ```
+## Choose your output
 
-## Render where you need it
+<CardGrid>
+  <LinkCard
+    title="Render SVG"
+    href="/renderers/core/svg/"
+    description="Create a scalable SVG string from @qrcodesdk/core."
+  />
+  <LinkCard
+    title="Render PNG in Node.js"
+    href="/renderers/node/png/"
+    description="Create a PNG Buffer for files, API responses, and attachments."
+  />
+  <LinkCard
+    title="Render to Canvas"
+    href="/renderers/browser/canvas/"
+    description="Create an HTMLCanvasElement in browser apps."
+  />
+  <LinkCard
+    title="Render to an Image Element"
+    href="/renderers/browser/image/"
+    description="Create an HTMLImageElement with a PNG data URL."
+  />
+  <LinkCard
+    title="Render Terminal Text"
+    href="/renderers/core/text/"
+    description="Create compact terminal output for CLIs, logs, and snapshots."
+  />
+</CardGrid>
 
-### SVG
+## Customize the QR code
+
+Most renderers use the same styling options.
 
 ```ts
 import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev')
-  .renderer(
+  .errorCorrection('H')
+  .render(
     SVGQRCodeRenderer({
+      size: 8,
+      margin: 4,
       colors: {
+        colorDark: '#111827',
         colorLight: '#ffffff',
-        colorDark: '#111111',
       },
-      ariaLabel: 'Open QRCodeSDK',
+      ariaLabel: 'Scan to open qrcodesdk.dev',
     }),
-  )
-  .render();
+  );
 ```
 
-### Terminal
-
-```ts
-import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
-
-const output = qrcode('HELLO WORLD')
-  .mode('alphanumeric')
-  .renderer(QRCodeTextRenderer({size: 1, margin: 2}))
-  .render();
-
-console.log(output);
-```
-
-### PNG
-
-```ts
-import {writeFileSync} from 'node:fs';
-
-import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
-
-const png = qrcode('https://qrcodesdk.dev')
-  .renderer(PNGQRCodeRenderer({size: 8, margin: 4}))
-  .render();
-
-writeFileSync('qr.png', png);
-```
-
-### Browser image
-
-```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-const image = qrcode('https://qrcodesdk.dev').render(
-  ImageQRCodeRenderer({
-    alt: 'Open QRCodeSDK',
-  }),
-);
-
-document.body.append(image);
-```
-
-## Learn the packages
+## Go deeper
 
 <CardGrid>
   <LinkCard
     title="Installation"
     href="/guides/installation/"
-    description="Install the package family and render SVG, terminal text, and PNG output."
+    description="Choose the package for your output format and runtime."
   />
   <LinkCard
-    title="Core Library"
+    title="Customize QR Codes"
+    href="/guides/customize/"
+    description="Set size, margin, colors, accessibility labels, error correction, version, and mask."
+  />
+  <LinkCard
+    title="Builder API"
     href="/libraries/core/"
-    description="Use the builder, matrix output, QR modes, versions, masks, and custom renderers."
+    description="Use data modes, error correction, matrix output, and the immutable builder."
   />
   <LinkCard
-    title="Core Renderers"
+    title="Custom Renderers"
     href="/renderers/"
-    description="Render runtime-neutral SVG and terminal text output from @qrcodesdk/core."
+    description="Render the QR matrix into any output type."
   />
   <LinkCard
-    title="Node Renderers"
-    href="/renderers/node/png/"
-    description="Render PNG buffers and write QR code images from Node.js."
+    title="API Reference"
+    href="/reference/api/"
+    description="Review public exports from @qrcodesdk/core, @qrcodesdk/browser, and @qrcodesdk/node."
   />
 </CardGrid>

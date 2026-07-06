@@ -1,11 +1,9 @@
 ---
-title: Browser Image Renderer
-description: The Browser Image renderer outputs a QR code as an HTMLImageElement. Use it when you need an image element that can be inserted into a browser page, styled with CSS, labeled for accessibility, or downloaded as a PNG.
+title: Render to an Image Element
+description: Render a QR code as an HTMLImageElement with @qrcodesdk/browser.
 ---
 
-The Browser Image renderer outputs a QR code as an `HTMLImageElement`.
-
-Use it when you need an image element that can be inserted into a browser page, styled with CSS, labeled for accessibility, or downloaded as a PNG.
+Use this when you need an `HTMLImageElement` that can be inserted into a browser page, styled with CSS, labeled for accessibility, or downloaded as a PNG.
 
 ## Minimal example
 
@@ -18,7 +16,7 @@ const image = qrcode('https://qrcodesdk.dev').render(ImageQRCodeRenderer());
 
 The returned value is an `HTMLImageElement` whose `src` is a PNG data URL.
 
-## Styling options
+## Common options
 
 You can customize the image output by passing styling options to `ImageQRCodeRenderer`.
 
@@ -39,8 +37,6 @@ const image = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-### Options
-
 | Option              |     Type |     Default | Description                                       |
 | ------------------- | -------: | ----------: | ------------------------------------------------- |
 | `size`              | `number` |         `5` | Pixel size of each QR module.                     |
@@ -55,7 +51,9 @@ Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827
 
 Image output requires `size` to be a positive integer and `margin` to be a non-negative integer.
 
-## Accessibility
+## Common recipes
+
+### Add accessibility labels
 
 For user-facing QR codes, provide a meaningful label so assistive technologies can describe what the code points to.
 
@@ -71,10 +69,6 @@ const image = qrcode('https://qrcodesdk.dev').render(
   }),
 );
 ```
-
-## Browser examples
-
-Because the image renderer returns an `HTMLImageElement`, you can append it directly to the DOM or use its PNG data URL as a download URL.
 
 ### Insert into the DOM
 
@@ -145,3 +139,9 @@ For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
 ```
 
 So the output image is `232 x 232` pixels.
+
+## Related pages
+
+- [Render to Canvas](/renderers/browser/canvas/)
+- [Customize QR Codes](/guides/customize/)
+- [@qrcodesdk/browser](/libraries/browser/)

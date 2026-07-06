@@ -1,42 +1,62 @@
 ---
-title: Renderers
-description: Choose between SVG, browser DOM, PNG, and text output depending on where you want to use your QR code.
+title: Custom Renderers
+description: Build your own QRCodeSDK renderer by converting a QR matrix into any output type.
 ---
 
-`qrcodesdk` supports multiple renderers so you can generate the same QR code for different environments and output formats.
+Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers for SVG, PNG, Canvas, Image elements, and terminal text, and you can write your own renderer for any other format.
 
-## Available renderers
+## Choose a built-in renderer
 
-| Renderer                | Output              | Best for                                              | Package              |
-| ----------------------- | ------------------- | ----------------------------------------------------- | -------------------- |
-| SVG Renderer            | `string`            | Web apps, emails, dashboards, HTML, static assets     | `@qrcodesdk/core`    |
-| Text Renderer           | `string`            | CLIs, logs, terminals, snapshot tests                 | `@qrcodesdk/core`    |
-| Browser Canvas Renderer | `HTMLCanvasElement` | Browser DOM, canvas workflows, client-side downloads  | `@qrcodesdk/browser` |
-| Browser Image Renderer  | `HTMLImageElement`  | Browser DOM, CSS styling, accessible image elements   | `@qrcodesdk/browser` |
-| Node PNG Renderer       | `Buffer`            | Servers, downloads, files, API responses, attachments | `@qrcodesdk/node`    |
+| Renderer                                                | Output              | Best for                                              | Package              |
+| ------------------------------------------------------- | ------------------- | ----------------------------------------------------- | -------------------- |
+| [Render SVG](/renderers/core/svg/)                      | `string`            | Web apps, emails, dashboards, HTML, static assets     | `@qrcodesdk/core`    |
+| [Render PNG in Node.js](/renderers/node/png/)           | `Buffer`            | Servers, downloads, files, API responses, attachments | `@qrcodesdk/node`    |
+| [Render to Canvas](/renderers/browser/canvas/)          | `HTMLCanvasElement` | Browser DOM, canvas workflows, client-side downloads  | `@qrcodesdk/browser` |
+| [Render to an Image Element](/renderers/browser/image/) | `HTMLImageElement`  | Browser DOM, CSS styling, accessible image elements   | `@qrcodesdk/browser` |
+| [Render Terminal Text](/renderers/core/text/)           | `string`            | CLIs, logs, terminals, snapshot tests                 | `@qrcodesdk/core`    |
 
-## Choosing a renderer
+## Write a custom renderer
 
-### Use SVG by default
+A renderer is a function that receives a `QRCodeMatrix` and returns any output type.
 
-The SVG renderer is the best default for most user-facing surfaces.
+```ts
+import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
-It produces a scalable SVG string that stays sharp at any size and can be embedded directly into HTML, returned from a server, saved to disk, or used in email templates.
+const jsonRenderer: QRCodeRenderer<string> = (matrix) =>
+  JSON.stringify({
+    size: matrix.length,
+    matrix,
+  });
 
-### Use PNG for bitmap image output
+const json = qrcode('custom output').render(jsonRenderer);
+```
 
-The Node PNG renderer is useful when the target system expects raster image bytes.
+The matrix is a two-dimensional array. `1` means a dark module and `0` means a light module.
 
-It returns a Node.js `Buffer`, which makes it easy to save a `.png` file, send an `image/png` HTTP response, attach a QR code to an email, or provide a downloadable image.
+## Store a renderer on the builder
 
-### Use browser renderers for DOM output
+You can pass a renderer directly to `.render(renderer)` or store it with `.renderer(renderer).render()`.
 
-The Browser Canvas and Browser Image renderers are useful when you want a QR code element created directly in the browser.
+```ts
+import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
-They return DOM elements, so you can append a QR code to a page, style it with CSS, draw it into another canvas, or trigger a client-side `.png` download.
+const moduleCountRenderer: QRCodeRenderer<number> = (matrix) => matrix.length;
 
-### Use text for terminals and tests
+const moduleCount = qrcode('https://qrcodesdk.dev').renderer(moduleCountRenderer).render();
+```
 
-The text renderer is designed for developer-facing output.
+## Use matrix output directly
 
-It returns a plain string made from Unicode block characters, which makes it useful for CLIs, logs, terminal output, and deterministic test snapshots.
+Use `.matrix()` when you want full control over rendering and do not need the renderer function shape.
+
+```ts
+import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
+
+const matrix: QRCodeMatrix = qrcode('https://qrcodesdk.dev').matrix();
+```
+
+## Related pages
+
+- [Customize QR Codes](/guides/customize/)
+- [Builder API](/libraries/core/)
+- [API Reference](/reference/api/)

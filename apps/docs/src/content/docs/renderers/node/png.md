@@ -1,11 +1,9 @@
 ---
-title: Node PNG Renderer
-description: The Node PNG renderer outputs a QR code as a PNG Buffer. Use it when you need a raster image such as a file saved to disk, an API response, a downloadable asset, an email attachment, or any integration that expects PNG image bytes.
+title: Render PNG in Node.js
+description: Render a QR code as a PNG Buffer with @qrcodesdk/node.
 ---
 
-The Node PNG renderer outputs a QR code as a PNG `Buffer`.
-
-Use it when you need a raster image such as a file saved to disk, an API response, a downloadable asset, an email attachment, or any integration that expects PNG image bytes.
+Use this when you need raster image bytes in Node.js, such as a file saved to disk, an API response, a downloadable asset, an email attachment, or any integration that expects PNG image bytes.
 
 ## Minimal example
 
@@ -18,7 +16,7 @@ const png = qrcode('https://qrcodesdk.dev').render(PNGQRCodeRenderer());
 
 The returned value is a Node.js `Buffer` containing PNG image bytes.
 
-## Styling options
+## Common options
 
 You can customize the PNG output by passing styling options to `PNGQRCodeRenderer`.
 
@@ -38,8 +36,6 @@ const png = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-### Options
-
 | Option              |     Type |     Default | Description                                       |
 | ------------------- | -------: | ----------: | ------------------------------------------------- |
 | `size`              | `number` |         `5` | Pixel size of each QR module.                     |
@@ -49,9 +45,7 @@ const png = qrcode('https://qrcodesdk.dev').render(
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
-## Node.js examples
-
-Because the PNG renderer returns a `Buffer`, you can write it directly to disk or send it from an HTTP server.
+## Common recipes
 
 ### Save to disk
 
@@ -85,26 +79,7 @@ app.get('/qrcode.png', (_req, res) => {
 app.listen(3000);
 ```
 
-### Serve with Fastify
-
-```ts
-import Fastify from 'fastify';
-
-import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
-
-const fastify = Fastify();
-
-fastify.get('/qrcode.png', async (_request, reply) => {
-  const png = qrcode('https://qrcodesdk.dev').render(PNGQRCodeRenderer());
-
-  return reply.type('image/png').send(png);
-});
-
-await fastify.listen({port: 3000});
-```
-
-### Serve with Hono
+### Return from Hono
 
 ```ts
 import {serve} from '@hono/node-server';
@@ -152,4 +127,10 @@ For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
 8 * (21 + 2 * 4) = 232
 ```
 
-So the output PNG is `232 × 232` pixels.
+So the output PNG is `232 x 232` pixels.
+
+## Related pages
+
+- [Installation](/guides/installation/)
+- [Customize QR Codes](/guides/customize/)
+- [Render SVG](/renderers/core/svg/)

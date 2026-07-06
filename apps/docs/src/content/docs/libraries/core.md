@@ -1,9 +1,17 @@
 ---
-title: Core Library
-description: Generate QR code matrices and render them with the runtime-neutral core package.
+title: Builder API
+description: Use @qrcodesdk/core to generate QR matrices, render runtime-neutral output, and build custom renderers.
 ---
 
-`@qrcodesdk/core` is the foundation of the package family. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, or any custom output.
+`@qrcodesdk/core` is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
+
+Install it when you need:
+
+- `qrcode()` and the immutable builder API
+- SVG output
+- terminal text output
+- matrix output
+- custom renderers
 
 ## Builder API
 
@@ -79,11 +87,9 @@ qrcode('https://qrcodesdk.dev').errorCorrection('H');
 
 Available levels are `L`, `M`, `Q`, and `H`. Higher levels can survive more damage, but they reduce capacity and can require a larger QR version.
 
-The default level is `M`.
-
 ### Version and mask
 
-**Most applications should let the builder choose the version and mask automatically.**
+Most applications should let the builder choose the version and mask automatically.
 
 ```ts
 const matrix = qrcode('HELLO WORLD').mode('alphanumeric').version(1).mask(2).matrix();
@@ -91,7 +97,7 @@ const matrix = qrcode('HELLO WORLD').mode('alphanumeric').version(1).mask(2).mat
 
 Versions range from `1` to `40`. Masks range from `0` to `7`.
 
-### Matrix output
+## Matrix output
 
 Use `.matrix()` when you want to build your own renderer or inspect the QR code directly.
 
@@ -103,7 +109,7 @@ const matrix: QRCodeMatrix = qrcode('custom renderer').matrix();
 
 A matrix is a two-dimensional array of modules. `1` means dark and `0` means light.
 
-### Custom renderers
+## Custom renderers
 
 A renderer is a function that receives a matrix and returns any output type.
 
@@ -117,3 +123,15 @@ const json = qrcode('renderer output').render(jsonRenderer);
 ```
 
 Renderers can be passed directly to `.render(renderer)` or stored with `.renderer(renderer).render()`.
+
+## Built-in core renderers
+
+`@qrcodesdk/core` includes runtime-neutral renderers:
+
+- [Render SVG](/renderers/core/svg/)
+- [Render Terminal Text](/renderers/core/text/)
+
+For runtime-specific output, add:
+
+- [`@qrcodesdk/node`](/libraries/node/) for PNG buffers
+- [`@qrcodesdk/browser`](/libraries/browser/) for Canvas and Image elements

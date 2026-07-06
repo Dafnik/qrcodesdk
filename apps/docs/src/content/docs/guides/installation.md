@@ -1,19 +1,17 @@
 ---
 title: Installation
-description: Install QRCodeSDK packages and render your first QR codes.
+description: Choose the QRCodeSDK package for your output format and runtime.
 ---
 
-qrcodesdk is split into small packages.
+Most projects start with `@qrcodesdk/core`.
 
-- @qrcodesdk/core (QRCodeBuilder, SVG & Text Renderer)
-- @qrcodesdk/browser (Browser Canvas & Image Renderers)
-- @qrcodesdk/node (Node PNG Buffer Renderer)
+- Install `@qrcodesdk/core` if you need SVG, terminal text, matrix output, or custom renderers.
+- Add `@qrcodesdk/node` if you need PNG buffers in Node.js.
+- Add `@qrcodesdk/browser` if you need Canvas or Image elements in the browser.
 
-**Install only the runtime and renderers your app needs.**
+## Start with core
 
-## Install core
-
-`@qrcodesdk/core` contains the QR code builder, matrix generator, SVG renderer, and terminal text renderer.
+Use `@qrcodesdk/core` for runtime-neutral QR code generation.
 
 ```sh
 pnpm add @qrcodesdk/core
@@ -22,11 +20,25 @@ yarn add @qrcodesdk/core
 bun add @qrcodesdk/core
 ```
 
-## Install Node renderers
+```ts
+import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
-Use `@qrcodesdk/node` when you need Node-specific output such as PNG buffers.
+const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
+```
 
-**Install it alongside `@qrcodesdk/core`.**
+`@qrcodesdk/core` includes:
+
+- `qrcode()` and `QRCodeBuilder`
+- SVG string output
+- terminal text output
+- raw matrix output
+- custom renderer support
+
+## Add PNG output in Node.js
+
+Use `@qrcodesdk/node` when the result must be PNG bytes in a Node.js process.
+
+Install it alongside `@qrcodesdk/core`.
 
 ```sh
 pnpm add @qrcodesdk/core @qrcodesdk/node
@@ -35,11 +47,20 @@ yarn add @qrcodesdk/core @qrcodesdk/node
 bun add @qrcodesdk/core @qrcodesdk/node
 ```
 
-## Install browser renderers
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {PNGQRCodeRenderer} from '@qrcodesdk/node';
 
-Use `@qrcodesdk/browser` when you need browser DOM output such as canvas or image elements.
+const png = qrcode('https://qrcodesdk.dev').render(PNGQRCodeRenderer());
+```
 
-**Install it alongside `@qrcodesdk/core`.**
+Use PNG buffers for files, API responses, downloads, email attachments, and other integrations that expect `image/png` bytes.
+
+## Add browser DOM output
+
+Use `@qrcodesdk/browser` when the result should be a DOM element created in the browser.
+
+Install it alongside `@qrcodesdk/core`.
 
 ```sh
 pnpm add @qrcodesdk/core @qrcodesdk/browser
@@ -48,10 +69,33 @@ yarn add @qrcodesdk/core @qrcodesdk/browser
 bun add @qrcodesdk/core @qrcodesdk/browser
 ```
 
-## Choose a package
+```ts
+import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
 
-| Package              | Use it for                                                                | Renderers                                         |
-| -------------------- | ------------------------------------------------------------------------- | ------------------------------------------------- |
-| `@qrcodesdk/core`    | Runtime-neutral QR code generation in browsers, servers, CLIs, and tests. | SVG strings, terminal text strings, raw matrices. |
-| `@qrcodesdk/browser` | Browser DOM output.                                                       | Canvas and image elements.                        |
-| `@qrcodesdk/node`    | Node.js output that depends on Node or native server APIs.                | PNG `Buffer` output.                              |
+const image = qrcode('https://qrcodesdk.dev').render(
+  ImageQRCodeRenderer({
+    alt: 'QR code for qrcodesdk.dev',
+  }),
+);
+
+document.body.append(image);
+```
+
+Use browser renderers when you want an `HTMLCanvasElement`, an `HTMLImageElement`, a client-side PNG download, or DOM/CSS integration.
+
+## Package guide
+
+| Package              | Install when you need                                 | Outputs                                           |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------- |
+| `@qrcodesdk/core`    | Runtime-neutral generation and common output formats. | SVG strings, terminal text strings, raw matrices. |
+| `@qrcodesdk/node`    | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                     |
+| `@qrcodesdk/browser` | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`.          |
+
+## Next steps
+
+- [Render SVG](/renderers/core/svg/)
+- [Render PNG in Node.js](/renderers/node/png/)
+- [Render to Canvas](/renderers/browser/canvas/)
+- [Render to an Image Element](/renderers/browser/image/)
+- [Render Terminal Text](/renderers/core/text/)

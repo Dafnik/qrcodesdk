@@ -94,43 +94,41 @@ export default defineConfig({
       title: 'QRCodeSDK',
       sidebar: [
         {
-          label: 'Getting Started',
+          label: 'Start Here',
           items: [
             {label: 'Overview', slug: ''},
             {label: 'Installation', slug: 'guides/installation'},
           ],
         },
         {
-          label: 'Libraries',
+          label: 'Choose Your Output',
           items: [
-            {label: 'Core', slug: 'libraries/core'},
-            {label: 'Node', slug: 'libraries/node'},
+            {label: 'Render SVG', slug: 'renderers/core/svg'},
+            {label: 'Render PNG in Node.js', slug: 'renderers/node/png'},
+            {label: 'Render to Canvas', slug: 'renderers/browser/canvas'},
+            {label: 'Render to an Image Element', slug: 'renderers/browser/image'},
+            {label: 'Render Terminal Text', slug: 'renderers/core/text'},
           ],
         },
         {
-          label: 'Renderers',
+          label: 'Customize',
+          items: [{label: 'Customize QR Codes', slug: 'guides/customize'}],
+        },
+        {
+          label: 'Advanced',
           items: [
-            {label: 'Overview', slug: 'renderers'},
-            {
-              label: 'Core',
-              items: [
-                {label: 'SVG', slug: 'renderers/core/svg'},
-                {label: 'Text', slug: 'renderers/core/text'},
-              ],
-            },
-            {
-              label: 'Browser',
-              items: [
-                {label: 'Canvas', slug: 'renderers/browser/canvas'},
-                {label: 'Image', slug: 'renderers/browser/image'},
-              ],
-            },
-            {label: 'Node', items: [{label: 'PNG', slug: 'renderers/node/png'}]},
+            {label: 'Builder API', slug: 'libraries/core'},
+            {label: 'Custom Renderers', slug: 'renderers'},
+            {label: 'API Reference', slug: 'reference/api'},
           ],
         },
         {
-          label: 'Reference',
-          items: [{label: 'API Reference', slug: 'reference/api'}],
+          label: 'Packages',
+          items: [
+            {label: '@qrcodesdk/core', slug: 'libraries/core'},
+            {label: '@qrcodesdk/browser', slug: 'libraries/browser'},
+            {label: '@qrcodesdk/node', slug: 'libraries/node'},
+          ],
         },
       ],
     }),

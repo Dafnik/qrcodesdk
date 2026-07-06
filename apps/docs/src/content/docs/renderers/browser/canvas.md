@@ -1,11 +1,9 @@
 ---
-title: Browser Canvas Renderer
-description: The Browser Canvas renderer outputs a QR code as an HTMLCanvasElement. Use it when you need a DOM canvas that can be inserted into a browser page, drawn into another canvas, converted to image bytes, or downloaded as a PNG.
+title: Render to Canvas
+description: Render a QR code as an HTMLCanvasElement with @qrcodesdk/browser.
 ---
 
-The Browser Canvas renderer outputs a QR code as an `HTMLCanvasElement`.
-
-Use it when you need a DOM canvas that can be inserted into a browser page, drawn into another canvas, converted to image bytes, or downloaded as a PNG.
+Use this when you need a browser-owned `HTMLCanvasElement` that can be inserted into a page, drawn into another canvas, converted to image bytes, or downloaded as a PNG.
 
 ## Minimal example
 
@@ -18,7 +16,7 @@ const canvas = qrcode('https://qrcodesdk.dev').render(CanvasQRCodeRenderer());
 
 The returned value is an `HTMLCanvasElement` containing rasterized QR code pixels.
 
-## Styling options
+## Common options
 
 You can customize the canvas output by passing styling options to `CanvasQRCodeRenderer`.
 
@@ -38,8 +36,6 @@ const canvas = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-### Options
-
 | Option              |     Type |     Default | Description                                       |
 | ------------------- | -------: | ----------: | ------------------------------------------------- |
 | `size`              | `number` |         `5` | Pixel size of each QR module.                     |
@@ -51,9 +47,7 @@ Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827
 
 Canvas output requires `size` to be a positive integer and `margin` to be a non-negative integer.
 
-## Browser examples
-
-Because the canvas renderer returns an `HTMLCanvasElement`, you can append it directly to the DOM or convert it to a PNG download.
+## Common recipes
 
 ### Insert into the DOM
 
@@ -77,6 +71,23 @@ if (container) {
 
 ```html
 <div id="qrcode"></div>
+```
+
+### Draw into another canvas
+
+```ts
+import {CanvasQRCodeRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const qrCanvas = qrcode('https://qrcodesdk.dev').render(CanvasQRCodeRenderer());
+const target = document.querySelector<HTMLCanvasElement>('#target');
+const context = target?.getContext('2d');
+
+if (target && context) {
+  target.width = qrCanvas.width;
+  target.height = qrCanvas.height;
+  context.drawImage(qrCanvas, 0, 0);
+}
 ```
 
 ### Download as PNG
@@ -125,3 +136,9 @@ For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
 ```
 
 So the output canvas is `232 x 232` pixels.
+
+## Related pages
+
+- [Render to an Image Element](/renderers/browser/image/)
+- [Customize QR Codes](/guides/customize/)
+- [@qrcodesdk/browser](/libraries/browser/)
