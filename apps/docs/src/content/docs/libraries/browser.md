@@ -1,9 +1,9 @@
 ---
 title: '@qrcodesdk/browser'
-description: Add Canvas and Image element output for browser apps.
+description: Add Canvas, Image element, and browser download output for browser apps.
 ---
 
-`@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser.
+`@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.
 
 ## Install
 
@@ -37,12 +37,26 @@ const canvas = qrcode('https://qrcodesdk.dev').render(CanvasQRCodeRenderer());
 document.body.append(canvas);
 ```
 
+## Download files
+
+```ts
+import {DownloadImageQRCodeRenderer, ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+qrcode('https://qrcodesdk.dev').render(
+  DownloadImageQRCodeRenderer({
+    renderer: ImageQRCodeRenderer(),
+    filename: 'qrcode',
+  }),
+);
+```
+
 ## Use it for
 
 - appending QR codes directly to a browser page
 - styling image elements with CSS
 - drawing QR codes into canvas workflows
-- creating client-side PNG downloads
+- creating client-side SVG and PNG downloads
 
 ## Package boundary
 

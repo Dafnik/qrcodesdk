@@ -6,8 +6,12 @@ import type {
 } from '@qrcodesdk/core';
 
 import {CanvasQRCodeRenderer} from './canvas';
+import {downloadQRCode, ensureExtension} from './download-helper';
+import type {QRCodeDownloadRendererOptions} from './types';
 
 export type QRCodeImageRendererOptions = QRCodeStylingOptions & QRCodeAccessibilityOptions;
+
+export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<HTMLImageElement>;
 
 export function ImageQRCodeRenderer(
   options?: QRCodeImageRendererOptions,
@@ -22,6 +26,16 @@ export function ImageQRCodeRenderer(
     applyAccessibilityAttributes(image, options);
 
     return image;
+  };
+}
+
+export function DownloadImageQRCodeRenderer(
+  options: QRCodeDownloadImageRendererOptions,
+): QRCodeRenderer<void> {
+  return (matrix: QRCodeMatrix) => {
+    const image = options.renderer(matrix);
+
+    downloadQRCode(image.src, ensureExtension(options?.filename ?? 'qrcode', '.png'));
   };
 }
 

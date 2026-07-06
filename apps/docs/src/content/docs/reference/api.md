@@ -78,12 +78,34 @@ ImageQRCodeRenderer(options?);
 
 Options include shared styling plus image accessibility attributes: `alt`, `ariaLabel`, and `title`.
 
+### DownloadImageQRCodeRenderer
+
+Creates a renderer that triggers a PNG download in the browser and returns `void`.
+
+```ts
+DownloadImageQRCodeRenderer(options);
+```
+
+Options include `renderer`, an image renderer such as `ImageQRCodeRenderer(options)`, and optional `filename`.
+
+### DownloadSVGQRCodeRenderer
+
+Creates a renderer that triggers an SVG download in the browser and returns `void`.
+
+```ts
+DownloadSVGQRCodeRenderer(options);
+```
+
+Options include `renderer`, an SVG renderer such as `SVGQRCodeRenderer(options)`, and optional `filename`.
+
 ### Types
 
 The browser package exports:
 
 ```ts
 type QRCodeCanvasRendererOptions;
+type QRCodeDownloadImageRendererOptions;
+type QRCodeDownloadSVGRendererOptions;
 type QRCodeImageRendererOptions;
 ```
 

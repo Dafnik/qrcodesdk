@@ -95,6 +95,26 @@ if (container) {
 
 ### Download as PNG
 
+Use `DownloadImageQRCodeRenderer` when a browser action should download the rendered image as a PNG.
+
+```ts
+import {DownloadImageQRCodeRenderer, ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+qrcode('https://qrcodesdk.dev').render(
+  DownloadImageQRCodeRenderer({
+    renderer: ImageQRCodeRenderer({
+      alt: 'QR code for qrcodesdk.dev',
+    }),
+    filename: 'qrcode',
+  }),
+);
+```
+
+The download renderer appends `.png` when the filename does not already end with `.png`. It uses the wrapped image renderer's `image.src`, clicks a temporary download link, and returns `void`.
+
+Use the returned image element directly when you need to control the download link yourself.
+
 ```ts
 import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';

@@ -7,7 +7,7 @@ Most projects start with `@qrcodesdk/core`.
 
 - Install `@qrcodesdk/core` if you need SVG, terminal text, matrix output, or custom renderers.
 - Add `@qrcodesdk/node` if you need PNG buffers in Node.js.
-- Add `@qrcodesdk/browser` if you need Canvas or Image elements in the browser.
+- Add `@qrcodesdk/browser` if you need Canvas, Image elements, or browser downloads.
 
 ## Start with core
 
@@ -82,15 +82,15 @@ const image = qrcode('https://qrcodesdk.dev').render(
 document.body.append(image);
 ```
 
-Use browser renderers when you want an `HTMLCanvasElement`, an `HTMLImageElement`, a client-side PNG download, or DOM/CSS integration.
+Use browser renderers when you want an `HTMLCanvasElement`, an `HTMLImageElement`, a client-side SVG or PNG download, or DOM/CSS integration.
 
 ## Package guide
 
-| Package              | Install when you need                                 | Outputs                                           |
-| -------------------- | ----------------------------------------------------- | ------------------------------------------------- |
-| `@qrcodesdk/core`    | Runtime-neutral generation and common output formats. | SVG strings, terminal text strings, raw matrices. |
-| `@qrcodesdk/node`    | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                     |
-| `@qrcodesdk/browser` | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`.          |
+| Package              | Install when you need                                 | Outputs                                             |
+| -------------------- | ----------------------------------------------------- | --------------------------------------------------- |
+| `@qrcodesdk/core`    | Runtime-neutral generation and common output formats. | SVG strings, terminal text strings, raw matrices.   |
+| `@qrcodesdk/node`    | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                       |
+| `@qrcodesdk/browser` | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`, downloads. |
 
 ## Next steps
 

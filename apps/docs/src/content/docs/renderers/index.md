@@ -3,7 +3,7 @@ title: Custom Renderers
 description: Build your own QRCodeSDK renderer by converting a QR matrix into any output type.
 ---
 
-Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers for SVG, PNG, Canvas, Image elements, and terminal text, and you can write your own renderer for any other format.
+Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers for SVG, PNG, Canvas, Image elements, browser downloads, and terminal text, and you can write your own renderer for any other format.
 
 ## Choose a built-in renderer
 
@@ -14,6 +14,8 @@ Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers
 | [Render to Canvas](/renderers/browser/canvas/)          | `HTMLCanvasElement` | Browser DOM, canvas workflows, client-side downloads  | `@qrcodesdk/browser` |
 | [Render to an Image Element](/renderers/browser/image/) | `HTMLImageElement`  | Browser DOM, CSS styling, accessible image elements   | `@qrcodesdk/browser` |
 | [Render Terminal Text](/renderers/core/text/)           | `string`            | CLIs, logs, terminals, snapshot tests                 | `@qrcodesdk/core`    |
+
+Browser downloads are recipes on the SVG and Image renderer pages: use the browser package to wrap `SVGQRCodeRenderer()` for `.svg` downloads, or `ImageQRCodeRenderer()` for `.png` downloads.
 
 ## Write a custom renderer
 

@@ -65,7 +65,7 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-### Save to disk
+### Save to disk (node)
 
 ```ts
 import {writeFile} from 'node:fs/promises';
@@ -137,6 +137,51 @@ if (container) {
 
 ```html
 <div id="qrcode"></div>
+```
+
+### Download in the browser
+
+Use `DownloadSVGQRCodeRenderer` from `@qrcodesdk/browser` when a browser action should download the rendered SVG.
+
+```ts
+import {DownloadSVGQRCodeRenderer} from '@qrcodesdk/browser';
+import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+
+qrcode('https://qrcodesdk.dev').render(
+  DownloadSVGQRCodeRenderer({
+    renderer: SVGQRCodeRenderer({
+      ariaLabel: 'Scan to open qrcodesdk.dev',
+    }),
+    filename: 'qrcode',
+  }),
+);
+```
+
+The download renderer appends `.svg` when the filename does not already end with `.svg`. It creates an SVG `Blob`, clicks a temporary download link, revokes the object URL, and returns `void`.
+
+Use the returned svg directly when you need to control the download link yourself.
+
+```ts
+import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+
+const svg = qrcode('https://qrcodesdk.dev').render(
+  SVGQRCodeRenderer({
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+  }),
+);
+
+const blob = new Blob([svg], {
+  type: 'image/svg+xml;charset=utf-8',
+});
+
+const url = URL.createObjectURL(blob);
+
+const link = document.createElement('a');
+link.href = url;
+link.download = 'qrcode.svg';
+link.click();
+
+URL.revokeObjectURL(url);
 ```
 
 ## Output details
