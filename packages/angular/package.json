@@ -34,6 +34,8 @@
   "private": true,
   "packageManager": "pnpm@11.7.0",
   "peerDependencies": {
+    "@qrcodesdk/core": "workspace:*",
+    "@qrcodesdk/browser": "workspace:*",
     "@angular/common": "catalog:",
     "@angular/core": "catalog:",
     "@angular/forms": "catalog:",

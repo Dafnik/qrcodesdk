@@ -91,9 +91,9 @@ export type ParsedQRCodeStylingOptions = {
 
 export type ResolvedQRCodeMatrixOptions = {
   data: QRCodeEncodedData;
+  version: QRCodeVersion;
   mode: QRCodeSupportedModeIndicator;
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue;
-  version: QRCodeVersion;
   mask: QRCodeMask | undefined;
 };
 

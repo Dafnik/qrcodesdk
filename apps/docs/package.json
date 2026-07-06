@@ -16,8 +16,11 @@
     "@angular/core": "catalog:",
     "@angular/platform-browser": "catalog:",
     "@angular/platform-server": "catalog:",
+    "@astrojs/starlight-tailwind": "^5.0.0",
     "@qrcodesdk/angular": "workspace:*",
+    "@tailwindcss/vite": "^4.3.2",
     "rxjs": "catalog:",
+    "tailwindcss": "^4.3.2",
     "tslib": "catalog:"
   },
   "devDependencies": {

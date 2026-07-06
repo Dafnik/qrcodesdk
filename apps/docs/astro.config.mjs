@@ -1,6 +1,7 @@
 // @ts-check
 import angular from '@analogjs/astro-angular';
 import starlight from '@astrojs/starlight';
+import tailwindcss from '@tailwindcss/vite';
 import {defineConfig} from 'astro/config';
 import {readFileSync} from 'fs';
 
@@ -87,10 +88,11 @@ export default defineConfig({
   },
   vite: {
     cacheDir: process.env.VITE_CACHE_DIR ?? './node_modules/.vite',
-    plugins: [includeContentPlugin()],
+    plugins: [includeContentPlugin(), tailwindcss()],
   },
   integrations: [
     starlight({
+      customCss: ['./src/styles/global.css'],
       title: 'QRCodeSDK',
       sidebar: [
         {
@@ -128,6 +130,7 @@ export default defineConfig({
             {label: '@qrcodesdk/core', slug: 'libraries/core'},
             {label: '@qrcodesdk/browser', slug: 'libraries/browser'},
             {label: '@qrcodesdk/node', slug: 'libraries/node'},
+            {label: '@qrcodesdk/angular', slug: 'libraries/angular'},
           ],
         },
       ],
@@ -136,7 +139,7 @@ export default defineConfig({
       useAngularHydration: true,
       vite: {
         transformFilter: (_code, id) => {
-          return id.includes('src/components'); // <- only transform Angular TypeScript files
+          return id.includes('src/components/angular'); // <- only transform Angular TypeScript files
         },
       },
     }),

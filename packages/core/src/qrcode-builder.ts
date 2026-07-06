@@ -53,7 +53,7 @@ export class QRCodeBuilder<
     return new QRCodeBuilder(value, this.config, this.currentRenderer);
   }
 
-  mode(mode: QRCodeMode): QRCodeBuilder<D, R> {
+  mode(mode?: QRCodeMode): QRCodeBuilder<D, R> {
     return new QRCodeBuilder(
       this._data,
       {
@@ -64,7 +64,7 @@ export class QRCodeBuilder<
     );
   }
 
-  errorCorrection(level: QRCodeErrorCorrectionLevel): QRCodeBuilder<D, R> {
+  errorCorrection(level?: QRCodeErrorCorrectionLevel): QRCodeBuilder<D, R> {
     return new QRCodeBuilder(
       this._data,
       {
@@ -75,7 +75,7 @@ export class QRCodeBuilder<
     );
   }
 
-  version(version: QRCodeVersion): QRCodeBuilder<D, R> {
+  version(version?: QRCodeVersion): QRCodeBuilder<D, R> {
     return new QRCodeBuilder(
       this._data,
       {
@@ -86,7 +86,7 @@ export class QRCodeBuilder<
     );
   }
 
-  mask(mask: QRCodeMask): QRCodeBuilder<D, R> {
+  mask(mask?: QRCodeMask): QRCodeBuilder<D, R> {
     return new QRCodeBuilder(
       this._data,
       {

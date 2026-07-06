@@ -43,6 +43,8 @@ describe('qrcode().matrix()', () => {
         errorCorrectionLevel: 'L',
         mask: 5,
       },
+      {data: '', mode: 'octet', version: 2, errorCorrectionLevel: 'Q', mask: 3},
+      {data: ' ', mode: 'octet', version: 2, errorCorrectionLevel: 'Q', mask: 3},
     ];
 
     for (const options of cases) {

@@ -1,8 +1,28 @@
 # @qrcodesdk/angular
 
-Placeholder Angular adapter package for QRCodeSDK.
+Angular components for rendering QRCodeSDK QR codes.
 
-This package is intentionally minimal right now. It is kept in the workspace so the package name, build pipeline, and docs integration can be reserved while the real Angular adapter API is designed.
+## Components
+
+- `SVGQRCode` renders a scalable SVG and supports SVG download.
+- `ImageQRCode` renders a PNG-backed image element and supports PNG download.
+- `CanvasQRCode` renders a canvas element.
+
+```ts
+import { Component } from '@angular/core';
+import { CanvasQRCode, ImageQRCode, SVGQRCode } from '@qrcodesdk/angular';
+
+@Component({
+  selector: 'app-root',
+  imports: [SVGQRCode, ImageQRCode, CanvasQRCode],
+  template: `
+    <svg-qrcode data="https://qrcodesdk.dev" />
+    <image-qrcode data="https://qrcodesdk.dev" />
+    <canvas-qrcode data="https://qrcodesdk.dev" />
+  `,
+})
+export class App {}
+```
 
 ## Build
 
@@ -15,5 +35,3 @@ ng build
 ```bash
 ng test
 ```
-
-The current output is a placeholder standalone component and should not be treated as the final public Angular API.
