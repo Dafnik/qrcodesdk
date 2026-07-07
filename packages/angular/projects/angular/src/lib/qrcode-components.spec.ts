@@ -142,7 +142,7 @@ describe('Angular QR code components', () => {
 
     fixture.detectChanges();
 
-    const wrapper = renderedElement<HTMLDivElement>(fixture, 'image-qrcode > div');
+    const wrapper = renderedElement<HTMLElement>(fixture, 'image-qrcode');
     const firstImage = renderedElement<HTMLImageElement>(fixture, 'img');
 
     fixture.componentInstance.options.set({size: 3, margin: 1});
@@ -161,7 +161,7 @@ describe('Angular QR code components', () => {
 
     fixture.detectChanges();
 
-    const wrapper = renderedElement<HTMLDivElement>(fixture, 'canvas-qrcode > div');
+    const wrapper = renderedElement<HTMLElement>(fixture, 'canvas-qrcode');
     const firstCanvas = renderedElement<HTMLCanvasElement>(fixture, 'canvas');
 
     fixture.componentInstance.data.set('WORLD');
