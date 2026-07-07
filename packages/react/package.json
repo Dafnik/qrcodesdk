@@ -1,0 +1,60 @@
+{
+  "name": "@qrcodesdk/react",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "React components for rendering QRCodeSDK QR codes.",
+  "author": "Dafnik",
+  "license": "MIT",
+  "homepage": "https://github.com/Dafnik/qrcodesdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dafnik/qrcodesdk.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/Dafnik/qrcodesdk/issues"
+  },
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "watch": "tsdown --watch",
+    "test": "vitest",
+    "check-types": "tsc --noEmit",
+    "release": "bumpp",
+    "lint": "eslint src tests --max-warnings 0",
+    "clean": "rm -rf .turbo dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "peerDependencies": {
+    "@qrcodesdk/browser": "workspace:*",
+    "@qrcodesdk/core": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@qrcodesdk/browser": "workspace:*",
+    "@qrcodesdk/core": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@testing-library/dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "bumpp": "catalog:",
+    "jsdom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

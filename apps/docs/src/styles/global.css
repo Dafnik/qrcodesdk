@@ -6,17 +6,88 @@
 
 @theme {
   /* Generated accent color palettes. */
-  --color-accent-200: #b3c7ff;
-  --color-accent-600: #364bff;
-  --color-accent-900: #182775;
-  --color-accent-950: #131e4f;
+  --color-accent-200: #84dcc8;
+  --color-accent-600: #007463;
+  --color-accent-900: #003c32;
+  --color-accent-950: #002b24;
   /* Generated gray color palettes. */
-  --color-gray-100: #f5f6f8;
-  --color-gray-200: #eceef2;
-  --color-gray-300: #c0c2c7;
-  --color-gray-400: #888b96;
-  --color-gray-500: #545861;
-  --color-gray-700: #353841;
-  --color-gray-800: #24272f;
-  --color-gray-900: #17181c;
+  --color-gray-100: #dffefc;
+  --color-gray-200: #bcfcf9;
+  --color-gray-300: #81d3cf;
+  --color-gray-400: #00a09d;
+  --color-gray-500: #006663;
+  --color-gray-700: #004240;
+  --color-gray-800: #002e2d;
+  --color-gray-900: #001d1c;
+}
+
+:root {
+  --btn-primary-bg: hsl(222.2 47.4% 11.2%);
+  --btn-primary-bg-hover: hsl(222.2 47.4% 13.5%);
+  --btn-primary-text: hsl(210 40% 98%);
+  --btn-primary-ring: hsl(222.2 47.4% 11.2%);
+  --btn-focus-offset: white;
+}
+
+[data-theme='dark'] {
+  --btn-primary-bg: hsl(210 40% 98%);
+  --btn-primary-bg-hover: hsl(210 40% 92%);
+  --btn-primary-text: hsl(222.2 47.4% 11.2%);
+  --btn-primary-ring: hsl(210 40% 98%);
+  --btn-focus-offset: hsl(222.2 84% 4.9%);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  height: 2.5rem;
+  padding: 0 1rem;
+
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.08),
+    0 1px 1px rgb(0 0 0 / 0.04);
+
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease,
+    opacity 150ms ease;
+}
+
+.btn-primary:hover {
+  background: var(--btn-primary-bg-hover);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.08);
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--btn-focus-offset),
+    0 0 0 4px var(--btn-primary-ring);
+}
+
+.btn-primary:disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }

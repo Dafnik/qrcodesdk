@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["es2023", "DOM", "DOM.Iterable"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "outDir": "dist",
+    "types": []
+  },
+  "exclude": ["node_modules", "dist"],
+  "extends": "@repo/typescript-config/react-library.json",
+  "include": ["src", "tests", "vitest.config.ts"]
+}

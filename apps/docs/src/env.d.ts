@@ -3,7 +3,8 @@
 
 declare module '*?includeContent' {
   import type {Type} from '@angular/core';
-  const component: Type<any>;
+  import type {ComponentType} from 'react';
+  const component: Type<any> | ComponentType<any>;
   export const content: string;
   export default component;
 }

@@ -16,9 +16,13 @@
     "@angular/core": "catalog:",
     "@angular/platform-browser": "catalog:",
     "@angular/platform-server": "catalog:",
+    "@astrojs/react": "catalog:",
     "@astrojs/starlight-tailwind": "^5.0.0",
     "@qrcodesdk/angular": "workspace:*",
+    "@qrcodesdk/react": "workspace:*",
     "@tailwindcss/vite": "^4.3.2",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "rxjs": "catalog:",
     "tailwindcss": "^4.3.2",
     "tslib": "catalog:"
@@ -32,6 +36,8 @@
     "@astrojs/check": "catalog:",
     "@astrojs/starlight": "catalog:",
     "@repo/eslint-config": "workspace:*",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "astro": "catalog:",
     "sharp": "catalog:",
     "typescript": "catalog:"

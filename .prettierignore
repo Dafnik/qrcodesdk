@@ -1,1 +1,4 @@
 .astro/
+.vite-cache/
+.astro-cache/
+.angular/

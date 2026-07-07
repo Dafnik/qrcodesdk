@@ -1,4 +1,10 @@
 {
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@qrcodesdk/react": ["../../packages/react/src/index.ts"]
+    }
+  },
   "exclude": ["dist", "eslint.config.mjs"],
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"]

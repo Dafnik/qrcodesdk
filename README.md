@@ -2,7 +2,7 @@
 
 A modular TypeScript package family for generating QR codes and rendering them in the format your runtime needs.
 
-`@qrcodesdk/core` builds QR code matrices and includes runtime-neutral SVG and terminal text renderers. `@qrcodesdk/browser` adds DOM element renderers, and `@qrcodesdk/node` adds Node.js PNG output on top of the same builder API.
+`@qrcodesdk/core` builds QR code matrices and includes runtime-neutral SVG and terminal text renderers. `@qrcodesdk/browser` adds DOM element renderers, `@qrcodesdk/node` adds Node.js PNG output, and the framework packages expose the same output through Angular and React components.
 
 ## Packages
 
@@ -11,6 +11,8 @@ A modular TypeScript package family for generating QR codes and rendering them i
 | `@qrcodesdk/core`    | Runtime-neutral QR generation for browsers, servers, CLIs, and tests. | SVG strings, terminal text strings, raw matrices. |
 | `@qrcodesdk/browser` | Browser-specific DOM output.                                          | Canvas and image elements.                        |
 | `@qrcodesdk/node`    | Node-specific QR output.                                              | PNG `Buffer` output.                              |
+| `@qrcodesdk/angular` | Angular component output.                                             | SVG, image, and canvas components.                |
+| `@qrcodesdk/react`   | React component output.                                               | SVG, image, and canvas components.                |
 
 ## Install
 
@@ -122,6 +124,8 @@ Defaults are designed for readable output:
 - [Renderers](apps/docs/src/content/docs/renderers/index.md)
 - [Browser library](apps/docs/src/content/docs/libraries/browser.md)
 - [Node renderers](apps/docs/src/content/docs/libraries/node.md)
+- [Angular components](apps/docs/src/content/docs/libraries/angular.mdx)
+- [React components](apps/docs/src/content/docs/libraries/react.mdx)
 - [API reference](apps/docs/src/content/docs/reference/api.md)
 
 ## Workspace development

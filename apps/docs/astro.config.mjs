@@ -1,9 +1,11 @@
 // @ts-check
 import angular from '@analogjs/astro-angular';
+import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import {defineConfig} from 'astro/config';
 import {readFileSync} from 'fs';
+import {fileURLToPath} from 'node:url';
 
 /**
  * @typedef {{ name: string, enforce: 'pre' | 'post', transform(code: string, id: string): void | { code: string } }} IncludeContentPlugin
@@ -48,6 +50,15 @@ function includeContentPlugin() {
         const fileContent = map.get(filePath);
         if (!fileContent) return;
 
+        if (filePath.includes('/src/components/react/')) {
+          return {
+            code: `
+              ${code}
+              export const content = ${JSON.stringify(fileContent)};
+            `,
+          };
+        }
+
         const filteredFileContent = fileContent
           .replace(/static clientProviders\s*=\s*\[.*?\];\n?/s, '')
           .replace(/static renderProviders\s*=\s*\[.*?\];\n?/s, '')
@@ -89,6 +100,13 @@ export default defineConfig({
   vite: {
     cacheDir: process.env.VITE_CACHE_DIR ?? './node_modules/.vite',
     plugins: [includeContentPlugin(), tailwindcss()],
+    resolve: {
+      alias: {
+        '@qrcodesdk/react': fileURLToPath(
+          new URL('../../packages/react/src/index.ts', import.meta.url),
+        ),
+      },
+    },
   },
   integrations: [
     starlight({
@@ -131,10 +149,12 @@ export default defineConfig({
             {label: '@qrcodesdk/browser', slug: 'libraries/browser'},
             {label: '@qrcodesdk/node', slug: 'libraries/node'},
             {label: '@qrcodesdk/angular', slug: 'libraries/angular'},
+            {label: '@qrcodesdk/react', slug: 'libraries/react'},
           ],
         },
       ],
     }),
+    react(),
     angular({
       useAngularHydration: true,
       vite: {

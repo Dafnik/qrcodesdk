@@ -28,11 +28,10 @@ pnpm add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
 
 All components accept:
 
-| Input      | Type     | Description                                     |
-| ---------- | -------- | ----------------------------------------------- |
-| `data`     | `string` | Required QR code payload.                       |
-| `options`  | `object` | Matrix and renderer options.                    |
-| `cssClass` | `string` | CSS class applied to the component wrapper div. |
+| Input     | Type     | Description                  |
+| --------- | -------- | ---------------------------- |
+| `data`    | `string` | Required QR code payload.    |
+| `options` | `object` | Matrix and renderer options. |
 
 `options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, and `mask`. Renderer options match the corresponding QRCodeSDK renderer:
 

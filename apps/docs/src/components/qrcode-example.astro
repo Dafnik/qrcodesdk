@@ -2,12 +2,12 @@
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import {Code} from 'astro/components';
 
-const { code } = Astro.props;
+const { code, lang = 'angular-ts' } = Astro.props;
 ---
 
-<Tabs>
+<Tabs syncKey="qrcode-example">
   <TabItem label="Code">
-    <Code lang="angular-ts" code={code ?? ''} />
+    <Code lang={lang} code={code ?? ''} />
   </TabItem>
   <TabItem label="Preview">
     <div class="flex flex-col items-center">
