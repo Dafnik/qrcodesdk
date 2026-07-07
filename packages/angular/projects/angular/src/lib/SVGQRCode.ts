@@ -1,12 +1,12 @@
-import { Component, computed, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
+import {Component, ElementRef, Renderer2, computed, effect, inject, input} from '@angular/core';
+
+import {DownloadSVGQRCodeRenderer} from '@qrcodesdk/browser';
 import {
   type QRCodeMatrixOptions,
   type QRCodeSVGRendererOptions,
-  qrcode,
   SVGQRCodeRenderer,
+  qrcode,
 } from '@qrcodesdk/core';
-
-import { DownloadSVGQRCodeRenderer } from '@qrcodesdk/browser';
 
 export type QRCodeSVGOptions = QRCodeMatrixOptions & QRCodeSVGRendererOptions;
 

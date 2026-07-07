@@ -1,23 +1,23 @@
-import { isPlatformBrowser } from '@angular/common';
+import {isPlatformBrowser} from '@angular/common';
 import {
   Component,
+  ElementRef,
   PLATFORM_ID,
+  Renderer2,
   computed,
   effect,
-  ElementRef,
   inject,
   input,
-  Renderer2,
 } from '@angular/core';
-import { type QRCodeMatrixOptions, qrcode } from '@qrcodesdk/core';
 
 import {
   DownloadImageQRCodeRenderer,
   ImageQRCodeRenderer,
   type QRCodeImageRendererOptions,
 } from '@qrcodesdk/browser';
+import {type QRCodeMatrixOptions, qrcode} from '@qrcodesdk/core';
 
-import { replaceElementChildren } from './render-element';
+import {replaceElementChildren} from './render-element';
 
 export type QRCodeImageOptions = QRCodeMatrixOptions & QRCodeImageRendererOptions;
 

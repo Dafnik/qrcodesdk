@@ -1,10 +1,11 @@
-import { Component, signal, ViewChild } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import {Component, ViewChild, signal} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CanvasQRCode, type QRCodeCanvasOptions } from './CanvasQRCode';
-import { ImageQRCode, type QRCodeImageOptions } from './ImageQRCode';
-import { SVGQRCode, type QRCodeSVGOptions } from './SVGQRCode';
+import {beforeEach, describe, expect, test, vi} from 'vitest';
+
+import {CanvasQRCode, type QRCodeCanvasOptions} from './CanvasQRCode';
+import {ImageQRCode, type QRCodeImageOptions} from './ImageQRCode';
+import {type QRCodeSVGOptions, SVGQRCode} from './SVGQRCode';
 
 @Component({
   selector: 'svg-qrcode-host',
@@ -13,7 +14,7 @@ import { SVGQRCode, type QRCodeSVGOptions } from './SVGQRCode';
 })
 class SVGQRCodeHost {
   data = signal('HELLO');
-  options = signal<QRCodeSVGOptions>({ size: 2, margin: 1 });
+  options = signal<QRCodeSVGOptions>({size: 2, margin: 1});
 }
 
 @Component({
@@ -41,7 +42,7 @@ class ImageQRCodeHost {
 })
 class CanvasQRCodeHost {
   data = signal('HELLO');
-  options = signal<QRCodeCanvasOptions>({ size: 2, margin: 1 });
+  options = signal<QRCodeCanvasOptions>({size: 2, margin: 1});
 }
 
 function renderedElement<TElement extends Element>(
@@ -144,7 +145,7 @@ describe('Angular QR code components', () => {
     const wrapper = renderedElement<HTMLDivElement>(fixture, 'image-qrcode > div');
     const firstImage = renderedElement<HTMLImageElement>(fixture, 'img');
 
-    fixture.componentInstance.options.set({ size: 3, margin: 1 });
+    fixture.componentInstance.options.set({size: 3, margin: 1});
     fixture.detectChanges();
 
     const secondImage = renderedElement<HTMLImageElement>(fixture, 'img');

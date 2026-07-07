@@ -25,7 +25,7 @@
   "scripts": {
     "build": "tsdown",
     "watch": "tsdown --watch",
-    "test": "vitest",
+    "test": "vitest --watch false",
     "check-types": "tsc --noEmit",
     "release": "bumpp",
     "lint": "eslint src tests --max-warnings 0",

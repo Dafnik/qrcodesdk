@@ -31,34 +31,50 @@ export class QRCodeBuilder<
 > {
   private constructor(
     private readonly _data: BuilderData<D>,
-    private readonly config: QRCodeMatrixOptions,
+    private readonly _config: QRCodeMatrixOptions,
     private readonly currentRenderer: BuilderRenderer<R>,
   ) {}
 
   static create(): QRCodeBuilder<NoData, NoRenderer>;
-  static create(data: QRCodeInputData): QRCodeBuilder<HasData, NoRenderer>;
+  static create(
+    data: QRCodeInputData,
+    config?: QRCodeMatrixOptions,
+  ): QRCodeBuilder<HasData, NoRenderer>;
   static create(
     data?: QRCodeInputData,
+    config?: QRCodeMatrixOptions,
   ): QRCodeBuilder<NoData, NoRenderer> | QRCodeBuilder<HasData, NoRenderer> {
     return new QRCodeBuilder(
       data,
       {
         errorCorrectionLevel: 'M',
+        ...config,
       },
       undefined,
     );
   }
 
   data(value: QRCodeInputData): QRCodeBuilder<HasData, R> {
-    return new QRCodeBuilder(value, this.config, this.currentRenderer);
+    return new QRCodeBuilder(value, this._config, this.currentRenderer);
   }
 
   mode(mode?: QRCodeMode): QRCodeBuilder<D, R> {
     return new QRCodeBuilder(
       this._data,
       {
-        ...this.config,
+        ...this._config,
         mode,
+      },
+      this.currentRenderer,
+    );
+  }
+
+  config(config?: QRCodeMatrixOptions): QRCodeBuilder<D, R> {
+    return new QRCodeBuilder(
+      this._data,
+      {
+        ...this._config,
+        ...config,
       },
       this.currentRenderer,
     );
@@ -68,7 +84,7 @@ export class QRCodeBuilder<
     return new QRCodeBuilder(
       this._data,
       {
-        ...this.config,
+        ...this._config,
         errorCorrectionLevel: level,
       },
       this.currentRenderer,
@@ -79,7 +95,7 @@ export class QRCodeBuilder<
     return new QRCodeBuilder(
       this._data,
       {
-        ...this.config,
+        ...this._config,
         version,
       },
       this.currentRenderer,
@@ -90,7 +106,7 @@ export class QRCodeBuilder<
     return new QRCodeBuilder(
       this._data,
       {
-        ...this.config,
+        ...this._config,
         mask,
       },
       this.currentRenderer,
@@ -98,11 +114,11 @@ export class QRCodeBuilder<
   }
 
   renderer<TOutput>(renderer: QRCodeRenderer<TOutput>): QRCodeBuilder<D, HasRenderer<TOutput>> {
-    return new QRCodeBuilder(this._data, this.config, renderer);
+    return new QRCodeBuilder(this._data, this._config, renderer);
   }
 
   matrix(this: QRCodeBuilder<HasData, R>): QRCodeMatrix {
-    const resolved = resolveQRCodeMatrixOptions(this._data, this.config);
+    const resolved = resolveQRCodeMatrixOptions(this._data, this._config);
     const codewords = createQRCodeCodewords(resolved);
 
     return assembleQRCodeMatrix(

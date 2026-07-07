@@ -1,4 +1,4 @@
-import type { ElementRef, Renderer2 } from '@angular/core';
+import type {ElementRef, Renderer2} from '@angular/core';
 
 export function replaceElementChildren<TElement extends HTMLElement>(
   renderer: Renderer2,
