@@ -32,7 +32,6 @@
     "clean": "rm -rf .turbo dist .angular"
   },
   "private": true,
-  "packageManager": "pnpm@11.7.0",
   "peerDependencies": {
     "@qrcodesdk/core": "workspace:*",
     "@qrcodesdk/browser": "workspace:*",

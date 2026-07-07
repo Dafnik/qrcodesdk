@@ -112,6 +112,9 @@ export default defineConfig({
     starlight({
       customCss: ['./src/styles/global.css'],
       title: 'QRCodeSDK',
+      expressiveCode: {
+        themes: ['github-light', 'github-dark'],
+      },
       sidebar: [
         {
           label: 'Start Here',
