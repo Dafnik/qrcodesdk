@@ -120,8 +120,8 @@ export default defineConfig({
           label: 'Start Here',
           items: [
             {label: 'Overview', slug: ''},
-            {label: 'Installation', slug: 'guides/installation'},
             {label: 'Playground', slug: 'playground'},
+            {label: 'Installation', slug: 'guides/installation'},
           ],
         },
         {

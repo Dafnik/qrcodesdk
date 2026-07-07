@@ -4,6 +4,9 @@ description: Configure Angular and React QR code components and copy production-
 template: splash
 hero:
   tagline: Configure QR codes visually, preview Angular or React components, then copy the code into your app.
+head:
+  - tag: style
+    content: ':root { --sl-content-width: 80rem !important; } .hero { padding: 5rem 0 !important;}'
 ---
 
 import QrcodePlayground from '../../components/astro/qrcode-playground.astro';

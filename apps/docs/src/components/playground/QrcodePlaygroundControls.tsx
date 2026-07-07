@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from 'react';
 
 import {generatePlaygroundCode} from './qrcode-playground-code';
 import {
+  QR_CODE_PLAYGROUND_DEFAULT_DRAFT,
   createPlaygroundSnapshot,
   normalizeHexColorInput,
   readPlaygroundDraftFromUrl,
@@ -47,12 +48,22 @@ export default function QrcodePlaygroundControls() {
     setCopied(true);
   };
 
+  const resetDraft = () => {
+    setCopied(false);
+    setDraft({...QR_CODE_PLAYGROUND_DEFAULT_DRAFT});
+  };
+
   return (
     <div className="qrcode-playground__controls">
       <section className="qrcode-playground__panel" aria-labelledby="playground-config-heading">
-        <div className="qrcode-playground__section-heading">
-          <h2 id="playground-config-heading">Configure</h2>
-          <p>Choose a package, output, matrix, and renderer options.</p>
+        <div className="qrcode-playground__section-heading qrcode-playground__section-heading--inline">
+          <div>
+            <h2 id="playground-config-heading">Configure</h2>
+            <p>Choose a package, output, matrix, and renderer options.</p>
+          </div>
+          <button className="qrcode-playground__button" type="button" onClick={resetDraft}>
+            Reset
+          </button>
         </div>
 
         <FieldGroup label="Package">

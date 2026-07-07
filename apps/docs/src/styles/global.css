@@ -94,6 +94,7 @@
 
 .qrcode-playground {
   width: 100%;
+  min-width: 0;
 }
 
 .qrcode-playground__shell {
@@ -101,14 +102,17 @@
   grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
   gap: 1rem;
   align-items: start;
+  min-width: 0;
 }
 
 .qrcode-playground__controls {
   display: grid;
   gap: 1rem;
+  min-width: 0;
 }
 
 .qrcode-playground__panel {
+  min-width: 0;
   border: 1px solid var(--sl-color-gray-5);
   border-radius: 0.5rem;
   background: var(--sl-color-bg);
@@ -282,8 +286,12 @@
 }
 
 .qrcode-playground__code {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   max-height: 34rem;
   overflow: auto;
+  overflow-x: auto;
   margin: 0;
   padding: 1rem;
   border: 1px solid var(--sl-color-gray-5);
@@ -296,7 +304,7 @@
 
 .qrcode-playground__preview-panel {
   position: sticky;
-  top: 1rem;
+  top: 5rem;
 }
 
 .qrcode-playground__preview-stage {
