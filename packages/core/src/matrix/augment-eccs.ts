@@ -38,22 +38,22 @@ export function augmentECCs(
   subSizes.push(subSize0);
 
   for (let i = 0; i < blockNumber; i++) {
-    eccs.push(calculateECC(poly.slice(subSizes[i], subSizes[i + 1]), genPoly));
+    eccs.push(calculateECC(poly.slice(subSizes[i]!, subSizes[i + 1]!), genPoly));
   }
 
   const result: QRCodeCodewords = [];
   const numberOfItemsPerBlock = (poly.length / blockNumber) | 0;
   for (let i = 0; i < numberOfItemsPerBlock; i++) {
     for (let j = 0; j < blockNumber; j++) {
-      result.push(poly[subSizes[j] + i]);
+      result.push(poly[subSizes[j]! + i]!);
     }
   }
   for (let j = pivot; j < blockNumber; j++) {
-    result.push(poly[subSizes[j + 1] - 1]);
+    result.push(poly[subSizes[j + 1]! - 1]!);
   }
   for (let i = 0; i < genPoly.length; i++) {
     for (let j = 0; j < blockNumber; j++) {
-      result.push(eccs[j][i]);
+      result.push(eccs[j]![i]!);
     }
   }
   return result;

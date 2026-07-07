@@ -40,9 +40,11 @@ export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState
 
   const blit = function (y: number, x: number, h: number, w: number, bits: QRCodeCodewords): void {
     for (let i = 0; i < h; i++) {
+      const matrixRow = matrix[y + i]!;
+      const reservedRow = reserved[y + i]!;
       for (let j = 0; j < w; j++) {
-        matrix[y + i][x + j] = ((bits[i] >> j) & 1) as QRCodeModule;
-        reserved[y + i][x + j] = 1;
+        matrixRow[x + j] = ((bits[i]! >> j) & 1) as QRCodeModule;
+        reservedRow[x + j] = 1;
       }
     }
   };
@@ -55,19 +57,19 @@ export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState
 
   // the rest of timing patterns
   for (let i = 9; i < sizeOfVersion - 8; i++) {
-    matrix[6][i] = matrix[i][6] = (~i & 1) as QRCodeModule;
-    reserved[6][i] = reserved[i][6] = 1;
+    matrix[6]![i] = matrix[i]![6] = (~i & 1) as QRCodeModule;
+    reserved[6]![i] = reserved[i]![6] = 1;
   }
 
   // alignment patterns
-  const alignmentPatterns = v[2],
+  const alignmentPatterns = v[2]!,
     m = alignmentPatterns.length;
 
   for (let i = 0; i < m; i++) {
     const minJ = i == 0 || i == m - 1 ? 1 : 0,
       maxJ = i == 0 ? m - 1 : m;
     for (let j = minJ; j < maxJ; j++) {
-      blit(alignmentPatterns[i], alignmentPatterns[j], 5, 5, [0x1f, 0x11, 0x15, 0x11, 0x1f]);
+      blit(alignmentPatterns[i]!, alignmentPatterns[j]!, 5, 5, [0x1f, 0x11, 0x15, 0x11, 0x1f]);
     }
   }
 
@@ -77,9 +79,9 @@ export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState
     let k = 0;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 3; j++) {
-        matrix[i][sizeOfVersion - 11 + j] = matrix[sizeOfVersion - 11 + j][i] = ((code >> k++) &
+        matrix[i]![sizeOfVersion - 11 + j] = matrix[sizeOfVersion - 11 + j]![i] = ((code >> k++) &
           1) as QRCodeModule;
-        reserved[i][sizeOfVersion - 11 + j] = reserved[sizeOfVersion - 11 + j][i] = 1;
+        reserved[i]![sizeOfVersion - 11 + j] = reserved[sizeOfVersion - 11 + j]![i] = 1;
       }
     }
   }

@@ -12,9 +12,11 @@ export function applyMaskToMatrix(
   const maskFunction = MASK_FUNCTIONS[mask];
   const n = matrix.length;
   for (let i = 0; i < n; i++) {
+    const matrixRow = matrix[i]!;
+    const reservedRow = reserved[i]!;
     for (let j = 0; j < n; j++) {
-      if (!reserved[i][j]) {
-        matrix[i][j] = (matrix[i][j] ^ (maskFunction(i, j) ? 1 : 0)) as QRCodeModule;
+      if (!reservedRow[j]) {
+        matrixRow[j] = (matrixRow[j]! ^ (maskFunction!(i, j) ? 1 : 0)) as QRCodeModule;
       }
     }
   }

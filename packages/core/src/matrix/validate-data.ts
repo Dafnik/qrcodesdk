@@ -7,6 +7,10 @@ import {
   NUMERIC_REGEXP,
 } from './const';
 
+type TextEncoderConstructor = new () => {
+  encode(input?: string): Uint8Array;
+};
+
 /**
  * Checks if the given data can be encoded in the given mode and returns
  * the converted data for further processing if possible. Otherwise, returns null.
@@ -34,7 +38,10 @@ export function validateData(
       return stringData.toUpperCase();
 
     case MODE_OCTET: {
-      return [...new TextEncoder().encode(String(data))];
+      const textEncoder = new (
+        globalThis as unknown as {TextEncoder: TextEncoderConstructor}
+      ).TextEncoder();
+      return [...textEncoder.encode(String(data))];
     }
   }
   return undefined;

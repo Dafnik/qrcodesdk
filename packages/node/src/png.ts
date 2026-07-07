@@ -35,8 +35,9 @@ export function PNGQRCodeRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
     fillRect(png, 0, 0, imageSize, imageSize, lightColor);
 
     for (let row = 0; row < n; row++) {
+      const matrixRow = matrix[row]!;
       for (let column = 0; column < n; column++) {
-        if (matrix[row][column]) {
+        if (matrixRow[column]) {
           fillRect(
             png,
             modSize * (margin + column),
@@ -85,10 +86,11 @@ function fillRect(
 function parseHexColor(value: string): RGBColor {
   const match = value.match(/^#([0-9a-f]{6})$/i);
   if (!match) throw new Error(`Only 6-digit hex colors are supported, received ${value}`);
+  const hex = match[1]!;
 
   return {
-    red: Number.parseInt(match[1].slice(0, 2), 16),
-    green: Number.parseInt(match[1].slice(2, 4), 16),
-    blue: Number.parseInt(match[1].slice(4, 6), 16),
+    red: Number.parseInt(hex.slice(0, 2), 16),
+    green: Number.parseInt(hex.slice(2, 4), 16),
+    blue: Number.parseInt(hex.slice(4, 6), 16),
   };
 }

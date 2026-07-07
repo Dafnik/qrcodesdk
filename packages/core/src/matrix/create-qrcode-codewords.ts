@@ -21,7 +21,7 @@ export function createQRCodeCodewords({
 
   return augmentECCs(
     dataCodewords,
-    versionConfig[1][errorCorrectionLevel],
-    generatorPolynomials[versionConfig[0][errorCorrectionLevel]],
+    versionConfig[1]![errorCorrectionLevel]!,
+    generatorPolynomials[versionConfig[0]![errorCorrectionLevel]!]!,
   );
 }

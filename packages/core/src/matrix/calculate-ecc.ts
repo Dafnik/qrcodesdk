@@ -25,10 +25,10 @@ export function calculateECC(poly: QRCodeCodewords, genPoly: QRCodePolynomial): 
   }
 
   for (let i = 0; i < polyLength;) {
-    const quotient = logarithms[modulus[i++]];
+    const quotient = logarithms[modulus[i++]!]!;
     if (quotient >= 0) {
       for (let j = 0; j < genPolyLength; j++) {
-        modulus[i + j] ^= exponents[(quotient + genPoly[j]) % 255];
+        modulus[i + j] = modulus[i + j]! ^ exponents[(quotient + genPoly[j]!) % 255]!;
       }
     }
   }

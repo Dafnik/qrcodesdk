@@ -297,12 +297,12 @@ function createGF256GeneratorPolynomials({
 }: GF256LookupTables): QRCodePolynomial[] {
   const polynomials: QRCodePolynomial[] = [[]];
   for (let i = 0; i < 30; i++) {
-    const previousPolynomial = polynomials[i];
+    const previousPolynomial = polynomials[i]!;
     const polynomial: QRCodePolynomial = [];
     for (let j = 0; j <= i; j++) {
-      const a = j < i ? exponents[previousPolynomial[j]] : 0;
-      const b = exponents[(i + (previousPolynomial[j - 1] || 0)) % 255];
-      polynomial.push(logarithms[a ^ b]);
+      const a = j < i ? exponents[previousPolynomial[j]!]! : 0;
+      const b = exponents[(i + (previousPolynomial[j - 1] || 0)) % 255]!;
+      polynomial.push(logarithms[a ^ b]!);
     }
     polynomials.push(polynomial);
   }

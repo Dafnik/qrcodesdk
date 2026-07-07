@@ -29,7 +29,7 @@ export function evaluateMatrix(matrix: QRCodeMatrix): number {
     numberOfBlackSquares = 0;
 
   for (let i = 0; i < matrixLength; i++) {
-    const row = matrix[i];
+    const row = matrix[i]!;
     let groups: number[];
 
     // evaluate the current row
@@ -51,11 +51,11 @@ export function evaluateMatrix(matrix: QRCodeMatrix): number {
     groups = [0];
     for (let j = 0; j < matrixLength;) {
       let k = 0;
-      for (; j < matrixLength && matrix[j][i]; k++) {
+      for (; j < matrixLength && matrix[j]![i]; k++) {
         j++;
       }
       groups.push(k);
-      for (k = 0; j < matrixLength && !matrix[j][i]; k++) {
+      for (k = 0; j < matrixLength && !matrix[j]![i]; k++) {
         j++;
       }
       groups.push(k);
@@ -64,9 +64,9 @@ export function evaluateMatrix(matrix: QRCodeMatrix): number {
 
     // check the 2x2 box and calculate the density
     const nextRow = matrix[i + 1] || [];
-    numberOfBlackSquares += row[0];
+    numberOfBlackSquares += row[0]!;
     for (let j = 1; j < matrixLength; j++) {
-      const p = row[j];
+      const p = row[j]!;
       numberOfBlackSquares += p;
       // at least comparison with next row should be strict...
       if (row[j - 1] == p && nextRow[j] === p && nextRow[j - 1] === p) {

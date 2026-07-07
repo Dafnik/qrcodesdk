@@ -58,7 +58,7 @@ export function encode(
       for (; i < dataLength; i += 3) {
         pack(parseInt(stringData.substring(i - 2, i + 1), 10), 10);
       }
-      pack(parseInt(stringData.substring(i - 2), 10), [0, 4, 7][dataLength % 3]);
+      pack(parseInt(stringData.substring(i - 2), 10), [0, 4, 7][dataLength % 3]!);
       break;
     }
     case MODE_ALPHANUMERIC: {
@@ -66,12 +66,12 @@ export function encode(
       let i = 1;
       for (; i < dataLength; i += 2) {
         pack(
-          alphanumericMap[stringData.charAt(i - 1)] * 45 + alphanumericMap[stringData.charAt(i)],
+          alphanumericMap[stringData.charAt(i - 1)]! * 45 + alphanumericMap[stringData.charAt(i)]!,
           11,
         );
       }
       if (dataLength % 2 == 1) {
-        pack(alphanumericMap[stringData.charAt(i - 1)], 6);
+        pack(alphanumericMap[stringData.charAt(i - 1)]!, 6);
       }
       break;
     }
@@ -79,7 +79,7 @@ export function encode(
       const arrayData = data as number[];
       let i = 0;
       for (; i < dataLength; i++) {
-        pack(arrayData[i], 8);
+        pack(arrayData[i]!, 8);
       }
       break;
     }

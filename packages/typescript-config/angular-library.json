@@ -3,16 +3,17 @@
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
   },
   "compileOnSave": false,
   "compilerOptions": {
     "experimentalDecorators": true,
+    "lib": ["es2022", "DOM"],
     "module": "preserve",
     "moduleResolution": "bundler",
-    "paths": {
-      "angular": ["./dist/angular"]
-    }
+    "target": "ES2022",
+    "types": []
   },
   "extends": "./base.json"
 }

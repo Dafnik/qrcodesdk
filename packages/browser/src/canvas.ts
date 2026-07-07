@@ -33,8 +33,9 @@ export function CanvasQRCodeRenderer(
 
     context.fillStyle = styling.colors.colorDark;
     for (let row = 0; row < matrix.length; row++) {
-      for (let column = 0; column < matrix[row].length; column++) {
-        if (matrix[row][column]) {
+      const matrixRow = matrix[row]!;
+      for (let column = 0; column < matrixRow.length; column++) {
+        if (matrixRow[column]) {
           context.fillRect(modSize * (margin + column), modSize * (margin + row), modSize, modSize);
         }
       }

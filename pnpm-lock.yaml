@@ -585,37 +585,6 @@ importers:
 
   packages/typescript-config: {}
 
-  packages/ui:
-    dependencies:
-      react:
-        specifier: 'catalog:'
-        version: 19.2.7
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.7(react@19.2.7)
-    devDependencies:
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../eslint-config
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@types/node':
-        specifier: 'catalog:'
-        version: 25.9.4
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.2
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.2.2(@types/react@19.2.2)
-      eslint:
-        specifier: 'catalog:'
-        version: 9.39.4(jiti@2.7.0)
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.3
-
 packages:
   '@acemir/cssom@0.9.31':
     resolution:

@@ -18,17 +18,17 @@ export function evaluateGroup(groups: number[]): number {
   let score = 0;
 
   for (let i = 0; i < groups.length; i++) {
-    if (groups[i] >= 5) score += PENALTY_CONSECUTIVE + (groups[i] - 5);
+    if (groups[i]! >= 5) score += PENALTY_CONSECUTIVE + (groups[i]! - 5);
   }
 
   for (let i = 5; i < groups.length; i += 2) {
-    const p = groups[i];
+    const p = groups[i]!;
     if (
       groups[i - 1] == p &&
       groups[i - 2] == 3 * p &&
       groups[i - 3] == p &&
       groups[i - 4] == p &&
-      (groups[i - 5] >= 4 * p || groups[i + 1] >= 4 * p)
+      (groups[i - 5]! >= 4 * p || (groups[i + 1] ?? 0) >= 4 * p)
     ) {
       // this part differs from zxing...
       score += PENALTY_FINDER_LIKE;

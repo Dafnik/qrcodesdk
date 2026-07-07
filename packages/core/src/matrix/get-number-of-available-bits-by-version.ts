@@ -43,11 +43,13 @@ export function getNumberOfAvailableBitsByVersion(version: QRCodeVersion): numbe
    *   timing patterns.
    */
   const v = VERSIONS[version] ?? [[-100]];
+  const alignmentPatterns = v[2]!;
   let numberOfBits = 16 * version * version + 128 * version + 64; // finder, timing and format info.
   if (needsVersionInfo(version)) numberOfBits -= 36; // version information
-  if (v[2].length) {
+  if (alignmentPatterns.length) {
     // alignment patterns
-    numberOfBits -= 25 * v[2].length * v[2].length - 10 * v[2].length - 55;
+    numberOfBits -=
+      25 * alignmentPatterns.length * alignmentPatterns.length - 10 * alignmentPatterns.length - 55;
   }
   return numberOfBits;
 }

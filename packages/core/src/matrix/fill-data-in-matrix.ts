@@ -29,10 +29,10 @@ export function fillDataInMatrix(
     let jj = dir < 0 ? n - 1 : 0;
     for (let j = 0; j < n; j++) {
       for (let ii = i; ii > i - 2; --ii) {
-        if (!reserved[jj][ii]) {
+        if (!reserved[jj]![ii]) {
           // may overflow, but (undefined >> x)
           // is 0, so it will auto-pad to zero.
-          matrix[jj][ii] = ((buffer[k >> 3] >> (~k & 7)) & 1) as QRCodeModule;
+          matrix[jj]![ii] = (((buffer[k >> 3] ?? 0) >> (~k & 7)) & 1) as QRCodeModule;
           ++k;
         }
       }

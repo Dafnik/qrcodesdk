@@ -49,7 +49,7 @@ function isScaledModuleDark(
     matrixRow < matrix.length &&
     matrixColumn >= 0 &&
     matrixColumn < matrix.length &&
-    matrix[matrixRow][matrixColumn] === 1
+    matrix[matrixRow]![matrixColumn] === 1
   );
 }
 

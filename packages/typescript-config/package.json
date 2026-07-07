@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
+  "exports": {
+    "./angular-library.json": "./angular-library.json",
+    "./base.json": "./base.json",
+    "./react-library.json": "./react-library.json",
+    "./ts-library.json": "./ts-library.json"
+  },
   "publishConfig": {
     "access": "public"
   }

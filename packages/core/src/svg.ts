@@ -52,12 +52,13 @@ function matrixToPath(matrix: QRCodeMatrix, margin: number): string {
 
   for (let row = 0; row < matrix.length; row++) {
     let lastRunEnd: number | undefined;
+    const matrixRow = matrix[row]!;
 
-    for (let column = 0; column < matrix[row].length; column++) {
-      if (!matrix[row][column]) continue;
+    for (let column = 0; column < matrixRow.length; column++) {
+      if (!matrixRow[column]) continue;
 
       const start = column;
-      while (column + 1 < matrix[row].length && matrix[row][column + 1]) {
+      while (column + 1 < matrixRow.length && matrixRow[column + 1]) {
         column++;
       }
 
