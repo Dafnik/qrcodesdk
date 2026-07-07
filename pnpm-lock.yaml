@@ -229,6 +229,9 @@ importers:
       '@qrcodesdk/angular':
         specifier: workspace:*
         version: link:../../packages/angular
+      '@qrcodesdk/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@qrcodesdk/react':
         specifier: workspace:*
         version: link:../../packages/react

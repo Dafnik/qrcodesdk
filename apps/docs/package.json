@@ -20,6 +20,7 @@
     "@astrojs/starlight-tailwind": "^5.0.0",
     "@expressive-code/plugin-line-numbers": "^0.44.0",
     "@qrcodesdk/angular": "workspace:*",
+    "@qrcodesdk/core": "workspace:*",
     "@qrcodesdk/react": "workspace:*",
     "@tailwindcss/vite": "^4.3.2",
     "react": "catalog:",

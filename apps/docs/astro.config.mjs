@@ -121,6 +121,7 @@ export default defineConfig({
           items: [
             {label: 'Overview', slug: ''},
             {label: 'Installation', slug: 'guides/installation'},
+            {label: 'Playground', slug: 'playground'},
           ],
         },
         {
@@ -162,7 +163,10 @@ export default defineConfig({
       useAngularHydration: true,
       vite: {
         transformFilter: (_code, id) => {
-          return id.includes('src/components/angular'); // <- only transform Angular TypeScript files
+          return (
+            id.includes('src/components/angular') ||
+            id.includes('src/components/playground/angular')
+          ); // <- only transform Angular TypeScript files
         },
       },
     }),

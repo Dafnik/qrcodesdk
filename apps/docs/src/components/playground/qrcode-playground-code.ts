@@ -1,0 +1,114 @@
+import type {QRCodePlaygroundDraft, QRCodePlaygroundOutput} from './qrcode-playground-types';
+
+type CodePreview = {
+  code: string;
+  lang: 'angular-ts' | 'tsx';
+};
+
+type ComponentMeta = {
+  componentName: string;
+  optionsType: string;
+  selector: string;
+  downloadLabel?: string;
+  handleType?: string;
+};
+
+const META_BY_OUTPUT: Record<QRCodePlaygroundOutput, ComponentMeta> = {
+  svg: {
+    componentName: 'SVGQRCode',
+    optionsType: 'QRCodeSVGOptions',
+    selector: 'svg-qrcode',
+    downloadLabel: 'Download SVG',
+    handleType: 'SVGQRCodeHandle',
+  },
+  image: {
+    componentName: 'ImageQRCode',
+    optionsType: 'QRCodeImageOptions',
+    selector: 'image-qrcode',
+    downloadLabel: 'Download PNG',
+    handleType: 'ImageQRCodeHandle',
+  },
+  canvas: {
+    componentName: 'CanvasQRCode',
+    optionsType: 'QRCodeCanvasOptions',
+    selector: 'canvas-qrcode',
+  },
+};
+
+export function generatePlaygroundCode(draft: QRCodePlaygroundDraft): CodePreview {
+  return draft.packageName === 'react' ? generateReactCode(draft) : generateAngularCode(draft);
+}
+
+function generateReactCode(draft: QRCodePlaygroundDraft): CodePreview {
+  const meta = META_BY_OUTPUT[draft.output];
+  const hasDownload = meta.handleType !== undefined;
+  const imports = hasDownload
+    ? `import {useRef} from 'react';\n\nimport {${meta.componentName}, type ${meta.handleType}, type ${meta.optionsType}} from '@qrcodesdk/react';`
+    : `import {${meta.componentName}, type ${meta.optionsType}} from '@qrcodesdk/react';`;
+  const refLine = hasDownload ? `  const qrcode = useRef<${meta.handleType}>(null);\n\n` : '';
+  const refProp = hasDownload ? ' ref={qrcode}' : '';
+  const downloadButton = hasDownload
+    ? `      <button type="button" onClick={() => qrcode.current?.download('qrcodesdk')}>\n        ${meta.downloadLabel}\n      </button>\n`
+    : '';
+  const body = hasDownload
+    ? `    <>\n${downloadButton}      <${meta.componentName}${refProp} data={data} options={options} />\n    </>`
+    : `    <${meta.componentName} data={data} options={options} />`;
+
+  return {
+    lang: 'tsx',
+    code: `${imports}\n\nexport function QRCodeExample() {\n  const data = ${quote(draft.data)};\n${refLine}  const options: ${meta.optionsType} = ${formatOptions(draft, 2)};\n\n  return (\n${body}\n  );\n}\n`,
+  };
+}
+
+function generateAngularCode(draft: QRCodePlaygroundDraft): CodePreview {
+  const meta = META_BY_OUTPUT[draft.output];
+  const hasDownload = meta.downloadLabel !== undefined;
+  const downloadButton = hasDownload
+    ? `    <button type="button" (click)="qrcode.download('qrcodesdk')">${meta.downloadLabel}</button>\n`
+    : '';
+  const template = hasDownload
+    ? `${downloadButton}    <${meta.selector} #qrcode [data]="data" [options]="options" />`
+    : `    <${meta.selector} [data]="data" [options]="options" />`;
+
+  return {
+    lang: 'angular-ts',
+    code: `import {Component} from '@angular/core';\n\nimport {${meta.componentName}, type ${meta.optionsType}} from '@qrcodesdk/angular';\n\n@Component({\n  selector: 'app-qrcode-example',\n  imports: [${meta.componentName}],\n  template: \`\n${template}\n  \`,\n})\nexport class QRCodeExample {\n  data = ${quote(draft.data)};\n\n  options: ${meta.optionsType} = ${formatOptions(draft, 2)};\n}\n`,
+  };
+}
+
+function formatOptions(draft: QRCodePlaygroundDraft, depth: number): string {
+  const entries: string[] = [
+    `size: ${draft.size}`,
+    `margin: ${draft.margin}`,
+    `colors: ${formatObject(
+      [`colorDark: ${quote(draft.colorDark)}`, `colorLight: ${quote(draft.colorLight)}`],
+      depth + 1,
+    )}`,
+  ];
+
+  if (draft.version !== 'auto') entries.push(`version: ${draft.version}`);
+  if (draft.mode !== 'auto') entries.push(`mode: ${quote(draft.mode)}`);
+  if (draft.errorCorrectionLevel !== 'auto') {
+    entries.push(`errorCorrectionLevel: ${quote(draft.errorCorrectionLevel)}`);
+  }
+  if (draft.mask !== 'auto') entries.push(`mask: ${draft.mask}`);
+
+  if (draft.output !== 'canvas') {
+    if (draft.alt) entries.push(`alt: ${quote(draft.alt)}`);
+    if (draft.ariaLabel) entries.push(`ariaLabel: ${quote(draft.ariaLabel)}`);
+    if (draft.title) entries.push(`title: ${quote(draft.title)}`);
+  }
+
+  return formatObject(entries, depth);
+}
+
+function formatObject(entries: string[], depth: number): string {
+  const indent = '  '.repeat(depth);
+  const closingIndent = '  '.repeat(depth - 1);
+
+  return `{\n${entries.map((entry) => `${indent}${entry},`).join('\n')}\n${closingIndent}}`;
+}
+
+function quote(value: string): string {
+  return JSON.stringify(value);
+}

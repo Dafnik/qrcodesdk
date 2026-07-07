@@ -1,0 +1,21 @@
+---
+import {AngularQrcodePlaygroundPreview} from '../playground/angular-qrcode-playground-preview';
+import QrcodePlaygroundControls from '../playground/QrcodePlaygroundControls';
+import ReactQrcodePlaygroundPreview from '../playground/ReactQrcodePlaygroundPreview';
+---
+
+<section class="qrcode-playground not-content" aria-label="QR code package playground">
+  <div class="qrcode-playground__shell">
+    <QrcodePlaygroundControls client:only="react" />
+    <section class="qrcode-playground__panel qrcode-playground__preview-panel" aria-labelledby="playground-preview-heading">
+      <div class="qrcode-playground__section-heading">
+        <h2 id="playground-preview-heading">Preview</h2>
+        <p>Rendered by the selected framework package.</p>
+      </div>
+      <div class="qrcode-playground__preview-stage">
+        <ReactQrcodePlaygroundPreview client:only="react" />
+        <AngularQrcodePlaygroundPreview client:load />
+      </div>
+    </section>
+  </div>
+</section>
