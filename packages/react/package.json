@@ -33,7 +33,6 @@
     "prepublishOnly": "pnpm run build"
   },
   "private": true,
-  "packageManager": "pnpm@11.7.0",
   "peerDependencies": {
     "@qrcodesdk/browser": "workspace:*",
     "@qrcodesdk/core": "workspace:*",
