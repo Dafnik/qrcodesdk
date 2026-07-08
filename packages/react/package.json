@@ -42,6 +42,7 @@
   "devDependencies": {
     "@qrcodesdk/browser": "workspace:*",
     "@qrcodesdk/core": "workspace:*",
+    "@repo/core-testing": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@testing-library/dom": "catalog:",

@@ -1,4 +1,5 @@
 import {cleanup, render, waitFor} from '@testing-library/react';
+import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 
@@ -26,17 +27,7 @@ const canvasOptions: QRCodeCanvasOptions = {size: 2, margin: 1};
 describe('React QR code components', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(((contextId: string) => {
-      if (contextId !== '2d') return null;
-
-      return {
-        fillStyle: '#000000',
-        fillRect: vi.fn(),
-      } as unknown as CanvasRenderingContext2D;
-    }) as HTMLCanvasElement['getContext']);
-    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
-      'data:image/png;base64,qrcode',
-    );
+    mockCanvasRendering(vi);
   });
 
   afterEach(() => {
@@ -69,26 +60,35 @@ describe('React QR code components', () => {
 
   test('downloads image QR code output as PNG', () => {
     const imageQRCode = createRef<ImageQRCodeHandle>();
-    const createElement = document.createElement.bind(document);
-    let anchor: HTMLAnchorElement | undefined;
-
-    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
-      const element = createElement(tagName, options);
-
-      if (tagName.toLowerCase() === 'a') {
-        anchor = element as HTMLAnchorElement;
-      }
-
-      return element;
-    });
-    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    const downloads = captureDownloads(vi);
 
     render(<ImageQRCode data="HELLO" options={imageOptions} ref={imageQRCode} />);
     imageQRCode.current?.download('qrcodesdk');
 
-    expect(anchor?.href).toMatch(/^data:image\/png;base64,/);
-    expect(anchor?.download).toBe('qrcodesdk.png');
-    expect(click).toHaveBeenCalledOnce();
+    expect(downloads).toEqual([
+      {
+        href: expect.stringMatching(/^data:image\/png;base64,/),
+        filename: 'qrcodesdk.png',
+      },
+    ]);
+  });
+
+  test('downloads SVG QR code output as SVG', () => {
+    const svgQRCode = createRef<SVGQRCodeHandle>();
+    const downloads = captureDownloads(vi);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+    render(<SVGQRCode data="HELLO" options={svgOptions} ref={svgQRCode} />);
+    svgQRCode.current?.download('qrcodesdk');
+
+    expect(downloads).toEqual([
+      {
+        href: 'blob:qrcode-svg',
+        filename: 'qrcodesdk.svg',
+      },
+    ]);
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 
   test('renders canvas QR code output', async () => {

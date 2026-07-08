@@ -1,11 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
-import {
-  MODE_ALPHANUMERIC,
-  MODE_NUMERIC,
-  MODE_OCTET,
-  getAlphanumericMap,
-} from '../../src/matrix/const';
+import {MODE_ALPHANUMERIC, MODE_NUMERIC, MODE_OCTET} from '../../src/matrix/const';
 import {encode} from '../../src/matrix/encode';
 import {validateData} from '../../src/matrix/validate-data';
 import {bitsToBytes} from './helpers';
@@ -29,15 +24,7 @@ describe('data validation and encoding', () => {
   });
 
   test('encodes alphanumeric pairs and odd trailing characters', () => {
-    const alphanumericMap = getAlphanumericMap();
-    const pairValue = alphanumericMap.A * 45 + alphanumericMap.B;
-    const expectedBits = [
-      '0010',
-      '000000011',
-      pairValue.toString(2).padStart(11, '0'),
-      alphanumericMap.C.toString(2).padStart(6, '0'),
-      '0000',
-    ].join('');
+    const expectedBits = ['0010', '000000011', '00111001101', '001100', '0000'].join('');
 
     expect(encode(1, MODE_ALPHANUMERIC, 'ABC', 7)).toEqual(bitsToBytes(expectedBits, 7));
   });

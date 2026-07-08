@@ -1,6 +1,7 @@
 import {Component, ViewChild, signal} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
+import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 
 import {CanvasQRCode, type QRCodeCanvasOptions} from './CanvasQRCode';
@@ -15,6 +16,8 @@ import {type QRCodeSVGOptions, SVGQRCode} from './SVGQRCode';
 class SVGQRCodeHost {
   data = signal('HELLO');
   options = signal<QRCodeSVGOptions>({size: 2, margin: 1});
+
+  @ViewChild(SVGQRCode) svgQRCode!: SVGQRCode;
 }
 
 @Component({
@@ -62,17 +65,7 @@ describe('Angular QR code components', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     TestBed.resetTestingModule();
-    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(((contextId: string) => {
-      if (contextId !== '2d') return null;
-
-      return {
-        fillStyle: '#000000',
-        fillRect: vi.fn(),
-      } as unknown as CanvasRenderingContext2D;
-    }) as HTMLCanvasElement['getContext']);
-    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
-      'data:image/png;base64,qrcode',
-    );
+    mockCanvasRendering(vi);
   });
 
   test('renders SVG QR code output', () => {
@@ -104,26 +97,35 @@ describe('Angular QR code components', () => {
 
   test('downloads image QR code output as PNG', () => {
     const fixture = TestBed.createComponent(ImageQRCodeHost);
-    const createElement = document.createElement.bind(document);
-    let anchor: HTMLAnchorElement | undefined;
-
-    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
-      const element = createElement(tagName, options);
-
-      if (tagName.toLowerCase() === 'a') {
-        anchor = element as HTMLAnchorElement;
-      }
-
-      return element;
-    });
-    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    const downloads = captureDownloads(vi);
 
     fixture.detectChanges();
     fixture.componentInstance.imageQRCode.download('qrcodesdk');
 
-    expect(anchor?.href).toMatch(/^data:image\/png;base64,/);
-    expect(anchor?.download).toBe('qrcodesdk.png');
-    expect(click).toHaveBeenCalledOnce();
+    expect(downloads).toEqual([
+      {
+        href: expect.stringMatching(/^data:image\/png;base64,/),
+        filename: 'qrcodesdk.png',
+      },
+    ]);
+  });
+
+  test('downloads SVG QR code output as SVG', () => {
+    const fixture = TestBed.createComponent(SVGQRCodeHost);
+    const downloads = captureDownloads(vi);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+    fixture.detectChanges();
+    fixture.componentInstance.svgQRCode.download('qrcodesdk');
+
+    expect(downloads).toEqual([
+      {
+        href: 'blob:qrcode-svg',
+        filename: 'qrcodesdk.svg',
+      },
+    ]);
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 
   test('renders canvas QR code output', () => {
