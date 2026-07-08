@@ -1,4 +1,4 @@
-import {Component, computed, signal} from '@angular/core';
+import {Component, DestroyRef, computed, inject, signal} from '@angular/core';
 
 import {
   CanvasQRCode,
@@ -66,8 +66,16 @@ export class AngularQrcodePlaygroundPreview {
   constructor() {
     if (typeof window === 'undefined') return;
 
-    window.addEventListener(QR_CODE_PLAYGROUND_UPDATE_EVENT, (event) => {
+    const destroyRef = inject(DestroyRef);
+
+    const handler = (event: CustomEvent) => {
       this.snapshot.set(event.detail);
+    };
+
+    window.addEventListener(QR_CODE_PLAYGROUND_UPDATE_EVENT, handler as EventListener);
+
+    destroyRef.onDestroy(() => {
+      window.removeEventListener(QR_CODE_PLAYGROUND_UPDATE_EVENT, handler as EventListener);
     });
   }
 }

@@ -4,9 +4,11 @@
   "version": "0.0.1",
   "scripts": {
     "start": "astro dev",
-    "build": "ASTRO_CACHE_DIR=.astro-cache/build VITE_CACHE_DIR=.vite-cache/build node scripts/with-astro-lock.mjs astro build",
+    "build": "pnpm run build:packages && pnpm run build:site",
+    "build:packages": "pnpm --workspace-root turbo run build --filter=docs... --filter=!docs",
+    "build:site": "ASTRO_CACHE_DIR=.astro-cache/build VITE_CACHE_DIR=.vite-cache/build node scripts/with-astro-lock.mjs astro build",
     "preview": "astro preview",
-    "check-types": "ASTRO_CACHE_DIR=.astro-cache/check-types VITE_CACHE_DIR=.vite-cache/check-types node scripts/with-astro-lock.mjs astro check",
+    "check-types": "pnpm run build:packages && ASTRO_CACHE_DIR=.astro-cache/check-types VITE_CACHE_DIR=.vite-cache/check-types node scripts/with-astro-lock.mjs astro check",
     "lint": "eslint astro.config.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
     "astro": "astro",
     "clean": "rm -rf .turbo dist .astro .astro-cache .vite-cache .astro-command.lock"
