@@ -9,6 +9,7 @@
     "clean:deep": "turbo run clean && rm -rf node_modules",
     "lint": "turbo run lint",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {

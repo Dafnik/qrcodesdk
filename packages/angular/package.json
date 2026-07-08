@@ -55,6 +55,8 @@
     "@angular/forms": "catalog:",
     "@angular/platform-browser": "catalog:",
     "@angular/router": "catalog:",
+    "@qrcodesdk/browser": "workspace:*",
+    "@qrcodesdk/core": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "jsdom": "catalog:",

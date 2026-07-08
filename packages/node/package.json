@@ -39,6 +39,7 @@
     "pngjs": "catalog:"
   },
   "devDependencies": {
+    "@qrcodesdk/core": "workspace:*",
     "@repo/core-testing": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",

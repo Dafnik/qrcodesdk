@@ -100,13 +100,6 @@ export default defineConfig({
   vite: {
     cacheDir: process.env.VITE_CACHE_DIR ?? './node_modules/.vite',
     plugins: [includeContentPlugin(), tailwindcss()],
-    resolve: {
-      alias: {
-        '@qrcodesdk/react': fileURLToPath(
-          new URL('../../packages/react/src/index.ts', import.meta.url),
-        ),
-      },
-    },
   },
   integrations: [
     starlight({
