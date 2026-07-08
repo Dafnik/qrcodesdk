@@ -60,6 +60,7 @@
     "@repo/core-testing": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "angular-eslint": "22.0.0",
     "jsdom": "catalog:",
     "ng-packagr": "22.0.0",
     "rxjs": "catalog:",
