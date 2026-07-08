@@ -32,8 +32,8 @@ export function SVGQRCodeRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
 
     return [
       `<svg ${attrs.join(' ')}>`,
-      `<path fill="${colorLight}" d="M0 0h${qrSize}v${qrSize}H0z"/>`,
-      darkPath ? `<path stroke="${colorDark}" d="${darkPath}"/>` : '',
+      `<path fill="${escapeAttributeValue(colorLight)}" d="M0 0h${qrSize}v${qrSize}H0z"/>`,
+      darkPath ? `<path stroke="${escapeAttributeValue(colorDark)}" d="${darkPath}"/>` : '',
       '</svg>',
     ].join('');
   };
