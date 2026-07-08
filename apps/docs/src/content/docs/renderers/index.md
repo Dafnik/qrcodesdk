@@ -60,5 +60,5 @@ const matrix: QRCodeMatrix = qrcode('https://qrcodesdk.dev').matrix();
 ## Related pages
 
 - [Customize QR Codes](/guides/customize/)
-- [Builder API](/libraries/core/)
+- [Builder API](/libs/core/)
 - [API Reference](/reference/api/)

@@ -141,4 +141,4 @@ So the output canvas is `232 x 232` pixels.
 
 - [Render to an Image Element](/renderers/browser/image/)
 - [Customize QR Codes](/guides/customize/)
-- [@qrcodesdk/browser](/libraries/browser/)
+- [@qrcodesdk/browser](/libs/browser/)

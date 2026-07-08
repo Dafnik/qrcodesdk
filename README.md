@@ -120,12 +120,12 @@ Defaults are designed for readable output:
 ## Documentation
 
 - [Installation](apps/docs/src/content/docs/guides/installation.md)
-- [Core library](apps/docs/src/content/docs/libraries/core.md)
+- [Core library](apps/docs/src/content/docs/libs/core.md)
 - [Renderers](apps/docs/src/content/docs/renderers/index.md)
-- [Browser library](apps/docs/src/content/docs/libraries/browser.md)
-- [Node renderers](apps/docs/src/content/docs/libraries/node.md)
-- [Angular components](apps/docs/src/content/docs/libraries/angular.mdx)
-- [React components](apps/docs/src/content/docs/libraries/react.mdx)
+- [Browser library](apps/docs/src/content/docs/libs/browser.md)
+- [Node renderers](apps/docs/src/content/docs/libs/node.md)
+- [Angular components](apps/docs/src/content/docs/libs/angular.mdx)
+- [React components](apps/docs/src/content/docs/libs/react.mdx)
 - [API reference](apps/docs/src/content/docs/reference/api.md)
 
 ## Workspace development

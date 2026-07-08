@@ -133,5 +133,5 @@ Renderers can be passed directly to `.render(renderer)` or stored with `.rendere
 
 For runtime-specific output, add:
 
-- [`@qrcodesdk/node`](/libraries/node/) for PNG buffers
-- [`@qrcodesdk/browser`](/libraries/browser/) for Canvas and Image elements
+- [`@qrcodesdk/node`](/libs/node/) for PNG buffers
+- [`@qrcodesdk/browser`](/libs/browser/) for Canvas and Image elements
