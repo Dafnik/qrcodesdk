@@ -36,7 +36,7 @@
     "@qrcodesdk/core": "workspace:*"
   },
   "dependencies": {
-    "pngjs": "catalog:"
+    "pngjs": "7.0.0"
   },
   "devDependencies": {
     "@qrcodesdk/core": "workspace:*",
@@ -44,7 +44,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
-    "@types/pngjs": "catalog:",
+    "@types/pngjs": "6.0.5",
     "@typescript/native-preview": "catalog:",
     "bumpp": "catalog:",
     "jsqr": "catalog:",

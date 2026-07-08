@@ -41,10 +41,10 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@typescript/native-preview": "catalog:",
-    "@vitest/browser-playwright": "catalog:",
+    "@vitest/browser-playwright": "4.1.9",
     "bumpp": "catalog:",
     "jsqr": "catalog:",
-    "playwright": "catalog:",
+    "playwright": "1.59.1",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

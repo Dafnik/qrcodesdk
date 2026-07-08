@@ -13,13 +13,13 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "catalog:",
+    "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "eslint": "catalog:",
-    "prettier": "catalog:",
-    "prettier-plugin-organize-attributes": "catalog:",
-    "prettier-plugin-sort-json": "catalog:",
-    "prettier-plugin-tailwindcss": "catalog:",
-    "turbo": "catalog:",
+    "prettier": "3.9.4",
+    "prettier-plugin-organize-attributes": "1.0.0",
+    "prettier-plugin-sort-json": "4.2.0",
+    "prettier-plugin-tailwindcss": "0.8.0",
+    "turbo": "2.10.4",
     "typescript": "catalog:"
   },
   "packageManager": "pnpm@11.10.0",

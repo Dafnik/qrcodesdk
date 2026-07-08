@@ -61,7 +61,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "jsdom": "catalog:",
-    "ng-packagr": "catalog:",
+    "ng-packagr": "22.0.0",
     "rxjs": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

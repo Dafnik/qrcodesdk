@@ -35,10 +35,10 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/qrcode": "catalog:",
+    "@types/qrcode": "1.5.6",
     "@typescript/native-preview": "catalog:",
     "bumpp": "catalog:",
-    "qrcode": "catalog:",
+    "qrcode": "1.5.4",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

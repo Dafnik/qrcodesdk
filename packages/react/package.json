@@ -32,7 +32,6 @@
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
   },
-  "private": true,
   "peerDependencies": {
     "@qrcodesdk/browser": "workspace:*",
     "@qrcodesdk/core": "workspace:*",
@@ -45,8 +44,8 @@
     "@repo/core-testing": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@testing-library/dom": "catalog:",
-    "@testing-library/react": "catalog:",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/react": "16.3.2",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "bumpp": "catalog:",
