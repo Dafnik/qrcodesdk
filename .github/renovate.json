@@ -1,0 +1,65 @@
+{
+  "assignees": ["Dafnik"],
+  "baseBranchPatterns": ["main"],
+  "commitBody": "See associated pull request for more information.",
+  "enabledManagers": ["npm", "github-actions"],
+  "extends": [
+    "config:recommended",
+    ":pinVersions",
+    "security:minimumReleaseAgeNpm",
+    ":preserveSemverRanges",
+    ":rebaseStalePrs",
+    ":semanticCommitTypeAll(chore)",
+    "schedule:monthly"
+  ],
+  "ignorePaths": ["**/libs/**"],
+  "labels": ["dependencies"],
+  "lockFileMaintenance": {
+    "automerge": true,
+    "automergeType": "branch",
+    "commitMessageAction": "lock file maintenance",
+    "enabled": true,
+    "semanticCommitType": "chore(deps)"
+  },
+  "packageRules": [
+    {
+      "groupName": "typescript types",
+      "matchPackageNames": ["/^@types/i"]
+    },
+    {
+      "groupName": "eslint dependencies",
+      "matchPackageNames": ["eslint", "@typescript-eslint/{/,}**"]
+    },
+    {
+      "groupName": "typescript dependencies",
+      "matchPackageNames": ["typescript", "tslib"]
+    },
+    {
+      "extends": ["monorepo:angular"],
+      "groupName": "angular monorepo"
+    },
+    {
+      "extends": ["monorepo:angular-cli"],
+      "groupName": "angular monorepo"
+    },
+    {
+      "excludePackageNames": [
+        "typescript",
+        "tslib",
+        "eslint",
+        "/^@typescript-eslint\\//",
+        "/^@types\\//"
+      ],
+      "groupName": "minor-updates",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
+    },
+    {
+      "groupName": "major-update",
+      "matchUpdateTypes": ["major"]
+    }
+  ],
+  "semanticCommitScope": "deps",
+  "semanticCommitType": "chore",
+  "semanticCommits": "enabled",
+  "timezone": "Europe/Vienna"
+}
