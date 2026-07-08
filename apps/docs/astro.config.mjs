@@ -5,7 +5,6 @@ import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import {defineConfig} from 'astro/config';
 import {readFileSync} from 'fs';
-import {URL, fileURLToPath} from 'node:url';
 
 /**
  * @typedef {{ name: string, enforce: 'pre' | 'post', transform(code: string, id: string): void | { code: string } }} IncludeContentPlugin
