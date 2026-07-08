@@ -2,3 +2,4 @@
 .vite-cache/
 .astro-cache/
 .angular/
+pnpm-lock.yaml

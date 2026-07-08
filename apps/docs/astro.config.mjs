@@ -3,13 +3,11 @@ import angular from '@analogjs/astro-angular';
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'astro/config';
+import {defineConfig} from 'astro/config';
 import starlightLinksValidator from 'starlight-links-validator';
 
-
-
-import { includeContentPlugin } from './astro-content-plugin.mjs';
-import { STARLIGHT_SIDEBAR } from './starlight-sidebar.mjs';
+import {includeContentPlugin} from './astro-content-plugin.mjs';
+import {STARLIGHT_SIDEBAR} from './starlight-sidebar.mjs';
 
 // https://astro.build/config
 export default defineConfig({
