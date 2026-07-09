@@ -1,0 +1,89 @@
+{
+  "name": "@qrcodesdk/cli",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "@qrcodesdk/cli provides the qrc command for generating QR codes as terminal text, SVG files, or PNG files.",
+  "sideEffects": false,
+  "private": false,
+  "license": "MIT",
+  "author": {
+    "name": "Dafnik",
+    "email": "contact@dafnik.me",
+    "url": "https://dafnik.me"
+  },
+  "keywords": [
+    "typescript",
+    "qr-code",
+    "qrcode",
+    "qr",
+    "code",
+    "cli",
+    "terminal",
+    "svg",
+    "png",
+    "esm",
+    "modules"
+  ],
+  "homepage": "https://qrcodesdk.dev/guides/cli",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Dafnik/qrcodesdk.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Dafnik/qrcodesdk/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/Dafnik"
+    },
+    {
+      "type": "liberapay",
+      "url": "https://liberapay.com/Dafnik"
+    }
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "bin": {
+    "cli": "./dist/index.mjs"
+  },
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "watch": "tsdown --watch",
+    "cli": "pnpm run build && node dist/index.mjs",
+    "test": "vitest --watch false",
+    "check-types": "tsc --noEmit",
+    "release": "bumpp",
+    "lint": "eslint src tests --max-warnings 0",
+    "clean": "rm -rf .turbo dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@clack/prompts": "1.6.0",
+    "@qrcodesdk/core": "workspace:*",
+    "@qrcodesdk/node": "workspace:*",
+    "chalk": "5.6.2",
+    "commander": "14.0.3"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "@typescript/native-preview": "catalog:",
+    "bumpp": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

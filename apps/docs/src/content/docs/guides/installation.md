@@ -8,6 +8,7 @@ Most projects start with `@qrcodesdk/core`.
 - Install `@qrcodesdk/core` if you need SVG, terminal text, matrix output, or custom renderers.
 - Add `@qrcodesdk/node` if you need PNG buffers in Node.js.
 - Add `@qrcodesdk/browser` if you need Canvas, Image elements, or browser downloads.
+- Install `@qrcodesdk/cli` if you want the `qrc` command for terminal and file output.
 
 ## Start with core
 
@@ -84,11 +85,33 @@ document.body.append(image);
 
 Use browser renderers when you want an `HTMLCanvasElement`, an `HTMLImageElement`, a client-side SVG or PNG download, or DOM/CSS integration.
 
+## Add the CLI
+
+Use `@qrcodesdk/cli` when you want to generate QR codes from a terminal, shell script, or CI job.
+
+Install it globally when you want the `qrc` command available anywhere.
+
+```sh
+pnpm add -g @qrcodesdk/cli
+npm install -g @qrcodesdk/cli
+yarn global add @qrcodesdk/cli
+bun add -g @qrcodesdk/cli
+```
+
+```sh
+qrc "https://qrcodesdk.dev"
+qrc "https://qrcodesdk.dev" --output qrcode.svg
+qrc "https://qrcodesdk.dev" --output qrcode.png
+```
+
+The CLI can print terminal text or write SVG and PNG files.
+
 ## Package guide
 
 | Package              | Install when you need                                 | Outputs                                             |
 | -------------------- | ----------------------------------------------------- | --------------------------------------------------- |
 | `@qrcodesdk/core`    | Runtime-neutral generation and common output formats. | SVG strings, terminal text strings, raw matrices.   |
+| `@qrcodesdk/cli`     | Command line generation from terminals and scripts.   | Terminal text, SVG files, PNG files.                |
 | `@qrcodesdk/node`    | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                       |
 | `@qrcodesdk/browser` | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`, downloads. |
 
@@ -96,6 +119,7 @@ Use browser renderers when you want an `HTMLCanvasElement`, an `HTMLImageElement
 
 - [Render SVG](/renderers/core/svg/)
 - [Render PNG in Node.js](/renderers/node/png/)
+- [Use the CLI](/guides/cli/)
 - [Render to Canvas](/renderers/browser/canvas/)
 - [Render to an Image Element](/renderers/browser/image/)
 - [Render Terminal Text](/renderers/core/text/)

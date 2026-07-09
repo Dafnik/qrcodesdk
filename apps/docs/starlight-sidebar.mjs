@@ -5,6 +5,7 @@ export const STARLIGHT_SIDEBAR = [
       {label: 'Overview', slug: ''},
       {label: 'Playground', slug: 'playground'},
       {label: 'Installation', slug: 'guides/installation'},
+      {label: 'CLI', slug: 'guides/cli'},
     ],
   },
   {

@@ -66,16 +66,17 @@ If you do not provide a mode, the builder resolves one from the input.
 
 The builder is immutable. Each method returns a new builder with the updated option.
 
-| Method                    | Description                                                              |
-| ------------------------- | ------------------------------------------------------------------------ |
-| `.data(value)`            | Sets QR input data.                                                      |
-| `.mode(mode)`             | Sets the mode: `numeric`, `alphanumeric`, or `octet`.                    |
-| `.errorCorrection(level)` | Sets the error correction level: `L`, `M`, `Q`, or `H`. Defaults to `M`. |
-| `.version(version)`       | Pins a QR version from `1` to `40`.                                      |
-| `.mask(mask)`             | Pins a mask from `0` to `7`.                                             |
-| `.matrix()`               | Returns the generated `QRCodeMatrix`.                                    |
-| `.renderer(renderer)`     | Stores a renderer for a later `.render()` call.                          |
-| `.render(renderer?)`      | Generates the matrix and returns renderer output.                        |
+| Method                    | Description                                             | Defaults |
+| ------------------------- | ------------------------------------------------------- | :------- |
+| `.data(value)`            | Sets QR input data.                                     | -        |
+| `.config(mode)`           | Sets all options in one call.                           | -        |
+| `.mode(mode)`             | Sets the mode: `numeric`, `alphanumeric`, or `octet`.   | `Auto`   |
+| `.errorCorrection(level)` | Sets the error correction level: `L`, `M`, `Q`, or `H`. | `M`      |
+| `.version(version)`       | Pins a QR version from `1` to `40`.                     | `Auto`   |
+| `.mask(mask)`             | Pins a mask from `0` to `7`.                            | `Auto`   |
+| `.matrix()`               | Returns the generated `QRCodeMatrix`.                   | -        |
+| `.renderer(renderer)`     | Stores a renderer for a later `.render()` call.         | -        |
+| `.render(renderer?)`      | Generates the matrix and returns renderer output.       | -        |
 
 ### Error correction
 
