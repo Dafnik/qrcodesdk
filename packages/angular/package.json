@@ -55,6 +55,7 @@
   "scripts": {
     "ng": "ng",
     "build": "ng build",
+    "postbuild": "cp ../../LICENSE dist/angular",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch false",
     "check-types": "ng build",
