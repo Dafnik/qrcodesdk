@@ -2,17 +2,48 @@
   "name": "@qrcodesdk/core",
   "type": "module",
   "version": "0.0.0",
-  "description": "Runtime-neutral QR code generation and renderers for TypeScript.",
-  "author": "Dafnik",
+  "description": "@qrcodesdk/core is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.",
+  "sideEffects": false,
+  "private": false,
   "license": "MIT",
-  "homepage": "https://github.com/Dafnik/qrcodesdk#readme",
+  "author": {
+    "name": "Dafnik",
+    "email": "contact@dafnik.me",
+    "url": "https://dafnik.me"
+  },
+  "keywords": [
+    "typescript",
+    "types",
+    "qr-code",
+    "qrcode",
+    "qr",
+    "code",
+    "esm",
+    "modules",
+    "module"
+  ],
+  "homepage": "https://qrcodesdk.dev/libs/core",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Dafnik/qrcodesdk.git",
+    "url": "git@github.com:Dafnik/qrcodesdk.git",
     "directory": "packages/core"
   },
   "bugs": {
     "url": "https://github.com/Dafnik/qrcodesdk/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/Dafnik"
+    },
+    {
+      "type": "liberapay",
+      "url": "https://liberapay.com/Dafnik"
+    }
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "types": "./dist/index.d.mts",
   "exports": {

@@ -2,17 +2,49 @@
   "name": "@qrcodesdk/node",
   "type": "module",
   "version": "0.0.0",
-  "description": "Node.js renderers for QRCodeSDK.",
-  "author": "Dafnik",
+  "description": "@qrcodesdk/node adds renderers that depend on Node.js APIs or server-side packages. Use it with `@qrcodesdk/core` when your output needs to be PNG bytes.",
+  "sideEffects": false,
+  "private": false,
   "license": "MIT",
-  "homepage": "https://github.com/Dafnik/qrcodesdk#readme",
+  "author": {
+    "name": "Dafnik",
+    "email": "contact@dafnik.me",
+    "url": "https://dafnik.me"
+  },
+  "keywords": [
+    "typescript",
+    "types",
+    "qr-code",
+    "qrcode",
+    "qr",
+    "code",
+    "esm",
+    "modules",
+    "module",
+    "node"
+  ],
+  "homepage": "https://qrcodesdk.dev/libs/node",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Dafnik/qrcodesdk.git",
+    "url": "git@github.com:Dafnik/qrcodesdk.git",
     "directory": "packages/node"
   },
   "bugs": {
     "url": "https://github.com/Dafnik/qrcodesdk/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/Dafnik"
+    },
+    {
+      "type": "liberapay",
+      "url": "https://liberapay.com/Dafnik"
+    }
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "types": "./dist/index.d.mts",
   "exports": {

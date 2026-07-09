@@ -2,17 +2,51 @@
   "name": "@qrcodesdk/react",
   "type": "module",
   "version": "0.0.0",
-  "description": "React components for rendering QRCodeSDK QR codes.",
-  "author": "Dafnik",
+  "description": "@qrcodesdk/react provides React components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.",
+  "sideEffects": false,
+  "private": false,
   "license": "MIT",
-  "homepage": "https://github.com/Dafnik/qrcodesdk#readme",
+  "author": {
+    "name": "Dafnik",
+    "email": "contact@dafnik.me",
+    "url": "https://dafnik.me"
+  },
+  "keywords": [
+    "typescript",
+    "types",
+    "qr-code",
+    "qrcode",
+    "qr",
+    "code",
+    "esm",
+    "modules",
+    "module",
+    "react",
+    "tsx",
+    "jsx"
+  ],
+  "homepage": "https://qrcodesdk.dev/libs/react",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Dafnik/qrcodesdk.git",
+    "url": "git@github.com:Dafnik/qrcodesdk.git",
     "directory": "packages/react"
   },
   "bugs": {
     "url": "https://github.com/Dafnik/qrcodesdk/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/Dafnik"
+    },
+    {
+      "type": "liberapay",
+      "url": "https://liberapay.com/Dafnik"
+    }
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "types": "./dist/index.d.mts",
   "exports": {
