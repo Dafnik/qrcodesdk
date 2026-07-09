@@ -58,7 +58,6 @@
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
     "check-types": "tsc --noEmit",
-    "release": "bumpp",
     "lint": "eslint src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
@@ -68,7 +67,6 @@
     "@repo/typescript-config": "workspace:*",
     "@types/qrcode": "1.5.6",
     "@typescript/native-preview": "catalog:",
-    "bumpp": "catalog:",
     "qrcode": "1.5.4",
     "tsdown": "catalog:",
     "typescript": "catalog:",

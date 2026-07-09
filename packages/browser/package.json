@@ -59,7 +59,6 @@
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
     "check-types": "tsc --noEmit",
-    "release": "bumpp",
     "lint": "eslint src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
@@ -74,7 +73,6 @@
     "@repo/typescript-config": "workspace:*",
     "@typescript/native-preview": "catalog:",
     "@vitest/browser-playwright": "4.1.9",
-    "bumpp": "catalog:",
     "jsqr": "catalog:",
     "playwright": "1.59.1",
     "tsdown": "catalog:",

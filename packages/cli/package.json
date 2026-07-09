@@ -64,7 +64,6 @@
     "cli": "pnpm run build && node dist/index.mjs",
     "test": "vitest --watch false",
     "check-types": "tsc --noEmit",
-    "release": "bumpp",
     "lint": "eslint src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
@@ -81,7 +80,6 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "@typescript/native-preview": "catalog:",
-    "bumpp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
