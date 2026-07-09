@@ -2,9 +2,9 @@
 /* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compilerOptions": {
-    "outDir": "../../out-tsc/spec",
-    "types": ["vitest/globals"]
+    "outDir": "out-tsc/lib"
   },
+  "exclude": ["**/*.spec.ts"],
   "extends": "@repo/typescript-config/angular-library.json",
-  "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
+  "include": ["src/**/*.ts"]
 }

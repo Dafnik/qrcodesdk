@@ -8,9 +8,9 @@ export default [
   {
     ignores: ['dist/**', '.angular/**', 'out-tsc/**'],
   },
-  ...withFiles(angular.configs.tsRecommended, ['projects/**/*.ts']),
+  ...withFiles(angular.configs.tsRecommended, ['src/**/*.ts']),
   {
-    files: ['projects/**/*.ts'],
+    files: ['src/**/*.ts'],
     processor: angular.processInlineTemplates,
     rules: {
       '@angular-eslint/component-selector': [
@@ -25,6 +25,6 @@ export default [
   },
   ...withFiles(
     [...angular.configs.templateRecommended, angular.configs.templateAccessibility.at(-1)],
-    ['projects/**/*.html'],
+    ['src/**/*.html'],
   ),
 ];
