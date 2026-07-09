@@ -1,0 +1,16 @@
+name: release @qrcodesdk/angular
+
+on:
+  push:
+    tags:
+      - '@qrcodesdk/angular@**'
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: write # Required for GitHub release action
+
+jobs:
+  angular:
+    uses: ./.github/workflows/release.yml
+    with:
+      lib: angular

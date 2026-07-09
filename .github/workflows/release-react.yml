@@ -1,0 +1,16 @@
+name: release @qrcodesdk/react
+
+on:
+  push:
+    tags:
+      - '@qrcodesdk/react@**'
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: write # Required for GitHub release action
+
+jobs:
+  react:
+    uses: ./.github/workflows/release.yml
+    with:
+      lib: react

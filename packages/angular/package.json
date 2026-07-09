@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "@qrcodesdk/angular provides standalone Angular components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.",
   "sideEffects": false,
-  "private": true,
+  "private": false,
   "license": "MIT",
   "author": {
     "name": "Dafnik",
@@ -42,16 +42,9 @@
   ],
   "publishConfig": {
     "access": "public",
+    "directory": "dist/angular",
     "provenance": true
   },
-  "types": "./dist/angular/types/qrcodesdk-angular.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/angular/types/qrcodesdk-angular.d.ts",
-      "default": "./dist/angular/fesm2022/qrcodesdk-angular.mjs"
-    }
-  },
-  "main": "./dist/angular/fesm2022/qrcodesdk-angular.mjs",
   "scripts": {
     "ng": "ng",
     "build": "ng build",

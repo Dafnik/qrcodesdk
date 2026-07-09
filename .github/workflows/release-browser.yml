@@ -1,0 +1,16 @@
+name: release @qrcodesdk/browser
+
+on:
+  push:
+    tags:
+      - '@qrcodesdk/browser@**'
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: write # Required for GitHub release action
+
+jobs:
+  browser:
+    uses: ./.github/workflows/release.yml
+    with:
+      lib: browser

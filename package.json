@@ -8,6 +8,9 @@
     "clean": "turbo run clean",
     "clean:deep": "turbo run clean && rm -rf node_modules",
     "lint": "turbo run lint",
+    "release:status": "changeset status --verbose",
+    "release:version": "changeset version && pnpm install",
+    "release:tag": "changeset tag",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check-types": "turbo run check-types"

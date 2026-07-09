@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "start": "astro dev",
+    "start": "pnpm run build:packages && astro dev",
     "build": "pnpm run build:packages && pnpm run build:site",
     "build:packages": "pnpm --workspace-root turbo run build --filter=docs... --filter=!docs",
     "build:site": "ASTRO_CACHE_DIR=.astro-cache/build VITE_CACHE_DIR=.vite-cache/build node scripts/with-astro-lock.mjs astro build",

@@ -1,0 +1,16 @@
+name: release @qrcodesdk/cli
+
+on:
+  push:
+    tags:
+      - '@qrcodesdk/cli@**'
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: write # Required for GitHub release action
+
+jobs:
+  cli:
+    uses: ./.github/workflows/release.yml
+    with:
+      lib: cli
