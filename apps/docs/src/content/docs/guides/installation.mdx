@@ -1,14 +1,7 @@
 ---
 title: Installation
-description: Choose the QRCodeSDK package for your output format and runtime.
+description: Choose the QRCodeSDK package for your output format, runtime or framework.
 ---
-
-Most projects start with `@qrcodesdk/core`.
-
-- Install `@qrcodesdk/core` if you need SVG, terminal text, matrix output, or custom renderers.
-- Add `@qrcodesdk/node` if you need PNG buffers in Node.js.
-- Add `@qrcodesdk/browser` if you need Canvas, Image elements, or browser downloads.
-- Install `@qrcodesdk/cli` if you want the `qrc` command for terminal and file output.
 
 ## Start with core
 
@@ -35,9 +28,18 @@ const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
 - raw matrix output
 - custom renderer support
 
-## Add PNG output in Node.js
+## Package guide
 
-Use `@qrcodesdk/node` when the result must be PNG bytes in a Node.js process.
+| Package              | Install when you need                                 | Outputs                                                |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| `@qrcodesdk/core`    | Runtime-neutral generation and common output formats. | SVG strings, terminal text strings, raw matrices.      |
+| `@qrcodesdk/cli`     | Command line generation from terminals and scripts.   | Terminal text, SVG files, PNG files.                   |
+| `@qrcodesdk/browser` | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`, downloads.    |
+| `@qrcodesdk/angular` | Angular components & download helpers.                | `SVGQRCode`, `ImageQRCode`, `CanvasQRCode`, downloads. |
+| `@qrcodesdk/react`   | React components & download helpers.                  | `SVGQRCode`, `ImageQRCode`, `CanvasQRCode`, downloads. |
+| `@qrcodesdk/node`    | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                          |
+
+## Add PNG output in Node.js
 
 Install it alongside `@qrcodesdk/core`.
 
@@ -105,15 +107,6 @@ qrc "https://qrcodesdk.dev" --output qrcode.png
 ```
 
 The CLI can print terminal text or write SVG and PNG files.
-
-## Package guide
-
-| Package              | Install when you need                                 | Outputs                                             |
-| -------------------- | ----------------------------------------------------- | --------------------------------------------------- |
-| `@qrcodesdk/core`    | Runtime-neutral generation and common output formats. | SVG strings, terminal text strings, raw matrices.   |
-| `@qrcodesdk/cli`     | Command line generation from terminals and scripts.   | Terminal text, SVG files, PNG files.                |
-| `@qrcodesdk/node`    | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                       |
-| `@qrcodesdk/browser` | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`, downloads. |
 
 ## Next steps
 

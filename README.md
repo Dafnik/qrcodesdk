@@ -119,7 +119,7 @@ Defaults are designed for readable output:
 
 ## Documentation
 
-- [Installation](apps/docs/src/content/docs/guides/installation.md)
+- [Installation](apps/docs/src/content/docs/guides/installation.mdx)
 - [Core library](apps/docs/src/content/docs/libs/core.md)
 - [Renderers](apps/docs/src/content/docs/renderers/index.md)
 - [Browser library](apps/docs/src/content/docs/libs/browser.md)

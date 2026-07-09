@@ -1,22 +1,22 @@
 ---
 title: QRCodeSDK
-description: Generate QR codes from one TypeScript builder and render them as SVG, PNG, Canvas, Image elements, terminal text, or custom output.
+description: Build QR codes with a single TypeScript-first API, then render them in the format your app needs.
 template: splash
 hero:
-  tagline: Generate QR codes from one TypeScript builder, then choose the output format your app needs.
+  tagline: Build QR codes with a single TypeScript-first API, then render them in the format your app needs.
   actions:
     - text: Get started
       link: /guides/installation/
       icon: right-arrow
-    - text: API reference
-      link: /reference/api/
-      icon: document
+    - text: CLI
+      link: /guides/cli/
+      icon: seti:shell
       variant: minimal
 ---
 
 import {CardGrid, LinkCard} from '@astrojs/starlight/components';
 
-QRCodeSDK separates QR code generation from output. Start with `qrcode()`, then render SVG, PNG, Canvas, Image elements, terminal text, matrix data, or your own custom format.
+QRCodeSDK keeps QR generation separate from presentation. Start with `qrcode()`, then output SVG, PNG, Canvas, image elements, terminal text, matrix data, or your own custom renderer.
 
 ## Install and render SVG
 
@@ -34,7 +34,14 @@ QRCodeSDK separates QR code generation from output. Start with `qrcode()`, then 
    const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
    ```
 
-SVG is the best default for most user-facing QR codes because it stays sharp at any size and works in browsers, servers, emails, and static assets.
+SVG is the best default for most user-facing QR codes because it stays sharp at any size and works in browsers, servers, emails and static assets.
+
+## Choose your framework
+
+<CardGrid>
+  <LinkCard title="Angular" href="/libs/angular" description="Render QRCodes with Angular." />
+  <LinkCard title="React" href="/libs/react" description="Render QRCodes with React." />
+</CardGrid>
 
 ## Choose your output
 
