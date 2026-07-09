@@ -2,9 +2,9 @@ import {CanvasQRCodeRenderer, type QRCodeCanvasRendererOptions} from '@qrcodesdk
 import {type QRCodeMatrixOptions} from '@qrcodesdk/core';
 import {useEffect, useMemo, useRef} from 'react';
 
-import {renderQRCode} from './qrcode-builder';
 import {replaceElementChildren} from './replace-children';
 import type {QRCodeBaseProps} from './types';
+import {qrcode} from '@qrcodesdk/core';
 
 export type QRCodeCanvasOptions = QRCodeMatrixOptions & QRCodeCanvasRendererOptions;
 
@@ -18,7 +18,7 @@ export function CanvasQRCode({data, options, className}: CanvasQRCodeProps) {
     const container = containerRef.current;
     if (!container) return;
 
-    replaceElementChildren(container, renderQRCode(data, options, canvasRenderer));
+    replaceElementChildren(container, qrcode(data).config(options).render(canvasRenderer));
   }, [canvasRenderer, data, options]);
 
   return <div className={className} ref={containerRef} />;

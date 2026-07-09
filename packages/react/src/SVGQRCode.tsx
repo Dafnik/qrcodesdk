@@ -6,8 +6,8 @@ import {
 } from '@qrcodesdk/core';
 import {forwardRef, useImperativeHandle, useMemo} from 'react';
 
-import {renderQRCode} from './qrcode-builder';
 import type {QRCodeBaseProps} from './types';
+import {qrcode} from '@qrcodesdk/core';
 
 export type QRCodeSVGOptions = QRCodeMatrixOptions & QRCodeSVGRendererOptions;
 
@@ -22,20 +22,23 @@ export const SVGQRCode = forwardRef<SVGQRCodeHandle, SVGQRCodeProps>(function SV
   ref,
 ) {
   const svgRenderer = useMemo(() => SVGQRCodeRenderer(options), [options]);
-  const svg = useMemo(() => renderQRCode(data, options, svgRenderer), [data, options, svgRenderer]);
+  const svg = useMemo(
+    () => qrcode(data).config(options).render(svgRenderer),
+    [data, options, svgRenderer],
+  );
 
   useImperativeHandle(
     ref,
     () => ({
       download(filename?: string) {
-        renderQRCode(
-          data,
-          options,
-          DownloadSVGQRCodeRenderer({
-            renderer: svgRenderer,
-            filename,
-          }),
-        );
+        qrcode(data)
+          .config(options)
+          .render(
+            DownloadSVGQRCodeRenderer({
+              renderer: svgRenderer,
+              filename,
+            }),
+          );
       },
     }),
     [data, options, svgRenderer],

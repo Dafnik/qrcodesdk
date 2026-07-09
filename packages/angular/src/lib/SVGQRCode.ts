@@ -24,15 +24,9 @@ export class SVGQRCode {
 
   readonly svgRenderer = computed(() => SVGQRCodeRenderer(this.options()));
 
-  readonly qrcodeBuilder = computed(() => {
-    const options = this.options();
-    return qrcode(this.data())
-      .version(options?.version)
-      .errorCorrection(options?.errorCorrectionLevel)
-      .mode(options?.mode)
-      .mask(options?.mask)
-      .renderer(this.svgRenderer());
-  });
+  readonly qrcodeBuilder = computed(() =>
+    qrcode(this.data()).config(this.options()).renderer(this.svgRenderer()),
+  );
 
   constructor() {
     effect(() => {

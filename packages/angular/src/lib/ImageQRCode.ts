@@ -36,15 +36,9 @@ export class ImageQRCode {
 
   readonly imageRenderer = computed(() => ImageQRCodeRenderer(this.options()));
 
-  readonly qrcodeBuilder = computed(() => {
-    const options = this.options();
-    return qrcode(this.data())
-      .version(options?.version)
-      .errorCorrection(options?.errorCorrectionLevel)
-      .mode(options?.mode)
-      .mask(options?.mask)
-      .renderer(this.imageRenderer());
-  });
+  readonly qrcodeBuilder = computed(() =>
+    qrcode(this.data()).config(this.options()).renderer(this.imageRenderer()),
+  );
 
   constructor() {
     effect(() => {

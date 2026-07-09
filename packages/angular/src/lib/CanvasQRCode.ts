@@ -32,15 +32,9 @@ export class CanvasQRCode {
 
   readonly canvasRenderer = computed(() => CanvasQRCodeRenderer(this.options()));
 
-  readonly qrcodeBuilder = computed(() => {
-    const options = this.options();
-    return qrcode(this.data())
-      .version(options?.version)
-      .errorCorrection(options?.errorCorrectionLevel)
-      .mode(options?.mode)
-      .mask(options?.mask)
-      .renderer(this.canvasRenderer());
-  });
+  readonly qrcodeBuilder = computed(() =>
+    qrcode(this.data()).config(this.options()).renderer(this.canvasRenderer()),
+  );
 
   constructor() {
     effect(() => {
