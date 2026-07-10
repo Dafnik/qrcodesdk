@@ -7,8 +7,8 @@ runs:
       id: playwright-version
       shell: bash
       run: |
-        cd web
-        echo "PLAYWRIGHT_VERSION=$(jq -r '.devDependencies."@playwright/test"' package.json)" >> $GITHUB_ENV
+        cd packages/browser
+        echo "PLAYWRIGHT_VERSION=$(jq -r '.devDependencies."playwright"' package.json)" >> $GITHUB_ENV
         cd -
 
     - name: Cache Playwright
@@ -35,6 +35,6 @@ runs:
         # - https://github.com/actions/runner/issues/4030
         # - https://github.com/microsoft/playwright/issues/14434
         sudo apt-get --yes remove --purge man-db
-        cd web
+        cd packages/browser
         pnpm exec playwright install --with-deps --only-shell
         cd -
