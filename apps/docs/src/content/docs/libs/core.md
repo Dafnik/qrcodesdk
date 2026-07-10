@@ -136,3 +136,8 @@ For runtime-specific output, add:
 
 - [`@qrcodesdk/node`](/libs/node/) for PNG buffers
 - [`@qrcodesdk/browser`](/libs/browser/) for Canvas and Image elements
+
+For framework-specific components, add:
+
+- [`@qrcodesdk/angular`](/libs/angular/) for Angular
+- [`@qrcodesdk/react`](/libs/react/) for React

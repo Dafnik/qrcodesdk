@@ -5,9 +5,9 @@ description: Generate QR codes from the terminal as text output, SVG files, or P
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
-`@qrcodesdk/cli` installs the `qrc` command. Use it when you want to generate QR codes from a shell script, local terminal, CI job, or one-off file generation workflow.
+`@qrcodesdk/cli` installs the `qrc` command.
 
-The CLI uses the same QR builder and renderers as `@qrcodesdk/core` and `@qrcodesdk/node`.
+The CLI uses the same `qrcode()` builder and renderers as `@qrcodesdk/core` and `@qrcodesdk/node`.
 
 ## Install
 
@@ -69,8 +69,8 @@ The CLI exposes the same builder and styling concepts as the packages.
 qrc "https://qrcodesdk.dev" \
   --output qrcode.svg \
   --error-correction H \
-  --size 1 \
-  --margin 1 \
+  --size 2 \
+  --margin 3 \
   --color-dark '#111827' \
   --color-light '#ffffff' \
   --aria-label 'Scan to open qrcodesdk.dev'

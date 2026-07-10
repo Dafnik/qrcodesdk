@@ -1,8 +1,7 @@
 ---
 import {Tabs, TabItem, Code} from '@astrojs/starlight/components';
 
-type PackageManager = 'pnpm' | 'npm' | 'yarn' | 'bun' | 'viteplus';
-type PackageManagerMode = 'add' | 'addDev' | 'addGlobal' | 'exec' | 'dlx';
+type PackageManagerMode = 'add' | 'addDev' | 'addGlobal' | 'exec' | 'dlx' | 'label';
 
 type Props = {
   packages: string[];
@@ -14,120 +13,83 @@ type Props = {
 
 const {packages, mode, command, args = [], syncKey = 'package-manager'} = Astro.props as Props;
 
-const packageManagers: PackageManager[] = ['npm', 'pnpm', 'viteplus', 'bun', 'yarn'];
+const packageManagers = {
+  npm: {
+    label: 'npm',
+    add: 'npm install',
+    addDev: 'npm install -D',
+    addGlobal: 'npm install -g',
+    exec: 'npx',
+    dlx: 'npx',
+  },
+  pnpm: {
+    label: 'pnpm',
+    add: 'pnpm add',
+    addDev: 'pnpm add -D',
+    addGlobal: 'pnpm add -g',
+    exec: 'pnpm exec',
+    dlx: 'pnpm dlx',
+  },
+  viteplus: {
+    label: 'vp',
+    add: 'vp add',
+    addDev: 'vp add -D',
+    addGlobal: 'vp install -g',
+    exec: 'vp exec',
+    dlx: 'vp dlx',
+  },
+  deno: {
+    label: 'deno',
+    add: 'deno add',
+    addDev: 'deno add --dev',
+    addGlobal: 'deno install --global',
+    exec: 'deno x',
+    dlx: 'deno x',
+  },
+  bun: {
+    label: 'bun',
+    add: 'bun add',
+    addDev: 'bun add -D',
+    addGlobal: 'bun add -g',
+    exec: 'bunx',
+    dlx: 'bunx',
+  },
+  yarn: {
+    label: 'yarn',
+    add: 'yarn add',
+    addDev: 'yarn add -D',
+    addGlobal: 'yarn global add',
+    exec: 'yarn',
+    dlx: 'yarn dlx',
+  },
+} satisfies Record<string, Record<PackageManagerMode, string>>;
 
-function commandFor(packageManager: PackageManager): string {
-  const packageList = packages.join(' ');
-  const argumentList = args.join(' ');
+const packageList = packages.join(' ');
+const argumentList = args.join(' ');
 
-  if (mode === 'exec') {
-    if (command === undefined) {
-      throw new Error('PackageManagerTabs requires a command when mode is "exec".');
-    }
-
-    return joinCommand([execCommandPrefix(packageManager), command, argumentList]);
-  }
-
-  if (mode === 'dlx') {
-    if (packageList.length === 0) {
-      throw new Error('PackageManagerTabs requires at least one package when mode is "dlx".');
-    }
-
-    return joinCommand([dlxCommandPrefix(packageManager), packageList, argumentList]);
-  }
-
-  return joinCommand([installCommandPrefix(packageManager, mode), packageList]);
+if (mode === 'exec' && command === undefined) {
+  throw new Error('PackageManagerTabs requires a command when mode is "exec".');
 }
 
-function installCommandPrefix(
-  packageManager: PackageManager,
-  installMode: Exclude<PackageManagerMode, 'exec' | 'dlx'>,
-): string {
-  if (installMode === 'addDev') {
-    if (packageManager === 'npm') {
-      return 'npm install -D';
-    }
-
-    if (packageManager === 'viteplus') {
-      return 'vp add -D';
-    }
-
-    return `${packageManager} add -D`;
-  }
-
-  if (installMode === 'addGlobal') {
-    if (packageManager === 'npm') {
-      return 'npm install -g';
-    }
-
-    if (packageManager === 'yarn') {
-      return 'yarn global add';
-    }
-
-    if (packageManager === 'viteplus') {
-      return 'vp install -g';
-    }
-
-    return `${packageManager} add -g`;
-  }
-
-  if (packageManager === 'viteplus') {
-    return 'vp add';
-  }
-
-  return packageManager === 'npm' ? 'npm install' : `${packageManager} add`;
+if (mode === 'dlx' && packageList.length === 0) {
+  throw new Error('PackageManagerTabs requires at least one package when mode is "dlx".');
 }
 
-function execCommandPrefix(packageManager: PackageManager): string {
-  if (packageManager === 'pnpm') {
-    return 'pnpm exec';
-  }
-
-  if (packageManager === 'npm') {
-    return 'npx';
-  }
-
-  if (packageManager === 'bun') {
-    return 'bunx';
-  }
-
-  if (packageManager === 'viteplus') {
-    return 'vp exec';
-  }
-
-  return 'yarn';
-}
-
-function dlxCommandPrefix(packageManager: PackageManager): string {
-  if (packageManager === 'pnpm') {
-    return 'pnpm dlx';
-  }
-
-  if (packageManager === 'npm') {
-    return 'npx';
-  }
-
-  if (packageManager === 'bun') {
-    return 'bunx';
-  }
-
-  if (packageManager === 'viteplus') {
-    return 'vp dlx';
-  }
-
-  return 'yarn dlx';
-}
-
-function joinCommand(parts: string[]): string {
-  return parts.filter((part) => part.length > 0).join(' ');
-}
+const commandTarget = mode === 'exec' ? command : packageList;
+const commandArguments = mode === 'exec' || mode === 'dlx' ? argumentList : '';
+const tabs = Object.entries(packageManagers).map(([_, commands]) => ({
+  label: commands['label'],
+  command: [commands[mode], commandTarget, commandArguments]
+    .filter((part) => part !== undefined && part.length > 0)
+    .join(' '),
+}));
 ---
 
 <Tabs syncKey={syncKey}>
   {
-    packageManagers.map((packageManager) => (
-      <TabItem label={packageManager}>
-        <Code lang="sh" code={commandFor(packageManager)} />
+    tabs.map(({label, command}) => (
+      <TabItem label={label}>
+        <Code lang="sh" code={command} />
       </TabItem>
     ))
   }
