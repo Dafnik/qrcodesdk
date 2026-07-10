@@ -1,0 +1,4 @@
+qrcodesdk
+qrcode
+eccs
+ecclevel

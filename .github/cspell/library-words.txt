@@ -1,0 +1,11 @@
+zxing
+serviceworker
+jsqr
+dontInvert
+packagr
+trivago
+astrojs
+seti
+viteplus
+analogjs
+shiki

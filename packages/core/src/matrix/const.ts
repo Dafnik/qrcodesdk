@@ -244,7 +244,7 @@ export const ECC_LEVELS_MAP: Record<QRCodeErrorCorrectionLevel, QRCodeErrorCorre
 // generator polynomial of degree K is product of (x-\alpha^0), (x-\alpha^1),
 // ..., (x-\alpha^(K-1)). by convention, we omit the K-th coefficient (always 1)
 // from the result; also other coefficients are written in terms of the exponent
-// to \alpha to avoid the redundant calculation. (see also calculateecc below.)
+// to \alpha to avoid the redundant calculation. (see also calculate ecc below.)
 type GF256LookupTables = {
   exponents: QRCodeCodewords;
   logarithms: QRCodeCodewords;

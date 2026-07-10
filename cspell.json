@@ -1,0 +1,22 @@
+{
+  "dictionaries": ["project-words"],
+  "dictionaryDefinitions": [
+    {
+      "addWords": true,
+      "name": "project-words",
+      "path": "./.github/project-words.txt"
+    },
+    {
+      "addWords": true,
+      "name": "people-words",
+      "path": "./.github/people-words.txt"
+    },
+    {
+      "addWords": true,
+      "name": "library-words",
+      "path": "./.github/library-words.txt"
+    }
+  ],
+  "ignorePaths": ["pnpm-workspace.yaml", "pnpm-lock.yaml", "fixtures.ts"],
+  "version": "0.2"
+}
