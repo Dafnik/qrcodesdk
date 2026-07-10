@@ -8,7 +8,7 @@ import type {
 
 export type QRCodeSVGRendererOptions = QRCodeStylingOptions & QRCodeAccessibilityOptions;
 
-export function SVGQRCodeRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
+export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
   return (matrix: QRCodeMatrix) => {
     const styling = parseQRCodeStylingOptions(options);
     const modSize = styling.size;

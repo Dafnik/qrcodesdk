@@ -1,15 +1,15 @@
-export {CanvasQRCode, type CanvasQRCodeProps, type QRCodeCanvasOptions} from './CanvasQRCode';
+export {QRCodeCanvas, type QRCodeCanvasOptions, type QRCodeCanvasProps} from './QRCodeCanvas';
 export {
-  ImageQRCode,
-  type ImageQRCodeHandle,
-  type ImageQRCodeProps,
+  QRCodeImage,
+  type QRCodeImageHandle,
   type QRCodeImageOptions,
-} from './ImageQRCode';
+  type QRCodeImageProps,
+} from './QRCodeImage';
 export {type QRCodeBaseProps} from './types';
 export {
   QRCodeSVGContainer,
-  SVGQRCode,
+  QRCodeSVG,
   type QRCodeSVGOptions,
-  type SVGQRCodeHandle,
-  type SVGQRCodeProps,
-} from './SVGQRCode';
+  type QRCodeSVGHandle,
+  type QRCodeSVGProps,
+} from './QRCodeSVG';

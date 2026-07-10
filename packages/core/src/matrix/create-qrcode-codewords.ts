@@ -1,4 +1,4 @@
-import type {QRCodeCodewords, ResolvedQRCodeMatrixOptions} from '../types';
+import type {QRCodeCodewords, QRCodeResolvedMatrixOptions} from '../types';
 import {augmentECCs} from './augment-eccs';
 import {VERSIONS, getGF256GeneratorPolynomials} from './const';
 import {encode} from './encode';
@@ -9,7 +9,7 @@ export function createQRCodeCodewords({
   mode,
   errorCorrectionLevel,
   version,
-}: ResolvedQRCodeMatrixOptions): QRCodeCodewords {
+}: QRCodeResolvedMatrixOptions): QRCodeCodewords {
   const versionConfig = VERSIONS[version] ?? [[-100]];
   const dataCodewords = encode(
     version,

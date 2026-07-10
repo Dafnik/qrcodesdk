@@ -10,10 +10,10 @@ QRCodeSDK separates QR code data from renderer output. Builder options control t
 Most visual renderers accept `size` and `margin`.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
-  SVGQRCodeRenderer({
+  QRCodeSVGRenderer({
     size: 8,
     margin: 4,
   }),
@@ -34,10 +34,10 @@ Defaults:
 SVG, PNG, Canvas, and Image renderers support `colors.colorDark` and `colors.colorLight`.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
-  SVGQRCodeRenderer({
+  QRCodeSVGRenderer({
     colors: {
       colorDark: '#111827',
       colorLight: '#ffffff',
@@ -53,10 +53,10 @@ Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827
 SVG and Image renderers support accessibility attributes.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
-  SVGQRCodeRenderer({
+  QRCodeSVGRenderer({
     title: 'QR code for qrcodesdk.dev',
     ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
@@ -64,11 +64,11 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 ```
 
 ```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  ImageQRCodeRenderer({
+  QRCodeImageRenderer({
     alt: 'QR code for qrcodesdk.dev',
     ariaLabel: 'Scan to open qrcodesdk.dev',
     title: 'QR code for qrcodesdk.dev',
@@ -83,9 +83,9 @@ Use labels for user-facing QR codes so assistive technologies can describe the d
 The default error correction level is `M`.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
-const svg = qrcode('https://qrcodesdk.dev').errorCorrection('H').render(SVGQRCodeRenderer());
+const svg = qrcode('https://qrcodesdk.dev').errorCorrection('H').render(QRCodeSVGRenderer());
 ```
 
 Available levels are `L`, `M`, `Q`, and `H`. Higher levels can survive more damage, but they reduce capacity and can require a larger QR version.
@@ -97,13 +97,13 @@ Most applications should let the builder choose the version and mask automatical
 Pin them only when you need deterministic output for a test fixture, compatibility target, or visual comparison.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('HELLO WORLD')
   .mode('alphanumeric')
   .version(1)
   .mask(2)
-  .render(SVGQRCodeRenderer());
+  .render(QRCodeSVGRenderer());
 ```
 
 Versions range from `1` to `40`. Masks range from `0` to `7`.
@@ -111,12 +111,12 @@ Versions range from `1` to `40`. Masks range from `0` to `7`.
 ## Common recipe
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev')
   .errorCorrection('H')
   .render(
-    SVGQRCodeRenderer({
+    QRCodeSVGRenderer({
       size: 8,
       margin: 4,
       colors: {

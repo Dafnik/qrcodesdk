@@ -3,7 +3,7 @@ import {describe, expect, test} from 'vitest';
 
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
-import {ImageQRCodeRenderer, type QRCodeImageRendererOptions} from '../src';
+import {QRCodeImageRenderer, type QRCodeImageRendererOptions} from '../src';
 import {BLACK, WHITE, decodeCanvasQRCode, expectPixel, getCanvasContext} from './helper';
 
 function waitForImage(image: HTMLImageElement): Promise<void> {
@@ -21,7 +21,7 @@ function renderFixtureImage(
   fixture: QRCodeTestFixture,
   options: QRCodeImageRendererOptions = {size: 8, margin: 4},
 ): HTMLImageElement {
-  return renderFixture(fixture, ImageQRCodeRenderer(options));
+  return renderFixture(fixture, QRCodeImageRenderer(options));
 }
 
 async function imageToCanvas(image: HTMLImageElement): Promise<HTMLCanvasElement> {
@@ -39,13 +39,13 @@ async function decodeImageQRCode(image: HTMLImageElement): Promise<string> {
   return decodeCanvasQRCode(await imageToCanvas(image));
 }
 
-describe('ImageQRCodeRenderer', () => {
+describe('QRCodeImageRenderer', () => {
   test('renders a PNG data URL image with real rasterized pixels', async () => {
     const matrix: QRCodeMatrix = [
       [1, 0],
       [0, 1],
     ];
-    const image = ImageQRCodeRenderer({
+    const image = QRCodeImageRenderer({
       alt: 'QR alt',
       ariaLabel: 'QR aria',
       title: 'QR title',

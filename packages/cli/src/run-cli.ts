@@ -8,13 +8,13 @@ import {
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
   type QRCodeMode,
+  QRCodeSVGRenderer,
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeVersion,
-  SVGQRCodeRenderer,
   qrcode,
 } from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 type OutputFormat = 'text' | 'svg' | 'png';
 
@@ -321,7 +321,7 @@ async function render(
 
   if (options.format === 'svg') {
     const svg = builder.render(
-      SVGQRCodeRenderer({
+      QRCodeSVGRenderer({
         ...options.styling,
         alt: options.alt,
         ariaLabel: options.ariaLabel,
@@ -334,7 +334,7 @@ async function render(
     return;
   }
 
-  const png = builder.render(PNGQRCodeRenderer(options.styling));
+  const png = builder.render(QRCodePNGRenderer(options.styling));
   await writeFile(requiredOutput(options), png);
   stderr.write(`${chalk.green('Wrote')} ${requiredOutput(options)}\n`);
 }

@@ -11,8 +11,8 @@ import {
 } from '@angular/core';
 
 import {
-  DownloadImageQRCodeRenderer,
-  ImageQRCodeRenderer,
+  QRCodeDownloadImageRenderer,
+  QRCodeImageRenderer,
   type QRCodeImageRendererOptions,
 } from '@qrcodesdk/browser';
 import {type QRCodeMatrixOptions, qrcode} from '@qrcodesdk/core';
@@ -22,10 +22,10 @@ import {replaceElementChildren} from './render-element';
 export type QRCodeImageOptions = QRCodeMatrixOptions & QRCodeImageRendererOptions;
 
 @Component({
-  selector: 'image-qrcode',
+  selector: 'qrcode-image',
   template: '',
 })
-export class ImageQRCode {
+export class QRCodeImage {
   private readonly renderer = inject(Renderer2);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);
@@ -34,7 +34,7 @@ export class ImageQRCode {
 
   options = input<QRCodeImageOptions>();
 
-  readonly imageRenderer = computed(() => ImageQRCodeRenderer(this.options()));
+  readonly imageRenderer = computed(() => QRCodeImageRenderer(this.options()));
 
   readonly qrcodeBuilder = computed(() =>
     qrcode(this.data()).config(this.options()).renderer(this.imageRenderer()),
@@ -54,7 +54,7 @@ export class ImageQRCode {
     if (!this.isBrowser) return;
 
     this.qrcodeBuilder().render(
-      DownloadImageQRCodeRenderer({
+      QRCodeDownloadImageRenderer({
         renderer: this.imageRenderer(),
         filename,
       }),

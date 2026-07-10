@@ -1,8 +1,8 @@
-import {DownloadSVGQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
 import {
   type QRCodeMatrixOptions,
   type QRCodeSVGRendererOptions,
-  SVGQRCodeRenderer,
+  QRCodeSVGRenderer,
 } from '@qrcodesdk/core';
 import {forwardRef, useImperativeHandle, useMemo} from 'react';
 
@@ -11,17 +11,17 @@ import {qrcode} from '@qrcodesdk/core';
 
 export type QRCodeSVGOptions = QRCodeMatrixOptions & QRCodeSVGRendererOptions;
 
-export type SVGQRCodeHandle = {
+export type QRCodeSVGHandle = {
   download(filename?: string): void;
 };
 
-export type SVGQRCodeProps = QRCodeBaseProps<QRCodeSVGOptions>;
+export type QRCodeSVGProps = QRCodeBaseProps<QRCodeSVGOptions>;
 
-export const SVGQRCode = forwardRef<SVGQRCodeHandle, SVGQRCodeProps>(function SVGQRCode(
+export const QRCodeSVG = forwardRef<QRCodeSVGHandle, QRCodeSVGProps>(function QRCodeSVG(
   {data, options, className},
   ref,
 ) {
-  const svgRenderer = useMemo(() => SVGQRCodeRenderer(options), [options]);
+  const svgRenderer = useMemo(() => QRCodeSVGRenderer(options), [options]);
   const svg = useMemo(
     () => qrcode(data).config(options).render(svgRenderer),
     [data, options, svgRenderer],
@@ -34,7 +34,7 @@ export const SVGQRCode = forwardRef<SVGQRCodeHandle, SVGQRCodeProps>(function SV
         qrcode(data)
           .config(options)
           .render(
-            DownloadSVGQRCodeRenderer({
+            QRCodeDownloadSVGRenderer({
               renderer: svgRenderer,
               filename,
             }),
@@ -47,4 +47,4 @@ export const SVGQRCode = forwardRef<SVGQRCodeHandle, SVGQRCodeProps>(function SV
   return <div className={className} dangerouslySetInnerHTML={{__html: svg}} />;
 });
 
-export const QRCodeSVGContainer = SVGQRCode;
+export const QRCodeSVGContainer = QRCodeSVG;

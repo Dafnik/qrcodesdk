@@ -1,22 +1,22 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {
-  CanvasQRCode,
-  ImageQRCode,
-  type ImageQRCodeHandle,
-  SVGQRCode,
-  type SVGQRCodeHandle,
+  QRCodeCanvas,
+  QRCodeImage,
+  type QRCodeImageHandle,
+  QRCodeSVG,
+  type QRCodeSVGHandle,
 } from '@qrcodesdk/react';
 
 import {createPlaygroundSnapshot, readPlaygroundDraftFromUrl} from './qrcode-playground-state';
 import {QR_CODE_PLAYGROUND_UPDATE_EVENT} from './qrcode-playground-types';
 
-export default function ReactQrcodePlaygroundPreview() {
+export default function QRCodeReactPlaygroundPreview() {
   const [snapshot, setSnapshot] = useState(() =>
     createPlaygroundSnapshot(readPlaygroundDraftFromUrl()),
   );
-  const svgRef = useRef<SVGQRCodeHandle>(null);
-  const imageRef = useRef<ImageQRCodeHandle>(null);
+  const svgRef = useRef<QRCodeSVGHandle>(null);
+  const imageRef = useRef<QRCodeImageHandle>(null);
 
   useEffect(() => {
     const handleUpdate = (event: WindowEventMap[typeof QR_CODE_PLAYGROUND_UPDATE_EVENT]) => {
@@ -35,7 +35,7 @@ export default function ReactQrcodePlaygroundPreview() {
       return (
         <>
           <div className="qrcode-playground__preview-output">
-            <SVGQRCode ref={svgRef} data={snapshot.config.data} options={snapshot.config.options} />
+            <QRCodeSVG ref={svgRef} data={snapshot.config.data} options={snapshot.config.options} />
           </div>
           <DownloadButton
             label="Download SVG"
@@ -49,7 +49,7 @@ export default function ReactQrcodePlaygroundPreview() {
       return (
         <>
           <div className="qrcode-playground__preview-output">
-            <ImageQRCode
+            <QRCodeImage
               ref={imageRef}
               data={snapshot.config.data}
               options={snapshot.config.options}
@@ -65,7 +65,7 @@ export default function ReactQrcodePlaygroundPreview() {
 
     return (
       <div className="qrcode-playground__preview-output">
-        <CanvasQRCode data={snapshot.config.data} options={snapshot.config.options} />
+        <QRCodeCanvas data={snapshot.config.data} options={snapshot.config.options} />
       </div>
     );
   }, [snapshot]);

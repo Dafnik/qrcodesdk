@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
 
-import {SVGQRCode} from '@qrcodesdk/angular';
+import {QRCodeSVG} from '@qrcodesdk/angular';
 
 @Component({
-  selector: 'AngularSVGQRCodeExample',
-  imports: [SVGQRCode],
+  selector: 'qrcode-angular-svg-example',
+  imports: [QRCodeSVG],
   template: `
-    <svg-qrcode
+    <qrcode-svg
       [options]="{
         title: 'QR code for qrcodesdk.dev',
         ariaLabel: 'Scan to open qrcodesdk.dev',
@@ -14,4 +14,4 @@ import {SVGQRCode} from '@qrcodesdk/angular';
       data="https://qrcodesdk.dev" />
   `,
 })
-export class SVGQRCodeExample {}
+export class QRCodeSVGExample {}

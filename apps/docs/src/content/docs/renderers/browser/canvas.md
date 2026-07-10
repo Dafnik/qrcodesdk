@@ -8,24 +8,24 @@ Use this when you need a browser-owned `HTMLCanvasElement` that can be inserted 
 ## Minimal example
 
 ```ts
-import {CanvasQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
-const canvas = qrcode('https://qrcodesdk.dev').render(CanvasQRCodeRenderer());
+const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
 ```
 
 The returned value is an `HTMLCanvasElement` containing rasterized QR code pixels.
 
 ## Common options
 
-You can customize the canvas output by passing styling options to `CanvasQRCodeRenderer`.
+You can customize the canvas output by passing styling options to `QRCodeCanvasRenderer`.
 
 ```ts
-import {CanvasQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const canvas = qrcode('https://qrcodesdk.dev').render(
-  CanvasQRCodeRenderer({
+  QRCodeCanvasRenderer({
     size: 8,
     margin: 4,
     colors: {
@@ -52,11 +52,11 @@ Canvas output requires `size` to be a positive integer and `margin` to be a non-
 ### Insert into the DOM
 
 ```ts
-import {CanvasQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const canvas = qrcode('https://qrcodesdk.dev').render(
-  CanvasQRCodeRenderer({
+  QRCodeCanvasRenderer({
     size: 8,
     margin: 4,
   }),
@@ -76,10 +76,10 @@ if (container) {
 ### Draw into another canvas
 
 ```ts
-import {CanvasQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
-const qrCanvas = qrcode('https://qrcodesdk.dev').render(CanvasQRCodeRenderer());
+const qrCanvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
 const target = document.querySelector<HTMLCanvasElement>('#target');
 const context = target?.getContext('2d');
 
@@ -93,10 +93,10 @@ if (target && context) {
 ### Download as PNG
 
 ```ts
-import {CanvasQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
-const canvas = qrcode('https://qrcodesdk.dev').render(CanvasQRCodeRenderer());
+const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
 
 canvas.toBlob((blob) => {
   if (!blob) return;

@@ -1,0 +1,8 @@
+---
+import QRCodeCanvasExample, { content } from '../../angular/qrcode-canvas-example.ts?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content}>
+  <QRCodeCanvasExample client:load />
+</QRCodeExample>

@@ -37,11 +37,11 @@ pnpm add @qrcodesdk/core @qrcodesdk/browser
 ### SVG
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev')
   .renderer(
-    SVGQRCodeRenderer({
+    QRCodeSVGRenderer({
       size: 6,
       margin: 4,
       colors: {
@@ -73,10 +73,10 @@ console.log(text);
 import {writeFileSync} from 'node:fs';
 
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 const png = qrcode('https://qrcodesdk.dev')
-  .renderer(PNGQRCodeRenderer({size: 8, margin: 4}))
+  .renderer(QRCodePNGRenderer({size: 8, margin: 4}))
   .render();
 
 writeFileSync('qrcode.png', png);
@@ -85,11 +85,11 @@ writeFileSync('qrcode.png', png);
 ### Browser image
 
 ```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  ImageQRCodeRenderer({
+  QRCodeImageRenderer({
     alt: 'QRCodeSDK documentation',
   }),
 );

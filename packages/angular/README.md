@@ -4,22 +4,22 @@ Angular components for rendering QRCodeSDK QR codes.
 
 ## Components
 
-- `SVGQRCode` renders a scalable SVG and supports SVG download.
-- `ImageQRCode` renders a PNG-backed image element and supports PNG download.
-- `CanvasQRCode` renders a canvas element.
+- `QRCodeSVG` renders a scalable SVG and supports SVG download.
+- `QRCodeImage` renders a PNG-backed image element and supports PNG download.
+- `QRCodeCanvas` renders a canvas element.
 
 ```ts
 import {Component} from '@angular/core';
 
-import {CanvasQRCode, ImageQRCode, SVGQRCode} from '@qrcodesdk/angular';
+import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
 
 @Component({
   selector: 'app-root',
-  imports: [SVGQRCode, ImageQRCode, CanvasQRCode],
+  imports: [QRCodeSVG, QRCodeImage, QRCodeCanvas],
   template: `
-    <svg-qrcode data="https://qrcodesdk.dev" />
-    <image-qrcode data="https://qrcodesdk.dev" />
-    <canvas-qrcode data="https://qrcodesdk.dev" />
+    <qrcode-svg data="https://qrcodesdk.dev" />
+    <qrcode-image data="https://qrcodesdk.dev" />
+    <qrcode-canvas data="https://qrcodesdk.dev" />
   `,
 })
 export class App {}

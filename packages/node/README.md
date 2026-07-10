@@ -16,11 +16,11 @@ pnpm add @qrcodesdk/core @qrcodesdk/node
 import {writeFileSync} from 'node:fs';
 
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 const png = qrcode('https://qrcodesdk.dev')
   .renderer(
-    PNGQRCodeRenderer({
+    QRCodePNGRenderer({
       size: 8,
       margin: 4,
       colors: {
@@ -36,13 +36,13 @@ writeFileSync('qrcode.png', png);
 
 ## Output type
 
-`PNGQRCodeRenderer()` returns a renderer whose output is a Node `Buffer`.
+`QRCodePNGRenderer()` returns a renderer whose output is a Node `Buffer`.
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
-const png: Buffer = qrcode('buffer output').render(PNGQRCodeRenderer());
+const png: Buffer = qrcode('buffer output').render(QRCodePNGRenderer());
 ```
 
 ## Options
@@ -61,5 +61,5 @@ Colors must be six-digit hex values such as `#ffffff` or `#111111`.
 ## Public API
 
 ```ts
-import {PNGQRCodeRenderer, type QRCodePNGRendererOptions} from '@qrcodesdk/node';
+import {QRCodePNGRenderer, type QRCodePNGRendererOptions} from '@qrcodesdk/node';
 ```

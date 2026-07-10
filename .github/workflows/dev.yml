@@ -40,6 +40,18 @@ jobs:
       - name: ESLint
         run: pnpm lint
 
+  cspell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: cspell
+        run: pnpm cspell
+
   commitlint:
     name: Commitlint Check
     runs-on: ubuntu-latest

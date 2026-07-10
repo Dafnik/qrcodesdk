@@ -1,8 +1,8 @@
-import type {ParsedQRCodeStylingOptions, QRCodeStylingOptions} from './types';
+import type {QRCodeParsedStylingOptions, QRCodeStylingOptions} from './types';
 
 export function parseQRCodeStylingOptions(
   options?: QRCodeStylingOptions,
-): ParsedQRCodeStylingOptions {
+): QRCodeParsedStylingOptions {
   return {
     size: options?.size ?? 5,
     margin: options?.margin ?? 4,

@@ -3,9 +3,9 @@ import type {
   QRCodeInputData,
   QRCodeMask,
   QRCodeMatrixOptions,
+  QRCodeResolvedMatrixOptions,
   QRCodeSupportedModeIndicator,
   QRCodeVersion,
-  ResolvedQRCodeMatrixOptions,
 } from '../types';
 import {ALPHANUMERIC_REGEXP, ECC_LEVELS_MAP, MODES_MAP, MODE_OCTET, NUMERIC_REGEXP} from './const';
 import {getMaxDataLength} from './get-max-data-length';
@@ -16,7 +16,7 @@ const QR_CODE_MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
 export function resolveQRCodeMatrixOptions(
   data: QRCodeInputData,
   options: QRCodeMatrixOptions = {},
-): ResolvedQRCodeMatrixOptions {
+): QRCodeResolvedMatrixOptions {
   const mode = resolveMode(data, options.mode);
   const encodedData = validateData(mode, data);
   if (encodedData === undefined) throw new Error('QRCode: Invalid data format');

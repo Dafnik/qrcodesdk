@@ -1,8 +1,8 @@
-import {SVGQRCode} from '@qrcodesdk/react';
+import {QRCodeSVG} from '@qrcodesdk/react';
 
-export default function SVGQRCodeExample() {
+export default function QRCodeSVGExample() {
   return (
-    <SVGQRCode
+    <QRCodeSVG
       data="https://qrcodesdk.dev"
       options={{
         title: 'QR code for qrcodesdk.dev',

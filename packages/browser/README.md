@@ -13,12 +13,12 @@ pnpm add @qrcodesdk/core @qrcodesdk/browser
 ## Render a Canvas
 
 ```ts
-import {CanvasQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const canvas = qrcode('https://qrcodesdk.dev')
   .renderer(
-    CanvasQRCodeRenderer({
+    QRCodeCanvasRenderer({
       size: 8,
       margin: 4,
       colors: {
@@ -35,17 +35,17 @@ document.body.append(canvas);
 ## Render an Image
 
 ```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const image: HTMLImageElement = qrcode('image output').render(
-  ImageQRCodeRenderer({
+  QRCodeImageRenderer({
     alt: 'Open QRCodeSDK',
   }),
 );
 ```
 
-`ImageQRCodeRenderer()` returns an `HTMLImageElement` whose `src` is a PNG data URL.
+`QRCodeImageRenderer()` returns an `HTMLImageElement` whose `src` is a PNG data URL.
 
 ## Options
 
@@ -64,9 +64,9 @@ Image and SVG element renderers also accept `alt`, `ariaLabel`, and `title`.
 
 ```ts
 import {
-  CanvasQRCodeRenderer,
-  ImageQRCodeRenderer,
+  QRCodeCanvasRenderer,
   type QRCodeCanvasRendererOptions,
+  QRCodeImageRenderer,
   type QRCodeImageRendererOptions,
 } from '@qrcodesdk/browser';
 ```

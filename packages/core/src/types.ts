@@ -80,7 +80,7 @@ export type QRCodeStylingOptions = {
   };
 };
 
-export type ParsedQRCodeStylingOptions = {
+export type QRCodeParsedStylingOptions = {
   size: number;
   margin: number;
   colors: {
@@ -89,7 +89,7 @@ export type ParsedQRCodeStylingOptions = {
   };
 };
 
-export type ResolvedQRCodeMatrixOptions = {
+export type QRCodeResolvedMatrixOptions = {
   data: QRCodeEncodedData;
   version: QRCodeVersion;
   mode: QRCodeSupportedModeIndicator;

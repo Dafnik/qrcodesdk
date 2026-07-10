@@ -5,7 +5,7 @@ import type {QRCodeDownloadRendererOptions} from './types';
 
 export type QRCodeDownloadSVGRendererOptions = QRCodeDownloadRendererOptions<string>;
 
-export function DownloadSVGQRCodeRenderer(
+export function QRCodeDownloadSVGRenderer(
   options: QRCodeDownloadSVGRendererOptions,
 ): QRCodeRenderer<void> {
   return (matrix: QRCodeMatrix) => {

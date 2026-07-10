@@ -8,24 +8,24 @@ Use this when you need an `HTMLImageElement` that can be inserted into a browser
 ## Minimal example
 
 ```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
-const image = qrcode('https://qrcodesdk.dev').render(ImageQRCodeRenderer());
+const image = qrcode('https://qrcodesdk.dev').render(QRCodeImageRenderer());
 ```
 
 The returned value is an `HTMLImageElement` whose `src` is a PNG data URL.
 
 ## Common options
 
-You can customize the image output by passing styling options to `ImageQRCodeRenderer`.
+You can customize the image output by passing styling options to `QRCodeImageRenderer`.
 
 ```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  ImageQRCodeRenderer({
+  QRCodeImageRenderer({
     size: 8,
     margin: 4,
     colors: {
@@ -58,11 +58,11 @@ Image output requires `size` to be a positive integer and `margin` to be a non-n
 For user-facing QR codes, provide a meaningful label so assistive technologies can describe what the code points to.
 
 ```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  ImageQRCodeRenderer({
+  QRCodeImageRenderer({
     alt: 'QR code for qrcodesdk.dev',
     ariaLabel: 'Scan to open qrcodesdk.dev',
     title: 'QR code for qrcodesdk.dev',
@@ -73,11 +73,11 @@ const image = qrcode('https://qrcodesdk.dev').render(
 ### Insert into the DOM
 
 ```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  ImageQRCodeRenderer({
+  QRCodeImageRenderer({
     alt: 'QR code for qrcodesdk.dev',
   }),
 );
@@ -95,15 +95,15 @@ if (container) {
 
 ### Download as PNG
 
-Use `DownloadImageQRCodeRenderer` when a browser action should download the rendered image as a PNG.
+Use `QRCodeDownloadImageRenderer` when a browser action should download the rendered image as a PNG.
 
 ```ts
-import {DownloadImageQRCodeRenderer, ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeDownloadImageRenderer, QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 qrcode('https://qrcodesdk.dev').render(
-  DownloadImageQRCodeRenderer({
-    renderer: ImageQRCodeRenderer({
+  QRCodeDownloadImageRenderer({
+    renderer: QRCodeImageRenderer({
       alt: 'QR code for qrcodesdk.dev',
     }),
     filename: 'qrcode',
@@ -116,11 +116,11 @@ The download renderer appends `.png` when the filename does not already end with
 Use the returned image element directly when you need to control the download link yourself.
 
 ```ts
-import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  ImageQRCodeRenderer({
+  QRCodeImageRenderer({
     alt: 'QR code for qrcodesdk.dev',
   }),
 );

@@ -1,0 +1,8 @@
+---
+import QRCodeImageExample, { content } from '../../angular/qrcode-image-example.ts?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content}>
+  <QRCodeImageExample client:load />
+</QRCodeExample>

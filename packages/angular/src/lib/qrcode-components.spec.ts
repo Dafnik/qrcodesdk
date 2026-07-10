@@ -4,28 +4,28 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 
-import {CanvasQRCode, type QRCodeCanvasOptions} from './CanvasQRCode';
-import {ImageQRCode, type QRCodeImageOptions} from './ImageQRCode';
-import {type QRCodeSVGOptions, SVGQRCode} from './SVGQRCode';
+import {QRCodeCanvas, type QRCodeCanvasOptions} from './QRCodeCanvas';
+import {QRCodeImage, type QRCodeImageOptions} from './QRCodeImage';
+import {QRCodeSVG, type QRCodeSVGOptions} from './QRCodeSVG';
 
 @Component({
-  selector: 'svg-qrcode-host',
-  imports: [SVGQRCode],
-  template: '<svg-qrcode [data]="data()" [options]="options()" />',
+  selector: 'qrcode-svg-host',
+  imports: [QRCodeSVG],
+  template: '<qrcode-svg [data]="data()" [options]="options()" />',
 })
-class SVGQRCodeHost {
+class QRCodeSVGHost {
   data = signal('HELLO');
   options = signal<QRCodeSVGOptions>({size: 2, margin: 1});
 
-  @ViewChild(SVGQRCode) svgQRCode!: SVGQRCode;
+  @ViewChild(QRCodeSVG) svgQRCode!: QRCodeSVG;
 }
 
 @Component({
-  selector: 'image-qrcode-host',
-  imports: [ImageQRCode],
-  template: '<image-qrcode [data]="data()" [options]="options()" />',
+  selector: 'qrcode-image-host',
+  imports: [QRCodeImage],
+  template: '<qrcode-image [data]="data()" [options]="options()" />',
 })
-class ImageQRCodeHost {
+class QRCodeImageHost {
   data = signal('HELLO');
   options = signal<QRCodeImageOptions>({
     size: 2,
@@ -35,15 +35,15 @@ class ImageQRCodeHost {
     title: 'QR title',
   });
 
-  @ViewChild(ImageQRCode) imageQRCode!: ImageQRCode;
+  @ViewChild(QRCodeImage) imageQRCode!: QRCodeImage;
 }
 
 @Component({
-  selector: 'canvas-qrcode-host',
-  imports: [CanvasQRCode],
-  template: '<canvas-qrcode [data]="data()" [options]="options()" />',
+  selector: 'qrcode-canvas-host',
+  imports: [QRCodeCanvas],
+  template: '<qrcode-canvas [data]="data()" [options]="options()" />',
 })
-class CanvasQRCodeHost {
+class QRCodeCanvasHost {
   data = signal('HELLO');
   options = signal<QRCodeCanvasOptions>({size: 2, margin: 1});
 }
@@ -69,7 +69,7 @@ describe('Angular QR code components', () => {
   });
 
   test('renders SVG QR code output', () => {
-    const fixture = TestBed.createComponent(SVGQRCodeHost);
+    const fixture = TestBed.createComponent(QRCodeSVGHost);
 
     fixture.detectChanges();
 
@@ -81,7 +81,7 @@ describe('Angular QR code components', () => {
   });
 
   test('renders image QR code output with PNG data and accessibility attributes', () => {
-    const fixture = TestBed.createComponent(ImageQRCodeHost);
+    const fixture = TestBed.createComponent(QRCodeImageHost);
 
     fixture.detectChanges();
 
@@ -96,7 +96,7 @@ describe('Angular QR code components', () => {
   });
 
   test('downloads image QR code output as PNG', () => {
-    const fixture = TestBed.createComponent(ImageQRCodeHost);
+    const fixture = TestBed.createComponent(QRCodeImageHost);
     const downloads = captureDownloads(vi);
 
     fixture.detectChanges();
@@ -111,7 +111,7 @@ describe('Angular QR code components', () => {
   });
 
   test('downloads SVG QR code output as SVG', () => {
-    const fixture = TestBed.createComponent(SVGQRCodeHost);
+    const fixture = TestBed.createComponent(QRCodeSVGHost);
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
@@ -129,7 +129,7 @@ describe('Angular QR code components', () => {
   });
 
   test('renders canvas QR code output', () => {
-    const fixture = TestBed.createComponent(CanvasQRCodeHost);
+    const fixture = TestBed.createComponent(QRCodeCanvasHost);
 
     fixture.detectChanges();
 
@@ -140,11 +140,11 @@ describe('Angular QR code components', () => {
   });
 
   test('replaces existing rendered image when inputs change', () => {
-    const fixture = TestBed.createComponent(ImageQRCodeHost);
+    const fixture = TestBed.createComponent(QRCodeImageHost);
 
     fixture.detectChanges();
 
-    const wrapper = renderedElement<HTMLElement>(fixture, 'image-qrcode');
+    const wrapper = renderedElement<HTMLElement>(fixture, 'qrcode-image');
     const firstImage = renderedElement<HTMLImageElement>(fixture, 'img');
 
     fixture.componentInstance.options.set({size: 3, margin: 1});
@@ -159,11 +159,11 @@ describe('Angular QR code components', () => {
   });
 
   test('replaces existing rendered canvas when inputs change', () => {
-    const fixture = TestBed.createComponent(CanvasQRCodeHost);
+    const fixture = TestBed.createComponent(QRCodeCanvasHost);
 
     fixture.detectChanges();
 
-    const wrapper = renderedElement<HTMLElement>(fixture, 'canvas-qrcode');
+    const wrapper = renderedElement<HTMLElement>(fixture, 'qrcode-canvas');
     const firstCanvas = renderedElement<HTMLCanvasElement>(fixture, 'canvas');
 
     fixture.componentInstance.data.set('WORLD');

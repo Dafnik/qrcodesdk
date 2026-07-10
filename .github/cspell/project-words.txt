@@ -2,3 +2,4 @@ qrcodesdk
 qrcode
 eccs
 ecclevel
+rrggbb

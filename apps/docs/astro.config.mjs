@@ -42,7 +42,7 @@ export default defineConfig({
         transformFilter: (_code, id) => {
           return (
             id.includes('src/components/angular') ||
-            id.includes('src/components/playground/angular')
+            id.includes('src/components/playground/qrcode-angular')
           ); // <- only transform Angular TypeScript files
         },
       },

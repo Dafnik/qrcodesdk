@@ -15,7 +15,7 @@ Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers
 | [Render to an Image Element](/renderers/browser/image/) | `HTMLImageElement`  | Browser DOM, CSS styling, accessible image elements   | `@qrcodesdk/browser` |
 | [Render Terminal Text](/renderers/core/text/)           | `string`            | CLIs, logs, terminals, snapshot tests                 | `@qrcodesdk/core`    |
 
-Browser downloads are recipes on the SVG and Image renderer pages: use the browser package to wrap `SVGQRCodeRenderer()` for `.svg` downloads, or `ImageQRCodeRenderer()` for `.png` downloads.
+Browser downloads are recipes on the SVG and Image renderer pages: use the browser package to wrap `QRCodeSVGRenderer()` for `.svg` downloads, or `QRCodeImageRenderer()` for `.png` downloads.
 
 ## Write a custom renderer
 

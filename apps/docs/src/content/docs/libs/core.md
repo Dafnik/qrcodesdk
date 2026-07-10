@@ -18,14 +18,14 @@ Install it when you need:
 Start with `qrcode()` and chain the options you need.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev')
   .mode('octet')
   .errorCorrection('M')
   .version(4)
   .mask(2)
-  .renderer(SVGQRCodeRenderer())
+  .renderer(QRCodeSVGRenderer())
   .render();
 ```
 

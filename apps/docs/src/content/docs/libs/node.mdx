@@ -17,10 +17,10 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 import {writeFile} from 'node:fs/promises';
 
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 const png = qrcode('https://qrcodesdk.dev').render(
-  PNGQRCodeRenderer({
+  QRCodePNGRenderer({
     size: 8,
     margin: 4,
   }),

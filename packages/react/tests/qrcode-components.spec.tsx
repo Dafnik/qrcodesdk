@@ -4,14 +4,14 @@ import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 
 import {
-  CanvasQRCode,
-  ImageQRCode,
-  type ImageQRCodeHandle,
+  QRCodeCanvas,
+  QRCodeImage,
+  type QRCodeImageHandle,
   type QRCodeCanvasOptions,
   type QRCodeImageOptions,
   type QRCodeSVGOptions,
-  SVGQRCode,
-  type SVGQRCodeHandle,
+  QRCodeSVG,
+  type QRCodeSVGHandle,
 } from '../src';
 
 const svgOptions: QRCodeSVGOptions = {size: 2, margin: 1};
@@ -35,7 +35,7 @@ describe('React QR code components', () => {
   });
 
   test('renders SVG QR code output', () => {
-    const {container} = render(<SVGQRCode data="HELLO" options={svgOptions} />);
+    const {container} = render(<QRCodeSVG data="HELLO" options={svgOptions} />);
     const svg = renderedElement<SVGSVGElement>(container, 'svg');
 
     expect(svg.tagName.toLowerCase()).toBe('svg');
@@ -44,7 +44,7 @@ describe('React QR code components', () => {
   });
 
   test('renders image QR code output with PNG data and accessibility attributes', async () => {
-    const {container} = render(<ImageQRCode data="HELLO" options={imageOptions} />);
+    const {container} = render(<QRCodeImage data="HELLO" options={imageOptions} />);
 
     await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
 
@@ -59,10 +59,10 @@ describe('React QR code components', () => {
   });
 
   test('downloads image QR code output as PNG', () => {
-    const imageQRCode = createRef<ImageQRCodeHandle>();
+    const imageQRCode = createRef<QRCodeImageHandle>();
     const downloads = captureDownloads(vi);
 
-    render(<ImageQRCode data="HELLO" options={imageOptions} ref={imageQRCode} />);
+    render(<QRCodeImage data="HELLO" options={imageOptions} ref={imageQRCode} />);
     imageQRCode.current?.download('qrcodesdk');
 
     expect(downloads).toEqual([
@@ -74,12 +74,12 @@ describe('React QR code components', () => {
   });
 
   test('downloads SVG QR code output as SVG', () => {
-    const svgQRCode = createRef<SVGQRCodeHandle>();
+    const svgQRCode = createRef<QRCodeSVGHandle>();
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
-    render(<SVGQRCode data="HELLO" options={svgOptions} ref={svgQRCode} />);
+    render(<QRCodeSVG data="HELLO" options={svgOptions} ref={svgQRCode} />);
     svgQRCode.current?.download('qrcodesdk');
 
     expect(downloads).toEqual([
@@ -92,7 +92,7 @@ describe('React QR code components', () => {
   });
 
   test('renders canvas QR code output', async () => {
-    const {container} = render(<CanvasQRCode data="HELLO" options={canvasOptions} />);
+    const {container} = render(<QRCodeCanvas data="HELLO" options={canvasOptions} />);
 
     await waitFor(() => expect(container.querySelector('canvas')).not.toBeNull());
 
@@ -103,14 +103,14 @@ describe('React QR code components', () => {
   });
 
   test('replaces existing rendered image when props change', async () => {
-    const {container, rerender} = render(<ImageQRCode data="HELLO" options={imageOptions} />);
+    const {container, rerender} = render(<QRCodeImage data="HELLO" options={imageOptions} />);
 
     await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
 
     const wrapper = renderedElement<HTMLDivElement>(container, 'div');
     const firstImage = renderedElement<HTMLImageElement>(container, 'img');
 
-    rerender(<ImageQRCode data="HELLO" options={{size: 3, margin: 1}} />);
+    rerender(<QRCodeImage data="HELLO" options={{size: 3, margin: 1}} />);
 
     await waitFor(() =>
       expect(renderedElement<HTMLImageElement>(container, 'img')).not.toBe(firstImage),
@@ -124,14 +124,14 @@ describe('React QR code components', () => {
   });
 
   test('replaces existing rendered canvas when props change', async () => {
-    const {container, rerender} = render(<CanvasQRCode data="HELLO" options={canvasOptions} />);
+    const {container, rerender} = render(<QRCodeCanvas data="HELLO" options={canvasOptions} />);
 
     await waitFor(() => expect(container.querySelector('canvas')).not.toBeNull());
 
     const wrapper = renderedElement<HTMLDivElement>(container, 'div');
     const firstCanvas = renderedElement<HTMLCanvasElement>(container, 'canvas');
 
-    rerender(<CanvasQRCode data="WORLD" options={canvasOptions} />);
+    rerender(<QRCodeCanvas data="WORLD" options={canvasOptions} />);
 
     await waitFor(() =>
       expect(renderedElement<HTMLCanvasElement>(container, 'canvas')).not.toBe(firstCanvas),
@@ -145,13 +145,13 @@ describe('React QR code components', () => {
   });
 
   test('exposes download handles only for SVG and image components', () => {
-    const svgQRCode = createRef<SVGQRCodeHandle>();
-    const imageQRCode = createRef<ImageQRCodeHandle>();
+    const svgQRCode = createRef<QRCodeSVGHandle>();
+    const imageQRCode = createRef<QRCodeImageHandle>();
 
     render(
       <>
-        <SVGQRCode data="HELLO" ref={svgQRCode} />
-        <ImageQRCode data="HELLO" ref={imageQRCode} />
+        <QRCodeSVG data="HELLO" ref={svgQRCode} />
+        <QRCodeImage data="HELLO" ref={imageQRCode} />
       </>,
     );
 

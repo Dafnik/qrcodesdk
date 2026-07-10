@@ -15,7 +15,7 @@ type RGBColor = {
   blue: number;
 };
 
-export function PNGQRCodeRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
+export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
   return (matrix: QRCodeMatrix) => {
     const styling = parseQRCodeStylingOptions(options);
     const modSize = styling.size;

@@ -29,9 +29,9 @@ QRCodeSDK keeps QR code generation separate from presentation. Start with `qrcod
 2. Render your first QR code.
 
    ```ts
-   import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+   import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
-   const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
+   const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
    ```
 
 SVG is the best default for most user-facing QR codes because it stays sharp at any size and works in browsers, servers, emails and static assets.
@@ -78,12 +78,12 @@ SVG is the best default for most user-facing QR codes because it stays sharp at 
 Most renderers use the same styling options.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev')
   .errorCorrection('H')
   .render(
-    SVGQRCodeRenderer({
+    QRCodeSVGRenderer({
       size: 8,
       margin: 4,
       colors: {

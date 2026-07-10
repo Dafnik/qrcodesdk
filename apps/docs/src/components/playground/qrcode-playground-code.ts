@@ -15,23 +15,23 @@ type ComponentMeta = {
 
 const META_BY_OUTPUT: Record<QRCodePlaygroundOutput, ComponentMeta> = {
   svg: {
-    componentName: 'SVGQRCode',
+    componentName: 'QRCodeSVG',
     optionsType: 'QRCodeSVGOptions',
-    selector: 'svg-qrcode',
+    selector: 'qrcode-svg',
     downloadLabel: 'Download SVG',
-    handleType: 'SVGQRCodeHandle',
+    handleType: 'QRCodeSVGHandle',
   },
   image: {
-    componentName: 'ImageQRCode',
+    componentName: 'QRCodeImage',
     optionsType: 'QRCodeImageOptions',
-    selector: 'image-qrcode',
+    selector: 'qrcode-image',
     downloadLabel: 'Download PNG',
-    handleType: 'ImageQRCodeHandle',
+    handleType: 'QRCodeImageHandle',
   },
   canvas: {
-    componentName: 'CanvasQRCode',
+    componentName: 'QRCodeCanvas',
     optionsType: 'QRCodeCanvasOptions',
-    selector: 'canvas-qrcode',
+    selector: 'qrcode-canvas',
   },
 };
 
@@ -72,7 +72,7 @@ function generateAngularCode(draft: QRCodePlaygroundDraft): CodePreview {
 
   return {
     lang: 'angular-ts',
-    code: `import {Component} from '@angular/core';\n\nimport {${meta.componentName}, type ${meta.optionsType}} from '@qrcodesdk/angular';\n\n@Component({\n  selector: 'app-qrcode-example',\n  imports: [${meta.componentName}],\n  template: \`\n${template}\n  \`,\n})\nexport class QRCodeExample {\n  data = ${quote(draft.data)};\n\n  options: ${meta.optionsType} = ${formatOptions(draft, 2)};\n}\n`,
+    code: `import {Component} from '@angular/core';\n\nimport {${meta.componentName}, type ${meta.optionsType}} from '@qrcodesdk/angular';\n\n@Component({\n  selector: 'qrcode-app-example',\n  imports: [${meta.componentName}],\n  template: \`\n${template}\n  \`,\n})\nexport class QRCodeExample {\n  data = ${quote(draft.data)};\n\n  options: ${meta.optionsType} = ${formatOptions(draft, 2)};\n}\n`,
   };
 }
 

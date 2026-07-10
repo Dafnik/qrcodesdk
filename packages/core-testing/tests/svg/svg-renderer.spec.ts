@@ -1,16 +1,16 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeMatrix, SVGQRCodeRenderer} from '@qrcodesdk/core';
+import {QRCodeMatrix, QRCodeSVGRenderer} from '@qrcodesdk/core';
 
 import {extractPaths, extractSvgAttrs} from './svg-helpers';
 
-describe('SVGQRCodeRenderer', () => {
+describe('QRCodeSVGRenderer', () => {
   test('renders default SVG geometry from a hand-authored matrix', () => {
     const matrix: QRCodeMatrix = [
       [1, 0],
       [0, 1],
     ];
-    const svg = SVGQRCodeRenderer()(matrix);
+    const svg = QRCodeSVGRenderer()(matrix);
     const svgAttrs = extractSvgAttrs(svg);
     const paths = extractPaths(svg);
 
@@ -36,7 +36,7 @@ describe('SVGQRCodeRenderer', () => {
       [1, 0, 1],
       [0, 0, 0],
     ];
-    const svg = SVGQRCodeRenderer({
+    const svg = QRCodeSVGRenderer({
       size: 3,
       margin: 1,
       colors: {
@@ -71,7 +71,7 @@ describe('SVGQRCodeRenderer', () => {
   });
 
   test('escapes SVG accessibility attribute values', () => {
-    const svg = SVGQRCodeRenderer({
+    const svg = QRCodeSVGRenderer({
       alt: 'Scan "A&B" <now>',
       ariaLabel: 'Open "docs" & examples',
       title: 'QR <title>',
@@ -83,7 +83,7 @@ describe('SVGQRCodeRenderer', () => {
   });
 
   test('renders only a background path when the matrix has no dark modules', () => {
-    const svg = SVGQRCodeRenderer({size: 2, margin: 0})([
+    const svg = QRCodeSVGRenderer({size: 2, margin: 0})([
       [0, 0],
       [0, 0],
     ]);

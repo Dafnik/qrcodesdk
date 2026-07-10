@@ -1,7 +1,7 @@
 import {captureDownloads} from '@repo/core-testing';
 import {afterEach, describe, expect, test, vi} from 'vitest';
 
-import {DownloadImageQRCodeRenderer, DownloadSVGQRCodeRenderer, ImageQRCodeRenderer} from '../src';
+import {QRCodeDownloadImageRenderer, QRCodeDownloadSVGRenderer, QRCodeImageRenderer} from '../src';
 
 describe('download QR code renderers', () => {
   afterEach(() => {
@@ -11,8 +11,8 @@ describe('download QR code renderers', () => {
   test('downloads image QR output as a PNG file', () => {
     const downloads = captureDownloads(vi);
 
-    DownloadImageQRCodeRenderer({
-      renderer: ImageQRCodeRenderer({size: 1, margin: 0}),
+    QRCodeDownloadImageRenderer({
+      renderer: QRCodeImageRenderer({size: 1, margin: 0}),
       filename: 'ticket',
     })([[1]]);
 
@@ -27,8 +27,8 @@ describe('download QR code renderers', () => {
   test('does not duplicate an existing PNG extension', () => {
     const downloads = captureDownloads(vi);
 
-    DownloadImageQRCodeRenderer({
-      renderer: ImageQRCodeRenderer({size: 1, margin: 0}),
+    QRCodeDownloadImageRenderer({
+      renderer: QRCodeImageRenderer({size: 1, margin: 0}),
       filename: 'ticket.png',
     })([[1]]);
 
@@ -40,7 +40,7 @@ describe('download QR code renderers', () => {
     const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
-    DownloadSVGQRCodeRenderer({
+    QRCodeDownloadSVGRenderer({
       renderer: () => '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
       filename: 'ticket',
     })([[1]]);
@@ -60,7 +60,7 @@ describe('download QR code renderers', () => {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
-    DownloadSVGQRCodeRenderer({
+    QRCodeDownloadSVGRenderer({
       renderer: () => '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
       filename: 'ticket.svg',
     })([[1]]);

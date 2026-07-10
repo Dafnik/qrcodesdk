@@ -5,7 +5,7 @@ import type {
   QRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
-import {CanvasQRCodeRenderer} from './canvas';
+import {QRCodeCanvasRenderer} from './canvas';
 import {downloadQRCode, ensureExtension} from './download-helper';
 import type {QRCodeDownloadRendererOptions} from './types';
 
@@ -13,11 +13,11 @@ export type QRCodeImageRendererOptions = QRCodeStylingOptions & QRCodeAccessibil
 
 export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<HTMLImageElement>;
 
-export function ImageQRCodeRenderer(
+export function QRCodeImageRenderer(
   options?: QRCodeImageRendererOptions,
 ): QRCodeRenderer<HTMLImageElement> {
   return (matrix: QRCodeMatrix) => {
-    const canvas = CanvasQRCodeRenderer(options)(matrix);
+    const canvas = QRCodeCanvasRenderer(options)(matrix);
     const image = document.createElement('img');
 
     image.src = canvas.toDataURL('image/png');
@@ -29,7 +29,7 @@ export function ImageQRCodeRenderer(
   };
 }
 
-export function DownloadImageQRCodeRenderer(
+export function QRCodeDownloadImageRenderer(
   options: QRCodeDownloadImageRendererOptions,
 ): QRCodeRenderer<void> {
   return (matrix: QRCodeMatrix) => {

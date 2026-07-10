@@ -7,12 +7,12 @@ description: Public API exported by @qrcodesdk/core, @qrcodesdk/browser, and @qr
 
 ### qrcode
 
-### SVGQRCodeRenderer
+### QRCodeSVGRenderer
 
 Creates a renderer that returns an SVG string.
 
 ```ts
-SVGQRCodeRenderer(options?);
+QRCodeSVGRenderer(options?);
 ```
 
 Options include shared styling plus SVG accessibility attributes: `alt`, `ariaLabel`, and `title`.
@@ -42,7 +42,7 @@ Defaults are `size: 5`, `margin: 4`, `colors.colorLight: '#ffffff'`, and `colors
 The core package exports these public types:
 
 ```ts
-type ParsedQRCodeStylingOptions;
+type QRCodeParsedStylingOptions;
 type QRCodeErrorCorrectionLevel;
 type QRCodeInputData;
 type QRCodeMask;
@@ -58,45 +58,45 @@ type QRCodeVersion;
 
 ## @qrcodesdk/browser
 
-### CanvasQRCodeRenderer
+### QRCodeCanvasRenderer
 
 Creates a renderer that returns an `HTMLCanvasElement`.
 
 ```ts
-CanvasQRCodeRenderer(options?);
+QRCodeCanvasRenderer(options?);
 ```
 
 Options use the shared styling shape: `size`, `margin`, `colors.colorLight`, and `colors.colorDark`.
 
-### ImageQRCodeRenderer
+### QRCodeImageRenderer
 
 Creates a renderer that returns an `HTMLImageElement` with a PNG data URL.
 
 ```ts
-ImageQRCodeRenderer(options?);
+QRCodeImageRenderer(options?);
 ```
 
 Options include shared styling plus image accessibility attributes: `alt`, `ariaLabel`, and `title`.
 
-### DownloadImageQRCodeRenderer
+### QRCodeDownloadImageRenderer
 
 Creates a renderer that triggers a PNG download in the browser and returns `void`.
 
 ```ts
-DownloadImageQRCodeRenderer(options);
+QRCodeDownloadImageRenderer(options);
 ```
 
-Options include `renderer`, an image renderer such as `ImageQRCodeRenderer(options)`, and optional `filename`.
+Options include `renderer`, an image renderer such as `QRCodeImageRenderer(options)`, and optional `filename`.
 
-### DownloadSVGQRCodeRenderer
+### QRCodeDownloadSVGRenderer
 
 Creates a renderer that triggers an SVG download in the browser and returns `void`.
 
 ```ts
-DownloadSVGQRCodeRenderer(options);
+QRCodeDownloadSVGRenderer(options);
 ```
 
-Options include `renderer`, an SVG renderer such as `SVGQRCodeRenderer(options)`, and optional `filename`.
+Options include `renderer`, an SVG renderer such as `QRCodeSVGRenderer(options)`, and optional `filename`.
 
 ### Types
 
@@ -111,12 +111,12 @@ type QRCodeImageRendererOptions;
 
 ## @qrcodesdk/node
 
-### PNGQRCodeRenderer
+### QRCodePNGRenderer
 
 Creates a renderer that returns a PNG `Buffer`.
 
 ```ts
-PNGQRCodeRenderer(options?);
+QRCodePNGRenderer(options?);
 ```
 
 Options use the shared styling shape: `size`, `margin`, `colors.colorLight`, and `colors.colorDark`.

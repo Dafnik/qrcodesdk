@@ -1,0 +1,8 @@
+---
+import QRCodeCanvasExample, { content } from '../../react/qrcode-canvas-example.tsx?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content} lang="tsx">
+  <QRCodeCanvasExample client:load />
+</QRCodeExample>

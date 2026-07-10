@@ -1,4 +1,4 @@
-import {CanvasQRCodeRenderer, type QRCodeCanvasRendererOptions} from '@qrcodesdk/browser';
+import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from '@qrcodesdk/browser';
 import {type QRCodeMatrixOptions} from '@qrcodesdk/core';
 import {useEffect, useMemo, useRef} from 'react';
 
@@ -8,11 +8,11 @@ import {qrcode} from '@qrcodesdk/core';
 
 export type QRCodeCanvasOptions = QRCodeMatrixOptions & QRCodeCanvasRendererOptions;
 
-export type CanvasQRCodeProps = QRCodeBaseProps<QRCodeCanvasOptions>;
+export type QRCodeCanvasProps = QRCodeBaseProps<QRCodeCanvasOptions>;
 
-export function CanvasQRCode({data, options, className}: CanvasQRCodeProps) {
+export function QRCodeCanvas({data, options, className}: QRCodeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRenderer = useMemo(() => CanvasQRCodeRenderer(options), [options]);
+  const canvasRenderer = useMemo(() => QRCodeCanvasRenderer(options), [options]);
 
   useEffect(() => {
     const container = containerRef.current;

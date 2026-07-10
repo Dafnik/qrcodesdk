@@ -9,23 +9,23 @@ Use this when you need raster image bytes in Node.js, such as a file saved to di
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
-const png = qrcode('https://qrcodesdk.dev').render(PNGQRCodeRenderer());
+const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 ```
 
 The returned value is a Node.js `Buffer` containing PNG image bytes.
 
 ## Common options
 
-You can customize the PNG output by passing styling options to `PNGQRCodeRenderer`.
+You can customize the PNG output by passing styling options to `QRCodePNGRenderer`.
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 const png = qrcode('https://qrcodesdk.dev').render(
-  PNGQRCodeRenderer({
+  QRCodePNGRenderer({
     size: 8,
     margin: 4,
     colors: {
@@ -53,9 +53,9 @@ Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827
 import {writeFile} from 'node:fs/promises';
 
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
-const png = qrcode('https://qrcodesdk.dev').render(PNGQRCodeRenderer());
+const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 
 await writeFile('qrcode.png', png);
 ```
@@ -66,12 +66,12 @@ await writeFile('qrcode.png', png);
 import express from 'express';
 
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 const app = express();
 
 app.get('/qrcode.png', (_req, res) => {
-  const png = qrcode('https://qrcodesdk.dev').render(PNGQRCodeRenderer());
+  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 
   res.type('image/png').send(png);
 });
@@ -86,12 +86,12 @@ import {serve} from '@hono/node-server';
 import {Hono} from 'hono';
 
 import {qrcode} from '@qrcodesdk/core';
-import {PNGQRCodeRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 const app = new Hono();
 
 app.get('/qrcode.png', (c) => {
-  const png = qrcode('https://qrcodesdk.dev').render(PNGQRCodeRenderer());
+  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 
   return c.body(png, 200, {
     'Content-Type': 'image/png',

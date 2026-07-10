@@ -1,8 +1,8 @@
-export {CanvasQRCodeRenderer, type QRCodeCanvasRendererOptions} from './canvas';
+export {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from './canvas';
 export {
-  ImageQRCodeRenderer,
+  QRCodeImageRenderer,
   type QRCodeImageRendererOptions,
-  DownloadImageQRCodeRenderer,
+  QRCodeDownloadImageRenderer,
   type QRCodeDownloadImageRendererOptions,
 } from './image';
-export {DownloadSVGQRCodeRenderer, type QRCodeDownloadSVGRendererOptions} from './svg';
+export {QRCodeDownloadSVGRenderer, type QRCodeDownloadSVGRendererOptions} from './svg';

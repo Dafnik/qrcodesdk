@@ -2,7 +2,7 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
 
-import {QRCodeMatrix, SVGQRCodeRenderer} from '@qrcodesdk/core';
+import {QRCodeMatrix, QRCodeSVGRenderer} from '@qrcodesdk/core';
 
 import {QR_CODE_TEST_FIXTURES} from '../../src';
 import {renderFixtureSvg} from './svg-fixture';
@@ -10,7 +10,7 @@ import {expectSvgToMatchFileSnapshot} from './svg-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/svg', import.meta.url));
 
-describe('SVGQRCodeRenderer snapshots', () => {
+describe('QRCodeSVGRenderer snapshots', () => {
   test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR SVG snapshot', (fixture) => {
     expectSvgToMatchFileSnapshot(
       renderFixtureSvg(fixture),
@@ -26,7 +26,7 @@ describe('SVGQRCodeRenderer snapshots', () => {
     ];
 
     expectSvgToMatchFileSnapshot(
-      SVGQRCodeRenderer({
+      QRCodeSVGRenderer({
         size: 3,
         margin: 1,
         colors: {

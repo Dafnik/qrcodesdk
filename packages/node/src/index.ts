@@ -1,1 +1,1 @@
-export {type QRCodePNGRendererOptions, PNGQRCodeRenderer} from './png';
+export {type QRCodePNGRendererOptions, QRCodePNGRenderer} from './png';

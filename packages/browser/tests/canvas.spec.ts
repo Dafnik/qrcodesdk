@@ -3,23 +3,23 @@ import {describe, expect, test} from 'vitest';
 
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
-import {CanvasQRCodeRenderer, type QRCodeCanvasRendererOptions} from '../src';
+import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from '../src';
 import {BLACK, WHITE, decodeCanvasQRCode, expectPixel, getCanvasContext} from './helper';
 
 function renderFixtureCanvas(
   fixture: QRCodeTestFixture,
   options: QRCodeCanvasRendererOptions = {size: 8, margin: 4},
 ): HTMLCanvasElement {
-  return renderFixture(fixture, CanvasQRCodeRenderer(options));
+  return renderFixture(fixture, QRCodeCanvasRenderer(options));
 }
 
-describe('CanvasQRCodeRenderer', () => {
+describe('QRCodeCanvasRenderer', () => {
   test('renders default canvas geometry and pixels from a hand-authored matrix', () => {
     const matrix: QRCodeMatrix = [
       [1, 0],
       [0, 1],
     ];
-    const canvas = CanvasQRCodeRenderer()(matrix);
+    const canvas = QRCodeCanvasRenderer()(matrix);
 
     expect(canvas).toBeInstanceOf(HTMLCanvasElement);
     expect(canvas.width).toBe(50);
@@ -37,7 +37,7 @@ describe('CanvasQRCodeRenderer', () => {
       [1, 0, 1],
       [0, 0, 0],
     ];
-    const canvas = CanvasQRCodeRenderer({
+    const canvas = QRCodeCanvasRenderer({
       size: 3,
       margin: 1,
       colors: {
@@ -56,7 +56,7 @@ describe('CanvasQRCodeRenderer', () => {
   });
 
   test('renders only background pixels when the matrix has no dark modules', () => {
-    const canvas = CanvasQRCodeRenderer({size: 2, margin: 0})([
+    const canvas = QRCodeCanvasRenderer({size: 2, margin: 0})([
       [0, 0],
       [0, 0],
     ]);
@@ -69,10 +69,10 @@ describe('CanvasQRCodeRenderer', () => {
   });
 
   test('rejects canvas dimensions that cannot map cleanly to pixels', () => {
-    expect(() => CanvasQRCodeRenderer({size: 1.5})([[1]])).toThrow(
+    expect(() => QRCodeCanvasRenderer({size: 1.5})([[1]])).toThrow(
       'Canvas QR code size must be a positive integer',
     );
-    expect(() => CanvasQRCodeRenderer({margin: -1})([[1]])).toThrow(
+    expect(() => QRCodeCanvasRenderer({margin: -1})([[1]])).toThrow(
       'Canvas QR code margin must be a non-negative integer',
     );
   });

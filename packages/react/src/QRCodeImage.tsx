@@ -1,6 +1,6 @@
 import {
-  DownloadImageQRCodeRenderer,
-  ImageQRCodeRenderer,
+  QRCodeDownloadImageRenderer,
+  QRCodeImageRenderer,
   type QRCodeImageRendererOptions,
 } from '@qrcodesdk/browser';
 import {type QRCodeMatrixOptions} from '@qrcodesdk/core';
@@ -12,18 +12,18 @@ import {qrcode} from '@qrcodesdk/core';
 
 export type QRCodeImageOptions = QRCodeMatrixOptions & QRCodeImageRendererOptions;
 
-export type ImageQRCodeHandle = {
+export type QRCodeImageHandle = {
   download(filename?: string): void;
 };
 
-export type ImageQRCodeProps = QRCodeBaseProps<QRCodeImageOptions>;
+export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
 
-export const ImageQRCode = forwardRef<ImageQRCodeHandle, ImageQRCodeProps>(function ImageQRCode(
+export const QRCodeImage = forwardRef<QRCodeImageHandle, QRCodeImageProps>(function QRCodeImage(
   {data, options, className},
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageRenderer = useMemo(() => ImageQRCodeRenderer(options), [options]);
+  const imageRenderer = useMemo(() => QRCodeImageRenderer(options), [options]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -39,7 +39,7 @@ export const ImageQRCode = forwardRef<ImageQRCodeHandle, ImageQRCodeProps>(funct
         qrcode(data)
           .config(options)
           .render(
-            DownloadImageQRCodeRenderer({
+            QRCodeDownloadImageRenderer({
               renderer: imageRenderer,
               filename,
             }),

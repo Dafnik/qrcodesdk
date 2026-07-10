@@ -18,7 +18,7 @@ import {
 const VERSION_OPTIONS = Array.from({length: 40}, (_, index) => index + 1);
 const MASK_OPTIONS = Array.from({length: 8}, (_, index) => index);
 
-export default function QrcodePlaygroundControls() {
+export default function QRCodePlaygroundControls() {
   const [draft, setDraft] = useState(readPlaygroundDraftFromUrl);
   const [copied, setCopied] = useState(false);
   const snapshot = useMemo(() => createPlaygroundSnapshot(draft), [draft]);

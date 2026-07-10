@@ -1,12 +1,12 @@
 import {Component, DestroyRef, computed, inject, signal} from '@angular/core';
 
 import {
-  CanvasQRCode,
-  ImageQRCode,
+  QRCodeCanvas,
   type QRCodeCanvasOptions,
+  QRCodeImage,
   type QRCodeImageOptions,
+  QRCodeSVG,
   type QRCodeSVGOptions,
-  SVGQRCode,
 } from '@qrcodesdk/angular';
 
 import {createPlaygroundSnapshot, readPlaygroundDraftFromUrl} from './qrcode-playground-state';
@@ -17,8 +17,8 @@ import {
 } from './qrcode-playground-types';
 
 @Component({
-  selector: 'AngularQrcodePlaygroundPreview',
-  imports: [CanvasQRCode, ImageQRCode, SVGQRCode],
+  selector: 'qrcode-angular-playground-preview',
+  imports: [QRCodeCanvas, QRCodeImage, QRCodeSVG],
   template: `
     @if (snapshot().draft.packageName === 'angular') {
       @if (!snapshot().config) {
@@ -27,7 +27,7 @@ import {
         </div>
       } @else if (config()?.output === 'svg') {
         <div class="qrcode-playground__preview-output">
-          <svg-qrcode #qrcode [data]="config()!.data" [options]="svgOptions()" />
+          <qrcode-svg #qrcode [data]="config()!.data" [options]="svgOptions()" />
         </div>
         <button
           class="qrcode-playground__button qrcode-playground__button--wide"
@@ -37,7 +37,7 @@ import {
         </button>
       } @else if (config()?.output === 'image') {
         <div class="qrcode-playground__preview-output">
-          <image-qrcode #qrcode [data]="config()!.data" [options]="imageOptions()" />
+          <qrcode-image #qrcode [data]="config()!.data" [options]="imageOptions()" />
         </div>
         <button
           class="qrcode-playground__button qrcode-playground__button--wide"
@@ -47,13 +47,13 @@ import {
         </button>
       } @else {
         <div class="qrcode-playground__preview-output">
-          <canvas-qrcode [data]="config()!.data" [options]="canvasOptions()" />
+          <qrcode-canvas [data]="config()!.data" [options]="canvasOptions()" />
         </div>
       }
     }
   `,
 })
-export class AngularQrcodePlaygroundPreview {
+export class QRCodeAngularPlaygroundPreview {
   readonly snapshot = signal<QRCodePlaygroundSnapshot>(
     createPlaygroundSnapshot(readPlaygroundDraftFromUrl()),
   );

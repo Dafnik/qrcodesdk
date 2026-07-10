@@ -1,5 +1,5 @@
 export type {
-  ParsedQRCodeStylingOptions,
+  QRCodeParsedStylingOptions,
   QRCodeAccessibilityOptions,
   QRCodeErrorCorrectionLevel,
   QRCodeInputData,
@@ -12,6 +12,6 @@ export type {
   QRCodeVersion,
 } from './types';
 export {type QRCodeTextRendererOptions, QRCodeTextRenderer} from './text';
-export {type QRCodeSVGRendererOptions, SVGQRCodeRenderer} from './svg';
+export {type QRCodeSVGRendererOptions, QRCodeSVGRenderer} from './svg';
 export {parseQRCodeStylingOptions} from './styling';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';

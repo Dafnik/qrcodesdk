@@ -5,13 +5,13 @@ import {describe, test} from 'vitest';
 
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
-import {PNGQRCodeRenderer} from '../../src';
+import {QRCodePNGRenderer} from '../../src';
 import {renderFixturePng} from './png-fixture';
 import {expectPngToMatchFileSnapshot} from './png-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/png', import.meta.url));
 
-describe('PNGQRCodeRenderer snapshots', () => {
+describe('QRCodePNGRenderer snapshots', () => {
   test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR PNG snapshot', (fixture) => {
     expectPngToMatchFileSnapshot(
       renderFixturePng(fixture),
@@ -27,7 +27,7 @@ describe('PNGQRCodeRenderer snapshots', () => {
     ];
 
     expectPngToMatchFileSnapshot(
-      PNGQRCodeRenderer({
+      QRCodePNGRenderer({
         size: 3,
         margin: 1,
         colors: {

@@ -13,11 +13,11 @@ pnpm add @qrcodesdk/core
 ## Render SVG
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev')
   .renderer(
-    SVGQRCodeRenderer({
+    QRCodeSVGRenderer({
       size: 6,
       margin: 4,
       colors: {
@@ -58,14 +58,14 @@ A matrix is a two-dimensional array where `1` is a dark module and `0` is a ligh
 ## Builder options
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('HELLO WORLD')
   .mode('alphanumeric')
   .errorCorrection('H')
   .version(4)
   .mask(2)
-  .renderer(SVGQRCodeRenderer())
+  .renderer(QRCodeSVGRenderer())
   .render();
 ```
 
@@ -91,7 +91,7 @@ Default styling:
 | `colors.colorLight` | `'#ffffff'` |
 | `colors.colorDark`  | `'#000000'` |
 
-`SVGQRCodeRenderer` accepts shared styling plus `alt`, `ariaLabel`, and `title`.
+`QRCodeSVGRenderer` accepts shared styling plus `alt`, `ariaLabel`, and `title`.
 
 `QRCodeTextRenderer` accepts `size` and `margin`. Both must map cleanly to terminal cells: `size` must be a positive integer and `margin` must be a non-negative integer.
 
@@ -99,18 +99,18 @@ Default styling:
 
 ```ts
 import {
-  type ParsedQRCodeStylingOptions,
   QRCodeBuilder,
   type QRCodeMask,
   type QRCodeMatrix,
   type QRCodeMode,
+  type QRCodeParsedStylingOptions,
   type QRCodeRenderer,
+  QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeVersion,
-  SVGQRCodeRenderer,
   parseQRCodeStylingOptions,
   qrcode,
 } from '@qrcodesdk/core';

@@ -10,22 +10,22 @@ SVG is the best default for most user-facing QR codes because it stays sharp at 
 ## Minimal example
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
-const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
+const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
 The returned value is an SVG string.
 
 ## Common options
 
-You can customize the rendered SVG by passing options to `SVGQRCodeRenderer`.
+You can customize the rendered SVG by passing options to `QRCodeSVGRenderer`.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
-  SVGQRCodeRenderer({
+  QRCodeSVGRenderer({
     size: 8,
     margin: 4,
     colors: {
@@ -55,10 +55,10 @@ Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827
 For user-facing QR codes, provide a meaningful label so assistive technologies can describe the destination or action.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
-  SVGQRCodeRenderer({
+  QRCodeSVGRenderer({
     title: 'QR code for qrcodesdk.dev',
     ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
@@ -70,9 +70,9 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 ```ts
 import {writeFile} from 'node:fs/promises';
 
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
-const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
+const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 
 await writeFile('qrcode.svg', svg, 'utf8');
 ```
@@ -82,12 +82,12 @@ await writeFile('qrcode.svg', svg, 'utf8');
 ```ts
 import express from 'express';
 
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const app = express();
 
 app.get('/qrcode.svg', (_req, res) => {
-  const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
+  const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 
   res.type('image/svg+xml').send(svg);
 });
@@ -98,10 +98,10 @@ app.listen(3000);
 ### Inline in HTML
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
-  SVGQRCodeRenderer({
+  QRCodeSVGRenderer({
     ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
 );
@@ -120,10 +120,10 @@ const html = `
 ### Insert into the DOM
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
-  SVGQRCodeRenderer({
+  QRCodeSVGRenderer({
     ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
 );
@@ -141,15 +141,15 @@ if (container) {
 
 ### Download in the browser
 
-Use `DownloadSVGQRCodeRenderer` from `@qrcodesdk/browser` when a browser action should download the rendered SVG.
+Use `QRCodeDownloadSVGRenderer` from `@qrcodesdk/browser` when a browser action should download the rendered SVG.
 
 ```ts
-import {DownloadSVGQRCodeRenderer} from '@qrcodesdk/browser';
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 qrcode('https://qrcodesdk.dev').render(
-  DownloadSVGQRCodeRenderer({
-    renderer: SVGQRCodeRenderer({
+  QRCodeDownloadSVGRenderer({
+    renderer: QRCodeSVGRenderer({
       ariaLabel: 'Scan to open qrcodesdk.dev',
     }),
     filename: 'qrcode',
@@ -162,10 +162,10 @@ The download renderer appends `.svg` when the filename does not already end with
 Use the returned svg directly when you need to control the download link yourself.
 
 ```ts
-import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
-  SVGQRCodeRenderer({
+  QRCodeSVGRenderer({
     ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
 );

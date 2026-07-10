@@ -9,7 +9,7 @@ import {getRenderedSize, validatePixelGeometry} from './geometry';
 
 export type QRCodeCanvasRendererOptions = QRCodeStylingOptions;
 
-export function CanvasQRCodeRenderer(
+export function QRCodeCanvasRenderer(
   options?: QRCodeCanvasRendererOptions,
 ): QRCodeRenderer<HTMLCanvasElement> {
   return (matrix: QRCodeMatrix) => {
