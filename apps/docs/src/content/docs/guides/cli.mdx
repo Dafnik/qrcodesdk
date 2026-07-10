@@ -3,6 +3,8 @@ title: '@qrcodesdk/cli'
 description: Generate QR codes from the terminal as text output, SVG files, or PNG files.
 ---
 
+import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
+
 `@qrcodesdk/cli` installs the `qrc` command. Use it when you want to generate QR codes from a shell script, local terminal, CI job, or one-off file generation workflow.
 
 The CLI uses the same QR builder and renderers as `@qrcodesdk/core` and `@qrcodesdk/node`.
@@ -11,26 +13,17 @@ The CLI uses the same QR builder and renderers as `@qrcodesdk/core` and `@qrcode
 
 Install it globally when you want `qrc` available as a command.
 
-```sh
-vp install -g @qrcodesdk/cli
-pnpm add -g @qrcodesdk/cli
-npm install -g @qrcodesdk/cli
-yarn global add @qrcodesdk/cli
-bun add -g @qrcodesdk/cli
-```
+<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="addGlobal" />
 
 You can also run it from a project dependency.
 
-```sh
-pnpm add -D @qrcodesdk/cli
-pnpm exec qrc "https://qrcodesdk.dev"
-```
+<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="addDev" />
+
+<PackageManagerTabs packages={[]} mode="exec" command="qrc" args={['"https://qrcodesdk.dev"']} />
 
 Or use it without installing it.
 
-```sh
-npx @qrcodesdk/cli "https://qrcodesdk.dev"
-```
+<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="dlx" args={['"https://qrcodesdk.dev"']} />
 
 ## Print terminal text
 

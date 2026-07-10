@@ -33,10 +33,10 @@ export const STARLIGHT_SIDEBAR = [
   {
     label: 'Packages',
     items: [
-      {label: '@qrcodesdk/core', slug: 'libs/core'},
-      {label: '@qrcodesdk/browser', slug: 'libs/browser'},
-      {label: '@qrcodesdk/node', slug: 'libs/node'},
       {label: '@qrcodesdk/angular', slug: 'libs/angular'},
+      {label: '@qrcodesdk/browser', slug: 'libs/browser'},
+      {label: '@qrcodesdk/core', slug: 'libs/core'},
+      {label: '@qrcodesdk/node', slug: 'libs/node'},
       {label: '@qrcodesdk/react', slug: 'libs/react'},
     ],
   },

@@ -3,16 +3,13 @@ title: Installation
 description: Choose the QRCodeSDK package for your output format, runtime or framework.
 ---
 
+import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
+
 ## Start with core
 
 Use `@qrcodesdk/core` for runtime-neutral QR code generation.
 
-```sh
-pnpm add @qrcodesdk/core
-npm install @qrcodesdk/core
-yarn add @qrcodesdk/core
-bun add @qrcodesdk/core
-```
+<PackageManagerTabs packages={['@qrcodesdk/core']} mode="add" />
 
 ```ts
 import {SVGQRCodeRenderer, qrcode} from '@qrcodesdk/core';
@@ -43,12 +40,7 @@ const svg = qrcode('https://qrcodesdk.dev').render(SVGQRCodeRenderer());
 
 Install it alongside `@qrcodesdk/core`.
 
-```sh
-pnpm add @qrcodesdk/core @qrcodesdk/node
-npm install @qrcodesdk/core @qrcodesdk/node
-yarn add @qrcodesdk/core @qrcodesdk/node
-bun add @qrcodesdk/core @qrcodesdk/node
-```
+<PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/node']} mode="add" />
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -65,12 +57,7 @@ Use `@qrcodesdk/browser` when the result should be a DOM element created in the 
 
 Install it alongside `@qrcodesdk/core`.
 
-```sh
-pnpm add @qrcodesdk/core @qrcodesdk/browser
-npm install @qrcodesdk/core @qrcodesdk/browser
-yarn add @qrcodesdk/core @qrcodesdk/browser
-bun add @qrcodesdk/core @qrcodesdk/browser
-```
+<PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/browser']} mode="add" />
 
 ```ts
 import {ImageQRCodeRenderer} from '@qrcodesdk/browser';
@@ -93,12 +80,7 @@ Use `@qrcodesdk/cli` when you want to generate QR codes from a terminal, shell s
 
 Install it globally when you want the `qrc` command available anywhere.
 
-```sh
-pnpm add -g @qrcodesdk/cli
-npm install -g @qrcodesdk/cli
-yarn global add @qrcodesdk/cli
-bun add -g @qrcodesdk/cli
-```
+<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="addGlobal" />
 
 ```sh
 qrc "https://qrcodesdk.dev"

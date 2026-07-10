@@ -7,14 +7,16 @@ import CanvasQrcode from '../../../components/astro/react-examples/canvas-qrcode
 import DownloadImageQrcode from '../../../components/astro/react-examples/download-image-qrcode.astro';
 import ImageQrcode from '../../../components/astro/react-examples/image-qrcode.astro';
 import SvgQrcode from '../../../components/astro/react-examples/svg-qrcode.astro';
+import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 `@qrcodesdk/react` provides React components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.
 
 ## Install
 
-```sh
-pnpm add @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
-```
+<PackageManagerTabs
+  packages={['@qrcodesdk/react', '@qrcodesdk/core', '@qrcodesdk/browser']}
+  mode="add"
+/>
 
 ## Components
 

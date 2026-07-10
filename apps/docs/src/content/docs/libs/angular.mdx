@@ -7,14 +7,16 @@ import CanvasQrcode from '../../../components/astro/angular-examples/canvas-qrco
 import DownloadImageQrcode from '../../../components/astro/angular-examples/download-image-qrcode.astro';
 import ImageQrcode from '../../../components/astro/angular-examples/image-qrcode.astro';
 import SvgQrcode from '../../../components/astro/angular-examples/svg-qrcode.astro';
+import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 `@qrcodesdk/angular` provides standalone Angular components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.
 
 ## Install
 
-```sh
-pnpm add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
-```
+<PackageManagerTabs
+  packages={['@qrcodesdk/angular', '@qrcodesdk/core', '@qrcodesdk/browser']}
+  mode="add"
+/>
 
 ## Components
 
