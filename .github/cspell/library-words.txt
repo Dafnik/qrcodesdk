@@ -9,3 +9,4 @@ seti
 viteplus
 analogjs
 shiki
+bunx

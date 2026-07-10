@@ -1,22 +1,19 @@
 {
-  "dictionaries": ["project-words"],
+  "dictionaries": ["project-words", "people-words", "library-words"],
   "dictionaryDefinitions": [
     {
-      "addWords": true,
       "name": "project-words",
-      "path": "./.github/project-words.txt"
+      "path": "./.github/cspell/project-words.txt"
     },
     {
-      "addWords": true,
       "name": "people-words",
-      "path": "./.github/people-words.txt"
+      "path": "./.github/cspell/people-words.txt"
     },
     {
-      "addWords": true,
       "name": "library-words",
-      "path": "./.github/library-words.txt"
+      "path": "./.github/cspell/library-words.txt"
     }
   ],
-  "ignorePaths": ["pnpm-workspace.yaml", "pnpm-lock.yaml", "fixtures.ts"],
+  "ignorePaths": ["pnpm-workspace.yaml", "pnpm-lock.yaml", "fixtures.ts", "*.svg"],
   "version": "0.2"
 }
