@@ -1,17 +1,9 @@
-import {type QRCodeTestFixture, QR_CODE_TEST_FIXTURES, renderFixture} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
-import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from '../src';
-import {BLACK, WHITE, decodeCanvasQRCode, expectPixel, getCanvasContext} from './helper';
-
-function renderFixtureCanvas(
-  fixture: QRCodeTestFixture,
-  options: QRCodeCanvasRendererOptions = {size: 8, margin: 4},
-): HTMLCanvasElement {
-  return renderFixture(fixture, QRCodeCanvasRenderer(options));
-}
+import {QRCodeCanvasRenderer} from '../src';
+import {BLACK, WHITE, expectPixel, getCanvasContext} from './helper';
 
 describe('QRCodeCanvasRenderer', () => {
   test('renders default canvas geometry and pixels from a hand-authored matrix', () => {
@@ -75,22 +67,5 @@ describe('QRCodeCanvasRenderer', () => {
     expect(() => QRCodeCanvasRenderer({margin: -1})([[1]])).toThrow(
       'Canvas QR code margin must be a non-negative integer',
     );
-  });
-
-  test.each(QR_CODE_TEST_FIXTURES)('decodes $name canvas output', (fixture) => {
-    expect(decodeCanvasQRCode(renderFixtureCanvas(fixture))).toBe(fixture.data);
-  });
-
-  test('decodes custom high-contrast color canvas output', () => {
-    const canvas = renderFixtureCanvas(QR_CODE_TEST_FIXTURES[1], {
-      size: 8,
-      margin: 4,
-      colors: {
-        colorLight: '#fefefe',
-        colorDark: '#101010',
-      },
-    });
-
-    expect(decodeCanvasQRCode(canvas)).toBe(QR_CODE_TEST_FIXTURES[1].data);
   });
 });

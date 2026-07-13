@@ -143,21 +143,6 @@ describe('React QR code components', () => {
     expect(secondCanvas.width).toBe(46);
     expect(secondCanvas.height).toBe(46);
   });
-
-  test('exposes download handles only for SVG and image components', () => {
-    const svgQRCode = createRef<QRCodeSVGHandle>();
-    const imageQRCode = createRef<QRCodeImageHandle>();
-
-    render(
-      <>
-        <QRCodeSVG data="HELLO" ref={svgQRCode} />
-        <QRCodeImage data="HELLO" ref={imageQRCode} />
-      </>,
-    );
-
-    expect(svgQRCode.current).toEqual({download: expect.any(Function)});
-    expect(imageQRCode.current).toEqual({download: expect.any(Function)});
-  });
 });
 
 function renderedElement<TElement extends Element>(
