@@ -1,6 +1,11 @@
 ---
 title: Render SVG
 description: Render a QR code as a scalable SVG string from @qrcodesdk/core.
+
+related:
+  - ../../guides/customize.md
+  - ../node/png.md
+  - ../browser/image.md
 ---
 
 Use this when you need a crisp, scalable QR code for web apps, dashboards, emails, documentation pages, server-rendered routes, or generated static assets.
@@ -200,9 +205,3 @@ The final pixel size is calculated as:
 ```ts
 const imageSize = size * (moduleCount + 2 * margin);
 ```
-
-## Related pages
-
-- [Customize QR Codes](/guides/customize/)
-- [Render PNG in Node.js](/renderers/node/png/)
-- [Render to an Image Element](/renderers/browser/image/)

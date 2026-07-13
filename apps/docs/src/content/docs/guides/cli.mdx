@@ -1,6 +1,14 @@
 ---
 title: '@qrcodesdk/cli'
 description: Generate QR codes from the terminal as text output, SVG files, or PNG files.
+
+related:
+  - ./installation.mdx
+  - ../libs/core.md
+  - ../renderers/core/svg.md
+  - ../renderers/node/png.md
+  - ../renderers/core/text.md
+  - ./customize.md
 ---
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
@@ -101,12 +109,3 @@ qrc "https://qrcodesdk.dev" \
 When `qrc` runs in an interactive terminal, it prompts only for missing required values such as QR input, an ambiguous file format, or an SVG/PNG output path.
 
 In non-interactive mode, missing required values fail with a clear error instead of opening a prompt.
-
-## Related pages
-
-- [Installation](/guides/installation/)
-- [Builder API](/libs/core/)
-- [Render SVG](/renderers/core/svg/)
-- [Render PNG in Node.js](/renderers/node/png/)
-- [Render Terminal Text](/renderers/core/text/)
-- [Customize QR Codes](/guides/customize/)

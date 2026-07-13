@@ -1,6 +1,13 @@
 ---
 title: Customize QR Codes
 description: Control QR code size, margin, colors, accessibility labels, error correction, version, and mask.
+
+related:
+  - ../renderers/core/svg.md
+  - ../renderers/node/png.md
+  - ../renderers/browser/canvas.md
+  - ../renderers/browser/image.md
+  - ../libs/core.md
 ---
 
 QRCodeSDK separates QR code data from renderer output. Builder options control the QR matrix, and renderer options control how that matrix looks.
@@ -127,11 +134,3 @@ const svg = qrcode('https://qrcodesdk.dev')
     }),
   );
 ```
-
-## Related pages
-
-- [Render SVG](/renderers/core/svg/)
-- [Render PNG in Node.js](/renderers/node/png/)
-- [Render to Canvas](/renderers/browser/canvas/)
-- [Render to an Image Element](/renderers/browser/image/)
-- [Builder API](/libs/core/)

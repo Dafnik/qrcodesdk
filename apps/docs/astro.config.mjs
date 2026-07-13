@@ -5,6 +5,8 @@ import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import {defineConfig} from 'astro/config';
 import starlightLinksValidator from 'starlight-links-validator';
+import starlightLlmsTxt from 'starlight-llms-txt';
+import starlightPageContextAction from 'starlight-page-context-action';
 
 import {includeContentPlugin} from './astro-content-plugin.mjs';
 import {STARLIGHT_SIDEBAR} from './starlight-sidebar.mjs';
@@ -29,11 +31,36 @@ export default defineConfig({
     starlight({
       customCss: ['./src/styles/global.css'],
       title: 'QRCodeSDK',
+      description:
+        'Build QR codes with a single TypeScript-first API, then render them in the format your app needs.',
       expressiveCode: {
         themes: ['github-light', 'github-dark'],
       },
-      plugins: [starlightLinksValidator()],
+      routeMiddleware: './src/routeData.ts',
+      plugins: [
+        starlightLinksValidator(),
+        starlightLlmsTxt(),
+        starlightPageContextAction({
+          position: 'below-toc',
+          actions: {
+            viewMarkdown: true,
+          },
+        }),
+      ],
       sidebar: STARLIGHT_SIDEBAR,
+      components: {
+        Footer: './src/components/ReferencesFooter.astro',
+      },
+      social: [
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/Dafnik/qrcodesdk',
+        },
+      ],
+      editLink: {
+        baseUrl: 'https://github.com/Dafnik/qrcodesdk/edit/main/docs/',
+      },
     }),
     react(),
     angular({

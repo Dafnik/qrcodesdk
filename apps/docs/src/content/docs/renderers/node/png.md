@@ -1,6 +1,11 @@
 ---
 title: Render PNG in Node.js
 description: Render a QR code as a PNG Buffer with @qrcodesdk/node.
+
+related:
+  - ../../guides/installation.mdx
+  - ../../guides/customize.md
+  - ../core/svg.md
 ---
 
 Use this when you need raster image bytes in Node.js, such as a file saved to disk, an API response, a downloadable asset, an email attachment, or any integration that expects PNG image bytes.
@@ -128,9 +133,3 @@ For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
 ```
 
 So the output PNG is `232 x 232` pixels.
-
-## Related pages
-
-- [Installation](/guides/installation/)
-- [Customize QR Codes](/guides/customize/)
-- [Render SVG](/renderers/core/svg/)

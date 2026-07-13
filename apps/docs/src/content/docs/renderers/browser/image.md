@@ -1,6 +1,11 @@
 ---
 title: Render to an Image Element
 description: Render a QR code as an HTMLImageElement with @qrcodesdk/browser.
+
+related:
+  - ./canvas.md
+  - ../../guides/customize.md
+  - ../../libs/browser.mdx
 ---
 
 Use this when you need an `HTMLImageElement` that can be inserted into a browser page, styled with CSS, labeled for accessibility, or downloaded as a PNG.
@@ -159,9 +164,3 @@ For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
 ```
 
 So the output image is `232 x 232` pixels.
-
-## Related pages
-
-- [Render to Canvas](/renderers/browser/canvas/)
-- [Customize QR Codes](/guides/customize/)
-- [@qrcodesdk/browser](/libs/browser/)

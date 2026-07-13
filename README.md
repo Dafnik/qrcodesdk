@@ -121,7 +121,7 @@ Defaults are designed for readable output:
 
 - [Installation](apps/docs/src/content/docs/guides/installation.mdx)
 - [Core library](apps/docs/src/content/docs/libs/core.md)
-- [Renderers](apps/docs/src/content/docs/renderers/index.md)
+- [Renderers](apps/docs/src/content/docs/renderers/custom.md)
 - [Browser library](apps/docs/src/content/docs/libs/browser.md)
 - [Node renderers](apps/docs/src/content/docs/libs/node.md)
 - [Angular components](apps/docs/src/content/docs/libs/angular.mdx)

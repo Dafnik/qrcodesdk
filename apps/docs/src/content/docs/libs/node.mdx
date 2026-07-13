@@ -1,6 +1,11 @@
 ---
 title: '@qrcodesdk/node'
 description: Add PNG Buffer output for Node.js apps, servers, scripts, and file generation.
+
+related:
+  - ../guides/installation.mdx
+  - ../renderers/node/png.md
+  - ../guides/customize.md
 ---
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
@@ -40,9 +45,3 @@ await writeFile('qrcode.png', png);
 ## Package boundary
 
 `@qrcodesdk/node` does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation, builder options, and shared styling normalization.
-
-## Related pages
-
-- [Installation](/guides/installation/)
-- [Render PNG in Node.js](/renderers/node/png/)
-- [Customize QR Codes](/guides/customize/)

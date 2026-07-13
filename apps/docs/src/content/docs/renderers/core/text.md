@@ -1,6 +1,11 @@
 ---
 title: Render Terminal Text
 description: Render a QR code as a plain text string for terminals, CLIs, logs, and snapshots.
+
+related:
+  - ../../guides/customize.md
+  - ./svg.md
+  - ../index.md
 ---
 
 Use this when you need developer-facing QR output in a terminal, CLI, log, text file, or deterministic snapshot test.
@@ -89,9 +94,3 @@ The renderer uses Unicode block characters to create compact terminal output:
 | space     | Upper and lower module are light |
 
 The renderer combines two vertical rows of QR modules into one terminal line, making the output shorter while preserving the QR pattern.
-
-## Related pages
-
-- [Customize QR Codes](/guides/customize/)
-- [Render SVG](/renderers/core/svg/)
-- [Custom Renderers](/renderers/)

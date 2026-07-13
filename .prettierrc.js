@@ -4,6 +4,7 @@ module.exports = {
     'prettier-plugin-organize-attributes',
     'prettier-plugin-tailwindcss',
     'prettier-plugin-sort-json',
+    'prettier-plugin-astro',
   ],
   printWidth: 100,
   singleQuote: true,
@@ -27,6 +28,12 @@ module.exports = {
       files: ['*.tsx'],
       options: {
         parser: 'babel-ts',
+      },
+    },
+    {
+      files: '*.astro',
+      options: {
+        parser: 'astro',
       },
     },
   ],

@@ -1,6 +1,11 @@
 ---
 title: Custom Renderers
 description: Build your own QRCodeSDK renderer by converting a QR matrix into any output type.
+
+related:
+  - ../guides/customize.md
+  - ../libs/core.md
+  - ../reference/api.md
 ---
 
 Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers for SVG, PNG, Canvas, Image elements, browser downloads, and terminal text, and you can write your own renderer for any other format.
@@ -56,9 +61,3 @@ import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
 
 const matrix: QRCodeMatrix = qrcode('https://qrcodesdk.dev').matrix();
 ```
-
-## Related pages
-
-- [Customize QR Codes](/guides/customize/)
-- [Builder API](/libs/core/)
-- [API Reference](/reference/api/)

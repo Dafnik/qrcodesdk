@@ -1,6 +1,11 @@
 ---
 title: Render to Canvas
 description: Render a QR code as an HTMLCanvasElement with @qrcodesdk/browser.
+
+related:
+  - ./image.md
+  - ../../guides/customize.md
+  - ../../libs/browser.mdx
 ---
 
 Use this when you need a browser-owned `HTMLCanvasElement` that can be inserted into a page, drawn into another canvas, converted to image bytes, or downloaded as a PNG.
@@ -136,9 +141,3 @@ For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
 ```
 
 So the output canvas is `232 x 232` pixels.
-
-## Related pages
-
-- [Render to an Image Element](/renderers/browser/image/)
-- [Customize QR Codes](/guides/customize/)
-- [@qrcodesdk/browser](/libs/browser/)
