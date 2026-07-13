@@ -2,13 +2,19 @@ import {describe, expect, test} from 'vitest';
 
 import {ECC_LEVELS_MAP} from '../../src/matrix/const';
 import {qrcode} from '../../src/qrcode-builder';
-import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeMode} from '../../src/types';
+import type {
+  QRCodeErrorCorrectionLevel,
+  QRCodeMask,
+  QRCodeMode,
+  QRCodeVersion,
+} from '../../src/types';
 import {
   ECC_LEVELS,
   MASKS,
   expectSquareBinaryMatrix,
   formatBitsMatch,
-  referenceMatrix,
+  referenceMatrixQRCodeGeneratorPackage,
+  referenceMatrixQRCodePackage,
 } from './helpers';
 
 describe('qrcode().matrix()', () => {
@@ -21,7 +27,7 @@ describe('qrcode().matrix()', () => {
     const cases: Array<{
       data: string;
       mode: QRCodeMode;
-      version: number;
+      version: QRCodeVersion;
       errorCorrectionLevel: QRCodeErrorCorrectionLevel;
       mask: QRCodeMask;
     }> = [
@@ -48,24 +54,33 @@ describe('qrcode().matrix()', () => {
     ];
 
     for (const options of cases) {
-      expect(
-        qrcode(options.data)
-          .mode(options.mode)
-          .version(options.version as never)
-          .errorCorrection(options.errorCorrectionLevel)
-          .mask(options.mask)
-          .matrix(),
-      ).toEqual(referenceMatrix(options.data, options));
+      const matrix = qrcode(options.data)
+        .mode(options.mode)
+        .version(options.version as never)
+        .errorCorrection(options.errorCorrectionLevel)
+        .mask(options.mask)
+        .matrix();
+      expect(matrix).toEqual(referenceMatrixQRCodePackage(options.data, options));
+      expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(options.data, options));
     }
   });
 
   test('matches reference matrices for every mask and ECC level', () => {
     for (const errorCorrectionLevel of ECC_LEVELS) {
       for (const mask of MASKS) {
-        expect(
-          qrcode('MASK TEST 123').errorCorrection(errorCorrectionLevel).mask(mask).matrix(),
-        ).toEqual(
-          referenceMatrix('MASK TEST 123', {
+        const matrix = qrcode('MASK TEST 123')
+          .errorCorrection(errorCorrectionLevel)
+          .mask(mask)
+          .matrix();
+        expect(matrix).toEqual(
+          referenceMatrixQRCodePackage('MASK TEST 123', {
+            mode: 'alphanumeric',
+            errorCorrectionLevel,
+            mask,
+          }),
+        );
+        expect(matrix).toEqual(
+          referenceMatrixQRCodeGeneratorPackage('MASK TEST 123', {
             mode: 'alphanumeric',
             errorCorrectionLevel,
             mask,
@@ -88,7 +103,7 @@ describe('qrcode().matrix()', () => {
     expect(qrcode('1'.repeat(42)).mask(1).matrix()).toHaveLength(25);
   });
 
-  test('auto-selects one of the reference mask matrices and writes matching format bits', () => {
+  test('auto-selects one of the reference qrcode mask matrices and writes matching format bits', () => {
     const matrix = qrcode('AUTO MASK 12345')
       .mode('alphanumeric')
       .errorCorrection('M')
@@ -100,7 +115,33 @@ describe('qrcode().matrix()', () => {
         row.every(
           (value, columnIndex) =>
             value ===
-            referenceMatrix('AUTO MASK 12345', {
+            referenceMatrixQRCodePackage('AUTO MASK 12345', {
+              mode: 'alphanumeric',
+              errorCorrectionLevel: 'M',
+              version: 2,
+              mask,
+            })[rowIndex][columnIndex],
+        ),
+      ),
+    );
+
+    expect(selectedMask).toBeDefined();
+    expect(formatBitsMatch(matrix, ECC_LEVELS_MAP.M, selectedMask as QRCodeMask)).toBe(true);
+  });
+
+  test('auto-selects one of the reference qrcode-generator mask matrices and writes matching format bits', () => {
+    const matrix = qrcode('AUTO MASK 12345')
+      .mode('alphanumeric')
+      .errorCorrection('M')
+      .version(2)
+      .matrix();
+
+    const selectedMask = MASKS.find((mask) =>
+      matrix.every((row, rowIndex) =>
+        row.every(
+          (value, columnIndex) =>
+            value ===
+            referenceMatrixQRCodeGeneratorPackage('AUTO MASK 12345', {
               mode: 'alphanumeric',
               errorCorrectionLevel: 'M',
               version: 2,
@@ -166,6 +207,7 @@ describe('qrcode().matrix()', () => {
   });
 
   test('throws Error instances for invalid runtime usage', () => {
+    // @ts-expect-error Expected type error
     expect(() => qrcode('123456789').render()).toThrow(Error);
     expect(() => qrcode('ABC').mode('numeric').matrix()).toThrow(Error);
   });

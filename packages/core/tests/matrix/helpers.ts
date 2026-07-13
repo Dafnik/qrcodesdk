@@ -1,4 +1,5 @@
 import {create} from 'qrcode';
+import qrcodeGenerator from 'qrcode-generator';
 import {expect} from 'vitest';
 
 import {augmentBCH} from '../../src/matrix/augment-bch';
@@ -7,6 +8,7 @@ import type {
   QRCodeMask,
   QRCodeMatrix,
   QRCodeMode,
+  QRCodeVersion,
 } from '../../src/types';
 
 export const ECC_LEVELS: QRCodeErrorCorrectionLevel[] = ['L', 'M', 'Q', 'H'];
@@ -22,11 +24,11 @@ export function bitsToBytes(bits: string, maxLength: number): number[] {
   return bytes.slice(0, maxLength);
 }
 
-export function referenceMatrix(
+export function referenceMatrixQRCodePackage(
   data: string,
   options: {
     mode?: QRCodeMode;
-    version?: number;
+    version?: QRCodeVersion;
     errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
     mask?: QRCodeMask;
   } = {},
@@ -48,6 +50,35 @@ export function referenceMatrix(
 
   return Array.from({length: qr.modules.size}, (_, row) =>
     Array.from({length: qr.modules.size}, (_, column) => Number(qr.modules.get(row, column))),
+  ) as QRCodeMatrix;
+}
+
+export function referenceMatrixQRCodeGeneratorPackage(
+  data: string,
+  options: {
+    mode?: QRCodeMode;
+    version?: QRCodeVersion;
+    errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
+    mask?: QRCodeMask;
+  } = {},
+): QRCodeMatrix {
+  qrcodeGenerator.stringToBytes = (value) => Array.from(new TextEncoder().encode(value));
+
+  const qr = qrcodeGenerator(options.version ?? 0, options.errorCorrectionLevel ?? 'L');
+  qr.addData(
+    data,
+    options.mode === 'numeric'
+      ? 'Numeric'
+      : options.mode === 'alphanumeric'
+        ? 'Alphanumeric'
+        : options.mode === 'octet'
+          ? 'Byte'
+          : 'Byte',
+  );
+  qr.make(options.mask);
+
+  return Array.from({length: qr.getModuleCount()}, (_, row) =>
+    Array.from({length: qr.getModuleCount()}, (_, column) => Number(qr.isDark(row, column))),
   ) as QRCodeMatrix;
 }
 

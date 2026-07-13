@@ -1,0 +1,66 @@
+diff --git a/dist/qrcode.d.ts b/dist/qrcode.d.ts
+index b34952e420da449f8e9b13f199ecc2f9a42033ec..aaa1537689e3304d0311e1a770b6e6e12806549b 100644
+--- a/dist/qrcode.d.ts
++++ b/dist/qrcode.d.ts
+@@ -25,6 +25,8 @@ type TypeNumber =
+ 
+ type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
+ 
++type MaskPattern = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
++
+ type Mode = 'Numeric' | 'Alphanumeric' | 'Byte' /* Default */ | 'Kanji';
+ 
+ interface QRCodeFactory {
+@@ -37,7 +39,7 @@ interface QRCodeFactory {
+ 
+ interface QRCode {
+   addData(data: string, mode?: Mode) : void;
+-  make() : void;
++  make(maskPattern?: MaskPattern) : void;
+   getModuleCount() : number;
+   isDark(row: number, col: number) : boolean;
+   createImgTag(cellSize?: number, margin?: number) : string;
+diff --git a/dist/qrcode.js b/dist/qrcode.js
+index df13f829bf41f36b82f0ed85751ed3b4c39cfeb8..bb2a3bee257a0b87cf5c0a406e981e9d8ffbb572 100644
+--- a/dist/qrcode.js
++++ b/dist/qrcode.js
+@@ -421,7 +421,7 @@ var qrcode = function() {
+       return _moduleCount;
+     };
+ 
+-    _this.make = function() {
++    _this.make = function(maskPattern) {
+       if (_typeNumber < 1) {
+         var typeNumber = 1;
+ 
+@@ -449,7 +449,7 @@ var qrcode = function() {
+         _typeNumber = typeNumber;
+       }
+ 
+-      makeImpl(false, getBestMaskPattern() );
++      makeImpl(false, typeof maskPattern == 'undefined' ? getBestMaskPattern() : maskPattern);
+     };
+ 
+     _this.createTableTag = function(cellSize, margin) {
+diff --git a/dist/qrcode.mjs b/dist/qrcode.mjs
+index 444522524987df3a4e37c2a5150dc5c8a052bd44..8dd86f807fe3cba47bedd117de5c29fc16bcf079 100644
+--- a/dist/qrcode.mjs
++++ b/dist/qrcode.mjs
+@@ -419,7 +419,7 @@ export const qrcode = function(typeNumber, errorCorrectionLevel) {
+     return _moduleCount;
+   };
+ 
+-  _this.make = function() {
++  _this.make = function(maskPattern) {
+     if (_typeNumber < 1) {
+       let typeNumber = 1;
+ 
+@@ -447,7 +447,7 @@ export const qrcode = function(typeNumber, errorCorrectionLevel) {
+       _typeNumber = typeNumber;
+     }
+ 
+-    makeImpl(false, getBestMaskPattern() );
++    makeImpl(false, typeof maskPattern == 'undefined' ? getBestMaskPattern() : maskPattern);
+   };
+ 
+   _this.createTableTag = function(cellSize, margin) {
