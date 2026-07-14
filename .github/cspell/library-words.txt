@@ -10,3 +10,6 @@ viteplus
 analogjs
 shiki
 bunx
+pagefind
+npmx
+llms
