@@ -5,7 +5,6 @@ import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import {defineConfig} from 'astro/config';
 import starlightLinksValidator from 'starlight-links-validator';
-import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightPageContextAction from 'starlight-page-context-action';
 
 import {includeContentPlugin} from './astro-content-plugin.mjs';
@@ -39,7 +38,6 @@ export default defineConfig({
       routeMiddleware: './src/routeData.ts',
       plugins: [
         starlightLinksValidator(),
-        starlightLlmsTxt(),
         starlightPageContextAction({
           position: 'below-toc',
           actions: {
