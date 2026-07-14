@@ -1,6 +1,7 @@
 ---
 title: Builder API
-description: Use @qrcodesdk/core to generate QR matrices, render runtime-neutral output, and build custom renderers.
+description: '@qrcodesdk/core is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.'
+
 packageName: '@angular/core'
 ---
 
@@ -10,17 +11,19 @@ import PackageBadges from '../../../components/package-badges.astro';
 
 `@qrcodesdk/core` is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
 
-Install it when you need:
+## Quick start
 
-- `qrcode()` and the immutable builder API
-- SVG output
-- terminal text output
-- matrix output
-- custom renderers
+```ts
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
+```
+
+Learn more about the different packages in the [Installation](/guides/installation#package-guide) section.
 
 ## Builder API
 
-Start with `qrcode()` and chain the options you need.
+`qrcode()` accepts `string` or `number` input. The builder is immutable: every configuration method returns a new builder.
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -34,18 +37,10 @@ const svg = qrcode('https://qrcodesdk.dev')
   .render();
 ```
 
-You can also create the builder first and provide data later.
+You can also create an empty builder and provide data later:
 
 ```ts
-import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
-
-const terminalRenderer = QRCodeTextRenderer({size: 1, margin: 2});
-
-const output = qrcode()
-  .data('HELLO WORLD')
-  .mode('alphanumeric')
-  .renderer(terminalRenderer)
-  .render();
+const builder = qrcode().data('https://qrcodesdk.dev');
 ```
 
 ### Data
@@ -73,11 +68,11 @@ The builder is immutable. Each method returns a new builder with the updated opt
 
 | Method                    | Description                                             | Defaults |
 | ------------------------- | ------------------------------------------------------- | :------- |
-| `.data(value)`            | Sets QR input data.                                     | -        |
+| `.data(value)`            | Sets QR code input data.                                | -        |
 | `.config(mode)`           | Sets all options in one call.                           | -        |
 | `.mode(mode)`             | Sets the mode: `numeric`, `alphanumeric`, or `octet`.   | `Auto`   |
 | `.errorCorrection(level)` | Sets the error correction level: `L`, `M`, `Q`, or `H`. | `M`      |
-| `.version(version)`       | Pins a QR version from `1` to `40`.                     | `Auto`   |
+| `.version(version)`       | Pins a QR code version from `1` to `40`.                | `Auto`   |
 | `.mask(mask)`             | Pins a mask from `0` to `7`.                            | `Auto`   |
 | `.matrix()`               | Returns the generated `QRCodeMatrix`.                   | -        |
 | `.renderer(renderer)`     | Stores a renderer for a later `.render()` call.         | -        |
@@ -91,7 +86,7 @@ The default error correction level is `M`.
 qrcode('https://qrcodesdk.dev').errorCorrection('H');
 ```
 
-Available levels are `L`, `M`, `Q`, and `H`. Higher levels can survive more damage, but they reduce capacity and can require a larger QR version.
+Available levels are `L`, `M`, `Q`, and `H`. Higher levels can survive more damage, but they reduce capacity and can require a larger QR code version.
 
 ### Version and mask
 
@@ -115,21 +110,6 @@ const matrix: QRCodeMatrix = qrcode('custom renderer').matrix();
 
 A matrix is a two-dimensional array of modules. `1` means dark and `0` means light.
 
-## Custom renderers
-
-A renderer is a function that receives a matrix and returns any output type.
-
-```ts
-import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
-
-const jsonRenderer: QRCodeRenderer<string> = (matrix) =>
-  JSON.stringify({size: matrix.length, matrix});
-
-const json = qrcode('renderer output').render(jsonRenderer);
-```
-
-Renderers can be passed directly to `.render(renderer)` or stored with `.renderer(renderer).render()`.
-
 ## Built-in core renderers
 
 `@qrcodesdk/core` includes runtime-neutral renderers:
@@ -146,3 +126,51 @@ For framework-specific components, add:
 
 - [`@qrcodesdk/angular`](/libs/angular/) for Angular
 - [`@qrcodesdk/react`](/libs/react/) for React
+
+## Matrix output and custom renderers
+
+Use `.matrix()` to inspect modules or take full control over rendering. A matrix is a two-dimensional array where `1` is dark and `0` is light.
+
+```ts
+import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
+
+const matrix: QRCodeMatrix = qrcode('custom output').matrix();
+```
+
+A renderer is any function that receives a matrix and returns an output value:
+
+```ts
+import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
+
+const jsonRenderer: QRCodeRenderer<string> = (matrix) =>
+  JSON.stringify({size: matrix.length, matrix});
+
+const json = qrcode('renderer output').render(jsonRenderer);
+```
+
+Renderers can be passed directly to `.render(renderer)` or stored with `.renderer(renderer).render()`.
+
+## Public API
+
+```ts
+import {
+  type QRCodeAccessibilityOptions,
+  QRCodeBuilder,
+  type QRCodeErrorCorrectionLevel,
+  type QRCodeInputData,
+  type QRCodeMask,
+  type QRCodeMatrix,
+  type QRCodeMatrixOptions,
+  type QRCodeMode,
+  type QRCodeParsedStylingOptions,
+  type QRCodeRenderer,
+  QRCodeSVGRenderer,
+  type QRCodeSVGRendererOptions,
+  type QRCodeStylingOptions,
+  QRCodeTextRenderer,
+  type QRCodeTextRendererOptions,
+  type QRCodeVersion,
+  parseQRCodeStylingOptions,
+  qrcode,
+} from '@qrcodesdk/core';
+```
