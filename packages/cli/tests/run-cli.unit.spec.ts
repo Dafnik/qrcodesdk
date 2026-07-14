@@ -1,6 +1,7 @@
 import {Buffer} from 'node:buffer';
-import {describe, expect, test} from 'vitest';
+import {beforeAll, describe, expect, test, vi} from 'vitest';
 
+import packageJson from '../package.json' with {type: 'json'};
 import {type CliRuntime, type WritableTarget} from '../src';
 import {runCli} from '../src/run-cli';
 
@@ -51,6 +52,20 @@ function createRuntime(): CliRuntime & {
 }
 
 describe('runCli', () => {
+  beforeAll(() => {
+    vi.stubGlobal('__QRCODESDK_CLI_VERSION__', packageJson.version);
+  });
+
+  test('prints the CLI package version with -V', async () => {
+    const runtime = createRuntime();
+
+    await expect(runCli(['-V'], runtime)).resolves.toBe(0);
+
+    expect(runtime.files).toEqual([]);
+    expect(runtime.stdoutText()).toBe(`${packageJson.version}\n`);
+    expect(runtime.stderrText()).toBe('');
+  });
+
   test('prints terminal text to stdout by default', async () => {
     const runtime = createRuntime();
 

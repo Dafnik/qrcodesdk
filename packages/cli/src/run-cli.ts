@@ -16,6 +16,8 @@ import {
 } from '@qrcodesdk/core';
 import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
+declare const __QRCODESDK_CLI_VERSION__: string;
+
 type OutputFormat = 'text' | 'svg' | 'png';
 
 type RawCliOptions = {
@@ -110,14 +112,16 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       .name('qrc')
       .showSuggestionAfterError(true)
       .showHelpAfterError(true)
+      .usage('[data] [options]')
       .summary('generate QR codes from a terminal.')
       .description(
         '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact terminal text or writes SVG and PNG files.',
       )
-      .argument('[data]', 'Positional QR code input data.')
+      .version(__QRCODESDK_CLI_VERSION__, '-V', 'Print the installed CLI package version')
+      .argument('[data]', 'Positional QR code input data')
       .option('--input <value>', 'QR code input data, equivalent to positional [data]')
-      .option('--format <format>', 'Output format. Inferred from `.svg` or `.png` output paths.')
-      .option('-o, --output <path>', 'Required output path for SVG and PNG.')
+      .option('--format <format>', 'Output format. Inferred from `.svg` or `.png` output paths')
+      .option('-o, --output <path>', 'Required output path for SVG and PNG')
       .option('--mode <mode>', 'QR code data mode: numeric, alphanumeric, or octet')
       .option('--error-correction <level>', 'Error correction level: L, M, Q, or H')
       .option('--version <version>', 'Pin a QR code version from 1 to 40')

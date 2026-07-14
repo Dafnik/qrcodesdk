@@ -109,6 +109,7 @@ qrc "HELLO WORLD" \
 | --------------------------------------- | ----------------------------------------------------------- | :---------- |
 | `[data]`                                | Positional QR code input data.                              | -           |
 | `--input <value>`                       | QR code input data, equivalent to positional `[data]`.      | -           |
+| `-V`                                    | Print the installed CLI package version.                    | -           |
 | `--format <text\|svg\|png>`             | Output format. Inferred from `.svg` or `.png` output paths. | -           |
 | `-o, --output <path>`                   | Required output path for SVG and PNG.                       | -           |
 | `--mode <numeric\|alphanumeric\|octet>` | QR code data mode.                                          | `Auto`      |
