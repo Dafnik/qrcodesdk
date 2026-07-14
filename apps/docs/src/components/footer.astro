@@ -7,46 +7,57 @@ const route = Astro.locals.starlightRoute;
 const related = route.entry.data.related ?? [];
 const docs = await getCollection('docs');
 
+interface ResolvedRelatedPath {
+  id: string;
+  suffix: string;
+}
+
 /**
  * Converts a related page path such as:
  *
  *   ./page-a.md
  *   ../other/page-b.mdx
+ *   ../playground.mdx?pkg=angular
  *
- * into an entry ID relative to the current document.
+ * into an entry ID relative to the current document while preserving its
+ * query string and fragment.
  */
-function resolveRelated(currentId: string, relatedPath: string): string {
-  const withoutExtension = relatedPath.replace(/\.(md|mdx|mdoc)$/i, '');
+function resolveRelated(currentId: string, relatedPath: string): ResolvedRelatedPath {
+  const suffixIndex = relatedPath.search(/[?#]/);
 
-  let resolved = path.posix.normalize(
-    path.posix.join(path.posix.dirname(currentId), withoutExtension),
-  );
+  const pathname = suffixIndex === -1 ? relatedPath : relatedPath.slice(0, suffixIndex);
+
+  const suffix = suffixIndex === -1 ? '' : relatedPath.slice(suffixIndex);
+
+  const withoutExtension = pathname.replace(/\.(md|mdx|mdoc)$/i, '');
+
+  let id = path.posix.normalize(path.posix.join(path.posix.dirname(currentId), withoutExtension));
 
   // Astro/Starlight represents `folder/index.md` as `folder`.
-  resolved = resolved.replace(/\/index$/, '');
+  id = id.replace(/\/index$/, '');
+  id = id.replace(/^\.?\//, '');
 
-  return resolved.replace(/^\.?\//, '');
+  return {id, suffix};
 }
 
-const resolvedRelated = related
-  .map((relatedPath) => {
-    const id = resolveRelated(route.entry.id, relatedPath);
-    const entry = docs.find((document) => document.id === id);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-    if (!entry) {
-      return undefined;
-    }
+const resolvedRelated = related.flatMap((relatedPath) => {
+  const {id, suffix} = resolveRelated(route.entry.id, relatedPath);
+  const entry = docs.find((document) => document.id === id);
 
-    const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-    const pageId = entry.id;
+  if (!entry) {
+    return [];
+  }
 
-    return {
+  return [
+    {
       source: relatedPath,
       title: entry.data.title ?? id,
-      href: `${base}/${pageId}/`,
-    };
-  })
-  .filter((it) => !!it);
+      href: `${base}/${entry.id}/${suffix}`,
+    },
+  ];
+});
 ---
 
 {

@@ -7,7 +7,7 @@ related:
   - ../renderers/node/png.md
   - ../renderers/browser/canvas.md
   - ../renderers/browser/image.md
-  - ../libs/core.md
+  - ../libs/core.mdx
 ---
 
 QRCodeSDK separates QR code data from renderer output. Builder options control the QR matrix, and renderer options control how that matrix looks.

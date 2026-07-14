@@ -8,6 +8,7 @@ export const collections = {
     loader: docsLoader(),
     schema: docsSchema({
       extend: z.object({
+        packageName: z.string().optional(),
         related: z.array(z.string()).optional(),
       }),
     }),

@@ -21,75 +21,29 @@
   --color-gray-900: #161723;
 }
 
-:root {
-  --btn-primary-bg: hsl(222.2 47.4% 11.2%);
-  --btn-primary-bg-hover: hsl(222.2 47.4% 13.5%);
-  --btn-primary-text: hsl(210 40% 98%);
-  --btn-primary-ring: hsl(222.2 47.4% 11.2%);
-  --btn-focus-offset: white;
-}
-
-[data-theme='dark'] {
-  --btn-primary-bg: hsl(210 40% 98%);
-  --btn-primary-bg-hover: hsl(210 40% 92%);
-  --btn-primary-text: hsl(222.2 47.4% 11.2%);
-  --btn-primary-ring: hsl(210 40% 98%);
-  --btn-focus-offset: hsl(222.2 84% 4.9%);
-}
-
 .btn-primary {
   display: inline-flex;
+  min-height: 2.35rem;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-
-  height: 2.5rem;
-  padding: 0 1rem;
-
-  border: 1px solid transparent;
-  border-radius: 0.5rem;
-
-  background: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-
-  font-family: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1;
-
+  padding: 0 0.8rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.4rem;
+  background: var(--sl-color-bg-nav);
+  color: var(--sl-color-white);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 650;
   cursor: pointer;
-  user-select: none;
-
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.08),
-    0 1px 1px rgb(0 0 0 / 0.04);
-
-  transition:
-    background-color 150ms ease,
-    box-shadow 150ms ease,
-    transform 150ms ease,
-    opacity 150ms ease;
 }
 
 .btn-primary:hover {
-  background: var(--btn-primary-bg-hover);
+  border-color: var(--sl-color-accent);
 }
 
-.btn-primary:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 1px rgb(0 0 0 / 0.08);
-}
-
-.btn-primary:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 2px var(--btn-focus-offset),
-    0 0 0 4px var(--btn-primary-ring);
-}
-
-.btn-primary:disabled {
-  pointer-events: none;
-  opacity: 0.5;
+.btn-primary-wide {
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .qrcode-playground {
@@ -258,31 +212,6 @@
 
 .qrcode-playground__color-inputs input[type='color'] {
   padding: 0.2rem;
-}
-
-.qrcode-playground__button {
-  display: inline-flex;
-  min-height: 2.35rem;
-  align-items: center;
-  justify-content: center;
-  padding: 0 0.8rem;
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 0.4rem;
-  background: var(--sl-color-bg-nav);
-  color: var(--sl-color-white);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.qrcode-playground__button:hover {
-  border-color: var(--sl-color-accent);
-}
-
-.qrcode-playground__button--wide {
-  width: 100%;
-  margin-top: 1rem;
 }
 
 .qrcode-playground__code {

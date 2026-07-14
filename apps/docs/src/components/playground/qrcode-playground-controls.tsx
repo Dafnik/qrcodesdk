@@ -61,7 +61,7 @@ export default function QRCodePlaygroundControls() {
             <h2 id="playground-config-heading">Configure</h2>
             <p>Choose a package, output, matrix, and renderer options.</p>
           </div>
-          <button className="qrcode-playground__button" type="button" onClick={resetDraft}>
+          <button className="btn-primary" type="button" onClick={resetDraft}>
             Reset
           </button>
         </div>
@@ -247,7 +247,7 @@ export default function QRCodePlaygroundControls() {
                 : `${codePreview.lang} - invalid config`}
             </p>
           </div>
-          <button className="qrcode-playground__button" type="button" onClick={copyCode}>
+          <button className="btn-primary" type="button" onClick={copyCode}>
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>

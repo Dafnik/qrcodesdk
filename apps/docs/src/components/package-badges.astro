@@ -1,0 +1,51 @@
+---
+const route = Astro.locals.starlightRoute;
+const packageName = route.entry.data.packageName;
+const color = '7469B6';
+
+const badges = [
+  {
+    label: 'npm version',
+    endpoint: 'version',
+  },
+  {
+    label: 'npm bundle size',
+    endpoint: 'size',
+  },
+  {
+    label: 'npm downloads per month',
+    endpoint: 'downloads-month',
+  },
+];
+---
+
+<div class="npm-badges not-content" style={{display: packageName ? 'flex' : 'none'}}>
+  <a href={`https://npmx.dev/${packageName}`} target="_blank" rel="noopener noreferrer">
+    <img
+      src={`https://npmx.dev/api/registry/badge/name/${packageName}?color=${color}&style=shieldsio`}
+      alt={`Open on ${packageName} npmx.dev`}
+      loading="lazy"
+    />
+  </a>
+  {
+    badges.map(({label, endpoint}) => (
+      <img
+        src={`https://npmx.dev/api/registry/badge/${endpoint}/${packageName}?color=${color}&style=shieldsio`}
+        alt={`${packageName} ${label}`}
+        loading="lazy"
+      />
+    ))
+  }
+</div>
+
+<style>
+  .npm-badges {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+  }
+
+  .npm-badges img {
+    display: block;
+  }
+</style>

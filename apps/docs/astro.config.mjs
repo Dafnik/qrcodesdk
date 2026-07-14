@@ -49,7 +49,7 @@ export default defineConfig({
       ],
       sidebar: STARLIGHT_SIDEBAR,
       components: {
-        Footer: './src/components/ReferencesFooter.astro',
+        Footer: './src/components/footer.astro',
       },
       social: [
         {
@@ -59,7 +59,7 @@ export default defineConfig({
         },
       ],
       editLink: {
-        baseUrl: 'https://github.com/Dafnik/qrcodesdk/edit/main/docs/',
+        baseUrl: 'https://github.com/Dafnik/qrcodesdk/edit/main/apps/docs/',
       },
     }),
     react(),

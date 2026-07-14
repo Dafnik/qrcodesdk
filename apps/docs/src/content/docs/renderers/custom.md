@@ -4,7 +4,7 @@ description: Build your own QRCodeSDK renderer by converting a QR matrix into an
 
 related:
   - ../guides/customize.md
-  - ../libs/core.md
+  - ../libs/core.mdx
   - ../reference/api.md
 ---
 

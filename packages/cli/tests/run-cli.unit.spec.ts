@@ -1,7 +1,8 @@
 import {Buffer} from 'node:buffer';
 import {describe, expect, test} from 'vitest';
 
-import {type CliRuntime, type WritableTarget, runCli} from '../src';
+import {type CliRuntime, type WritableTarget} from '../src';
+import {runCli} from '../src/run-cli';
 
 type WriteRecord = {
   readonly path: string;

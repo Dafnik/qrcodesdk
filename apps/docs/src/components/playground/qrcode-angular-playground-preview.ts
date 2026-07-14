@@ -30,7 +30,7 @@ import {
           <qrcode-svg #qrcode [data]="config()!.data" [options]="svgOptions()" />
         </div>
         <button
-          class="qrcode-playground__button qrcode-playground__button--wide"
+          class="btn-primary btn-primary-wide"
           (click)="qrcode.download('qrcodesdk')"
           type="button">
           Download SVG
@@ -40,7 +40,7 @@ import {
           <qrcode-image #qrcode [data]="config()!.data" [options]="imageOptions()" />
         </div>
         <button
-          class="qrcode-playground__button qrcode-playground__button--wide"
+          class="btn-primary btn-primary-wide"
           (click)="qrcode.download('qrcodesdk')"
           type="button">
           Download PNG

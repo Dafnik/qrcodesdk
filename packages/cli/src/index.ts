@@ -4,7 +4,6 @@ import {fileURLToPath} from 'node:url';
 
 import {runCli} from './run-cli';
 
-export {runCli};
 export type {CliRuntime, WritableTarget} from './run-cli';
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {

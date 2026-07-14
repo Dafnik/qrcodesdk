@@ -1,21 +1,26 @@
 ---
 title: '@qrcodesdk/react'
-description: Render QRCodeSDK QR codes with React components.
+description: '@qrcodesdk/react provides React components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.'
+packageName: '@angular/core'
 
 related:
   - ../guides/customize.md
+  - ../renderers/core/svg.md
   - ../renderers/browser/image.md
   - ../renderers/browser/canvas.md
-  - ../renderers/core/svg.md
+  - ../playground.mdx?pkg=react
 ---
 
 import QRCodeCanvas from '../../../components/astro/react-examples/qrcode-canvas.astro';
 import QRCodeDownloadImage from '../../../components/astro/react-examples/qrcode-download-image.astro';
 import QRCodeImage from '../../../components/astro/react-examples/qrcode-image.astro';
 import QRCodeSVG from '../../../components/astro/react-examples/qrcode-svg.astro';
+import PackageBadges from '../../../components/package-badges.astro';
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
-`@qrcodesdk/react` provides React components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.
+<PackageBadges />
+
+`@qrcodesdk/react` provides React components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
 ## Install
 
@@ -24,27 +29,58 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
   mode="add"
 />
 
+## Quick start
+
+Import the components directly where you need them:
+
+```tsx
+import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/react';
+
+export function App() {
+  return (
+    <>
+      <QRCodeSVG data="https://qrcodesdk.dev" />
+      <QRCodeImage data="https://qrcodesdk.dev" />
+      <QRCodeCanvas data="https://qrcodesdk.dev" />
+    </>
+  );
+}
+```
+
 ## Components
 
-| Component      | Output             | Download support |
-| -------------- | ------------------ | ---------------- |
-| `QRCodeSVG`    | Inline SVG element | SVG              |
-| `QRCodeImage`  | PNG-backed `<img>` | PNG              |
-| `QRCodeCanvas` | `<canvas>` element | None             |
+| Component      | Output                                      | Download support |
+| -------------- | ------------------------------------------- | ---------------- |
+| `QRCodeSVG`    | Inline SVG inside a wrapper `<div>`         | SVG              |
+| `QRCodeImage`  | PNG-backed `<img>` inside a wrapper `<div>` | PNG              |
+| `QRCodeCanvas` | `<canvas>` inside a wrapper `<div>`         | None             |
 
 All components accept:
 
-| Prop        | Type     | Description                                     |
-| ----------- | -------- | ----------------------------------------------- |
-| `data`      | `string` | Required QR code payload.                       |
-| `options`   | `object` | Matrix and renderer options.                    |
-| `className` | `string` | CSS class applied to the component wrapper div. |
+| Prop        | Type                       | Description                                     |
+| ----------- | -------------------------- | ----------------------------------------------- |
+| `data`      | `string`                   | Required QR code payload.                       |
+| `options`   | Component-specific options | Optional matrix and renderer configuration.     |
+| `className` | `string`                   | CSS class applied to the component wrapper div. |
 
 `options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, and `mask`. Renderer options match the corresponding QRCodeSDK renderer:
 
 - `QRCodeSVG` uses `QRCodeSVGOptions`.
 - `QRCodeImage` uses `QRCodeImageOptions`.
 - `QRCodeCanvas` uses `QRCodeCanvasOptions`.
+
+## Matrix options
+
+The `options` prop combines the component's renderer options with the shared QR matrix options:
+
+| Option                 | Type                                     | Default   | Description             |
+| ---------------------- | ---------------------------------------- | --------- | ----------------------- |
+| `mode`                 | `'numeric' \| 'alphanumeric' \| 'octet'` | Automatic | Encoding mode.          |
+| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`               | `'M'`     | Error correction level. |
+| `version`              | `1` through `40`                         | Automatic | Pins the QR version.    |
+| `mask`                 | `0` through `7`                          | Automatic | Pins the QR mask.       |
+
+Most applications should let the builder select the mode, version, and mask automatically.
 
 ## Live examples
 
@@ -63,6 +99,20 @@ All components accept:
 ### PNG download
 
 <QRCodeDownloadImage />
+
+## Renderer options
+
+| Option              | Components | Type     |     Default |
+| ------------------- | ---------- | -------- | ----------: |
+| `size`              | All        | `number` |         `5` |
+| `margin`            | All        | `number` |         `4` |
+| `colors.colorDark`  | All        | `string` | `'#000000'` |
+| `colors.colorLight` | All        | `string` | `'#ffffff'` |
+| `alt`               | SVG, Image | `string` | `undefined` |
+| `ariaLabel`         | SVG, Image | `string` | `undefined` |
+| `title`             | SVG, Image | `string` | `undefined` |
+
+Color options use hash-prefixed values such as `#111827`. Image and Canvas output require a positive integer `size` and a non-negative integer `margin`.
 
 ## Download files
 
@@ -88,3 +138,9 @@ export function QRCodeDownload() {
 ```
 
 `QRCodeCanvas` does not include a download method. Use `QRCodeImage` when you want built-in PNG download support.
+
+## Server-side rendering
+
+`QRCodeSVG` produces runtime-neutral SVG and can render on the server.
+
+`QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.

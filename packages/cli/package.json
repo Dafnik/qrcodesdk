@@ -48,7 +48,7 @@
     "provenance": true
   },
   "bin": {
-    "cli": "./dist/index.mjs"
+    "qrc": "./dist/index.mjs"
   },
   "types": "./dist/index.d.mts",
   "exports": {

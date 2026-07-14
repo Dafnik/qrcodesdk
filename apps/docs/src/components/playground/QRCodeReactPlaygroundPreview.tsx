@@ -75,10 +75,7 @@ export default function QRCodeReactPlaygroundPreview() {
 
 function DownloadButton({label, onClick}: {label: string; onClick(): void}) {
   return (
-    <button
-      className="qrcode-playground__button qrcode-playground__button--wide"
-      type="button"
-      onClick={onClick}>
+    <button className="btn-primary btn-primary-wide" type="button" onClick={onClick}>
       {label}
     </button>
   );
