@@ -5,16 +5,17 @@
     "build": "turbo run build",
     "start": "turbo run start",
     "test": "turbo run test",
+    "check-types": "turbo run check-types",
     "clean": "turbo run clean",
     "clean:deep": "turbo run clean && rm -rf node_modules",
     "lint": "turbo run lint",
     "cspell": "cspell \"**\" --gitignore",
-    "release:status": "changeset status --verbose",
-    "release:version": "changeset version && pnpm install",
-    "release:tag": "changeset tag",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check-types": "turbo run check-types"
+    "check": "turbo run check",
+    "release:status": "changeset status --verbose",
+    "release:version": "changeset version && pnpm install",
+    "release:tag": "changeset tag"
   },
   "devDependencies": {
     "@changesets/cli": "2.31.0",

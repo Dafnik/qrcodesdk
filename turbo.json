@@ -8,10 +8,20 @@
     "VITE_CACHE_DIR"
   ],
   "tasks": {
+    "//#cspell": {
+      "cache": false
+    },
+    "//#format:check": {
+      "cache": false
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", "!.turbo/**", "!.astro-cache/**"]
+    },
+    "check": {
+      "cache": false,
+      "dependsOn": ["//#format:check", "//#cspell", "^build", "^test", "^lint"]
     },
     "check-types": {
       "dependsOn": ["^build", "^check-types"]
