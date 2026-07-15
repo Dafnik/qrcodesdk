@@ -1,24 +1,24 @@
 import type {
   QRCodeErrorCorrectionLevelValue,
   QRCodeMask,
-  QRCodeMatrix,
   QRCodeModule,
+  QRCodeMutableMatrix,
 } from '../types';
 import {augmentBCH} from './augment-bch';
 
 /**
  * Puts the format information into the matrix.
  *
- * @param {QRCodeMatrix} matrix - The matrix to be filled with format information.
+ * @param {QRCodeMutableMatrix} matrix - The matrix to be filled with format information.
  * @param {QRCodeErrorCorrectionLevelValue} ecclevel - The error correction level.
  * @param {QRCodeMask} mask - The mask pattern.
- * @returns {QRCodeMatrix} The matrix with format information filled in.
+ * @returns {QRCodeMutableMatrix} The matrix with format information filled in.
  */
 export function fillFormatInformationInMatrix(
-  matrix: QRCodeMatrix,
+  matrix: QRCodeMutableMatrix,
   ecclevel: QRCodeErrorCorrectionLevelValue,
   mask: QRCodeMask,
-): QRCodeMatrix {
+): QRCodeMutableMatrix {
   const n: number = matrix.length,
     code: number = augmentBCH((ecclevel << 3) | mask, 5, 0x537, 10) ^ 0x5412;
 

@@ -8,6 +8,7 @@ import type {
   QRCodeMask,
   QRCodeMatrix,
   QRCodeMode,
+  QRCodeMutableMatrix,
   QRCodeVersion,
 } from '../../src/types';
 
@@ -95,7 +96,11 @@ export function formatBitsFor(eccLevel: number, mask: QRCodeMask): number[] {
   return Array.from({length: 15}, (_, i) => (code >> i) & 1);
 }
 
-export function formatBitsMatch(matrix: QRCodeMatrix, eccLevel: number, mask: QRCodeMask): boolean {
+export function formatBitsMatch(
+  matrix: QRCodeMutableMatrix,
+  eccLevel: number,
+  mask: QRCodeMask,
+): boolean {
   const n = matrix.length;
   const rows = [0, 1, 2, 3, 4, 5, 7, 8, n - 7, n - 6, n - 5, n - 4, n - 3, n - 2, n - 1];
   const columns = [n - 1, n - 2, n - 3, n - 4, n - 5, n - 6, n - 7, n - 8, 7, 5, 4, 3, 2, 1, 0];

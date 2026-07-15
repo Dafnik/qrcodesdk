@@ -21,7 +21,7 @@
     },
     "check": {
       "cache": false,
-      "dependsOn": ["//#format:check", "//#cspell", "^build", "^test", "^lint"]
+      "dependsOn": ["//#format:check", "//#cspell", "^build", "^test", "^lint", "^check-types"]
     },
     "check-types": {
       "dependsOn": ["^build", "^check-types"]
