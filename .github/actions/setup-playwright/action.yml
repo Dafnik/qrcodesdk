@@ -3,6 +3,23 @@ description: 'Setup Playwright with caching, using pnpm (should already be insta
 runs:
   using: 'composite'
   steps:
+    # Avoid long delays on the "Processing triggers for man-db"
+    # step during installation
+    #
+    # ```
+    # pnpm playwright install --with-deps chrome
+    # Installing dependencies...
+    # Switching to root user to install dependencies...
+    # ...
+    # Processing triggers for man-db (2.12.0-4build2) ...
+    # ```
+    #
+    # - https://github.com/actions/runner/issues/4030
+    # - https://github.com/microsoft/playwright/issues/14434
+    - name: Remove man-db triggers
+      shell: bash
+      run: sudo apt-get --yes remove --purge man-db
+
     - name: Extract Playwright version
       id: playwright-version
       shell: bash
@@ -11,6 +28,9 @@ runs:
         echo "PLAYWRIGHT_VERSION=$(jq -r '.devDependencies."playwright"' package.json)" >> $GITHUB_ENV
         cd -
 
+    # Cache the Playwright browser binary (only @qrcodesdk/browser test needs it).
+    # ponytail: system deps assumed present on the runner on a cache hit; if a
+    # future runner image drops them, add `playwright install-deps` to the hit path.
     - name: Cache Playwright
       id: playwright-cache
       uses: actions/cache@v5
@@ -20,21 +40,16 @@ runs:
 
     - name: Install Playwright dependencies
       shell: bash
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: |
-        # Avoid long delays on the "Processing triggers for man-db"
-        # step during installation
-        #
-        # ```
-        # pnpm playwright install --with-deps chrome
-        # Installing dependencies...
-        # Switching to root user to install dependencies...
-        # ...
-        # Processing triggers for man-db (2.12.0-4build2) ...
-        # ```
-        #
-        # - https://github.com/actions/runner/issues/4030
-        # - https://github.com/microsoft/playwright/issues/14434
-        sudo apt-get --yes remove --purge man-db
         cd packages/browser
-        pnpm exec playwright install --with-deps --only-shell
-        cd -
+        pnpm exec playwright install chromium --with-deps
+
+    # On a cache hit the binary is restored but the apt system deps aren't, so
+    # install just those (fast) to avoid missing-library flakiness.
+    - name: Install Playwright dependencies
+      shell: bash
+      if: steps.playwright-cache.outputs.cache-hit == 'true'
+      run: |
+        cd packages/browser
+        pnpm exec playwright install-deps chromium
