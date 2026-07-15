@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeMatrix, QRCodeSVGRenderer} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer} from '@qrcodesdk/core';
+import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 import {extractPaths, extractSvgAttrs} from './svg-helpers';
 

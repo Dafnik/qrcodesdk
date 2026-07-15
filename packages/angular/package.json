@@ -51,7 +51,7 @@
     "postbuild": "cp ../../LICENSE dist/angular",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch false",
-    "check-types": "ng build",
+    "check-types": "ng build && tsc -p tsconfig.spec.json --noEmit",
     "lint": "eslint src --max-warnings 0",
     "clean": "rm -rf .turbo dist .angular"
   },

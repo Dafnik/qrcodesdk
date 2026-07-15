@@ -2,7 +2,8 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
 
-import {QRCodeMatrix, QRCodeSVGRenderer} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer} from '@qrcodesdk/core';
+import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 import {expectSvgToMatchFileSnapshot} from './svg-helpers';
 

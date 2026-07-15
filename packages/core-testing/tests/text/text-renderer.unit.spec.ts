@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeMatrix, QRCodeTextRenderer} from '@qrcodesdk/core';
+import {QRCodeTextRenderer} from '@qrcodesdk/core';
+import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 describe('QRCodeTextRenderer', () => {
   test('renders default text geometry from a hand-authored matrix', () => {

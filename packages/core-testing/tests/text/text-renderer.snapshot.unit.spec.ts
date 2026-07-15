@@ -2,7 +2,8 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
 
-import {QRCodeMatrix, QRCodeTextRenderer} from '@qrcodesdk/core';
+import {QRCodeTextRenderer} from '@qrcodesdk/core';
+import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 import {expectTextToMatchFileSnapshot} from './text-helpers';
 

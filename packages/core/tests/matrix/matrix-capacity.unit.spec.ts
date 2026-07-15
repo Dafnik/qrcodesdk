@@ -36,6 +36,7 @@ describe('capacity helpers', () => {
     expect(getNumberOfBitsOfData(1, MODE_OCTET)).toBe(8);
     expect(getNumberOfBitsOfData(10, MODE_OCTET)).toBe(16);
     expect(getNumberOfBitsOfData(27, MODE_KANJI)).toBe(12);
+    // @ts-expect-error Exercise the runtime fallback for an unsupported mode.
     expect(getNumberOfBitsOfData(1, -1)).toBe(-100);
   });
 
@@ -56,6 +57,7 @@ describe('capacity helpers', () => {
     expect(getMaxDataLength(1, MODE_OCTET, ECC_LEVEL_L)).toBe(17);
     expect(getMaxDataLength(1, MODE_OCTET, ECC_LEVEL_M)).toBe(14);
     expect(getMaxDataLength(1, MODE_KANJI, ECC_LEVEL_L)).toBe(10);
+    // @ts-expect-error Exercise the runtime fallback for an unsupported mode.
     expect(getMaxDataLength(1, -1, ECC_LEVEL_L)).toBe(-100);
   });
 });
