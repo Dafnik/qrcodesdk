@@ -4,15 +4,13 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "pnpm run build:packages && astro dev",
-    "build": "pnpm run build:packages && pnpm run build:site",
-    "build:packages": "pnpm --workspace-root turbo run build --filter=docs... --filter=!docs",
-    "build:site": "ASTRO_CACHE_DIR=.astro-cache/build VITE_CACHE_DIR=.vite-cache/build node scripts/with-astro-lock.mjs astro build",
+    "start": "astro dev",
+    "build": "astro build",
     "preview": "astro preview",
-    "check-types": "pnpm run build:packages && ASTRO_CACHE_DIR=.astro-cache/check-types VITE_CACHE_DIR=.vite-cache/check-types node scripts/with-astro-lock.mjs astro check",
-    "lint": "eslint astro.config.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
+    "check-types": "astro check",
+    "lint": "eslint astro.config.mjs src --ext .js,.mjs,.ts --max-warnings 0",
     "astro": "astro",
-    "clean": "rm -rf .turbo dist .astro .astro-cache .vite-cache .astro-command.lock"
+    "clean": "rm -rf .turbo dist .astro"
   },
   "dependencies": {
     "@angular/common": "catalog:",
@@ -23,6 +21,7 @@
     "@astrojs/starlight-tailwind": "5.0.0",
     "@expressive-code/plugin-line-numbers": "0.44.0",
     "@qrcodesdk/angular": "workspace:*",
+    "@qrcodesdk/browser": "workspace:*",
     "@qrcodesdk/core": "workspace:*",
     "@qrcodesdk/react": "workspace:*",
     "@tailwindcss/vite": "4.3.2",
@@ -36,6 +35,7 @@
   },
   "devDependencies": {
     "@analogjs/astro-angular": "2.6.2",
+    "@angular/animations": "catalog:",
     "@angular/build": "catalog:",
     "@angular/compiler": "catalog:",
     "@angular/compiler-cli": "catalog:",

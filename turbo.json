@@ -1,18 +1,15 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "globalEnv": [
-    "ASTRO_CACHE_DIR",
-    "UPDATE_PNG_SNAPSHOTS",
-    "UPDATE_SVG_SNAPSHOTS",
-    "UPDATE_TEXT_SNAPSHOTS",
-    "VITE_CACHE_DIR"
-  ],
+  "globalEnv": ["UPDATE_PNG_SNAPSHOTS", "UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"],
   "tasks": {
     "//#cspell": {
       "cache": false
     },
     "//#format:check": {
       "cache": false
+    },
+    "@qrcodesdk/cli#test": {
+      "dependsOn": ["build", "^test"]
     },
     "build": {
       "dependsOn": ["^build"],
@@ -21,7 +18,7 @@
     },
     "check": {
       "cache": false,
-      "dependsOn": ["//#format:check", "//#cspell", "^build", "^test", "^lint", "^check-types"]
+      "dependsOn": ["//#format:check", "//#cspell", "build", "test", "lint", "check-types"]
     },
     "check-types": {
       "dependsOn": ["^build", "^check-types"]

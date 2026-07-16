@@ -60,9 +60,6 @@
     "@qrcodesdk/browser": "workspace:*",
     "@angular/common": "catalog:",
     "@angular/core": "catalog:",
-    "@angular/forms": "catalog:",
-    "@angular/platform-browser": "catalog:",
-    "@angular/router": "catalog:",
     "rxjs": "catalog:"
   },
   "dependencies": {
@@ -75,9 +72,7 @@
     "@angular/compiler": "catalog:",
     "@angular/compiler-cli": "catalog:",
     "@angular/core": "catalog:",
-    "@angular/forms": "catalog:",
     "@angular/platform-browser": "catalog:",
-    "@angular/router": "catalog:",
     "@qrcodesdk/browser": "workspace:*",
     "@qrcodesdk/core": "workspace:*",
     "@repo/core-testing": "workspace:*",

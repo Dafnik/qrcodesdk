@@ -150,5 +150,5 @@ pnpm cspell
 Run the documentation site locally:
 
 ```sh
-pnpm --filter docs start
+pnpm turbo run start --filter=docs
 ```
