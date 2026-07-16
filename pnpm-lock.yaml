@@ -372,18 +372,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
-      '@types/qrcode':
-        specifier: 1.5.6
-        version: 1.5.6
       '@typescript/native-preview':
         specifier: 'catalog:'
         version: 7.0.0-dev.20260509.2
-      qrcode:
-        specifier: 1.5.4
-        version: 1.5.4
-      qrcode-generator:
-        specifier: ^2.0.4
-        version: 2.0.4(patch_hash=c98e53f3d0a080d3bdc8bdfbdbe41837086b66e201780921019c646ce2eca1ed)
       tsdown:
         specifier: 'catalog:'
         version: 0.22.3(@typescript/native-preview@7.0.0-dev.20260509.2)(typescript@6.0.3)
@@ -409,12 +400,21 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 25.9.4
+      '@types/qrcode':
+        specifier: 1.5.6
+        version: 1.5.6
       '@typescript/native-preview':
         specifier: 'catalog:'
         version: 7.0.0-dev.20260509.2
       jsqr:
         specifier: 'catalog:'
         version: 1.4.0
+      qrcode:
+        specifier: 1.5.4
+        version: 1.5.4
+      qrcode-generator:
+        specifier: 2.0.4
+        version: 2.0.4(patch_hash=c98e53f3d0a080d3bdc8bdfbdbe41837086b66e201780921019c646ce2eca1ed)
       sharp:
         specifier: 'catalog:'
         version: 0.34.5
