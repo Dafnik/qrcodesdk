@@ -7,9 +7,13 @@ on:
         description: Package short name to publish.
         required: true
         type: string
+    secrets:
+      npm_token:
+        description: npm access token used to bootstrap the first package publish.
+        required: true
 
 permissions:
-  id-token: write # Required for OIDC
+  id-token: write # Required for npm provenance
   contents: write # Required for GitHub release action
 
 jobs:
@@ -28,14 +32,15 @@ jobs:
       - name: Check everything (format:check, cspell, build, test, lint, check-types)
         run: pnpm check
 
-  release:
-    name: Release ${{ inputs.lib }}
-    needs: check
+  build:
+    name: Build ${{ inputs.lib }}
     runs-on: ubuntu-latest
+    outputs:
+      package-name: ${{ steps.package.outputs.name }}
+      package-dir: ${{ steps.package.outputs.dir }}
+      package-version: ${{ steps.package.outputs.version }}
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - uses: dafnik/setup-node-pnpm@v5
         with:
@@ -82,35 +87,95 @@ jobs:
           echo "dir=${package_dir}" >> "$GITHUB_OUTPUT"
           echo "version=${package_version}" >> "$GITHUB_OUTPUT"
 
-      - name: Build package graph
-        run: pnpm turbo run build --filter='${{ steps.package.outputs.name }}...'
-
-      - name: Check npm version
-        id: npm
+      - name: Validate release tag
         shell: bash
         run: |
-          if npm view '${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}' version >/dev/null 2>&1; then
-            echo "published=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "published=false" >> "$GITHUB_OUTPUT"
-          fi
+          expected_ref="refs/tags/${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}"
 
-      - name: Pack package
-        if: steps.npm.outputs.published == 'false'
-        id: pack
-        shell: bash
-        run: |
-          pack_dir="$(mktemp -d)"
-          pnpm -C '${{ steps.package.outputs.dir }}' pack --pack-destination "$pack_dir"
-          tarball="$(find "$pack_dir" -maxdepth 1 -name '*.tgz' -print -quit)"
-
-          if [ -z "$tarball" ]; then
-            echo "No package tarball was created." >&2
+          if [ "$GITHUB_REF" != "$expected_ref" ]; then
+            echo "Expected tag '${expected_ref#refs/tags/}', received '${GITHUB_REF#refs/tags/}'." >&2
             exit 1
           fi
 
-          echo "tarball=${tarball}" >> "$GITHUB_OUTPUT"
+      - name: Build package graph
+        run: pnpm turbo run build --filter='${{ steps.package.outputs.name }}...'
 
-      - name: Publish package
-        if: steps.npm.outputs.published == 'false'
-        run: npm publish '${{ steps.pack.outputs.tarball }}' --access public --provenance
+      - name: Pack package
+        shell: bash
+        run: |
+          pack_dir="$RUNNER_TEMP/npm-package"
+          mkdir -p "$pack_dir"
+          pnpm -C '${{ steps.package.outputs.dir }}' pack --pack-destination "$pack_dir"
+
+          mapfile -t tarballs < <(find "$pack_dir" -maxdepth 1 -type f -name '*.tgz')
+          if [ "${#tarballs[@]}" -ne 1 ]; then
+            echo "Expected exactly one npm tarball, found ${#tarballs[@]}." >&2
+            exit 1
+          fi
+
+      - name: Upload npm package
+        uses: actions/upload-artifact@v7
+        with:
+          name: npm-package-${{ inputs.lib }}
+          path: ${{ runner.temp }}/npm-package/*.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  release-npm:
+    name: Release ${{ inputs.lib }} to npm
+    needs: [check, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure npm registry authentication
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download npm package
+        uses: actions/download-artifact@v8
+        with:
+          name: npm-package-${{ inputs.lib }}
+          path: npm-package
+
+      - name: Publish package if needed
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          PACKAGE_NAME: ${{ needs.build.outputs.package-name }}
+          PACKAGE_VERSION: ${{ needs.build.outputs.package-version }}
+        run: |
+          published_version="$(npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version 2>/dev/null || true)"
+
+          if [ "$published_version" = "$PACKAGE_VERSION" ]; then
+            echo "${PACKAGE_NAME}@${PACKAGE_VERSION} is already published; skipping."
+          else
+            npm publish npm-package/*.tgz --access public --provenance
+          fi
+
+  release-github:
+    name: Release ${{ inputs.lib }} on GitHub
+    needs: [build, release-npm]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download npm package
+        uses: actions/download-artifact@v8
+        with:
+          name: npm-package-${{ inputs.lib }}
+          path: npm-package
+
+      - name: Extract latest changelog
+        shell: bash
+        run: ./.github/extract-latest-version-changelog.sh '${{ needs.build.outputs.package-dir }}/CHANGELOG.md'
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          body_path: RELEASE_CHANGELOG.md
+          fail_on_unmatched_files: true
+          files: npm-package/*.tgz

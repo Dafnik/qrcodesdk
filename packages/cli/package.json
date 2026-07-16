@@ -54,6 +54,7 @@
     "qrc": "./dist/bin.mjs"
   },
   "files": [
+    "CHANGELOG.md",
     "dist"
   ],
   "scripts": {

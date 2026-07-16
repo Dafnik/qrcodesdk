@@ -57,6 +57,7 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "CHANGELOG.md",
     "dist"
   ],
   "scripts": {
