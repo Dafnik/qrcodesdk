@@ -16,6 +16,18 @@ permissions:
   pull-requests: write
 
 jobs:
+  check-types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Check types
+        run: pnpm check-types
+
   prettier:
     runs-on: ubuntu-latest
     steps:
@@ -68,7 +80,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v7
 
