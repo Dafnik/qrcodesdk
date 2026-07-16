@@ -2,6 +2,9 @@
   "name": "@qrcodesdk/core",
   "type": "module",
   "version": "0.0.0",
+  "engines": {
+    "node": ">=20.12.0"
+  },
   "description": "@qrcodesdk/core is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.",
   "sideEffects": false,
   "private": false,

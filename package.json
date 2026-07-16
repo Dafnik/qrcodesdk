@@ -15,7 +15,8 @@
     "check": "turbo run check",
     "release:status": "changeset status --verbose",
     "release:version": "changeset version && pnpm install",
-    "release:tag": "changeset tag"
+    "release:tag": "changeset tag",
+    "turbo": "turbo"
   },
   "devDependencies": {
     "@changesets/cli": "2.31.0",

@@ -2,6 +2,9 @@
   "name": "@qrcodesdk/react",
   "type": "module",
   "version": "0.0.0",
+  "engines": {
+    "node": ">=20.12.0"
+  },
   "description": "@qrcodesdk/react provides React components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.",
   "sideEffects": false,
   "private": false,
@@ -66,10 +69,10 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "@qrcodesdk/browser": "workspace:*",
-    "@qrcodesdk/core": "workspace:*",
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "@qrcodesdk/browser": "workspace:^",
+    "@qrcodesdk/core": "workspace:^",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@qrcodesdk/browser": "workspace:*",

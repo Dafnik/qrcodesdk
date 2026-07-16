@@ -2,6 +2,9 @@
   "name": "@qrcodesdk/cli",
   "type": "module",
   "version": "0.0.0",
+  "engines": {
+    "node": ">=20.12.0"
+  },
   "description": "@qrcodesdk/cli provides the qrc command for generating QR codes as terminal text, SVG files, or PNG files.",
   "sideEffects": false,
   "private": false,
