@@ -4,7 +4,7 @@
 [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular)
 [![npm download per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular)
 
-**[Live Demo](http://localhost:4321/playground/?pkg=angular)**
+**[Live Demo](https://qrcodesdk.dev/playground/?pkg=angular)**
 
 `@qrcodesdk/angular` provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
