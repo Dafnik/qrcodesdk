@@ -70,6 +70,9 @@ describe('qrcode().matrix()', () => {
     expect(new Set(ALL_QR_CODE_COMBINATIONS.map(({name}) => name)).size).toBe(
       TOTAL_QR_CODE_COMBINATIONS,
     );
+    for (const {data, version} of ALL_QR_CODE_COMBINATIONS) {
+      expect(data).toHaveLength(version);
+    }
   });
 
   test('matches reference matrices for explicit modes, ECC levels, versions, and masks', () => {

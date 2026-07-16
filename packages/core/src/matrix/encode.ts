@@ -96,5 +96,5 @@ export function encode(
   // words when the overflow already occurred.
   while (buffer.length + 1 < maxBufferLength) buffer.push(0xec, 0x11);
   if (buffer.length < maxBufferLength) buffer.push(0xec);
-  return buffer;
+  return buffer.slice(0, maxBufferLength);
 }

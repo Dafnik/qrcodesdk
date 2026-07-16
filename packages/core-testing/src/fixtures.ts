@@ -97,4 +97,28 @@ export const QR_CODE_TEST_FIXTURES: QRCodeTestFixture[] = [
     version: 6,
     mask: 4,
   },
+  {
+    name: 'numeric-max-capacity',
+    data: '1'.repeat(7_089),
+    mode: 'numeric',
+    version: 40,
+    mask: 0,
+    errorCorrectionLevel: 'L',
+  },
+  {
+    name: 'alphanumeric-max-capacity',
+    data: 'A'.repeat(4_296),
+    mode: 'alphanumeric',
+    version: 40,
+    mask: 1,
+    errorCorrectionLevel: 'L',
+  },
+  {
+    name: 'bytes-max-capacity',
+    data: 'A'.repeat(2_953),
+    mode: 'octet',
+    version: 40,
+    mask: 2,
+    errorCorrectionLevel: 'L',
+  },
 ];

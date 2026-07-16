@@ -46,7 +46,7 @@ export function* getAllQRCodeCombinations(): Generator<QRCodeCombination> {
               `mask-${mask}`,
               `mode-${mode}`,
             ].join('_'),
-            data: DATA_BY_MODE[mode],
+            data: DATA_BY_MODE[mode].repeat(version),
             mode,
             version: version as QRCodeVersion,
             mask,

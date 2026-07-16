@@ -34,4 +34,10 @@ describe('data validation and encoding', () => {
 
     expect(encode(1, MODE_OCTET, [0x41, 0xff], 7)).toEqual(bitsToBytes(expectedBits, 7));
   });
+
+  test('fits maximum-capacity payloads into the available data codewords', () => {
+    expect(encode(40, MODE_NUMERIC, '1'.repeat(7_089), 2_956)).toHaveLength(2_956);
+    expect(encode(40, MODE_ALPHANUMERIC, 'A'.repeat(4_296), 2_956)).toHaveLength(2_956);
+    expect(encode(40, MODE_OCTET, Array(2_953).fill(0x41), 2_956)).toHaveLength(2_956);
+  });
 });
