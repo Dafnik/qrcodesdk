@@ -8,8 +8,5 @@
     "./base.json": "./base.json",
     "./react-library.json": "./react-library.json",
     "./ts-library.json": "./ts-library.json"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }
