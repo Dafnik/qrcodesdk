@@ -13,8 +13,21 @@ permissions:
   contents: write # Required for GitHub release action
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Check everything (format:check, cspell, build, test, lint, check-types)
+        run: pnpm check
+
   release:
     name: Release ${{ inputs.lib }}
+    needs: check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
