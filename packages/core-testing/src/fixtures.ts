@@ -1,18 +1,9 @@
-import type {
-  QRCodeErrorCorrectionLevel,
-  QRCodeMask,
-  QRCodeMode,
-  QRCodeVersion,
-} from '@qrcodesdk/core';
+import type {QRCodeMatrixOptions} from '@qrcodesdk/core';
 
-export type QRCodeTestFixture = {
+export interface QRCodeTestFixture extends QRCodeMatrixOptions {
   name: string;
   data: string;
-  mode?: QRCodeMode;
-  version?: QRCodeVersion;
-  mask?: QRCodeMask;
-  errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
-};
+}
 
 export const QR_CODE_TEST_FIXTURES: QRCodeTestFixture[] = [
   {

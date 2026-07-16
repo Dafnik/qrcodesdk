@@ -55,12 +55,7 @@ function referenceMatrixQRCodeGeneratorPackage(fixture: QRCodeTestFixture): QRCo
 describe('qrcode().matrix()', () => {
   test('matches reference matrices for explicit modes, ECC levels, versions, and masks', () => {
     for (const fixture of QR_CODE_TEST_FIXTURES) {
-      const matrix = qrcode(fixture.data)
-        .mode(fixture.mode)
-        .version(fixture.version as never)
-        .errorCorrection(fixture.errorCorrectionLevel)
-        .mask(fixture.mask)
-        .matrix();
+      const matrix = qrcode(fixture.data).config(fixture).matrix();
       expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
       expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
     }
