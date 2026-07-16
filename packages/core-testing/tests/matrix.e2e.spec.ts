@@ -5,10 +5,16 @@ import {describe, expect, test} from 'vitest';
 import {qrcode} from '@qrcodesdk/core';
 import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeMatrix} from '@qrcodesdk/core';
 
-import {type QRCodeTestFixture, QR_CODE_TEST_FIXTURES} from '../src';
+import {
+  type QRCodeTestFixture,
+  QR_CODE_TEST_FIXTURES,
+  TOTAL_QR_CODE_COMBINATIONS,
+  getAllQRCodeCombinations,
+} from '../src';
 
 const ECC_LEVELS: QRCodeErrorCorrectionLevel[] = ['L', 'M', 'Q', 'H'];
 const MASKS: QRCodeMask[] = [0, 1, 2, 3, 4, 5, 6, 7];
+const ALL_QR_CODE_COMBINATIONS = [...getAllQRCodeCombinations()];
 
 function referenceMatrixQRCodePackage(fixture: QRCodeTestFixture): QRCodeMatrix {
   const encodedData =
@@ -53,6 +59,19 @@ function referenceMatrixQRCodeGeneratorPackage(fixture: QRCodeTestFixture): QRCo
 }
 
 describe('qrcode().matrix()', () => {
+  test('provides every unique version, ECC level, mask, and mode combination', () => {
+    const combinationKeys = ALL_QR_CODE_COMBINATIONS.map(
+      ({version, errorCorrectionLevel, mask, mode}) =>
+        `${version}-${errorCorrectionLevel}-${mask}-${mode}`,
+    );
+
+    expect(ALL_QR_CODE_COMBINATIONS).toHaveLength(TOTAL_QR_CODE_COMBINATIONS);
+    expect(new Set(combinationKeys).size).toBe(TOTAL_QR_CODE_COMBINATIONS);
+    expect(new Set(ALL_QR_CODE_COMBINATIONS.map(({name}) => name)).size).toBe(
+      TOTAL_QR_CODE_COMBINATIONS,
+    );
+  });
+
   test('matches reference matrices for explicit modes, ECC levels, versions, and masks', () => {
     for (const fixture of QR_CODE_TEST_FIXTURES) {
       const matrix = qrcode(fixture.data).config(fixture).matrix();
@@ -79,5 +98,12 @@ describe('qrcode().matrix()', () => {
         expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
       }
     }
+  });
+
+  test.each(ALL_QR_CODE_COMBINATIONS)('matches reference matrices for $name', (fixture) => {
+    const matrix = qrcode(fixture.data).config(fixture).matrix();
+
+    expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
+    expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
   });
 });
