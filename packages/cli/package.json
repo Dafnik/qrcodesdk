@@ -48,12 +48,7 @@
     "provenance": true
   },
   "bin": {
-    "qrc": "./dist/index.mjs"
-  },
-  "types": "./dist/index.d.mts",
-  "exports": {
-    ".": "./dist/index.mjs",
-    "./package.json": "./package.json"
+    "qrc": "./dist/bin.mjs"
   },
   "files": [
     "dist"
@@ -61,7 +56,7 @@
   "scripts": {
     "build": "tsdown",
     "watch": "tsdown --watch",
-    "cli": "pnpm run build && node dist/index.mjs",
+    "cli": "pnpm run build && node dist/bin.mjs",
     "test": "vitest --watch false",
     "check-types": "tsc --noEmit",
     "lint": "eslint src tests --max-warnings 0",

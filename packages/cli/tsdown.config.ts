@@ -6,12 +6,9 @@ export default defineConfig({
   define: {
     __QRCODESDK_CLI_VERSION__: JSON.stringify(packageJson.version),
   },
-  dts: {
-    tsgo: true,
+  dts: false,
+  entry: {
+    bin: './src/bin.ts',
   },
-  exports: {
-    bin: {
-      qrc: './src/index.ts',
-    },
-  },
+  exports: false,
 });

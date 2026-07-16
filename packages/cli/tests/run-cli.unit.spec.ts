@@ -2,8 +2,7 @@ import {Buffer} from 'node:buffer';
 import {beforeAll, describe, expect, test, vi} from 'vitest';
 
 import packageJson from '../package.json' with {type: 'json'};
-import {type CliRuntime, type WritableTarget} from '../src';
-import {runCli} from '../src/run-cli';
+import {type CliRuntime, type WritableTarget, runCli} from '../src/run-cli';
 
 type WriteRecord = {
   readonly path: string;
