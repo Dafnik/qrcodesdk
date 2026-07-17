@@ -3,16 +3,10 @@ import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 
-import {
-  QRCodeCanvas,
-  QRCodeImage,
-  type QRCodeImageHandle,
-  type QRCodeCanvasOptions,
-  type QRCodeImageOptions,
-  type QRCodeSVGOptions,
-  QRCodeSVG,
-  type QRCodeSVGHandle,
-} from '../src';
+import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeSVGOptions} from '@qrcodesdk/core';
+
+import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '../src';
 
 const svgOptions: QRCodeSVGOptions = {size: 2, margin: 1};
 const imageOptions: QRCodeImageOptions = {
@@ -43,6 +37,13 @@ describe('React QR code components', () => {
     expect(svg.getAttribute('height')).toBe('46');
   });
 
+  test('renders numeric input data', () => {
+    const {container} = render(<QRCodeSVG data={12_345} options={svgOptions} />);
+    const svg = renderedElement<SVGSVGElement>(container, 'svg');
+
+    expect(svg.querySelectorAll('path')).toHaveLength(2);
+  });
+
   test('renders image QR code output with PNG data and accessibility attributes', async () => {
     const {container} = render(<QRCodeImage data="HELLO" options={imageOptions} />);
 
@@ -59,7 +60,7 @@ describe('React QR code components', () => {
   });
 
   test('downloads image QR code output as PNG', () => {
-    const imageQRCode = createRef<QRCodeImageHandle>();
+    const imageQRCode = createRef<QRCodeDownloadHandle>();
     const downloads = captureDownloads(vi);
 
     render(<QRCodeImage data="HELLO" options={imageOptions} ref={imageQRCode} />);
@@ -74,7 +75,7 @@ describe('React QR code components', () => {
   });
 
   test('downloads SVG QR code output as SVG', () => {
-    const svgQRCode = createRef<QRCodeSVGHandle>();
+    const svgQRCode = createRef<QRCodeDownloadHandle>();
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});

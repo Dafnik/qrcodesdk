@@ -7,7 +7,7 @@ import {evaluateGroup} from '../../src/matrix/evaluate-group';
 import {evaluateMatrix} from '../../src/matrix/evaluate-matrix';
 import {fillDataInMatrix} from '../../src/matrix/fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from '../../src/matrix/fill-format-information-in-matrix';
-import type {QRCodeMatrix, QRCodeMutableMatrix} from '../../src/types';
+import type {QRCodeMatrix, QRCodeMutableMatrix, QRCodeReservedMatrix} from '../../src/types';
 import {formatBitsMatch} from './helpers';
 
 describe('matrix construction and mutation helpers', () => {
@@ -33,7 +33,9 @@ describe('matrix construction and mutation helpers', () => {
 
   test('fills data bits through non-reserved modules and pads with zeroes', () => {
     const matrix = Array.from({length: 9}, () => Array<number>(9)) as QRCodeMutableMatrix;
-    const reserved = Array.from({length: 9}, () => Array<number>(9).fill(0)) as QRCodeMutableMatrix;
+    const reserved = Array.from({length: 9}, () =>
+      Array<number>(9).fill(0),
+    ) as QRCodeReservedMatrix;
 
     fillDataInMatrix(matrix, reserved, [0b10101010]);
 
@@ -56,7 +58,7 @@ describe('matrix construction and mutation helpers', () => {
       [1, 0, 1],
       [0, 1, 0],
       [1, 0, 1],
-    ] satisfies QRCodeMatrix;
+    ] satisfies QRCodeReservedMatrix;
     const reserved = [
       [1, 0, 0],
       [0, 1, 0],

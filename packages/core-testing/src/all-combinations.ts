@@ -5,6 +5,8 @@ import type {
   QRCodeVersion,
 } from '@qrcodesdk/core';
 
+import type {QRCodeTestFixture} from './fixtures';
+
 const ERROR_CORRECTION_LEVELS = [
   'L',
   'M',
@@ -22,14 +24,7 @@ const DATA_BY_MODE = {
   octet: 'A',
 } as const satisfies Record<QRCodeMode, string>;
 
-export type QRCodeCombination = {
-  name: string;
-  data: string;
-  mode: QRCodeMode;
-  version: QRCodeVersion;
-  mask: QRCodeMask;
-  errorCorrectionLevel: QRCodeErrorCorrectionLevel;
-};
+export type QRCodeCombination = Required<QRCodeTestFixture>;
 
 export const TOTAL_QR_CODE_COMBINATIONS =
   40 * ERROR_CORRECTION_LEVELS.length * MASKS.length * MODES.length;

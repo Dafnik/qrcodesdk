@@ -2,11 +2,13 @@ import {parseQRCodeStylingOptions} from './styling';
 import type {
   QRCodeAccessibilityOptions,
   QRCodeMatrix,
+  QRCodeOptions,
   QRCodeRenderer,
   QRCodeStylingOptions,
 } from './types';
 
 export type QRCodeSVGRendererOptions = QRCodeStylingOptions & QRCodeAccessibilityOptions;
+export type QRCodeSVGOptions = QRCodeOptions<QRCodeSVGRendererOptions>;
 
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
   return (matrix: QRCodeMatrix) => {

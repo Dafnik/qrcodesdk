@@ -12,14 +12,12 @@ import {
 
 import {
   QRCodeDownloadImageRenderer,
+  type QRCodeImageOptions,
   QRCodeImageRenderer,
-  type QRCodeImageRendererOptions,
 } from '@qrcodesdk/browser';
-import {type QRCodeMatrixOptions, qrcode} from '@qrcodesdk/core';
+import {type QRCodeInputData, qrcode} from '@qrcodesdk/core';
 
 import {replaceElementChildren} from './render-element';
-
-export type QRCodeImageOptions = QRCodeMatrixOptions & QRCodeImageRendererOptions;
 
 @Component({
   selector: 'qrcode-image',
@@ -30,7 +28,7 @@ export class QRCodeImage {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);
 
-  data = input.required<string>();
+  data = input.required<QRCodeInputData>();
 
   options = input<QRCodeImageOptions>();
 

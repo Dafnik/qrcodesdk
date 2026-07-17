@@ -1,5 +1,6 @@
 import {qrcode} from '@qrcodesdk/core';
 import type {
+  QRCodeColorHex,
   QRCodeErrorCorrectionLevel,
   QRCodeMask,
   QRCodeMode,
@@ -7,7 +8,6 @@ import type {
 } from '@qrcodesdk/core';
 
 import type {
-  QRCodePlaygroundColorHex,
   QRCodePlaygroundConfig,
   QRCodePlaygroundDraft,
   QRCodePlaygroundOutput,
@@ -126,8 +126,8 @@ export function createPlaygroundConfig(draft: QRCodePlaygroundDraft): QRCodePlay
     size: draft.size,
     margin: draft.margin,
     colors: {
-      colorDark: draft.colorDark as QRCodePlaygroundColorHex,
-      colorLight: draft.colorLight as QRCodePlaygroundColorHex,
+      colorDark: draft.colorDark as QRCodeColorHex,
+      colorLight: draft.colorLight as QRCodeColorHex,
     },
   };
 

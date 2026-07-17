@@ -7,29 +7,30 @@ type CodePreview = {
 
 type ComponentMeta = {
   componentName: string;
+  optionsPackage: '@qrcodesdk/browser' | '@qrcodesdk/core';
   optionsType: string;
   selector: string;
   downloadLabel?: string;
-  handleType?: string;
 };
 
 const META_BY_OUTPUT: Record<QRCodePlaygroundOutput, ComponentMeta> = {
   svg: {
     componentName: 'QRCodeSVG',
+    optionsPackage: '@qrcodesdk/core',
     optionsType: 'QRCodeSVGOptions',
     selector: 'qrcode-svg',
     downloadLabel: 'Download SVG',
-    handleType: 'QRCodeSVGHandle',
   },
   image: {
     componentName: 'QRCodeImage',
+    optionsPackage: '@qrcodesdk/browser',
     optionsType: 'QRCodeImageOptions',
     selector: 'qrcode-image',
     downloadLabel: 'Download PNG',
-    handleType: 'QRCodeImageHandle',
   },
   canvas: {
     componentName: 'QRCodeCanvas',
+    optionsPackage: '@qrcodesdk/browser',
     optionsType: 'QRCodeCanvasOptions',
     selector: 'qrcode-canvas',
   },
@@ -41,11 +42,12 @@ export function generatePlaygroundCode(draft: QRCodePlaygroundDraft): CodePrevie
 
 function generateReactCode(draft: QRCodePlaygroundDraft): CodePreview {
   const meta = META_BY_OUTPUT[draft.output];
-  const hasDownload = meta.handleType !== undefined;
-  const imports = hasDownload
-    ? `import {useRef} from 'react';\n\nimport {${meta.componentName}, type ${meta.handleType}, type ${meta.optionsType}} from '@qrcodesdk/react';`
-    : `import {${meta.componentName}, type ${meta.optionsType}} from '@qrcodesdk/react';`;
-  const refLine = hasDownload ? `  const qrcode = useRef<${meta.handleType}>(null);\n\n` : '';
+  const hasDownload = meta.downloadLabel !== undefined;
+  const componentImport = hasDownload
+    ? `import {${meta.componentName}, type QRCodeDownloadHandle} from '@qrcodesdk/react';`
+    : `import {${meta.componentName}} from '@qrcodesdk/react';`;
+  const imports = `${hasDownload ? "import {useRef} from 'react';\n\n" : ''}import type {${meta.optionsType}} from '${meta.optionsPackage}';\n${componentImport}`;
+  const refLine = hasDownload ? '  const qrcode = useRef<QRCodeDownloadHandle>(null);\n\n' : '';
   const refProp = hasDownload ? ' ref={qrcode}' : '';
   const downloadButton = hasDownload
     ? `      <button type="button" onClick={() => qrcode.current?.download('qrcodesdk')}>\n        ${meta.downloadLabel}\n      </button>\n`
@@ -72,7 +74,7 @@ function generateAngularCode(draft: QRCodePlaygroundDraft): CodePreview {
 
   return {
     lang: 'angular-ts',
-    code: `import {Component} from '@angular/core';\n\nimport {${meta.componentName}, type ${meta.optionsType}} from '@qrcodesdk/angular';\n\n@Component({\n  selector: 'qrcode-app-example',\n  imports: [${meta.componentName}],\n  template: \`\n${template}\n  \`,\n})\nexport class QRCodeExample {\n  data = ${quote(draft.data)};\n\n  options: ${meta.optionsType} = ${formatOptions(draft, 2)};\n}\n`,
+    code: `import {Component} from '@angular/core';\n\nimport {${meta.componentName}} from '@qrcodesdk/angular';\nimport type {${meta.optionsType}} from '${meta.optionsPackage}';\n\n@Component({\n  selector: 'qrcode-app-example',\n  imports: [${meta.componentName}],\n  template: \`\n${template}\n  \`,\n})\nexport class QRCodeExample {\n  data = ${quote(draft.data)};\n\n  options: ${meta.optionsType} = ${formatOptions(draft, 2)};\n}\n`,
   };
 }
 

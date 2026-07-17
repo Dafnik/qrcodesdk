@@ -43,15 +43,20 @@ The core package exports these public types:
 
 ```ts
 type QRCodeParsedStylingOptions;
+type QRCodeAccessibilityOptions;
+type QRCodeColorHex;
 type QRCodeErrorCorrectionLevel;
 type QRCodeInputData;
 type QRCodeMask;
 type QRCodeMatrix;
 type QRCodeMatrixOptions;
 type QRCodeMode;
+type QRCodeOptions<TRendererOptions>;
 type QRCodeRenderer;
+type QRCodeStylingColors;
 type QRCodeStylingOptions;
 type QRCodeTextRendererOptions;
+type QRCodeSVGOptions;
 type QRCodeSVGRendererOptions;
 type QRCodeVersion;
 ```
@@ -104,8 +109,10 @@ The browser package exports:
 
 ```ts
 type QRCodeCanvasRendererOptions;
+type QRCodeCanvasOptions;
 type QRCodeDownloadImageRendererOptions;
 type QRCodeDownloadSVGRendererOptions;
+type QRCodeImageOptions;
 type QRCodeImageRendererOptions;
 ```
 

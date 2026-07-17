@@ -53,7 +53,7 @@ All components accept:
 
 | Input     | Type                       | Description                                 |
 | --------- | -------------------------- | ------------------------------------------- |
-| `data`    | `string`                   | Required QR code payload.                   |
+| `data`    | `string \| number`         | Required QR code payload.                   |
 | `options` | Component-specific options | Optional matrix and renderer configuration. |
 
 `options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, and `mask`. Renderer options match the corresponding QRCodeSDK renderer:
@@ -61,6 +61,8 @@ All components accept:
 - `QRCodeSVG` uses `QRCodeSVGOptions`.
 - `QRCodeImage` uses `QRCodeImageOptions`.
 - `QRCodeCanvas` uses `QRCodeCanvasOptions`.
+
+Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` and `QRCodeCanvasOptions` from `@qrcodesdk/browser`.
 
 ## Matrix options
 
@@ -82,7 +84,8 @@ Use `QRCodeSVG` for crisp, scalable output and server-side rendering.
 ```ts
 import {Component} from '@angular/core';
 
-import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/angular';
+import {QRCodeSVG} from '@qrcodesdk/angular';
+import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 @Component({
   selector: 'app-qrcode',
@@ -112,7 +115,8 @@ export class QRCodeExample {
 ```ts
 import {Component} from '@angular/core';
 
-import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/angular';
+import {QRCodeImage} from '@qrcodesdk/angular';
+import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 
 @Component({
   selector: 'app-qrcode',
@@ -136,7 +140,8 @@ export class QRCodeExample {
 ```ts
 import {Component} from '@angular/core';
 
-import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/angular';
+import {QRCodeCanvas} from '@qrcodesdk/angular';
+import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
 
 @Component({
   selector: 'app-qrcode',
@@ -208,14 +213,9 @@ The appropriate `.svg` or `.png` extension is appended when necessary. `QRCodeCa
 ## Public API
 
 ```ts
-import {
-  QRCodeCanvas,
-  type QRCodeCanvasOptions,
-  QRCodeImage,
-  type QRCodeImageOptions,
-  QRCodeSVG,
-  type QRCodeSVGOptions,
-} from '@qrcodesdk/angular';
+import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
+import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 ```
 
 ## Documentation

@@ -1,6 +1,18 @@
 import {describe, expectTypeOf, test} from 'vitest';
 
-import type {QRCodeErrorCorrectionLevel, QRCodeInputData, QRCodeMatrixOptions} from '../src';
+import type {
+  QRCodeAccessibilityOptions,
+  QRCodeColorHex,
+  QRCodeErrorCorrectionLevel,
+  QRCodeInputData,
+  QRCodeMatrixOptions,
+  QRCodeOptions,
+  QRCodeParsedStylingOptions,
+  QRCodeSVGOptions,
+  QRCodeSVGRendererOptions,
+  QRCodeStylingColors,
+  QRCodeStylingOptions,
+} from '../src';
 
 describe('public API types', () => {
   test('exports user-facing matrix input types', () => {
@@ -12,5 +24,27 @@ describe('public API types', () => {
       errorCorrectionLevel?: string;
       mask?: number;
     }>();
+  });
+
+  test('exports canonical renderer and styling composition types', () => {
+    expectTypeOf<QRCodeColorHex>().toEqualTypeOf<`#${string}`>();
+    expectTypeOf<QRCodeStylingColors>().toEqualTypeOf<{
+      colorLight: QRCodeColorHex;
+      colorDark: QRCodeColorHex;
+    }>();
+    expectTypeOf<QRCodeStylingOptions['colors']>().toEqualTypeOf<
+      Partial<QRCodeStylingColors> | undefined
+    >();
+    type ExpectedParsedStylingOptions = {
+      size: number;
+      margin: number;
+      colors: QRCodeStylingColors;
+    };
+    expectTypeOf<QRCodeParsedStylingOptions>().toMatchTypeOf<ExpectedParsedStylingOptions>();
+    expectTypeOf<ExpectedParsedStylingOptions>().toMatchTypeOf<QRCodeParsedStylingOptions>();
+    expectTypeOf<QRCodeSVGOptions>().toEqualTypeOf<QRCodeOptions<QRCodeSVGRendererOptions>>();
+    expectTypeOf<QRCodeSVGOptions>().toEqualTypeOf<
+      QRCodeMatrixOptions & QRCodeStylingOptions & QRCodeAccessibilityOptions
+    >();
   });
 });

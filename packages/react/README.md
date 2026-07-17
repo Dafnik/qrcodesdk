@@ -50,7 +50,7 @@ All components accept:
 
 | Prop        | Type                       | Description                                     |
 | ----------- | -------------------------- | ----------------------------------------------- |
-| `data`      | `string`                   | Required QR code payload.                       |
+| `data`      | `string \| number`         | Required QR code payload.                       |
 | `options`   | Component-specific options | Optional matrix and renderer configuration.     |
 | `className` | `string`                   | CSS class applied to the component wrapper div. |
 
@@ -59,6 +59,8 @@ All components accept:
 - `QRCodeSVG` uses `QRCodeSVGOptions`.
 - `QRCodeImage` uses `QRCodeImageOptions`.
 - `QRCodeCanvas` uses `QRCodeCanvasOptions`.
+
+Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` and `QRCodeCanvasOptions` from `@qrcodesdk/browser`.
 
 ## Matrix options
 
@@ -78,7 +80,8 @@ Most applications should let the builder select the mode, version, and mask auto
 Use `QRCodeSVG` for crisp, scalable output and server-side rendering:
 
 ```tsx
-import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/react';
+import type {QRCodeSVGOptions} from '@qrcodesdk/core';
+import {QRCodeSVG} from '@qrcodesdk/react';
 
 const options: QRCodeSVGOptions = {
   size: 8,
@@ -101,7 +104,8 @@ export function QRCodeExample() {
 `QRCodeImage` creates a PNG-backed `<img>` in the browser. Add meaningful accessibility text for user-facing QR codes.
 
 ```tsx
-import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/react';
+import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+import {QRCodeImage} from '@qrcodesdk/react';
 
 const options: QRCodeImageOptions = {
   size: 8,
@@ -118,7 +122,8 @@ export function QRCodeExample() {
 ## Canvas component
 
 ```tsx
-import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/react';
+import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
+import {QRCodeCanvas} from '@qrcodesdk/react';
 
 const options: QRCodeCanvasOptions = {
   size: 8,
@@ -157,14 +162,13 @@ import {useRef} from 'react';
 
 import {
   QRCodeImage,
-  type QRCodeImageHandle,
   QRCodeSVG,
-  type QRCodeSVGHandle,
+  type QRCodeDownloadHandle,
 } from '@qrcodesdk/react';
 
 export function DownloadQRCodes() {
-  const svg = useRef<QRCodeSVGHandle>(null);
-  const image = useRef<QRCodeImageHandle>(null);
+  const svg = useRef<QRCodeDownloadHandle>(null);
+  const image = useRef<QRCodeDownloadHandle>(null);
 
   return (
     <>
@@ -197,19 +201,17 @@ The appropriate `.svg` or `.png` extension is appended when necessary. `QRCodeCa
 ## Public API
 
 ```ts
+import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {
   type QRCodeBaseProps,
   QRCodeCanvas,
-  type QRCodeCanvasOptions,
   type QRCodeCanvasProps,
+  type QRCodeDownloadHandle,
   QRCodeImage,
-  type QRCodeImageHandle,
-  type QRCodeImageOptions,
   type QRCodeImageProps,
   QRCodeSVG,
   QRCodeSVGContainer,
-  type QRCodeSVGHandle,
-  type QRCodeSVGOptions,
   type QRCodeSVGProps,
 } from '@qrcodesdk/react';
 ```

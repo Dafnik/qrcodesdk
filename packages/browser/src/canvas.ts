@@ -1,5 +1,6 @@
 import {
   type QRCodeMatrix,
+  type QRCodeOptions,
   type QRCodeRenderer,
   type QRCodeStylingOptions,
   parseQRCodeStylingOptions,
@@ -8,6 +9,7 @@ import {
 import {getRenderedSize, validatePixelGeometry} from './geometry';
 
 export type QRCodeCanvasRendererOptions = QRCodeStylingOptions;
+export type QRCodeCanvasOptions = QRCodeOptions<QRCodeCanvasRendererOptions>;
 
 export function QRCodeCanvasRenderer(
   options?: QRCodeCanvasRendererOptions,

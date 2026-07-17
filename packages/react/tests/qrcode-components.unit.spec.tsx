@@ -3,7 +3,7 @@ import {mockCanvasRendering} from '@repo/core-testing';
 import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 
-import {QRCodeImage, type QRCodeImageHandle, QRCodeSVG, type QRCodeSVGHandle} from '../src';
+import {QRCodeImage, QRCodeSVG, type QRCodeDownloadHandle} from '../src';
 
 describe('React QR code component handles', () => {
   beforeEach(() => {
@@ -16,8 +16,8 @@ describe('React QR code component handles', () => {
   });
 
   test('exposes download handles only for SVG and image components', () => {
-    const svgQRCode = createRef<QRCodeSVGHandle>();
-    const imageQRCode = createRef<QRCodeImageHandle>();
+    const svgQRCode = createRef<QRCodeDownloadHandle>();
+    const imageQRCode = createRef<QRCodeDownloadHandle>();
 
     render(
       <>

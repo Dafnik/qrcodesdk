@@ -10,12 +10,10 @@ import {
   input,
 } from '@angular/core';
 
-import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from '@qrcodesdk/browser';
-import {type QRCodeMatrixOptions, qrcode} from '@qrcodesdk/core';
+import {type QRCodeCanvasOptions, QRCodeCanvasRenderer} from '@qrcodesdk/browser';
+import {type QRCodeInputData, qrcode} from '@qrcodesdk/core';
 
 import {replaceElementChildren} from './render-element';
-
-export type QRCodeCanvasOptions = QRCodeMatrixOptions & QRCodeCanvasRendererOptions;
 
 @Component({
   selector: 'qrcode-canvas',
@@ -26,7 +24,7 @@ export class QRCodeCanvas {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);
 
-  data = input.required<string>();
+  data = input.required<QRCodeInputData>();
 
   options = input<QRCodeCanvasOptions>();
 

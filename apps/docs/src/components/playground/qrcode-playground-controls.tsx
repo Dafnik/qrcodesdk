@@ -18,6 +18,17 @@ import {
 const VERSION_OPTIONS = Array.from({length: 40}, (_, index) => index + 1);
 const MASK_OPTIONS = Array.from({length: 8}, (_, index) => index);
 
+type ValueFieldProps<TValue> = {
+  error?: string;
+  label: string;
+  onChange(value: TValue): void;
+  value: TValue;
+};
+
+type NumberFieldProps = ValueFieldProps<number> & {
+  min: number;
+};
+
 export default function QRCodePlaygroundControls() {
   const [draft, setDraft] = useState(readPlaygroundDraftFromUrl);
   const [copied, setCopied] = useState(false);
@@ -297,19 +308,7 @@ function SegmentedControl({
   );
 }
 
-function NumberField({
-  error,
-  label,
-  min,
-  onChange,
-  value,
-}: {
-  error?: string;
-  label: string;
-  min: number;
-  onChange(value: number): void;
-  value: number;
-}) {
+function NumberField({error, label, min, onChange, value}: NumberFieldProps) {
   return (
     <label className="qrcode-playground__field">
       <span>{label}</span>
@@ -325,17 +324,7 @@ function NumberField({
   );
 }
 
-function ColorField({
-  error,
-  label,
-  onChange,
-  value,
-}: {
-  error?: string;
-  label: string;
-  onChange(value: string): void;
-  value: string;
-}) {
+function ColorField({error, label, onChange, value}: ValueFieldProps<string>) {
   const isValidColor = /^#[0-9a-fA-F]{6}$/.test(value);
 
   return (

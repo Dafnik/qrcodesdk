@@ -1,24 +1,17 @@
 import {
   QRCodeDownloadImageRenderer,
+  type QRCodeImageOptions,
   QRCodeImageRenderer,
-  type QRCodeImageRendererOptions,
 } from '@qrcodesdk/browser';
-import {type QRCodeMatrixOptions} from '@qrcodesdk/core';
 import {forwardRef, useEffect, useImperativeHandle, useMemo, useRef} from 'react';
 
 import {replaceElementChildren} from './replace-children';
-import type {QRCodeBaseProps} from './types';
+import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
 import {qrcode} from '@qrcodesdk/core';
-
-export type QRCodeImageOptions = QRCodeMatrixOptions & QRCodeImageRendererOptions;
-
-export type QRCodeImageHandle = {
-  download(filename?: string): void;
-};
 
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
 
-export const QRCodeImage = forwardRef<QRCodeImageHandle, QRCodeImageProps>(function QRCodeImage(
+export const QRCodeImage = forwardRef<QRCodeDownloadHandle, QRCodeImageProps>(function QRCodeImage(
   {data, options, className},
   ref,
 ) {

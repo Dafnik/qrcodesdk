@@ -1,12 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 
-import {
-  QRCodeCanvas,
-  QRCodeImage,
-  type QRCodeImageHandle,
-  QRCodeSVG,
-  type QRCodeSVGHandle,
-} from '@qrcodesdk/react';
+import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '@qrcodesdk/react';
 
 import {createPlaygroundSnapshot, readPlaygroundDraftFromUrl} from './qrcode-playground-state';
 import {QR_CODE_PLAYGROUND_UPDATE_EVENT} from './qrcode-playground-types';
@@ -15,8 +9,8 @@ export default function QRCodeReactPlaygroundPreview() {
   const [snapshot, setSnapshot] = useState(() =>
     createPlaygroundSnapshot(readPlaygroundDraftFromUrl()),
   );
-  const svgRef = useRef<QRCodeSVGHandle>(null);
-  const imageRef = useRef<QRCodeImageHandle>(null);
+  const svgRef = useRef<QRCodeDownloadHandle>(null);
+  const imageRef = useRef<QRCodeDownloadHandle>(null);
 
   useEffect(() => {
     const handleUpdate = (event: WindowEventMap[typeof QR_CODE_PLAYGROUND_UPDATE_EVENT]) => {

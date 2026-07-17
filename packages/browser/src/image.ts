@@ -1,6 +1,7 @@
 import type {
   QRCodeAccessibilityOptions,
   QRCodeMatrix,
+  QRCodeOptions,
   QRCodeRenderer,
   QRCodeStylingOptions,
 } from '@qrcodesdk/core';
@@ -10,6 +11,7 @@ import {downloadQRCode, ensureExtension} from './download-helper';
 import type {QRCodeDownloadRendererOptions} from './types';
 
 export type QRCodeImageRendererOptions = QRCodeStylingOptions & QRCodeAccessibilityOptions;
+export type QRCodeImageOptions = QRCodeOptions<QRCodeImageRendererOptions>;
 
 export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<HTMLImageElement>;
 

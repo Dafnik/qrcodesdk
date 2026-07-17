@@ -2,13 +2,11 @@ import {Component, ElementRef, Renderer2, computed, effect, inject, input} from 
 
 import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
 import {
-  type QRCodeMatrixOptions,
+  type QRCodeInputData,
+  type QRCodeSVGOptions,
   QRCodeSVGRenderer,
-  type QRCodeSVGRendererOptions,
   qrcode,
 } from '@qrcodesdk/core';
-
-export type QRCodeSVGOptions = QRCodeMatrixOptions & QRCodeSVGRendererOptions;
 
 @Component({
   selector: 'qrcode-svg',
@@ -18,7 +16,7 @@ export class QRCodeSVG {
   private readonly renderer = inject(Renderer2);
   private readonly qrcode = inject(ElementRef);
 
-  data = input.required<string>();
+  data = input.required<QRCodeInputData>();
 
   options = input<QRCodeSVGOptions>();
 

@@ -1,4 +1,5 @@
-import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/react';
+import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+import {QRCodeImage} from '@qrcodesdk/react';
 
 export default function QRCodeImageExample() {
   const options: QRCodeImageOptions = {

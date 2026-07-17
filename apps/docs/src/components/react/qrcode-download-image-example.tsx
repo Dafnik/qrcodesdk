@@ -1,9 +1,9 @@
 import {useRef} from 'react';
 
-import {QRCodeImage, type QRCodeImageHandle} from '@qrcodesdk/react';
+import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/react';
 
 export default function QRCodeDownloadImageExample() {
-  const qrcode = useRef<QRCodeImageHandle>(null);
+  const qrcode = useRef<QRCodeDownloadHandle>(null);
 
   return (
     <div className="flex flex-col items-center">

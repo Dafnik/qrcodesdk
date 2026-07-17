@@ -1,4 +1,5 @@
-import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/react';
+import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
+import {QRCodeCanvas} from '@qrcodesdk/react';
 
 export default function QRCodeCanvasExample() {
   const options: QRCodeCanvasOptions = {

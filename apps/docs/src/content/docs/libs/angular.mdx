@@ -62,7 +62,7 @@ All components accept:
 
 | Input     | Type                       | Description                                 |
 | --------- | -------------------------- | ------------------------------------------- |
-| `data`    | `string`                   | Required QR code payload.                   |
+| `data`    | `string \| number`         | Required QR code payload.                   |
 | `options` | Component-specific options | Optional matrix and renderer configuration. |
 
 `options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, and `mask`. Renderer options match the corresponding QRCodeSDK renderer:
@@ -70,6 +70,8 @@ All components accept:
 - `QRCodeSVG` uses `QRCodeSVGOptions`.
 - `QRCodeImage` uses `QRCodeImageOptions`.
 - `QRCodeCanvas` uses `QRCodeCanvasOptions`.
+
+Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` and `QRCodeCanvasOptions` from `@qrcodesdk/browser`.
 
 ## Matrix options
 

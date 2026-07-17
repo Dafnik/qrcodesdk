@@ -1,15 +1,9 @@
+import type {RGBAPixel} from '@repo/core-testing';
 import jsQR from 'jsqr';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname} from 'node:path';
 import {PNG} from 'pngjs';
 import {expect} from 'vitest';
-
-export type RGBAPixel = {
-  red: number;
-  green: number;
-  blue: number;
-  alpha: number;
-};
 
 export function decodePngQRCode(input: Buffer | PNG): string {
   const png = Buffer.isBuffer(input) ? PNG.sync.read(input) : input;

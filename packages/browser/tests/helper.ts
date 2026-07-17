@@ -1,12 +1,6 @@
+import type {RGBAPixel} from '@repo/core-testing';
 import jsQR from 'jsqr';
 import {expect} from 'vitest';
-
-type RGBAPixel = {
-  red: number;
-  green: number;
-  blue: number;
-  alpha: number;
-};
 
 export const BLACK = {red: 0, green: 0, blue: 0, alpha: 255};
 export const WHITE = {red: 255, green: 255, blue: 255, alpha: 255};

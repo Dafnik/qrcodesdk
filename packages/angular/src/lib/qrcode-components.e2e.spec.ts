@@ -4,9 +4,12 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 
-import {QRCodeCanvas, type QRCodeCanvasOptions} from './QRCodeCanvas';
-import {QRCodeImage, type QRCodeImageOptions} from './QRCodeImage';
-import {QRCodeSVG, type QRCodeSVGOptions} from './QRCodeSVG';
+import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeInputData, QRCodeSVGOptions} from '@qrcodesdk/core';
+
+import {QRCodeCanvas} from './QRCodeCanvas';
+import {QRCodeImage} from './QRCodeImage';
+import {QRCodeSVG} from './QRCodeSVG';
 
 @Component({
   selector: 'qrcode-svg-host',
@@ -14,7 +17,7 @@ import {QRCodeSVG, type QRCodeSVGOptions} from './QRCodeSVG';
   template: '<qrcode-svg [data]="data()" [options]="options()" />',
 })
 class QRCodeSVGHost {
-  data = signal('HELLO');
+  data = signal<QRCodeInputData>('HELLO');
   options = signal<QRCodeSVGOptions>({size: 2, margin: 1});
 
   @ViewChild(QRCodeSVG) svgQRCode!: QRCodeSVG;
@@ -78,6 +81,17 @@ describe('Angular QR code components', () => {
     expect(svg.tagName.toLowerCase()).toBe('svg');
     expect(svg.getAttribute('width')).toBe('46');
     expect(svg.getAttribute('height')).toBe('46');
+  });
+
+  test('renders numeric input data', async () => {
+    const fixture = TestBed.createComponent(QRCodeSVGHost);
+
+    fixture.componentInstance.data.set(12_345);
+    await fixture.whenStable();
+
+    const svg = renderedElement<SVGSVGElement>(fixture, 'svg');
+
+    expect(svg.querySelectorAll('path')).toHaveLength(2);
   });
 
   test('renders image QR code output with PNG data and accessibility attributes', () => {

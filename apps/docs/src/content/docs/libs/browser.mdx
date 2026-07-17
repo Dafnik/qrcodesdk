@@ -71,3 +71,7 @@ qrcode('https://qrcodesdk.dev').render(
 ## Package boundary
 
 `@qrcodesdk/browser` does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation, builder options, and shared styling normalization.
+
+## Public types
+
+`QRCodeCanvasOptions` and `QRCodeImageOptions` combine their corresponding renderer options with the shared core matrix options. Framework components consume these canonical option types directly.

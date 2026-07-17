@@ -60,7 +60,12 @@ export type QRCodeErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 export type QRCodeMode = 'numeric' | 'alphanumeric' | 'octet';
 export type QRCodeMask = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-export type ColorValueHex = `#${string}`;
+export type QRCodeColorHex = `#${string}`;
+
+export type QRCodeStylingColors = {
+  colorLight: QRCodeColorHex;
+  colorDark: QRCodeColorHex;
+};
 
 export type QRCodeRenderer<TOutput> = (matrix: QRCodeMatrix) => TOutput;
 
@@ -71,22 +76,16 @@ export type QRCodeMatrixOptions = {
   mask?: QRCodeMask;
 };
 
+export type QRCodeOptions<TRendererOptions> = QRCodeMatrixOptions & TRendererOptions;
+
 export type QRCodeStylingOptions = {
   size?: number;
   margin?: number;
-  colors?: {
-    colorLight?: ColorValueHex;
-    colorDark?: ColorValueHex;
-  };
+  colors?: Partial<QRCodeStylingColors>;
 };
 
-export type QRCodeParsedStylingOptions = {
-  size: number;
-  margin: number;
-  colors: {
-    colorLight: ColorValueHex;
-    colorDark: ColorValueHex;
-  };
+export type QRCodeParsedStylingOptions = Required<Omit<QRCodeStylingOptions, 'colors'>> & {
+  colors: QRCodeStylingColors;
 };
 
 export type QRCodeResolvedMatrixOptions = {

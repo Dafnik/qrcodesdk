@@ -1,23 +1,13 @@
 import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
-import {
-  type QRCodeMatrixOptions,
-  type QRCodeSVGRendererOptions,
-  QRCodeSVGRenderer,
-} from '@qrcodesdk/core';
+import {type QRCodeSVGOptions, QRCodeSVGRenderer} from '@qrcodesdk/core';
 import {forwardRef, useImperativeHandle, useMemo} from 'react';
 
-import type {QRCodeBaseProps} from './types';
+import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
 import {qrcode} from '@qrcodesdk/core';
-
-export type QRCodeSVGOptions = QRCodeMatrixOptions & QRCodeSVGRendererOptions;
-
-export type QRCodeSVGHandle = {
-  download(filename?: string): void;
-};
 
 export type QRCodeSVGProps = QRCodeBaseProps<QRCodeSVGOptions>;
 
-export const QRCodeSVG = forwardRef<QRCodeSVGHandle, QRCodeSVGProps>(function QRCodeSVG(
+export const QRCodeSVG = forwardRef<QRCodeDownloadHandle, QRCodeSVGProps>(function QRCodeSVG(
   {data, options, className},
   ref,
 ) {

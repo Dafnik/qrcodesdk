@@ -1,13 +1,8 @@
 import {Component, DestroyRef, computed, inject, signal} from '@angular/core';
 
-import {
-  QRCodeCanvas,
-  type QRCodeCanvasOptions,
-  QRCodeImage,
-  type QRCodeImageOptions,
-  QRCodeSVG,
-  type QRCodeSVGOptions,
-} from '@qrcodesdk/angular';
+import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
+import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 import {createPlaygroundSnapshot, readPlaygroundDraftFromUrl} from './qrcode-playground-state';
 import {

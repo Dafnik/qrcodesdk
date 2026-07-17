@@ -5,9 +5,10 @@ import {writeFile as writeFileDefault} from 'node:fs/promises';
 import process from 'node:process';
 
 import {
+  type QRCodeAccessibilityOptions,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
-  type QRCodeMode,
+  type QRCodeMatrixOptions,
   QRCodeSVGRenderer,
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
@@ -37,19 +38,15 @@ type RawCliOptions = {
   readonly title?: string;
 };
 
-type ResolvedCliOptions = {
-  readonly input: string;
-  readonly format: OutputFormat;
-  readonly output?: string;
-  readonly mode?: QRCodeMode;
-  readonly errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
-  readonly version?: QRCodeVersion;
-  readonly mask?: QRCodeMask;
-  readonly styling: QRCodeStylingOptions;
-  readonly alt?: string;
-  readonly ariaLabel?: string;
-  readonly title?: string;
-};
+type ResolvedCliOptions = Readonly<
+  QRCodeMatrixOptions &
+    QRCodeAccessibilityOptions & {
+      readonly input: string;
+      readonly format: OutputFormat;
+      readonly output?: string;
+      readonly styling: QRCodeStylingOptions;
+    }
+>;
 
 export type WritableTarget = {
   write(chunk: string | Uint8Array): unknown;

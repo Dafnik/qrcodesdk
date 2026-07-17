@@ -59,7 +59,7 @@ All components accept:
 
 | Prop        | Type                       | Description                                     |
 | ----------- | -------------------------- | ----------------------------------------------- |
-| `data`      | `string`                   | Required QR code payload.                       |
+| `data`      | `string \| number`         | Required QR code payload.                       |
 | `options`   | Component-specific options | Optional matrix and renderer configuration.     |
 | `className` | `string`                   | CSS class applied to the component wrapper div. |
 
@@ -68,6 +68,8 @@ All components accept:
 - `QRCodeSVG` uses `QRCodeSVGOptions`.
 - `QRCodeImage` uses `QRCodeImageOptions`.
 - `QRCodeCanvas` uses `QRCodeCanvasOptions`.
+
+Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` and `QRCodeCanvasOptions` from `@qrcodesdk/browser`.
 
 ## Matrix options
 
@@ -121,10 +123,10 @@ Color options use hash-prefixed values such as `#111827`. Image and Canvas outpu
 ```tsx
 import {useRef} from 'react';
 
-import {QRCodeImage, type QRCodeImageHandle} from '@qrcodesdk/react';
+import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/react';
 
 export function QRCodeDownload() {
-  const qrcode = useRef<QRCodeImageHandle>(null);
+  const qrcode = useRef<QRCodeDownloadHandle>(null);
 
   return (
     <>
