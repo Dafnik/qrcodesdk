@@ -1,5 +1,7 @@
 import {readFileSync} from 'fs';
 
+import {createExampleContent} from './example-content.mjs';
+
 /**
  * @typedef {{ name: string, enforce: 'pre' | 'post', transform(code: string, id: string): void | { code: string } }} IncludeContentPlugin
  * @returns {IncludeContentPlugin[]}
@@ -23,7 +25,7 @@ export function includeContentPlugin() {
         const fileContent = readFileSync(filePath, 'utf-8');
 
         if (map.has(filePath)) return;
-        map.set(filePath, fileContent.replace(/\t/g, '  '));
+        map.set(filePath, createExampleContent(filePath, fileContent));
       },
     },
     {
@@ -40,33 +42,12 @@ export function includeContentPlugin() {
         const fileContent = map.get(filePath);
         if (!fileContent) return;
 
-        if (filePath.includes('/src/components/react/')) {
-          return {
-            code: `
-              ${code}
-              export const content = ${JSON.stringify(fileContent)};
-            `,
-          };
-        }
-
-        const filteredFileContent = fileContent
-          .replace(/static clientProviders\s*=\s*\[.*?\];\n?/s, '')
-          .replace(/static renderProviders\s*=\s*\[.*?\];\n?/s, '')
-          .replace(/(?<=class\s+\w+\s+{\s*)\s*(?=\s*})/g, '');
-
-        const neededProviders = fileContent
-          .match(/static clientProviders\s*=\s*\[(.*?)\];/s)
-          ?.at(1);
         const className = fileContent.match(/export class\s+(\w+)/)?.at(1);
-
-        const bootstrapApplication = `bootstrapApplication(${className}, {
-  providers: [${neededProviders}],
-}).catch((err) => console.error(err));`;
 
         return {
           code: `
             ${code}
-            export const content = ${JSON.stringify(`${filteredFileContent}${neededProviders ? `\n${bootstrapApplication}` : ''}`)};
+            export const content = ${JSON.stringify(fileContent)};
             ${className ? `export default ${className};` : ''}
           `,
         };

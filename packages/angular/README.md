@@ -1,16 +1,14 @@
+<!-- Generated from apps/docs/src/content/docs/libs/angular.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+
 # @qrcodesdk/angular
 
-[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular)
-[![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular)
-[![npm download per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular)
+[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular)
 
 **[Live Demo](https://qrcodesdk.dev/playground/?pkg=angular)**
 
 `@qrcodesdk/angular` provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
 ## Install
-
-Install the Angular package with its Core and Browser peer dependencies:
 
 ```sh
 npm install @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
@@ -19,6 +17,35 @@ npm install @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
 ```sh
 pnpm add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
 ```
+
+<details>
+<summary>Other package managers</summary>
+
+**vp**
+
+```sh
+vp add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+```
+
+**deno**
+
+```sh
+deno add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+```
+
+**bun**
+
+```sh
+bun add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+```
+
+**yarn**
+
+```sh
+yarn add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+```
+
+</details>
 
 ## Quick start
 
@@ -45,9 +72,9 @@ export class App {}
 
 | Component      | Selector        | Output             | Download support |
 | -------------- | --------------- | ------------------ | ---------------- |
-| `QRCodeSVG`    | `qrcode-svg`    | Inline SVG         | SVG              |
+| `QRCodeSVG`    | `qrcode-svg`    | Inline SVG element | SVG              |
 | `QRCodeImage`  | `qrcode-image`  | PNG-backed `<img>` | PNG              |
-| `QRCodeCanvas` | `qrcode-canvas` | `<canvas>`         | None             |
+| `QRCodeCanvas` | `qrcode-canvas` | `<canvas>` element | None             |
 
 All components accept:
 
@@ -77,40 +104,31 @@ The `options` input combines the component's renderer options with the shared QR
 
 Most applications should let the builder select the mode, version, and mask automatically.
 
-## SVG component
+## Live examples
 
-Use `QRCodeSVG` for crisp, scalable output and server-side rendering.
+### SVG component
 
 ```ts
 import {Component} from '@angular/core';
 
 import {QRCodeSVG} from '@qrcodesdk/angular';
-import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 @Component({
-  selector: 'app-qrcode',
+  selector: 'qrcode-angular-svg-example',
   imports: [QRCodeSVG],
   template: `
-    <qrcode-svg [options]="options" data="https://qrcodesdk.dev" />
+    <qrcode-svg
+      [options]="{
+        title: 'QR code for qrcodesdk.dev',
+        ariaLabel: 'Scan to open qrcodesdk.dev',
+      }"
+      data="https://qrcodesdk.dev" />
   `,
 })
-export class QRCodeExample {
-  protected readonly options: QRCodeSVGOptions = {
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
-    },
-    title: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
-  };
-}
+export class QRCodeSVGExample {}
 ```
 
-## Image component
-
-`QRCodeImage` creates a PNG-backed `<img>` in the browser. Add meaningful accessibility text for user-facing QR codes.
+### Image component
 
 ```ts
 import {Component} from '@angular/core';
@@ -119,13 +137,13 @@ import {QRCodeImage} from '@qrcodesdk/angular';
 import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 
 @Component({
-  selector: 'app-qrcode',
+  selector: 'qrcode-angular-image-example',
   imports: [QRCodeImage],
   template: `
     <qrcode-image [options]="options" data="https://qrcodesdk.dev" />
   `,
 })
-export class QRCodeExample {
+export class QRCodeImageExample {
   protected readonly options: QRCodeImageOptions = {
     size: 8,
     margin: 4,
@@ -135,7 +153,7 @@ export class QRCodeExample {
 }
 ```
 
-## Canvas component
+### Canvas component
 
 ```ts
 import {Component} from '@angular/core';
@@ -144,13 +162,13 @@ import {QRCodeCanvas} from '@qrcodesdk/angular';
 import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
 
 @Component({
-  selector: 'app-qrcode',
+  selector: 'qrcode-angular-canvas-example',
   imports: [QRCodeCanvas],
   template: `
     <qrcode-canvas [options]="options" data="https://qrcodesdk.dev" />
   `,
 })
-export class QRCodeExample {
+export class QRCodeCanvasExample {
   protected readonly options: QRCodeCanvasOptions = {
     size: 8,
     margin: 4,
@@ -159,6 +177,39 @@ export class QRCodeExample {
       colorLight: '#ffffff',
     },
   };
+}
+```
+
+### PNG download
+
+```ts
+import {Component, viewChild} from '@angular/core';
+
+import {QRCodeImage} from '@qrcodesdk/angular';
+
+@Component({
+  selector: 'qrcode-angular-download-image-example',
+  imports: [QRCodeImage],
+  template: `
+    <div class="flex flex-col items-center">
+      <qrcode-image
+        #qrcode
+        [options]="{
+          alt: 'QR code for qrcodesdk.dev',
+        }"
+        data="https://qrcodesdk.dev" />
+      <button class="btn-primary" (click)="qrcode.download('qrcodesdk')" type="button">
+        Download PNG
+      </button>
+    </div>
+  `,
+})
+export class QRCodeDownloadImageExample {
+  private readonly qrCode = viewChild.required(QRCodeImage);
+
+  protected download() {
+    this.qrCode().download('qrcode.png');
+  }
 }
 ```
 
@@ -176,33 +227,22 @@ export class QRCodeExample {
 
 Color options use hash-prefixed values such as `#111827`. Image and Canvas output require a positive integer `size` and a non-negative integer `margin`.
 
-## Download SVG and PNG files
+## Download files
 
-`QRCodeSVG` and `QRCodeImage` expose `download(filename?)`. Call the component through an Angular template reference:
+- `QRCodeSVG` exposes `download(filename?)` and writes an SVG file.
+- `QRCodeImage` exposes `download(filename?)` and writes a PNG file.
 
-```ts
-import {Component} from '@angular/core';
+```angular2html
+<qrcode-svg #qrcodeSvg data="https://qrcodesdk.dev" />
+<button type="button" (click)="qrcodeSvg.download('qrcodesdk')">Download SVG</button>
 
-import {QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
-
-@Component({
-  selector: 'app-download-qr-codes',
-  imports: [QRCodeSVG, QRCodeImage],
-  template: `
-    <qrcode-svg #svg data="https://qrcodesdk.dev" />
-    <button (click)="svg.download('qrcodesdk')" type="button">Download SVG</button>
-
-    <qrcode-image
-      #image
-      [options]="{alt: 'QR code for qrcodesdk.dev'}"
-      data="https://qrcodesdk.dev" />
-    <button (click)="image.download('qrcodesdk')" type="button">Download PNG</button>
-  `,
-})
-export class DownloadQRCodes {}
+<qrcode-image #qrcodeImage data="https://qrcodesdk.dev" />
+<button type="button" (click)="qrcodeImage.download('qrcodesdk')">Download PNG</button>
 ```
 
-The appropriate `.svg` or `.png` extension is appended when necessary. `QRCodeCanvas` does not expose a download method; use `QRCodeImage` for built-in PNG downloads.
+The appropriate `.svg` or `.png` extension is appended when necessary.
+
+`QRCodeCanvas` does not include a download method. Use `QRCodeImage` when you want built-in PNG download support.
 
 ## Server-side rendering
 
@@ -220,8 +260,8 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 ## Documentation
 
-- [Angular library](https://qrcodesdk.dev/libs/angular/)
-- [Customize QR codes](https://qrcodesdk.dev/guides/customize/)
-- [SVG renderer](https://qrcodesdk.dev/renderers/core/svg/)
-- [Image renderer](https://qrcodesdk.dev/renderers/browser/image/)
-- [Canvas renderer](https://qrcodesdk.dev/renderers/browser/canvas/)
+- [@qrcodesdk/angular](https://qrcodesdk.dev/libs/angular/)
+- [Customize QR Codes](https://qrcodesdk.dev/guides/customize/)
+- [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
+- [Render to an Image Element](https://qrcodesdk.dev/renderers/browser/image/)
+- [Render to Canvas](https://qrcodesdk.dev/renderers/browser/canvas/)

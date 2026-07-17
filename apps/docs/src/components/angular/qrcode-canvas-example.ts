@@ -11,7 +11,7 @@ import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
   `,
 })
 export class QRCodeCanvasExample {
-  options: QRCodeCanvasOptions = {
+  protected readonly options: QRCodeCanvasOptions = {
     size: 8,
     margin: 4,
     colors: {

@@ -1,6 +1,8 @@
 ---
 import {Tabs, TabItem, Code} from '@astrojs/starlight/components';
 
+import {createPackageManagerCommands} from '../../package-manager-commands.mjs';
+
 type PackageManagerMode = 'add' | 'addDev' | 'addGlobal' | 'exec' | 'dlx' | 'label';
 
 type Props = {
@@ -13,76 +15,7 @@ type Props = {
 
 const {packages, mode, command, args = [], syncKey = 'package-manager'} = Astro.props as Props;
 
-const packageManagers = {
-  npm: {
-    label: 'npm',
-    add: 'npm install',
-    addDev: 'npm install -D',
-    addGlobal: 'npm install -g',
-    exec: 'npx',
-    dlx: 'npx',
-  },
-  pnpm: {
-    label: 'pnpm',
-    add: 'pnpm add',
-    addDev: 'pnpm add -D',
-    addGlobal: 'pnpm add -g',
-    exec: 'pnpm exec',
-    dlx: 'pnpm dlx',
-  },
-  viteplus: {
-    label: 'vp',
-    add: 'vp add',
-    addDev: 'vp add -D',
-    addGlobal: 'vp install -g',
-    exec: 'vp exec',
-    dlx: 'vp dlx',
-  },
-  deno: {
-    label: 'deno',
-    add: 'deno add',
-    addDev: 'deno add --dev',
-    addGlobal: 'deno install --global',
-    exec: 'deno x',
-    dlx: 'deno x',
-  },
-  bun: {
-    label: 'bun',
-    add: 'bun add',
-    addDev: 'bun add -D',
-    addGlobal: 'bun add -g',
-    exec: 'bunx',
-    dlx: 'bunx',
-  },
-  yarn: {
-    label: 'yarn',
-    add: 'yarn add',
-    addDev: 'yarn add -D',
-    addGlobal: 'yarn global add',
-    exec: 'yarn',
-    dlx: 'yarn dlx',
-  },
-} satisfies Record<string, Record<PackageManagerMode, string>>;
-
-const packageList = packages.join(' ');
-const argumentList = args.join(' ');
-
-if (mode === 'exec' && command === undefined) {
-  throw new Error('PackageManagerTabs requires a command when mode is "exec".');
-}
-
-if (mode === 'dlx' && packageList.length === 0) {
-  throw new Error('PackageManagerTabs requires at least one package when mode is "dlx".');
-}
-
-const commandTarget = mode === 'exec' ? command : packageList;
-const commandArguments = mode === 'exec' || mode === 'dlx' ? argumentList : '';
-const tabs = Object.entries(packageManagers).map(([_, commands]) => ({
-  label: commands['label'],
-  command: [commands[mode], commandTarget, commandArguments]
-    .filter((part) => part !== undefined && part.length > 0)
-    .join(' '),
-}));
+const tabs = createPackageManagerCommands({packages, mode, command, args});
 ---
 
 <Tabs syncKey={syncKey}>

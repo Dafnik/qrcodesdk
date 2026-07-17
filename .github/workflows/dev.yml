@@ -40,6 +40,9 @@ jobs:
       - name: Style check
         run: pnpm format:check
 
+      - name: Generated README check
+        run: pnpm --filter docs check-readmes
+
   eslint:
     runs-on: ubuntu-latest
     steps:

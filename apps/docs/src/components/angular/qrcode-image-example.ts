@@ -11,7 +11,7 @@ import type {QRCodeImageOptions} from '@qrcodesdk/browser';
   `,
 })
 export class QRCodeImageExample {
-  options: QRCodeImageOptions = {
+  protected readonly options: QRCodeImageOptions = {
     size: 8,
     margin: 4,
     alt: 'QR code for qrcodesdk.dev',

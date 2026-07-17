@@ -58,6 +58,9 @@ catalogs:
     jsqr:
       specifier: 1.4.0
       version: 1.4.0
+    prettier:
+      specifier: 3.9.5
+      version: 3.9.5
     react:
       specifier: 19.2.7
       version: 19.2.7
@@ -105,7 +108,7 @@ importers:
         specifier: 'catalog:'
         version: 9.39.1(jiti@2.7.0)
       prettier:
-        specifier: 3.9.5
+        specifier: 'catalog:'
         version: 3.9.5
       prettier-plugin-astro:
         specifier: 0.14.1
@@ -222,12 +225,33 @@ importers:
       astro:
         specifier: 7.0.9
         version: 7.0.9(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.4)(jiti@2.7.0)(less@4.6.7)(rollup@4.62.2)(sass@1.99.0)(yaml@2.9.0)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.5
+      remark-gfm:
+        specifier: 4.0.1
+        version: 4.0.1
+      remark-mdx:
+        specifier: 3.1.1
+        version: 3.1.1
+      remark-parse:
+        specifier: 11.0.0
+        version: 11.0.0
+      remark-stringify:
+        specifier: 11.0.0
+        version: 11.0.0
       sharp:
         specifier: 'catalog:'
         version: 0.35.3(@types/node@25.9.4)
       typescript:
         specifier: catalog:angular-typescript
         version: 6.0.3
+      unified:
+        specifier: 11.0.5
+        version: 11.0.5
+      yaml:
+        specifier: 2.9.0
+        version: 2.9.0
 
   packages/angular:
     dependencies:

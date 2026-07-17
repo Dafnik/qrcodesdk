@@ -6,9 +6,15 @@
   "scripts": {
     "start": "astro dev",
     "build": "astro build",
+    "check": "pnpm run check-readmes",
+    "check-readme": "pnpm run check-readmes",
+    "check-readmes": "node scripts/readmes/generate-readmes.mjs --check",
+    "generate-readme": "pnpm run generate-readmes",
+    "generate-readmes": "node scripts/readmes/generate-readmes.mjs --write",
     "preview": "astro preview",
     "check-types": "astro check",
-    "lint": "eslint astro.config.mjs src --ext .js,.mjs,.ts --max-warnings 0",
+    "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
+    "test": "node --test scripts/readmes/*.test.mjs",
     "astro": "astro",
     "clean": "rm -rf .turbo dist .astro"
   },
@@ -46,7 +52,14 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "astro": "7.0.9",
+    "prettier": "catalog:",
+    "remark-gfm": "4.0.1",
+    "remark-mdx": "3.1.1",
+    "remark-parse": "11.0.0",
+    "remark-stringify": "11.0.0",
     "sharp": "catalog:",
-    "typescript": "catalog:angular-typescript"
+    "typescript": "catalog:angular-typescript",
+    "unified": "11.0.5",
+    "yaml": "2.9.0"
   }
 }

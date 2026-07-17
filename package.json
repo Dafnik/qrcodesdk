@@ -23,7 +23,7 @@
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "cspell": "10.0.1",
     "eslint": "catalog:",
-    "prettier": "3.9.5",
+    "prettier": "catalog:",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-organize-attributes": "1.0.0",
     "prettier-plugin-sort-json": "4.2.0",
