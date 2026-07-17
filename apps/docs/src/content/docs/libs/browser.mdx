@@ -7,6 +7,7 @@ related:
   - ../guides/installation.mdx
   - ../renderers/browser/canvas.md
   - ../renderers/browser/image.md
+  - ../renderers/core/svg.md
   - ../guides/customize.md
 ---
 
@@ -21,7 +22,7 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 <PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/browser']} mode="add" />
 
-## Render an image element
+## Render an Image element
 
 ```ts
 import {QRCodeImageRenderer} from '@qrcodesdk/browser';
@@ -29,25 +30,61 @@ import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
   QRCodeImageRenderer({
+    size: 8,
+    margin: 4,
+    colors: {
+      colorDark: '#111827',
+      colorLight: '#ffffff',
+    },
     alt: 'QR code for qrcodesdk.dev',
+    ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
 );
 
 document.body.append(image);
 ```
 
-## Render a canvas element
+`QRCodeImageRenderer()` returns an `HTMLImageElement`. Its `src` is a PNG data URL, and its `width` and `height` match the rendered QR code size.
+
+## Render a Canvas element
 
 ```ts
 import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
-const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
+const canvas = qrcode('https://qrcodesdk.dev').render(
+  QRCodeCanvasRenderer({
+    size: 8,
+    margin: 4,
+    colors: {
+      colorDark: '#111827',
+      colorLight: '#ffffff',
+    },
+  }),
+);
 
-document.body.append(canvas);
+document.querySelector('#qrcode')?.append(canvas);
 ```
 
-## Download files
+`QRCodeCanvasRenderer()` returns an `HTMLCanvasElement` that you can insert into the DOM, draw into another canvas, or export with `toBlob()` or `toDataURL()`.
+
+## Renderer options
+
+| Option              | Type     |     Default | Description                                   |
+| ------------------- | -------- | ----------: | --------------------------------------------- |
+| `size`              | `number` |         `5` | Pixel size of each QR module.                 |
+| `margin`            | `number` |         `4` | Quiet-zone width in modules.                  |
+| `colors.colorDark`  | `string` | `'#000000'` | Dark module color.                            |
+| `colors.colorLight` | `string` | `'#ffffff'` | Background color.                             |
+| `alt`               | `string` | `undefined` | Image `alt` attribute; Image renderer only.   |
+| `ariaLabel`         | `string` | `undefined` | Image `aria-label`; Image renderer only.      |
+| `title`             | `string` | `undefined` | Image `title` attribute; Image renderer only. |
+
+Color options use hash-prefixed values such as `#111827`. Browser pixel output requires a positive integer `size` and a non-negative integer `margin`.
+
+## Download PNG
+
+Wrap an Image renderer with `QRCodeDownloadImageRenderer` to trigger a browser download:
 
 ```ts
 import {QRCodeDownloadImageRenderer, QRCodeImageRenderer} from '@qrcodesdk/browser';
@@ -55,23 +92,53 @@ import {qrcode} from '@qrcodesdk/core';
 
 qrcode('https://qrcodesdk.dev').render(
   QRCodeDownloadImageRenderer({
-    renderer: QRCodeImageRenderer(),
+    renderer: QRCodeImageRenderer({
+      alt: 'QR code for qrcodesdk.dev',
+    }),
     filename: 'qrcode',
   }),
 );
 ```
 
-## Use it for
+The renderer appends `.png` when necessary, clicks a temporary download link, and returns `void`.
 
-- appending QR codes directly to a browser page
-- styling image elements with CSS
-- drawing QR codes into canvas workflows
-- creating client-side SVG and PNG downloads
+## Download SVG
+
+SVG strings come from `@qrcodesdk/core`. Wrap its renderer to download the result in the browser:
+
+```ts
+import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+qrcode('https://qrcodesdk.dev').render(
+  QRCodeDownloadSVGRenderer({
+    renderer: QRCodeSVGRenderer({
+      size: 4,
+      margin: 2,
+      ariaLabel: 'Scan to open qrcodesdk.dev',
+    }),
+    filename: 'qrcode',
+  }),
+);
+```
+
+The renderer appends `.svg` when necessary, downloads an SVG `Blob`, revokes its temporary object URL, and returns `void`.
 
 ## Package boundary
 
-`@qrcodesdk/browser` does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation, builder options, and shared styling normalization.
+`@qrcodesdk/browser` depends on browser DOM APIs and does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation, builder options, and shared styling normalization.
 
-## Public types
+## Public API
 
-`QRCodeCanvasOptions` and `QRCodeImageOptions` combine their corresponding renderer options with the shared core matrix options. Framework components consume these canonical option types directly.
+```ts
+import {
+  QRCodeCanvasRenderer,
+  type QRCodeCanvasRendererOptions,
+  QRCodeDownloadImageRenderer,
+  type QRCodeDownloadImageRendererOptions,
+  QRCodeDownloadSVGRenderer,
+  type QRCodeDownloadSVGRendererOptions,
+  QRCodeImageRenderer,
+  type QRCodeImageRendererOptions,
+} from '@qrcodesdk/browser';
+```

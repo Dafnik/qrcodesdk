@@ -38,4 +38,10 @@ export const README_MAPPINGS = [
     output: '../../packages/node/README.md',
     codeLanguage: 'ts',
   },
+  {
+    id: 'browser',
+    source: 'src/content/docs/libs/browser.mdx',
+    output: '../../packages/browser/README.md',
+    codeLanguage: 'ts',
+  },
 ];
