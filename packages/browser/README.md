@@ -2,7 +2,7 @@
 
 # @qrcodesdk/browser
 
-[![npm version](https://npmx.dev/api/registry/badge/version/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core)
+[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/browser) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/browser) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/browser)
 
 `@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.
 

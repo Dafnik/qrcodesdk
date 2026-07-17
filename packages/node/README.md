@@ -2,7 +2,7 @@
 
 # @qrcodesdk/node
 
-[![npm version](https://npmx.dev/api/registry/badge/version/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core)
+[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/node) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/node) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/node)
 
 Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
 
