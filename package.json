@@ -2,6 +2,7 @@
   "name": "qrcodesdk",
   "private": true,
   "scripts": {
+    "benchmark": "turbo run benchmark --filter=@repo/benchmarks",
     "build": "turbo run build",
     "start": "turbo run start",
     "test": "turbo run test",
