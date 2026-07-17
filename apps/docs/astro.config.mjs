@@ -7,8 +7,8 @@ import {defineConfig} from 'astro/config';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightPageContextAction from 'starlight-page-context-action';
 
-import {includeContentPlugin} from './astro-content-plugin.mjs';
-import {STARLIGHT_SIDEBAR} from './starlight-sidebar.mjs';
+import {STARLIGHT_SIDEBAR} from './src/starlight-sidebar.mjs';
+import {includeContentPlugin} from './src/utils/index.js';
 
 // https://astro.build/config
 export default defineConfig({

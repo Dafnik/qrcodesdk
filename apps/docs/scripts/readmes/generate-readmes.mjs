@@ -9,8 +9,7 @@ import remarkStringify from 'remark-stringify';
 import {unified} from 'unified';
 import {parse as parseYaml} from 'yaml';
 
-import {createExampleContent} from '../../example-content.mjs';
-import {createPackageManagerCommands} from '../../package-manager-commands.mjs';
+import {createExampleContent, createPackageManagerCommands} from '../../src/utils/index.js';
 import {README_MAPPINGS} from './readme-mappings.mjs';
 
 // cspell:ignore mdxjs

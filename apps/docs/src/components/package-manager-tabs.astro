@@ -1,7 +1,7 @@
 ---
 import {Tabs, TabItem, Code} from '@astrojs/starlight/components';
 
-import {createPackageManagerCommands} from '../../package-manager-commands.mjs';
+import {createPackageManagerCommands} from '../utils';
 
 type PackageManagerMode = 'add' | 'addDev' | 'addGlobal' | 'exec' | 'dlx' | 'label';
 
