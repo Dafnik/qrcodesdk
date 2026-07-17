@@ -14,9 +14,9 @@
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-only-warn": "1.2.1",
     "eslint-plugin-react": "7.37.5",
-    "eslint-plugin-react-hooks": "5.2.0",
+    "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-turbo": "2.10.5",
-    "globals": "16.5.0",
+    "globals": "17.7.0",
     "typescript": "catalog:angular-typescript",
     "typescript-eslint": "8.64.0"
   }
