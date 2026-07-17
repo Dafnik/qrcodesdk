@@ -6,9 +6,8 @@ export default defineConfig({
       clean: false,
       include: ['src/**/*.{ts,tsx}'],
       provider: 'v8',
-      reporter: [['json', {file: 'react.json'}]],
-      reportsDirectory: '../../.coverage/raw/react',
+      reporter: [['json', {file: 'cli.json'}]],
+      reportsDirectory: '../../.coverage/raw/cli',
     },
-    environment: 'jsdom',
   },
 });

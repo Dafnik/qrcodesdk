@@ -62,6 +62,7 @@
     "build": "tsdown",
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
+    "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",

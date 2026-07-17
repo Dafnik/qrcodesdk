@@ -9,5 +9,12 @@ export default defineConfig({
       provider: playwright(),
       instances: [{browser: 'chromium'}],
     },
+    coverage: {
+      clean: false,
+      include: ['src/**/*.{ts,tsx}'],
+      provider: 'v8',
+      reporter: [['json', {file: 'browser.json'}]],
+      reportsDirectory: '../../.coverage/raw/browser',
+    },
   },
 });
