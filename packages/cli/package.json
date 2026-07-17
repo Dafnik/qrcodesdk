@@ -62,6 +62,7 @@
     "watch": "tsdown --watch",
     "cli": "pnpm run build && node dist/bin.mjs",
     "test": "vitest --watch false",
+    "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit",
     "lint": "eslint src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",

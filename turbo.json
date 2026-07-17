@@ -11,6 +11,9 @@
     "@qrcodesdk/cli#test": {
       "dependsOn": ["build", "^test"]
     },
+    "@qrcodesdk/cli#test:coverage:raw": {
+      "dependsOn": ["build", "^test:coverage:raw"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
@@ -35,6 +38,10 @@
     },
     "test": {
       "dependsOn": ["^build", "^test"]
+    },
+    "test:coverage:raw": {
+      "cache": false,
+      "dependsOn": ["^build"]
     }
   },
   "ui": "tui"

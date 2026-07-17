@@ -16,6 +16,7 @@ node_modules
 .env.production.local
 
 # Testing
+.coverage
 coverage
 
 # Turbo
@@ -39,4 +40,3 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
-
