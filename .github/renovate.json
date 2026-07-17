@@ -2,6 +2,7 @@
   "assignees": ["Dafnik"],
   "baseBranchPatterns": ["main"],
   "commitBody": "See associated pull request for more information.",
+  "dependencyDashboard": true,
   "enabledManagers": ["npm", "github-actions"],
   "extends": [
     "config:recommended",
