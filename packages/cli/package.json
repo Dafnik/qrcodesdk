@@ -73,7 +73,7 @@
     "@qrcodesdk/core": "workspace:*",
     "@qrcodesdk/node": "workspace:*",
     "chalk": "5.6.2",
-    "commander": "14.0.3"
+    "commander": "15.0.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
