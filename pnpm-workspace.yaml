@@ -43,5 +43,10 @@ minimumReleaseAgeExclude:
   - 'starlight-page-actions@0.7.0'
   - tsdown@0.22.9
 
+packageExtensions:
+  '@analogjs/vite-plugin-angular@2.6.3':
+    dependencies:
+      typescript: 6.0.3
+
 patchedDependencies:
   qrcode-generator@2.0.4: patches/qrcode-generator@2.0.4.patch
