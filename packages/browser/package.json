@@ -75,9 +75,9 @@
     "@repo/core-testing": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@vitest/browser-playwright": "4.1.9",
+    "@vitest/browser-playwright": "4.1.10",
     "jsqr": "catalog:",
-    "playwright": "1.59.1",
+    "playwright": "1.61.1",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
