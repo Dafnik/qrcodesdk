@@ -14,7 +14,7 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 <PackageBadges />
 
-`@qrcodesdk/node` adds renderers that depend on Node.js APIs or server-side packages. Use it with `@qrcodesdk/core` when your output needs to be PNG bytes.
+Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
 
 ## Install
 
@@ -23,29 +23,74 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 ## Render PNG output
 
 ```ts
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const png: Buffer = qrcode('https://qrcodesdk.dev').render(
+  QRCodePNGRenderer({
+    size: 8,
+    margin: 4,
+    colors: {
+      colorDark: '#111827',
+      colorLight: '#ffffff',
+    },
+  }),
+);
+```
+
+`QRCodePNGRenderer()` returns a Node.js `Buffer` containing a square, fully opaque PNG image.
+
+## Options
+
+| Option              | Type     |     Default | Description                   |
+| ------------------- | -------- | ----------: | ----------------------------- |
+| `size`              | `number` |         `5` | Pixel size of each QR module. |
+| `margin`            | `number` |         `4` | Quiet-zone width in modules.  |
+| `colors.colorDark`  | `string` | `'#000000'` | Dark module color.            |
+| `colors.colorLight` | `string` | `'#ffffff'` | Background color.             |
+
+Colors must be six-digit hex values such as `#111827`. `size` must be a positive integer and `margin` must be a non-negative integer.
+
+## Save to disk
+
+```ts
 import {writeFile} from 'node:fs/promises';
 
 import {qrcode} from '@qrcodesdk/core';
 import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
-const png = qrcode('https://qrcodesdk.dev').render(
-  QRCodePNGRenderer({
-    size: 8,
-    margin: 4,
-  }),
-);
+const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 
 await writeFile('qrcode.png', png);
 ```
 
-## Use it for
+## Send an HTTP response
 
-- writing QR code PNG files
-- serving `image/png` responses from Node.js servers
-- creating download assets
-- attaching QR code images to emails
-- integrating with systems that expect PNG bytes
+The returned buffer can be sent from any Node.js HTTP framework as `image/png`:
+
+```ts
+import {createServer} from 'node:http';
+
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+createServer((_request, response) => {
+  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+
+  response.writeHead(200, {
+    'Content-Length': png.length,
+    'Content-Type': 'image/png',
+  });
+  response.end(png);
+}).listen(3000);
+```
 
 ## Package boundary
 
-`@qrcodesdk/node` does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation, builder options, and shared styling normalization.
+`@qrcodesdk/node` provides Node-specific renderers and does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation, builder options, and shared styling normalization.
+
+## Public API
+
+```ts
+import {QRCodePNGRenderer, type QRCodePNGRendererOptions} from '@qrcodesdk/node';
+```

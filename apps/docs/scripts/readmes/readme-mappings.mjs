@@ -32,4 +32,10 @@ export const README_MAPPINGS = [
     output: '../../packages/react/README.md',
     codeLanguage: 'tsx',
   },
+  {
+    id: 'node',
+    source: 'src/content/docs/libs/node.mdx',
+    output: '../../packages/node/README.md',
+    codeLanguage: 'ts',
+  },
 ];

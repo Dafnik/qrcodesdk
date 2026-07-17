@@ -1,10 +1,8 @@
+<!-- Generated from apps/docs/src/content/docs/libs/node.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+
 # @qrcodesdk/node
 
-[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/node)
-[![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/node)
-[![npm download per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/node)
-
-**[Live Demo](https://qrcodesdk.dev/playground/)**
+[![npm version](https://npmx.dev/api/registry/badge/version/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@angular/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@angular/core)
 
 Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
 
@@ -17,6 +15,35 @@ npm install @qrcodesdk/core @qrcodesdk/node
 ```sh
 pnpm add @qrcodesdk/core @qrcodesdk/node
 ```
+
+<details>
+<summary>Other package managers</summary>
+
+**vp**
+
+```sh
+vp add @qrcodesdk/core @qrcodesdk/node
+```
+
+**deno**
+
+```sh
+deno add @qrcodesdk/core @qrcodesdk/node
+```
+
+**bun**
+
+```sh
+bun add @qrcodesdk/core @qrcodesdk/node
+```
+
+**yarn**
+
+```sh
+yarn add @qrcodesdk/core @qrcodesdk/node
+```
+
+</details>
 
 ## Render PNG output
 
@@ -85,7 +112,7 @@ createServer((_request, response) => {
 
 ## Package boundary
 
-`@qrcodesdk/node` provides Node-specific renderers and does not replace Core. Import `qrcode()`, matrix options, and shared styling from `@qrcodesdk/core`.
+`@qrcodesdk/node` provides Node-specific renderers and does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation, builder options, and shared styling normalization.
 
 ## Public API
 
@@ -95,7 +122,7 @@ import {QRCodePNGRenderer, type QRCodePNGRendererOptions} from '@qrcodesdk/node'
 
 ## Documentation
 
-- [Node library](https://qrcodesdk.dev/libs/node/)
+- [@qrcodesdk/node](https://qrcodesdk.dev/libs/node/)
+- [Installation](https://qrcodesdk.dev/guides/installation/)
 - [Render PNG in Node.js](https://qrcodesdk.dev/renderers/node/png/)
-- [Customize QR codes](https://qrcodesdk.dev/guides/customize/)
-- [API reference](https://qrcodesdk.dev/reference/api/)
+- [Customize QR Codes](https://qrcodesdk.dev/guides/customize/)
