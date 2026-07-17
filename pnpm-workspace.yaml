@@ -23,7 +23,7 @@ catalog:
   '@types/node': 25.9.5
   '@types/react': 19.2.17
   '@types/react-dom': 19.2.3
-  eslint: 10.7.0
+  eslint: 9.39.5
   jsdom: 29.1.1
   jsqr: 1.4.0
   prettier: 3.9.5
@@ -38,7 +38,7 @@ catalog:
 
 catalogs:
   angular-typescript:
-    typescript: 7.0.2
+    typescript: 6.0.3
 
 minimumReleaseAgeExclude:
   - 'starlight-page-actions@0.7.0'
