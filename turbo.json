@@ -8,12 +8,6 @@
     "//#format:check": {
       "cache": false
     },
-    "@qrcodesdk/cli#test": {
-      "dependsOn": ["build", "^test"]
-    },
-    "@qrcodesdk/cli#test:coverage:raw": {
-      "dependsOn": ["build", "^test:coverage:raw"]
-    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
