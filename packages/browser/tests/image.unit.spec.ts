@@ -3,29 +3,7 @@ import {describe, expect, test} from 'vitest';
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 import {QRCodeImageRenderer} from '../src';
-import {BLACK, WHITE, expectPixel, getCanvasContext} from './helper';
-
-function waitForImage(image: HTMLImageElement): Promise<void> {
-  if (image.complete && image.naturalWidth > 0) return Promise.resolve();
-
-  return new Promise((resolve, reject) => {
-    image.addEventListener('load', () => resolve(), {once: true});
-    image.addEventListener('error', () => reject(new Error('Expected QR code image to load')), {
-      once: true,
-    });
-  });
-}
-
-async function imageToCanvas(image: HTMLImageElement): Promise<HTMLCanvasElement> {
-  await waitForImage(image);
-
-  const canvas = document.createElement('canvas');
-  canvas.width = image.width;
-  canvas.height = image.height;
-  getCanvasContext(canvas).drawImage(image, 0, 0);
-
-  return canvas;
-}
+import {BLACK, WHITE, expectPixel, imageToCanvas} from './helper';
 
 describe('QRCodeImageRenderer', () => {
   test('renders a PNG data URL image with real rasterized pixels', async () => {

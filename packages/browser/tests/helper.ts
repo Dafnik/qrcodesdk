@@ -5,15 +5,21 @@ import {expect} from 'vitest';
 export const BLACK = {red: 0, green: 0, blue: 0, alpha: 255};
 export const WHITE = {red: 255, green: 255, blue: 255, alpha: 255};
 
+export async function imageToCanvas(image: HTMLImageElement): Promise<HTMLCanvasElement> {
+  await waitForImage(image);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+  getCanvasContext(canvas).drawImage(image, 0, 0);
+
+  return canvas;
+}
+
 export function getCanvasContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Expected a 2D canvas context');
   return context;
-}
-
-export function getPixel(canvas: HTMLCanvasElement, x: number, y: number): RGBAPixel {
-  const [red, green, blue, alpha] = getCanvasContext(canvas).getImageData(x, y, 1, 1).data;
-  return {red, green, blue, alpha};
 }
 
 export function expectPixel(
@@ -37,4 +43,20 @@ export function decodeCanvasQRCode(canvas: HTMLCanvasElement): string {
   }
 
   return result.data;
+}
+
+function waitForImage(image: HTMLImageElement): Promise<void> {
+  if (image.complete && image.naturalWidth > 0) return Promise.resolve();
+
+  return new Promise((resolve, reject) => {
+    image.addEventListener('load', () => resolve(), {once: true});
+    image.addEventListener('error', () => reject(new Error('Expected QR code image to load')), {
+      once: true,
+    });
+  });
+}
+
+function getPixel(canvas: HTMLCanvasElement, x: number, y: number): RGBAPixel {
+  const [red, green, blue, alpha] = getCanvasContext(canvas).getImageData(x, y, 1, 1).data;
+  return {red, green, blue, alpha};
 }

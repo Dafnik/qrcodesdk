@@ -1,4 +1,4 @@
-import {Component, ViewChild, signal} from '@angular/core';
+import {Component, input, viewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
@@ -17,10 +17,10 @@ import {QRCodeSVG} from './QRCodeSVG';
   template: '<qrcode-svg [data]="data()" [options]="options()" />',
 })
 class QRCodeSVGHost {
-  data = signal<QRCodeInputData>('HELLO');
-  options = signal<QRCodeSVGOptions>({size: 2, margin: 1});
+  readonly data = input<QRCodeInputData>('HELLO');
+  readonly options = input<QRCodeSVGOptions>({size: 2, margin: 1});
 
-  @ViewChild(QRCodeSVG) svgQRCode!: QRCodeSVG;
+  readonly svgQRCode = viewChild.required(QRCodeSVG);
 }
 
 @Component({
@@ -29,8 +29,8 @@ class QRCodeSVGHost {
   template: '<qrcode-image [data]="data()" [options]="options()" />',
 })
 class QRCodeImageHost {
-  data = signal('HELLO');
-  options = signal<QRCodeImageOptions>({
+  readonly data = input<QRCodeInputData>('HELLO');
+  readonly options = input<QRCodeImageOptions>({
     size: 2,
     margin: 1,
     alt: 'QR alt',
@@ -38,7 +38,7 @@ class QRCodeImageHost {
     title: 'QR title',
   });
 
-  @ViewChild(QRCodeImage) imageQRCode!: QRCodeImage;
+  readonly imageQRCode = viewChild.required(QRCodeImage);
 }
 
 @Component({
@@ -47,11 +47,11 @@ class QRCodeImageHost {
   template: '<qrcode-canvas [data]="data()" [options]="options()" />',
 })
 class QRCodeCanvasHost {
-  data = signal('HELLO');
-  options = signal<QRCodeCanvasOptions>({size: 2, margin: 1});
+  readonly data = input<QRCodeInputData>('HELLO');
+  readonly options = input<QRCodeCanvasOptions>({size: 2, margin: 1});
 }
 
-function renderedElement<TElement extends Element>(
+function getRenderedElement<TElement extends Element>(
   fixture: ComponentFixture<unknown>,
   selector: string,
 ): TElement {
@@ -76,7 +76,7 @@ describe('Angular QR code components', () => {
 
     fixture.detectChanges();
 
-    const svg = renderedElement<SVGSVGElement>(fixture, 'svg');
+    const svg = getRenderedElement<SVGSVGElement>(fixture, 'svg');
 
     expect(svg.tagName.toLowerCase()).toBe('svg');
     expect(svg.getAttribute('width')).toBe('46');
@@ -86,10 +86,10 @@ describe('Angular QR code components', () => {
   test('renders numeric input data', async () => {
     const fixture = TestBed.createComponent(QRCodeSVGHost);
 
-    fixture.componentInstance.data.set(12_345);
+    fixture.componentRef.setInput('data', 12_345);
     await fixture.whenStable();
 
-    const svg = renderedElement<SVGSVGElement>(fixture, 'svg');
+    const svg = getRenderedElement<SVGSVGElement>(fixture, 'svg');
 
     expect(svg.querySelectorAll('path')).toHaveLength(2);
   });
@@ -99,7 +99,7 @@ describe('Angular QR code components', () => {
 
     fixture.detectChanges();
 
-    const image = renderedElement<HTMLImageElement>(fixture, 'img');
+    const image = getRenderedElement<HTMLImageElement>(fixture, 'img');
 
     expect(image.src).toMatch(/^data:image\/png;base64,/);
     expect(image.width).toBe(46);
@@ -114,7 +114,7 @@ describe('Angular QR code components', () => {
     const downloads = captureDownloads(vi);
 
     fixture.detectChanges();
-    fixture.componentInstance.imageQRCode.download('qrcodesdk');
+    fixture.componentInstance.imageQRCode().download('qrcodesdk');
 
     expect(downloads).toEqual([
       {
@@ -131,7 +131,7 @@ describe('Angular QR code components', () => {
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
     fixture.detectChanges();
-    fixture.componentInstance.svgQRCode.download('qrcodesdk');
+    fixture.componentInstance.svgQRCode().download('qrcodesdk');
 
     expect(downloads).toEqual([
       {
@@ -147,7 +147,7 @@ describe('Angular QR code components', () => {
 
     fixture.detectChanges();
 
-    const canvas = renderedElement<HTMLCanvasElement>(fixture, 'canvas');
+    const canvas = getRenderedElement<HTMLCanvasElement>(fixture, 'canvas');
 
     expect(canvas.width).toBe(46);
     expect(canvas.height).toBe(46);
@@ -158,13 +158,13 @@ describe('Angular QR code components', () => {
 
     fixture.detectChanges();
 
-    const wrapper = renderedElement<HTMLElement>(fixture, 'qrcode-image');
-    const firstImage = renderedElement<HTMLImageElement>(fixture, 'img');
+    const wrapper = getRenderedElement<HTMLElement>(fixture, 'qrcode-image');
+    const firstImage = getRenderedElement<HTMLImageElement>(fixture, 'img');
 
-    fixture.componentInstance.options.set({size: 3, margin: 1});
+    fixture.componentRef.setInput('options', {size: 3, margin: 1});
     fixture.detectChanges();
 
-    const secondImage = renderedElement<HTMLImageElement>(fixture, 'img');
+    const secondImage = getRenderedElement<HTMLImageElement>(fixture, 'img');
 
     expect(wrapper.children).toHaveLength(1);
     expect(secondImage).not.toBe(firstImage);
@@ -177,13 +177,13 @@ describe('Angular QR code components', () => {
 
     fixture.detectChanges();
 
-    const wrapper = renderedElement<HTMLElement>(fixture, 'qrcode-canvas');
-    const firstCanvas = renderedElement<HTMLCanvasElement>(fixture, 'canvas');
+    const wrapper = getRenderedElement<HTMLElement>(fixture, 'qrcode-canvas');
+    const firstCanvas = getRenderedElement<HTMLCanvasElement>(fixture, 'canvas');
 
-    fixture.componentInstance.data.set('WORLD');
+    fixture.componentRef.setInput('data', 'WORLD');
     fixture.detectChanges();
 
-    const secondCanvas = renderedElement<HTMLCanvasElement>(fixture, 'canvas');
+    const secondCanvas = getRenderedElement<HTMLCanvasElement>(fixture, 'canvas');
 
     expect(wrapper.children).toHaveLength(1);
     expect(secondCanvas).not.toBe(firstCanvas);

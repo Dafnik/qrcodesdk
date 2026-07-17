@@ -68,4 +68,9 @@ describe('QRCodeCanvasRenderer', () => {
       'Canvas QR code margin must be a non-negative integer',
     );
   });
+
+  test('excepts canvas dimensions that are valid', () => {
+    expect(() => QRCodeCanvasRenderer({margin: 0})([[1]])).not.toThrow();
+    expect(() => QRCodeCanvasRenderer({size: 1})([[1]])).not.toThrow();
+  });
 });

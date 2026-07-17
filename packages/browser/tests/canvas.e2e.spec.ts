@@ -1,31 +1,57 @@
-import {type QRCodeTestFixture, QR_CODE_TEST_FIXTURES, renderFixture} from '@repo/core-testing';
+import {QR_CODE_TEST_FIXTURES, getAllQRCodeCombinations} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from '../src';
+import {qrcode} from '@qrcodesdk/core';
+
+import {QRCodeCanvasRenderer} from '../src';
 import {decodeCanvasQRCode} from './helper';
 
-function renderFixtureCanvas(
-  fixture: QRCodeTestFixture,
-  options: QRCodeCanvasRendererOptions = {size: 8, margin: 4},
-): HTMLCanvasElement {
-  return renderFixture(fixture, QRCodeCanvasRenderer(options));
-}
+/**
+ * Version 23 QR codes always fail to decode
+ * https://github.com/cozmo/jsQR/issues/251
+ */
+const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
+  ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
+);
 
 describe('QRCodeCanvasRenderer', () => {
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name canvas output', (fixture) => {
-    expect(decodeCanvasQRCode(renderFixtureCanvas(fixture))).toBe(fixture.data);
+    expect(
+      decodeCanvasQRCode(
+        qrcode()
+          .data(fixture.data)
+          .config(fixture)
+          .render(QRCodeCanvasRenderer({size: 8, margin: 4})),
+      ),
+    ).toBe(fixture.data);
+  });
+
+  test.each(JSQR_ROUNDTRIP_COMBINATIONS)('decodes $name image output', async (fixture) => {
+    expect(
+      decodeCanvasQRCode(
+        qrcode(fixture.data)
+          .config(fixture)
+          .render(QRCodeCanvasRenderer({size: 8, margin: 4})),
+      ),
+    ).toBe(fixture.data);
   });
 
   test('decodes custom high-contrast color canvas output', () => {
-    const canvas = renderFixtureCanvas(QR_CODE_TEST_FIXTURES[1], {
-      size: 8,
-      margin: 4,
-      colors: {
-        colorLight: '#fefefe',
-        colorDark: '#101010',
-      },
-    });
+    const fixture = QR_CODE_TEST_FIXTURES[1];
+    const canvas = qrcode()
+      .data(fixture.data)
+      .config(fixture)
+      .render(
+        QRCodeCanvasRenderer({
+          size: 8,
+          margin: 4,
+          colors: {
+            colorLight: '#fefefe',
+            colorDark: '#101010',
+          },
+        }),
+      );
 
-    expect(decodeCanvasQRCode(canvas)).toBe(QR_CODE_TEST_FIXTURES[1].data);
+    expect(decodeCanvasQRCode(canvas)).toBe(fixture.data);
   });
 });
