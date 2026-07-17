@@ -34,18 +34,18 @@
     "tslib": "catalog:"
   },
   "devDependencies": {
-    "@analogjs/astro-angular": "2.6.2",
+    "@analogjs/astro-angular": "2.6.3",
     "@angular/animations": "catalog:",
     "@angular/build": "catalog:",
     "@angular/compiler": "catalog:",
     "@angular/compiler-cli": "catalog:",
     "@angular/language-service": "catalog:",
     "@astrojs/check": "0.9.9",
-    "@astrojs/starlight": "0.41.1",
+    "@astrojs/starlight": "0.41.3",
     "@repo/eslint-config": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "astro": "7.0.3",
+    "astro": "7.0.9",
     "sharp": "catalog:",
     "typescript": "catalog:angular-typescript"
   }

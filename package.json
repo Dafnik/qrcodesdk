@@ -23,15 +23,15 @@
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "cspell": "10.0.1",
     "eslint": "catalog:",
-    "prettier": "3.9.4",
+    "prettier": "3.9.5",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-organize-attributes": "1.0.0",
     "prettier-plugin-sort-json": "4.2.0",
     "prettier-plugin-tailwindcss": "0.8.0",
-    "turbo": "2.10.4",
+    "turbo": "2.10.5",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@11.10.0",
+  "packageManager": "pnpm@11.11.0",
   "engines": {
     "node": ">= 24.15.0"
   }
