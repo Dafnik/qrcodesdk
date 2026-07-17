@@ -62,7 +62,7 @@
     "build": "tsdown",
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
-    "check-types": "tsc --noEmit && tsgo -p tsconfig.spec.json",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
@@ -75,7 +75,6 @@
     "@repo/core-testing": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@typescript/native-preview": "catalog:",
     "@vitest/browser-playwright": "4.1.9",
     "jsqr": "catalog:",
     "playwright": "1.59.1",

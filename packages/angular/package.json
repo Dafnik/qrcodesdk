@@ -85,7 +85,7 @@
     "jsdom": "catalog:",
     "ng-packagr": "22.0.0",
     "rxjs": "catalog:",
-    "typescript": "catalog:",
+    "typescript": "catalog:angular-typescript",
     "vitest": "catalog:"
   }
 }

@@ -47,6 +47,6 @@
     "@types/react-dom": "catalog:",
     "astro": "7.0.3",
     "sharp": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:angular-typescript"
   }
 }

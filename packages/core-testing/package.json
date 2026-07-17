@@ -15,7 +15,7 @@
     "build": "tsdown",
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
-    "check-types": "tsc --noEmit && tsgo -p tsconfig.spec.json",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist"
   },
@@ -27,7 +27,6 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
-    "@typescript/native-preview": "catalog:",
     "qrcode": "1.5.4",
     "qrcode-generator": "2.0.4",
     "jsqr": "catalog:",
