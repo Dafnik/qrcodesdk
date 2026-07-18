@@ -2,8 +2,8 @@ export type QRCodeInputData = string | number;
 
 export type QRCodeModule = 0 | 1;
 export type QRCodeMatrix = QRCodeModule[][];
-export type QRCodeMutableMatrix = Array<Array<QRCodeModule | undefined>>;
-export type QRCodeReservedMatrix = Array<Array<QRCodeModule | undefined>>;
+export type QRCodeMutableMatrix = QRCodeModule[][];
+export type QRCodeReservedMatrix = QRCodeModule[][];
 
 export type QRCodeCodeword = number;
 export type QRCodeCodewords = QRCodeCodeword[];

@@ -21,59 +21,63 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     const qrSize = n + 2 * margin;
     const size = modSize * qrSize;
     const darkPath = matrixToPath(matrix, margin);
-    const attrs = [
-      'xmlns="http://www.w3.org/2000/svg"',
-      `width="${size}"`,
-      `height="${size}"`,
-      `viewBox="0 0 ${qrSize} ${qrSize}"`,
-      'shape-rendering="crispEdges"',
-      options?.alt ? `alt="${escapeAttributeValue(options.alt)}"` : undefined,
-      options?.ariaLabel ? `aria-label="${escapeAttributeValue(options.ariaLabel)}"` : undefined,
-      options?.title ? `title="${escapeAttributeValue(options.title)}"` : undefined,
-    ].filter((attr) => attr !== undefined);
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${qrSize} ${qrSize}" shape-rendering="crispEdges"`;
 
-    return [
-      `<svg ${attrs.join(' ')}>`,
-      `<path fill="${escapeAttributeValue(colorLight)}" d="M0 0h${qrSize}v${qrSize}H0z"/>`,
-      darkPath ? `<path stroke="${escapeAttributeValue(colorDark)}" d="${darkPath}"/>` : '',
-      '</svg>',
-    ].join('');
+    if (options?.alt) svg += ` alt="${escapeAttributeValue(options.alt)}"`;
+    if (options?.ariaLabel) svg += ` aria-label="${escapeAttributeValue(options.ariaLabel)}"`;
+    if (options?.title) svg += ` title="${escapeAttributeValue(options.title)}"`;
+
+    svg += `><path fill="${escapeAttributeValue(colorLight)}" d="M0 0h${qrSize}v${qrSize}H0z"/>`;
+    if (darkPath) {
+      svg += `<path stroke="${escapeAttributeValue(colorDark)}" d="${darkPath}"/>`;
+    }
+
+    return `${svg}</svg>`;
   };
 }
 
 function escapeAttributeValue(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return value.replace(/[&"<>]/g, (character) => {
+    switch (character) {
+      case '&':
+        return '&amp;';
+      case '"':
+        return '&quot;';
+      case '<':
+        return '&lt;';
+      default:
+        return '&gt;';
+    }
+  });
 }
 
 function matrixToPath(matrix: QRCodeMatrix, margin: number): string {
-  const path: string[] = [];
+  let path = '';
+  const matrixSize = matrix.length;
 
-  for (let row = 0; row < matrix.length; row++) {
+  for (let row = 0; row < matrixSize; row++) {
     let lastRunEnd: number | undefined;
     const matrixRow = matrix[row]!;
+    const rowSize = matrixRow.length;
 
-    for (let column = 0; column < matrixRow.length; column++) {
+    for (let column = 0; column < rowSize; column++) {
       if (!matrixRow[column]) continue;
 
       const start = column;
-      while (column + 1 < matrixRow.length && matrixRow[column + 1]) {
+      while (column + 1 < rowSize && matrixRow[column + 1]) {
         column++;
       }
 
       const runLength = column - start + 1;
       if (lastRunEnd === undefined) {
-        path.push(`M${margin + start} ${margin + row + 0.5}`);
+        path += `M${margin + start} ${margin + row + 0.5}`;
       } else {
-        path.push(`m${start - lastRunEnd} 0`);
+        path += `m${start - lastRunEnd} 0`;
       }
-      path.push(`h${runLength}`);
+      path += `h${runLength}`;
       lastRunEnd = column + 1;
     }
   }
 
-  return path.join('');
+  return path;
 }

@@ -24,12 +24,11 @@ export function assembleQRCodeMatrix(
   const unmaskedMatrix = fillDataInMatrix(matrix, reserved, codewords);
   const selectedMask =
     requestedMask ?? selectBestMask(unmaskedMatrix, reserved, errorCorrectionLevel);
-  const finalMatrix = cloneMatrix(unmaskedMatrix);
 
-  applyMaskToMatrix(finalMatrix, reserved, selectedMask);
-  fillFormatInformationInMatrix(finalMatrix, errorCorrectionLevel, selectedMask);
+  applyMaskToMatrix(unmaskedMatrix, reserved, selectedMask);
+  fillFormatInformationInMatrix(unmaskedMatrix, errorCorrectionLevel, selectedMask);
 
-  return finalMatrix;
+  return unmaskedMatrix;
 }
 
 function selectBestMask(

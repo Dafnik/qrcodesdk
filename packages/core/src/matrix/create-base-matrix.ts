@@ -20,9 +20,9 @@ type QRCodeMatrixBuildState = {
  * one of which is the actual matrix and the other represents the "reserved" portion
  * (e.g., finder and timing patterns) of the matrix.
  *
- * Some entries in the matrix may be undefined, rather than 0 or 1. This is
- * intentional (no initialization needed!), and `fillDataInMatrix` will fill
- * the remaining ones.
+ * Rows are initialized densely to keep subsequent data placement, masking, and
+ * rendering on V8's packed-array fast path. `fillDataInMatrix` overwrites every
+ * non-reserved module before the matrix is returned publicly.
  *
  * @param {QRCodeVersion} version - The version number of the QR code.
  * @returns {QRCodeMatrixBuildState} The base matrix and the reserved portion matrix.
@@ -34,8 +34,8 @@ export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState
     reserved: QRCodeReservedMatrix = [];
 
   for (let i = 0; i < sizeOfVersion; i++) {
-    matrix.push([]);
-    reserved.push([]);
+    matrix.push(new Array<QRCodeModule>(sizeOfVersion).fill(0));
+    reserved.push(new Array<QRCodeModule>(sizeOfVersion).fill(0));
   }
 
   const blit = function (y: number, x: number, h: number, w: number, bits: QRCodeCodewords): void {
@@ -86,5 +86,5 @@ export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState
     }
   }
 
-  return {matrix: matrix, reserved: reserved};
+  return {matrix, reserved};
 }

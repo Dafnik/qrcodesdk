@@ -11,6 +11,18 @@ import type {QRCodeMatrix, QRCodeMutableMatrix, QRCodeReservedMatrix} from '../.
 import {formatBitsMatch} from './helpers';
 
 describe('matrix construction and mutation helpers', () => {
+  test.each([1, 40] as const)('preallocates dense version %s matrix rows', (version) => {
+    const {matrix, reserved} = createBaseMatrix(version);
+    const expectedSize = 17 + 4 * version;
+
+    expect(matrix).toHaveLength(expectedSize);
+    expect(reserved).toHaveLength(expectedSize);
+    expect(matrix.every((row) => row.length === expectedSize)).toBe(true);
+    expect(reserved.every((row) => row.length === expectedSize)).toBe(true);
+    expect(matrix.every((row) => row.every((value) => value === 0 || value === 1))).toBe(true);
+    expect(reserved.every((row) => row.every((value) => value === 0 || value === 1))).toBe(true);
+  });
+
   test('creates finder, timing, alignment, and version patterns', () => {
     const version1 = createBaseMatrix(1);
     expect(version1.matrix).toHaveLength(21);
@@ -32,7 +44,7 @@ describe('matrix construction and mutation helpers', () => {
   });
 
   test('fills data bits through non-reserved modules and pads with zeroes', () => {
-    const matrix = Array.from({length: 9}, () => Array<number>(9)) as QRCodeMutableMatrix;
+    const matrix = Array.from({length: 9}, () => Array<number>(9).fill(0)) as QRCodeMutableMatrix;
     const reserved = Array.from({length: 9}, () =>
       Array<number>(9).fill(0),
     ) as QRCodeReservedMatrix;
@@ -43,6 +55,7 @@ describe('matrix construction and mutation helpers', () => {
     expect(matrix[0][8]).toBe(0);
     expect(matrix[0][7]).toBe(0);
     expect(matrix[0][5]).toBe(0);
+    expect(matrix.every((row) => row.every((value) => value === 0 || value === 1))).toBe(true);
   });
 
   test('writes mirrored format information for the selected ECC level and mask', () => {
