@@ -1,12 +1,18 @@
 import type {QRCodeTestFixture} from '@repo/core-testing';
 
 export type BenchmarkCategory = 'matrix' | 'svg';
-export type BenchmarkLibraryId = 'qrcodesdk' | 'qrcode' | 'qrcode-generator';
+export type BenchmarkLibraryId =
+  | 'qrcodesdk'
+  | 'qrcode'
+  | 'qrcode-generator'
+  | 'qrcode-generator-default'
+  | 'qrcode-generator-utf8';
 
 export interface BenchmarkAdapter {
   readonly id: BenchmarkLibraryId;
   readonly label: string;
   readonly version: string;
+  readonly prepare?: () => void;
   readonly matrix: (fixture: QRCodeTestFixture) => number;
   readonly svg: (fixture: QRCodeTestFixture) => number;
 }
@@ -39,9 +45,8 @@ export interface BenchmarkResult extends BenchmarkSummary {
 }
 
 export interface BenchmarkReport {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 2;
   readonly generatedAt: string;
-  readonly gitRevision: string | null;
   readonly environment: {
     readonly node: string;
     readonly platform: NodeJS.Platform;
@@ -54,6 +59,7 @@ export interface BenchmarkReport {
   readonly configuration: {
     readonly samples: number;
     readonly warmupStaticPasses: number;
+    readonly warmupExhaustivePasses: number;
     readonly staticFixtureCount: number;
     readonly staticMultipliers: readonly number[];
     readonly exhaustiveFixtureCount: number;

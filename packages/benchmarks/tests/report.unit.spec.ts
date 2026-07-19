@@ -6,7 +6,9 @@ import type {BenchmarkAdapter, BenchmarkResult} from '../src/types';
 const adapters: BenchmarkAdapter[] = [
   ['qrcodesdk', 'QRCodeSDK'],
   ['qrcode', 'qrcode'],
-  ['qrcode-generator', 'qrcode-generator'],
+  ['qrcode-generator-default', 'qrcode-generator (default)'],
+  ['qrcode-generator', 'qrcode-generator (TextEncoder)'],
+  ['qrcode-generator-utf8', 'qrcode-generator (bundled UTF-8)'],
 ].map(([id, label]) => ({
   id: id as BenchmarkAdapter['id'],
   label: label!,
@@ -23,11 +25,11 @@ const result: BenchmarkResult = {
   libraryId: 'qrcodesdk',
   libraryLabel: 'QRCodeSDK',
   libraryVersion: '1.0.0',
-  samplesMs: [1, 2, 3, 4, 5],
-  medianMs: 3,
+  samplesMs: [1, 2, 3, 4, 5, 6],
+  medianMs: 3.5,
   minMs: 1,
-  maxMs: 5,
-  qrCodesPerSecond: 16_000 / 3,
+  maxMs: 6,
+  qrCodesPerSecond: 16_000 / 3.5,
   timeVsQRCodeSDK: 1,
 };
 
@@ -38,8 +40,9 @@ describe('benchmark report', () => {
       adapters,
       results: [result],
       checksum: 123,
-      samples: 5,
+      samples: 6,
       warmupStaticPasses: 5,
+      warmupExhaustivePasses: 1,
       staticFixtureCount: 16,
       staticMultipliers: [1, 5, 10, 100, 500],
       exhaustiveFixtureCount: 3_840,
@@ -51,22 +54,26 @@ describe('benchmark report', () => {
     const parsed = JSON.parse(serialized) as typeof report;
 
     expect(parsed).toMatchObject({
-      schemaVersion: 1,
+      schemaVersion: 2,
       generatedAt: '2026-07-17T00:00:00.000Z',
       libraries: {
         qrcodesdk: '1.0.0',
         qrcode: '1.0.0',
         'qrcode-generator': '1.0.0',
+        'qrcode-generator-default': '1.0.0',
+        'qrcode-generator-utf8': '1.0.0',
       },
       configuration: {
-        samples: 5,
+        samples: 6,
+        warmupStaticPasses: 5,
+        warmupExhaustivePasses: 1,
         exhaustiveFixtureCount: 3_840,
         svg: {pixelsPerModule: 8, quietZoneModules: 4},
       },
       checksum: 123,
     });
     expect(parsed.environment.node).toBe(process.version);
-    expect(parsed.results[0]?.samplesMs).toEqual([1, 2, 3, 4, 5]);
+    expect(parsed.results[0]?.samplesMs).toEqual([1, 2, 3, 4, 5, 6]);
     expect(serialized.endsWith('\n')).toBe(true);
   });
 });

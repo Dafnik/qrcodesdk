@@ -53,7 +53,7 @@ function requireFiniteNumber(value, label) {
 export function validateBenchmarkReport(report) {
   const parsedReport = requireObject(report, 'Benchmark report');
 
-  if (parsedReport.schemaVersion !== 1) {
+  if (parsedReport.schemaVersion !== 2) {
     throw new Error(`Unsupported benchmark schema version: ${parsedReport.schemaVersion}.`);
   }
 
@@ -73,6 +73,7 @@ export function validateBenchmarkReport(report) {
   const configuration = requireObject(parsedReport.configuration, 'configuration');
   requireFiniteNumber(configuration.samples, 'configuration.samples');
   requireFiniteNumber(configuration.warmupStaticPasses, 'configuration.warmupStaticPasses');
+  requireFiniteNumber(configuration.warmupExhaustivePasses, 'configuration.warmupExhaustivePasses');
   const svgConfiguration = requireObject(configuration.svg, 'configuration.svg');
   requireFiniteNumber(svgConfiguration.pixelsPerModule, 'configuration.svg.pixelsPerModule');
   requireFiniteNumber(svgConfiguration.quietZoneModules, 'configuration.svg.quietZoneModules');
@@ -124,10 +125,6 @@ export async function generatePerformancePage(report, options = {}) {
   const libraryVersions = Object.entries(parsedReport.libraries)
     .map(([library, version]) => `\`${library}@${version}\``)
     .join(', ');
-  const gitRevision =
-    typeof parsedReport.gitRevision === 'string' && parsedReport.gitRevision.length > 0
-      ? `- Git revision: \`${parsedReport.gitRevision}\`\n`
-      : '';
   const sections = CATEGORIES.map(([category, title]) => {
     const rows = parsedReport.results
       .filter((result) => result.category === category)
@@ -150,17 +147,19 @@ title: Performance
 description: Matrix and SVG generation benchmark results for QRCodeSDK and its reference libraries.
 ---
 
-<!-- Generated from ${sourcePath}. Run \`pnpm --filter docs generate-performance\` to update. -->
+<!-- Generated from ${sourcePath}. Run \`pnpm turbo run generate-performance --filter=docs\` to update. -->
 
-These results compare QRCodeSDK with the two reference libraries used by the correctness suite. Benchmarks are environment-specific and should be read as relative comparisons, not universal guarantees.
+These results compare QRCodeSDK with **qrcode** and three **qrcode-generator** encoder configurations. Benchmarks are environment-specific and should be read as relative comparisons, not universal guarantees.
+
+All **qrcode-generator** rows use the repository patch that applies each fixture's explicit mask and skips automatic mask evaluation. The **default** row uses the package's stock low-byte converter, **TextEncoder** uses the platform encoder, and **bundled UTF-8** uses the package's handwritten UTF-8 converter. The default converter truncates UTF-16 code units, so its Unicode byte fixtures do not encode content equivalent to the other rows. TextEncoder and bundled UTF-8 produce the same bytes for the valid Unicode fixtures.
 
 ## Benchmark environment
 
 - Generated: \`${parsedReport.generatedAt}\`
-${gitRevision}- Runtime: \`${environment.node}\` on \`${environment.platform} ${environment.architecture}\`
+- Runtime: \`${environment.node}\` on \`${environment.platform} ${environment.architecture}\`
 - CPU: \`${environment.cpuModel}\` (${environment.cpuCount} logical cores)
 - Libraries: ${libraryVersions}
-- Samples: ${configuration.samples} timed samples after ${configuration.warmupStaticPasses} static warmup passes
+- Samples: ${configuration.samples} timed samples after ${configuration.warmupStaticPasses} static warm-up passes and ${configuration.warmupExhaustivePasses} exhaustive warm-up pass${configuration.warmupExhaustivePasses === 1 ? '' : 'es'}
 - SVG output: ${configuration.svg.pixelsPerModule} px/module with a ${configuration.svg.quietZoneModules}-module quiet zone
 
 Lower median time and relative time are better. Throughput is calculated from the median. QRCodeSDK is fixed at \`1.00×\` in the relative-time column.
@@ -185,7 +184,7 @@ export async function assertPerformancePageCurrent(expected, outputPath = DEFAUL
 
   if (current !== expected) {
     throw new Error(
-      `${path.relative(WORKSPACE_ROOT, outputPath)} is stale. Run \`pnpm --filter docs generate-performance\`.`,
+      `${path.relative(WORKSPACE_ROOT, outputPath)} is stale. Run \`pnpm turbo run generate-performance --filter=docs\`.`,
     );
   }
 }

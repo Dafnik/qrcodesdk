@@ -27,6 +27,9 @@
     "clean": {
       "cache": false
     },
+    "generate-performance": {
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },

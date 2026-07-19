@@ -1,4 +1,3 @@
-import {execFileSync} from 'node:child_process';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {arch, cpus, platform, release} from 'node:os';
 import {join} from 'node:path';
@@ -12,6 +11,7 @@ export interface CreateBenchmarkReportOptions {
   readonly checksum: number;
   readonly samples: number;
   readonly warmupStaticPasses: number;
+  readonly warmupExhaustivePasses: number;
   readonly staticFixtureCount: number;
   readonly staticMultipliers: readonly number[];
   readonly exhaustiveFixtureCount: number;
@@ -20,25 +20,12 @@ export interface CreateBenchmarkReportOptions {
   readonly generatedAt?: string;
 }
 
-function gitRevision(workspaceRoot: string): string | null {
-  try {
-    return execFileSync('git', ['rev-parse', 'HEAD'], {
-      cwd: workspaceRoot,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-  } catch {
-    return null;
-  }
-}
-
 export function createBenchmarkReport(options: CreateBenchmarkReportOptions): BenchmarkReport {
   const cpuList = cpus();
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     generatedAt: options.generatedAt ?? new Date().toISOString(),
-    gitRevision: gitRevision(options.workspaceRoot),
     environment: {
       node: process.version,
       platform: platform(),
@@ -53,6 +40,7 @@ export function createBenchmarkReport(options: CreateBenchmarkReportOptions): Be
     configuration: {
       samples: options.samples,
       warmupStaticPasses: options.warmupStaticPasses,
+      warmupExhaustivePasses: options.warmupExhaustivePasses,
       staticFixtureCount: options.staticFixtureCount,
       staticMultipliers: options.staticMultipliers,
       exhaustiveFixtureCount: options.exhaustiveFixtureCount,

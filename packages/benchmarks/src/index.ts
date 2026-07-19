@@ -5,38 +5,43 @@ import {BENCHMARK_ADAPTERS, SVG_PIXELS_PER_MODULE, SVG_QUIET_ZONE_MODULES} from 
 import {createBenchmarkReport, printBenchmarkResults, writeBenchmarkReport} from './report';
 import {executeWorkload, rotateAdapters, timedWorkload} from './runner';
 import {calculateTimeRatio, summarizeSamples} from './statistics';
-import type {
-  BenchmarkCategory,
-  BenchmarkLibraryId,
-  BenchmarkResult,
-  BenchmarkWorkload,
-} from './types';
-import {STATIC_MULTIPLIERS, createBenchmarkWorkloads} from './workloads';
+import type {BenchmarkCategory, BenchmarkLibraryId, BenchmarkResult} from './types';
+import {
+  STATIC_MULTIPLIERS,
+  WARMUP_EXHAUSTIVE_PASSES,
+  WARMUP_STATIC_PASSES,
+  createBenchmarkWarmupWorkloads,
+  createBenchmarkWorkloads,
+} from './workloads';
 
 const SAMPLE_COUNT = 5;
-const WARMUP_STATIC_PASSES = 5;
 const WORKSPACE_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const CATEGORIES = ['matrix', 'svg'] as const satisfies readonly BenchmarkCategory[];
+type BenchmarkSampleKey = `${BenchmarkCategory}:${string}:${BenchmarkLibraryId}`;
+
+function benchmarkSampleKey(
+  category: BenchmarkCategory,
+  workloadId: string,
+  libraryId: BenchmarkLibraryId,
+): BenchmarkSampleKey {
+  return `${category}:${workloadId}:${libraryId}`;
+}
 
 async function main(): Promise<void> {
   const workloads = createBenchmarkWorkloads();
-  const warmupWorkload: BenchmarkWorkload = {
-    id: 'warmup',
-    label: 'Warmup',
-    fixtures: QR_CODE_TEST_FIXTURES,
-    repetitions: WARMUP_STATIC_PASSES,
-    qrCodesPerSample: QR_CODE_TEST_FIXTURES.length * WARMUP_STATIC_PASSES,
-  };
-  const samples = new Map<string, number[]>();
+  const warmupWorkloads = createBenchmarkWarmupWorkloads();
+  const samples = new Map<BenchmarkSampleKey, number[]>();
   const results: BenchmarkResult[] = [];
   let checksum = 0;
 
-  console.log(
-    `Warming ${String(BENCHMARK_ADAPTERS.length)} libraries with ${String(warmupWorkload.qrCodesPerSample)} QR codes per category…`,
-  );
   for (const category of CATEGORIES) {
-    for (const adapter of BENCHMARK_ADAPTERS) {
-      checksum += executeWorkload(adapter, category, warmupWorkload);
+    for (const workload of warmupWorkloads) {
+      console.log(
+        `[${category}] ${workload.label}: ${String(workload.qrCodesPerSample)} QR codes per library…`,
+      );
+      for (const adapter of BENCHMARK_ADAPTERS) {
+        checksum += executeWorkload(adapter, category, workload);
+      }
     }
   }
 
@@ -51,7 +56,7 @@ async function main(): Promise<void> {
         for (const adapter of adapters) {
           const measurement = timedWorkload(adapter, category, workload);
           checksum += measurement.checksum;
-          const key = `${category}:${workload.id}:${adapter.id}`;
+          const key = benchmarkSampleKey(category, workload.id, adapter.id);
           const adapterSamples = samples.get(key) ?? [];
           adapterSamples.push(measurement.elapsedMs);
           samples.set(key, adapterSamples);
@@ -60,13 +65,15 @@ async function main(): Promise<void> {
 
       const summaries = new Map<BenchmarkLibraryId, ReturnType<typeof summarizeSamples>>();
       for (const adapter of BENCHMARK_ADAPTERS) {
-        const adapterSamples = samples.get(`${category}:${workload.id}:${adapter.id}`) ?? [];
+        const adapterSamples =
+          samples.get(benchmarkSampleKey(category, workload.id, adapter.id)) ?? [];
         summaries.set(adapter.id, summarizeSamples(adapterSamples, workload.qrCodesPerSample));
       }
 
       const sdkMedian = summaries.get('qrcodesdk')!.medianMs;
       for (const adapter of BENCHMARK_ADAPTERS) {
-        const adapterSamples = samples.get(`${category}:${workload.id}:${adapter.id}`) ?? [];
+        const adapterSamples =
+          samples.get(benchmarkSampleKey(category, workload.id, adapter.id)) ?? [];
         const summary = summaries.get(adapter.id)!;
         results.push({
           category,
@@ -91,6 +98,7 @@ async function main(): Promise<void> {
     checksum,
     samples: SAMPLE_COUNT,
     warmupStaticPasses: WARMUP_STATIC_PASSES,
+    warmupExhaustivePasses: WARMUP_EXHAUSTIVE_PASSES,
     staticFixtureCount: QR_CODE_TEST_FIXTURES.length,
     staticMultipliers: STATIC_MULTIPLIERS,
     exhaustiveFixtureCount: TOTAL_QR_CODE_COMBINATIONS,
