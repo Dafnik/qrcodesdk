@@ -14,3 +14,6 @@ pagefind
 npmx
 llms
 Funcs
+roledescription
+xychart
+Descr
