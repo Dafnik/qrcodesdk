@@ -13,3 +13,4 @@ bunx
 pagefind
 npmx
 llms
+Funcs

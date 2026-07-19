@@ -103,6 +103,19 @@ describe('qrcode().matrix()', () => {
     }
   });
 
+  test('matches reference matrix mask selection when the mask is automatic', () => {
+    const fixture = {
+      name: 'automatic-mask',
+      data: 'AUTO MASK 123',
+      mode: 'alphanumeric' as const,
+      version: 2 as const,
+      errorCorrectionLevel: 'M' as const,
+    };
+    const matrix = qrcode(fixture.data).config(fixture).matrix();
+
+    expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
+  });
+
   test.each(ALL_QR_CODE_COMBINATIONS)('matches reference matrices for $name', (fixture) => {
     const matrix = qrcode(fixture.data).config(fixture).matrix();
 
