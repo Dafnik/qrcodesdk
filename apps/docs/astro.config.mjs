@@ -3,6 +3,7 @@ import angular from '@analogjs/astro-angular';
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
+import mermaidIntegration from 'astro-mermaid';
 import {defineConfig} from 'astro/config';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightPageContextAction from 'starlight-page-context-action';
@@ -14,6 +15,10 @@ import {includeContentPlugin} from './src/utils/index.js';
 export default defineConfig({
   site: 'https://qrcodesdk.dev',
   markdown: {
+    syntaxHighlight: {
+      type: 'shiki',
+      excludeLangs: ['math', 'mermaid'],
+    },
     shikiConfig: {
       themes: {
         light: 'github-light',
@@ -25,6 +30,33 @@ export default defineConfig({
     plugins: [includeContentPlugin(), tailwindcss()],
   },
   integrations: [
+    mermaidIntegration({
+      autoTheme: true,
+      enableLog: false,
+      mermaidConfig: {
+        xyChart: {
+          width: 760,
+          height: 340,
+          titleFontSize: 16,
+          titlePadding: 6,
+          plotReservedSpacePercent: 72,
+          xAxis: {
+            showTitle: false,
+            showTick: false,
+            showAxisLine: false,
+            labelFontSize: 13,
+            labelPadding: 8,
+          },
+          yAxis: {
+            showTitle: false,
+            tickLength: 3,
+            tickWidth: 1,
+            axisLineWidth: 1,
+            labelFontSize: 12,
+          },
+        },
+      },
+    }),
     starlight({
       customCss: ['./src/styles/global.css'],
       title: 'QRCodeSDK',

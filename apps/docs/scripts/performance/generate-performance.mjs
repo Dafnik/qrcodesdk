@@ -12,6 +12,15 @@ const CATEGORIES = [
   ['matrix', 'Matrix generation'],
   ['svg', 'SVG generation'],
 ];
+const LIBRARIES = [
+  ['qrcodesdk', 'QRCodeSDK'],
+  ['qrcode', 'qrcode'],
+  ['qrcode-generator-default', 'generator default'],
+  ['qrcode-generator', 'generator TextEncoder'],
+  ['qrcode-generator-utf8', 'generator bundled UTF-8'],
+];
+const LIBRARY_ORDER = new Map(LIBRARIES.map(([libraryId], index) => [libraryId, index]));
+const LIBRARY_LABELS = new Map(LIBRARIES);
 
 /**
  * @param {unknown} value
@@ -85,7 +94,9 @@ export function validateBenchmarkReport(report) {
   for (const [index, result] of parsedReport.results.entries()) {
     const entry = requireObject(result, `results[${index}]`);
     requireString(entry.category, `results[${index}].category`);
+    requireString(entry.workloadId, `results[${index}].workloadId`);
     requireString(entry.workloadLabel, `results[${index}].workloadLabel`);
+    requireString(entry.libraryId, `results[${index}].libraryId`);
     requireString(entry.libraryLabel, `results[${index}].libraryLabel`);
     requireString(entry.libraryVersion, `results[${index}].libraryVersion`);
     requireFiniteNumber(entry.qrCodesPerSample, `results[${index}].qrCodesPerSample`);
@@ -111,6 +122,66 @@ function formatResultRow(result) {
   return `| ${result.workloadLabel} | ${formatInteger(result.qrCodesPerSample)} | ${result.libraryLabel} v${result.libraryVersion} | ${result.medianMs.toFixed(3)} | ${result.minMs.toFixed(3)}–${result.maxMs.toFixed(3)} | ${formatInteger(result.qrCodesPerSecond)} | ${result.timeVsQRCodeSDK.toFixed(2)}× |`;
 }
 
+/** @param {Record<string, any>} left @param {Record<string, any>} right */
+function compareLibraries(left, right) {
+  const leftOrder = LIBRARY_ORDER.get(left.libraryId) ?? Number.MAX_SAFE_INTEGER;
+  const rightOrder = LIBRARY_ORDER.get(right.libraryId) ?? Number.MAX_SAFE_INTEGER;
+
+  return leftOrder - rightOrder || left.libraryLabel.localeCompare(right.libraryLabel);
+}
+
+/** @param {Record<string, any>[]} results */
+function groupResultsByWorkload(results) {
+  const workloads = new Map();
+
+  for (const result of results) {
+    const workloadResults = workloads.get(result.workloadId) ?? [];
+    workloadResults.push(result);
+    workloads.set(result.workloadId, workloadResults);
+  }
+
+  return [...workloads.values()];
+}
+
+/** @param {Record<string, any>} result */
+function formatChartLibraryLabel(result) {
+  return LIBRARY_LABELS.get(result.libraryId) ?? result.libraryLabel;
+}
+
+/**
+ * @param {Record<string, any>[]} results
+ * @param {string} categoryTitle
+ * @param {number} yAxisMaximum
+ */
+function formatMermaidChart(results, categoryTitle, yAxisMaximum) {
+  const sortedResults = results.toSorted(compareLibraries);
+  const [{workloadLabel, qrCodesPerSample}] = sortedResults;
+  const libraryLabels = sortedResults.map(formatChartLibraryLabel);
+  const relativeTimes = sortedResults.map((result) => result.timeVsQRCodeSDK.toFixed(2));
+  const accessibleValues = sortedResults
+    .map(
+      (result) => `${formatChartLibraryLabel(result)} ${result.timeVsQRCodeSDK.toFixed(2)} times`,
+    )
+    .join(', ');
+  const chartTitle = `${workloadLabel} — ${formatInteger(qrCodesPerSample)} QR codes/sample`;
+
+  return `\`\`\`mermaid
+---
+config:
+  xyChart:
+    showDataLabel: true
+    showDataLabelOutsideBar: true
+---
+xychart horizontal
+  accTitle: ${categoryTitle}: ${chartTitle}
+  accDescr: Relative median time compared with QRCodeSDK. ${accessibleValues}. Lower is better.
+  title ${JSON.stringify(chartTitle)}
+  x-axis "Library" [${libraryLabels.map((label) => JSON.stringify(label)).join(', ')}]
+  y-axis "Time ÷ QRCodeSDK" 0 --> ${yAxisMaximum.toFixed(1)}
+  bar [${relativeTimes.join(', ')}]
+\`\`\``;
+}
+
 /**
  * @param {unknown} report
  * @param {{ inputPath?: string, outputPath?: string, workspaceRoot?: string }} [options]
@@ -126,20 +197,33 @@ export async function generatePerformancePage(report, options = {}) {
     .map(([library, version]) => `\`${library}@${version}\``)
     .join(', ');
   const sections = CATEGORIES.map(([category, title]) => {
-    const rows = parsedReport.results
-      .filter((result) => result.category === category)
-      .map(formatResultRow)
-      .join('\n');
+    const categoryResults = parsedReport.results.filter((result) => result.category === category);
 
-    if (rows.length === 0) {
+    if (categoryResults.length === 0) {
       throw new Error(`No ${category} benchmark results were found.`);
     }
 
+    const maximumRelativeTime = Math.max(
+      ...categoryResults.map((result) => result.timeVsQRCodeSDK),
+    );
+    const yAxisMaximum = Math.ceil(maximumRelativeTime * 2) / 2 + 0.5;
+    const charts = groupResultsByWorkload(categoryResults)
+      .map((results) => formatMermaidChart(results, title, yAxisMaximum))
+      .join('\n\n');
+    const rows = categoryResults.map(formatResultRow).join('\n');
+
     return `## ${title}
+
+${charts}
+
+<details>
+<summary>Exact benchmark data</summary>
 
 | Workload | QR codes/sample | Library | Median (ms) | Min–max (ms) | QR codes/second | Time ÷ QRCodeSDK |
 | --- | ---: | --- | ---: | ---: | ---: | ---: |
-${rows}`;
+${rows}
+
+</details>`;
   }).join('\n\n');
   const sourcePath = path.relative(workspaceRoot, inputPath).split(path.sep).join('/');
   const markdown = `---
@@ -162,7 +246,7 @@ All **qrcode-generator** rows use the repository patch that applies each fixture
 - Samples: ${configuration.samples} timed samples after ${configuration.warmupStaticPasses} static warm-up passes and ${configuration.warmupExhaustivePasses} exhaustive warm-up pass${configuration.warmupExhaustivePasses === 1 ? '' : 'es'}
 - SVG output: ${configuration.svg.pixelsPerModule} px/module with a ${configuration.svg.quietZoneModules}-module quiet zone
 
-Lower median time and relative time are better. Throughput is calculated from the median. QRCodeSDK is fixed at \`1.00×\` in the relative-time column.
+The charts show relative median time, where lower is better and QRCodeSDK is fixed at \`1.00×\`. Expand the exact benchmark data beneath each section for median time, min–max range, and throughput calculated from the median.
 
 ${sections}
 `;

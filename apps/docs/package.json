@@ -31,6 +31,8 @@
     "@qrcodesdk/core": "workspace:*",
     "@qrcodesdk/react": "workspace:*",
     "@tailwindcss/vite": "4.3.2",
+    "astro-mermaid": "2.1.0",
+    "mermaid": "11.16.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "rxjs": "catalog:",

@@ -302,6 +302,14 @@
 }
 
 @media (max-width: 38rem) {
+  .sl-markdown-content pre.mermaid:has(svg[aria-roledescription='xychart']) {
+    justify-content: flex-start;
+  }
+
+  .sl-markdown-content pre.mermaid svg[aria-roledescription='xychart'] {
+    min-width: 43.75rem;
+  }
+
   .qrcode-playground__grid,
   .qrcode-playground__color-row {
     grid-template-columns: 1fr;
@@ -311,4 +319,19 @@
     align-items: stretch;
     flex-direction: column;
   }
+}
+
+.sl-markdown-content pre.mermaid[data-processed] {
+  margin-block: 1rem 2rem;
+  padding: 1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--sl-color-gray-7) 70%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.sl-markdown-content pre.mermaid svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }

@@ -59,9 +59,18 @@ const REPORT = {
     {
       ...RESULT,
       category: 'matrix',
+      libraryId: 'qrcode',
+      libraryLabel: 'qrcode',
+      libraryVersion: '1.5.4',
+      timeVsQRCodeSDK: 1.5,
+    },
+    {
+      ...RESULT,
+      category: 'matrix',
       libraryId: 'qrcode-generator-default',
       libraryLabel: 'qrcode-generator (default)',
       libraryVersion: '2.0.4',
+      timeVsQRCodeSDK: 4.25,
     },
     {
       ...RESULT,
@@ -69,6 +78,7 @@ const REPORT = {
       libraryId: 'qrcode-generator',
       libraryLabel: 'qrcode-generator (TextEncoder)',
       libraryVersion: '2.0.4',
+      timeVsQRCodeSDK: 4.5,
     },
     {
       ...RESULT,
@@ -76,13 +86,21 @@ const REPORT = {
       libraryId: 'qrcode-generator-utf8',
       libraryLabel: 'qrcode-generator (bundled UTF-8)',
       libraryVersion: '2.0.4',
+      timeVsQRCodeSDK: 4.4,
+    },
+    {
+      ...RESULT,
+      category: 'matrix',
+      workloadId: 'static-5',
+      workloadLabel: 'Static fixtures ×5',
+      qrCodesPerSample: 80,
     },
     {...RESULT, category: 'svg', medianMs: 4, qrCodesPerSecond: 4000},
   ],
   checksum: 123,
 };
 
-test('generates performance metadata and markdown tables', async () => {
+test('generates accessible Mermaid charts and collapsible exact benchmark tables', async () => {
   const markdown = await generatePerformancePage(REPORT, {
     inputPath: '/workspace/benchmark-results/latest.json',
     outputPath: '/workspace/apps/docs/src/content/docs/guides/performance.md',
@@ -100,6 +118,22 @@ test('generates performance metadata and markdown tables', async () => {
   );
   assert.match(markdown, /## Matrix generation/);
   assert.match(markdown, /## SVG generation/);
+  assert.equal(markdown.match(/```mermaid/g)?.length, 3);
+  assert.match(markdown, /xychart horizontal/);
+  assert.match(markdown, /showDataLabel: true/);
+  assert.match(markdown, /showDataLabelOutsideBar: true/);
+  assert.match(markdown, /accTitle: Matrix generation: Static fixtures ×1 — 16 QR codes\/sample/);
+  assert.match(markdown, /accDescr: Relative median time compared with QRCodeSDK\./);
+  assert.match(
+    markdown,
+    /x-axis "Library" \["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"\]/,
+  );
+  assert.match(markdown, /y-axis "Time ÷ QRCodeSDK" 0 --> 5\.0/);
+  assert.match(markdown, /bar \[1\.00, 1\.50, 4\.25, 4\.50, 4\.40\]/);
+  assert.ok(
+    markdown.indexOf('title "Static fixtures ×1') < markdown.indexOf('title "Static fixtures ×5'),
+  );
+  assert.equal(markdown.match(/<summary>Exact benchmark data<\/summary>/g)?.length, 2);
   assert.match(markdown, /\| Static fixtures ×1 \|\s+16 \| QRCodeSDK v1\.2\.3\s+\|\s+2\.000/);
   assert.match(markdown, /\| Static fixtures ×1 \|\s+16 \| QRCodeSDK v1\.2\.3\s+\|\s+4\.000/);
   assert.match(markdown, /qrcode-generator \(default\) v2\.0\.4/);
