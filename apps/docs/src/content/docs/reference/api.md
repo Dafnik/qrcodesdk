@@ -25,7 +25,7 @@ Creates a renderer that returns terminal text.
 QRCodeTextRenderer(options?);
 ```
 
-Options include `size` and `margin`.
+Options include `size`, `margin`, and `small`. The renderer uses 24-bit ANSI black and white background colors by default; `small: true` uses plain Unicode block characters without ANSI escape sequences.
 
 ### parseQRCodeStylingOptions
 

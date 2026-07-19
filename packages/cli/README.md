@@ -4,7 +4,7 @@
 [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/cli?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/cli)
 [![npm download per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/cli?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/cli)
 
-`@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact terminal text or writes SVG and PNG files.
+`@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints ANSI terminal text or writes SVG and PNG files.
 
 ## Install
 
@@ -42,13 +42,19 @@ pnpm dlx @qrcodesdk/cli "https://qrcodesdk.dev"
 
 ## Print terminal text
 
-Without an output file, `qrc` prints compact Unicode text to standard output:
+Without an output file, `qrc` prints gap-free ANSI background cells to standard output:
 
 ```sh
 qrc "https://qrcodesdk.dev"
 ```
 
-Terminal output is useful for local checks, scripts, logs, and copyable command output.
+Terminal output is useful for local checks, scripts, logs, and copyable command output. Use compact mode to combine two QR rows into each terminal row with plain Unicode block characters:
+
+```sh
+qrc "https://qrcodesdk.dev" --small
+```
+
+Default output always includes ANSI escape sequences, including when standard output is redirected. `--small` uses the original Unicode block renderer without ANSI colors and affects text output only.
 
 ## Write SVG's
 
@@ -118,13 +124,14 @@ qrc "HELLO WORLD" \
 | `--mask <0-7>`                          | Pin a QR code mask.                                         | `Auto`      |
 | `--size <number>`                       | Module size as a positive integer.                          | `1`         |
 | `--margin <number>`                     | Margin as a non-negative integer.                           | `2`         |
+| `--small`                               | Render compact plain Unicode terminal text.                 | `false`     |
 | `--color-dark <#rrggbb>`                | Dark module color.                                          | `#000000`   |
 | `--color-light <#rrggbb>`               | Light module color.                                         | `#ffffff`   |
 | `--alt <text>`                          | SVG `alt` text.                                             | `undefined` |
 | `--aria-label <text>`                   | SVG `aria-label`.                                           | `undefined` |
 | `--title <text>`                        | SVG `title`.                                                | `undefined` |
 
-Colors must be six-digit hex values. `--size` must be positive and `--margin` must be non-negative.
+Colors must be six-digit hex values. `--size` must be positive and `--margin` must be non-negative. Default text output uses fixed 24-bit ANSI black and white; color options apply to visual file renderers.
 
 ## Interactive and automated use
 

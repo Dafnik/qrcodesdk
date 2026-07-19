@@ -31,6 +31,7 @@ type RawCliOptions = {
   readonly mask?: string;
   readonly size?: string;
   readonly margin?: string;
+  readonly small?: boolean;
   readonly colorDark?: string;
   readonly colorLight?: string;
   readonly alt?: string;
@@ -44,6 +45,7 @@ type ResolvedCliOptions = Readonly<
       readonly input: string;
       readonly format: OutputFormat;
       readonly output?: string;
+      readonly small: boolean;
       readonly styling: QRCodeStylingOptions;
     }
 >;
@@ -112,7 +114,7 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       .usage('[data] [options]')
       .summary('generate QR codes from a terminal.')
       .description(
-        '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact terminal text or writes SVG and PNG files.',
+        '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints ANSI terminal text or writes SVG and PNG files.',
       )
       .version(__QRCODESDK_CLI_VERSION__, '-V', 'Print the installed CLI package version')
       .argument('[data]', 'Positional QR code input data')
@@ -125,6 +127,7 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       .option('--mask <mask>', 'Pin a QR code mask from 0 to 7')
       .option('--size <size>', 'Module size as a positive integer')
       .option('--margin <margin>', 'Margin as a non-negative integer')
+      .option('--small', 'Render compact terminal text with Unicode blocks')
       .option('--color-dark <hex>', 'Dark module color as #rrggbb')
       .option('--color-light <hex>', 'Light module color as #rrggbb')
       .option('--alt <text>', 'SVG alt text')
@@ -160,6 +163,7 @@ async function resolveCliOptions(
     input,
     format,
     output,
+    small: rawOptions.small ?? false,
     mode: optionalEnum(rawOptions.mode, qrModes, 'mode'),
     errorCorrectionLevel: optionalErrorCorrectionLevel(rawOptions.errorCorrection),
     version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as
@@ -319,7 +323,9 @@ async function render(
   });
 
   if (options.format === 'text') {
-    stdout.write(`${builder.render(QRCodeTextRenderer(options.styling))}\n`);
+    stdout.write(
+      `${builder.render(QRCodeTextRenderer({...options.styling, small: options.small}))}\n`,
+    );
     return;
   }
 

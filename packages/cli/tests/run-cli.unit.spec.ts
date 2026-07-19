@@ -71,7 +71,8 @@ describe('runCli', () => {
     await expect(runCli(['HELLO WORLD'], runtime)).resolves.toBe(0);
 
     expect(runtime.files).toEqual([]);
-    expect(runtime.stdoutText()).toContain('█');
+    expect(runtime.stdoutText()).toContain('\u001b[48;2;0;0;0m');
+    expect(runtime.stdoutText()).toContain('\u001b[48;2;255;255;255m');
     expect(runtime.stderrText()).toBe('');
   });
 
@@ -80,7 +81,18 @@ describe('runCli', () => {
 
     await expect(runCli(['--input', 'HELLO WORLD'], runtime)).resolves.toBe(0);
 
-    expect(runtime.stdoutText()).toContain('█');
+    expect(runtime.stdoutText()).toContain('\u001b[48;2;0;0;0m');
+  });
+
+  test('prints compact plain Unicode terminal text with --small', async () => {
+    const runtime = createRuntime();
+
+    await expect(
+      runCli(['HELLO WORLD', '--small', '--size', '1', '--margin', '0'], runtime),
+    ).resolves.toBe(0);
+
+    expect(runtime.stdoutText()).toContain('▀');
+    expect(runtime.stdoutText()).not.toContain('\u001b[');
   });
 
   test('rejects conflicting positional and option input', async () => {
@@ -160,7 +172,7 @@ describe('runCli', () => {
 
     await expect(runCli([], runtime)).resolves.toBe(0);
 
-    expect(runtime.stdoutText()).toContain('█');
+    expect(runtime.stdoutText()).toContain('\u001b[48;2;0;0;0m');
   });
 
   test('rejects empty prompted output paths', async () => {
