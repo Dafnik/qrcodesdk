@@ -1,4 +1,4 @@
-import {parseQRCodeStylingOptions} from './styling';
+import {calculateQRCodeRenderedSize, parseQRCodeStylingOptions} from './styling';
 import type {
   QRCodeAccessibilityOptions,
   QRCodeMatrix,
@@ -13,13 +13,12 @@ export type QRCodeSVGOptions = QRCodeOptions<QRCodeSVGRendererOptions>;
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
   return (matrix: QRCodeMatrix) => {
     const styling = parseQRCodeStylingOptions(options);
-    const modSize = styling.size;
     const margin = styling.margin;
     const colorLight = styling.colors.colorLight;
     const colorDark = styling.colors.colorDark;
     const n = matrix.length;
     const qrSize = n + 2 * margin;
-    const size = modSize * qrSize;
+    const size = calculateQRCodeRenderedSize(matrix, styling);
     const darkPath = matrixToPath(matrix, margin);
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${qrSize} ${qrSize}" shape-rendering="crispEdges"`;
 

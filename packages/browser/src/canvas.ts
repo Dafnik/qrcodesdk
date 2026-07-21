@@ -3,10 +3,9 @@ import {
   type QRCodeOptions,
   type QRCodeRenderer,
   type QRCodeStylingOptions,
+  calculateQRCodeRenderedSize,
   parseQRCodeStylingOptions,
 } from '@qrcodesdk/core';
-
-import {getRenderedSize, validatePixelGeometry} from './geometry';
 
 export type QRCodeCanvasRendererOptions = QRCodeStylingOptions;
 export type QRCodeCanvasOptions = QRCodeOptions<QRCodeCanvasRendererOptions>;
@@ -18,9 +17,7 @@ export function QRCodeCanvasRenderer(
     const styling = parseQRCodeStylingOptions(options);
     const modSize = styling.size;
     const margin = styling.margin;
-    validatePixelGeometry('Canvas', modSize, margin);
-
-    const imageSize = getRenderedSize(matrix, modSize, margin);
+    const imageSize = calculateQRCodeRenderedSize(matrix, styling);
     const canvas = document.createElement('canvas');
     canvas.width = imageSize;
     canvas.height = imageSize;

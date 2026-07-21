@@ -62,14 +62,17 @@ describe('QRCodeCanvasRenderer', () => {
 
   test('rejects canvas dimensions that cannot map cleanly to pixels', () => {
     expect(() => QRCodeCanvasRenderer({size: 1.5})([[1]])).toThrow(
-      'Canvas QR code size must be a positive integer',
+      'QR code size must be a positive integer',
     );
     expect(() => QRCodeCanvasRenderer({margin: -1})([[1]])).toThrow(
-      'Canvas QR code margin must be a non-negative integer',
+      'QR code margin must be a non-negative integer',
+    );
+    expect(() => QRCodeCanvasRenderer({colors: {colorLight: '#fff'}})([[1]])).toThrow(
+      'QR code colorLight must be a 6-digit hex color',
     );
   });
 
-  test('excepts canvas dimensions that are valid', () => {
+  test('accepts canvas dimensions that are valid', () => {
     expect(() => QRCodeCanvasRenderer({margin: 0})([[1]])).not.toThrow();
     expect(() => QRCodeCanvasRenderer({size: 1})([[1]])).not.toThrow();
   });

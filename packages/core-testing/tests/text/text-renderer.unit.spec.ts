@@ -148,19 +148,19 @@ describe('QRCodeTextRenderer', () => {
 
   test('rejects text output that cannot map cleanly to terminal cells', () => {
     expect(() => QRCodeTextRenderer({size: 1.5})([[1]])).toThrow(
-      'Text QR code size must be a positive integer',
+      'QR code size must be a positive integer',
     );
     expect(() => QRCodeTextRenderer({margin: -1})([[1]])).toThrow(
-      'Text QR code margin must be a non-negative integer',
+      'QR code margin must be a non-negative integer',
     );
   });
 
-  test('rejects unsupported colors when ANSI styling is enabled', () => {
-    expect(() =>
-      QRCodeTextRenderer({ansiColors: true, colors: {colorDark: '#abc'}})([[1]]),
-    ).toThrow('Text QR code dark color must be a six-digit hex color');
-    expect(() =>
-      QRCodeTextRenderer({ansiColors: true, colors: {colorLight: '#not-a-color'}})([[1]]),
-    ).toThrow('Text QR code light color must be a six-digit hex color');
+  test('rejects invalid shared colors', () => {
+    expect(() => QRCodeTextRenderer({colors: {colorDark: '#abc'}})([[1]])).toThrow(
+      'QR code colorDark must be a 6-digit hex color',
+    );
+    expect(() => QRCodeTextRenderer({colors: {colorLight: '#not-a-color'}})([[1]])).toThrow(
+      'QR code colorLight must be a 6-digit hex color',
+    );
   });
 });

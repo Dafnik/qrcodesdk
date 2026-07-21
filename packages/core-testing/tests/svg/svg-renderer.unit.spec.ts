@@ -95,4 +95,16 @@ describe('QRCodeSVGRenderer', () => {
       d: 'M0 0h2v2H0z',
     });
   });
+
+  test('rejects invalid shared styling', () => {
+    expect(() => QRCodeSVGRenderer({size: 1.5})([[1]])).toThrow(
+      'QR code size must be a positive integer',
+    );
+    expect(() => QRCodeSVGRenderer({margin: -1})([[1]])).toThrow(
+      'QR code margin must be a non-negative integer',
+    );
+    expect(() => QRCodeSVGRenderer({colors: {colorDark: '#abc'}})([[1]])).toThrow(
+      'QR code colorDark must be a 6-digit hex color',
+    );
+  });
 });

@@ -72,10 +72,13 @@ describe('QRCodePNGRenderer', () => {
 
   test('rejects PNG dimensions that cannot map cleanly to pixels', () => {
     expect(() => QRCodePNGRenderer({size: 1.5})([[1]])).toThrow(
-      'PNG QR code size must be a positive integer',
+      'QR code size must be a positive integer',
     );
     expect(() => QRCodePNGRenderer({margin: -1})([[1]])).toThrow(
-      'PNG QR code margin must be a non-negative integer',
+      'QR code margin must be a non-negative integer',
+    );
+    expect(() => QRCodePNGRenderer({colors: {colorDark: '#xyz'}})([[1]])).toThrow(
+      'QR code colorDark must be a 6-digit hex color',
     );
   });
 });

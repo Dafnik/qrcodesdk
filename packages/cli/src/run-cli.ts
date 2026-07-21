@@ -13,6 +13,9 @@ import {
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeVersion,
+  isQRCodeColorHex,
+  isValidQRCodeMargin,
+  isValidQRCodeSize,
   qrcode,
 } from '@qrcodesdk/core';
 import {QRCodePNGRenderer} from '@qrcodesdk/node';
@@ -425,14 +428,18 @@ function optionalErrorCorrectionLevel(
 function optionalPositiveInteger(value: string | undefined, name: string): number | undefined {
   const parsed = optionalInteger(value, name);
   if (parsed === undefined) return undefined;
-  if (parsed <= 0) throw new CliError(`Invalid ${name}. Expected a positive integer.`);
+  if (!isValidQRCodeSize(parsed)) {
+    throw new CliError(`Invalid ${name}. Expected a positive integer.`);
+  }
   return parsed;
 }
 
 function optionalNonNegativeInteger(value: string | undefined, name: string): number | undefined {
   const parsed = optionalInteger(value, name);
   if (parsed === undefined) return undefined;
-  if (parsed < 0) throw new CliError(`Invalid ${name}. Expected a non-negative integer.`);
+  if (!isValidQRCodeMargin(parsed)) {
+    throw new CliError(`Invalid ${name}. Expected a non-negative integer.`);
+  }
   return parsed;
 }
 
@@ -460,11 +467,11 @@ function optionalInteger(value: string | undefined, name: string): number | unde
 
 function optionalHexColor(value: string | undefined, name: string): `#${string}` | undefined {
   if (value === undefined) return undefined;
-  if (!/^#[0-9a-f]{6}$/i.test(value)) {
+  if (!isQRCodeColorHex(value)) {
     throw new CliError(`Invalid ${name}. Expected a six-digit hex color like #111111.`);
   }
 
-  return value as `#${string}`;
+  return value;
 }
 
 const defaultPromptAdapter: PromptAdapter = {

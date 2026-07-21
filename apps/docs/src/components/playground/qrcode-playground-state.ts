@@ -1,4 +1,4 @@
-import {qrcode} from '@qrcodesdk/core';
+import {isQRCodeColorHex, isValidQRCodeMargin, isValidQRCodeSize, qrcode} from '@qrcodesdk/core';
 import type {
   QRCodeColorHex,
   QRCodeErrorCorrectionLevel,
@@ -15,8 +15,6 @@ import type {
   QRCodePlaygroundSnapshot,
   QRCodePlaygroundValidation,
 } from './qrcode-playground-types';
-
-const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 
 const DEFAULT_DRAFT: QRCodePlaygroundDraft = {
   packageName: 'react',
@@ -76,19 +74,19 @@ export function createPlaygroundSnapshot(draft: QRCodePlaygroundDraft): QRCodePl
 export function validatePlaygroundDraft(draft: QRCodePlaygroundDraft): QRCodePlaygroundValidation {
   const fieldErrors: QRCodePlaygroundValidation['fieldErrors'] = {};
 
-  if (!Number.isInteger(draft.size) || draft.size < 1) {
+  if (!isValidQRCodeSize(draft.size)) {
     fieldErrors.size = 'Size must be a positive integer.';
   }
 
-  if (!Number.isInteger(draft.margin) || draft.margin < 0) {
+  if (!isValidQRCodeMargin(draft.margin)) {
     fieldErrors.margin = 'Margin must be zero or a positive integer.';
   }
 
-  if (!HEX_COLOR_PATTERN.test(draft.colorDark)) {
+  if (!isQRCodeColorHex(draft.colorDark)) {
     fieldErrors.colorDark = 'Use a 6-digit hex color.';
   }
 
-  if (!HEX_COLOR_PATTERN.test(draft.colorLight)) {
+  if (!isQRCodeColorHex(draft.colorLight)) {
     fieldErrors.colorLight = 'Use a 6-digit hex color.';
   }
 

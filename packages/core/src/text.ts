@@ -1,5 +1,5 @@
-import {parseQRCodeStylingOptions} from './styling';
-import type {QRCodeMatrix, QRCodeRenderer, QRCodeStylingOptions} from './types';
+import {calculateQRCodeRenderedSize, parseQRCodeStylingOptions} from './styling';
+import type {QRCodeColorHex, QRCodeMatrix, QRCodeRenderer, QRCodeStylingOptions} from './types';
 
 const ANSI_RESET = '\u001b[0m';
 
@@ -15,10 +15,7 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
     const modSize = styling.size;
     const margin = styling.margin;
 
-    validateTextGeometry(modSize, margin);
-
-    const moduleCount = matrix.length + 2 * margin;
-    const scaledSize = moduleCount * modSize;
+    const scaledSize = calculateQRCodeRenderedSize(matrix, styling);
 
     if (options?.onlyAnsiColors === true) {
       if (options.ansiColors === false) {
@@ -52,11 +49,11 @@ function renderAnsiOnlyText(
   scaledSize: number,
   margin: number,
   modSize: number,
-  colorDark: string,
-  colorLight: string,
+  colorDark: QRCodeColorHex,
+  colorLight: QRCodeColorHex,
 ): string {
-  const darkBackground = createAnsiColor('48', parseAnsiColor(colorDark, 'dark'));
-  const lightBackground = createAnsiColor('48', parseAnsiColor(colorLight, 'light'));
+  const darkBackground = createAnsiColor('48', hexColorToRGB(colorDark));
+  const lightBackground = createAnsiColor('48', hexColorToRGB(colorLight));
   const rows: string[] = [];
 
   for (let row = 0; row < scaledSize; row++) {
@@ -123,9 +120,9 @@ function renderSmallText(
   return rows;
 }
 
-function createAnsiPrefix(colorDark: string, colorLight: string): string {
-  const darkForeground = createAnsiColor('38', parseAnsiColor(colorDark, 'dark'));
-  const lightBackground = createAnsiColor('48', parseAnsiColor(colorLight, 'light'));
+function createAnsiPrefix(colorDark: QRCodeColorHex, colorLight: QRCodeColorHex): string {
+  const darkForeground = createAnsiColor('38', hexColorToRGB(colorDark));
+  const lightBackground = createAnsiColor('48', hexColorToRGB(colorLight));
 
   return `${darkForeground}${lightBackground}`;
 }
@@ -134,13 +131,8 @@ function createAnsiColor(code: '38' | '48', color: [number, number, number]): st
   return `\u001b[${code};2;${color.join(';')}m`;
 }
 
-function parseAnsiColor(color: string, name: string): [number, number, number] {
-  const match = /^#([0-9a-f]{6})$/i.exec(color);
-  if (!match) {
-    throw new Error(`Text QR code ${name} color must be a six-digit hex color, received ${color}`);
-  }
-
-  const hexadecimal = match[1]!;
+function hexColorToRGB(color: QRCodeColorHex): [number, number, number] {
+  const hexadecimal = color.slice(1);
   return [
     Number.parseInt(hexadecimal.slice(0, 2), 16),
     Number.parseInt(hexadecimal.slice(2, 4), 16),
@@ -172,14 +164,4 @@ function compactModuleCharacter(upperDark: boolean, lowerDark: boolean): string 
   if (upperDark) return '▀';
   if (lowerDark) return '▄';
   return ' ';
-}
-
-function validateTextGeometry(modSize: number, margin: number): void {
-  if (!Number.isInteger(modSize) || modSize <= 0) {
-    throw new Error(`Text QR code size must be a positive integer, received ${modSize}`);
-  }
-
-  if (!Number.isInteger(margin) || margin < 0) {
-    throw new Error(`Text QR code margin must be a non-negative integer, received ${margin}`);
-  }
 }

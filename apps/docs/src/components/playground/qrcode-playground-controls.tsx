@@ -1,5 +1,7 @@
 import {useEffect, useMemo, useState} from 'react';
 
+import {isQRCodeColorHex} from '@qrcodesdk/core';
+
 import {generatePlaygroundCode} from './qrcode-playground-code';
 import {
   QR_CODE_PLAYGROUND_DEFAULT_DRAFT,
@@ -325,7 +327,7 @@ function NumberField({error, label, min, onChange, value}: NumberFieldProps) {
 }
 
 function ColorField({error, label, onChange, value}: ValueFieldProps<string>) {
-  const isValidColor = /^#[0-9a-fA-F]{6}$/.test(value);
+  const isValidColor = isQRCodeColorHex(value);
 
   return (
     <label className="qrcode-playground__field qrcode-playground__field--color">

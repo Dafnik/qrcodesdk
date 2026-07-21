@@ -276,6 +276,25 @@ describe('runCli', () => {
     expect(runtime.stderrText()).toContain('Expected an integer from 1 to 40');
   });
 
+  test.each([
+    {args: ['--size', '0'], message: 'Invalid size. Expected a positive integer.'},
+    {args: ['--margin', '-1'], message: 'Invalid margin. Expected a non-negative integer.'},
+    {
+      args: ['--color-dark', '#fff'],
+      message: 'Invalid color-dark. Expected a six-digit hex color like #111111.',
+    },
+    {
+      args: ['--color-light', '#gggggg'],
+      message: 'Invalid color-light. Expected a six-digit hex color like #111111.',
+    },
+  ])('rejects invalid styling options: $args', async ({args, message}) => {
+    const runtime = createRuntime();
+
+    await expect(runCli(['HELLO WORLD', ...args], runtime)).resolves.toBe(1);
+
+    expect(runtime.stderrText()).toContain(message);
+  });
+
   test('fails instead of prompting in non-interactive mode', async () => {
     const runtime = createRuntime();
 

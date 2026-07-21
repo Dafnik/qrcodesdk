@@ -127,6 +127,19 @@ For framework-specific components, add:
 - [`@qrcodesdk/angular`](/libs/angular/) for Angular
 - [`@qrcodesdk/react`](/libs/react/) for React
 
+## Styling validation and geometry
+
+All built-in renderers share one styling contract: `size` must be a positive safe integer,
+`margin` must be a non-negative safe integer, and colors must be hash-prefixed six-digit
+hexadecimal values.
+
+`parseQRCodeStylingOptions()` applies the shared defaults and throws when the resolved styling is
+invalid. Applications that need non-throwing input validation can use `isValidQRCodeSize()`,
+`isValidQRCodeMargin()`, and the `isQRCodeColorHex()` type guard.
+
+Custom renderers can use `calculateQRCodeRenderedSize(matrix, styling)` to calculate and validate
+the square output dimension, including the quiet-zone margin.
+
 ## Matrix output and custom renderers
 
 Use `.matrix()` to inspect modules or take full control over rendering. A matrix is a two-dimensional array where `1` is dark and `0` is light.
@@ -174,6 +187,10 @@ import {
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeVersion,
+  calculateQRCodeRenderedSize,
+  isQRCodeColorHex,
+  isValidQRCodeMargin,
+  isValidQRCodeSize,
   parseQRCodeStylingOptions,
   qrcode,
 } from '@qrcodesdk/core';

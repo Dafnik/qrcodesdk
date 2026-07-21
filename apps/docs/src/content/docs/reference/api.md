@@ -29,13 +29,37 @@ Options include `size`, `margin`, `colors`, `small`, `ansiColors`, and `onlyAnsi
 
 ### parseQRCodeStylingOptions
 
-Normalizes styling options into complete defaults.
+`parseQRCodeStylingOptions` normalizes styling options into complete defaults and validates the
+shared renderer contract.
 
 ```ts
 parseQRCodeStylingOptions(options?);
 ```
 
 Defaults are `size: 5`, `margin: 4`, `colors.colorLight: '#ffffff'`, and `colors.colorDark: '#000000'`.
+Sizes must be positive safe integers, margins must be non-negative safe integers, and colors must
+be hash-prefixed six-digit hexadecimal values.
+
+### Validation predicates
+
+Use the non-throwing predicates when validating application input:
+
+```ts
+isValidQRCodeSize(value);
+isValidQRCodeMargin(value);
+isQRCodeColorHex(value);
+```
+
+`isQRCodeColorHex` is a type guard for `QRCodeColorHex`.
+
+### calculateQRCodeRenderedSize
+
+Calculates the square output dimension for a matrix and resolved styling, including the quiet-zone
+margin. It rejects invalid styling and dimensions that are not positive safe integers.
+
+```ts
+calculateQRCodeRenderedSize(matrix, styling);
+```
 
 ### Types
 

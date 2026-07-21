@@ -1,9 +1,11 @@
 import {PNG} from 'pngjs';
 
 import {
+  type QRCodeColorHex,
   type QRCodeMatrix,
   type QRCodeRenderer,
   type QRCodeStylingOptions,
+  calculateQRCodeRenderedSize,
   parseQRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
@@ -20,16 +22,11 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
     const styling = parseQRCodeStylingOptions(options);
     const modSize = styling.size;
     const margin = styling.margin;
-    validatePngGeometry(modSize, margin);
 
-    const lightColor = parseHexColor(styling.colors.colorLight);
-    const darkColor = parseHexColor(styling.colors.colorDark);
+    const lightColor = hexColorToRGB(styling.colors.colorLight);
+    const darkColor = hexColorToRGB(styling.colors.colorDark);
     const n = matrix.length;
-    const imageSize = modSize * (n + 2 * margin);
-
-    if (!Number.isInteger(imageSize) || imageSize <= 0) {
-      throw new Error(`PNG QR code dimensions must be positive integers, received ${imageSize}`);
-    }
+    const imageSize = calculateQRCodeRenderedSize(matrix, styling);
 
     const png = new PNG({width: imageSize, height: imageSize});
     fillRect(png, 0, 0, imageSize, imageSize, lightColor);
@@ -54,16 +51,6 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
   };
 }
 
-function validatePngGeometry(modSize: number, margin: number): void {
-  if (!Number.isInteger(modSize) || modSize <= 0) {
-    throw new Error(`PNG QR code size must be a positive integer, received ${modSize}`);
-  }
-
-  if (!Number.isInteger(margin) || margin < 0) {
-    throw new Error(`PNG QR code margin must be a non-negative integer, received ${margin}`);
-  }
-}
-
 function fillRect(
   png: PNG,
   x: number,
@@ -83,10 +70,8 @@ function fillRect(
   }
 }
 
-function parseHexColor(value: string): RGBColor {
-  const match = value.match(/^#([0-9a-f]{6})$/i);
-  if (!match) throw new Error(`Only 6-digit hex colors are supported, received ${value}`);
-  const hex = match[1]!;
+function hexColorToRGB(value: QRCodeColorHex): RGBColor {
+  const hex = value.slice(1);
 
   return {
     red: Number.parseInt(hex.slice(0, 2), 16),

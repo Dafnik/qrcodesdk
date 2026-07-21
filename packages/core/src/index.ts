@@ -16,5 +16,11 @@ export type {
 } from './types';
 export {type QRCodeTextRendererOptions, QRCodeTextRenderer} from './text';
 export {type QRCodeSVGOptions, type QRCodeSVGRendererOptions, QRCodeSVGRenderer} from './svg';
-export {parseQRCodeStylingOptions} from './styling';
+export {
+  calculateQRCodeRenderedSize,
+  isQRCodeColorHex,
+  isValidQRCodeMargin,
+  isValidQRCodeSize,
+  parseQRCodeStylingOptions,
+} from './styling';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';

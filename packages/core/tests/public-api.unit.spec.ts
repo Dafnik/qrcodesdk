@@ -1,5 +1,11 @@
-import {describe, expectTypeOf, test} from 'vitest';
+import {describe, expect, expectTypeOf, test} from 'vitest';
 
+import {
+  calculateQRCodeRenderedSize,
+  isQRCodeColorHex,
+  isValidQRCodeMargin,
+  isValidQRCodeSize,
+} from '../src';
 import type {
   QRCodeAccessibilityOptions,
   QRCodeColorHex,
@@ -55,5 +61,16 @@ describe('public API types', () => {
     expectTypeOf<QRCodeTextRendererOptions['onlyAnsiColors']>().toEqualTypeOf<
       boolean | undefined
     >();
+  });
+
+  test('exports styling validation and geometry utilities', () => {
+    expectTypeOf(isValidQRCodeSize).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(isValidQRCodeMargin).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(isQRCodeColorHex).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(calculateQRCodeRenderedSize).returns.toEqualTypeOf<number>();
+
+    const value: unknown = '#123456';
+    expect(isQRCodeColorHex(value)).toBe(true);
+    if (isQRCodeColorHex(value)) expectTypeOf(value).toEqualTypeOf<QRCodeColorHex>();
   });
 });

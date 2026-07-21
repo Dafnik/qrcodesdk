@@ -152,7 +152,13 @@ For framework-specific components, add:
 | `ariaLabel`         | `string`  | `undefined` | Adds an `aria-label` attribute to SVG output.          |
 | `title`             | `string`  | `undefined` | Adds a `title` attribute to SVG output.                |
 
-Color options use six-digit hash-prefixed values such as `#111827`. Pixel renderers and terminal text require a positive integer `size` and a non-negative integer `margin`. Terminal text is compact plain UTF-8 by default; ANSI styling and full-height `██` output are enabled independently with `ansiColors: true` and `small: false`. Use `onlyAnsiColors: true` for ANSI background cells containing spaces instead of UTF-8 block glyphs.
+Color options use six-digit hash-prefixed values such as `#111827`. All renderers require a positive safe integer `size` and a non-negative safe integer `margin`. Terminal text is compact plain UTF-8 by default; ANSI styling and full-height `██` output are enabled independently with `ansiColors: true` and `small: false`. Use `onlyAnsiColors: true` for ANSI background cells containing spaces instead of UTF-8 block glyphs.
+
+## Styling validation and geometry
+
+`parseQRCodeStylingOptions()` applies the shared defaults and throws when the resolved styling is invalid. Applications that need non-throwing input validation can use `isValidQRCodeSize()`, `isValidQRCodeMargin()`, and the `isQRCodeColorHex()` type guard.
+
+Custom renderers can use `calculateQRCodeRenderedSize(matrix, styling)` to calculate and validate the square output dimension, including the quiet-zone margin.
 
 ## Matrix output and custom renderers
 
@@ -183,20 +189,28 @@ Renderers can be passed directly to `.render(renderer)` or stored with `.rendere
 import {
   type QRCodeAccessibilityOptions,
   QRCodeBuilder,
+  type QRCodeColorHex,
   type QRCodeErrorCorrectionLevel,
   type QRCodeInputData,
   type QRCodeMask,
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
   type QRCodeMode,
+  type QRCodeOptions,
   type QRCodeParsedStylingOptions,
   type QRCodeRenderer,
+  type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
+  type QRCodeStylingColors,
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeVersion,
+  calculateQRCodeRenderedSize,
+  isQRCodeColorHex,
+  isValidQRCodeMargin,
+  isValidQRCodeSize,
   parseQRCodeStylingOptions,
   qrcode,
 } from '@qrcodesdk/core';
