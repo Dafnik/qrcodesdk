@@ -45,14 +45,14 @@
     },
     {
       "groupName": "minor-updates",
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "matchPackageNames": [
         "!typescript",
         "!tslib",
         "!eslint",
         "!/^@typescript-eslint\\//",
         "!/^@types\\//"
-      ]
+      ],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
     },
     {
       "groupName": "major-update",
