@@ -25,7 +25,7 @@ Creates a renderer that returns terminal text.
 QRCodeTextRenderer(options?);
 ```
 
-Options include `size` and `margin`.
+Options include `size`, `margin`, `colors`, `small`, `ansiColors`, and `onlyAnsiColors`. Compact UTF-8 output is enabled by default with `small: true`; use `small: false` for double-width `██` modules. ANSI styling is disabled by default and, when enabled, uses the shared dark foreground and light background colors. `onlyAnsiColors: true` suppresses UTF-8 glyphs and renders every module as two ANSI-background-colored spaces.
 
 ### parseQRCodeStylingOptions
 

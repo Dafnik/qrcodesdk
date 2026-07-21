@@ -1,18 +1,10 @@
-import {QR_CODE_TEST_FIXTURES, getAllQRCodeCombinations} from '@repo/core-testing';
+import {QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 
 import {QRCodeImageRenderer} from '../src';
-import {decodeCanvasQRCode, imageToCanvas} from './helper';
-
-/**
- * Version 23 QR codes always fail to decode
- * https://github.com/cozmo/jsQR/issues/251
- */
-const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
-  ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
-);
+import {JSQR_ROUNDTRIP_COMBINATIONS_TWO, decodeCanvasQRCode, imageToCanvas} from './helper';
 
 async function decodeImageQRCode(image: HTMLImageElement): Promise<string> {
   return decodeCanvasQRCode(await imageToCanvas(image));
@@ -30,7 +22,7 @@ describe('QRCodeImageRenderer', () => {
     ).resolves.toBe(fixture.data);
   });
 
-  test.each(JSQR_ROUNDTRIP_COMBINATIONS)('decodes $name image output', async (fixture) => {
+  test.each(JSQR_ROUNDTRIP_COMBINATIONS_TWO)('decodes $name image output', async (fixture) => {
     await expect(
       decodeImageQRCode(
         qrcode(fixture.data)

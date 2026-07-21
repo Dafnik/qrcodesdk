@@ -2,7 +2,7 @@
   "extends": ["//"],
   "tasks": {
     "test": {
-      "dependsOn": ["build", "^test"]
+      "dependsOn": ["build"]
     },
     "test:coverage:raw": {
       "dependsOn": ["build", "^test:coverage:raw"]

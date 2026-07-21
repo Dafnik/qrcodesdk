@@ -3,6 +3,7 @@ title: Customize QR Codes
 description: Control QR code size, margin, colors, accessibility labels, error correction, version, and mask.
 
 related:
+  - ../renderers/core/text.md
   - ../renderers/core/svg.md
   - ../renderers/node/png.md
   - ../renderers/browser/canvas.md
@@ -38,7 +39,7 @@ Defaults:
 
 ## Colors
 
-SVG, PNG, Canvas, and Image renderers support `colors.colorDark` and `colors.colorLight`.
+SVG, PNG, Canvas, and Image renderers support `colors.colorDark` and `colors.colorLight`. The terminal text renderer uses the same colors as its foreground and background when `ansiColors` is enabled.
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -54,6 +55,24 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 ```
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
+
+```ts
+import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
+
+const text = qrcode('https://qrcodesdk.dev').render(
+  QRCodeTextRenderer({
+    ansiColors: true,
+    colors: {
+      colorDark: '#111827',
+      colorLight: '#ffffff',
+    },
+  }),
+);
+```
+
+ANSI styling is disabled by default in the core API. It changes colors only; `small` independently controls whether terminal output uses compact or full-height geometry.
+
+Set `onlyAnsiColors: true` when terminal output should use colored space cells without any UTF-8 block glyphs. This background-only layout implies ANSI styling and ignores `small`.
 
 ## Accessibility labels
 
