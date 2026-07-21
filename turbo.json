@@ -21,6 +21,12 @@
       "cache": false,
       "dependsOn": ["//#format:check", "//#cspell", "build", "test", "lint", "check-types"]
     },
+    "check-performance": {
+      "cache": false
+    },
+    "check-readmes": {
+      "cache": false
+    },
     "check-types": {
       "dependsOn": ["^build", "^check-types"]
     },
@@ -28,6 +34,9 @@
       "cache": false
     },
     "generate-performance": {
+      "cache": false
+    },
+    "generate-readmes": {
       "cache": false
     },
     "lint": {},

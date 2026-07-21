@@ -4,6 +4,8 @@ import {beforeAll, describe, expect, test, vi} from 'vitest';
 import packageJson from '../package.json' with {type: 'json'};
 import {type CliRuntime, type WritableTarget, runCli} from '../src/run-cli';
 
+const ANSI_PATTERN = new RegExp(`${String.fromCodePoint(27)}\\[[\\d;]+m`, 'g');
+
 type WriteRecord = {
   readonly path: string;
   readonly data: string | Uint8Array;
@@ -71,8 +73,9 @@ describe('runCli', () => {
     await expect(runCli(['HELLO WORLD'], runtime)).resolves.toBe(0);
 
     expect(runtime.files).toEqual([]);
-    expect(runtime.stdoutText()).toContain('\u001b[48;2;0;0;0m');
+    expect(runtime.stdoutText()).toContain('\u001b[38;2;0;0;0m');
     expect(runtime.stdoutText()).toContain('\u001b[48;2;255;255;255m');
+    expect(runtime.stdoutText()).toMatch(/[▀▄█]/);
     expect(runtime.stderrText()).toBe('');
   });
 
@@ -81,18 +84,155 @@ describe('runCli', () => {
 
     await expect(runCli(['--input', 'HELLO WORLD'], runtime)).resolves.toBe(0);
 
-    expect(runtime.stdoutText()).toContain('\u001b[48;2;0;0;0m');
+    expect(runtime.stdoutText()).toContain('\u001b[38;2;0;0;0m');
   });
 
-  test('prints compact plain Unicode terminal text with --small', async () => {
+  test.each([
+    {name: 'default options', args: [], small: true, ansiColors: true},
+    {
+      name: '--small true and --ansi-colors true',
+      args: ['--small', 'true', '--ansi-colors', 'true'],
+      small: true,
+      ansiColors: true,
+    },
+    {name: '--small false', args: ['--small', 'false'], small: false, ansiColors: true},
+    {
+      name: '--ansi-colors false',
+      args: ['--ansi-colors', 'false'],
+      small: true,
+      ansiColors: false,
+    },
+    {
+      name: '--small false and --ansi-colors false',
+      args: ['--small', 'false', '--ansi-colors', 'false'],
+      small: false,
+      ansiColors: false,
+    },
+  ])('supports text renderer booleans with $name', async ({args, small, ansiColors}) => {
     const runtime = createRuntime();
 
     await expect(
-      runCli(['HELLO WORLD', '--small', '--size', '1', '--margin', '0'], runtime),
+      runCli(['HELLO WORLD', '--size', '1', '--margin', '0', ...args], runtime),
     ).resolves.toBe(0);
 
-    expect(runtime.stdoutText()).toContain('▀');
-    expect(runtime.stdoutText()).not.toContain('\u001b[');
+    const output = runtime.stdoutText();
+    const visibleLines = output.replaceAll(ANSI_PATTERN, '').split('\n').slice(0, -1);
+
+    expect(output.includes('\u001b[')).toBe(ansiColors);
+    expect(visibleLines).toHaveLength(small ? 11 : 21);
+    expect(Array.from(visibleLines[0]!)).toHaveLength(small ? 21 : 42);
+  });
+
+  test('supports negated aliases for false renderer booleans', async () => {
+    const explicit = createRuntime();
+    const equalsSyntax = createRuntime();
+    const negated = createRuntime();
+
+    await expect(
+      runCli(['HELLO WORLD', '--small', 'false', '--ansi-colors', 'false'], explicit),
+    ).resolves.toBe(0);
+    await expect(
+      runCli(['HELLO WORLD', '--small=false', '--ansi-colors=false'], equalsSyntax),
+    ).resolves.toBe(0);
+    await expect(runCli(['HELLO WORLD', '--no-small', '--no-ansi-colors'], negated)).resolves.toBe(
+      0,
+    );
+
+    expect(equalsSyntax.stdoutText()).toBe(explicit.stdoutText());
+    expect(negated.stdoutText()).toBe(explicit.stdoutText());
+  });
+
+  test('uses the last repeated renderer boolean option', async () => {
+    const falseLast = createRuntime();
+    const trueLast = createRuntime();
+    const ansiFalseLast = createRuntime();
+    const ansiTrueLast = createRuntime();
+    const expectedFalse = createRuntime();
+    const expectedTrue = createRuntime();
+
+    await expect(runCli(['HELLO WORLD', '--small', 'true', '--no-small'], falseLast)).resolves.toBe(
+      0,
+    );
+    await expect(runCli(['HELLO WORLD', '--no-small', '--small', 'true'], trueLast)).resolves.toBe(
+      0,
+    );
+    await expect(runCli(['HELLO WORLD', '--small', 'false'], expectedFalse)).resolves.toBe(0);
+    await expect(runCli(['HELLO WORLD', '--small', 'true'], expectedTrue)).resolves.toBe(0);
+    await expect(
+      runCli(['HELLO WORLD', '--ansi-colors', 'true', '--no-ansi-colors'], ansiFalseLast),
+    ).resolves.toBe(0);
+    await expect(
+      runCli(['HELLO WORLD', '--no-ansi-colors', '--ansi-colors', 'true'], ansiTrueLast),
+    ).resolves.toBe(0);
+
+    expect(falseLast.stdoutText()).toBe(expectedFalse.stdoutText());
+    expect(trueLast.stdoutText()).toBe(expectedTrue.stdoutText());
+    expect(ansiFalseLast.stdoutText()).not.toContain('\u001b[');
+    expect(ansiTrueLast.stdoutText()).toContain('\u001b[');
+  });
+
+  test('uses custom colors for ANSI terminal output', async () => {
+    const runtime = createRuntime();
+
+    await expect(
+      runCli(['HELLO WORLD', '--color-dark', '#1a2b3c', '--color-light', '#ddeeff'], runtime),
+    ).resolves.toBe(0);
+
+    expect(runtime.stdoutText()).toContain('\u001b[38;2;26;43;60m');
+    expect(runtime.stdoutText()).toContain('\u001b[48;2;221;238;255m');
+  });
+
+  test('renders ANSI-background-only terminal output', async () => {
+    const runtime = createRuntime();
+
+    await expect(
+      runCli(
+        [
+          'HELLO WORLD',
+          '--only-ansi-colors',
+          '--size',
+          '1',
+          '--margin',
+          '0',
+          '--color-dark',
+          '#1a2b3c',
+          '--color-light',
+          '#ddeeff',
+        ],
+        runtime,
+      ),
+    ).resolves.toBe(0);
+
+    const output = runtime.stdoutText();
+    const visibleLines = output.replaceAll(ANSI_PATTERN, '').split('\n').slice(0, -1);
+
+    expect(output).toContain('\u001b[48;2;26;43;60m');
+    expect(output).toContain('\u001b[48;2;221;238;255m');
+    expect(output).not.toContain('\u001b[38;');
+    expect(output).not.toMatch(/[▀▄█]/);
+    expect(visibleLines).toHaveLength(21);
+    expect(Array.from(visibleLines[0]!)).toHaveLength(42);
+  });
+
+  test('rejects disabling ANSI with ANSI-background-only output', async () => {
+    const runtime = createRuntime();
+
+    await expect(
+      runCli(['HELLO WORLD', '--only-ansi-colors', '--no-ansi-colors'], runtime),
+    ).resolves.toBe(1);
+
+    expect(runtime.stderrText()).toContain('onlyAnsiColors requires ansiColors to be enabled');
+  });
+
+  test('rejects invalid and missing renderer boolean values', async () => {
+    const invalid = createRuntime();
+    const missing = createRuntime();
+
+    await expect(runCli(['HELLO WORLD', '--small', 'yes'], invalid)).resolves.toBe(1);
+    await expect(runCli(['HELLO WORLD', '--ansi-colors'], missing)).resolves.toBe(1);
+
+    expect(invalid.stderrText()).toContain('Expected true or false');
+    expect(missing.stderrText()).toContain("option '--ansi-colors <boolean>' argument missing");
   });
 
   test('rejects conflicting positional and option input', async () => {
@@ -172,7 +312,7 @@ describe('runCli', () => {
 
     await expect(runCli([], runtime)).resolves.toBe(0);
 
-    expect(runtime.stdoutText()).toContain('\u001b[48;2;0;0;0m');
+    expect(runtime.stdoutText()).toContain('\u001b[38;2;0;0;0m');
   });
 
   test('rejects empty prompted output paths', async () => {

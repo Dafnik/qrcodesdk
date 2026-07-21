@@ -8,8 +8,8 @@ import {expectTextToMatchFileSnapshot} from './text-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/text', import.meta.url));
 const RENDERER_VARIANTS = [
-  {name: 'normal', small: false, snapshotSuffix: ''},
-  {name: 'small', small: true, snapshotSuffix: '-small'},
+  {name: 'compact', small: true, snapshotSuffix: ''},
+  {name: 'full', small: false, snapshotSuffix: '-full'},
 ] as const;
 
 describe('QRCodeTextRenderer snapshots', () => {
