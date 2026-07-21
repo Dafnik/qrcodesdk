@@ -1,6 +1,6 @@
 ---
 title: '@qrcodesdk/cli'
-description: '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact terminal text or writes SVG and PNG files.'
+description: '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG and PNG files.'
 packageName: '@angular/core'
 
 related:
@@ -16,7 +16,7 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 <PackageBadges />
 
-`@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact terminal text or writes SVG and PNG files.
+`@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG and PNG files.
 
 ## Install
 
@@ -36,13 +36,33 @@ Or use it without installing it.
 
 ## Print terminal text
 
-Without an output file, `qrc` prints compact Unicode text to standard output:
+Without an output file, `qrc` packs two QR rows into each terminal line and applies ANSI colors:
 
 ```sh
 qrc "https://qrcodesdk.dev"
 ```
 
-Terminal output is useful for local checks, scripts, logs, and copyable command output.
+Use full-height, double-width `██` modules when preferred:
+
+```sh
+qrc "https://qrcodesdk.dev" --no-small
+```
+
+Disable ANSI styling explicitly for logs, files, and redirected output:
+
+```sh
+qrc "https://qrcodesdk.dev" --no-ansi-colors
+```
+
+Render modules entirely as ANSI-colored spaces, without UTF-8 block glyphs:
+
+```sh
+qrc "https://qrcodesdk.dev" --only-ansi-colors
+```
+
+The equivalent explicit boolean forms are `--small false` and `--ansi-colors false`. Both options also accept `true`. Layout and ANSI styling are independent and affect text output only. Compact and full block layouts require UTF-8; ANSI-background-only output contains spaces and escape sequences instead. ANSI remains enabled by default when standard output is redirected; the CLI does not inspect TTY state or `NO_COLOR`.
+
+`--only-ansi-colors` ignores the `small` setting and implies ANSI output. It cannot be combined with `--no-ansi-colors` or `--ansi-colors false`.
 
 ## Write SVG's
 
@@ -112,13 +132,18 @@ qrc "HELLO WORLD" \
 | `--mask <0-7>`                          | Pin a QR code mask.                                         | `Auto`      |
 | `--size <number>`                       | Module size as a positive integer.                          | `1`         |
 | `--margin <number>`                     | Margin as a non-negative integer.                           | `2`         |
+| `--small <true\|false>`                 | Pack two QR rows into each terminal line.                   | `true`      |
+| `--no-small`                            | Alias for `--small false`.                                  | -           |
+| `--ansi-colors <true\|false>`           | Style terminal text with ANSI colors.                       | `true`      |
+| `--no-ansi-colors`                      | Alias for `--ansi-colors false`.                            | -           |
+| `--only-ansi-colors`                    | Use ANSI background cells without UTF-8 block glyphs.       | `false`     |
 | `--color-dark <#rrggbb>`                | Dark module color.                                          | `#000000`   |
 | `--color-light <#rrggbb>`               | Light module color.                                         | `#ffffff`   |
 | `--alt <text>`                          | SVG `alt` text.                                             | `undefined` |
 | `--aria-label <text>`                   | SVG `aria-label`.                                           | `undefined` |
 | `--title <text>`                        | SVG `title`.                                                | `undefined` |
 
-Colors must be six-digit hex values. `--size` must be positive and `--margin` must be non-negative.
+Colors must be six-digit hex values. `--size` must be positive and `--margin` must be non-negative. For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI background. With `--only-ansi-colors`, both become module background colors.
 
 ## Interactive and automated use
 

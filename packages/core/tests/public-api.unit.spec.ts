@@ -12,6 +12,7 @@ import type {
   QRCodeSVGRendererOptions,
   QRCodeStylingColors,
   QRCodeStylingOptions,
+  QRCodeTextRendererOptions,
 } from '../src';
 
 describe('public API types', () => {
@@ -45,6 +46,14 @@ describe('public API types', () => {
     expectTypeOf<QRCodeSVGOptions>().toEqualTypeOf<QRCodeOptions<QRCodeSVGRendererOptions>>();
     expectTypeOf<QRCodeSVGOptions>().toEqualTypeOf<
       QRCodeMatrixOptions & QRCodeStylingOptions & QRCodeAccessibilityOptions
+    >();
+    expectTypeOf<QRCodeTextRendererOptions['colors']>().toEqualTypeOf<
+      QRCodeStylingOptions['colors']
+    >();
+    expectTypeOf<QRCodeTextRendererOptions['small']>().toEqualTypeOf<boolean | undefined>();
+    expectTypeOf<QRCodeTextRendererOptions['ansiColors']>().toEqualTypeOf<boolean | undefined>();
+    expectTypeOf<QRCodeTextRendererOptions['onlyAnsiColors']>().toEqualTypeOf<
+      boolean | undefined
     >();
   });
 });

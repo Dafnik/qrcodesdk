@@ -1,6 +1,6 @@
 import {cancel, isCancel, select, text} from '@clack/prompts';
 import chalk from 'chalk';
-import {Command, CommanderError} from 'commander';
+import {Command, CommanderError, Option} from 'commander';
 import {writeFile as writeFileDefault} from 'node:fs/promises';
 import process from 'node:process';
 
@@ -31,6 +31,9 @@ type RawCliOptions = {
   readonly mask?: string;
   readonly size?: string;
   readonly margin?: string;
+  readonly small?: boolean;
+  readonly ansiColors?: boolean;
+  readonly onlyAnsiColors?: boolean;
   readonly colorDark?: string;
   readonly colorLight?: string;
   readonly alt?: string;
@@ -44,6 +47,9 @@ type ResolvedCliOptions = Readonly<
       readonly input: string;
       readonly format: OutputFormat;
       readonly output?: string;
+      readonly small: boolean;
+      readonly ansiColors: boolean;
+      readonly onlyAnsiColors: boolean;
       readonly styling: QRCodeStylingOptions;
     }
 >;
@@ -112,7 +118,7 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       .usage('[data] [options]')
       .summary('generate QR codes from a terminal.')
       .description(
-        '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact terminal text or writes SVG and PNG files.',
+        '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG and PNG files.',
       )
       .version(__QRCODESDK_CLI_VERSION__, '-V', 'Print the installed CLI package version')
       .argument('[data]', 'Positional QR code input data')
@@ -125,6 +131,17 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       .option('--mask <mask>', 'Pin a QR code mask from 0 to 7')
       .option('--size <size>', 'Module size as a positive integer')
       .option('--margin <margin>', 'Margin as a non-negative integer')
+      .addOption(booleanOption('--small <boolean>', 'Pack two QR rows per terminal line', 'small'))
+      .option('--no-small', 'Render full-height terminal text')
+      .addOption(
+        booleanOption(
+          '--ansi-colors <boolean>',
+          'Style terminal text with ANSI colors',
+          'ansi-colors',
+        ),
+      )
+      .option('--no-ansi-colors', 'Render terminal text without ANSI colors')
+      .option('--only-ansi-colors', 'Render terminal text with ANSI background colors only')
       .option('--color-dark <hex>', 'Dark module color as #rrggbb')
       .option('--color-light <hex>', 'Light module color as #rrggbb')
       .option('--alt <text>', 'SVG alt text')
@@ -160,6 +177,9 @@ async function resolveCliOptions(
     input,
     format,
     output,
+    small: rawOptions.small ?? true,
+    ansiColors: rawOptions.ansiColors ?? true,
+    onlyAnsiColors: rawOptions.onlyAnsiColors ?? false,
     mode: optionalEnum(rawOptions.mode, qrModes, 'mode'),
     errorCorrectionLevel: optionalErrorCorrectionLevel(rawOptions.errorCorrection),
     version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as
@@ -319,7 +339,16 @@ async function render(
   });
 
   if (options.format === 'text') {
-    stdout.write(`${builder.render(QRCodeTextRenderer(options.styling))}\n`);
+    stdout.write(
+      `${builder.render(
+        QRCodeTextRenderer({
+          ...options.styling,
+          small: options.small,
+          ansiColors: options.ansiColors,
+          onlyAnsiColors: options.onlyAnsiColors,
+        }),
+      )}\n`,
+    );
     return;
   }
 
@@ -365,6 +394,19 @@ function optionalEnum<T extends string>(
 ): T | undefined {
   if (value === undefined) return undefined;
   return requiredEnum(value, allowed, name);
+}
+
+function booleanOption(flags: string, description: string, name: string): Option {
+  return new Option(flags, description)
+    .default(true)
+    .argParser((value) => requiredBoolean(value, name));
+}
+
+function requiredBoolean(value: string, name: string): boolean {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+
+  throw new CliError(`Invalid ${name}. Expected true or false.`);
 }
 
 function requiredEnum<T extends string>(value: string, allowed: readonly T[], name: string): T {

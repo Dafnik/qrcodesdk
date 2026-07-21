@@ -1,9 +1,23 @@
-import type {RGBAPixel} from '@repo/core-testing';
+import {type RGBAPixel, getAllQRCodeCombinations} from '@repo/core-testing';
 import jsQR from 'jsqr';
 import {expect} from 'vitest';
 
 export const BLACK = {red: 0, green: 0, blue: 0, alpha: 255};
 export const WHITE = {red: 255, green: 255, blue: 255, alpha: 255};
+
+/**
+ * Version 23 QR codes always fail to decode
+ * https://github.com/cozmo/jsQR/issues/251
+ */
+const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
+  ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
+);
+export const JSQR_ROUNDTRIP_COMBINATIONS_ONE = JSQR_ROUNDTRIP_COMBINATIONS.filter(
+  (_, i) => i % 2 === 0,
+);
+export const JSQR_ROUNDTRIP_COMBINATIONS_TWO = JSQR_ROUNDTRIP_COMBINATIONS.filter(
+  (_, i) => i % 2 !== 0,
+);
 
 export async function imageToCanvas(image: HTMLImageElement): Promise<HTMLCanvasElement> {
   await waitForImage(image);

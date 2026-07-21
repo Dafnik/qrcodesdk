@@ -138,17 +138,55 @@ const svg = qrcode('HELLO WORLD')
 
 ```sh
 pnpm install
-pnpm check
 pnpm build
-pnpm test
-pnpm check-types
-pnpm lint
-pnpm format
-pnpm cspell
 ```
+
+### Checks
+
+Run the following command to check for formatting, linting, spelling, type errors, build errors, and test failures:
+
+```shell
+pnpm check
+```
+
+### Linting
+
+```sh
+pnpm format:check
+pnpm lint
+pnpm cspell
+pnpm check-types
+```
+
+### Testing
+
+```sh
+pnpm test
+pnpm test:coverage
+```
+
+### Docs
 
 Run the documentation site locally:
 
 ```sh
 pnpm turbo run start --filter=docs
+```
+
+#### Generate and check readmes and performance files:
+
+```sh
+pnpm turbo run generate-readmes --filter=docs
+pnpm turbo run check-readmes --filter=docs
+```
+
+```sh
+pnpm turbo run generate-performance --filter=docs
+pnpm turbo run check-performance --filter=docs
+```
+
+### Benchmarks
+
+```sh
+pnpm benchmark
 ```

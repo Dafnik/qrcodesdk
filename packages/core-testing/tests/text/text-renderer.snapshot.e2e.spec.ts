@@ -7,12 +7,18 @@ import {renderFixtureText} from './text-fixture';
 import {expectTextToMatchFileSnapshot} from './text-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/text', import.meta.url));
+const RENDERER_VARIANTS = [
+  {name: 'compact', small: true, snapshotSuffix: ''},
+  {name: 'full', small: false, snapshotSuffix: '-full'},
+] as const;
 
 describe('QRCodeTextRenderer snapshots', () => {
-  test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR text snapshot', (fixture) => {
-    expectTextToMatchFileSnapshot(
-      renderFixtureText(fixture),
-      join(SNAPSHOT_DIR, `${fixture.name}.txt`),
-    );
+  describe.each(RENDERER_VARIANTS)('$name rendering', (variant) => {
+    test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR text snapshot', (fixture) => {
+      expectTextToMatchFileSnapshot(
+        renderFixtureText(fixture, {size: 2, margin: 4, small: variant.small}),
+        join(SNAPSHOT_DIR, `${fixture.name}${variant.snapshotSuffix}.txt`),
+      );
+    });
   });
 });
