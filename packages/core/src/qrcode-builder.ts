@@ -59,58 +59,23 @@ export class QRCodeBuilder<
   }
 
   mode(mode?: QRCodeMode): QRCodeBuilder<D, R> {
-    return new QRCodeBuilder(
-      this._data,
-      {
-        ...this._config,
-        mode,
-      },
-      this.currentRenderer,
-    );
+    return this.withConfig({mode});
   }
 
   config(config?: QRCodeMatrixOptions): QRCodeBuilder<D, R> {
-    return new QRCodeBuilder(
-      this._data,
-      {
-        ...this._config,
-        ...config,
-      },
-      this.currentRenderer,
-    );
+    return this.withConfig(config);
   }
 
   errorCorrection(level?: QRCodeErrorCorrectionLevel): QRCodeBuilder<D, R> {
-    return new QRCodeBuilder(
-      this._data,
-      {
-        ...this._config,
-        errorCorrectionLevel: level,
-      },
-      this.currentRenderer,
-    );
+    return this.withConfig({errorCorrectionLevel: level});
   }
 
   version(version?: QRCodeVersion): QRCodeBuilder<D, R> {
-    return new QRCodeBuilder(
-      this._data,
-      {
-        ...this._config,
-        version,
-      },
-      this.currentRenderer,
-    );
+    return this.withConfig({version});
   }
 
   mask(mask?: QRCodeMask): QRCodeBuilder<D, R> {
-    return new QRCodeBuilder(
-      this._data,
-      {
-        ...this._config,
-        mask,
-      },
-      this.currentRenderer,
-    );
+    return this.withConfig({mask});
   }
 
   renderer<TOutput>(renderer: QRCodeRenderer<TOutput>): QRCodeBuilder<D, HasRenderer<TOutput>> {
@@ -142,6 +107,17 @@ export class QRCodeBuilder<
     }
 
     return selectedRenderer(this.matrix()) as TOutput;
+  }
+
+  private withConfig(config: QRCodeMatrixOptions = {}): QRCodeBuilder<D, R> {
+    return new QRCodeBuilder(
+      this._data,
+      {
+        ...this._config,
+        ...config,
+      },
+      this.currentRenderer,
+    );
   }
 }
 

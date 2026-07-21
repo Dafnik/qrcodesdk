@@ -6,15 +6,18 @@ import {
   ECC_LEVEL_L,
   ECC_LEVEL_M,
   ECC_LEVEL_Q,
-  MASK_FUNCTIONS,
+  getGF256GeneratorPolynomials,
+  getGF256LookupTables,
+} from '../../src/matrix/error-correction';
+import {MASK_FUNCTIONS, QR_CODE_MASKS} from '../../src/matrix/mask';
+import {
   MODES_MAP,
   MODE_ALPHANUMERIC,
   MODE_NUMERIC,
   MODE_OCTET,
   getAlphanumericMap,
-  getGF256GeneratorPolynomials,
-  getGF256LookupTables,
-} from '../../src/matrix/const';
+  getModeDefinition,
+} from '../../src/matrix/mode';
 
 describe('matrix constants', () => {
   test('exposes QR mode and ECC maps', () => {
@@ -42,6 +45,15 @@ describe('matrix constants', () => {
     expect(alphanumericMap[':']).toBe(44);
   });
 
+  test('resolves every supported mode through its descriptor', () => {
+    expect(Object.values(MODES_MAP).map((mode) => getModeDefinition(mode).indicator)).toEqual([
+      MODE_NUMERIC,
+      MODE_ALPHANUMERIC,
+      MODE_OCTET,
+    ]);
+    expect(() => getModeDefinition(-1)).toThrow('QRCode: Invalid mode');
+  });
+
   test('builds GF256 lookup tables and generator polynomial degrees', () => {
     const {exponents, logarithms} = getGF256LookupTables();
     const generatorPolynomials = getGF256GeneratorPolynomials();
@@ -64,6 +76,7 @@ describe('matrix constants', () => {
   });
 
   test('implements all QR mask predicates', () => {
+    expect(QR_CODE_MASKS).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
     const points = [
       [0, 0],
       [0, 1],

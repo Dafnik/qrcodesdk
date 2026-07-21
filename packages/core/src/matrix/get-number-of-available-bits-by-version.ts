@@ -1,6 +1,6 @@
 import type {QRCodeVersion} from '../types';
-import {VERSIONS} from './const';
 import {needsVersionInfo} from './needs-version-info';
+import {VERSIONS} from './version-config';
 
 /**
  * Returns the number of bits available for code words in a given version.

@@ -74,6 +74,9 @@ qrcode('https://qrcodesdk.dev');
 qrcode(1234567890);
 ```
 
+Number inputs must be non-negative safe integers. Use a string when the value has leading
+zeroes or exceeds JavaScript's safe integer range.
+
 Use a mode when you know the shape of your data.
 
 | Mode           | Best for                                              |
@@ -83,6 +86,10 @@ Use a mode when you know the shape of your data.
 | `octet`        | UTF-8 text, URLs, JSON, emoji, and general byte data. |
 
 If you do not provide a mode, the builder resolves one from the input.
+
+QRCodeSDK implements QR Code Model 2 matrix generation for numeric, alphanumeric, and UTF-8
+octet payloads. Kanji mode and structured append are not supported, so this is a documented
+subset of ISO/IEC 18004 rather than full feature coverage.
 
 ### Methods
 
@@ -119,6 +126,10 @@ const matrix = qrcode('HELLO WORLD').mode('alphanumeric').version(1).mask(2).mat
 ```
 
 Versions range from `1` to `40`. Masks range from `0` to `7`.
+
+When a pinned version cannot contain the payload at the selected error correction level,
+matrix generation throws `QRCode: Data too large`. Remove the version override or select a
+larger version.
 
 ## Built-in core renderers
 

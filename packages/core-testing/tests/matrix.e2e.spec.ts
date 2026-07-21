@@ -8,13 +8,30 @@ import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeMatrix} from '@qrcode
 import {
   type QRCodeTestFixture,
   QR_CODE_TEST_FIXTURES,
+  TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS,
   TOTAL_QR_CODE_COMBINATIONS,
+  getAllQRCodeAutoMaskCombinations,
   getAllQRCodeCombinations,
 } from '../src';
 
 const ECC_LEVELS: QRCodeErrorCorrectionLevel[] = ['L', 'M', 'Q', 'H'];
 const MASKS: QRCodeMask[] = [0, 1, 2, 3, 4, 5, 6, 7];
 const ALL_QR_CODE_COMBINATIONS = [...getAllQRCodeCombinations()];
+const ALL_QR_CODE_AUTO_MASK_COMBINATIONS = [...getAllQRCodeAutoMaskCombinations()];
+
+// `qrcode` uses an asymmetric ceiling calculation for N4 density penalties. QRCodeSDK keeps
+// its symmetric N4 calculation, so these inputs intentionally choose a different best mask.
+const AUTOMATIC_MASK_N4_DIVERGENCES = new Map<
+  string,
+  {qrcodeSdk: QRCodeMask; reference: QRCodeMask}
+>([
+  ['version-01_ecc-Q_mask-auto_mode-alphanumeric', {qrcodeSdk: 4, reference: 2}],
+  ['version-01_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 0}],
+  ['version-06_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 0, reference: 4}],
+  ['version-07_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 4, reference: 2}],
+  ['version-10_ecc-L_mask-auto_mode-numeric', {qrcodeSdk: 4, reference: 2}],
+  ['version-16_ecc-H_mask-auto_mode-alphanumeric', {qrcodeSdk: 0, reference: 2}],
+]);
 
 function referenceMatrixQRCodePackage(fixture: QRCodeTestFixture): QRCodeMatrix {
   const encodedData =
@@ -59,7 +76,7 @@ function referenceMatrixQRCodeGeneratorPackage(fixture: QRCodeTestFixture): QRCo
 }
 
 describe('qrcode().matrix()', () => {
-  test('provides every unique version, ECC level, mask, and mode combination', () => {
+  test('provides every unique explicit version, ECC level, mask, and mode combination', () => {
     const combinationKeys = ALL_QR_CODE_COMBINATIONS.map(
       ({version, errorCorrectionLevel, mask, mode}) =>
         `${version}-${errorCorrectionLevel}-${mask}-${mode}`,
@@ -73,6 +90,15 @@ describe('qrcode().matrix()', () => {
     for (const {data, version} of ALL_QR_CODE_COMBINATIONS) {
       expect(data).toHaveLength(version);
     }
+  });
+
+  test('provides every unique automatic-mask version, ECC level, and mode combination', () => {
+    const combinationKeys = ALL_QR_CODE_AUTO_MASK_COMBINATIONS.map(
+      ({version, errorCorrectionLevel, mode}) => `${version}-${errorCorrectionLevel}-${mode}`,
+    );
+
+    expect(ALL_QR_CODE_AUTO_MASK_COMBINATIONS).toHaveLength(TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS);
+    expect(new Set(combinationKeys).size).toBe(TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS);
   });
 
   test('matches reference matrices for explicit modes, ECC levels, versions, and masks', () => {
@@ -116,10 +142,48 @@ describe('qrcode().matrix()', () => {
     expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
   });
 
-  test.each(ALL_QR_CODE_COMBINATIONS)('matches reference matrices for $name', (fixture) => {
-    const matrix = qrcode(fixture.data).config(fixture).matrix();
+  test('matches the reference automatic mask for the numeric version 1 regression', () => {
+    const fixture = {
+      name: 'automatic-mask-numeric-version-1',
+      data: '1',
+      mode: 'numeric' as const,
+      version: 1 as const,
+      errorCorrectionLevel: 'M' as const,
+    };
 
-    expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
-    expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
+    expect(qrcode(fixture.data).config(fixture).matrix()).toEqual(
+      referenceMatrixQRCodePackage(fixture),
+    );
   });
+
+  test.each(ALL_QR_CODE_COMBINATIONS)(
+    'matches explicit-mask reference matrices for $name',
+    (fixture) => {
+      const matrix = qrcode(fixture.data).config(fixture).matrix();
+
+      expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
+      expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
+    },
+  );
+
+  test.each(ALL_QR_CODE_AUTO_MASK_COMBINATIONS)(
+    'matches automatic-mask reference matrix for $name',
+    (fixture) => {
+      const matrix = qrcode(fixture.data).config(fixture).matrix();
+      const referenceMatrix = referenceMatrixQRCodePackage(fixture);
+      const knownDivergence = AUTOMATIC_MASK_N4_DIVERGENCES.get(fixture.name);
+
+      if (!knownDivergence) {
+        expect(matrix).toEqual(referenceMatrix);
+        return;
+      }
+
+      expect(matrix).toEqual(
+        qrcode(fixture.data).config(fixture).mask(knownDivergence.qrcodeSdk).matrix(),
+      );
+      expect(referenceMatrix).toEqual(
+        qrcode(fixture.data).config(fixture).mask(knownDivergence.reference).matrix(),
+      );
+    },
+  );
 });

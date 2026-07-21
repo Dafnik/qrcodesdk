@@ -1,8 +1,8 @@
 import {describe, expect, test} from 'vitest';
 
 import {applyMaskToMatrix} from '../../src/matrix/apply-mask-to-matrix';
-import {ECC_LEVEL_Q} from '../../src/matrix/const';
 import {createBaseMatrix} from '../../src/matrix/create-base-matrix';
+import {ECC_LEVEL_Q} from '../../src/matrix/error-correction';
 import {evaluateGroup} from '../../src/matrix/evaluate-group';
 import {evaluateMatrix} from '../../src/matrix/evaluate-matrix';
 import {fillDataInMatrix} from '../../src/matrix/fill-data-in-matrix';
@@ -93,7 +93,10 @@ describe('matrix evaluation helpers', () => {
     expect(evaluateGroup([0, 4])).toBe(0);
     expect(evaluateGroup([0, 5])).toBe(3);
     expect(evaluateGroup([0, 7])).toBe(5);
-    expect(evaluateGroup([4, 1, 1, 3, 1, 1, 4])).toBe(40);
+    expect(evaluateGroup([4, 1, 1, 3, 1, 1, 4])).toBe(80);
+    expect(evaluateGroup([4, 1, 1, 3, 1, 1, 0])).toBe(40);
+    expect(evaluateGroup([0, 1, 1, 3, 1, 1, 4])).toBe(40);
+    expect(evaluateGroup([4, 2, 2, 6, 2, 2, 4])).toBe(4);
   });
 
   test('penalizes blocks and black density', () => {

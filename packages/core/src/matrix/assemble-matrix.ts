@@ -11,8 +11,7 @@ import {createBaseMatrix} from './create-base-matrix';
 import {evaluateMatrix} from './evaluate-matrix';
 import {fillDataInMatrix} from './fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from './fill-format-information-in-matrix';
-
-const QR_CODE_MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
+import {QR_CODE_MASKS} from './mask';
 
 export function assembleQRCodeMatrix(
   version: QRCodeVersion,

@@ -6,9 +6,9 @@ import type {
   QRCodeVersion,
 } from '../types';
 import {augmentBCH} from './augment-bch';
-import {VERSIONS} from './const';
 import {getSizeByVersion} from './get-size-by-version';
 import {needsVersionInfo} from './needs-version-info';
+import {VERSIONS} from './version-config';
 
 type QRCodeMatrixBuildState = {
   matrix: QRCodeMutableMatrix;

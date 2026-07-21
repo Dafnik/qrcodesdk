@@ -4,14 +4,7 @@ import type {
   QRCodeSupportedModeIndicator,
   QRCodeVersion,
 } from '../types';
-import {
-  MODE_ALPHANUMERIC,
-  MODE_NUMERIC,
-  MODE_OCTET,
-  MODE_TERMINATOR,
-  getAlphanumericMap,
-} from './const';
-import {getNumberOfBitsOfData} from './get-number-of-bits-of-data';
+import {MODE_TERMINATOR, getModeDefinition} from './mode';
 
 /**
  * Returns the code words (sans ECC bits) for given data and configurations.
@@ -30,7 +23,7 @@ export function encode(
   data: QRCodeEncodedData,
   maxBufferLength: number,
 ): QRCodeCodewords {
-  const alphanumericMap = getAlphanumericMap();
+  const definition = getModeDefinition(mode);
   const buffer: QRCodeCodewords = [];
   let bits = 0,
     remaining = 8;
@@ -47,43 +40,13 @@ export function encode(
     if (n > 0) bits |= (x & ((1 << n) - 1)) << (remaining -= n);
   };
 
-  const dataNumberOfBits = getNumberOfBitsOfData(version, mode);
+  const dataNumberOfBits = definition.getCharacterCountBits(version);
   pack(mode, 4);
   pack(dataLength, dataNumberOfBits);
+  definition.encodePayload(data, pack);
 
-  switch (mode) {
-    case MODE_NUMERIC: {
-      const stringData = data as string;
-      let i = 2;
-      for (; i < dataLength; i += 3) {
-        pack(parseInt(stringData.substring(i - 2, i + 1), 10), 10);
-      }
-      pack(parseInt(stringData.substring(i - 2), 10), [0, 4, 7][dataLength % 3]!);
-      break;
-    }
-    case MODE_ALPHANUMERIC: {
-      const stringData = data as string;
-      let i = 1;
-      for (; i < dataLength; i += 2) {
-        pack(
-          alphanumericMap[stringData.charAt(i - 1)]! * 45 + alphanumericMap[stringData.charAt(i)]!,
-          11,
-        );
-      }
-      if (dataLength % 2 == 1) {
-        pack(alphanumericMap[stringData.charAt(i - 1)]!, 6);
-      }
-      break;
-    }
-    case MODE_OCTET: {
-      const arrayData = data as number[];
-      let i = 0;
-      for (; i < dataLength; i++) {
-        pack(arrayData[i]!, 8);
-      }
-      break;
-    }
-  }
+  const encodedDataBitLength = buffer.length * 8 + (8 - remaining);
+  if (encodedDataBitLength > maxBufferLength * 8) throw new Error('QRCode: Data too large');
 
   // final bits. it is possible that adding terminator causes the buffer
   // to overflow, but then the buffer truncated to the maximum size will

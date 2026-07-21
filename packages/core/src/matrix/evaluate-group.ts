@@ -3,9 +3,11 @@
 const PENALTY_CONSECUTIVE = 3;
 
 // N3 points for each pattern with >4W:1B:1W:3B:1W:1B or
-// 1B:1W:3B:1W:1B:>4W, or their multiples (e.g. highly unlikely,
-// but 13W:3B:3W:9B:3W:3B counts).
+// 1B:1W:3B:1W:1B:>4W.
 const PENALTY_FINDER_LIKE = 40;
+const FINDER_LIKE_LEFT_PADDING = 0x05d;
+const FINDER_LIKE_RIGHT_PADDING = 0x5d0;
+const FINDER_LIKE_WINDOW_MASK = 0x7ff;
 
 /**
  * Evaluates a group of modules and assigns a penalty score based on certain patterns.
@@ -21,17 +23,20 @@ export function evaluateGroup(groups: number[]): number {
     if (groups[i]! >= 5) score += PENALTY_CONSECUTIVE + (groups[i]! - 5);
   }
 
-  for (let i = 5; i < groups.length; i += 2) {
-    const p = groups[i]!;
-    if (
-      groups[i - 1] == p &&
-      groups[i - 2] == 3 * p &&
-      groups[i - 3] == p &&
-      groups[i - 4] == p &&
-      (groups[i - 5]! >= 4 * p || (groups[i + 1] ?? 0) >= 4 * p)
-    ) {
-      // this part differs from zxing...
-      score += PENALTY_FINDER_LIKE;
+  let finderLikeWindow = 0;
+  let numberOfModules = 0;
+  for (let i = 0; i < groups.length; i++) {
+    const module = i % 2;
+    for (let j = 0; j < groups[i]!; j++) {
+      finderLikeWindow = ((finderLikeWindow << 1) & FINDER_LIKE_WINDOW_MASK) | module;
+      numberOfModules++;
+      if (
+        numberOfModules >= 11 &&
+        (finderLikeWindow === FINDER_LIKE_LEFT_PADDING ||
+          finderLikeWindow === FINDER_LIKE_RIGHT_PADDING)
+      ) {
+        score += PENALTY_FINDER_LIKE;
+      }
     }
   }
 

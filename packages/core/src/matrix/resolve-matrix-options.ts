@@ -7,11 +7,10 @@ import type {
   QRCodeSupportedModeIndicator,
   QRCodeVersion,
 } from '../types';
-import {ALPHANUMERIC_REGEXP, ECC_LEVELS_MAP, MODES_MAP, MODE_OCTET, NUMERIC_REGEXP} from './const';
+import {ECC_LEVELS_MAP} from './error-correction';
 import {getMaxDataLength} from './get-max-data-length';
-import {validateData} from './validate-data';
-
-const QR_CODE_MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
+import {QR_CODE_MASKS} from './mask';
+import {resolveMode, validateData} from './mode';
 
 export function resolveQRCodeMatrixOptions(
   data: QRCodeInputData,
@@ -26,25 +25,6 @@ export function resolveQRCodeMatrixOptions(
   const mask = resolveMask(options.mask);
 
   return {data: encodedData, mode, errorCorrectionLevel, version, mask};
-}
-
-function resolveMode(
-  data: QRCodeInputData,
-  requestedMode: QRCodeMatrixOptions['mode'],
-): QRCodeSupportedModeIndicator {
-  if (requestedMode !== undefined) {
-    const mode = MODES_MAP[requestedMode];
-    if (!isSupportedMode(mode)) throw new Error('QRCode: Invalid mode');
-    return mode;
-  }
-
-  if (typeof data === 'number' || data.match(NUMERIC_REGEXP)) return MODES_MAP.numeric;
-  if (data.match(ALPHANUMERIC_REGEXP)) return MODES_MAP.alphanumeric;
-  return MODE_OCTET;
-}
-
-function isSupportedMode(mode: number | undefined): mode is QRCodeSupportedModeIndicator {
-  return mode === MODES_MAP.numeric || mode === MODES_MAP.alphanumeric || mode === MODE_OCTET;
 }
 
 function resolveErrorCorrectionLevel(
@@ -64,6 +44,9 @@ function resolveVersion(
 ): QRCodeVersion {
   if (requestedVersion !== undefined) {
     if (requestedVersion < 1 || requestedVersion > 40) throw new Error('QRCode: Invalid version');
+    if (dataLength > getMaxDataLength(requestedVersion, mode, errorCorrectionLevel)) {
+      throw new Error('QRCode: Data too large');
+    }
     return requestedVersion;
   }
 

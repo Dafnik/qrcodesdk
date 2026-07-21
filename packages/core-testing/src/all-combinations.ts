@@ -25,9 +25,12 @@ const DATA_BY_MODE = {
 } as const satisfies Record<QRCodeMode, string>;
 
 export type QRCodeCombination = Required<QRCodeTestFixture>;
+export type QRCodeAutoMaskCombination = Omit<QRCodeCombination, 'mask'>;
 
 export const TOTAL_QR_CODE_COMBINATIONS =
   40 * ERROR_CORRECTION_LEVELS.length * MASKS.length * MODES.length;
+export const TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS =
+  40 * ERROR_CORRECTION_LEVELS.length * MODES.length;
 
 export function* getAllQRCodeCombinations(): Generator<QRCodeCombination> {
   for (let version = 1; version <= 40; version += 1) {
@@ -48,6 +51,27 @@ export function* getAllQRCodeCombinations(): Generator<QRCodeCombination> {
             errorCorrectionLevel,
           };
         }
+      }
+    }
+  }
+}
+
+export function* getAllQRCodeAutoMaskCombinations(): Generator<QRCodeAutoMaskCombination> {
+  for (let version = 1; version <= 40; version += 1) {
+    for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
+      for (const mode of MODES) {
+        yield {
+          name: [
+            `version-${String(version).padStart(2, '0')}`,
+            `ecc-${errorCorrectionLevel}`,
+            'mask-auto',
+            `mode-${mode}`,
+          ].join('_'),
+          data: DATA_BY_MODE[mode].repeat(version),
+          mode,
+          version: version as QRCodeVersion,
+          errorCorrectionLevel,
+        };
       }
     }
   }

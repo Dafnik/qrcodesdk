@@ -5,16 +5,17 @@ import {
   ECC_LEVEL_L,
   ECC_LEVEL_M,
   ECC_LEVEL_Q,
-  MODE_ALPHANUMERIC,
-  MODE_KANJI,
-  MODE_NUMERIC,
-  MODE_OCTET,
-} from '../../src/matrix/const';
+} from '../../src/matrix/error-correction';
 import {getMaxDataLength} from '../../src/matrix/get-max-data-length';
 import {getNumberOfAvailableBitsByVersion} from '../../src/matrix/get-number-of-available-bits-by-version';
 import {getNumberOfAvailableBitsForData} from '../../src/matrix/get-number-of-available-bits-for-data';
-import {getNumberOfBitsOfData} from '../../src/matrix/get-number-of-bits-of-data';
 import {getSizeByVersion} from '../../src/matrix/get-size-by-version';
+import {
+  MODE_ALPHANUMERIC,
+  MODE_NUMERIC,
+  MODE_OCTET,
+  getModeDefinition,
+} from '../../src/matrix/mode';
 import {needsVersionInfo} from '../../src/matrix/needs-version-info';
 
 describe('capacity helpers', () => {
@@ -27,17 +28,15 @@ describe('capacity helpers', () => {
   });
 
   test('returns character count bit widths by mode and version group', () => {
-    expect(getNumberOfBitsOfData(1, MODE_NUMERIC)).toBe(10);
-    expect(getNumberOfBitsOfData(10, MODE_NUMERIC)).toBe(12);
-    expect(getNumberOfBitsOfData(27, MODE_NUMERIC)).toBe(14);
-    expect(getNumberOfBitsOfData(1, MODE_ALPHANUMERIC)).toBe(9);
-    expect(getNumberOfBitsOfData(10, MODE_ALPHANUMERIC)).toBe(11);
-    expect(getNumberOfBitsOfData(27, MODE_ALPHANUMERIC)).toBe(13);
-    expect(getNumberOfBitsOfData(1, MODE_OCTET)).toBe(8);
-    expect(getNumberOfBitsOfData(10, MODE_OCTET)).toBe(16);
-    expect(getNumberOfBitsOfData(27, MODE_KANJI)).toBe(12);
-    // @ts-expect-error Exercise the runtime fallback for an unsupported mode.
-    expect(getNumberOfBitsOfData(1, -1)).toBe(-100);
+    expect(getModeDefinition(MODE_NUMERIC).getCharacterCountBits(1)).toBe(10);
+    expect(getModeDefinition(MODE_NUMERIC).getCharacterCountBits(10)).toBe(12);
+    expect(getModeDefinition(MODE_NUMERIC).getCharacterCountBits(27)).toBe(14);
+    expect(getModeDefinition(MODE_ALPHANUMERIC).getCharacterCountBits(1)).toBe(9);
+    expect(getModeDefinition(MODE_ALPHANUMERIC).getCharacterCountBits(10)).toBe(11);
+    expect(getModeDefinition(MODE_ALPHANUMERIC).getCharacterCountBits(27)).toBe(13);
+    expect(getModeDefinition(MODE_OCTET).getCharacterCountBits(1)).toBe(8);
+    expect(getModeDefinition(MODE_OCTET).getCharacterCountBits(10)).toBe(16);
+    expect(() => getModeDefinition(-1)).toThrow('QRCode: Invalid mode');
   });
 
   test('calculates available codeword and data bits', () => {
@@ -56,8 +55,7 @@ describe('capacity helpers', () => {
     expect(getMaxDataLength(1, MODE_ALPHANUMERIC, ECC_LEVEL_L)).toBe(25);
     expect(getMaxDataLength(1, MODE_OCTET, ECC_LEVEL_L)).toBe(17);
     expect(getMaxDataLength(1, MODE_OCTET, ECC_LEVEL_M)).toBe(14);
-    expect(getMaxDataLength(1, MODE_KANJI, ECC_LEVEL_L)).toBe(10);
     // @ts-expect-error Exercise the runtime fallback for an unsupported mode.
-    expect(getMaxDataLength(1, -1, ECC_LEVEL_L)).toBe(-100);
+    expect(() => getMaxDataLength(1, -1, ECC_LEVEL_L)).toThrow('QRCode: Invalid mode');
   });
 });

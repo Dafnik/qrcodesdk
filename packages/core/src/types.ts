@@ -10,7 +10,6 @@ export type QRCodeCodewords = QRCodeCodeword[];
 export type QRCodePolynomial = QRCodeCodeword[];
 export type QRCodeEncodedData = string | QRCodeCodewords;
 
-export type QRCodeModeIndicator = 1 | 2 | 4 | 8;
 export type QRCodeSupportedModeIndicator = 1 | 2 | 4;
 export type QRCodeErrorCorrectionLevelValue = 0 | 1 | 2 | 3;
 

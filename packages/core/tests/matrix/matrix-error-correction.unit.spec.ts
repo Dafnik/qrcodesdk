@@ -3,7 +3,7 @@ import {describe, expect, test} from 'vitest';
 import {augmentBCH} from '../../src/matrix/augment-bch';
 import {augmentECCs} from '../../src/matrix/augment-eccs';
 import {calculateECC} from '../../src/matrix/calculate-ecc';
-import {getGF256GeneratorPolynomials} from '../../src/matrix/const';
+import {getGF256GeneratorPolynomials} from '../../src/matrix/error-correction';
 
 describe('error correction helpers', () => {
   test('augments BCH format and version codes', () => {

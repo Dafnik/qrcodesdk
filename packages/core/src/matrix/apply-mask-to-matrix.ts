@@ -1,5 +1,5 @@
 import type {QRCodeMask, QRCodeMatrix, QRCodeModule, QRCodeReservedMatrix} from '../types';
-import {MASK_FUNCTIONS} from './const';
+import {MASK_FUNCTIONS} from './mask';
 
 /**
  * Applies a QR mask to the data portion of a matrix.
