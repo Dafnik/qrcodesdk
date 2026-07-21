@@ -43,6 +43,9 @@ catalogs:
     '@types/node':
       specifier: 25.9.5
       version: 25.9.5
+    '@types/qrcode':
+      specifier: 1.5.6
+      version: 1.5.6
     '@types/react':
       specifier: 19.2.17
       version: 19.2.17
@@ -61,6 +64,12 @@ catalogs:
     prettier:
       specifier: 3.9.5
       version: 3.9.5
+    qrcode:
+      specifier: 1.5.4
+      version: 1.5.4
+    qrcode-generator:
+      specifier: 2.0.4
+      version: 2.0.4
     react:
       specifier: 19.2.7
       version: 19.2.7
@@ -336,10 +345,10 @@ importers:
         specifier: workspace:*
         version: link:../core-testing
       qrcode:
-        specifier: 1.5.4
+        specifier: 'catalog:'
         version: 1.5.4
       qrcode-generator:
-        specifier: 2.0.4
+        specifier: 'catalog:'
         version: 2.0.4(patch_hash=c98e53f3d0a080d3bdc8bdfbdbe41837086b66e201780921019c646ce2eca1ed)
     devDependencies:
       '@repo/eslint-config':
@@ -352,7 +361,7 @@ importers:
         specifier: 'catalog:'
         version: 25.9.5
       '@types/qrcode':
-        specifier: 1.5.6
+        specifier: 'catalog:'
         version: 1.5.6
       tsdown:
         specifier: 'catalog:'
@@ -468,16 +477,16 @@ importers:
         specifier: 'catalog:'
         version: 25.9.5
       '@types/qrcode':
-        specifier: 1.5.6
+        specifier: 'catalog:'
         version: 1.5.6
       jsqr:
         specifier: 'catalog:'
         version: 1.4.0
       qrcode:
-        specifier: 1.5.4
+        specifier: 'catalog:'
         version: 1.5.4
       qrcode-generator:
-        specifier: 2.0.4
+        specifier: 'catalog:'
         version: 2.0.4(patch_hash=c98e53f3d0a080d3bdc8bdfbdbe41837086b66e201780921019c646ce2eca1ed)
       sharp:
         specifier: 'catalog:'
