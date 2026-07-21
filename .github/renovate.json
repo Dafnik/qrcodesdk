@@ -44,14 +44,14 @@
       "groupName": "angular monorepo"
     },
     {
-      "excludePackageNames": [
-        "typescript",
-        "tslib",
-        "eslint",
-        "/^@typescript-eslint\\//",
-        "/^@types\\//"
-      ],
       "groupName": "minor-updates",
+      "matchPackageNames": [
+        "!typescript",
+        "!tslib",
+        "!eslint",
+        "!/^@typescript-eslint\\//",
+        "!/^@types\\//"
+      ],
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
     },
     {
