@@ -2,7 +2,7 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
 
-import {QRCodeSVGRenderer} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 import {expectSvgToMatchFileSnapshot} from './svg-helpers';
@@ -30,6 +30,22 @@ describe('QRCodeSVGRenderer snapshots', () => {
         title: 'QR title',
       })(matrix),
       join(SNAPSHOT_DIR, 'hand-authored-custom.svg'),
+    );
+  });
+
+  test('renders a mixed styled SVG snapshot', () => {
+    expectSvgToMatchFileSnapshot(
+      qrcode('styled snapshot').render(
+        QRCodeSVGRenderer({
+          size: 8,
+          margin: 4,
+          colors: {colorLight: '#fefefe', colorDark: '#101010'},
+          dotsOptions: {color: '#123456', type: 'classy-rounded'},
+          cornersSquareOptions: {color: '#654321', type: 'extra-rounded'},
+          cornersDotOptions: {color: '#2468ac', type: 'dot'},
+        }),
+      ),
+      join(SNAPSHOT_DIR, 'styled-custom.svg'),
     );
   });
 });

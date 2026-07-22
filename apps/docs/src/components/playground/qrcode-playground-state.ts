@@ -1,6 +1,17 @@
-import {isQRCodeColorHex, isValidQRCodeMargin, isValidQRCodeSize, qrcode} from '@qrcodesdk/core';
+import {
+  isQRCodeColorHex,
+  isQRCodeCornerDotType,
+  isQRCodeCornerSquareType,
+  isQRCodeDotType,
+  isValidQRCodeMargin,
+  isValidQRCodeSize,
+  qrcode,
+} from '@qrcodesdk/core';
 import type {
   QRCodeColorHex,
+  QRCodeCornerDotType,
+  QRCodeCornerSquareType,
+  QRCodeDotType,
   QRCodeErrorCorrectionLevel,
   QRCodeMask,
   QRCodeMode,
@@ -28,6 +39,9 @@ const DEFAULT_DRAFT: QRCodePlaygroundDraft = {
   margin: 4,
   colorDark: '#111827',
   colorLight: '#ffffff',
+  dotsType: 'square',
+  cornersSquareType: 'square',
+  cornersDotType: 'square',
   title: 'QR code for qrcodesdk.dev',
   ariaLabel: 'Scan to open qrcodesdk.dev',
   alt: 'QR code for qrcodesdk.dev',
@@ -54,6 +68,12 @@ export function parsePlaygroundDraft(params: URLSearchParams): QRCodePlaygroundD
     margin: parseInteger(params.get('margin'), DEFAULT_DRAFT.margin),
     colorDark: parseColorParam(params.get('dark'), DEFAULT_DRAFT.colorDark),
     colorLight: parseColorParam(params.get('light'), DEFAULT_DRAFT.colorLight),
+    dotsType: parseDotsType(params.get('dots-type')),
+    dotsColor: parseOptionalColorParam(params.get('dots-color')),
+    cornersSquareType: parseCornersSquareType(params.get('corners-square-type')),
+    cornersSquareColor: parseOptionalColorParam(params.get('corners-square-color')),
+    cornersDotType: parseCornersDotType(params.get('corners-dot-type')),
+    cornersDotColor: parseOptionalColorParam(params.get('corners-dot-color')),
     title: params.get('title') ?? DEFAULT_DRAFT.title,
     ariaLabel: params.get('aria') ?? DEFAULT_DRAFT.ariaLabel,
     alt: params.get('alt') ?? DEFAULT_DRAFT.alt,
@@ -89,6 +109,10 @@ export function validatePlaygroundDraft(draft: QRCodePlaygroundDraft): QRCodePla
   if (!isQRCodeColorHex(draft.colorLight)) {
     fieldErrors.colorLight = 'Use a 6-digit hex color.';
   }
+
+  validateOptionalColor('dotsColor', draft.dotsColor, fieldErrors);
+  validateOptionalColor('cornersSquareColor', draft.cornersSquareColor, fieldErrors);
+  validateOptionalColor('cornersDotColor', draft.cornersDotColor, fieldErrors);
 
   if (Object.keys(fieldErrors).length > 0) {
     return {
@@ -128,6 +152,29 @@ export function createPlaygroundConfig(draft: QRCodePlaygroundDraft): QRCodePlay
       colorLight: draft.colorLight as QRCodeColorHex,
     },
   };
+
+  if (draft.dotsType !== 'square' || draft.dotsColor !== undefined) {
+    options.dotsOptions = {
+      type: draft.dotsType,
+      ...(draft.dotsColor === undefined ? {} : {color: draft.dotsColor as QRCodeColorHex}),
+    };
+  }
+  if (draft.cornersSquareType !== 'square' || draft.cornersSquareColor !== undefined) {
+    options.cornersSquareOptions = {
+      type: draft.cornersSquareType,
+      ...(draft.cornersSquareColor === undefined
+        ? {}
+        : {color: draft.cornersSquareColor as QRCodeColorHex}),
+    };
+  }
+  if (draft.cornersDotType !== 'square' || draft.cornersDotColor !== undefined) {
+    options.cornersDotOptions = {
+      type: draft.cornersDotType,
+      ...(draft.cornersDotColor === undefined
+        ? {}
+        : {color: draft.cornersDotColor as QRCodeColorHex}),
+    };
+  }
 
   const version = valueOrUndefined(draft.version);
   const mode = valueOrUndefined(draft.mode);
@@ -179,6 +226,17 @@ export function writePlaygroundDraftToUrl(draft: QRCodePlaygroundDraft): void {
     stripHash(draft.colorLight),
     stripHash(DEFAULT_DRAFT.colorLight),
   );
+  setChangedParam(params, 'dots-type', draft.dotsType, DEFAULT_DRAFT.dotsType);
+  setOptionalColorParam(params, 'dots-color', draft.dotsColor);
+  setChangedParam(
+    params,
+    'corners-square-type',
+    draft.cornersSquareType,
+    DEFAULT_DRAFT.cornersSquareType,
+  );
+  setOptionalColorParam(params, 'corners-square-color', draft.cornersSquareColor);
+  setChangedParam(params, 'corners-dot-type', draft.cornersDotType, DEFAULT_DRAFT.cornersDotType);
+  setOptionalColorParam(params, 'corners-dot-color', draft.cornersDotColor);
   setChangedParam(params, 'title', draft.title, DEFAULT_DRAFT.title);
   setChangedParam(params, 'aria', draft.ariaLabel, DEFAULT_DRAFT.ariaLabel);
   setChangedParam(params, 'alt', draft.alt, DEFAULT_DRAFT.alt);
@@ -240,6 +298,22 @@ function parseColorParam(value: string | null, fallback: string): string {
   return normalizeHexColorInput(value);
 }
 
+function parseOptionalColorParam(value: string | null): string | undefined {
+  return value ? normalizeHexColorInput(value) : undefined;
+}
+
+function parseDotsType(value: string | null): QRCodeDotType {
+  return isQRCodeDotType(value) ? value : DEFAULT_DRAFT.dotsType;
+}
+
+function parseCornersSquareType(value: string | null): QRCodeCornerSquareType {
+  return isQRCodeCornerSquareType(value) ? value : DEFAULT_DRAFT.cornersSquareType;
+}
+
+function parseCornersDotType(value: string | null): QRCodeCornerDotType {
+  return isQRCodeCornerDotType(value) ? value : DEFAULT_DRAFT.cornersDotType;
+}
+
 function stripHash(value: string): string {
   return value.startsWith('#') ? value.slice(1) : value;
 }
@@ -251,6 +325,24 @@ function setChangedParam(
   defaultValue: string,
 ): void {
   if (value !== defaultValue) params.set(key, value);
+}
+
+function setOptionalColorParam(
+  params: URLSearchParams,
+  key: string,
+  value: string | undefined,
+): void {
+  if (value !== undefined) params.set(key, stripHash(value));
+}
+
+function validateOptionalColor(
+  field: 'dotsColor' | 'cornersSquareColor' | 'cornersDotColor',
+  value: string | undefined,
+  fieldErrors: QRCodePlaygroundValidation['fieldErrors'],
+): void {
+  if (value !== undefined && !isQRCodeColorHex(value)) {
+    fieldErrors[field] = 'Use a 6-digit hex color.';
+  }
 }
 
 function valueOrUndefined<T>(value: T | 'auto'): T | undefined {

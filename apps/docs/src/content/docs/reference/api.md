@@ -36,7 +36,9 @@ shared renderer contract.
 parseQRCodeStylingOptions(options?);
 ```
 
-Defaults are `size: 5`, `margin: 4`, `colors.colorLight: '#ffffff'`, and `colors.colorDark: '#000000'`.
+Defaults are `size: 5`, `margin: 4`, `colors.colorLight: '#ffffff'`, `colors.colorDark: '#000000'`,
+and `type: 'square'` for ordinary modules, finder rings, and finder centers. Each feature color
+defaults independently to `colors.colorDark`.
 Sizes must be positive safe integers, margins must be non-negative safe integers, and colors must
 be hash-prefixed six-digit hexadecimal values.
 
@@ -48,9 +50,35 @@ Use the non-throwing predicates when validating application input:
 isValidQRCodeSize(value);
 isValidQRCodeMargin(value);
 isQRCodeColorHex(value);
+isQRCodeDotType(value);
+isQRCodeCornerSquareType(value);
+isQRCodeCornerDotType(value);
 ```
 
 `isQRCodeColorHex` is a type guard for `QRCodeColorHex`.
+
+### createQRCodeStylePlan
+
+Creates the platform-neutral drawing plan used by the built-in visual renderers. Pass a matrix and
+the result of `parseQRCodeStylingOptions()`:
+
+```ts
+const styling = parseQRCodeStylingOptions({
+  dotsOptions: {type: 'rounded'},
+  cornersSquareOptions: {type: 'extra-rounded'},
+  cornersDotOptions: {type: 'dot'},
+});
+const plan = createQRCodeStylePlan(matrix, styling);
+```
+
+Coordinates and sizes in `plan.primitives` are expressed in QR modules and already include the
+quiet-zone offset. Multiply them by `styling.size` when drawing pixels. Primitives are emitted in
+ordinary-module, finder-ring, finder-center order and include their role, resolved color, shape,
+and quarter-turn rotation. `plan.hasCurves` identifies plans that require curved rendering.
+
+Canonical 7×7 finder patterns are recognized only in square QR-sized matrices of at least 21
+modules. Malformed or hand-authored matrices without canonical finders are planned entirely as
+ordinary modules.
 
 ### calculateQRCodeRenderedSize
 
@@ -67,6 +95,12 @@ The core package exports these public types:
 
 ```ts
 type QRCodeParsedStylingOptions;
+type QRCodeDotType;
+type QRCodeCornerSquareType;
+type QRCodeCornerDotType;
+type QRCodeDotsOptions;
+type QRCodeCornersSquareOptions;
+type QRCodeCornersDotOptions;
 type QRCodeAccessibilityOptions;
 type QRCodeColorHex;
 type QRCodeErrorCorrectionLevel;
@@ -79,6 +113,14 @@ type QRCodeOptions<TRendererOptions>;
 type QRCodeRenderer;
 type QRCodeStylingColors;
 type QRCodeStylingOptions;
+type QRCodeStylePlan;
+type QRCodeStylePrimitive;
+type QRCodeModuleStylePrimitive;
+type QRCodeFinderRingStylePrimitive;
+type QRCodeFinderCenterStylePrimitive;
+type QRCodeModuleShape;
+type QRCodeStyleRole;
+type QRCodeStyleRotation;
 type QRCodeTextRendererOptions;
 type QRCodeSVGOptions;
 type QRCodeSVGRendererOptions;

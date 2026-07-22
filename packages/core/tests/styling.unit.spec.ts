@@ -3,6 +3,9 @@ import {describe, expect, test} from 'vitest';
 import {
   calculateQRCodeRenderedSize,
   isQRCodeColorHex,
+  isQRCodeCornerDotType,
+  isQRCodeCornerSquareType,
+  isQRCodeDotType,
   isValidQRCodeMargin,
   isValidQRCodeSize,
   parseQRCodeStylingOptions,
@@ -18,6 +21,9 @@ describe('parseQRCodeStylingOptions', () => {
         colorLight: '#ffffff',
         colorDark: '#000000',
       },
+      dotsOptions: {color: '#000000', type: 'square'},
+      cornersSquareOptions: {color: '#000000', type: 'square'},
+      cornersDotOptions: {color: '#000000', type: 'square'},
     });
   });
 
@@ -29,6 +35,9 @@ describe('parseQRCodeStylingOptions', () => {
         colorLight: '#ffffff',
         colorDark: '#000000',
       },
+      dotsOptions: {color: '#000000', type: 'square'},
+      cornersSquareOptions: {color: '#000000', type: 'square'},
+      cornersDotOptions: {color: '#000000', type: 'square'},
     });
 
     expect(parseQRCodeStylingOptions({margin: 2})).toEqual({
@@ -38,6 +47,9 @@ describe('parseQRCodeStylingOptions', () => {
         colorLight: '#ffffff',
         colorDark: '#000000',
       },
+      dotsOptions: {color: '#000000', type: 'square'},
+      cornersSquareOptions: {color: '#000000', type: 'square'},
+      cornersDotOptions: {color: '#000000', type: 'square'},
     });
   });
 
@@ -49,6 +61,9 @@ describe('parseQRCodeStylingOptions', () => {
         colorLight: '#eeeeee',
         colorDark: '#000000',
       },
+      dotsOptions: {color: '#000000', type: 'square'},
+      cornersSquareOptions: {color: '#000000', type: 'square'},
+      cornersDotOptions: {color: '#000000', type: 'square'},
     });
 
     expect(parseQRCodeStylingOptions({colors: {colorDark: '#111111'}})).toEqual({
@@ -58,6 +73,9 @@ describe('parseQRCodeStylingOptions', () => {
         colorLight: '#ffffff',
         colorDark: '#111111',
       },
+      dotsOptions: {color: '#111111', type: 'square'},
+      cornersSquareOptions: {color: '#111111', type: 'square'},
+      cornersDotOptions: {color: '#111111', type: 'square'},
     });
   });
 
@@ -78,6 +96,9 @@ describe('parseQRCodeStylingOptions', () => {
         colorLight: '#fefefe',
         colorDark: '#101010',
       },
+      dotsOptions: {color: '#101010', type: 'square'},
+      cornersSquareOptions: {color: '#101010', type: 'square'},
+      cornersDotOptions: {color: '#101010', type: 'square'},
     });
   });
 
@@ -92,6 +113,24 @@ describe('parseQRCodeStylingOptions', () => {
       size: 1,
       margin: 0,
       colors: {colorLight: '#ABCDEF', colorDark: '#abcdef'},
+      dotsOptions: {color: '#abcdef', type: 'square'},
+      cornersSquareOptions: {color: '#abcdef', type: 'square'},
+      cornersDotOptions: {color: '#abcdef', type: 'square'},
+    });
+  });
+
+  test('resolves feature types and colors independently from the base dark color', () => {
+    expect(
+      parseQRCodeStylingOptions({
+        colors: {colorDark: '#111111'},
+        dotsOptions: {color: '#222222', type: 'rounded'},
+        cornersSquareOptions: {type: 'extra-rounded'},
+        cornersDotOptions: {color: '#333333', type: 'dot'},
+      }),
+    ).toMatchObject({
+      dotsOptions: {color: '#222222', type: 'rounded'},
+      cornersSquareOptions: {color: '#111111', type: 'extra-rounded'},
+      cornersDotOptions: {color: '#333333', type: 'dot'},
     });
   });
 
@@ -125,6 +164,27 @@ describe('parseQRCodeStylingOptions', () => {
       `QR code ${name} must be a 6-digit hex color`,
     );
   });
+
+  test.each([
+    ['dotsOptions', 'color', '#fff'],
+    ['cornersSquareOptions', 'color', '112233'],
+    ['cornersDotOptions', 'color', '#gggggg'],
+  ] as const)('rejects invalid %s.%s colors', (group, name, value) => {
+    const options = {[group]: {[name]: value}} as QRCodeStylingOptions;
+    expect(() => parseQRCodeStylingOptions(options)).toThrow(
+      `QR code ${group}.${name} must be a 6-digit hex color`,
+    );
+  });
+
+  test.each(['dotsOptions', 'cornersSquareOptions', 'cornersDotOptions'] as const)(
+    'rejects invalid %s types at runtime',
+    (group) => {
+      const options = {[group]: {type: 'pill'}} as unknown as QRCodeStylingOptions;
+      expect(() => parseQRCodeStylingOptions(options)).toThrow(
+        `QR code ${group}.type must be one of`,
+      );
+    },
+  );
 });
 
 describe('styling validation predicates', () => {
@@ -143,6 +203,15 @@ describe('styling validation predicates', () => {
     expect(isQRCodeColorHex('#abc')).toBe(false);
     expect(isQRCodeColorHex('abcdef')).toBe(false);
     expect(isQRCodeColorHex(123456)).toBe(false);
+  });
+
+  test('identifies supported module and finder types', () => {
+    expect(isQRCodeDotType('classy-rounded')).toBe(true);
+    expect(isQRCodeDotType('dot')).toBe(false);
+    expect(isQRCodeCornerSquareType('dot')).toBe(true);
+    expect(isQRCodeCornerSquareType('pill')).toBe(false);
+    expect(isQRCodeCornerDotType('extra-rounded')).toBe(true);
+    expect(isQRCodeCornerDotType('DOT')).toBe(false);
   });
 });
 

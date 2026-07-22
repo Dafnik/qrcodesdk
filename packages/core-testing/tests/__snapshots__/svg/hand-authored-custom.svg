@@ -1,1 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 5 5" shape-rendering="crispEdges" alt="QR alt" aria-label="QR aria" title="QR title"><path fill="#eeeeee" d="M0 0h5v5H0z"/><path stroke="#111111" d="M2 1.5h1M1 2.5h1m1 0h1"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 5 5" shape-rendering="crispEdges" alt="QR alt" aria-label="QR aria" title="QR title"><path fill="#eeeeee" d="M0 0h5v5H0z"/><path fill="#111111" fill-rule="evenodd" d="M2 1h1v1h-1ZM1 2h1v1h-1ZM3 2h1v1h-1Z"/></svg>

@@ -49,8 +49,19 @@ export function mockCanvasRendering(mockApi: MockApi): void {
     if (contextId !== '2d') return null;
 
     return {
+      arc: mockApi.fn(),
+      beginPath: mockApi.fn(),
+      closePath: mockApi.fn(),
+      fill: mockApi.fn(),
       fillStyle: '#000000',
       fillRect: mockApi.fn(),
+      lineTo: mockApi.fn(),
+      moveTo: mockApi.fn(),
+      quadraticCurveTo: mockApi.fn(),
+      restore: mockApi.fn(),
+      rotate: mockApi.fn(),
+      save: mockApi.fn(),
+      translate: mockApi.fn(),
     } as unknown as CanvasRenderingContext2D;
   }) as HTMLCanvasElement['getContext']);
   mockApi

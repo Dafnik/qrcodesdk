@@ -104,17 +104,23 @@ Most applications should let the builder select the mode, version, and mask auto
 
 ## Renderer options
 
-| Option              | Components | Type     |     Default |
-| ------------------- | ---------- | -------- | ----------: |
-| `size`              | All        | `number` |         `5` |
-| `margin`            | All        | `number` |         `4` |
-| `colors.colorDark`  | All        | `string` | `'#000000'` |
-| `colors.colorLight` | All        | `string` | `'#ffffff'` |
-| `alt`               | SVG, Image | `string` | `undefined` |
-| `ariaLabel`         | SVG, Image | `string` | `undefined` |
-| `title`             | SVG, Image | `string` | `undefined` |
+| Option                 | Components | Type                         |            Default |
+| ---------------------- | ---------- | ---------------------------- | -----------------: |
+| `size`                 | All        | `number`                     |                `5` |
+| `margin`               | All        | `number`                     |                `4` |
+| `colors.colorDark`     | All        | `string`                     |        `'#000000'` |
+| `colors.colorLight`    | All        | `string`                     |        `'#ffffff'` |
+| `dotsOptions`          | All        | `QRCodeDotsOptions`          | `{type: 'square'}` |
+| `cornersSquareOptions` | All        | `QRCodeCornersSquareOptions` | `{type: 'square'}` |
+| `cornersDotOptions`    | All        | `QRCodeCornersDotOptions`    | `{type: 'square'}` |
+| `alt`                  | SVG, Image | `string`                     |        `undefined` |
+| `ariaLabel`            | SVG, Image | `string`                     |        `undefined` |
+| `title`                | SVG, Image | `string`                     |        `undefined` |
 
 Color options use hash-prefixed values such as `#111827`. Image and Canvas output require a positive integer `size` and a non-negative integer `margin`.
+
+Module, finder-ring, and finder-center options pass through to every component. Their optional
+colors independently inherit `colors.colorDark`.
 
 ## Download files
 

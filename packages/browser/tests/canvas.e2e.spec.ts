@@ -2,6 +2,7 @@ import {QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
+import type {QRCodeCornerDotType, QRCodeCornerSquareType, QRCodeDotType} from '@qrcodesdk/core';
 
 import {QRCodeCanvasRenderer} from '../src';
 import {JSQR_ROUNDTRIP_COMBINATIONS_ONE, decodeCanvasQRCode} from './helper';
@@ -45,5 +46,53 @@ describe('QRCodeCanvasRenderer', () => {
       );
 
     expect(decodeCanvasQRCode(canvas)).toBe(fixture.data);
+  });
+
+  test.each([
+    'rounded',
+    'dots',
+    'classy',
+    'classy-rounded',
+    'square',
+    'extra-rounded',
+  ] satisfies QRCodeDotType[])('decodes %s data module styling', (type) => {
+    expect(
+      decodeCanvasQRCode(
+        qrcode('styled dots').render(QRCodeCanvasRenderer({size: 12, dotsOptions: {type}})),
+      ),
+    ).toBe('styled dots');
+  });
+
+  test.each([
+    'dot',
+    'square',
+    'extra-rounded',
+    'rounded',
+    'dots',
+    'classy',
+    'classy-rounded',
+  ] satisfies QRCodeCornerSquareType[])('decodes %s finder ring styling', (type) => {
+    expect(
+      decodeCanvasQRCode(
+        qrcode('styled finder ring').render(
+          QRCodeCanvasRenderer({size: 12, cornersSquareOptions: {type}}),
+        ),
+      ),
+    ).toBe('styled finder ring');
+  });
+
+  test.each([
+    'dot',
+    'square',
+    'rounded',
+    'classy',
+    'classy-rounded',
+    'extra-rounded',
+  ] satisfies QRCodeCornerDotType[])('decodes %s finder center styling', (type) => {
+    expect(
+      decodeCanvasQRCode(
+        qrcode('A').render(QRCodeCanvasRenderer({size: 12, cornersDotOptions: {type}})),
+      ),
+    ).toBe('A');
   });
 });

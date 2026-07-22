@@ -153,6 +153,36 @@ describe('Angular QR code components', () => {
     expect(canvas.height).toBe(46);
   });
 
+  test('passes styled options through SVG, image, and canvas components', () => {
+    const styledOptions = {
+      size: 2,
+      margin: 1,
+      dotsOptions: {color: '#112233' as const, type: 'classy-rounded' as const},
+      cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
+      cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
+    };
+    const svgFixture = TestBed.createComponent(QRCodeSVGHost);
+    const imageFixture = TestBed.createComponent(QRCodeImageHost);
+    const canvasFixture = TestBed.createComponent(QRCodeCanvasHost);
+
+    svgFixture.componentRef.setInput('options', styledOptions);
+    imageFixture.componentRef.setInput('options', styledOptions);
+    canvasFixture.componentRef.setInput('options', styledOptions);
+    svgFixture.detectChanges();
+    imageFixture.detectChanges();
+    canvasFixture.detectChanges();
+
+    const svg = getRenderedElement<SVGSVGElement>(svgFixture, 'svg');
+
+    expect(
+      Array.from(svg.querySelectorAll('path')).map((path) => path.getAttribute('fill')),
+    ).toEqual(['#ffffff', '#112233', '#445566', '#778899']);
+    expect(getRenderedElement<HTMLImageElement>(imageFixture, 'img').src).toMatch(
+      /^data:image\/png;base64,/,
+    );
+    expect(getRenderedElement<HTMLCanvasElement>(canvasFixture, 'canvas').width).toBe(46);
+  });
+
   test('replaces existing rendered image when inputs change', () => {
     const fixture = TestBed.createComponent(QRCodeImageHost);
 

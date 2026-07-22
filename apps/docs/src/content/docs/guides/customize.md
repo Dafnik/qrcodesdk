@@ -1,6 +1,6 @@
 ---
 title: Customize QR Codes
-description: Control QR code size, margin, colors, accessibility labels, error correction, version, and mask.
+description: Control QR code module shapes, colors, size, margin, accessibility labels, error correction, version, and mask.
 
 related:
   - ../renderers/core/text.md
@@ -55,6 +55,49 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 ```
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
+
+## Module and finder styles
+
+SVG, browser Canvas/Image, and Node PNG output can style ordinary data modules, finder outer
+rings, and finder centers independently.
+
+```ts
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+const svg = qrcode('https://qrcodesdk.dev').render(
+  QRCodeSVGRenderer({
+    colors: {
+      colorDark: '#111827',
+      colorLight: '#ffffff',
+    },
+    dotsOptions: {
+      type: 'rounded',
+    },
+    cornersSquareOptions: {
+      type: 'extra-rounded',
+      color: '#7c3aed',
+    },
+    cornersDotOptions: {
+      type: 'dot',
+      color: '#2563eb',
+    },
+  }),
+);
+```
+
+| Feature               | Option                 | Supported types                                                          | Default color      |
+| --------------------- | ---------------------- | ------------------------------------------------------------------------ | ------------------ |
+| Ordinary data modules | `dotsOptions`          | `square`, `rounded`, `dots`, `classy`, `classy-rounded`, `extra-rounded` | `colors.colorDark` |
+| Finder outer rings    | `cornersSquareOptions` | The data-module types plus `dot`                                         | `colors.colorDark` |
+| Finder centers        | `cornersDotOptions`    | The data-module types plus `dot`                                         | `colors.colorDark` |
+
+All three types default to `square`. The color overrides are independent: setting a finder-ring
+color does not change data modules or finder centers. Omit a feature color to inherit
+`colors.colorDark`.
+
+Curved shapes are neighbor-aware and antialiased by raster renderers. Keep sufficient contrast
+between every feature color and `colors.colorLight`, and test the final code with the scanners you
+support. These shape options do not affect terminal text output.
 
 ```ts
 import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';

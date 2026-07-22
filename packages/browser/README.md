@@ -59,6 +59,9 @@ const image = qrcode('https://qrcodesdk.dev').render(
       colorDark: '#111827',
       colorLight: '#ffffff',
     },
+    dotsOptions: {type: 'rounded'},
+    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
+    cornersDotOptions: {type: 'dot'},
     alt: 'QR code for qrcodesdk.dev',
     ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
@@ -93,17 +96,23 @@ document.querySelector('#qrcode')?.append(canvas);
 
 ## Renderer options
 
-| Option              | Type     |     Default | Description                                   |
-| ------------------- | -------- | ----------: | --------------------------------------------- |
-| `size`              | `number` |         `5` | Pixel size of each QR module.                 |
-| `margin`            | `number` |         `4` | Quiet-zone width in modules.                  |
-| `colors.colorDark`  | `string` | `'#000000'` | Dark module color.                            |
-| `colors.colorLight` | `string` | `'#ffffff'` | Background color.                             |
-| `alt`               | `string` | `undefined` | Image `alt` attribute; Image renderer only.   |
-| `ariaLabel`         | `string` | `undefined` | Image `aria-label`; Image renderer only.      |
-| `title`             | `string` | `undefined` | Image `title` attribute; Image renderer only. |
+| Option                 | Type                         |            Default | Description                                   |
+| ---------------------- | ---------------------------- | -----------------: | --------------------------------------------- |
+| `size`                 | `number`                     |                `5` | Pixel size of each QR module.                 |
+| `margin`               | `number`                     |                `4` | Quiet-zone width in modules.                  |
+| `colors.colorDark`     | `string`                     |        `'#000000'` | Dark module color.                            |
+| `colors.colorLight`    | `string`                     |        `'#ffffff'` | Background color.                             |
+| `dotsOptions`          | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary module shape and optional color.     |
+| `cornersSquareOptions` | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color.         |
+| `cornersDotOptions`    | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color.       |
+| `alt`                  | `string`                     |        `undefined` | Image `alt` attribute; Image renderer only.   |
+| `ariaLabel`            | `string`                     |        `undefined` | Image `aria-label`; Image renderer only.      |
+| `title`                | `string`                     |        `undefined` | Image `title` attribute; Image renderer only. |
 
 Color options use hash-prefixed values such as `#111827`. Browser pixel output requires a positive integer `size` and a non-negative integer `margin`.
+
+All feature colors inherit `colors.colorDark` when omitted. Shapes are shared by Canvas and Image
+output, including PNG downloads.
 
 ## Download PNG
 

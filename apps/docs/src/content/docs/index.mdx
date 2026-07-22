@@ -93,6 +93,9 @@ const svg = qrcode('https://qrcodesdk.dev')
         colorDark: '#111827',
         colorLight: '#ffffff',
       },
+      dotsOptions: {type: 'rounded'},
+      cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
+      cornersDotOptions: {type: 'dot'},
       ariaLabel: 'Scan to open qrcodesdk.dev',
     }),
   );
@@ -109,7 +112,7 @@ const svg = qrcode('https://qrcodesdk.dev')
   <LinkCard
     title="Customize QR Codes"
     href="/guides/customize/"
-    description="Set size, margin, colors, accessibility labels, error correction, version, and mask."
+    description="Set module and finder shapes, colors, size, margin, accessibility labels, error correction, version, and mask."
   />
   <LinkCard
     title="Playground"

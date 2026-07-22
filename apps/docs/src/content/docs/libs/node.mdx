@@ -34,6 +34,9 @@ const png: Buffer = qrcode('https://qrcodesdk.dev').render(
       colorDark: '#111827',
       colorLight: '#ffffff',
     },
+    dotsOptions: {type: 'rounded'},
+    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
+    cornersDotOptions: {type: 'dot'},
   }),
 );
 ```
@@ -42,14 +45,20 @@ const png: Buffer = qrcode('https://qrcodesdk.dev').render(
 
 ## Options
 
-| Option              | Type     |     Default | Description                   |
-| ------------------- | -------- | ----------: | ----------------------------- |
-| `size`              | `number` |         `5` | Pixel size of each QR module. |
-| `margin`            | `number` |         `4` | Quiet-zone width in modules.  |
-| `colors.colorDark`  | `string` | `'#000000'` | Dark module color.            |
-| `colors.colorLight` | `string` | `'#ffffff'` | Background color.             |
+| Option                 | Type                         |            Default | Description                               |
+| ---------------------- | ---------------------------- | -----------------: | ----------------------------------------- |
+| `size`                 | `number`                     |                `5` | Pixel size of each QR module.             |
+| `margin`               | `number`                     |                `4` | Quiet-zone width in modules.              |
+| `colors.colorDark`     | `string`                     |        `'#000000'` | Dark module color.                        |
+| `colors.colorLight`    | `string`                     |        `'#ffffff'` | Background color.                         |
+| `dotsOptions`          | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary module shape and optional color. |
+| `cornersSquareOptions` | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color.     |
+| `cornersDotOptions`    | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color.   |
 
 Colors must be six-digit hex values such as `#111827`. `size` must be a positive integer and `margin` must be a non-negative integer.
+
+All feature colors inherit `colors.colorDark` when omitted. Curves are rendered with deterministic
+subpixel coverage and blended into the opaque background.
 
 ## Save to disk
 

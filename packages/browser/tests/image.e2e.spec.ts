@@ -50,4 +50,17 @@ describe('QRCodeImageRenderer', () => {
 
     await expect(decodeImageQRCode(image)).resolves.toBe(QR_CODE_TEST_FIXTURES[1].data);
   });
+
+  test('decodes mixed styled PNG image output', async () => {
+    const image = qrcode('mixed styled browser png').render(
+      QRCodeImageRenderer({
+        size: 12,
+        dotsOptions: {color: '#112233', type: 'classy-rounded'},
+        cornersSquareOptions: {color: '#445566', type: 'extra-rounded'},
+        cornersDotOptions: {color: '#778899', type: 'dot'},
+      }),
+    );
+
+    await expect(decodeImageQRCode(image)).resolves.toBe('mixed styled browser png');
+  });
 });

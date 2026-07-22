@@ -1,7 +1,10 @@
 import type {
   QRCodeAccessibilityOptions,
+  QRCodeCornerDotType,
+  QRCodeCornerSquareType,
+  QRCodeDotType,
   QRCodeMatrixOptions,
-  QRCodeParsedStylingOptions,
+  QRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
 export const QR_CODE_PLAYGROUND_UPDATE_EVENT = 'qrcodesdk:playground-update';
@@ -22,19 +25,36 @@ export type QRCodePlaygroundDraft = QRCodePlaygroundMatrixDraft &
     margin: number;
     colorDark: string;
     colorLight: string;
+    dotsType: QRCodeDotType;
+    dotsColor?: string;
+    cornersSquareType: QRCodeCornerSquareType;
+    cornersSquareColor?: string;
+    cornersDotType: QRCodeCornerDotType;
+    cornersDotColor?: string;
   };
 
 export type QRCodePlaygroundConfig = {
   packageName: QRCodePlaygroundPackage;
   output: QRCodePlaygroundOutput;
   data: string;
-  options: QRCodeMatrixOptions & QRCodeParsedStylingOptions & QRCodeAccessibilityOptions;
+  options: QRCodeMatrixOptions & QRCodeStylingOptions & QRCodeAccessibilityOptions;
 };
 
 export type QRCodePlaygroundValidation = {
   valid: boolean;
   error?: string;
-  fieldErrors: Partial<Record<'colorDark' | 'colorLight' | 'size' | 'margin', string>>;
+  fieldErrors: Partial<
+    Record<
+      | 'colorDark'
+      | 'colorLight'
+      | 'dotsColor'
+      | 'cornersSquareColor'
+      | 'cornersDotColor'
+      | 'size'
+      | 'margin',
+      string
+    >
+  >;
 };
 
 export type QRCodePlaygroundSnapshot = {

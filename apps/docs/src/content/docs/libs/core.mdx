@@ -147,10 +147,16 @@ hexadecimal values.
 
 `parseQRCodeStylingOptions()` applies the shared defaults and throws when the resolved styling is
 invalid. Applications that need non-throwing input validation can use `isValidQRCodeSize()`,
-`isValidQRCodeMargin()`, and the `isQRCodeColorHex()` type guard.
+`isValidQRCodeMargin()`, `isQRCodeColorHex()`, `isQRCodeDotType()`,
+`isQRCodeCornerSquareType()`, and `isQRCodeCornerDotType()`.
 
 Custom renderers can use `calculateQRCodeRenderedSize(matrix, styling)` to calculate and validate
 the square output dimension, including the quiet-zone margin.
+
+The built-in SVG, browser Canvas/Image, and Node PNG renderers all consume
+`createQRCodeStylePlan(matrix, styling)` as their platform-neutral drawing foundation. Its ordered
+primitives use QR-module coordinates and contain resolved roles, colors, shapes, and rotations for
+ordinary modules and canonical finder patterns.
 
 ## Matrix output and custom renderers
 
@@ -182,6 +188,12 @@ import {
   type QRCodeAccessibilityOptions,
   QRCodeBuilder,
   type QRCodeColorHex,
+  type QRCodeCornerDotType,
+  type QRCodeCornerSquareType,
+  type QRCodeCornersDotOptions,
+  type QRCodeCornersSquareOptions,
+  type QRCodeDotType,
+  type QRCodeDotsOptions,
   type QRCodeErrorCorrectionLevel,
   type QRCodeInputData,
   type QRCodeMask,
@@ -194,13 +206,19 @@ import {
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
+  type QRCodeStylePlan,
+  type QRCodeStylePrimitive,
   type QRCodeStylingColors,
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeVersion,
   calculateQRCodeRenderedSize,
+  createQRCodeStylePlan,
   isQRCodeColorHex,
+  isQRCodeCornerDotType,
+  isQRCodeCornerSquareType,
+  isQRCodeDotType,
   isValidQRCodeMargin,
   isValidQRCodeSize,
   parseQRCodeStylingOptions,

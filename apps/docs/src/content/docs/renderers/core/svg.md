@@ -37,21 +37,34 @@ const svg = qrcode('https://qrcodesdk.dev').render(
       colorDark: '#111827',
       colorLight: '#ffffff',
     },
+    dotsOptions: {type: 'rounded'},
+    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
+    cornersDotOptions: {type: 'dot'},
   }),
 );
 ```
 
-| Option              |     Type |     Default | Description                                       |
-| ------------------- | -------: | ----------: | ------------------------------------------------- |
-| `size`              | `number` |         `5` | Pixel size of each QR module.                     |
-| `margin`            | `number` |         `4` | Quiet-zone margin around the QR code, in modules. |
-| `colors.colorDark`  | `string` | `'#000000'` | Color used for dark modules.                      |
-| `colors.colorLight` | `string` | `'#ffffff'` | Background color.                                 |
-| `alt`               | `string` | `undefined` | Adds an `alt` attribute to the SVG.               |
-| `ariaLabel`         | `string` | `undefined` | Adds an `aria-label` attribute to the SVG.        |
-| `title`             | `string` | `undefined` | Adds a `title` attribute to the SVG.              |
+| Option                       |                     Type |            Default | Description                                       |
+| ---------------------------- | -----------------------: | -----------------: | ------------------------------------------------- |
+| `size`                       |                 `number` |                `5` | Pixel size of each QR module.                     |
+| `margin`                     |                 `number` |                `4` | Quiet-zone margin around the QR code, in modules. |
+| `colors.colorDark`           |                 `string` |        `'#000000'` | Color used for dark modules.                      |
+| `colors.colorLight`          |                 `string` |        `'#ffffff'` | Background color.                                 |
+| `dotsOptions.type`           |          `QRCodeDotType` |         `'square'` | Shape used for ordinary data modules.             |
+| `dotsOptions.color`          |                 `string` | `colors.colorDark` | Color used for ordinary data modules.             |
+| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                |
+| `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                |
+| `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                    |
+| `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                    |
+| `alt`                        |                 `string` |        `undefined` | Adds an `alt` attribute to the SVG.               |
+| `ariaLabel`                  |                 `string` |        `undefined` | Adds an `aria-label` attribute to the SVG.        |
+| `title`                      |                 `string` |        `undefined` | Adds a `title` attribute to the SVG.              |
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
+
+Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
+`extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
+is independent; omit it to inherit `colors.colorDark`.
 
 ## Common recipes
 
@@ -195,10 +208,21 @@ The SVG renderer generates:
 
 - A square `<svg>` string
 - A light background path using `colors.colorLight`
-- A dark module path using `colors.colorDark`
+- Compact filled paths grouped by the resolved data-module, finder-ring, and finder-center colors
+- Merged, non-overlapping rectangles for compatible square modules and finder primitives
+- Curved primitive path segments in the same resolved-color groups
+- Even-odd paths so circular and rounded-square finder rings retain their holes
 - A `viewBox` measured in QR modules
 - Pixel `width` and `height` values derived from `size`, matrix size, and `margin`
 - Optional `alt`, `aria-label`, and `title` attributes
+
+SVG, browser Canvas/Image, and Node PNG renderers all create and consume a
+`QRCodeStylePlan`. The SVG renderer scans square cells into horizontal runs and merges vertically
+adjacent runs with matching positions and widths. Square-only plans use crisp-edge rendering;
+plans containing curves omit that override.
+
+Serialized SVG and snapshot compatibility is not guaranteed. Visual geometry and successful QR
+decoding are the compatibility targets.
 
 The final pixel size is calculated as:
 
