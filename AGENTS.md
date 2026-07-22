@@ -14,3 +14,7 @@ pnpm turbo run build --filter=docs
 pnpm turbo run check-types --filter=docs
 pnpm turbo run start --filter=docs
 ```
+
+---
+
+Never create changesets! This is the work of a human.
