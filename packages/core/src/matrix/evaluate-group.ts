@@ -25,17 +25,19 @@ export function evaluateGroup(groups: number[]): number {
 
   let finderLikeWindow = 0;
   let numberOfModules = 0;
+  let lastMatchedModuleIndex = -1;
   for (let i = 0; i < groups.length; i++) {
     const module = i % 2;
     for (let j = 0; j < groups[i]!; j++) {
       finderLikeWindow = ((finderLikeWindow << 1) & FINDER_LIKE_WINDOW_MASK) | module;
       numberOfModules++;
-      if (
-        numberOfModules >= 11 &&
-        (finderLikeWindow === FINDER_LIKE_LEFT_PADDING ||
-          finderLikeWindow === FINDER_LIKE_RIGHT_PADDING)
-      ) {
-        score += PENALTY_FINDER_LIKE;
+      const isLeftPaddedMatch = finderLikeWindow === FINDER_LIKE_LEFT_PADDING;
+      const isRightPaddedMatch = finderLikeWindow === FINDER_LIKE_RIGHT_PADDING;
+      if (numberOfModules >= 11 && (isLeftPaddedMatch || isRightPaddedMatch)) {
+        if (!(isRightPaddedMatch && lastMatchedModuleIndex === numberOfModules - 4)) {
+          score += PENALTY_FINDER_LIKE;
+        }
+        lastMatchedModuleIndex = numberOfModules;
       }
     }
   }

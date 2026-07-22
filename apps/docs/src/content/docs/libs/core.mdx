@@ -105,9 +105,10 @@ const matrix = qrcode('HELLO WORLD').mode('alphanumeric').version(1).mask(2).mat
 
 Versions range from `1` to `40`. Masks range from `0` to `7`.
 
-When a pinned version cannot contain the payload at the selected error correction level,
-matrix generation throws `QRCode: Data too large`. Remove the version override or select a
-larger version.
+Capacity depends on both the encoding mode and error correction level. When a pinned version
+cannot contain the payload, matrix generation throws `QRCode: Data too large`. Removing the
+version override helps only when a larger supported version can fit the payload. If automatic
+selection cannot fit any version, reduce or change the payload.
 
 ## Matrix output
 

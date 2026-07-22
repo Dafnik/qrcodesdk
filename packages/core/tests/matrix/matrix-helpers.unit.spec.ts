@@ -93,7 +93,7 @@ describe('matrix evaluation helpers', () => {
     expect(evaluateGroup([0, 4])).toBe(0);
     expect(evaluateGroup([0, 5])).toBe(3);
     expect(evaluateGroup([0, 7])).toBe(5);
-    expect(evaluateGroup([4, 1, 1, 3, 1, 1, 4])).toBe(80);
+    expect(evaluateGroup([4, 1, 1, 3, 1, 1, 4])).toBe(40);
     expect(evaluateGroup([4, 1, 1, 3, 1, 1, 0])).toBe(40);
     expect(evaluateGroup([0, 1, 1, 3, 1, 1, 4])).toBe(40);
     expect(evaluateGroup([4, 2, 2, 6, 2, 2, 4])).toBe(4);

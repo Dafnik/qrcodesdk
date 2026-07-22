@@ -19,7 +19,7 @@ export const MODES_MAP: Record<QRCodeMode, QRCodeSupportedModeIndicator> = {
 };
 
 const NUMERIC_REGEXP = /^\d*$/;
-const ALPHANUMERIC_REGEXP = /^[A-Z0-9 $%*+\-./:_]*$/;
+const ALPHANUMERIC_REGEXP = /^[A-Z0-9 $%*+\-./:]*$/;
 
 type PackBits = (value: number, bitCount: number) => void;
 type TextEncoderConstructor = new () => {

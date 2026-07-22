@@ -27,6 +27,7 @@ describe('data validation and encoding', () => {
 
     expect(validateData(MODE_ALPHANUMERIC, 'HELLO WORLD:')).toBe('HELLO WORLD:');
     expect(validateData(MODE_ALPHANUMERIC, 'hello')).toBeUndefined();
+    expect(validateData(MODE_ALPHANUMERIC, 'HELLO_WORLD')).toBeUndefined();
 
     expect(validateData(MODE_OCTET, 'Aé')).toEqual([0x41, 0xc3, 0xa9]);
   });
