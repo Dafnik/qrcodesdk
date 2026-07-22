@@ -33,6 +33,19 @@ const AUTOMATIC_MASK_N4_DIVERGENCES = new Map<
   ['version-16_ecc-H_mask-auto_mode-alphanumeric', {qrcodeSdk: 0, reference: 2}],
 ]);
 
+// `qrcode` counts both 11-module windows around a finder-like core flanked by four light
+// modules on each side. QRCodeSDK counts the core once, so these inputs choose a different mask.
+const AUTOMATIC_MASK_N3_DIVERGENCES = new Map<
+  string,
+  {qrcodeSdk: QRCodeMask; reference: QRCodeMask}
+>([
+  ['version-16_ecc-Q_mask-auto_mode-numeric', {qrcodeSdk: 4, reference: 2}],
+  ['version-18_ecc-M_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 0}],
+  ['version-18_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 0, reference: 4}],
+  ['version-37_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 4, reference: 2}],
+  ['version-37_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 2}],
+]);
+
 function referenceMatrixQRCodePackage(fixture: QRCodeTestFixture): QRCodeMatrix {
   const encodedData =
     fixture.mode === 'numeric'
@@ -171,7 +184,9 @@ describe('qrcode().matrix()', () => {
     (fixture) => {
       const matrix = qrcode(fixture.data).config(fixture).matrix();
       const referenceMatrix = referenceMatrixQRCodePackage(fixture);
-      const knownDivergence = AUTOMATIC_MASK_N4_DIVERGENCES.get(fixture.name);
+      const knownDivergence =
+        AUTOMATIC_MASK_N3_DIVERGENCES.get(fixture.name) ??
+        AUTOMATIC_MASK_N4_DIVERGENCES.get(fixture.name);
 
       if (!knownDivergence) {
         expect(matrix).toEqual(referenceMatrix);
