@@ -9,5 +9,6 @@ export {captureDownloads, mockCanvasRendering} from './dom';
 export type {CapturedDownload} from './dom';
 export {QR_CODE_TEST_FIXTURES} from './fixtures';
 export type {QRCodeTestFixture} from './fixtures';
-export {renderFixture} from './render-fixture';
+export {QR_CODE_STYLING_FIXTURES} from './styling-fixtures';
+export type {QRCodeStylingFixture} from './styling-fixtures';
 export type {RGBAPixel} from './types';

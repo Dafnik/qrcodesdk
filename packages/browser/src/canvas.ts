@@ -30,7 +30,9 @@ export function QRCodeCanvasRenderer(
     context.fillStyle = plan.backgroundColor;
     context.fillRect(0, 0, plan.renderedSize, plan.renderedSize);
 
-    for (const primitive of plan.primitives) drawPrimitive(context, primitive, scale);
+    for (let index = 0; index < plan.primitives.length; index++) {
+      drawPrimitive(context, plan.primitives[index]!, scale);
+    }
 
     return canvas;
   };

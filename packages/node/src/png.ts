@@ -26,7 +26,9 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
     const png = new PNG({width: plan.renderedSize, height: plan.renderedSize});
     fillRect(png, 0, 0, plan.renderedSize, plan.renderedSize, hexColorToRGB(plan.backgroundColor));
 
-    for (const primitive of plan.primitives) rasterizePrimitive(png, primitive, scale);
+    for (let index = 0; index < plan.primitives.length; index++) {
+      rasterizePrimitive(png, plan.primitives[index]!, scale);
+    }
 
     return PNG.sync.write(png);
   };

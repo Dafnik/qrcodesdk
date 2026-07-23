@@ -25,7 +25,9 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     if (options?.title) svg += ` title="${escapeAttributeValue(options.title)}"`;
 
     svg += `><path fill="${escapeAttributeValue(plan.backgroundColor)}" d="M0 0h${plan.viewSize}v${plan.viewSize}H0z"/>`;
-    for (const [color, path] of createPathsByColor(plan.primitives)) {
+    const pathsByColor = createPathsByColor(plan.primitives, plan.viewSize);
+    for (let index = 0; index < pathsByColor.length; index++) {
+      const {color, path} = pathsByColor[index]!;
       svg += `<path fill="${escapeAttributeValue(color)}" fill-rule="evenodd" d="${path}"/>`;
     }
 
@@ -33,116 +35,149 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
   };
 }
 
-function createPathsByColor(primitives: readonly QRCodeStylePrimitive[]): Map<string, string> {
-  const groups = new Map<string, {squareCells: Map<number, Set<number>>; curvedPath: string}>();
+type SVGPathGroup = {
+  color: string;
+  squareCells: Uint8Array;
+  curvedPaths: string[];
+};
 
-  for (const primitive of primitives) {
-    let group = groups.get(primitive.color);
+type SVGPathByColor = {
+  color: string;
+  path: string;
+};
+
+function createPathsByColor(
+  primitives: readonly QRCodeStylePrimitive[],
+  viewSize: number,
+): SVGPathByColor[] {
+  let squareGridWidth = viewSize;
+  let squareGridHeight = viewSize;
+  for (let index = 0; index < primitives.length; index++) {
+    const primitive = primitives[index]!;
+    if (primitive.shape !== 'square') continue;
+    const size = primitive.kind === 'module' ? 1 : primitive.size;
+    squareGridWidth = Math.max(squareGridWidth, primitive.x + size);
+    squareGridHeight = Math.max(squareGridHeight, primitive.y + size);
+  }
+
+  const groupsByColor = new Map<string, SVGPathGroup>();
+  const groups: SVGPathGroup[] = [];
+
+  for (let index = 0; index < primitives.length; index++) {
+    const primitive = primitives[index]!;
+    let group = groupsByColor.get(primitive.color);
     if (!group) {
-      group = {squareCells: new Map(), curvedPath: ''};
-      groups.set(primitive.color, group);
+      group = {
+        color: primitive.color,
+        squareCells: new Uint8Array(squareGridWidth * squareGridHeight),
+        curvedPaths: [],
+      };
+      groupsByColor.set(primitive.color, group);
+      groups.push(group);
     }
 
     if (primitive.shape === 'square') {
-      addSquarePrimitiveCells(group.squareCells, primitive);
+      addSquarePrimitiveCells(group.squareCells, squareGridWidth, primitive);
     } else {
-      group.curvedPath += primitiveToPath(primitive);
+      group.curvedPaths.push(primitiveToPath(primitive));
     }
   }
 
-  const paths = new Map<string, string>();
-  for (const [color, group] of groups) {
-    paths.set(color, `${compactSquareCells(group.squareCells)}${group.curvedPath}`);
+  const paths: SVGPathByColor[] = [];
+  for (let index = 0; index < groups.length; index++) {
+    const group = groups[index]!;
+    paths.push({
+      color: group.color,
+      path: `${compactSquareCells(group.squareCells, squareGridWidth, squareGridHeight)}${group.curvedPaths.join('')}`,
+    });
   }
 
   return paths;
 }
 
 function addSquarePrimitiveCells(
-  rows: Map<number, Set<number>>,
+  cells: Uint8Array,
+  viewSize: number,
   primitive: QRCodeStylePrimitive,
 ): void {
+  const x = primitive.x;
+  const y = primitive.y;
+
   if (primitive.kind === 'module') {
-    addSquareCell(rows, primitive.x, primitive.y);
+    cells[y * viewSize + x] = 1;
     return;
   }
 
-  for (let row = 0; row < primitive.size; row++) {
-    for (let column = 0; column < primitive.size; column++) {
-      if (
-        primitive.kind === 'finder-center' ||
-        row === 0 ||
-        row === primitive.size - 1 ||
-        column === 0 ||
-        column === primitive.size - 1
-      ) {
-        addSquareCell(rows, primitive.x + column, primitive.y + row);
-      }
+  if (primitive.kind === 'finder-center') {
+    for (let row = 0; row < primitive.size; row++) {
+      const start = (y + row) * viewSize + x;
+      cells.fill(1, start, start + primitive.size);
     }
+    return;
+  }
+
+  const top = y * viewSize + x;
+  const bottom = (y + primitive.size - 1) * viewSize + x;
+  cells.fill(1, top, top + primitive.size);
+  cells.fill(1, bottom, bottom + primitive.size);
+  for (let row = 1; row < primitive.size - 1; row++) {
+    const start = (y + row) * viewSize + x;
+    cells[start] = 1;
+    cells[start + primitive.size - 1] = 1;
   }
 }
 
-function addSquareCell(rows: Map<number, Set<number>>, x: number, y: number): void {
-  let columns = rows.get(y);
-  if (!columns) {
-    columns = new Set();
-    rows.set(y, columns);
-  }
-  columns.add(x);
-}
+function compactSquareCells(cells: Uint8Array, width: number, height: number): string {
+  const rectangleXs: number[] = [];
+  const rectangleYs: number[] = [];
+  const rectangleWidths: number[] = [];
+  const rectangleHeights: number[] = [];
+  let previousWidths = new Uint16Array(width);
+  let previousRectangleIndexes = new Int32Array(width);
+  let currentWidths = new Uint16Array(width);
+  let currentRectangleIndexes = new Int32Array(width);
 
-type SquareRectangle = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+  for (let y = 0; y < height; y++) {
+    currentWidths.fill(0);
+    const rowOffset = y * width;
+    let x = 0;
 
-function compactSquareCells(rows: Map<number, Set<number>>): string {
-  const rectangles: SquareRectangle[] = [];
-  let activeRectangles = new Map<string, number>();
-  let previousRow: number | undefined;
+    while (x < width) {
+      while (x < width && cells[rowOffset + x] === 0) x++;
+      if (x === width) break;
 
-  for (const [y, columns] of [...rows].sort(([left], [right]) => left - right)) {
-    const currentRectangles = new Map<string, number>();
-    for (const run of createHorizontalRuns(columns)) {
-      const key = `${run.x}:${run.width}`;
-      const activeIndex = previousRow === y - 1 ? activeRectangles.get(key) : undefined;
+      const start = x;
+      while (x < width && cells[rowOffset + x] === 1) x++;
+      const runWidth = x - start;
+      let rectangleIndex: number;
 
-      if (activeIndex === undefined) {
-        rectangles.push({x: run.x, y, width: run.width, height: 1});
-        currentRectangles.set(key, rectangles.length - 1);
+      if (previousWidths[start] === runWidth) {
+        rectangleIndex = previousRectangleIndexes[start]!;
+        rectangleHeights[rectangleIndex]!++;
       } else {
-        rectangles[activeIndex]!.height++;
-        currentRectangles.set(key, activeIndex);
+        rectangleIndex = rectangleXs.length;
+        rectangleXs.push(start);
+        rectangleYs.push(y);
+        rectangleWidths.push(runWidth);
+        rectangleHeights.push(1);
       }
+
+      currentWidths[start] = runWidth;
+      currentRectangleIndexes[start] = rectangleIndex;
     }
-    activeRectangles = currentRectangles;
-    previousRow = y;
+
+    [previousWidths, currentWidths] = [currentWidths, previousWidths];
+    [previousRectangleIndexes, currentRectangleIndexes] = [
+      currentRectangleIndexes,
+      previousRectangleIndexes,
+    ];
   }
 
-  return rectangles
-    .map(
-      ({x, y, width, height}) =>
-        `M${formatPoint(x, y)}h${formatNumber(width)}v${formatNumber(height)}h${formatNumber(-width)}Z`,
-    )
-    .join('');
-}
-
-function createHorizontalRuns(columns: Set<number>): {x: number; width: number}[] {
-  const sortedColumns = [...columns].sort((left, right) => left - right);
-  const runs: {x: number; width: number}[] = [];
-
-  for (const column of sortedColumns) {
-    const lastRun = runs.at(-1);
-    if (lastRun && lastRun.x + lastRun.width === column) {
-      lastRun.width++;
-    } else {
-      runs.push({x: column, width: 1});
-    }
+  let path = '';
+  for (let index = 0; index < rectangleXs.length; index++) {
+    path += `M${rectangleXs[index]} ${rectangleYs[index]}h${rectangleWidths[index]}v${rectangleHeights[index]}h-${rectangleWidths[index]}Z`;
   }
-
-  return runs;
+  return path;
 }
 
 function primitiveToPath(primitive: QRCodeStylePrimitive): string {
@@ -217,7 +252,8 @@ type LocalPathCommand =
 
 function localPath(primitive: QRCodeStylePrimitive, commands: readonly LocalPathCommand[]): string {
   let path = '';
-  for (const command of commands) {
+  for (let index = 0; index < commands.length; index++) {
+    const command = commands[index]!;
     if (command[0] === 'Z') {
       path += 'Z';
       continue;
