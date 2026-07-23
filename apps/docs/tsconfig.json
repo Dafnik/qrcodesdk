@@ -1,6 +1,16 @@
 {
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@spartan-ng/helm/button": ["./src/libs/ui/button/src/index.ts"],
+      "@spartan-ng/helm/card": ["./src/libs/ui/card/src/index.ts"],
+      "@spartan-ng/helm/field": ["./src/libs/ui/field/src/index.ts"],
+      "@spartan-ng/helm/label": ["./src/libs/ui/label/src/index.ts"],
+      "@spartan-ng/helm/radio-group": ["./src/libs/ui/radio-group/src/index.ts"],
+      "@spartan-ng/helm/separator": ["./src/libs/ui/separator/src/index.ts"],
+      "@spartan-ng/helm/tabs": ["./src/libs/ui/tabs/src/index.ts"],
+      "@spartan-ng/helm/utils": ["./src/libs/ui/utils/src/index.ts"]
+    }
   },
   "exclude": ["dist", "eslint.config.mjs"],
   "extends": "astro/tsconfigs/strict",

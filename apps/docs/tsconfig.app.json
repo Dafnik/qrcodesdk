@@ -30,5 +30,5 @@
   },
   "extends": "./tsconfig.json",
   "files": [],
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/libs/ui/**/src/**/*.ts"]
 }

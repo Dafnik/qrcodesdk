@@ -4,12 +4,12 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
 import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
 import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
-import {createPlaygroundSnapshot, readPlaygroundDraftFromUrl} from './qrcode-playground-state';
+import {createPlaygroundSnapshot, readPlaygroundDraftFromUrl} from '../qrcode-playground-state.ts';
 import {
   type QRCodePlaygroundConfig,
   type QRCodePlaygroundSnapshot,
   QR_CODE_PLAYGROUND_UPDATE_EVENT,
-} from './qrcode-playground-types';
+} from '../qrcode-playground-types.ts';
 
 @Component({
   selector: 'qrcode-angular-playground-preview',
@@ -48,7 +48,7 @@ import {
     }
   `,
 })
-export class QRCodeAngularPlaygroundPreview {
+export class AngularPlaygroundPreview {
   readonly snapshot = signal<QRCodePlaygroundSnapshot>(
     createPlaygroundSnapshot(readPlaygroundDraftFromUrl()),
   );

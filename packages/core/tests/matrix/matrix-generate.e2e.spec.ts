@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
 import {
+  MODES,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMode,
   type QRCodeVersion,
@@ -17,7 +18,6 @@ const ERROR_CORRECTION_LEVELS = [
   'Q',
   'H',
 ] as const satisfies readonly QRCodeErrorCorrectionLevel[];
-const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
 const DATA_BY_MODE = {
   numeric: '1',
   alphanumeric: 'A',

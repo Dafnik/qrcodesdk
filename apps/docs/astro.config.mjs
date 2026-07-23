@@ -27,6 +27,10 @@ export default defineConfig({
     },
   },
   vite: {
+    ssr: {
+      // transform these packages during SSR. Globs supported
+      noExternal: ['@spartan-ng/brain', '@spartan-ng/helm', '@spartan-ng/helm/**'],
+    },
     plugins: [includeContentPlugin(), tailwindcss()],
   },
   integrations: [
@@ -94,10 +98,12 @@ export default defineConfig({
     angular({
       useAngularHydration: true,
       vite: {
+        fastCompile: true,
         transformFilter: (_code, id) => {
           return (
             id.includes('src/components/angular') ||
-            id.includes('src/components/playground/qrcode-angular')
+            id.includes('src/components/playground/angular') ||
+            id.includes('src/libs/ui')
           ); // <- only transform Angular TypeScript files
         },
       },

@@ -5,6 +5,8 @@ import {writeFile as writeFileDefault} from 'node:fs/promises';
 import process from 'node:process';
 
 import {
+  ECC_LEVELS,
+  MODES,
   type QRCodeAccessibilityOptions,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
@@ -85,8 +87,6 @@ class CliError extends Error {}
 
 const outputFormats = ['text', 'svg', 'png'] as const;
 const fileOutputFormats = ['svg', 'png'] as const;
-const qrModes = ['numeric', 'alphanumeric', 'octet'] as const;
-const errorCorrectionLevels = ['L', 'M', 'Q', 'H'] as const;
 
 export async function runCli(argv: readonly string[], runtime: CliRuntime = {}): Promise<number> {
   const stdout = runtime.stdout ?? process.stdout;
@@ -183,7 +183,7 @@ async function resolveCliOptions(
     small: rawOptions.small ?? true,
     ansiColors: rawOptions.ansiColors ?? true,
     onlyAnsiColors: rawOptions.onlyAnsiColors ?? false,
-    mode: optionalEnum(rawOptions.mode, qrModes, 'mode'),
+    mode: optionalEnum(rawOptions.mode, MODES, 'mode'),
     errorCorrectionLevel: optionalErrorCorrectionLevel(rawOptions.errorCorrection),
     version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as
       QRCodeVersion | undefined,
@@ -422,7 +422,7 @@ function optionalErrorCorrectionLevel(
   value: string | undefined,
 ): QRCodeErrorCorrectionLevel | undefined {
   if (value === undefined) return undefined;
-  return requiredEnum(value.toUpperCase(), errorCorrectionLevels, 'error-correction');
+  return requiredEnum(value.toUpperCase(), ECC_LEVELS, 'error-correction');
 }
 
 function optionalPositiveInteger(value: string | undefined, name: string): number | undefined {

@@ -8,8 +8,8 @@ import type {
   QRCodeStylingOptions,
 } from './types';
 
-const QR_CODE_COLOR_HEX_PATTERN = /^#[0-9a-f]{6}$/i;
-const QR_CODE_DOT_TYPES = [
+export const QR_CODE_COLOR_HEX_PATTERN = /^#[0-9a-f]{6}$/i;
+export const QR_CODE_DOT_TYPES = [
   'rounded',
   'dots',
   'classy',
@@ -17,7 +17,7 @@ const QR_CODE_DOT_TYPES = [
   'square',
   'extra-rounded',
 ] as const satisfies readonly QRCodeDotType[];
-const QR_CODE_CORNER_SQUARE_TYPES = [
+export const QR_CODE_CORNER_SQUARE_TYPES = [
   'dot',
   'square',
   'extra-rounded',
@@ -26,7 +26,7 @@ const QR_CODE_CORNER_SQUARE_TYPES = [
   'classy',
   'classy-rounded',
 ] as const satisfies readonly QRCodeCornerSquareType[];
-const QR_CODE_CORNER_DOT_TYPES = [
+export const QR_CODE_CORNER_DOT_TYPES = [
   'dot',
   'square',
   'rounded',
