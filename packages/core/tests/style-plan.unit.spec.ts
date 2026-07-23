@@ -96,6 +96,50 @@ describe('createQRCodeStylePlan', () => {
     ).toMatchObject({shape: 'square'});
   });
 
+  test.each([
+    [
+      'classy',
+      'left and bottom',
+      [
+        [0, 0, 0],
+        [1, 1, 0],
+        [0, 1, 0],
+      ],
+    ],
+    [
+      'classy',
+      'right and top',
+      [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0],
+      ],
+    ],
+    [
+      'classy-rounded',
+      'left and bottom',
+      [
+        [0, 0, 0],
+        [1, 1, 0],
+        [0, 1, 0],
+      ],
+    ],
+    [
+      'classy-rounded',
+      'right and top',
+      [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0],
+      ],
+    ],
+  ] satisfies readonly (readonly [QRCodeDotType, string, QRCodeMatrix])[])(
+    'keeps %s modules square with %s neighbors',
+    (type, _neighbors, matrix) => {
+      expect(modulePrimitives(matrix, type)[1]).toMatchObject({shape: 'square', rotation: 0});
+    },
+  );
+
   test('uses whole or per-module finder primitives according to the requested types', () => {
     const matrix = createFinderMatrix();
     const whole = createQRCodeStylePlan(

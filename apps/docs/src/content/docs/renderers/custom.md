@@ -53,15 +53,14 @@ import {
   parseQRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
+const stylingOptions = parseQRCodeStylingOptions({
+  dotsOptions: {type: 'rounded'},
+  cornersSquareOptions: {type: 'extra-rounded'},
+  cornersDotOptions: {type: 'dot'},
+});
+
 const planRenderer: QRCodeRenderer<QRCodeStylePlan> = (matrix) =>
-  createQRCodeStylePlan(
-    matrix,
-    parseQRCodeStylingOptions({
-      dotsOptions: {type: 'rounded'},
-      cornersSquareOptions: {type: 'extra-rounded'},
-      cornersDotOptions: {type: 'dot'},
-    }),
-  );
+  createQRCodeStylePlan(matrix, stylingOptions);
 ```
 
 The plan contains a resolved background color and ordered drawing primitives. Primitive `x`, `y`,

@@ -155,8 +155,8 @@ describe('Angular QR code components', () => {
 
   test('passes styled options through SVG, image, and canvas components', () => {
     const styledOptions = {
-      size: 2,
-      margin: 1,
+      size: 3,
+      margin: 2,
       dotsOptions: {color: '#112233' as const, type: 'classy-rounded' as const},
       cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
       cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
@@ -177,10 +177,19 @@ describe('Angular QR code components', () => {
     expect(
       Array.from(svg.querySelectorAll('path')).map((path) => path.getAttribute('fill')),
     ).toEqual(['#ffffff', '#112233', '#445566', '#778899']);
-    expect(getRenderedElement<HTMLImageElement>(imageFixture, 'img').src).toMatch(
-      /^data:image\/png;base64,/,
-    );
-    expect(getRenderedElement<HTMLCanvasElement>(canvasFixture, 'canvas').width).toBe(46);
+    expect(svg.getAttribute('width')).toBe('75');
+    expect(svg.getAttribute('height')).toBe('75');
+
+    const image = getRenderedElement<HTMLImageElement>(imageFixture, 'img');
+
+    expect(image.src).toMatch(/^data:image\/png;base64,/);
+    expect(image.width).toBe(75);
+    expect(image.height).toBe(75);
+
+    const canvas = getRenderedElement<HTMLCanvasElement>(canvasFixture, 'canvas');
+
+    expect(canvas.width).toBe(75);
+    expect(canvas.height).toBe(75);
   });
 
   test('replaces existing rendered image when inputs change', () => {
