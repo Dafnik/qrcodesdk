@@ -11,6 +11,59 @@ import starlightPageContextAction from 'starlight-page-context-action';
 import {STARLIGHT_SIDEBAR} from './src/starlight-sidebar.mjs';
 import {includeContentPlugin} from './src/utils/index.js';
 
+/** @returns {import('vite').Plugin} */
+function suppressAngularSourcemapWarnings() {
+  return {
+    name: 'suppress-angular-sourcemap-warnings',
+    enforce: 'post',
+
+    configResolved(config) {
+      const originalWarn = config.logger.warn.bind(config.logger);
+      const originalWarnOnce = config.logger.warnOnce.bind(config.logger);
+
+      /**
+       * @param {string} message - The message to evaluate.
+       * @returns {boolean} `true` when the message is a sourcemap warning related to
+       * `@angular+platform-server`; otherwise, `false`.
+       */
+      const shouldIgnore = (message) =>
+        message.includes('Sourcemap for') && message.includes('@angular+platform-server');
+
+      config.logger.warn = (message, options) => {
+        if (shouldIgnore(message)) return;
+        originalWarn(message, options);
+      };
+
+      config.logger.warnOnce = (message, options) => {
+        if (shouldIgnore(message)) return;
+        originalWarnOnce(message, options);
+      };
+    },
+  };
+}
+
+/** Needs to be done as plugin so that it wins against @analogjs-astrojs integration
+ * @returns {import('astro').AstroIntegration}
+ */
+function useProductionJsx() {
+  return {
+    name: 'use-production-jsx',
+    hooks: {
+      'astro:config:setup': ({updateConfig}) => {
+        updateConfig({
+          vite: {
+            oxc: {
+              jsx: {
+                development: false,
+              },
+            },
+          },
+        });
+      },
+    },
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://qrcodesdk.dev',
@@ -27,7 +80,18 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [includeContentPlugin(), tailwindcss()],
+    ssr: {
+      // transform these packages during SSR. Globs supported
+      noExternal: [
+        '@spartan-ng/brain',
+        '@spartan-ng/brain/**',
+        '@spartan-ng/helm',
+        '@spartan-ng/helm/**',
+        '@ng-icons/**',
+        '@sim/**',
+      ],
+    },
+    plugins: [includeContentPlugin(), tailwindcss(), suppressAngularSourcemapWarnings()],
   },
   integrations: [
     mermaidIntegration({
@@ -92,15 +156,22 @@ export default defineConfig({
     }),
     react(),
     angular({
-      useAngularHydration: true,
+      useAngularHydration: false,
       vite: {
+        tailwindCss: {
+          rootStylesheet: 'src/styles/global.css',
+        },
+        fastCompile: true,
         transformFilter: (_code, id) => {
           return (
             id.includes('src/components/angular') ||
-            id.includes('src/components/playground/qrcode-angular')
+            id.includes('src/components/playground/angular') ||
+            id.includes('src/libs/ui') ||
+            id.includes('src/libs/sim')
           ); // <- only transform Angular TypeScript files
         },
       },
     }),
+    useProductionJsx(),
   ],
 });

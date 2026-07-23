@@ -14,6 +14,12 @@
       "path": "./.github/cspell/library-words.txt"
     }
   ],
-  "ignorePaths": ["pnpm-workspace.yaml", "pnpm-lock.yaml", "fixtures.ts", "*.svg"],
+  "ignorePaths": [
+    "pnpm-workspace.yaml",
+    "pnpm-lock.yaml",
+    "fixtures.ts",
+    "*.svg",
+    "apps/docs/src/libs"
+  ],
   "version": "0.2"
 }

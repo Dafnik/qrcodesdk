@@ -1,8 +1,9 @@
-import type {
-  QRCodeErrorCorrectionLevel,
-  QRCodeMask,
-  QRCodeMode,
-  QRCodeVersion,
+import {
+  MODES,
+  type QRCodeErrorCorrectionLevel,
+  type QRCodeMask,
+  type QRCodeMode,
+  type QRCodeVersion,
 } from '@qrcodesdk/core';
 
 import type {QRCodeTestFixture} from './fixtures';
@@ -15,8 +16,6 @@ const ERROR_CORRECTION_LEVELS = [
 ] as const satisfies readonly QRCodeErrorCorrectionLevel[];
 
 const MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const satisfies readonly QRCodeMask[];
-
-const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
 
 const DATA_BY_MODE = {
   numeric: '1',

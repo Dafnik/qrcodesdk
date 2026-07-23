@@ -11,7 +11,7 @@
     "clean": "turbo run clean",
     "clean:deep": "turbo run clean && rm -rf node_modules",
     "lint": "turbo run lint",
-    "cspell": "cspell \"**\" --gitignore",
+    "cspell": "cspell \"**\" --gitignore --quiet",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "turbo run check",
