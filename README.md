@@ -123,9 +123,16 @@ const svg = qrcode('HELLO WORLD')
         colorDark: '#111827',
         colorLight: '#ffffff',
       },
+      dotsOptions: {type: 'rounded'},
+      cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
+      cornersDotOptions: {type: 'dot'},
     }),
   );
 ```
+
+SVG, browser Canvas/Image, and Node PNG output share these module and finder-pattern options.
+Feature colors inherit `colors.colorDark` when omitted. Terminal text output keeps its existing
+block geometry and is not affected by shape options.
 
 ## Documentation
 

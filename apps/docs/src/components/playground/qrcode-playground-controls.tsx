@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useState} from 'react';
 
 import {isQRCodeColorHex} from '@qrcodesdk/core';
+import type {QRCodeCornerDotType, QRCodeCornerSquareType, QRCodeDotType} from '@qrcodesdk/core';
 
 import {generatePlaygroundCode} from './qrcode-playground-code';
 import {
@@ -19,6 +20,32 @@ import {
 
 const VERSION_OPTIONS = Array.from({length: 40}, (_, index) => index + 1);
 const MASK_OPTIONS = Array.from({length: 8}, (_, index) => index);
+const DOT_TYPE_OPTIONS = [
+  'square',
+  'rounded',
+  'dots',
+  'classy',
+  'classy-rounded',
+  'extra-rounded',
+] as const satisfies readonly QRCodeDotType[];
+const CORNER_SQUARE_TYPE_OPTIONS = [
+  'square',
+  'dot',
+  'extra-rounded',
+  'rounded',
+  'dots',
+  'classy',
+  'classy-rounded',
+] as const satisfies readonly QRCodeCornerSquareType[];
+const CORNER_DOT_TYPE_OPTIONS = [
+  'square',
+  'dot',
+  'rounded',
+  'dots',
+  'classy',
+  'classy-rounded',
+  'extra-rounded',
+] as const satisfies readonly QRCodeCornerDotType[];
 
 type ValueFieldProps<TValue> = {
   error?: string;
@@ -220,6 +247,45 @@ export default function QRCodePlaygroundControls() {
           />
         </div>
 
+        <fieldset className="qrcode-playground__style-fieldset">
+          <legend>Module styles</legend>
+          <p>Shape each QR feature independently. Feature colors inherit the dark color.</p>
+          <div className="qrcode-playground__style-grid">
+            <StyleCard
+              label="Data modules"
+              type={draft.dotsType}
+              typeOptions={DOT_TYPE_OPTIONS}
+              color={draft.dotsColor}
+              inheritedColor={draft.colorDark}
+              colorError={snapshot.validation.fieldErrors.dotsColor}
+              onTypeChange={(value) => updateDraft('dotsType', value as QRCodeDotType)}
+              onColorChange={(value) => updateDraft('dotsColor', value)}
+            />
+            <StyleCard
+              label="Finder rings"
+              type={draft.cornersSquareType}
+              typeOptions={CORNER_SQUARE_TYPE_OPTIONS}
+              color={draft.cornersSquareColor}
+              inheritedColor={draft.colorDark}
+              colorError={snapshot.validation.fieldErrors.cornersSquareColor}
+              onTypeChange={(value) =>
+                updateDraft('cornersSquareType', value as QRCodeCornerSquareType)
+              }
+              onColorChange={(value) => updateDraft('cornersSquareColor', value)}
+            />
+            <StyleCard
+              label="Finder centers"
+              type={draft.cornersDotType}
+              typeOptions={CORNER_DOT_TYPE_OPTIONS}
+              color={draft.cornersDotColor}
+              inheritedColor={draft.colorDark}
+              colorError={snapshot.validation.fieldErrors.cornersDotColor}
+              onTypeChange={(value) => updateDraft('cornersDotType', value as QRCodeCornerDotType)}
+              onColorChange={(value) => updateDraft('cornersDotColor', value)}
+            />
+          </div>
+        </fieldset>
+
         {draft.output !== 'canvas' ? (
           <div className="qrcode-playground__grid">
             <label className="qrcode-playground__field">
@@ -326,7 +392,68 @@ function NumberField({error, label, min, onChange, value}: NumberFieldProps) {
   );
 }
 
-function ColorField({error, label, onChange, value}: ValueFieldProps<string>) {
+function StyleCard({
+  color,
+  colorError,
+  inheritedColor,
+  label,
+  onColorChange,
+  onTypeChange,
+  type,
+  typeOptions,
+}: {
+  color?: string;
+  colorError?: string;
+  inheritedColor: string;
+  label: string;
+  onColorChange(value: string | undefined): void;
+  onTypeChange(value: string): void;
+  type: string;
+  typeOptions: readonly string[];
+}) {
+  const overridesColor = color !== undefined;
+
+  return (
+    <fieldset className="qrcode-playground__style-card">
+      <legend>{label}</legend>
+      <label className="qrcode-playground__field">
+        <span>Type</span>
+        <select value={type} onChange={(event) => onTypeChange(event.currentTarget.value)}>
+          {typeOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="qrcode-playground__checkbox">
+        <input
+          checked={overridesColor}
+          type="checkbox"
+          onChange={(event) =>
+            onColorChange(event.currentTarget.checked ? inheritedColor : undefined)
+          }
+        />
+        <span>Override dark color</span>
+      </label>
+      <ColorField
+        disabled={!overridesColor}
+        error={colorError}
+        label={`${label} color`}
+        value={color ?? inheritedColor}
+        onChange={(value) => onColorChange(value)}
+      />
+    </fieldset>
+  );
+}
+
+function ColorField({
+  disabled = false,
+  error,
+  label,
+  onChange,
+  value,
+}: ValueFieldProps<string> & {disabled?: boolean}) {
   const isValidColor = isQRCodeColorHex(value);
 
   return (
@@ -335,11 +462,13 @@ function ColorField({error, label, onChange, value}: ValueFieldProps<string>) {
       <span className="qrcode-playground__color-inputs">
         <input
           aria-label={`${label} picker`}
+          disabled={disabled}
           type="color"
           value={isValidColor ? value : '#000000'}
           onChange={(event) => onChange(event.currentTarget.value)}
         />
         <input
+          disabled={disabled}
           type="text"
           value={value}
           onBlur={(event) => onChange(normalizeHexColorInput(event.currentTarget.value))}

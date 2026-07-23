@@ -2,7 +2,7 @@ import {describe, expect, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
-import {QR_CODE_TEST_FIXTURES, getAllQRCodeCombinations} from '../../src';
+import {QR_CODE_STYLING_FIXTURES, QR_CODE_TEST_FIXTURES, getAllQRCodeCombinations} from '../../src';
 import {decodeSvgQRCode} from './svg-helpers';
 
 /**
@@ -34,21 +34,13 @@ describe('SVG QR roundtrips', () => {
     ).resolves.toBe(fixture.data);
   });
 
-  test('decodes custom high-contrast color SVG output', async () => {
-    const fixture = QR_CODE_TEST_FIXTURES[1];
-    const svg = qrcode(fixture.data)
-      .config(fixture)
-      .render(
-        QRCodeSVGRenderer({
-          size: 8,
-          margin: 4,
-          colors: {
-            colorLight: '#fefefe',
-            colorDark: '#101010',
-          },
-        }),
-      );
-
-    await expect(decodeSvgQRCode(svg)).resolves.toBe(QR_CODE_TEST_FIXTURES[1].data);
+  test.each(QR_CODE_STYLING_FIXTURES)('decodes $name SVG styling fixture', async (fixture) => {
+    await expect(
+      decodeSvgQRCode(
+        qrcode(fixture.data)
+          .config(fixture.matrixOptions)
+          .render(QRCodeSVGRenderer(fixture.styling)),
+      ),
+    ).resolves.toBe(fixture.data);
   });
 });

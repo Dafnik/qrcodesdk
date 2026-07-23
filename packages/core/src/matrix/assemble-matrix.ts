@@ -38,7 +38,8 @@ function selectBestMask(
   let bestMask: QRCodeMask = 0;
   let bestScore = Number.POSITIVE_INFINITY;
 
-  for (const mask of QR_CODE_MASKS) {
+  for (let index = 0; index < QR_CODE_MASKS.length; index++) {
+    const mask = QR_CODE_MASKS[index]!;
     const candidateMatrix = cloneMatrix(unmaskedMatrix);
     applyMaskToMatrix(candidateMatrix, reserved, mask);
     fillFormatInformationInMatrix(candidateMatrix, errorCorrectionLevel, mask);

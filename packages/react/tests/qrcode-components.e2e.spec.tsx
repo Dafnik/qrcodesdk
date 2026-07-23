@@ -103,6 +103,32 @@ describe('React QR code components', () => {
     expect(canvas.height).toBe(46);
   });
 
+  test('passes styled options through SVG, image, and canvas components', async () => {
+    const styledOptions = {
+      size: 2,
+      margin: 1,
+      dotsOptions: {color: '#112233' as const, type: 'classy-rounded' as const},
+      cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
+      cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
+    };
+    const {container} = render(
+      <>
+        <QRCodeSVG data="STYLED" options={styledOptions} />
+        <QRCodeImage data="STYLED" options={styledOptions} />
+        <QRCodeCanvas data="STYLED" options={styledOptions} />
+      </>,
+    );
+
+    await waitFor(() => {
+      expect(container.querySelector('img')).not.toBeNull();
+      expect(container.querySelector('canvas')).not.toBeNull();
+    });
+
+    expect(
+      Array.from(container.querySelectorAll('svg path')).map((path) => path.getAttribute('fill')),
+    ).toEqual(['#ffffff', '#112233', '#445566', '#778899']);
+  });
+
   test('replaces existing rendered image when props change', async () => {
     const {container, rerender} = render(<QRCodeImage data="HELLO" options={imageOptions} />);
 

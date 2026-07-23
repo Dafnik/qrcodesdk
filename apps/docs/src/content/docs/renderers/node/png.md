@@ -37,18 +37,31 @@ const png = qrcode('https://qrcodesdk.dev').render(
       colorDark: '#111827',
       colorLight: '#ffffff',
     },
+    dotsOptions: {type: 'rounded'},
+    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
+    cornersDotOptions: {type: 'dot'},
   }),
 );
 ```
 
-| Option              |     Type |     Default | Description                                       |
-| ------------------- | -------: | ----------: | ------------------------------------------------- |
-| `size`              | `number` |         `5` | Pixel size of each QR module.                     |
-| `margin`            | `number` |         `4` | Quiet-zone margin around the QR code, in modules. |
-| `colors.colorDark`  | `string` | `'#000000'` | Color used for dark QR modules.                   |
-| `colors.colorLight` | `string` | `'#ffffff'` | Background color.                                 |
+| Option                       |                     Type |            Default | Description                                       |
+| ---------------------------- | -----------------------: | -----------------: | ------------------------------------------------- |
+| `size`                       |                 `number` |                `5` | Pixel size of each QR module.                     |
+| `margin`                     |                 `number` |                `4` | Quiet-zone margin around the QR code, in modules. |
+| `colors.colorDark`           |                 `string` |        `'#000000'` | Color used for dark QR modules.                   |
+| `colors.colorLight`          |                 `string` |        `'#ffffff'` | Background color.                                 |
+| `dotsOptions.type`           |          `QRCodeDotType` |         `'square'` | Shape used for ordinary data modules.             |
+| `dotsOptions.color`          |                 `string` | `colors.colorDark` | Color used for ordinary data modules.             |
+| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                |
+| `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                |
+| `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                    |
+| `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                    |
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
+
+Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
+`extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
+is independent; omit it to inherit `colors.colorDark`.
 
 ## Common recipes
 
@@ -114,9 +127,9 @@ serve({
 The PNG renderer generates:
 
 - A square PNG image
-- One pixel block per scaled QR module
+- Square or deterministically antialiased curved modules, depending on the selected feature types
 - A solid background using `colors.colorLight`
-- Dark modules using `colors.colorDark`
+- Independently colored data modules, finder rings, and finder centers
 - Fully opaque pixels
 - A Node.js `Buffer`
 

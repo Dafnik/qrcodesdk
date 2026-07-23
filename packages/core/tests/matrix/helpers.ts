@@ -15,7 +15,8 @@ export function bitsToBytes(bits: string, maxLength: number): number[] {
 
 export function expectSquareBinaryMatrix(matrix: QRCodeMatrix, size: number): void {
   expect(matrix).toHaveLength(size);
-  for (const row of matrix) {
+  for (let index = 0; index < matrix.length; index++) {
+    const row = matrix[index]!;
     expect(row).toHaveLength(size);
     expect(row.every((value) => value === 0 || value === 1)).toBe(true);
   }

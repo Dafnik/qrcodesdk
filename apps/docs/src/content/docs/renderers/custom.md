@@ -40,6 +40,35 @@ const json = qrcode('custom output').render(jsonRenderer);
 
 The matrix is a two-dimensional array. `1` means a dark module and `0` means a light module.
 
+## Reuse the visual style planner
+
+Custom visual renderers can consume the same platform-neutral drawing plan as the built-in SVG,
+Canvas, and PNG renderers.
+
+```ts
+import {
+  type QRCodeRenderer,
+  type QRCodeStylePlan,
+  createQRCodeStylePlan,
+  parseQRCodeStylingOptions,
+} from '@qrcodesdk/core';
+
+const stylingOptions = parseQRCodeStylingOptions({
+  dotsOptions: {type: 'rounded'},
+  cornersSquareOptions: {type: 'extra-rounded'},
+  cornersDotOptions: {type: 'dot'},
+});
+
+const planRenderer: QRCodeRenderer<QRCodeStylePlan> = (matrix) =>
+  createQRCodeStylePlan(matrix, stylingOptions);
+```
+
+The plan contains a resolved background color and ordered drawing primitives. Primitive `x`, `y`,
+and `size` values use QR-module coordinates and include the quiet-zone offset. Multiply those
+values by the parsed `size` for pixel output. The discriminated `kind` values are `module`,
+`finder-ring`, and `finder-center`; each primitive also carries its styling role, color, shape, and
+quarter-turn rotation.
+
 ## Store a renderer on the builder
 
 You can pass a renderer directly to `.render(renderer)` or store it with `.renderer(renderer).render()`.

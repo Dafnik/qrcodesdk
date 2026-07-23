@@ -1,4 +1,4 @@
-import {QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
+import {QR_CODE_STYLING_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
@@ -28,22 +28,13 @@ describe('QRCodeCanvasRenderer', () => {
     ).toBe(fixture.data);
   });
 
-  test('decodes custom high-contrast color canvas output', () => {
-    const fixture = QR_CODE_TEST_FIXTURES[1];
-    const canvas = qrcode()
-      .data(fixture.data)
-      .config(fixture)
-      .render(
-        QRCodeCanvasRenderer({
-          size: 8,
-          margin: 4,
-          colors: {
-            colorLight: '#fefefe',
-            colorDark: '#101010',
-          },
-        }),
-      );
-
-    expect(decodeCanvasQRCode(canvas)).toBe(fixture.data);
+  test.each(QR_CODE_STYLING_FIXTURES)('decodes $name canvas styling fixture', (fixture) => {
+    expect(
+      decodeCanvasQRCode(
+        qrcode(fixture.data)
+          .config(fixture.matrixOptions)
+          .render(QRCodeCanvasRenderer(fixture.styling)),
+      ),
+    ).toBe(fixture.data);
   });
 });

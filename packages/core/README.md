@@ -151,26 +151,37 @@ For framework-specific components, add:
 
 ## Renderer options
 
-| Option              | Type      |     Default | Description                                            |
-| ------------------- | --------- | ----------: | ------------------------------------------------------ |
-| `size`              | `number`  |         `5` | Pixel size or text scale of each QR module.            |
-| `margin`            | `number`  |         `4` | Quiet-zone width in modules.                           |
-| `colors.colorDark`  | `string`  | `'#000000'` | Dark module or ANSI foreground color.                  |
-| `colors.colorLight` | `string`  | `'#ffffff'` | Background color for visual and ANSI text renderers.   |
-| `small`             | `boolean` |      `true` | Packs two text-renderer rows into each terminal line.  |
-| `ansiColors`        | `boolean` |     `false` | Enables ANSI colors for terminal text.                 |
-| `onlyAnsiColors`    | `boolean` |     `false` | Uses ANSI background cells without UTF-8 block glyphs. |
-| `alt`               | `string`  | `undefined` | Adds an `alt` attribute to SVG output.                 |
-| `ariaLabel`         | `string`  | `undefined` | Adds an `aria-label` attribute to SVG output.          |
-| `title`             | `string`  | `undefined` | Adds a `title` attribute to SVG output.                |
+| Option                 | Type                         |            Default | Description                                                 |
+| ---------------------- | ---------------------------- | -----------------: | ----------------------------------------------------------- |
+| `size`                 | `number`                     |                `5` | Pixel size or text scale of each QR module.                 |
+| `margin`               | `number`                     |                `4` | Quiet-zone width in modules.                                |
+| `colors.colorDark`     | `string`                     |        `'#000000'` | Dark module or ANSI foreground color.                       |
+| `colors.colorLight`    | `string`                     |        `'#ffffff'` | Background color for visual and ANSI text renderers.        |
+| `dotsOptions`          | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary-module shape and optional color for visual output. |
+| `cornersSquareOptions` | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color for visual output.     |
+| `cornersDotOptions`    | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color for visual output.   |
+| `small`                | `boolean`                    |             `true` | Packs two text-renderer rows into each terminal line.       |
+| `ansiColors`           | `boolean`                    |            `false` | Enables ANSI colors for terminal text.                      |
+| `onlyAnsiColors`       | `boolean`                    |            `false` | Uses ANSI background cells without UTF-8 block glyphs.      |
+| `alt`                  | `string`                     |        `undefined` | Adds an `alt` attribute to SVG output.                      |
+| `ariaLabel`            | `string`                     |        `undefined` | Adds an `aria-label` attribute to SVG output.               |
+| `title`                | `string`                     |        `undefined` | Adds a `title` attribute to SVG output.                     |
 
 Color options use six-digit hash-prefixed values such as `#111827`. All renderers require a positive safe integer `size` and a non-negative safe integer `margin`. Terminal text is compact plain UTF-8 by default; ANSI styling and full-height `██` output are enabled independently with `ansiColors: true` and `small: false`. Use `onlyAnsiColors: true` for ANSI background cells containing spaces instead of UTF-8 block glyphs.
 
+Feature colors independently inherit `colors.colorDark`. Visual shape options are supported by
+SVG, browser Canvas/Image, and Node PNG output; they do not affect terminal text geometry.
+
 ## Styling validation and geometry
 
-`parseQRCodeStylingOptions()` applies the shared defaults and throws when the resolved styling is invalid. Applications that need non-throwing input validation can use `isValidQRCodeSize()`, `isValidQRCodeMargin()`, and the `isQRCodeColorHex()` type guard.
+`parseQRCodeStylingOptions()` applies the shared defaults and throws when the resolved styling is invalid. Applications that need non-throwing input validation can use `isValidQRCodeSize()`, `isValidQRCodeMargin()`, `isQRCodeColorHex()`, `isQRCodeDotType()`, `isQRCodeCornerSquareType()`, and `isQRCodeCornerDotType()`.
 
 Custom renderers can use `calculateQRCodeRenderedSize(matrix, styling)` to calculate and validate the square output dimension, including the quiet-zone margin.
+
+The built-in SVG, browser Canvas/Image, and Node PNG renderers all consume
+`createQRCodeStylePlan(matrix, styling)` as their platform-neutral drawing foundation. Its ordered
+primitives use QR-module coordinates and contain resolved roles, colors, shapes, and rotations for
+ordinary modules and canonical finder patterns.
 
 ## Matrix output and custom renderers
 
@@ -202,6 +213,12 @@ import {
   type QRCodeAccessibilityOptions,
   QRCodeBuilder,
   type QRCodeColorHex,
+  type QRCodeCornerDotType,
+  type QRCodeCornerSquareType,
+  type QRCodeCornersDotOptions,
+  type QRCodeCornersSquareOptions,
+  type QRCodeDotType,
+  type QRCodeDotsOptions,
   type QRCodeErrorCorrectionLevel,
   type QRCodeInputData,
   type QRCodeMask,
@@ -214,13 +231,19 @@ import {
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
+  type QRCodeStylePlan,
+  type QRCodeStylePrimitive,
   type QRCodeStylingColors,
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeVersion,
   calculateQRCodeRenderedSize,
+  createQRCodeStylePlan,
   isQRCodeColorHex,
+  isQRCodeCornerDotType,
+  isQRCodeCornerSquareType,
+  isQRCodeDotType,
   isValidQRCodeMargin,
   isValidQRCodeSize,
   parseQRCodeStylingOptions,

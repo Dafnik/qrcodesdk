@@ -2,13 +2,23 @@ import {describe, expect, expectTypeOf, test} from 'vitest';
 
 import {
   calculateQRCodeRenderedSize,
+  createQRCodeStylePlan,
   isQRCodeColorHex,
+  isQRCodeCornerDotType,
+  isQRCodeCornerSquareType,
+  isQRCodeDotType,
   isValidQRCodeMargin,
   isValidQRCodeSize,
 } from '../src';
 import type {
   QRCodeAccessibilityOptions,
   QRCodeColorHex,
+  QRCodeCornerDotType,
+  QRCodeCornerSquareType,
+  QRCodeCornersDotOptions,
+  QRCodeCornersSquareOptions,
+  QRCodeDotType,
+  QRCodeDotsOptions,
   QRCodeErrorCorrectionLevel,
   QRCodeInputData,
   QRCodeMatrixOptions,
@@ -46,6 +56,9 @@ describe('public API types', () => {
       size: number;
       margin: number;
       colors: QRCodeStylingColors;
+      dotsOptions: Required<QRCodeDotsOptions>;
+      cornersSquareOptions: Required<QRCodeCornersSquareOptions>;
+      cornersDotOptions: Required<QRCodeCornersDotOptions>;
     };
     expectTypeOf<QRCodeParsedStylingOptions>().toMatchTypeOf<ExpectedParsedStylingOptions>();
     expectTypeOf<ExpectedParsedStylingOptions>().toMatchTypeOf<QRCodeParsedStylingOptions>();
@@ -61,6 +74,11 @@ describe('public API types', () => {
     expectTypeOf<QRCodeTextRendererOptions['onlyAnsiColors']>().toEqualTypeOf<
       boolean | undefined
     >();
+    expectTypeOf<QRCodeDotType>().toEqualTypeOf<
+      'rounded' | 'dots' | 'classy' | 'classy-rounded' | 'square' | 'extra-rounded'
+    >();
+    expectTypeOf<QRCodeCornerSquareType>().toEqualTypeOf<QRCodeDotType | 'dot'>();
+    expectTypeOf<QRCodeCornerDotType>().toEqualTypeOf<QRCodeDotType | 'dot'>();
   });
 
   test('exports styling validation and geometry utilities', () => {
@@ -68,6 +86,10 @@ describe('public API types', () => {
     expectTypeOf(isValidQRCodeMargin).parameter(0).toEqualTypeOf<unknown>();
     expectTypeOf(isQRCodeColorHex).parameter(0).toEqualTypeOf<unknown>();
     expectTypeOf(calculateQRCodeRenderedSize).returns.toEqualTypeOf<number>();
+    expectTypeOf(createQRCodeStylePlan).parameter(0).toEqualTypeOf<import('../src').QRCodeMatrix>();
+    expectTypeOf(isQRCodeDotType).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(isQRCodeCornerSquareType).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(isQRCodeCornerDotType).parameter(0).toEqualTypeOf<unknown>();
 
     const value: unknown = '#123456';
     expect(isQRCodeColorHex(value)).toBe(true);

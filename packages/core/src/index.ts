@@ -1,6 +1,12 @@
 export type {
   QRCodeAccessibilityOptions,
   QRCodeColorHex,
+  QRCodeCornerDotType,
+  QRCodeCornersDotOptions,
+  QRCodeCornerSquareType,
+  QRCodeCornersSquareOptions,
+  QRCodeDotsOptions,
+  QRCodeDotType,
   QRCodeErrorCorrectionLevel,
   QRCodeInputData,
   QRCodeMask,
@@ -10,6 +16,14 @@ export type {
   QRCodeOptions,
   QRCodeParsedStylingOptions,
   QRCodeRenderer,
+  QRCodeFinderCenterStylePrimitive,
+  QRCodeFinderRingStylePrimitive,
+  QRCodeModuleShape,
+  QRCodeModuleStylePrimitive,
+  QRCodeStylePlan,
+  QRCodeStylePrimitive,
+  QRCodeStyleRole,
+  QRCodeStyleRotation,
   QRCodeStylingColors,
   QRCodeStylingOptions,
   QRCodeVersion,
@@ -18,9 +32,13 @@ export {type QRCodeTextRendererOptions, QRCodeTextRenderer} from './text';
 export {type QRCodeSVGOptions, type QRCodeSVGRendererOptions, QRCodeSVGRenderer} from './svg';
 export {
   calculateQRCodeRenderedSize,
+  isQRCodeCornerDotType,
+  isQRCodeCornerSquareType,
   isQRCodeColorHex,
+  isQRCodeDotType,
   isValidQRCodeMargin,
   isValidQRCodeSize,
   parseQRCodeStylingOptions,
 } from './styling';
+export {createQRCodeStylePlan} from './style-plan';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';

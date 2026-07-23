@@ -88,6 +88,28 @@ function formatOptions(draft: QRCodePlaygroundDraft, depth: number): string {
     )}`,
   ];
 
+  if (draft.dotsType !== 'square' || draft.dotsColor !== undefined) {
+    entries.push(`dotsOptions: ${formatStyleOptions(draft.dotsType, draft.dotsColor, depth + 1)}`);
+  }
+  if (draft.cornersSquareType !== 'square' || draft.cornersSquareColor !== undefined) {
+    entries.push(
+      `cornersSquareOptions: ${formatStyleOptions(
+        draft.cornersSquareType,
+        draft.cornersSquareColor,
+        depth + 1,
+      )}`,
+    );
+  }
+  if (draft.cornersDotType !== 'square' || draft.cornersDotColor !== undefined) {
+    entries.push(
+      `cornersDotOptions: ${formatStyleOptions(
+        draft.cornersDotType,
+        draft.cornersDotColor,
+        depth + 1,
+      )}`,
+    );
+  }
+
   if (draft.version !== 'auto') entries.push(`version: ${draft.version}`);
   if (draft.mode !== 'auto') entries.push(`mode: ${quote(draft.mode)}`);
   if (draft.errorCorrectionLevel !== 'auto') {
@@ -102,6 +124,13 @@ function formatOptions(draft: QRCodePlaygroundDraft, depth: number): string {
   }
 
   return formatObject(entries, depth);
+}
+
+function formatStyleOptions(type: string, color: string | undefined, depth: number): string {
+  return formatObject(
+    [`type: ${quote(type)}`, ...(color === undefined ? [] : [`color: ${quote(color)}`])],
+    depth,
+  );
 }
 
 function formatObject(entries: string[], depth: number): string {

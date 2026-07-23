@@ -96,7 +96,10 @@ const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinitio
     getCharacterCountBits: (version) => (version < 10 ? 8 : 16),
     getMaxDataLength: (numberOfBits) => (numberOfBits / 8) | 0,
     encodePayload: (data, pack) => {
-      for (const byte of data as number[]) pack(byte, 8);
+      const dataArray = data as number[];
+      for (let index = 0; index < dataArray.length; index++) {
+        pack(dataArray[index]!, 8);
+      }
     },
   },
 };

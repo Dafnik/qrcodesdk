@@ -1,6 +1,7 @@
 import {PNG} from 'pngjs';
 import {describe, expect, test} from 'vitest';
 
+import {createQRCodeStylePlan, parseQRCodeStylingOptions, qrcode} from '@qrcodesdk/core';
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 import {QRCodePNGRenderer} from '../../src';
@@ -80,5 +81,74 @@ describe('QRCodePNGRenderer', () => {
     expect(() => QRCodePNGRenderer({colors: {colorDark: '#xyz'}})([[1]])).toThrow(
       'QR code colorDark must be a 6-digit hex color',
     );
+  });
+
+  test('renders square feature colors and finder holes without partial coverage', () => {
+    const png = readPng(
+      qrcode('square png').render(
+        QRCodePNGRenderer({
+          size: 4,
+          margin: 0,
+          dotsOptions: {color: '#112233', type: 'square'},
+          cornersSquareOptions: {color: '#445566', type: 'square'},
+          cornersDotOptions: {color: '#778899', type: 'square'},
+        }),
+      ),
+    );
+
+    expectPixel(png, 2, 2, {red: 68, green: 85, blue: 102, alpha: 255});
+    expectPixel(png, 6, 6, {red: 255, green: 255, blue: 255, alpha: 255});
+    expectPixel(png, 14, 14, {red: 119, green: 136, blue: 153, alpha: 255});
+
+    const colors = new Set(['255,255,255,255', '17,34,51,255', '68,85,102,255', '119,136,153,255']);
+    for (let index = 0; index < png.data.length; index += 4) {
+      expect(colors.has([...png.data.subarray(index, index + 4)].join(','))).toBe(true);
+    }
+  });
+
+  test('renders independent module and finder colors with opaque antialiased curves', () => {
+    const matrix = qrcode('styled png').matrix();
+    const options = {
+      size: 8,
+      margin: 4,
+      colors: {colorLight: '#ffffff' as const, colorDark: '#000000' as const},
+      dotsOptions: {color: '#112233' as const, type: 'dots' as const},
+      cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
+      cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
+    };
+    const plan = createQRCodeStylePlan(matrix, parseQRCodeStylingOptions(options));
+    const png = readPng(QRCodePNGRenderer(options)(matrix));
+    const dataModule = plan.primitives.find(({role}) => role === 'dots')!;
+
+    expectPixel(png, (dataModule.x + 0.5) * 8, (dataModule.y + 0.5) * 8, {
+      red: 17,
+      green: 34,
+      blue: 51,
+      alpha: 255,
+    });
+    expectPixel(png, 7 * 8 + 4, 4 * 8 + 4, {red: 68, green: 85, blue: 102, alpha: 255});
+    expectPixel(png, 7 * 8 + 4, 7 * 8 + 4, {
+      red: 119,
+      green: 136,
+      blue: 153,
+      alpha: 255,
+    });
+
+    const antialiasedPixel = Array.from({length: png.width * png.height}, (_, index) => ({
+      red: png.data[index * 4],
+      green: png.data[index * 4 + 1],
+      blue: png.data[index * 4 + 2],
+      alpha: png.data[index * 4 + 3],
+    })).find(
+      ({red, green, blue}) =>
+        red !== green &&
+        green !== blue &&
+        !(
+          (red === 17 && green === 34 && blue === 51) ||
+          (red === 68 && green === 85 && blue === 102) ||
+          (red === 119 && green === 136 && blue === 153)
+        ),
+    );
+    expect(antialiasedPixel?.alpha).toBe(255);
   });
 });

@@ -1,4 +1,4 @@
-import {QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
+import {QR_CODE_STYLING_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
@@ -32,22 +32,11 @@ describe('QRCodeImageRenderer', () => {
     ).resolves.toBe(fixture.data);
   });
 
-  test('decodes custom high-contrast color image output', async () => {
-    const fixture = QR_CODE_TEST_FIXTURES[1];
-    const image = qrcode()
-      .data(fixture.data)
-      .config(fixture)
-      .render(
-        QRCodeImageRenderer({
-          size: 8,
-          margin: 4,
-          colors: {
-            colorLight: '#fefefe',
-            colorDark: '#101010',
-          },
-        }),
-      );
+  test.each(QR_CODE_STYLING_FIXTURES)('decodes $name image styling fixture', async (fixture) => {
+    const image = qrcode(fixture.data)
+      .config(fixture.matrixOptions)
+      .render(QRCodeImageRenderer(fixture.styling));
 
-    await expect(decodeImageQRCode(image)).resolves.toBe(QR_CODE_TEST_FIXTURES[1].data);
+    await expect(decodeImageQRCode(image)).resolves.toBe(fixture.data);
   });
 });
