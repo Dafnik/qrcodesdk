@@ -2,31 +2,38 @@
 import {Card} from '@astrojs/starlight/components';
 import {AngularPlaygroundPreview} from '../playground/angular/angular-playground-preview.ts';
 import {PlaygroundControls} from '../playground/angular/playground-controls.ts';
+import {PlaygroundCode} from '../playground/angular/playground-code.ts';
 import QRCodePlaygroundControls from '../playground/qrcode-playground-controls';
 import QRCodeReactPlaygroundPreview from '../playground/QRCodeReactPlaygroundPreview';
-
-import {startQrQuerySync} from '../playground/query-sync.ts';
-
-startQrQuerySync({
-  debounceMs: 150,
-});
 ---
 
+<script>
+  import {startQrQuerySync} from '../playground/query-sync.ts';
+
+  startQrQuerySync({
+    debounceMs: 150,
+  });
+</script>
+
 <section class="not-content w-full min-w-0" aria-label="QR code package playground">
-  <div class="grid min-w-0 items-start gap-4 grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
     <Card title="Configure">
-      <div class="grid gap-4">
+      <div class="grid gap-8">
         <p>Choose a package, output, matrix, and renderer options.</p>
 
         <PlaygroundControls client:load />
+        <PlaygroundCode client:load />
       </div>
     </Card>
-    <div class="sticky top-20">
+    <div class="lg:sticky lg:top-20">
       <Card title="Preview">
-        <p>Rendered by the selected framework package.</p>
-        <div class="min-h-96 grid content-center">
-          <QRCodeReactPlaygroundPreview client:only="react" />
-          <AngularPlaygroundPreview client:load />
+        <div class="grid gap-8">
+          <p>Rendered by the selected framework package.</p>
+          <div class="min-h-96 grid content-center playground-preview-output">
+            <QRCodeReactPlaygroundPreview client:only="react" />
+            <AngularPlaygroundPreview client:load />
+          </div>
         </div>
       </Card>
     </div>
@@ -34,7 +41,8 @@ startQrQuerySync({
 </section>
 
 <section class="not-content w-full min-w-0" aria-label="QR code package playground">
-  <div class="grid min-w-0 items-start gap-4 grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
     <QRCodePlaygroundControls client:only="react" />
     <section class="qrcode-playground__panel" aria-labelledby="playground-preview-heading">
       <div class="qrcode-playground__section-heading">

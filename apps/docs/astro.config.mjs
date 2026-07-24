@@ -29,7 +29,7 @@ export default defineConfig({
   vite: {
     ssr: {
       // transform these packages during SSR. Globs supported
-      noExternal: ['@spartan-ng/brain', '@spartan-ng/helm', '@spartan-ng/helm/**'],
+      noExternal: ['@spartan-ng/brain', '@spartan-ng/helm', '@spartan-ng/helm/**', '@ng-icons/**'],
     },
     plugins: [includeContentPlugin(), tailwindcss()],
   },

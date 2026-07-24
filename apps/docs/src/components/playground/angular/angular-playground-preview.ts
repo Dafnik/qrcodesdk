@@ -1,76 +1,52 @@
-import {Component, DestroyRef, computed, inject, signal} from '@angular/core';
+import {Component, inject} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+
+import {NanostoresService} from '@nanostores/angular';
+import {HlmButtonImports} from '@spartan-ng/helm/button';
 
 import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
-import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
-import {createPlaygroundSnapshot, readPlaygroundDraftFromUrl} from '../qrcode-playground-state.ts';
-import {
-  type QRCodePlaygroundConfig,
-  type QRCodePlaygroundSnapshot,
-  QR_CODE_PLAYGROUND_UPDATE_EVENT,
-} from '../qrcode-playground-types.ts';
+import {qrConfig} from '../playground-config.ts';
 
 @Component({
   selector: 'qrcode-angular-playground-preview',
-  imports: [QRCodeCanvas, QRCodeImage, QRCodeSVG],
+  imports: [QRCodeCanvas, QRCodeImage, QRCodeSVG, HlmButtonImports],
+  host: {
+    class: 'flex flex-col gap-4 justify-center items-center',
+  },
   template: `
-    @if (snapshot().draft.packageName === 'angular') {
-      @if (!snapshot().config) {
-        <div class="qrcode-playground__preview-error" role="status">
-          {{ snapshot().validation.error || 'This QR code configuration is invalid.' }}
-        </div>
-      } @else if (config()?.output === 'svg') {
-        <div class="qrcode-playground__preview-output">
-          <qrcode-svg #qrcode [data]="config()!.data" [options]="svgOptions()" />
-        </div>
+    @if (config()?.packageName === 'angular') {
+      <!--      @if (!snapshot().config) {-->
+      <!--        <div class="qrcode-playground__preview-error" role="status">-->
+      <!--          {{ snapshot().validation.error || 'This QR code configuration is invalid.' }}-->
+      <!--        </div>-->
+      @if (config()?.output === 'svg') {
+        <qrcode-svg #qrcode [data]="config()!.value" [options]="config()" />
         <button
-          class="btn-primary btn-primary-wide"
+          class="min-w-64"
           (click)="qrcode.download('qrcodesdk')"
+          size="lg"
+          hlmBtn
           type="button">
           Download SVG
         </button>
       } @else if (config()?.output === 'image') {
-        <div class="qrcode-playground__preview-output">
-          <qrcode-image #qrcode [data]="config()!.data" [options]="imageOptions()" />
-        </div>
+        <qrcode-image #qrcode [data]="config()!.value" [options]="config()" />
         <button
-          class="btn-primary btn-primary-wide"
+          class="min-w-64"
           (click)="qrcode.download('qrcodesdk')"
+          size="lg"
+          hlmBtn
           type="button">
           Download PNG
         </button>
       } @else {
-        <div class="qrcode-playground__preview-output">
-          <qrcode-canvas [data]="config()!.data" [options]="canvasOptions()" />
-        </div>
+        <qrcode-canvas [data]="config()!.value" [options]="config()" />
       }
     }
   `,
 })
 export class AngularPlaygroundPreview {
-  readonly snapshot = signal<QRCodePlaygroundSnapshot>(
-    createPlaygroundSnapshot(readPlaygroundDraftFromUrl()),
-  );
-
-  readonly config = computed<QRCodePlaygroundConfig | undefined>(() => this.snapshot().config);
-  readonly svgOptions = computed<QRCodeSVGOptions>(() => this.config()?.options ?? {});
-  readonly imageOptions = computed<QRCodeImageOptions>(() => this.config()?.options ?? {});
-  readonly canvasOptions = computed<QRCodeCanvasOptions>(() => this.config()?.options ?? {});
-
-  constructor() {
-    if (typeof window === 'undefined') return;
-
-    const destroyRef = inject(DestroyRef);
-
-    const handler = (event: CustomEvent) => {
-      this.snapshot.set(event.detail);
-    };
-
-    window.addEventListener(QR_CODE_PLAYGROUND_UPDATE_EVENT, handler as EventListener);
-
-    destroyRef.onDestroy(() => {
-      window.removeEventListener(QR_CODE_PLAYGROUND_UPDATE_EVENT, handler as EventListener);
-    });
-  }
+  private readonly nanostores = inject(NanostoresService);
+  protected readonly config = toSignal(this.nanostores.useStore(qrConfig));
 }

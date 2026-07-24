@@ -20,6 +20,8 @@ export const defaultQrConfig: PlaygroundConfig = {
   value: 'https://qrcodesdk.dev',
   packageName: 'react',
   output: 'svg',
+  size: 8,
+  margin: 4,
 };
 
 export const qrConfig = atom<PlaygroundConfig>(defaultQrConfig);
