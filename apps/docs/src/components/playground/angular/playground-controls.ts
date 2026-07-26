@@ -70,7 +70,7 @@ import {
 export class PlaygroundColorInput {
   buttonId = input.required<string>();
   color = model<string>();
-  resets = input.required<string[]>();
+  presets = input.required<string[]>();
   disabled = input<boolean>(false);
 }
 
