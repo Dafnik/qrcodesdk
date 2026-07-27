@@ -46,8 +46,7 @@ export const HLM_SWITCH_VALUE_ACCESSOR = {
       [aria-label]="ariaLabel()"
       [aria-labelledby]="ariaLabelledby()"
       [aria-describedby]="ariaDescribedby()"
-      (checkedChange)="handleChange($event)"
-      (touched)="_onTouched?.()">
+      (checkedChange)="handleChange($event)">
       <brn-switch-thumb hlm />
     </brn-switch>
   `,
@@ -93,12 +92,12 @@ export class HlmSwitch implements ControlValueAccessor {
 
   protected readonly _disabled = linkedSignal(this.disabled);
 
-  protected _onChange?: ChangeFn<boolean>;
-  protected _onTouched?: TouchFn;
+  protected _onChange: ChangeFn<boolean> = () => undefined;
+  protected _onTouched: TouchFn = () => undefined;
 
   protected handleChange(value: boolean): void {
     this.checked.set(value);
-    this._onChange?.(value);
+    this._onChange(value);
     this.checkedChange.emit(value);
   }
 

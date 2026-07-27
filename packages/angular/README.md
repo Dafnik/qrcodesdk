@@ -2,7 +2,7 @@
 
 # @qrcodesdk/angular
 
-[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular)
+[![Open @qrcodesdk/angular on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/angular) ![@qrcodesdk/angular version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/angular install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/angular download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/angular Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/angular)
 
 **[Live Demo](https://qrcodesdk.dev/playground/?package=angular)**
 

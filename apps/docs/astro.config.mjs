@@ -124,6 +124,10 @@ export default defineConfig({
     starlight({
       customCss: ['./src/styles/global.css'],
       title: 'QRCodeSDK',
+      logo: {
+        src: './src/assets/logo.svg',
+        replacesTitle: true,
+      },
       description:
         'Build QR codes with a single TypeScript-first API, then render them in the format your app needs.',
       expressiveCode: {
@@ -142,6 +146,7 @@ export default defineConfig({
       sidebar: STARLIGHT_SIDEBAR,
       components: {
         Footer: './src/components/footer.astro',
+        PageTitle: './src/components/PageTitle.astro',
       },
       social: [
         {

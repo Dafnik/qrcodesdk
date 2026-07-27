@@ -28,7 +28,6 @@ export const STARLIGHT_SIDEBAR = [
       {label: 'Builder API', slug: 'libs/core'},
       {label: 'Custom Renderers', slug: 'renderers/custom'},
       {label: 'Performance', slug: 'guides/performance'},
-      {label: 'API Reference', slug: 'reference/api'},
     ],
   },
   {

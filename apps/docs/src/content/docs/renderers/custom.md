@@ -5,7 +5,6 @@ description: Build your own QRCodeSDK renderer by converting a QR matrix into an
 related:
   - ../guides/customize.md
   - ../libs/core.mdx
-  - ../reference/api.md
 ---
 
 Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers for SVG, PNG, Canvas, Image elements, browser downloads, and terminal text, and you can write your own renderer for any other format.

@@ -1,8 +1,6 @@
 # @qrcodesdk/cli
 
-[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/cli?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/cli)
-[![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/cli?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/cli)
-[![npm download per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/cli?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/cli)
+[![Open @qrcodesdk/cli on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/cli?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/cli) ![@qrcodesdk/cli version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/cli?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/cli install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/cli?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/cli download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/cli?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/cli Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/cli?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/cli)
 
 `@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG and PNG files.
 

@@ -9,7 +9,11 @@ import remarkStringify from 'remark-stringify';
 import {unified} from 'unified';
 import {parse as parseYaml} from 'yaml';
 
-import {createExampleContent, createPackageManagerCommands} from '../../src/utils/index.js';
+import {
+  createExampleContent,
+  createPackageBadges,
+  createPackageManagerCommands,
+} from '../../src/utils/index.js';
 import {README_MAPPINGS} from './readme-mappings.mjs';
 
 // cspell:ignore mdxjs
@@ -86,9 +90,7 @@ export async function generateReadme(mapping, options = {}) {
 
   tree.children = await transformChildren(tree.children, {
     sourcePath,
-    packageName,
     imports,
-    playground,
     codeLanguage,
   });
 
@@ -104,6 +106,8 @@ export async function generateReadme(mapping, options = {}) {
       depth: 1,
       children: [{type: 'text', value: title}],
     },
+    ...createBadgeNodes(packageName),
+    ...createPlaygroundNodes(playground?.url),
   );
 
   tree.children.push(
@@ -211,9 +215,7 @@ function resolveReadmeMapping(mapping, docsRoot) {
  * @param {Array<Record<string, any>>} children
  * @param {{
  *   sourcePath: string,
- *   packageName: string,
  *   imports: Map<string, string>,
- *   playground?: { url: string },
  *   codeLanguage: string,
  * }} context
  */
@@ -249,9 +251,7 @@ async function transformChildren(children, context) {
  * @param {Record<string, any>} node
  * @param {{
  *   sourcePath: string,
- *   packageName: string,
  *   imports: Map<string, string>,
- *   playground?: { url: string },
  *   codeLanguage: string,
  * }} context
  */
@@ -260,12 +260,6 @@ async function transformComponent(node, context) {
 
   if (!componentName) {
     throw unsupportedMdxError(node, context.sourcePath);
-  }
-
-  if (componentName === 'PackageBadges') {
-    assertNoAttributes(node, context.sourcePath);
-
-    return createBadgeNodes(context.packageName, context.playground?.url);
   }
 
   if (componentName === 'PackageManagerTabs') {
@@ -479,49 +473,49 @@ function createPackageManagerNodes(attributes) {
   ];
 }
 
-/** @param {string} packageName @param {string | undefined} playgroundUrl */
-function createBadgeNodes(packageName, playgroundUrl) {
-  const color = '7469B6';
-  const packageUrl = `https://npmx.dev/package/${packageName}`;
-  const badges = [
-    ['npm version', 'version'],
-    ['npm bundle size', 'size'],
-    ['npm downloads per month', 'downloads-month'],
-  ].map(([label, endpoint]) => ({
-    type: 'link',
-    url: packageUrl,
-    children: [
-      {
-        type: 'image',
-        alt: label,
-        url: `https://npmx.dev/api/registry/badge/${endpoint}/${packageName}?color=${color}&style=shieldsio`,
-      },
-    ],
-  }));
-  const badgeChildren = badges.flatMap((badge, index) =>
-    index === 0 ? [badge] : [{type: 'text', value: ' '}, badge],
-  );
-  const nodes = [{type: 'paragraph', children: badgeChildren}];
+/** @param {string} packageName */
+function createBadgeNodes(packageName) {
+  const badgeChildren = createPackageBadges(packageName).flatMap(({alt, imageUrl, href}, index) => {
+    const image = {
+      type: 'image',
+      alt,
+      url: imageUrl,
+    };
+    const badge = href
+      ? {
+          type: 'link',
+          url: href,
+          children: [image],
+        }
+      : image;
 
-  if (playgroundUrl) {
-    nodes.push({
-      type: 'paragraph',
-      children: [
+    return index === 0 ? [badge] : [{type: 'text', value: ' '}, badge];
+  });
+
+  return [{type: 'paragraph', children: badgeChildren}];
+}
+
+/** @param {string | undefined} playgroundUrl */
+function createPlaygroundNodes(playgroundUrl) {
+  return playgroundUrl
+    ? [
         {
-          type: 'strong',
+          type: 'paragraph',
           children: [
             {
-              type: 'link',
-              url: playgroundUrl,
-              children: [{type: 'text', value: 'Live Demo'}],
+              type: 'strong',
+              children: [
+                {
+                  type: 'link',
+                  url: playgroundUrl,
+                  children: [{type: 'text', value: 'Live Demo'}],
+                },
+              ],
             },
           ],
         },
-      ],
-    });
-  }
-
-  return nodes;
+      ]
+    : [];
 }
 
 /** @param {string} title @param {string} url */

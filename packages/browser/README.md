@@ -2,7 +2,7 @@
 
 # @qrcodesdk/browser
 
-[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/browser) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/browser) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/browser)
+[![Open @qrcodesdk/browser on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/browser) ![@qrcodesdk/browser version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/browser?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/browser install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/browser?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/browser download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/browser?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/browser Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/browser?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/browser)
 
 `@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.
 
