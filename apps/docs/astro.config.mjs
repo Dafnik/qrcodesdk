@@ -5,7 +5,9 @@ import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import mermaidIntegration from 'astro-mermaid';
 import {defineConfig} from 'astro/config';
+import starlightChangelogs from 'starlight-changelogs';
 import starlightLinksValidator from 'starlight-links-validator';
+import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightPageContextAction from 'starlight-page-context-action';
 
 import {STARLIGHT_SIDEBAR} from './src/starlight-sidebar.mjs';
@@ -142,6 +144,10 @@ export default defineConfig({
             viewMarkdown: true,
           },
         }),
+        starlightLlmsTxt({
+          rawContent: true,
+        }),
+        starlightChangelogs(),
       ],
       sidebar: STARLIGHT_SIDEBAR,
       components: {
