@@ -104,7 +104,7 @@ catalogs:
 overrides:
   '@phenomnomnominal/tsquery@6.2.0>typescript': npm:typescript@6.0.3
 
-packageExtensionsChecksum: sha256-c59wQRzJvSyYJkEqh5IgKlZo9hfU59tDcWgHJTfSSco=
+packageExtensionsChecksum: sha256-INOBciKjpuBrcS3x9FKWP2kGryoMs3c2xaDMWB73ORw=
 
 patchedDependencies:
   qrcode-generator@2.0.4: c98e53f3d0a080d3bdc8bdfbdbe41837086b66e201780921019c646ce2eca1ed
@@ -11610,6 +11610,7 @@ snapshots:
       oxc-resolver: 11.24.2
       rolldown: 1.2.0
       tinyglobby: 0.2.17
+      typescript: 6.0.3
     optionalDependencies:
       '@angular/build': 22.0.6(a3df8c59c92527a3105050867dfa66fd)
       vite: 8.1.5(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0)(sass-embedded@1.100.0)(sass@1.101.3)(terser@5.49.0)(yaml@2.9.0)
