@@ -26,7 +26,7 @@ test('generates a GitHub README from the canonical Angular MDX', async () => {
   assert.match(readme, /^<!-- Generated from apps\/docs\/src\/content\/docs\/libs\/angular\.mdx\./);
   assert.match(readme, /# @qrcodesdk\/angular/);
   assert.match(readme, /badge\/version\/@qrcodesdk\/angular/);
-  assert.match(readme, /https:\/\/qrcodesdk\.dev\/playground\/\?pkg=angular/);
+  assert.match(readme, /https:\/\/qrcodesdk\.dev\/playground\/\?package=angular/);
   assert.match(readme, /npm install @qrcodesdk\/angular @qrcodesdk\/core @qrcodesdk\/browser/);
   assert.match(readme, /pnpm add @qrcodesdk\/angular @qrcodesdk\/core @qrcodesdk\/browser/);
   assert.match(readme, /<summary>Other package managers<\/summary>/);

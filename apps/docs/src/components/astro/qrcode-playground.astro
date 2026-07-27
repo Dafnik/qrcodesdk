@@ -1,23 +1,36 @@
 ---
-import {QRCodeAngularPlaygroundPreview} from '../playground/qrcode-angular-playground-preview';
-import QRCodePlaygroundControls from '../playground/qrcode-playground-controls';
+import {Card} from '@astrojs/starlight/components';
+import {AngularPlaygroundPreview} from '../playground/angular/angular-playground-preview.ts';
+import {PlaygroundControls} from '../playground/angular/playground-controls.ts';
+import {PlaygroundCode} from '../playground/angular/playground-code.ts';
 import QRCodeReactPlaygroundPreview from '../playground/QRCodeReactPlaygroundPreview';
 ---
 
-<section class="qrcode-playground not-content" aria-label="QR code package playground">
-  <div class="qrcode-playground__shell">
-    <QRCodePlaygroundControls client:only="react" />
-    <section
-      class="qrcode-playground__panel qrcode-playground__preview-panel"
-      aria-labelledby="playground-preview-heading">
-      <div class="qrcode-playground__section-heading">
-        <h2 id="playground-preview-heading">Preview</h2>
-        <p>Rendered by the selected framework package.</p>
+<script>
+  import {startQrQuerySync} from '../playground/query-sync.ts';
+
+  startQrQuerySync({
+    debounceMs: 150,
+  });
+</script>
+
+<section class="not-content w-full min-w-0" aria-label="QR code package playground">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
+    <Card title="">
+      <PlaygroundControls client:load />
+    </Card>
+    <div class="lg:sticky lg:top-20">
+      <div class="grid gap-8">
+        <Card title="">
+          <div class="min-h-96 grid content-center playground-preview-output">
+            <QRCodeReactPlaygroundPreview client:only="react" />
+            <AngularPlaygroundPreview client:load />
+          </div>
+        </Card>
+
+        <PlaygroundCode client:load />
       </div>
-      <div class="qrcode-playground__preview-stage">
-        <QRCodeReactPlaygroundPreview client:only="react" />
-        <QRCodeAngularPlaygroundPreview client:load />
-      </div>
-    </section>
+    </div>
   </div>
 </section>

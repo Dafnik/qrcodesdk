@@ -4,7 +4,7 @@
 
 [![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/angular)
 
-**[Live Demo](https://qrcodesdk.dev/playground/?pkg=angular)**
+**[Live Demo](https://qrcodesdk.dev/playground/?package=angular)**
 
 `@qrcodesdk/angular` provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
@@ -238,12 +238,12 @@ colors independently inherit `colors.colorDark`.
 - `QRCodeSVG` exposes `download(filename?)` and writes an SVG file.
 - `QRCodeImage` exposes `download(filename?)` and writes a PNG file.
 
-```angular2html
+```angular-html
 <qrcode-svg #qrcodeSvg data="https://qrcodesdk.dev" />
-<button type="button" (click)="qrcodeSvg.download('qrcodesdk')">Download SVG</button>
+<button (click)="qrcodeSvg.download('qrcodesdk')" type="button">Download SVG</button>
 
 <qrcode-image #qrcodeImage data="https://qrcodesdk.dev" />
-<button type="button" (click)="qrcodeImage.download('qrcodesdk')">Download PNG</button>
+<button (click)="qrcodeImage.download('qrcodesdk')" type="button">Download PNG</button>
 ```
 
 The appropriate `.svg` or `.png` extension is appended when necessary.

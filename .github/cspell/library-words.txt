@@ -17,3 +17,7 @@ Funcs
 roledescription
 xychart
 Descr
+shikijs
+nanostores
+titlecase
+culori

@@ -1,8 +1,28 @@
 {
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@sim/color-picker": ["./src/libs/sim/color-picker/index.ts"],
+      "@spartan-ng/helm/accordion": ["./src/libs/ui/accordion/src/index.ts"],
+      "@spartan-ng/helm/alert": ["./src/libs/ui/alert/src/index.ts"],
+      "@spartan-ng/helm/button": ["./src/libs/ui/button/src/index.ts"],
+      "@spartan-ng/helm/button-group": ["./src/libs/ui/button-group/src/index.ts"],
+      "@spartan-ng/helm/field": ["./src/libs/ui/field/src/index.ts"],
+      "@spartan-ng/helm/input": ["./src/libs/ui/input/src/index.ts"],
+      "@spartan-ng/helm/input-group": ["./src/libs/ui/input-group/src/index.ts"],
+      "@spartan-ng/helm/label": ["./src/libs/ui/label/src/index.ts"],
+      "@spartan-ng/helm/native-select": ["./src/libs/ui/native-select/src/index.ts"],
+      "@spartan-ng/helm/popover": ["./src/libs/ui/popover/src/index.ts"],
+      "@spartan-ng/helm/radio-group": ["./src/libs/ui/radio-group/src/index.ts"],
+      "@spartan-ng/helm/select": ["./src/libs/ui/select/src/index.ts"],
+      "@spartan-ng/helm/separator": ["./src/libs/ui/separator/src/index.ts"],
+      "@spartan-ng/helm/switch": ["./src/libs/ui/switch/src/index.ts"],
+      "@spartan-ng/helm/textarea": ["./src/libs/ui/textarea/src/index.ts"],
+      "@spartan-ng/helm/toggle": ["./src/libs/ui/toggle/src/index.ts"],
+      "@spartan-ng/helm/utils": ["./src/libs/ui/utils/src/index.ts"]
+    }
   },
-  "exclude": ["dist", "eslint.config.mjs"],
+  "exclude": ["dist", "eslint.config.mjs", "src/libs"],
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"]
 }

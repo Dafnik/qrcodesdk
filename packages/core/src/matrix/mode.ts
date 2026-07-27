@@ -18,6 +18,8 @@ export const MODES_MAP: Record<QRCodeMode, QRCodeSupportedModeIndicator> = {
   octet: MODE_OCTET,
 };
 
+export const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
+
 const NUMERIC_REGEXP = /^\d*$/;
 const ALPHANUMERIC_REGEXP = /^[A-Z0-9 $%*+\-./:]*$/;
 

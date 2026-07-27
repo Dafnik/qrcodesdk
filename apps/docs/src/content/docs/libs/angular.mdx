@@ -8,7 +8,7 @@ related:
   - ../renderers/core/svg.md
   - ../renderers/browser/image.md
   - ../renderers/browser/canvas.md
-  - ../playground.mdx?pkg=angular
+  - ../playground.mdx?package=angular
 ---
 
 import QRCodeCanvas from '../../../components/astro/angular-examples/qrcode-canvas.astro';
@@ -129,12 +129,12 @@ colors independently inherit `colors.colorDark`.
 - `QRCodeSVG` exposes `download(filename?)` and writes an SVG file.
 - `QRCodeImage` exposes `download(filename?)` and writes a PNG file.
 
-```angular2html
+```angular-html
 <qrcode-svg #qrcodeSvg data="https://qrcodesdk.dev" />
-<button type="button" (click)="qrcodeSvg.download('qrcodesdk')">Download SVG</button>
+<button (click)="qrcodeSvg.download('qrcodesdk')" type="button">Download SVG</button>
 
 <qrcode-image #qrcodeImage data="https://qrcodesdk.dev" />
-<button type="button" (click)="qrcodeImage.download('qrcodesdk')">Download PNG</button>
+<button (click)="qrcodeImage.download('qrcodesdk')" type="button">Download PNG</button>
 ```
 
 The appropriate `.svg` or `.png` extension is appended when necessary.

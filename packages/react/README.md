@@ -4,7 +4,7 @@
 
 [![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/react?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/react) [![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/react?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/react) [![npm downloads per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/react?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/react)
 
-**[Live Demo](https://qrcodesdk.dev/playground/?pkg=react)**
+**[Live Demo](https://qrcodesdk.dev/playground/?package=react)**
 
 `@qrcodesdk/react` provides React components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
