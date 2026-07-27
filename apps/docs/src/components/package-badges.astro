@@ -8,14 +8,18 @@ const bundleJsUrl = packageName ? createBundleJsUrl(packageName) : null;
 
 let size = 'N/A';
 if (bundleJsUrl) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5_000);
   try {
-    const response = await fetch(bundleJsUrl);
+    const response = await fetch(bundleJsUrl, {signal: controller.signal});
     if (response.ok) {
       const data = await response.json();
       size = data.size?.size || 'N/A';
     }
   } catch (error) {
     console.error('Failed to fetch bundle size:', error);
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
