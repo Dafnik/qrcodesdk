@@ -18,7 +18,12 @@ export const ECC_LEVELS_MAP: Record<QRCodeErrorCorrectionLevel, QRCodeErrorCorre
   H: ECC_LEVEL_H,
 };
 
-export const ECC_LEVELS = ['L', 'M', 'Q', 'H'] as QRCodeErrorCorrectionLevel[];
+export const ECC_LEVELS = [
+  'L',
+  'M',
+  'Q',
+  'H',
+] as const satisfies readonly QRCodeErrorCorrectionLevel[];
 
 type GF256LookupTables = {
   exponents: QRCodeCodewords;

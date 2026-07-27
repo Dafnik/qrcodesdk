@@ -17,12 +17,12 @@ import QRCodeReactPlaygroundPreview from '../playground/QRCodeReactPlaygroundPre
 <section class="not-content w-full min-w-0" aria-label="QR code package playground">
   <div
     class="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
-    <Card>
+    <Card title="">
       <PlaygroundControls client:load />
     </Card>
     <div class="lg:sticky lg:top-20">
       <div class="grid gap-8">
-        <Card>
+        <Card title="">
           <div class="min-h-96 grid content-center playground-preview-output">
             <QRCodeReactPlaygroundPreview client:only="react" />
             <AngularPlaygroundPreview client:load />

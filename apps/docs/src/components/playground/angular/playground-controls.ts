@@ -148,10 +148,9 @@ export class PlaygroundColorInput {
         <div hlmField>
           <label hlmFieldLabel for="mode">Mode</label>
           <hlm-select
-            id="mode"
             [ngModel]="currentConfig().mode"
             (ngModelChange)="updateQrConfig({mode: $event})">
-            <hlm-select-trigger class="w-full">
+            <hlm-select-trigger class="w-full" buttonId="mode">
               <hlm-select-value placeholder="Auto" />
             </hlm-select-trigger>
             <hlm-select-content *hlmSelectPortal>
@@ -168,10 +167,9 @@ export class PlaygroundColorInput {
         <div hlmField>
           <label hlmFieldLabel for="version">Version</label>
           <hlm-select
-            id="version"
             [ngModel]="currentConfig().version"
             (ngModelChange)="updateQrConfig({version: $event})">
-            <hlm-select-trigger class="w-full">
+            <hlm-select-trigger class="w-full" buttonId="version">
               <hlm-select-value placeholder="Auto" />
             </hlm-select-trigger>
             <hlm-select-content *hlmSelectPortal>
@@ -188,10 +186,9 @@ export class PlaygroundColorInput {
         <div hlmField>
           <label hlmFieldLabel for="errorCorrection">Error Correction</label>
           <hlm-select
-            id="errorCorrection"
             [ngModel]="currentConfig().errorCorrectionLevel"
             (ngModelChange)="updateQrConfig({errorCorrectionLevel: $event})">
-            <hlm-select-trigger class="w-full">
+            <hlm-select-trigger class="w-full" buttonId="errorCorrection">
               <hlm-select-value placeholder="Auto" />
             </hlm-select-trigger>
             <hlm-select-content *hlmSelectPortal>
@@ -209,10 +206,9 @@ export class PlaygroundColorInput {
         <div hlmField>
           <label hlmFieldLabel for="mask">Mask</label>
           <hlm-select
-            id="mask"
             [ngModel]="currentConfig().mask"
             (ngModelChange)="updateQrConfig({mask: $event})">
-            <hlm-select-trigger class="w-full">
+            <hlm-select-trigger class="w-full" buttonId="mask">
               <hlm-select-value placeholder="Auto" />
             </hlm-select-trigger>
             <hlm-select-content *hlmSelectPortal>
@@ -296,11 +292,10 @@ export class PlaygroundColorInput {
                     <div hlmField>
                       <label hlmFieldLabel for="dotType">Type</label>
                       <hlm-select
-                        id="dotType"
                         [disabled]="!overrideDot()"
                         [ngModel]="dotType()"
                         (ngModelChange)="updateQrConfig({dotsOptions: {type: $event}})">
-                        <hlm-select-trigger class="w-full">
+                        <hlm-select-trigger class="w-full" buttonId="dotType">
                           <hlm-select-value placeholder="Auto" />
                         </hlm-select-trigger>
                         <hlm-select-content *hlmSelectPortal>
@@ -350,11 +345,10 @@ export class PlaygroundColorInput {
                     <div hlmField>
                       <label hlmFieldLabel for="cornerSquareType">Type</label>
                       <hlm-select
-                        id="cornerSquareType"
                         [disabled]="!overrideCornersSquare()"
                         [ngModel]="cornersSquareType()"
                         (ngModelChange)="updateQrConfig({cornersSquareOptions: {type: $event}})">
-                        <hlm-select-trigger class="w-full">
+                        <hlm-select-trigger class="w-full" buttonId="cornerSquareType">
                           <hlm-select-value placeholder="Auto" />
                         </hlm-select-trigger>
                         <hlm-select-content *hlmSelectPortal>
@@ -405,11 +399,10 @@ export class PlaygroundColorInput {
                     <div hlmField>
                       <label hlmFieldLabel for="cornerDotType">Type</label>
                       <hlm-select
-                        id="cornerDotType"
                         [disabled]="!overrideCornersDot()"
                         [ngModel]="cornersDotType()"
                         (ngModelChange)="updateQrConfig({cornersDotOptions: {type: $event}})">
-                        <hlm-select-trigger class="w-full">
+                        <hlm-select-trigger class="w-full" buttonId="cornerDotType">
                           <hlm-select-value placeholder="Auto" />
                         </hlm-select-trigger>
                         <hlm-select-content *hlmSelectPortal>

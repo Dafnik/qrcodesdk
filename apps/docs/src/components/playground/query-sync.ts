@@ -26,37 +26,183 @@ const PLAYGROUND_OUTPUTS = [
   'canvas',
 ] as const satisfies readonly PlaygroundOutput[];
 
-const QUERY_PARAM_KEYS = {
-  data: 'data',
-  packageName: 'package',
-  output: 'output',
+interface QueryFieldCodec {
+  readonly key: string;
+  read(params: URLSearchParams, fallback: PlaygroundConfig, config: PlaygroundConfig): void;
+  write(
+    params: URLSearchParams,
+    config: PlaygroundConfig,
+    defaults: PlaygroundConfig | undefined,
+  ): void;
+}
 
-  version: 'version',
-  mode: 'mode',
-  errorCorrectionLevel: 'level',
-  mask: 'mask',
+const QUERY_FIELD_CODECS = [
+  defineQueryField(
+    'data',
+    (config) => config.data,
+    (config, data) => {
+      config.data = data;
+    },
+    parseRequiredString,
+    serializeString,
+  ),
+  defineQueryField(
+    'package',
+    (config) => config.packageName,
+    (config, packageName) => {
+      config.packageName = packageName;
+    },
+    (value, fallback) => parseStringUnion(value, PLAYGROUND_PACKAGES, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'output',
+    (config) => config.output,
+    (config, output) => {
+      config.output = output;
+    },
+    (value, fallback) => parseStringUnion(value, PLAYGROUND_OUTPUTS, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'version',
+    (config) => config.version,
+    (config, version) => setOptionalProperty(config, 'version', version),
+    (value, fallback) => parseOptionalNumber(value, isQRCodeVersion, fallback),
+    serializeNumber,
+  ),
+  defineQueryField(
+    'mode',
+    (config) => config.mode,
+    (config, mode) => setOptionalProperty(config, 'mode', mode),
+    (value, fallback) => parseOptionalStringUnion(value, MODES, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'level',
+    (config) => config.errorCorrectionLevel,
+    (config, errorCorrectionLevel) =>
+      setOptionalProperty(config, 'errorCorrectionLevel', errorCorrectionLevel),
+    (value, fallback) => parseOptionalStringUnion(value, ECC_LEVELS, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'mask',
+    (config) => config.mask,
+    (config, mask) => setOptionalProperty(config, 'mask', mask),
+    (value, fallback) => parseOptionalNumber(value, isQRCodeMask, fallback),
+    serializeNumber,
+  ),
+  defineQueryField(
+    'size',
+    (config) => config.size,
+    (config, size) => setOptionalProperty(config, 'size', size),
+    (value, fallback) => parseOptionalNumber(value, isValidQRCodeSize, fallback),
+    serializeNumber,
+  ),
+  defineQueryField(
+    'margin',
+    (config) => config.margin,
+    (config, margin) => setOptionalProperty(config, 'margin', margin),
+    (value, fallback) => parseOptionalNumber(value, isValidQRCodeMargin, fallback),
+    serializeNumber,
+  ),
+  defineQueryField(
+    'light',
+    (config) => config.colors?.colorLight,
+    (config, colorLight) => {
+      config.colors = compactObject({...config.colors, colorLight});
+    },
+    parseOptionalColor,
+    serializeColor,
+  ),
+  defineQueryField(
+    'dark',
+    (config) => config.colors?.colorDark,
+    (config, colorDark) => {
+      config.colors = compactObject({...config.colors, colorDark});
+    },
+    parseOptionalColor,
+    serializeColor,
+  ),
+  defineQueryField(
+    'dots-color',
+    (config) => config.dotsOptions?.color,
+    (config, color) => {
+      config.dotsOptions = compactObject({...config.dotsOptions, color});
+    },
+    parseOptionalColor,
+    serializeColor,
+  ),
+  defineQueryField(
+    'dots-type',
+    (config) => config.dotsOptions?.type,
+    (config, type) => {
+      config.dotsOptions = compactObject({...config.dotsOptions, type});
+    },
+    (value, fallback) => parseOptionalGuardedString(value, isQRCodeDotType, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'corner-square-color',
+    (config) => config.cornersSquareOptions?.color,
+    (config, color) => {
+      config.cornersSquareOptions = compactObject({...config.cornersSquareOptions, color});
+    },
+    parseOptionalColor,
+    serializeColor,
+  ),
+  defineQueryField(
+    'corner-square-type',
+    (config) => config.cornersSquareOptions?.type,
+    (config, type) => {
+      config.cornersSquareOptions = compactObject({...config.cornersSquareOptions, type});
+    },
+    (value, fallback) => parseOptionalGuardedString(value, isQRCodeCornerSquareType, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'corner-dot-color',
+    (config) => config.cornersDotOptions?.color,
+    (config, color) => {
+      config.cornersDotOptions = compactObject({...config.cornersDotOptions, color});
+    },
+    parseOptionalColor,
+    serializeColor,
+  ),
+  defineQueryField(
+    'corner-dot-type',
+    (config) => config.cornersDotOptions?.type,
+    (config, type) => {
+      config.cornersDotOptions = compactObject({...config.cornersDotOptions, type});
+    },
+    (value, fallback) => parseOptionalGuardedString(value, isQRCodeCornerDotType, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'alt',
+    (config) => config.alt,
+    (config, alt) => setOptionalProperty(config, 'alt', alt),
+    parseOptionalString,
+    serializeString,
+  ),
+  defineQueryField(
+    'aria-label',
+    (config) => config.ariaLabel,
+    (config, ariaLabel) => setOptionalProperty(config, 'ariaLabel', ariaLabel),
+    parseOptionalString,
+    serializeString,
+  ),
+  defineQueryField(
+    'title',
+    (config) => config.title,
+    (config, title) => setOptionalProperty(config, 'title', title),
+    parseOptionalString,
+    serializeString,
+  ),
+] as const satisfies readonly QueryFieldCodec[];
 
-  size: 'size',
-  margin: 'margin',
-
-  colorLight: 'light',
-  colorDark: 'dark',
-
-  dotsColor: 'dots-color',
-  dotsType: 'dots-type',
-
-  cornersSquareColor: 'corner-square-color',
-  cornersSquareType: 'corner-square-type',
-
-  cornersDotColor: 'corner-dot-color',
-  cornersDotType: 'corner-dot-type',
-
-  alt: 'alt',
-  ariaLabel: 'aria-label',
-  title: 'title',
-} as const;
-
-const MANAGED_QUERY_PARAM_KEYS = Object.values(QUERY_PARAM_KEYS);
+const MANAGED_QUERY_PARAM_KEYS = QUERY_FIELD_CODECS.map(({key}) => key);
 
 export interface QrQuerySyncOptions {
   /**
@@ -167,139 +313,11 @@ export function readQrConfigFromSearchParams(
   params: URLSearchParams,
   fallback: PlaygroundConfig = defaultPlaygroundConfig,
 ): PlaygroundConfig {
-  const config: PlaygroundConfig = {
-    data: readRequiredString(params, QUERY_PARAM_KEYS.data, fallback.data),
+  const config = clonePlaygroundConfig(fallback);
 
-    packageName: parseStringUnion(
-      params.get(QUERY_PARAM_KEYS.packageName),
-      PLAYGROUND_PACKAGES,
-      fallback.packageName,
-    ),
-
-    output: parseStringUnion(
-      params.get(QUERY_PARAM_KEYS.output),
-      PLAYGROUND_OUTPUTS,
-      fallback.output,
-    ),
-  };
-
-  assignDefined(
-    config,
-    'version',
-    parseOptionalNumber(params.get(QUERY_PARAM_KEYS.version), isQRCodeVersion, fallback.version),
-  );
-
-  assignDefined(
-    config,
-    'mode',
-    parseOptionalStringUnion(params.get(QUERY_PARAM_KEYS.mode), MODES, fallback.mode),
-  );
-
-  assignDefined(
-    config,
-    'errorCorrectionLevel',
-    parseOptionalStringUnion(
-      params.get(QUERY_PARAM_KEYS.errorCorrectionLevel),
-      ECC_LEVELS,
-      fallback.errorCorrectionLevel,
-    ),
-  );
-
-  assignDefined(
-    config,
-    'mask',
-    parseOptionalNumber(params.get(QUERY_PARAM_KEYS.mask), isQRCodeMask, fallback.mask),
-  );
-
-  assignDefined(
-    config,
-    'size',
-    parseOptionalNumber(params.get(QUERY_PARAM_KEYS.size), isValidQRCodeSize, fallback.size),
-  );
-
-  assignDefined(
-    config,
-    'margin',
-    parseOptionalNumber(params.get(QUERY_PARAM_KEYS.margin), isValidQRCodeMargin, fallback.margin),
-  );
-
-  const colors = compactObject({
-    colorLight: parseOptionalColor(
-      params.get(QUERY_PARAM_KEYS.colorLight),
-      fallback.colors?.colorLight,
-    ),
-
-    colorDark: parseOptionalColor(
-      params.get(QUERY_PARAM_KEYS.colorDark),
-      fallback.colors?.colorDark,
-    ),
-  });
-
-  if (colors) {
-    config.colors = colors;
+  for (const codec of QUERY_FIELD_CODECS) {
+    codec.read(params, fallback, config);
   }
-
-  const dotsOptions = compactObject({
-    color: parseOptionalColor(params.get(QUERY_PARAM_KEYS.dotsColor), fallback.dotsOptions?.color),
-
-    type: parseOptionalGuardedString(
-      params.get(QUERY_PARAM_KEYS.dotsType),
-      isQRCodeDotType,
-      fallback.dotsOptions?.type,
-    ),
-  });
-
-  if (dotsOptions) {
-    config.dotsOptions = dotsOptions;
-  }
-
-  const cornersSquareOptions = compactObject({
-    color: parseOptionalColor(
-      params.get(QUERY_PARAM_KEYS.cornersSquareColor),
-      fallback.cornersSquareOptions?.color,
-    ),
-
-    type: parseOptionalGuardedString(
-      params.get(QUERY_PARAM_KEYS.cornersSquareType),
-      isQRCodeCornerSquareType,
-      fallback.cornersSquareOptions?.type,
-    ),
-  });
-
-  if (cornersSquareOptions) {
-    config.cornersSquareOptions = cornersSquareOptions;
-  }
-
-  const cornersDotOptions = compactObject({
-    color: parseOptionalColor(
-      params.get(QUERY_PARAM_KEYS.cornersDotColor),
-      fallback.cornersDotOptions?.color,
-    ),
-
-    type: parseOptionalGuardedString(
-      params.get(QUERY_PARAM_KEYS.cornersDotType),
-      isQRCodeCornerDotType,
-      fallback.cornersDotOptions?.type,
-    ),
-  });
-
-  if (cornersDotOptions) {
-    config.cornersDotOptions = cornersDotOptions;
-  }
-
-  assignDefined(config, 'alt', readOptionalString(params, QUERY_PARAM_KEYS.alt, fallback.alt));
-
-  assignDefined(
-    config,
-    'ariaLabel',
-    readOptionalString(params, QUERY_PARAM_KEYS.ariaLabel, fallback.ariaLabel),
-  );
-
-  assignDefined(
-    config,
-    'title',
-    readOptionalString(params, QUERY_PARAM_KEYS.title, fallback.title),
-  );
 
   return config;
 }
@@ -348,90 +366,9 @@ export function writeQrConfigToSearchParams(
   config: PlaygroundConfig,
   defaults?: PlaygroundConfig,
 ): URLSearchParams {
-  setStringParam(params, QUERY_PARAM_KEYS.data, config.data, defaults?.data);
-
-  setStringParam(params, QUERY_PARAM_KEYS.packageName, config.packageName, defaults?.packageName);
-
-  setStringParam(params, QUERY_PARAM_KEYS.output, config.output, defaults?.output);
-
-  setNumberParam(params, QUERY_PARAM_KEYS.version, config.version, defaults?.version);
-
-  setStringParam(params, QUERY_PARAM_KEYS.mode, config.mode, defaults?.mode);
-
-  setStringParam(
-    params,
-    QUERY_PARAM_KEYS.errorCorrectionLevel,
-    config.errorCorrectionLevel,
-    defaults?.errorCorrectionLevel,
-  );
-
-  setNumberParam(params, QUERY_PARAM_KEYS.mask, config.mask, defaults?.mask);
-
-  setNumberParam(params, QUERY_PARAM_KEYS.size, config.size, defaults?.size);
-
-  setNumberParam(params, QUERY_PARAM_KEYS.margin, config.margin, defaults?.margin);
-
-  setColorParam(
-    params,
-    QUERY_PARAM_KEYS.colorLight,
-    config.colors?.colorLight,
-    defaults?.colors?.colorLight,
-  );
-
-  setColorParam(
-    params,
-    QUERY_PARAM_KEYS.colorDark,
-    config.colors?.colorDark,
-    defaults?.colors?.colorDark,
-  );
-
-  setColorParam(
-    params,
-    QUERY_PARAM_KEYS.dotsColor,
-    config.dotsOptions?.color,
-    defaults?.dotsOptions?.color,
-  );
-
-  setStringParam(
-    params,
-    QUERY_PARAM_KEYS.dotsType,
-    config.dotsOptions?.type,
-    defaults?.dotsOptions?.type,
-  );
-
-  setColorParam(
-    params,
-    QUERY_PARAM_KEYS.cornersSquareColor,
-    config.cornersSquareOptions?.color,
-    defaults?.cornersSquareOptions?.color,
-  );
-
-  setStringParam(
-    params,
-    QUERY_PARAM_KEYS.cornersSquareType,
-    config.cornersSquareOptions?.type,
-    defaults?.cornersSquareOptions?.type,
-  );
-
-  setColorParam(
-    params,
-    QUERY_PARAM_KEYS.cornersDotColor,
-    config.cornersDotOptions?.color,
-    defaults?.cornersDotOptions?.color,
-  );
-
-  setStringParam(
-    params,
-    QUERY_PARAM_KEYS.cornersDotType,
-    config.cornersDotOptions?.type,
-    defaults?.cornersDotOptions?.type,
-  );
-
-  setStringParam(params, QUERY_PARAM_KEYS.alt, config.alt, defaults?.alt);
-
-  setStringParam(params, QUERY_PARAM_KEYS.ariaLabel, config.ariaLabel, defaults?.ariaLabel);
-
-  setStringParam(params, QUERY_PARAM_KEYS.title, config.title, defaults?.title);
+  for (const codec of QUERY_FIELD_CODECS) {
+    codec.write(params, config, defaults);
+  }
 
   return params;
 }
@@ -469,6 +406,35 @@ export function clearQrConfigQueryParams(history: 'replace' | 'push' = 'replace'
   } else {
     window.history.replaceState(window.history.state, '', url);
   }
+}
+
+function defineQueryField<T>(
+  key: string,
+  getValue: (config: PlaygroundConfig) => T,
+  setValue: (config: PlaygroundConfig, value: T) => void,
+  parse: (value: string | null, fallback: T) => T,
+  serialize: (value: T, defaultValue: T | undefined) => string | undefined,
+): QueryFieldCodec {
+  return {
+    key,
+    read(params, fallback, config) {
+      setValue(config, parse(params.get(key), getValue(fallback)));
+    },
+    write(params, config, defaults) {
+      const defaultValue = defaults === undefined ? undefined : getValue(defaults);
+      const value = serialize(getValue(config), defaultValue);
+
+      if (value === undefined) {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    },
+  };
+}
+
+function parseRequiredString(value: string | null, fallback: string): string {
+  return value ?? fallback;
 }
 
 function parseStringUnion<const T extends string>(
@@ -538,69 +504,48 @@ function parseOptionalColor(
   return normalized.toLowerCase() as QRCodeColorHex;
 }
 
-function readRequiredString(params: URLSearchParams, key: string, fallback: string): string {
-  if (!params.has(key)) {
-    return fallback;
-  }
-
-  return params.get(key) ?? fallback;
-}
-
-function readOptionalString(
-  params: URLSearchParams,
-  key: string,
+function parseOptionalString(
+  value: string | null,
   fallback: string | undefined,
 ): string | undefined {
-  if (!params.has(key)) {
+  if (value === null) {
     return fallback;
   }
-
-  const value = params.get(key);
-
-  return value === null || value === '' ? undefined : value;
+  return value === '' ? undefined : value;
 }
 
-function setStringParam(
-  params: URLSearchParams,
-  key: string,
+function serializeString(
   value: string | undefined,
   defaultValue: string | undefined,
-): void {
+): string | undefined {
   if (value === undefined || value === '' || value === defaultValue) {
-    params.delete(key);
-    return;
+    return undefined;
   }
 
-  params.set(key, value);
+  return value;
 }
 
-function setNumberParam(
-  params: URLSearchParams,
-  key: string,
+function serializeNumber(
   value: number | undefined,
   defaultValue: number | undefined,
-): void {
+): string | undefined {
   if (value === undefined || value === defaultValue) {
-    params.delete(key);
-    return;
+    return undefined;
   }
 
-  params.set(key, String(value));
+  return String(value);
 }
 
-function setColorParam(
-  params: URLSearchParams,
-  key: string,
+function serializeColor(
   value: QRCodeColorHex | undefined,
   defaultValue: QRCodeColorHex | undefined,
-): void {
+): string | undefined {
   if (value === undefined || !isQRCodeColorHex(value) || colorsEqual(value, defaultValue)) {
-    params.delete(key);
-    return;
+    return undefined;
   }
 
   // The leading "#" is omitted to avoid encoding it as "%23".
-  params.set(key, value.slice(1).toLowerCase());
+  return value.slice(1).toLowerCase();
 }
 
 function colorsEqual(first: QRCodeColorHex, second: QRCodeColorHex | undefined): boolean {
@@ -621,13 +566,26 @@ function compactObject<T extends object>(value: T): T | undefined {
   return entries.length > 0 ? (Object.fromEntries(entries) as T) : undefined;
 }
 
-function assignDefined<T extends object, K extends keyof T>(
-  target: T,
+type OptionalPlaygroundConfigKey =
+  | 'version'
+  | 'mode'
+  | 'errorCorrectionLevel'
+  | 'mask'
+  | 'size'
+  | 'margin'
+  | 'alt'
+  | 'ariaLabel'
+  | 'title';
+
+function setOptionalProperty<K extends OptionalPlaygroundConfigKey>(
+  config: PlaygroundConfig,
   key: K,
-  value: T[K] | undefined,
+  value: PlaygroundConfig[K],
 ): void {
-  if (value !== undefined) {
-    target[key] = value;
+  if (value === undefined) {
+    delete (config as Partial<PlaygroundConfig>)[key];
+  } else {
+    config[key] = value;
   }
 }
 
