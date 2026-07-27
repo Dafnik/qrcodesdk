@@ -1,3 +1,5 @@
+import {makeChangelogsSidebarLinks} from 'starlight-changelogs';
+
 export const STARLIGHT_SIDEBAR = [
   {
     label: 'Start Here',
@@ -28,7 +30,6 @@ export const STARLIGHT_SIDEBAR = [
       {label: 'Builder API', slug: 'libs/core'},
       {label: 'Custom Renderers', slug: 'renderers/custom'},
       {label: 'Performance', slug: 'guides/performance'},
-      {label: 'API Reference', slug: 'reference/api'},
     ],
   },
   {
@@ -41,4 +42,46 @@ export const STARLIGHT_SIDEBAR = [
       {label: '@qrcodesdk/react', slug: 'libs/react'},
     ],
   },
+  {
+    label: 'Changelogs',
+    collapsed: true,
+    items: [
+      {
+        label: '@qrcodesdk/core',
+        items: getPackageChangelogsSidebarLinks('core'),
+      },
+      {
+        label: '@qrcodesdk/browser',
+        items: getPackageChangelogsSidebarLinks('browser'),
+      },
+      {
+        label: '@qrcodesdk/node',
+        items: getPackageChangelogsSidebarLinks('node'),
+      },
+      {
+        label: '@qrcodesdk/react',
+        items: getPackageChangelogsSidebarLinks('react'),
+      },
+      {label: '@qrcodesdk/angular', items: getPackageChangelogsSidebarLinks('angular')},
+    ],
+  },
 ];
+
+/**
+ *
+ * @param {string} packageName
+ */
+function getPackageChangelogsSidebarLinks(packageName) {
+  return makeChangelogsSidebarLinks([
+    {
+      type: 'all',
+      base: `changelog/${packageName}`,
+      label: 'All versions',
+    },
+    {
+      type: 'recent',
+      base: `changelog/${packageName}`,
+      count: 10,
+    },
+  ]);
+}

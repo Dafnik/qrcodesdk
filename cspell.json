@@ -19,7 +19,8 @@
     "pnpm-lock.yaml",
     "fixtures.ts",
     "*.svg",
-    "apps/docs/src/libs"
+    "apps/docs/src/libs",
+    "apps/docs/src/content/docs/guides/performance.md"
   ],
   "version": "0.2"
 }

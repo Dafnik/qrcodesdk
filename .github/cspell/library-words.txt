@@ -21,3 +21,6 @@ shikijs
 nanostores
 titlecase
 culori
+shieldsio
+bundlejs
+haspopup

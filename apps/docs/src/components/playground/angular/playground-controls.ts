@@ -52,7 +52,7 @@ import {
           class="w-[380px] max-w-[calc(100vw-1rem)] gap-4 rounded-2xl p-5"
           [(value)]="color"
           [format]="'hex'"
-          [presets]="presets">
+          [presets]="presets()">
           <sim-color-palette />
 
           <sim-color-value-editor class="gap-0 [&>label]:sr-only" />
@@ -70,7 +70,7 @@ import {
 export class PlaygroundColorInput {
   buttonId = input.required<string>();
   color = model<string>();
-  presets = input.required<string[]>();
+  presets = input.required<readonly string[]>();
   disabled = input<boolean>(false);
 }
 

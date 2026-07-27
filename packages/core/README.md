@@ -1,8 +1,6 @@
 # @qrcodesdk/core
 
-[![npm version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/core)
-[![npm bundle size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/core)
-[![npm download per month](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/core?color=7469B6&style=shieldsio)](https://npmx.dev/package/@qrcodesdk/core)
+[![Open @qrcodesdk/core on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/core?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/core) ![@qrcodesdk/core version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/core?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/core install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/core?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/core download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/core?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/core Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/core?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/core)
 
 `@qrcodesdk/core` is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
 
@@ -258,4 +256,3 @@ import {
 - [Render terminal text](https://qrcodesdk.dev/renderers/core/text/)
 - [Customize QR codes](https://qrcodesdk.dev/guides/customize/)
 - [Custom renderers](https://qrcodesdk.dev/libs/core/#custom-renderers)
-- [API reference](https://qrcodesdk.dev/reference/api/)

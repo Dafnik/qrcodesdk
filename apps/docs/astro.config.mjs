@@ -5,7 +5,9 @@ import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import mermaidIntegration from 'astro-mermaid';
 import {defineConfig} from 'astro/config';
+import starlightChangelogs from 'starlight-changelogs';
 import starlightLinksValidator from 'starlight-links-validator';
+import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightPageContextAction from 'starlight-page-context-action';
 
 import {STARLIGHT_SIDEBAR} from './src/starlight-sidebar.mjs';
@@ -124,6 +126,10 @@ export default defineConfig({
     starlight({
       customCss: ['./src/styles/global.css'],
       title: 'QRCodeSDK',
+      logo: {
+        src: './src/assets/logo.svg',
+        replacesTitle: true,
+      },
       description:
         'Build QR codes with a single TypeScript-first API, then render them in the format your app needs.',
       expressiveCode: {
@@ -138,10 +144,15 @@ export default defineConfig({
             viewMarkdown: true,
           },
         }),
+        starlightLlmsTxt({
+          rawContent: true,
+        }),
+        starlightChangelogs(),
       ],
       sidebar: STARLIGHT_SIDEBAR,
       components: {
         Footer: './src/components/footer.astro',
+        PageTitle: './src/components/PageTitle.astro',
       },
       social: [
         {
