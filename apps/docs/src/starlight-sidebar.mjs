@@ -2,12 +2,11 @@ import {makeChangelogsSidebarLinks} from 'starlight-changelogs';
 
 export const STARLIGHT_SIDEBAR = [
   {
-    label: 'Start Here',
+    label: 'Getting Started',
     items: [
       {label: 'Overview', slug: ''},
       {label: 'Playground', slug: 'playground'},
       {label: 'Installation', slug: 'guides/installation'},
-      {label: 'CLI', slug: 'guides/cli'},
     ],
   },
   {
@@ -35,11 +34,12 @@ export const STARLIGHT_SIDEBAR = [
   {
     label: 'Packages',
     items: [
-      {label: '@qrcodesdk/angular', slug: 'libs/angular'},
-      {label: '@qrcodesdk/browser', slug: 'libs/browser'},
-      {label: '@qrcodesdk/core', slug: 'libs/core'},
-      {label: '@qrcodesdk/node', slug: 'libs/node'},
-      {label: '@qrcodesdk/react', slug: 'libs/react'},
+      {label: 'Core', slug: 'libs/core'},
+      {label: 'CLI', slug: 'libs/cli'},
+      {label: 'Browser', slug: 'libs/browser'},
+      {label: 'Node', slug: 'libs/node'},
+      {label: 'React & Next.js', slug: 'libs/react'},
+      {label: 'Angular', slug: 'libs/angular'},
     ],
   },
   {

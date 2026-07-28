@@ -7,7 +7,7 @@ QRCodeSDK keeps QR code generation separate from presentation. Start with `qrcod
 | Package                                                     | Install when you need                                 | Outputs                                                |
 | ----------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
 | [`@qrcodesdk/core`](https://qrcodesdk.dev/libs/core/)       | Runtime-neutral generation and common output formats. | SVG strings, terminal text strings, raw matrices.      |
-| [`@qrcodesdk/cli`](https://qrcodesdk.dev/guides/cli/)       | Command line generation from terminals and scripts.   | Terminal text, SVG files, PNG files.                   |
+| [`@qrcodesdk/cli`](https://qrcodesdk.dev/libs/cli/)         | Command line generation from terminals and scripts.   | Terminal text, SVG files, PNG files.                   |
 | [`@qrcodesdk/browser`](https://qrcodesdk.dev/libs/browser/) | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`, downloads.    |
 | [`@qrcodesdk/node`](https://qrcodesdk.dev/libs/node/)       | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                          |
 | [`@qrcodesdk/angular`](https://qrcodesdk.dev/libs/angular/) | Angular components & download helpers.                | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, downloads. |
@@ -139,7 +139,7 @@ block geometry and is not affected by shape options.
 - [Installation](https://qrcodesdk.dev/guides/installation/)
 - [Customize QR codes](https://qrcodesdk.dev/guides/customize/)
 - [Builder API](https://qrcodesdk.dev/libs/core/)
-- [CLI](https://qrcodesdk.dev/guides/cli/)
+- [CLI](https://qrcodesdk.dev/libs/cli/)
 
 ## Workspace development
 

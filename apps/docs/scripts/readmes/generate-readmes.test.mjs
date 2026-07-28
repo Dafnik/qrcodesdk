@@ -25,7 +25,10 @@ test('generates a GitHub README from the canonical Angular MDX', async () => {
   const {content: secondReadme} = await generateReadme(ANGULAR_MAPPING);
 
   assert.equal(readme, secondReadme);
-  assert.match(readme, /^<!-- Generated from apps\/docs\/src\/content\/docs\/libs\/angular\.mdx\./);
+  assert.match(
+    readme,
+    /^<!-- Generated from apps\/docs\/src\/content\/docs\/libs\/angular\.mdx\.[^\n]*\n\n<p align="center"><img src="https:\/\/qrcodesdk\.dev\/favicon\.svg" alt="QRCodeSDK logo" width="240"><\/p>\n\n# @qrcodesdk\/angular/,
+  );
   assert.match(readme, /# @qrcodesdk\/angular/);
   assertReadmeBadges(readme, '@qrcodesdk/angular');
   assert.match(readme, /https:\/\/qrcodesdk\.dev\/playground\/\?package=angular/);

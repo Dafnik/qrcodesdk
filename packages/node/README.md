@@ -1,5 +1,7 @@
 <!-- Generated from apps/docs/src/content/docs/libs/node.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
 
+<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+
 # @qrcodesdk/node
 
 [![Open @qrcodesdk/node on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/node) ![@qrcodesdk/node version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/node?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/node install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/node?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/node download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/node?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/node Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/node?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/node)

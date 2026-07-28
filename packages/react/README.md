@@ -1,5 +1,7 @@
 <!-- Generated from apps/docs/src/content/docs/libs/react.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
 
+<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+
 # @qrcodesdk/react
 
 [![Open @qrcodesdk/react on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/react?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/react) ![@qrcodesdk/react version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/react?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/react install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/react?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/react download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/react?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/react Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/react?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/react)

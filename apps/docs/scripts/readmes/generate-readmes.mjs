@@ -22,6 +22,8 @@ const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const DOCS_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
 const WORKSPACE_ROOT = path.resolve(DOCS_ROOT, '../..');
 const SITE_URL = 'https://qrcodesdk.dev';
+const README_LOGO =
+  '<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>';
 
 const markdownProcessor = unified()
   .use(remarkParse)
@@ -100,6 +102,10 @@ export async function generateReadme(mapping, options = {}) {
     {
       type: 'html',
       value: `<!-- Generated from ${toPosixPath(path.relative(workspaceRoot, sourcePath))}. Run \`pnpm --filter docs generate-readmes\` to update. -->`,
+    },
+    {
+      type: 'html',
+      value: README_LOGO,
     },
     {
       type: 'heading',

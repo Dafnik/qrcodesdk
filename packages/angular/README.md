@@ -1,5 +1,7 @@
 <!-- Generated from apps/docs/src/content/docs/libs/angular.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
 
+<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+
 # @qrcodesdk/angular
 
 [![Open @qrcodesdk/angular on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/angular) ![@qrcodesdk/angular version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/angular install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/angular download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/angular Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/angular)

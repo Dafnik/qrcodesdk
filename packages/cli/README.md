@@ -1,3 +1,7 @@
+<!-- Generated from apps/docs/src/content/docs/libs/cli.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+
+<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+
 # @qrcodesdk/cli
 
 [![Open @qrcodesdk/cli on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/cli?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/cli) ![@qrcodesdk/cli version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/cli?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/cli install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/cli?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/cli download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/cli?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/cli Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/cli?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/cli)
@@ -9,34 +13,156 @@
 Install it globally when you want `qrc` available as a command anywhere:
 
 ```sh
-npm install --global @qrcodesdk/cli
+npm install -g @qrcodesdk/cli
 ```
 
 ```sh
-pnpm add --global @qrcodesdk/cli
+pnpm add -g @qrcodesdk/cli
 ```
+
+<details>
+<summary>Other package managers</summary>
+
+**vp**
+
+```sh
+vp install -g @qrcodesdk/cli
+```
+
+**deno**
+
+```sh
+deno install --global @qrcodesdk/cli
+```
+
+**bun**
+
+```sh
+bun add -g @qrcodesdk/cli
+```
+
+**yarn**
+
+```sh
+yarn global add @qrcodesdk/cli
+```
+
+</details>
 
 You can also run it from a project dependency.
 
 ```sh
-npm install --save-dev @qrcodesdk/cli
+npm install -D @qrcodesdk/cli
+```
+
+```sh
+pnpm add -D @qrcodesdk/cli
+```
+
+<details>
+<summary>Other package managers</summary>
+
+**vp**
+
+```sh
+vp add -D @qrcodesdk/cli
+```
+
+**deno**
+
+```sh
+deno add --dev @qrcodesdk/cli
+```
+
+**bun**
+
+```sh
+bun add -D @qrcodesdk/cli
+```
+
+**yarn**
+
+```sh
+yarn add -D @qrcodesdk/cli
+```
+
+</details>
+
+```sh
 npx qrc "https://qrcodesdk.dev"
 ```
 
 ```sh
-pnpm add --save-dev @qrcodesdk/cli
 pnpm exec qrc "https://qrcodesdk.dev"
 ```
+
+<details>
+<summary>Other package managers</summary>
+
+**vp**
+
+```sh
+vp exec qrc "https://qrcodesdk.dev"
+```
+
+**deno**
+
+```sh
+deno x qrc "https://qrcodesdk.dev"
+```
+
+**bun**
+
+```sh
+bunx qrc "https://qrcodesdk.dev"
+```
+
+**yarn**
+
+```sh
+yarn qrc "https://qrcodesdk.dev"
+```
+
+</details>
 
 Or use it without installing it.
 
 ```sh
-npx --package @qrcodesdk/cli qrc "https://qrcodesdk.dev"
+npx @qrcodesdk/cli "https://qrcodesdk.dev"
 ```
 
 ```sh
 pnpm dlx @qrcodesdk/cli "https://qrcodesdk.dev"
 ```
+
+<details>
+<summary>Other package managers</summary>
+
+**vp**
+
+```sh
+vp dlx @qrcodesdk/cli "https://qrcodesdk.dev"
+```
+
+**deno**
+
+```sh
+deno x @qrcodesdk/cli "https://qrcodesdk.dev"
+```
+
+**bun**
+
+```sh
+bunx @qrcodesdk/cli "https://qrcodesdk.dev"
+```
+
+**yarn**
+
+```sh
+yarn dlx @qrcodesdk/cli "https://qrcodesdk.dev"
+```
+
+</details>
 
 ## Print terminal text
 
@@ -82,7 +208,7 @@ You can also set the format explicitly:
 qrc "https://qrcodesdk.dev" --format svg --output qrcode.svg
 ```
 
-## Write PNG
+## Write PNG output
 
 An `.png` output path selects PNG automatically:
 
@@ -166,9 +292,9 @@ Successful file output writes a confirmation to standard error, leaving standard
 
 ## Documentation
 
-- [CLI guide](https://qrcodesdk.dev/guides/cli/)
+- [@qrcodesdk/cli](https://qrcodesdk.dev/libs/cli/)
 - [Installation](https://qrcodesdk.dev/guides/installation/)
-- [Customize QR codes](https://qrcodesdk.dev/guides/customize/)
-- [Terminal text renderer](https://qrcodesdk.dev/renderers/core/text/)
-- [SVG renderer](https://qrcodesdk.dev/renderers/core/svg/)
-- [PNG renderer](https://qrcodesdk.dev/renderers/node/png/)
+- [Customize QR Codes](https://qrcodesdk.dev/guides/customize/)
+- [Render Terminal Text](https://qrcodesdk.dev/renderers/core/text/)
+- [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
+- [Render PNG in Node.js](https://qrcodesdk.dev/renderers/node/png/)
