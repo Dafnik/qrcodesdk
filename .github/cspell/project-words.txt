@@ -3,3 +3,4 @@ qrcode
 eccs
 ecclevel
 rrggbb
+fesm

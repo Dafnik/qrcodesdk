@@ -1,11 +1,11 @@
 ---
 title: Builder API
-description: '@qrcodesdk/core is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.'
+description: '@qrcodesdk/core provides runtime-neutral QR code generation for JavaScript runtimes with native ESM, ES2020, and TextEncoder.'
 
 packageName: '@qrcodesdk/core'
 ---
 
-`@qrcodesdk/core` is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
+`@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
 
 ## Quick start
 
@@ -16,6 +16,25 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
 Learn more about the different packages in the [Installation](/getting-started/installation/#package-guide) section.
+
+## Runtime compatibility
+
+> `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 language and built-in support, and a global `TextEncoder`.
+
+| Runtime                         | Support policy                                                      | CI verification                          |
+| ------------------------------- | ------------------------------------------------------------------- | ---------------------------------------- |
+| Node.js                         | All maintained LTS lines                                            | Latest Node 22.x and 24.x                |
+| Deno                            | Current stable major                                                | Latest Deno 2.x                          |
+| Bun                             | Current stable release                                              | Latest stable Bun                        |
+| Browsers                        | Current evergreen browser families                                  | Playwright Chromium, Firefox, and WebKit |
+| Other runtimes and edge workers | Supported when they provide ESM, ES2020, and a global `TextEncoder` | Not individually verified                |
+
+Core has no Node, DOM, filesystem, or framework dependency. Every verified runtime executes the
+same published ESM artifact, and no polyfills are bundled. Playwright WebKit is the Safari-class
+engine check; it is not a claim that branded Safari runs in Linux CI.
+
+Use [`@qrcodesdk/browser`](/packages/browser/) for DOM-dependent output and
+[`@qrcodesdk/node`](/packages/node/) for Node.js PNG buffers.
 
 ## Builder API
 

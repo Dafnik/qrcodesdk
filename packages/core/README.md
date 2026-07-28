@@ -2,7 +2,9 @@
 
 [![Open @qrcodesdk/core on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/core?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/core) ![@qrcodesdk/core version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/core?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/core install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/core?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/core download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/core?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/core Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/core?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/core)
 
-`@qrcodesdk/core` is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
+[![Core runtime compatibility](https://github.com/Dafnik/qrcodesdk/actions/workflows/core-runtime.yml/badge.svg)](https://github.com/Dafnik/qrcodesdk/actions/workflows/core-runtime.yml)
+
+`@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
 
 ## Install
 
@@ -29,6 +31,25 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 - terminal text output
 - raw matrix output
 - custom renderer support
+
+## Runtime compatibility
+
+> `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 language and built-in support, and a global `TextEncoder`.
+
+| Runtime                         | Support policy                                         | CI verification                          |
+| ------------------------------- | ------------------------------------------------------ | ---------------------------------------- |
+| Node.js                         | All maintained LTS lines                               | Latest Node 22.x and 24.x                |
+| Deno                            | Current stable major                                   | Latest Deno 2.x                          |
+| Bun                             | Current stable release                                 | Latest stable Bun                        |
+| Browsers                        | Current evergreen browser families                     | Playwright Chromium, Firefox, and WebKit |
+| Other runtimes and edge workers | Supported with ESM, ES2020, and a global `TextEncoder` | Not individually verified                |
+
+Core has no Node, DOM, filesystem, or framework dependency. Every verified runtime executes the
+same published ESM artifact, and no polyfills are bundled. Playwright WebKit is the Safari-class
+engine check; it is not a claim that branded Safari runs in Linux CI.
+
+Use [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) for DOM-dependent output and
+[`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/) for Node.js PNG buffers.
 
 ## Package guide
 

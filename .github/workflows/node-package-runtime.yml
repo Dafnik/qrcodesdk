@@ -1,0 +1,135 @@
+name: Node package compatibility
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_call:
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Build the CLI package graph
+        run: pnpm turbo run build --filter='@qrcodesdk/cli...'
+
+      - name: Pack Node-targeted package graph
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/node-packages"
+          pnpm --dir packages/core pack --pack-destination "$RUNNER_TEMP/node-packages"
+          pnpm --dir packages/node pack --pack-destination "$RUNNER_TEMP/node-packages"
+          pnpm --dir packages/cli pack --pack-destination "$RUNNER_TEMP/node-packages"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: node-packages
+          path: ${{ runner.temp }}/node-packages/*.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  node:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 22.0.0
+          - 24.x
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: node-packages
+          path: ${{ runner.temp }}/node-packages
+
+      - name: Test the installed Node renderer
+        shell: bash
+        run: |
+          consumer="$RUNNER_TEMP/node-renderer-consumer"
+          mkdir -p "$consumer"
+          cp packages/node/runtime/smoke-package.mjs "$consumer"
+          cd "$consumer"
+          npm init --yes
+          npm pkg set type=module
+          npm config set engine-strict true --location=project
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false \
+            "$RUNNER_TEMP/node-packages/qrcodesdk-core-"*.tgz \
+            "$RUNNER_TEMP/node-packages/qrcodesdk-node-"*.tgz
+          node smoke-package.mjs
+
+  cli:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 22.12.0
+          - 24.x
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: node-packages
+          path: ${{ runner.temp }}/node-packages
+
+      - name: Test the installed CLI
+        shell: bash
+        run: |
+          consumer="$RUNNER_TEMP/cli-consumer"
+          mkdir -p "$consumer"
+          cp packages/cli/runtime/smoke-package.mjs "$consumer"
+          cd "$consumer"
+          npm init --yes
+          npm pkg set type=module
+          npm config set engine-strict true --location=project
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false \
+            "$RUNNER_TEMP/node-packages/qrcodesdk-core-"*.tgz \
+            "$RUNNER_TEMP/node-packages/qrcodesdk-node-"*.tgz \
+            "$RUNNER_TEMP/node-packages/qrcodesdk-cli-"*.tgz
+          node smoke-package.mjs
+
+  required:
+    name: required
+    if: always()
+    needs:
+      - build
+      - node
+      - cli
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every Node package job
+        if: >-
+          needs.build.result != 'success' ||
+          needs.node.result != 'success' ||
+          needs.cli.result != 'success'
+        run: exit 1
+
+      - name: Report success
+        run: echo "Every Node package compatibility job succeeded."

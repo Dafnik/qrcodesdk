@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "engines": {
-    "node": ">=20.12.0"
+    "node": ">=22.12.0"
   },
   "description": "@qrcodesdk/cli provides the qrc command for generating QR codes as terminal text, SVG files, or PNG files.",
   "sideEffects": false,
@@ -66,7 +66,7 @@
     "test": "vitest --watch false",
     "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src tests --max-warnings 0",
+    "lint": "eslint src tests runtime --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
   },

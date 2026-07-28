@@ -523,6 +523,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      playwright:
+        specifier: 1.61.1
+        version: 1.61.1
       tsdown:
         specifier: 'catalog:'
         version: 0.22.9(@volar/typescript@2.4.28)(oxc-resolver@11.24.2)(typescript@7.0.2)

@@ -5,5 +5,9 @@ export default defineConfig({
     tsgo: true,
   },
   exports: true,
-  // ...config options
+  fixedExtension: true,
+  format: 'es',
+  platform: 'neutral',
+  sourcemap: true,
+  target: 'es2020',
 });

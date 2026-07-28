@@ -39,6 +39,8 @@ npm install @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
 
 ### SVG in any JavaScript runtime
 
+See the [`@qrcodesdk/core` runtime compatibility matrix](https://qrcodesdk.dev/packages/core/#runtime-compatibility) for the portable runtime contract and the environments verified in CI.
+
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 

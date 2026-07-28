@@ -2,10 +2,7 @@
   "name": "@qrcodesdk/core",
   "type": "module",
   "version": "0.0.0",
-  "engines": {
-    "node": ">=20.12.0"
-  },
-  "description": "@qrcodesdk/core is the foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.",
+  "description": "Runtime-neutral QR code generation for any JavaScript runtime with native ESM, ES2020, and TextEncoder. Build matrices, SVG, terminal text, or custom output.",
   "sideEffects": false,
   "private": false,
   "license": "MIT",
@@ -23,7 +20,12 @@
     "code",
     "esm",
     "modules",
-    "module"
+    "module",
+    "runtime-agnostic",
+    "node",
+    "browser",
+    "deno",
+    "bun"
   ],
   "homepage": "https://qrcodesdk.dev/packages/core",
   "repository": {
@@ -63,15 +65,18 @@
     "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
+    "test:runtime:dist": "node runtime/smoke-dist.mjs",
+    "test:runtime:browser": "node runtime/smoke-browser.mjs",
     "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
-    "lint": "eslint src tests --max-warnings 0",
+    "lint": "eslint src tests runtime --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "playwright": "1.61.1",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
