@@ -55,10 +55,12 @@
   },
   "files": [
     "CHANGELOG.md",
+    "LICENSE",
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
+    "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",
     "cli": "pnpm run build && node dist/bin.mjs",
     "test": "vitest --watch false",

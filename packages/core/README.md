@@ -93,17 +93,28 @@ subset of ISO/IEC 18004 rather than full feature coverage.
 
 The builder is immutable. Each method returns a new builder with the updated option.
 
-| Method                    | Description                                             | Defaults |
-| ------------------------- | ------------------------------------------------------- | :------- |
-| `.data(value)`            | Sets QR code input data.                                | -        |
-| `.config(mode)`           | Sets all options in one call.                           | -        |
-| `.mode(mode)`             | Sets the mode: `numeric`, `alphanumeric`, or `octet`.   | `Auto`   |
-| `.errorCorrection(level)` | Sets the error correction level: `L`, `M`, `Q`, or `H`. | `M`      |
-| `.version(version)`       | Pins a QR code version from `1` to `40`.                | `Auto`   |
-| `.mask(mask)`             | Pins a mask from `0` to `7`.                            | `Auto`   |
-| `.matrix()`               | Returns the generated `QRCodeMatrix`.                   | -        |
-| `.renderer(renderer)`     | Stores a renderer for a later `.render()` call.         | -        |
-| `.render(renderer?)`      | Generates the matrix and returns renderer output.       | -        |
+| Method                                   | Description                                             | Defaults |
+| ---------------------------------------- | ------------------------------------------------------- | :------- |
+| `.data(value)`                           | Sets QR code input data.                                | -        |
+| `.config(options?: QRCodeMatrixOptions)` | Sets all matrix options in one call.                    | -        |
+| `.mode(mode)`                            | Sets the mode: `numeric`, `alphanumeric`, or `octet`.   | `Auto`   |
+| `.errorCorrection(level)`                | Sets the error correction level: `L`, `M`, `Q`, or `H`. | `M`      |
+| `.version(version)`                      | Pins a QR code version from `1` to `40`.                | `Auto`   |
+| `.mask(mask)`                            | Pins a mask from `0` to `7`.                            | `Auto`   |
+| `.matrix()`                              | Returns the generated `QRCodeMatrix`.                   | -        |
+| `.renderer(renderer)`                    | Stores a renderer for a later `.render()` call.         | -        |
+| `.render(renderer?)`                     | Generates the matrix and returns renderer output.       | -        |
+
+For example, configure multiple matrix options together:
+
+```ts
+qrcode('https://qrcodesdk.dev').config({
+  mode: 'octet',
+  errorCorrectionLevel: 'H',
+  version: 4,
+  mask: 2,
+});
+```
 
 ### Error correction
 
@@ -204,10 +215,35 @@ const json = qrcode('renderer output').render(jsonRenderer);
 
 Renderers can be passed directly to `.render(renderer)` or stored with `.renderer(renderer).render()`.
 
+## Exported constants and styling primitives
+
+The low-level constants and style-plan types exported by `@qrcodesdk/core` are intentional public
+contracts. They are useful for building validated configuration controls and custom renderers
+without duplicating QRCodeSDK's supported values.
+
+| Export                             | Contract                                                                        |
+| ---------------------------------- | ------------------------------------------------------------------------------- |
+| `ECC_LEVELS`                       | Supported error correction names: `L`, `M`, `Q`, and `H`.                       |
+| `MODES`                            | Supported encoding modes: `numeric`, `alphanumeric`, and `octet`.               |
+| `QR_CODE_COLOR_HEX_PATTERN`        | Regular expression used to validate hash-prefixed six-digit hexadecimal colors. |
+| `QR_CODE_DOT_TYPES`                | Supported ordinary-module shapes.                                               |
+| `QR_CODE_CORNER_SQUARE_TYPES`      | Supported finder-ring shapes.                                                   |
+| `QR_CODE_CORNER_DOT_TYPES`         | Supported finder-center shapes.                                                 |
+| `QRCodeStylePlan`                  | Platform-neutral dimensions, background, curve flag, and ordered primitives.    |
+| `QRCodeStylePrimitive`             | Union of module, finder-ring, and finder-center primitives.                     |
+| `QRCodeModuleStylePrimitive`       | Shape, role, color, position, size, and rotation for an ordinary module.        |
+| `QRCodeFinderRingStylePrimitive`   | Styling primitive for a finder pattern's outer ring.                            |
+| `QRCodeFinderCenterStylePrimitive` | Styling primitive for a finder pattern's center.                                |
+| `QRCodeStyleRole`                  | Primitive role: `dots`, `cornersSquare`, or `cornersDot`.                       |
+| `QRCodeModuleShape`                | Resolved geometry used to draw an ordinary module.                              |
+| `QRCodeStyleRotation`              | Clockwise primitive rotation: `0`, `90`, `180`, or `270` degrees.               |
+
 ## Public API
 
 ```ts
 import {
+  ECC_LEVELS,
+  MODES,
   type QRCodeAccessibilityOptions,
   QRCodeBuilder,
   type QRCodeColorHex,
@@ -218,11 +254,15 @@ import {
   type QRCodeDotType,
   type QRCodeDotsOptions,
   type QRCodeErrorCorrectionLevel,
+  type QRCodeFinderCenterStylePrimitive,
+  type QRCodeFinderRingStylePrimitive,
   type QRCodeInputData,
   type QRCodeMask,
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
   type QRCodeMode,
+  type QRCodeModuleShape,
+  type QRCodeModuleStylePrimitive,
   type QRCodeOptions,
   type QRCodeParsedStylingOptions,
   type QRCodeRenderer,
@@ -231,11 +271,17 @@ import {
   type QRCodeSVGRendererOptions,
   type QRCodeStylePlan,
   type QRCodeStylePrimitive,
+  type QRCodeStyleRole,
+  type QRCodeStyleRotation,
   type QRCodeStylingColors,
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeVersion,
+  QR_CODE_COLOR_HEX_PATTERN,
+  QR_CODE_CORNER_DOT_TYPES,
+  QR_CODE_CORNER_SQUARE_TYPES,
+  QR_CODE_DOT_TYPES,
   calculateQRCodeRenderedSize,
   createQRCodeStylePlan,
   isQRCodeColorHex,

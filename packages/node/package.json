@@ -56,10 +56,12 @@
   },
   "files": [
     "CHANGELOG.md",
+    "LICENSE",
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
+    "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
     "test:coverage:raw": "vitest --coverage --watch false",
