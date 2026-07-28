@@ -25,11 +25,11 @@ You can also run it from a project dependency.
 
 <PackageManagerTabs packages={['@qrcodesdk/cli']} mode="addDev" />
 
-<PackageManagerTabs packages={[]} mode="exec" command="qrc" args={['"https://qrcodesdk.dev"']} />
+<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="exec" command="qrc" args={['"https://qrcodesdk.dev"']} />
 
 Or use it without installing it.
 
-<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="dlx" args={['"https://qrcodesdk.dev"']} />
+<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="dlx" command="qrc" args={['"https://qrcodesdk.dev"']} />
 
 ## Print terminal text
 
@@ -75,7 +75,7 @@ You can also set the format explicitly:
 qrc "https://qrcodesdk.dev" --format svg --output qrcode.svg
 ```
 
-## Write PNG's
+## Write PNGs
 
 An `.png` output path selects PNG automatically:
 

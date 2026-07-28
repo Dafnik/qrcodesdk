@@ -108,7 +108,7 @@ vp exec qrc "https://qrcodesdk.dev"
 **deno**
 
 ```sh
-deno x qrc "https://qrcodesdk.dev"
+deno x npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"
 ```
 
 **bun**
@@ -147,7 +147,7 @@ vp dlx @qrcodesdk/cli "https://qrcodesdk.dev"
 **deno**
 
 ```sh
-deno x @qrcodesdk/cli "https://qrcodesdk.dev"
+deno x npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"
 ```
 
 **bun**
@@ -208,7 +208,7 @@ You can also set the format explicitly:
 qrc "https://qrcodesdk.dev" --format svg --output qrcode.svg
 ```
 
-## Write PNG's
+## Write PNGs
 
 An `.png` output path selects PNG automatically:
 

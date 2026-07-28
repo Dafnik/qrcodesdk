@@ -73,11 +73,21 @@ export function createPackageManagerCommands({packages, mode, command, args = []
   const commandTarget = mode === 'exec' ? command : packageList;
   const commandArguments = mode === 'exec' || mode === 'dlx' ? argumentList : '';
 
-  return Object.entries(PACKAGE_MANAGERS).map(([id, commands]) => ({
-    id,
-    label: commands.label,
-    command: [commands[mode], commandTarget, commandArguments]
-      .filter((part) => part !== undefined && part.length > 0)
-      .join(' '),
-  }));
+  return Object.entries(PACKAGE_MANAGERS).map(([id, commands]) => {
+    const target =
+      id === 'deno' &&
+      (mode === 'exec' || mode === 'dlx') &&
+      packages.length === 1 &&
+      command !== undefined
+        ? `npm:${packages[0]}/${command}`
+        : commandTarget;
+
+    return {
+      id,
+      label: commands.label,
+      command: [commands[mode], target, commandArguments]
+        .filter((part) => part !== undefined && part.length > 0)
+        .join(' '),
+    };
+  });
 }

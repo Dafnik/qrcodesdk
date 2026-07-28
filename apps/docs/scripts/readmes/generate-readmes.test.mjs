@@ -5,7 +5,7 @@ import path from 'node:path';
 import {test} from 'node:test';
 import {fileURLToPath} from 'node:url';
 
-import {createPackageBadges} from '../../src/utils/index.js';
+import {createPackageBadges, createPackageManagerCommands} from '../../src/utils/index.js';
 import {
   assertReadmeCurrent,
   generateReadme,
@@ -19,6 +19,22 @@ const DOCS_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
 const WORKSPACE_ROOT = path.resolve(DOCS_ROOT, '../..');
 const SOURCE_PATH = path.join(DOCS_ROOT, 'src/content/docs/packages/angular.mdx');
 const ANGULAR_MAPPING = README_MAPPINGS[0];
+
+test('selects an npm package binary explicitly for deno x', () => {
+  for (const mode of ['exec', 'dlx']) {
+    const commands = createPackageManagerCommands({
+      packages: ['@qrcodesdk/cli'],
+      mode,
+      command: 'qrc',
+      args: ['"https://qrcodesdk.dev"'],
+    });
+
+    assert.equal(
+      commands.find(({id}) => id === 'deno')?.command,
+      'deno x npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"',
+    );
+  }
+});
 
 test('generates a GitHub README from the canonical Angular MDX', async () => {
   const {content: readme} = await generateReadme(ANGULAR_MAPPING);
