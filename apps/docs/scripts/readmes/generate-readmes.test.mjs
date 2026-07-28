@@ -5,7 +5,7 @@ import path from 'node:path';
 import {test} from 'node:test';
 import {fileURLToPath} from 'node:url';
 
-import {createPackageBadges} from '../../src/utils/index.js';
+import {createPackageBadges, createPackageManagerCommands} from '../../src/utils/index.js';
 import {
   assertReadmeCurrent,
   generateReadme,
@@ -17,15 +17,34 @@ import {README_MAPPINGS} from './readme-mappings.mjs';
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const DOCS_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
 const WORKSPACE_ROOT = path.resolve(DOCS_ROOT, '../..');
-const SOURCE_PATH = path.join(DOCS_ROOT, 'src/content/docs/libs/angular.mdx');
+const SOURCE_PATH = path.join(DOCS_ROOT, 'src/content/docs/packages/angular.mdx');
 const ANGULAR_MAPPING = README_MAPPINGS[0];
+
+test('selects an npm package binary explicitly for deno x', () => {
+  for (const mode of ['exec', 'dlx']) {
+    const commands = createPackageManagerCommands({
+      packages: ['@qrcodesdk/cli'],
+      mode,
+      command: 'qrc',
+      args: ['"https://qrcodesdk.dev"'],
+    });
+
+    assert.equal(
+      commands.find(({id}) => id === 'deno')?.command,
+      'deno x npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"',
+    );
+  }
+});
 
 test('generates a GitHub README from the canonical Angular MDX', async () => {
   const {content: readme} = await generateReadme(ANGULAR_MAPPING);
   const {content: secondReadme} = await generateReadme(ANGULAR_MAPPING);
 
   assert.equal(readme, secondReadme);
-  assert.match(readme, /^<!-- Generated from apps\/docs\/src\/content\/docs\/libs\/angular\.mdx\./);
+  assert.match(
+    readme,
+    /^<!-- Generated from apps\/docs\/src\/content\/docs\/packages\/angular\.mdx\.[^\n]*\n\n<p align="center"><img src="https:\/\/qrcodesdk\.dev\/favicon\.svg" alt="QRCodeSDK logo" width="240"><\/p>\n\n# @qrcodesdk\/angular/,
+  );
   assert.match(readme, /# @qrcodesdk\/angular/);
   assertReadmeBadges(readme, '@qrcodesdk/angular');
   assert.match(readme, /https:\/\/qrcodesdk\.dev\/playground\/\?package=angular/);
@@ -41,7 +60,7 @@ test('generates a GitHub README from the canonical Angular MDX', async () => {
   assert.match(readme, /export class QRCodeCanvasExample/);
   assert.match(readme, /export class QRCodeDownloadImageExample/);
   assert.match(readme, /## Public API/);
-  assert.match(readme, /https:\/\/qrcodesdk\.dev\/guides\/customize\//);
+  assert.match(readme, /https:\/\/qrcodesdk\.dev\/advanced\/customize\//);
   assert.doesNotMatch(readme, /^---$/m);
   assert.doesNotMatch(readme, /^import .*\.astro';$/m);
   assert.doesNotMatch(readme, /<QRCode(?:SVG|Image|Canvas|DownloadImage) \/>/);
@@ -143,7 +162,7 @@ test('generates multiple framework mappings with mapping-specific code languages
     ANGULAR_MAPPING,
     {
       id: 'react',
-      source: 'src/content/docs/libs/react.mdx',
+      source: 'src/content/docs/packages/react.mdx',
       output: path.join(fixtureRoot, 'react.md'),
       codeLanguage: 'tsx',
     },
@@ -167,7 +186,7 @@ test('rejects duplicate and incomplete mappings', () => {
       validateReadmeMappings([
         {
           id: 'react',
-          source: 'src/content/docs/libs/react.mdx',
+          source: 'src/content/docs/packages/react.mdx',
           output: '../../packages/react/README.md',
         },
       ]),

@@ -43,7 +43,9 @@ function resolveVersion(
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
 ): QRCodeVersion {
   if (requestedVersion !== undefined) {
-    if (requestedVersion < 1 || requestedVersion > 40) throw new Error('QRCode: Invalid version');
+    if (!Number.isInteger(requestedVersion) || requestedVersion < 1 || requestedVersion > 40) {
+      throw new Error('QRCode: Invalid version');
+    }
     if (dataLength > getMaxDataLength(requestedVersion, mode, errorCorrectionLevel)) {
       throw new Error('QRCode: Data too large');
     }

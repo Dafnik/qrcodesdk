@@ -26,7 +26,7 @@
     "module",
     "node"
   ],
-  "homepage": "https://qrcodesdk.dev/libs/node",
+  "homepage": "https://qrcodesdk.dev/packages/node",
   "repository": {
     "type": "git",
     "url": "git@github.com:Dafnik/qrcodesdk.git",
@@ -56,10 +56,12 @@
   },
   "files": [
     "CHANGELOG.md",
+    "LICENSE",
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
+    "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
     "test:coverage:raw": "vitest --coverage --watch false",

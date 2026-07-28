@@ -2,12 +2,12 @@ import {makeChangelogsSidebarLinks} from 'starlight-changelogs';
 
 export const STARLIGHT_SIDEBAR = [
   {
-    label: 'Start Here',
+    label: 'Getting Started',
     items: [
       {label: 'Overview', slug: ''},
       {label: 'Playground', slug: 'playground'},
-      {label: 'Installation', slug: 'guides/installation'},
-      {label: 'CLI', slug: 'guides/cli'},
+      {label: 'Installation', slug: 'getting-started/installation'},
+      {label: 'Credits', slug: 'getting-started/credits'},
     ],
   },
   {
@@ -21,25 +21,23 @@ export const STARLIGHT_SIDEBAR = [
     ],
   },
   {
-    label: 'Customize',
-    items: [{label: 'Customize QR Codes', slug: 'guides/customize'}],
-  },
-  {
     label: 'Advanced',
     items: [
-      {label: 'Builder API', slug: 'libs/core'},
-      {label: 'Custom Renderers', slug: 'renderers/custom'},
-      {label: 'Performance', slug: 'guides/performance'},
+      {label: 'Builder API', slug: 'packages/core'},
+      {label: 'Customize QR Codes', slug: 'advanced/customize'},
+      {label: 'Custom Renderers', slug: 'advanced/custom-renderers'},
+      {label: 'Performance', slug: 'advanced/performance'},
     ],
   },
   {
     label: 'Packages',
     items: [
-      {label: '@qrcodesdk/angular', slug: 'libs/angular'},
-      {label: '@qrcodesdk/browser', slug: 'libs/browser'},
-      {label: '@qrcodesdk/core', slug: 'libs/core'},
-      {label: '@qrcodesdk/node', slug: 'libs/node'},
-      {label: '@qrcodesdk/react', slug: 'libs/react'},
+      {label: 'Core', slug: 'packages/core'},
+      {label: 'CLI', slug: 'packages/cli'},
+      {label: 'Browser', slug: 'packages/browser'},
+      {label: 'Node', slug: 'packages/node'},
+      {label: 'React & Next.js', slug: 'packages/react'},
+      {label: 'Angular', slug: 'packages/angular'},
     ],
   },
   {
@@ -48,21 +46,29 @@ export const STARLIGHT_SIDEBAR = [
     items: [
       {
         label: '@qrcodesdk/core',
+        collapsed: true,
         items: getPackageChangelogsSidebarLinks('core'),
       },
       {
         label: '@qrcodesdk/browser',
+        collapsed: true,
         items: getPackageChangelogsSidebarLinks('browser'),
       },
       {
         label: '@qrcodesdk/node',
+        collapsed: true,
         items: getPackageChangelogsSidebarLinks('node'),
       },
       {
         label: '@qrcodesdk/react',
+        collapsed: true,
         items: getPackageChangelogsSidebarLinks('react'),
       },
-      {label: '@qrcodesdk/angular', items: getPackageChangelogsSidebarLinks('angular')},
+      {
+        label: '@qrcodesdk/angular',
+        collapsed: true,
+        items: getPackageChangelogsSidebarLinks('angular'),
+      },
     ],
   },
 ];

@@ -4,8 +4,8 @@ description: '@qrcodesdk/cli generates QR codes from a terminal, shell script, o
 packageName: '@qrcodesdk/cli'
 
 related:
-  - ./installation.mdx
-  - ./customize.md
+  - ../getting-started/installation.mdx
+  - ../advanced/customize.md
   - ../renderers/core/text.md
   - ../renderers/core/svg.md
   - ../renderers/node/png.md
@@ -25,11 +25,11 @@ You can also run it from a project dependency.
 
 <PackageManagerTabs packages={['@qrcodesdk/cli']} mode="addDev" />
 
-<PackageManagerTabs packages={[]} mode="exec" command="qrc" args={['"https://qrcodesdk.dev"']} />
+<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="exec" command="qrc" args={['"https://qrcodesdk.dev"']} />
 
 Or use it without installing it.
 
-<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="dlx" args={['"https://qrcodesdk.dev"']} />
+<PackageManagerTabs packages={['@qrcodesdk/cli']} mode="dlx" command="qrc" args={['"https://qrcodesdk.dev"']} />
 
 ## Print terminal text
 
@@ -75,7 +75,7 @@ You can also set the format explicitly:
 qrc "https://qrcodesdk.dev" --format svg --output qrcode.svg
 ```
 
-## Write PNG output
+## Write PNGs
 
 An `.png` output path selects PNG automatically:
 

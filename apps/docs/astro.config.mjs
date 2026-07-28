@@ -153,6 +153,8 @@ export default defineConfig({
       components: {
         Footer: './src/components/footer.astro',
         PageTitle: './src/components/PageTitle.astro',
+        Sidebar: './src/components/Sidebar.astro',
+        TableOfContents: './src/components/TableOfContents.astro',
       },
       social: [
         {

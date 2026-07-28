@@ -103,7 +103,7 @@ const REPORT = {
 test('generates accessible Mermaid charts and collapsible exact benchmark tables', async () => {
   const markdown = await generatePerformancePage(REPORT, {
     inputPath: '/workspace/benchmark-results/latest.json',
-    outputPath: '/workspace/apps/docs/src/content/docs/guides/performance.md',
+    outputPath: '/workspace/apps/docs/src/content/docs/advanced/performance.md',
     workspaceRoot: '/workspace',
   });
 

@@ -1,4 +1,6 @@
-<!-- Generated from apps/docs/src/content/docs/libs/react.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+<!-- Generated from apps/docs/src/content/docs/packages/react.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+
+<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
 
 # @qrcodesdk/react
 
@@ -7,6 +9,8 @@
 **[Live Demo](https://qrcodesdk.dev/playground/?package=react)**
 
 `@qrcodesdk/react` provides React components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
+
+It supports React and React DOM 18 and 19.
 
 ## Install
 
@@ -246,8 +250,8 @@ The appropriate `.svg` or `.png` extension is appended when necessary.
 
 ## Documentation
 
-- [@qrcodesdk/react](https://qrcodesdk.dev/libs/react/)
-- [Customize QR Codes](https://qrcodesdk.dev/guides/customize/)
+- [@qrcodesdk/react](https://qrcodesdk.dev/packages/react/)
+- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
 - [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
 - [Render to an Image Element](https://qrcodesdk.dev/renderers/browser/image/)
 - [Render to Canvas](https://qrcodesdk.dev/renderers/browser/canvas/)

@@ -3,7 +3,7 @@
  *
  * {
  *   id: 'react',
- *   source: 'src/content/docs/libs/react.mdx',
+ *   source: 'src/content/docs/packages/react.mdx',
  *   output: '../../packages/react/README.md',
  *   codeLanguage: 'tsx',
  * }
@@ -22,25 +22,31 @@
 export const README_MAPPINGS = [
   {
     id: 'angular',
-    source: 'src/content/docs/libs/angular.mdx',
+    source: 'src/content/docs/packages/angular.mdx',
     output: '../../packages/angular/README.md',
     codeLanguage: 'ts',
   },
   {
+    id: 'cli',
+    source: 'src/content/docs/packages/cli.mdx',
+    output: '../../packages/cli/README.md',
+    codeLanguage: 'ts',
+  },
+  {
     id: 'react',
-    source: 'src/content/docs/libs/react.mdx',
+    source: 'src/content/docs/packages/react.mdx',
     output: '../../packages/react/README.md',
     codeLanguage: 'tsx',
   },
   {
     id: 'node',
-    source: 'src/content/docs/libs/node.mdx',
+    source: 'src/content/docs/packages/node.mdx',
     output: '../../packages/node/README.md',
     codeLanguage: 'ts',
   },
   {
     id: 'browser',
-    source: 'src/content/docs/libs/browser.mdx',
+    source: 'src/content/docs/packages/browser.mdx',
     output: '../../packages/browser/README.md',
     codeLanguage: 'ts',
   },

@@ -1,4 +1,6 @@
-<!-- Generated from apps/docs/src/content/docs/libs/browser.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+<!-- Generated from apps/docs/src/content/docs/packages/browser.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+
+<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
 
 # @qrcodesdk/browser
 
@@ -177,9 +179,9 @@ import {
 
 ## Documentation
 
-- [@qrcodesdk/browser](https://qrcodesdk.dev/libs/browser/)
-- [Installation](https://qrcodesdk.dev/guides/installation/)
+- [@qrcodesdk/browser](https://qrcodesdk.dev/packages/browser/)
+- [Installation](https://qrcodesdk.dev/getting-started/installation/)
 - [Render to Canvas](https://qrcodesdk.dev/renderers/browser/canvas/)
 - [Render to an Image Element](https://qrcodesdk.dev/renderers/browser/image/)
 - [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
-- [Customize QR Codes](https://qrcodesdk.dev/guides/customize/)
+- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)

@@ -25,7 +25,7 @@
     "modules",
     "module"
   ],
-  "homepage": "https://qrcodesdk.dev/libs/core",
+  "homepage": "https://qrcodesdk.dev/packages/core",
   "repository": {
     "type": "git",
     "url": "git@github.com:Dafnik/qrcodesdk.git",
@@ -55,10 +55,12 @@
   },
   "files": [
     "CHANGELOG.md",
+    "LICENSE",
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
+    "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",
     "test": "vitest --watch false",
     "test:coverage:raw": "vitest --coverage --watch false",

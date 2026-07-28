@@ -36,5 +36,3 @@ export const QRCodeSVG = forwardRef<QRCodeDownloadHandle, QRCodeSVGProps>(functi
 
   return <div className={className} dangerouslySetInnerHTML={{__html: svg}} />;
 });
-
-export const QRCodeSVGContainer = QRCodeSVG;
