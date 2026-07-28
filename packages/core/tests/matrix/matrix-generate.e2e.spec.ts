@@ -139,6 +139,13 @@ describe('qrcode().matrix()', () => {
         .version(41 as never)
         .matrix(),
     ).toThrow('QRCode: Invalid version');
+    for (const invalidVersion of [1.5, Number.NaN, '1']) {
+      expect(() =>
+        qrcode('123')
+          .version(invalidVersion as never)
+          .matrix(),
+      ).toThrow('QRCode: Invalid version');
+    }
     expect(() =>
       qrcode('123')
         .mask(8 as never)
