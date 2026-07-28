@@ -3,7 +3,7 @@ title: Render SVG
 description: Render a QR code as a scalable SVG string from @qrcodesdk/core.
 
 related:
-  - ../../guides/customize.md
+  - ../../advanced/customize.md
   - ../node/png.md
   - ../browser/image.md
 ---

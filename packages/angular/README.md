@@ -1,4 +1,4 @@
-<!-- Generated from apps/docs/src/content/docs/libs/angular.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+<!-- Generated from apps/docs/src/content/docs/packages/angular.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
 
 <p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
 
@@ -268,8 +268,8 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 ## Documentation
 
-- [@qrcodesdk/angular](https://qrcodesdk.dev/libs/angular/)
-- [Customize QR Codes](https://qrcodesdk.dev/guides/customize/)
+- [@qrcodesdk/angular](https://qrcodesdk.dev/packages/angular/)
+- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
 - [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
 - [Render to an Image Element](https://qrcodesdk.dev/renderers/browser/image/)
 - [Render to Canvas](https://qrcodesdk.dev/renderers/browser/canvas/)

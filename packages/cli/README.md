@@ -1,4 +1,4 @@
-<!-- Generated from apps/docs/src/content/docs/libs/cli.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+<!-- Generated from apps/docs/src/content/docs/packages/cli.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
 
 <p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
 
@@ -208,7 +208,7 @@ You can also set the format explicitly:
 qrc "https://qrcodesdk.dev" --format svg --output qrcode.svg
 ```
 
-## Write PNG output
+## Write PNG's
 
 An `.png` output path selects PNG automatically:
 
@@ -292,9 +292,9 @@ Successful file output writes a confirmation to standard error, leaving standard
 
 ## Documentation
 
-- [@qrcodesdk/cli](https://qrcodesdk.dev/libs/cli/)
-- [Installation](https://qrcodesdk.dev/guides/installation/)
-- [Customize QR Codes](https://qrcodesdk.dev/guides/customize/)
+- [@qrcodesdk/cli](https://qrcodesdk.dev/packages/cli/)
+- [Installation](https://qrcodesdk.dev/getting-started/installation/)
+- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
 - [Render Terminal Text](https://qrcodesdk.dev/renderers/core/text/)
 - [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
 - [Render PNG in Node.js](https://qrcodesdk.dev/renderers/node/png/)

@@ -25,7 +25,7 @@
     "modules",
     "module"
   ],
-  "homepage": "https://qrcodesdk.dev/libs/core",
+  "homepage": "https://qrcodesdk.dev/packages/core",
   "repository": {
     "type": "git",
     "url": "git@github.com:Dafnik/qrcodesdk.git",

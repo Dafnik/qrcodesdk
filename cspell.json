@@ -20,7 +20,7 @@
     "fixtures.ts",
     "*.svg",
     "apps/docs/src/libs",
-    "apps/docs/src/content/docs/guides/performance.md"
+    "apps/docs/src/content/docs/advanced/performance.md"
   ],
   "version": "0.2"
 }

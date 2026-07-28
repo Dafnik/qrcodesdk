@@ -3,8 +3,8 @@ title: Render PNG in Node.js
 description: Render a QR code as a PNG Buffer with @qrcodesdk/node.
 
 related:
-  - ../../guides/installation.mdx
-  - ../../guides/customize.md
+  - ../../getting-started/installation.mdx
+  - ../../advanced/customize.md
   - ../core/svg.md
 ---
 

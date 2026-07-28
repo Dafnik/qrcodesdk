@@ -4,8 +4,8 @@ description: Render a QR code as an HTMLCanvasElement with @qrcodesdk/browser.
 
 related:
   - ./image.md
-  - ../../guides/customize.md
-  - ../../libs/browser.mdx
+  - ../../advanced/customize.md
+  - ../../packages/browser.mdx
 ---
 
 Use this when you need a browser-owned `HTMLCanvasElement` that can be inserted into a page, drawn into another canvas, converted to image bytes, or downloaded as a PNG.

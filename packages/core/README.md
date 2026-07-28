@@ -139,13 +139,13 @@ selection cannot fit any version, reduce or change the payload.
 
 For runtime-specific output, add:
 
-- [`@qrcodesdk/node`](https://qrcodesdk.dev/libs/node/) for PNG buffers
-- [`@qrcodesdk/browser`](https://qrcodesdk.dev/libs/browser/) for Canvas and Image elements
+- [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/) for PNG buffers
+- [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) for Canvas and Image elements
 
 For framework-specific components, add:
 
-- [`@qrcodesdk/angular`](https://qrcodesdk.dev/libs/angular/) for Angular
-- [`@qrcodesdk/react`](https://qrcodesdk.dev/libs/react/) for React
+- [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) for Angular
+- [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/) for React
 
 ## Renderer options
 
@@ -251,8 +251,8 @@ import {
 
 ## Documentation
 
-- [Builder API](https://qrcodesdk.dev/libs/core/)
+- [Builder API](https://qrcodesdk.dev/packages/core/)
 - [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
 - [Render terminal text](https://qrcodesdk.dev/renderers/core/text/)
-- [Customize QR codes](https://qrcodesdk.dev/guides/customize/)
-- [Custom renderers](https://qrcodesdk.dev/libs/core/#custom-renderers)
+- [Customize QR codes](https://qrcodesdk.dev/advanced/customize/)
+- [Custom renderers](https://qrcodesdk.dev/advanced/custom-renderers/)

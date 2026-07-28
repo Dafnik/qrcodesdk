@@ -15,7 +15,7 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
-Learn more about the different packages in the [Installation](/guides/installation#package-guide) section.
+Learn more about the different packages in the [Installation](/getting-started/installation/#package-guide) section.
 
 ## Builder API
 
@@ -127,13 +127,13 @@ A matrix is a two-dimensional array of modules. `1` means dark and `0` means lig
 
 For runtime-specific output, add:
 
-- [`@qrcodesdk/node`](/libs/node/) for PNG buffers
-- [`@qrcodesdk/browser`](/libs/browser/) for Canvas and Image elements
+- [`@qrcodesdk/node`](/packages/node/) for PNG buffers
+- [`@qrcodesdk/browser`](/packages/browser/) for Canvas and Image elements
 
 For framework-specific components, add:
 
-- [`@qrcodesdk/angular`](/libs/angular/) for Angular
-- [`@qrcodesdk/react`](/libs/react/) for React
+- [`@qrcodesdk/angular`](/packages/angular/) for Angular
+- [`@qrcodesdk/react`](/packages/react/) for React
 
 ## Styling validation and geometry
 

@@ -27,7 +27,7 @@
     "esm",
     "modules"
   ],
-  "homepage": "https://qrcodesdk.dev/libs/cli",
+  "homepage": "https://qrcodesdk.dev/packages/cli",
   "repository": {
     "type": "git",
     "url": "git@github.com:Dafnik/qrcodesdk.git",

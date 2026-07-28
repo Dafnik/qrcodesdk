@@ -28,7 +28,7 @@
     "tsx",
     "jsx"
   ],
-  "homepage": "https://qrcodesdk.dev/libs/react",
+  "homepage": "https://qrcodesdk.dev/packages/react",
   "repository": {
     "type": "git",
     "url": "git@github.com:Dafnik/qrcodesdk.git",

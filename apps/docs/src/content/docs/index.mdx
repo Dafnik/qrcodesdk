@@ -5,11 +5,11 @@ template: splash
 hero:
   image:
     alt: A treasure chest with a QR code, language & framework logos.
-    file: ../../assets/hero.webp
+    file: ../../assets/logo-square.svg
   tagline: Build QR codes with a single TypeScript-first API, then render them in the format your app needs.
   actions:
     - text: Get started
-      link: /guides/installation/
+      link: /getting-started/installation/
       icon: right-arrow
     - text: Playground
       link: /playground
@@ -38,8 +38,11 @@ SVG is the best default for most user-facing QR codes because it stays sharp at 
 ## Choose your framework
 
 <CardGrid>
-  <LinkCard title="Angular" href="/libs/angular" description="Render QRCodes with Angular." />
-  <LinkCard title="React" href="/libs/react" description="Render QRCodes with React." />
+  <LinkCard title="Angular" href="/packages/angular" description="Render QRCodes with Angular." />
+  <LinkCard title="React" href="/packages/react" description="Render QRCodes with React." />
+  <LinkCard title="Node" href="/packages/node" description="Render QRCodes with Node.js." />
+  <LinkCard title="Browser" href="/packages/browser" description="Render QRCodes with Browser." />
+  <LinkCard title="Terminal" href="/packages/cli" description="Render QRCodes with Terminal." />
 </CardGrid>
 
 ## Choose your output
@@ -102,12 +105,12 @@ const svg = qrcode('https://qrcodesdk.dev')
 <CardGrid>
   <LinkCard
     title="Installation"
-    href="/guides/installation/"
+    href="/getting-started/installation/"
     description="Choose the package for your output format and runtime."
   />
   <LinkCard
     title="Customize QR Codes"
-    href="/guides/customize/"
+    href="/advanced/customize/"
     description="Set module and finder shapes, colors, size, margin, accessibility labels, error correction, version, and mask."
   />
   <LinkCard
@@ -117,12 +120,12 @@ const svg = qrcode('https://qrcodesdk.dev')
   />
   <LinkCard
     title="Builder API"
-    href="/libs/core/"
+    href="/packages/core/"
     description="Use data modes, error correction, matrix output, and the immutable builder."
   />
   <LinkCard
     title="Custom Renderers"
-    href="/renderers/custom/"
+    href="/advanced/custom-renderers/"
     description="Render the QR matrix into any output type."
   />
 </CardGrid>

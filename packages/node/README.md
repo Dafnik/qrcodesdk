@@ -1,4 +1,4 @@
-<!-- Generated from apps/docs/src/content/docs/libs/node.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+<!-- Generated from apps/docs/src/content/docs/packages/node.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
 
 <p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
 
@@ -133,7 +133,7 @@ import {QRCodePNGRenderer, type QRCodePNGRendererOptions} from '@qrcodesdk/node'
 
 ## Documentation
 
-- [@qrcodesdk/node](https://qrcodesdk.dev/libs/node/)
-- [Installation](https://qrcodesdk.dev/guides/installation/)
+- [@qrcodesdk/node](https://qrcodesdk.dev/packages/node/)
+- [Installation](https://qrcodesdk.dev/getting-started/installation/)
 - [Render PNG in Node.js](https://qrcodesdk.dev/renderers/node/png/)
-- [Customize QR Codes](https://qrcodesdk.dev/guides/customize/)
+- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
