@@ -92,7 +92,7 @@ const png: Buffer = qrcode('https://qrcodesdk.dev').render(
 | `image.padding`         | `number`                     |                `1` | Clear padding in QR modules.              |
 | `image.clearBackground` | `boolean`                    |             `true` | Clears modules behind the image.          |
 
-Colors must be six-digit hex values such as `#111827`. `size` must be a positive integer and `margin` must be a non-negative integer.
+Colors must be six-digit hex values such as `#111827`. `size` must be a positive safe integer and `margin` must be a non-negative safe integer.
 
 All feature colors inherit `colors.colorDark` when omitted. Curves are rendered with deterministic
 subpixel coverage and blended into the opaque background.

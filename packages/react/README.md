@@ -213,7 +213,7 @@ export default function QRCodeDownloadImageExample() {
 | `image.padding`         | All        | `number`                     |                `1` |
 | `image.clearBackground` | All        | `boolean`                    |             `true` |
 
-Color options use hash-prefixed values such as `#111827`. Image and Canvas output require a positive integer `size` and a non-negative integer `margin`.
+Color options use hash-prefixed values such as `#111827`. All built-in renderers require a positive safe integer `size` and a non-negative safe integer `margin`.
 
 Module, finder-ring, and finder-center options pass through to every component. Their optional
 colors independently inherit `colors.colorDark`.
@@ -232,17 +232,35 @@ export function QRCodeWithLogo() {
 
   async function selectLogo(file: File) {
     const source = new Image();
-    source.src = URL.createObjectURL(file);
-    await source.decode();
-    setLogo(source);
+    const localUrl = URL.createObjectURL(file);
+    source.src = localUrl;
+
+    try {
+      await source.decode();
+      setLogo(source);
+    } finally {
+      URL.revokeObjectURL(localUrl);
+    }
   }
 
-  return logo ? (
-    <QRCodeImage
-      data="https://qrcodesdk.dev"
-      options={{errorCorrectionLevel: 'H', image: {source: logo, size: 0.3}}}
-    />
-  ) : null;
+  return (
+    <>
+      <input
+        accept="image/*"
+        type="file"
+        onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          if (file) void selectLogo(file);
+        }}
+      />
+      {logo ? (
+        <QRCodeImage
+          data="https://qrcodesdk.dev"
+          options={{errorCorrectionLevel: 'H', image: {source: logo, size: 0.3}}}
+        />
+      ) : null}
+    </>
+  );
 }
 ```
 

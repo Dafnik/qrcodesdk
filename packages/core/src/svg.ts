@@ -62,7 +62,7 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
 }
 
 function isQRCodeDataImageURL(value: unknown): value is QRCodeDataImageURL {
-  if (typeof value !== 'string') return false;
+  if (typeof value !== 'string' || !value.startsWith('data:')) return false;
 
   const commaIndex = value.indexOf(',');
   if (commaIndex < 0 || commaIndex === value.length - 1) return false;

@@ -159,6 +159,7 @@ describe('QRCodeSVGRenderer', () => {
     'file:///tmp/logo.png',
     'blob:prepared-logo',
     './logo.png',
+    '12345image/png;base64,cHJlcGFyZWQ=',
     'data:text/plain,logo',
     'data:image/png,',
     'data:image/png',

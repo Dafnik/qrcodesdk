@@ -172,7 +172,7 @@ function generateAngularCode(
   const template = hasImage
     ? `    <input type="file" accept="image/*" (change)="selectImage($event)" />
     @if (options(); as options) {
-${indent(qrcodeTemplate.replaceAll('[options]="options"', '[options]="options"'), 3)}
+${indent(qrcodeTemplate, 3)}
     }`
     : qrcodeTemplate;
   const angularImports = hasImage ? 'Component, computed, signal' : 'Component';

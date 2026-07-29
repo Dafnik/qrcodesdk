@@ -234,7 +234,7 @@ export class QRCodeDownloadImageExample {
 | `image.padding`         | All        | `number`                     |                `1` |
 | `image.clearBackground` | All        | `boolean`                    |             `true` |
 
-Color options use hash-prefixed values such as `#111827`. Image and Canvas output require a positive integer `size` and a non-negative integer `margin`.
+Color options use hash-prefixed values such as `#111827`. All built-in renderers require a positive safe integer `size` and a non-negative safe integer `margin`.
 
 Module, finder-ring, and finder-center options pass through to every component. Their optional
 colors independently inherit `colors.colorDark`.
@@ -245,17 +245,27 @@ Pass prepared data through the existing `options` input. For browser output, fin
 only instantiate the component when the source is ready:
 
 ```ts
-readonly logo = signal<HTMLImageElement>();
+readonly logo = signal<HTMLImageElement | undefined>(undefined);
 
-async selectLogo(file: File) {
+async selectLogo(file: File | undefined) {
+  if (!file) return;
+
   const source = new Image();
-  source.src = URL.createObjectURL(file);
-  await source.decode();
-  this.logo.set(source);
+  const localUrl = URL.createObjectURL(file);
+  source.src = localUrl;
+
+  try {
+    await source.decode();
+    this.logo.set(source);
+  } finally {
+    URL.revokeObjectURL(localUrl);
+  }
 }
 ```
 
 ```angular-html
+<input #logoInput (change)="selectLogo(logoInput.files?.[0])" accept="image/*" type="file" />
+
 @if (logo(); as source) {
   <qrcode-image
     [options]="{errorCorrectionLevel: 'H', image: {source, size: 0.3}}"

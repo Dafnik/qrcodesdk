@@ -71,7 +71,7 @@ Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, a
 `extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
 is independent; omit it to inherit `colors.colorDark`.
 
-Image output requires `size` to be a positive integer and `margin` to be a non-negative integer.
+Image output requires `size` to be a positive safe integer and `margin` to be a non-negative safe integer.
 
 ### Add an already-loaded center image
 
