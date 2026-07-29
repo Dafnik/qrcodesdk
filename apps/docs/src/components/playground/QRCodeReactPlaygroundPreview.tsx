@@ -3,24 +3,35 @@ import {useMemo, useRef} from 'react';
 import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '@qrcodesdk/react';
 
 import {useStore} from '@nanostores/react';
-import {playgroundConfig} from './playground-config.ts';
+import {
+  createPlaygroundCanvasOptions,
+  createPlaygroundImageOptions,
+  createPlaygroundSVGOptions,
+  playgroundConfig,
+  playgroundPreparedImage,
+} from './playground-config.ts';
 import {hasQRCodeError} from './qrcode-error-checker.ts';
 
 export default function QRCodeReactPlaygroundPreview() {
   const config = useStore(playgroundConfig);
+  const preparedImage = useStore(playgroundPreparedImage);
 
   const svgRef = useRef<QRCodeDownloadHandle>(null);
   const imageRef = useRef<QRCodeDownloadHandle>(null);
 
   const content = useMemo(() => {
     if (config.packageName !== 'react') return null;
-    const hasError = hasQRCodeError(config);
+    const hasError = hasQRCodeError(config, preparedImage);
     if (hasError) return <PreviewError message={hasError} />;
 
     if (config.output === 'svg') {
       return (
         <div className="flex flex-col items-center justify-center gap-4">
-          <QRCodeSVG ref={svgRef} data={config.data} options={config} />
+          <QRCodeSVG
+            ref={svgRef}
+            data={config.data}
+            options={createPlaygroundSVGOptions(config, preparedImage)}
+          />
           <DownloadButton
             label="Download SVG"
             onClick={() => svgRef.current?.download('qrcodesdk')}
@@ -32,7 +43,11 @@ export default function QRCodeReactPlaygroundPreview() {
     if (config.output === 'image') {
       return (
         <div className="flex flex-col items-center justify-center gap-4">
-          <QRCodeImage ref={imageRef} data={config.data} options={config} />
+          <QRCodeImage
+            ref={imageRef}
+            data={config.data}
+            options={createPlaygroundImageOptions(config, preparedImage)}
+          />
           <DownloadButton
             label="Download PNG"
             onClick={() => imageRef.current?.download('qrcodesdk')}
@@ -41,8 +56,13 @@ export default function QRCodeReactPlaygroundPreview() {
       );
     }
 
-    return <QRCodeCanvas data={config.data} options={config} />;
-  }, [config]);
+    return (
+      <QRCodeCanvas
+        data={config.data}
+        options={createPlaygroundCanvasOptions(config, preparedImage)}
+      />
+    );
+  }, [config, preparedImage]);
 
   return <div data-active={config.packageName === 'react'}>{content}</div>;
 }

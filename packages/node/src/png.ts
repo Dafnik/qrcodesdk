@@ -2,15 +2,20 @@ import {PNG} from 'pngjs';
 
 import {
   type QRCodeColorHex,
+  type QRCodeImageOverlayOptions,
   type QRCodeMatrix,
   type QRCodeRenderer,
   type QRCodeStylePrimitive,
   type QRCodeStylingOptions,
   ɵcreateQRCodeStylePlan,
   ɵparseQRCodeStylingOptions,
+  ɵresolveQRCodeImageOverlay,
 } from '@qrcodesdk/core';
 
-export type QRCodePNGRendererOptions = QRCodeStylingOptions;
+export type QRCodePNGImageOptions = QRCodeImageOverlayOptions<Buffer>;
+export type QRCodePNGRendererOptions = QRCodeStylingOptions & {
+  image?: QRCodePNGImageOptions;
+};
 
 type RGBColor = {
   red: number;
@@ -22,6 +27,7 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
   return (matrix: QRCodeMatrix) => {
     const styling = ɵparseQRCodeStylingOptions(options);
     const plan = ɵcreateQRCodeStylePlan(matrix, styling);
+    const image = ɵresolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
     const scale = plan.renderedSize / plan.viewSize;
     const png = new PNG({width: plan.renderedSize, height: plan.renderedSize});
     fillRect(png, 0, 0, plan.renderedSize, plan.renderedSize, hexColorToRGB(plan.backgroundColor));
@@ -30,8 +36,120 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
       rasterizePrimitive(png, plan.primitives[index]!, scale);
     }
 
+    if (image) {
+      const source = decodeImageSource(image.source);
+      if (image.clearBackground) {
+        const startX = Math.max(0, Math.floor(image.clearX * scale));
+        const startY = Math.max(0, Math.floor(image.clearY * scale));
+        const endX = Math.min(png.width, Math.ceil((image.clearX + image.clearSize) * scale));
+        const endY = Math.min(png.height, Math.ceil((image.clearY + image.clearSize) * scale));
+        fillRect(
+          png,
+          startX,
+          startY,
+          endX - startX,
+          endY - startY,
+          hexColorToRGB(plan.backgroundColor),
+        );
+      }
+      compositeImage(
+        png,
+        source,
+        image.imageX * scale,
+        image.imageY * scale,
+        image.imageSize * scale,
+      );
+    }
+
     return PNG.sync.write(png);
   };
+}
+
+function decodeImageSource(source: Buffer): PNG {
+  if (!Buffer.isBuffer(source)) {
+    throw new Error('QR code PNG image source must be a Buffer containing PNG bytes');
+  }
+
+  try {
+    return PNG.sync.read(source);
+  } catch (error) {
+    throw new Error('QR code PNG image source must contain valid PNG bytes', {cause: error});
+  }
+}
+
+function compositeImage(
+  target: PNG,
+  source: PNG,
+  boxX: number,
+  boxY: number,
+  boxSize: number,
+): void {
+  const scale = Math.min(boxSize / source.width, boxSize / source.height);
+  const width = Math.max(1, Math.round(source.width * scale));
+  const height = Math.max(1, Math.round(source.height * scale));
+  const startX = Math.round(boxX + (boxSize - width) / 2);
+  const startY = Math.round(boxY + (boxSize - height) / 2);
+
+  for (let targetY = 0; targetY < height; targetY++) {
+    const outputY = startY + targetY;
+    if (outputY < 0 || outputY >= target.height) continue;
+
+    const sourceY = ((targetY + 0.5) * source.height) / height - 0.5;
+    const sourceY0 = Math.floor(sourceY);
+    const y0 = clamp(sourceY0, 0, source.height - 1);
+    const y1 = clamp(sourceY0 + 1, 0, source.height - 1);
+    const yWeight = sourceY - sourceY0;
+
+    for (let targetX = 0; targetX < width; targetX++) {
+      const outputX = startX + targetX;
+      if (outputX < 0 || outputX >= target.width) continue;
+
+      const sourceX = ((targetX + 0.5) * source.width) / width - 0.5;
+      const sourceX0 = Math.floor(sourceX);
+      const x0 = clamp(sourceX0, 0, source.width - 1);
+      const x1 = clamp(sourceX0 + 1, 0, source.width - 1);
+      const xWeight = sourceX - sourceX0;
+      const topLeftWeight = (1 - xWeight) * (1 - yWeight);
+      const topRightWeight = xWeight * (1 - yWeight);
+      const bottomLeftWeight = (1 - xWeight) * yWeight;
+      const bottomRightWeight = xWeight * yWeight;
+      const samples = [
+        {x: x0, y: y0, weight: topLeftWeight},
+        {x: x1, y: y0, weight: topRightWeight},
+        {x: x0, y: y1, weight: bottomLeftWeight},
+        {x: x1, y: y1, weight: bottomRightWeight},
+      ] as const;
+
+      let alpha = 0;
+      let red = 0;
+      let green = 0;
+      let blue = 0;
+      for (const sample of samples) {
+        const sourceIndex = (source.width * sample.y + sample.x) << 2;
+        const sampleAlpha = source.data[sourceIndex + 3]! / 0xff;
+        const weightedAlpha = sampleAlpha * sample.weight;
+        alpha += weightedAlpha;
+        red += source.data[sourceIndex]! * weightedAlpha;
+        green += source.data[sourceIndex + 1]! * weightedAlpha;
+        blue += source.data[sourceIndex + 2]! * weightedAlpha;
+      }
+
+      const targetIndex = (target.width * outputY + outputX) << 2;
+      const backgroundAlpha = 1 - alpha;
+      target.data[targetIndex] = Math.round(red + target.data[targetIndex]! * backgroundAlpha);
+      target.data[targetIndex + 1] = Math.round(
+        green + target.data[targetIndex + 1]! * backgroundAlpha,
+      );
+      target.data[targetIndex + 2] = Math.round(
+        blue + target.data[targetIndex + 2]! * backgroundAlpha,
+      );
+      target.data[targetIndex + 3] = 0xff;
+    }
+  }
+}
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.max(minimum, Math.min(value, maximum));
 }
 
 function rasterizePrimitive(png: PNG, primitive: QRCodeStylePrimitive, scale: number): void {

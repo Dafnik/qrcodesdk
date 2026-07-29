@@ -59,12 +59,47 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 | `alt`                        |                 `string` |        `undefined` | Adds an `alt` attribute to the SVG.               |
 | `ariaLabel`                  |                 `string` |        `undefined` | Adds an `aria-label` attribute to the SVG.        |
 | `title`                      |                 `string` |        `undefined` | Adds a `title` attribute to the SVG.              |
+| `image.source`               |     `QRCodeDataImageURL` |        `undefined` | Prepared embedded image data URL.                 |
+| `image.size`                 |                 `number` |              `0.4` | Image box as a fraction of matrix width.          |
+| `image.padding`              |                 `number` |                `1` | Clear padding in QR module units.                 |
+| `image.clearBackground`      |                `boolean` |             `true` | Clears modules behind the image and padding.      |
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
 Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
 `extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
 is independent; omit it to inherit `colors.colorDark`.
+
+### Add a prepared center image
+
+The SVG renderer accepts an embedded `data:image/...` URL. Read or fetch the source and convert it
+before calling the renderer; `QRCodeSVGRenderer` never reads a path or fetches a URL.
+
+```ts
+import {readFile} from 'node:fs/promises';
+
+import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+const logoBytes = await readFile('./logo.png');
+const logo = `data:image/png;base64,${logoBytes.toString('base64')}` as QRCodeDataImageURL;
+
+const svg = qrcode('https://qrcodesdk.dev')
+  .errorCorrection('H')
+  .render(
+    QRCodeSVGRenderer({
+      image: {
+        source: logo,
+        size: 0.3,
+        padding: 1,
+        clearBackground: true,
+      },
+    }),
+  );
+```
+
+The image is centered and contained without cropping. `size` must be greater than `0` and at most
+`1`; `padding` must be non-negative. Large images can make the code impossible to scan even with high
+error correction, so start near `0.3` and test with real scanners.
 
 ## Common recipes
 

@@ -7,7 +7,13 @@ import {HlmButtonImports} from '@spartan-ng/helm/button';
 
 import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
 
-import {playgroundConfig} from '../playground-config.ts';
+import {
+  createPlaygroundCanvasOptions,
+  createPlaygroundImageOptions,
+  createPlaygroundSVGOptions,
+  playgroundConfig,
+  playgroundPreparedImage,
+} from '../playground-config.ts';
 import {hasQRCodeError} from '../qrcode-error-checker.ts';
 
 @Component({
@@ -25,7 +31,7 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
           </hlm-alert>
         } @else {
           @if (config().output === 'svg') {
-            <qrcode-svg #qrcode [data]="config().data" [options]="config()" />
+            <qrcode-svg #qrcode [data]="config().data" [options]="svgOptions()" />
             <button
               class="min-w-64"
               (click)="qrcode.download('qrcodesdk')"
@@ -35,7 +41,7 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
               Download SVG
             </button>
           } @else if (config().output === 'image') {
-            <qrcode-image #qrcode [data]="config().data" [options]="config()" />
+            <qrcode-image #qrcode [data]="config().data" [options]="imageOptions()" />
             <button
               class="min-w-64"
               (click)="qrcode.download('qrcodesdk')"
@@ -45,7 +51,7 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
               Download PNG
             </button>
           } @else {
-            <qrcode-canvas [data]="config().data" [options]="config()" />
+            <qrcode-canvas [data]="config().data" [options]="canvasOptions()" />
           }
         }
       }
@@ -57,6 +63,18 @@ export class AngularPlaygroundPreview {
   protected readonly config = toSignal(this.nanostores.useStore(playgroundConfig), {
     requireSync: true,
   });
+  protected readonly preparedImage = toSignal(this.nanostores.useStore(playgroundPreparedImage), {
+    requireSync: true,
+  });
 
-  protected readonly hasError = computed(() => hasQRCodeError(this.config()));
+  protected readonly svgOptions = computed(() =>
+    createPlaygroundSVGOptions(this.config(), this.preparedImage()),
+  );
+  protected readonly imageOptions = computed(() =>
+    createPlaygroundImageOptions(this.config(), this.preparedImage()),
+  );
+  protected readonly canvasOptions = computed(() =>
+    createPlaygroundCanvasOptions(this.config(), this.preparedImage()),
+  );
+  protected readonly hasError = computed(() => hasQRCodeError(this.config(), this.preparedImage()));
 }

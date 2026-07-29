@@ -147,6 +147,35 @@ const image = qrcode('https://qrcodesdk.dev').render(
 
 Use labels for user-facing QR codes so assistive technologies can describe the destination or action.
 
+## Prepared center images
+
+SVG, browser Canvas/Image, and Node PNG renderers support one centered image:
+
+```ts
+image: {
+  source: preparedSource,
+  size: 0.4,
+  padding: 1,
+  clearBackground: true,
+}
+```
+
+`size` is relative to the matrix width, excluding the quiet zone. The image keeps its aspect ratio
+inside that square. Padding is measured in QR modules, and background clearing is enabled by
+default.
+
+The source type depends on the renderer:
+
+| Renderer             | Prepared source               |
+| -------------------- | ----------------------------- |
+| Core SVG             | Embedded `data:image/...` URL |
+| Browser Canvas/Image | Loaded `CanvasImageSource`    |
+| Node PNG             | PNG `Buffer`                  |
+
+QRCodeSDK does not fetch URLs or read paths. Load the source first, then pass it to the renderer.
+Use `errorCorrection('H')` for logo-style overlays, keep the image small, and scan-test the final
+output. The API accepts sizes through `1`, but that flexibility does not guarantee reliable scanning.
+
 ## Error correction
 
 The default error correction level is `M`.

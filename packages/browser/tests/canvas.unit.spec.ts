@@ -7,6 +7,16 @@ import {QRCodeCanvasRenderer} from '../src';
 import {BLACK, WHITE, expectPixel, getCanvasContext} from './helper';
 
 describe('QRCodeCanvasRenderer', () => {
+  function createPreparedImage(width: number, height: number, color: string): HTMLCanvasElement {
+    const image = document.createElement('canvas');
+    image.width = width;
+    image.height = height;
+    const context = getCanvasContext(image);
+    context.fillStyle = color;
+    context.fillRect(0, 0, width, height);
+    return image;
+  }
+
   test('renders default canvas geometry and pixels from a hand-authored matrix', () => {
     const matrix: QRCodeMatrix = [
       [1, 0],
@@ -59,6 +69,69 @@ describe('QRCodeCanvasRenderer', () => {
     expect(Array.from(getCanvasContext(canvas).getImageData(0, 0, 4, 4).data)).toEqual(
       new Array<number>(4 * 4 * 4).fill(255),
     );
+  });
+
+  test('centers and contains a prepared image without changing its aspect ratio', () => {
+    const canvas = QRCodeCanvasRenderer({
+      size: 10,
+      margin: 0,
+      image: {
+        source: createPreparedImage(4, 2, '#ff0000'),
+        size: 0.5,
+        padding: 0,
+      },
+    })([
+      [1, 1, 1, 1],
+      [1, 1, 1, 1],
+      [1, 1, 1, 1],
+      [1, 1, 1, 1],
+    ]);
+
+    expectPixel(canvas, 10, 10, WHITE);
+    expectPixel(canvas, 20, 14, WHITE);
+    expectPixel(canvas, 10, 15, {red: 255, green: 0, blue: 0, alpha: 255});
+    expectPixel(canvas, 29, 24, {red: 255, green: 0, blue: 0, alpha: 255});
+    expectPixel(canvas, 20, 25, WHITE);
+  });
+
+  test('preserves modules under transparent pixels when clearing is disabled', () => {
+    const transparentImage = createPreparedImage(1, 1, 'rgba(255, 0, 0, 0)');
+    const matrix: QRCodeMatrix = [
+      [1, 1],
+      [1, 1],
+    ];
+    const withoutClearing = QRCodeCanvasRenderer({
+      size: 10,
+      margin: 0,
+      image: {source: transparentImage, size: 1, clearBackground: false},
+    })(matrix);
+    const withClearing = QRCodeCanvasRenderer({
+      size: 10,
+      margin: 0,
+      image: {source: transparentImage, size: 1},
+    })(matrix);
+
+    expectPixel(withoutClearing, 10, 10, BLACK);
+    expectPixel(withClearing, 10, 10, WHITE);
+  });
+
+  test('rejects browser image sources that are not prepared', () => {
+    const unloadedImage = document.createElement('img');
+    Object.defineProperty(unloadedImage, 'complete', {value: false});
+    expect(() =>
+      QRCodeCanvasRenderer({
+        image: {source: unloadedImage},
+      })([[1]]),
+    ).toThrow('QR code canvas image source must be loaded before rendering');
+
+    const emptyCanvas = document.createElement('canvas');
+    emptyCanvas.width = 0;
+    emptyCanvas.height = 0;
+    expect(() =>
+      QRCodeCanvasRenderer({
+        image: {source: emptyCanvas},
+      })([[1]]),
+    ).toThrow('QR code canvas image source must have positive intrinsic dimensions');
   });
 
   test('rejects canvas dimensions that cannot map cleanly to pixels', () => {

@@ -174,6 +174,28 @@ hexadecimal values.
 Each built-in renderer applies the shared defaults and validates resolved styling before producing
 output. Custom renderers receive the generated matrix and can define their own output geometry.
 
+### Prepared SVG images
+
+The SVG renderer accepts one centered image through
+`image: {source, size, padding, clearBackground}`. `source` must be an embedded
+`QRCodeDataImageURL`; create it before rendering. Core never reads image paths or fetches URLs.
+
+```ts
+import {readFile} from 'node:fs/promises';
+
+import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+const bytes = await readFile('./logo.png');
+const source = `data:image/png;base64,${bytes.toString('base64')}` as QRCodeDataImageURL;
+
+const svg = qrcode('https://qrcodesdk.dev')
+  .errorCorrection('H')
+  .render(QRCodeSVGRenderer({image: {source, size: 0.3}}));
+```
+
+Image size defaults to `0.4`, clear padding to one module, and clearing to enabled. Large images
+can make QR codes impossible to scan; high error correction helps but is not a guarantee.
+
 ## Matrix output and custom renderers
 
 Use `.matrix()` to inspect modules or take full control over rendering. A matrix is a two-dimensional array where `1` is dark and `0` is light.
@@ -224,11 +246,13 @@ import {
   type QRCodeCornerSquareType,
   type QRCodeCornersDotOptions,
   type QRCodeCornersSquareOptions,
+  type QRCodeDataImageURL,
   type QRCodeDotType,
   type QRCodeDotsOptions,
   type QRCodeErrorCorrectionLevel,
   type QRCodeFinderCenterStylePrimitive,
   type QRCodeFinderRingStylePrimitive,
+  type QRCodeImageOverlayOptions,
   type QRCodeInputData,
   type QRCodeMask,
   type QRCodeMatrix,
@@ -239,6 +263,7 @@ import {
   type QRCodeOptions,
   type QRCodeParsedStylingOptions,
   type QRCodeRenderer,
+  type QRCodeSVGImageOptions,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,

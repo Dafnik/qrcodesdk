@@ -26,6 +26,7 @@ import {
   resetQrConfig,
   updateQrConfig,
 } from '../playground-config.ts';
+import {PlaygroundImageControls} from './image-controls.ts';
 import {QrMatrixControls} from './qr-matrix-controls.ts';
 
 @Component({
@@ -134,6 +135,7 @@ export class PlaygroundColorInput {
         </div>
       </div>
       <qr-matrix-controls />
+      <playground-image-controls />
       <div class="grid gap-4 md:grid-cols-2">
         <div hlmField>
           <label hlmFieldLabel for="darkColor">Dark Color</label>
@@ -377,6 +379,7 @@ export class PlaygroundColorInput {
     UpperCasePipe,
     NgIcon,
     PlaygroundColorInput,
+    PlaygroundImageControls,
     QrMatrixControls,
   ],
 })

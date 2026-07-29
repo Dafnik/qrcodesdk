@@ -129,6 +129,88 @@ describe('React QR code components', () => {
     ).toEqual(['#ffffff', '#112233', '#445566', '#778899']);
   });
 
+  test('passes prepared image overlays through SVG, image, and canvas components', async () => {
+    const source = document.createElement('canvas');
+    source.width = 4;
+    source.height = 2;
+    const svgSource = 'data:image/png;base64,cHJlcGFyZWQ=' as const;
+    const {container, rerender} = render(
+      <>
+        <QRCodeSVG
+          data="OVERLAY"
+          options={{...svgOptions, image: {source: svgSource, size: 0.2}}}
+        />
+        <QRCodeImage data="OVERLAY" options={{...imageOptions, image: {source, size: 0.2}}} />
+        <QRCodeCanvas data="OVERLAY" options={{...canvasOptions, image: {source, size: 0.2}}} />
+      </>,
+    );
+
+    await waitFor(() => {
+      expect(container.querySelector('img')).not.toBeNull();
+      expect(container.querySelector('canvas')).not.toBeNull();
+    });
+
+    const embeddedImage = renderedElement<SVGImageElement>(container, 'svg image');
+    const firstImage = renderedElement<HTMLImageElement>(container, 'img');
+    const firstCanvas = renderedElement<HTMLCanvasElement>(container, 'div > canvas');
+
+    expect(embeddedImage.getAttribute('href')).toBe(svgSource);
+    expect(container.querySelector('svg rect')).not.toBeNull();
+
+    rerender(
+      <>
+        <QRCodeSVG
+          data="OVERLAY"
+          options={{...svgOptions, image: {source: svgSource, size: 0.3}}}
+        />
+        <QRCodeImage data="OVERLAY" options={{...imageOptions, image: {source, size: 0.3}}} />
+        <QRCodeCanvas data="OVERLAY" options={{...canvasOptions, image: {source, size: 0.3}}} />
+      </>,
+    );
+
+    await waitFor(() => {
+      expect(renderedElement<HTMLImageElement>(container, 'img')).not.toBe(firstImage);
+      expect(renderedElement<HTMLCanvasElement>(container, 'div > canvas')).not.toBe(firstCanvas);
+    });
+  });
+
+  test('downloads prepared SVG and PNG image overlays', () => {
+    const source = document.createElement('canvas');
+    source.width = 2;
+    source.height = 1;
+    const svgQRCode = createRef<QRCodeDownloadHandle>();
+    const imageQRCode = createRef<QRCodeDownloadHandle>();
+    const downloads = captureDownloads(vi);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-overlay-svg');
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+    render(
+      <>
+        <QRCodeSVG
+          ref={svgQRCode}
+          data="OVERLAY"
+          options={{
+            ...svgOptions,
+            image: {source: 'data:image/png;base64,cHJlcGFyZWQ='},
+          }}
+        />
+        <QRCodeImage
+          ref={imageQRCode}
+          data="OVERLAY"
+          options={{...imageOptions, image: {source}}}
+        />
+      </>,
+    );
+
+    svgQRCode.current?.download('overlay');
+    imageQRCode.current?.download('overlay');
+
+    expect(downloads).toEqual([
+      {href: 'blob:qrcode-overlay-svg', filename: 'overlay.svg'},
+      {href: 'data:image/png;base64,qrcode', filename: 'overlay.png'},
+    ]);
+  });
+
   test('replaces existing rendered image when props change', async () => {
     const {container, rerender} = render(<QRCodeImage data="HELLO" options={imageOptions} />);
 

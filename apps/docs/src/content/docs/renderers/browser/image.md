@@ -60,6 +60,10 @@ const image = qrcode('https://qrcodesdk.dev').render(
 | `alt`                        |                 `string` |        `undefined` | Adds an `alt` attribute to the image.             |
 | `ariaLabel`                  |                 `string` |        `undefined` | Adds an `aria-label` attribute to the image.      |
 | `title`                      |                 `string` |        `undefined` | Adds a `title` attribute to the image.            |
+| `image.source`               |      `CanvasImageSource` |        `undefined` | Image already loaded by the caller.               |
+| `image.size`                 |                 `number` |              `0.4` | Image box as a fraction of matrix width.          |
+| `image.padding`              |                 `number` |                `1` | Clear padding in QR module units.                 |
+| `image.clearBackground`      |                `boolean` |             `true` | Clears modules behind the image and padding.      |
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
@@ -68,6 +72,33 @@ Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, a
 is independent; omit it to inherit `colors.colorDark`.
 
 Image output requires `size` to be a positive integer and `margin` to be a non-negative integer.
+
+### Add an already-loaded center image
+
+`QRCodeImageRenderer` uses the Canvas renderer internally, so it accepts the same prepared
+`CanvasImageSource`. Finish loading before rendering:
+
+```ts
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const response = await fetch('/logo.png');
+const blob = await response.blob();
+const logo = await createImageBitmap(blob);
+
+const image = qrcode('https://qrcodesdk.dev')
+  .errorCorrection('H')
+  .render(
+    QRCodeImageRenderer({
+      image: {source: logo, size: 0.3, padding: 1},
+      alt: 'QR code for qrcodesdk.dev',
+    }),
+  );
+```
+
+The returned PNG-backed image and `QRCodeDownloadImageRenderer` downloads both include the
+overlay. QRCodeSDK never fetches the source. Keep overlays modest and test the result with real
+scanners.
 
 ## Common recipes
 

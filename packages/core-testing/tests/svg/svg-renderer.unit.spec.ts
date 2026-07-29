@@ -124,6 +124,52 @@ describe('QRCodeSVGRenderer', () => {
     expect(svg).toContain('title="QR &lt;title&gt;"');
   });
 
+  test('renders a centered embedded image after an optional clearing rectangle', () => {
+    const source = 'data:image/png;base64,cHJlcGFyZWQ=' as const;
+    const svg = QRCodeSVGRenderer({
+      size: 1,
+      margin: 1,
+      colors: {colorLight: '#eeeeee'},
+      image: {source},
+    })([
+      [1, 0],
+      [0, 1],
+    ]);
+
+    expect(svg).toContain(
+      '<rect fill="#eeeeee" x="1" y="1" width="2" height="2"/><image href="data:image/png;base64,cHJlcGFyZWQ=" x="1.6" y="1.6" width="0.8" height="0.8" preserveAspectRatio="xMidYMid meet"/>',
+    );
+    expect(svg.indexOf('<image')).toBeGreaterThan(svg.lastIndexOf('<path'));
+  });
+
+  test('can overlay an embedded image without clearing QR modules', () => {
+    const svg = QRCodeSVGRenderer({
+      image: {
+        source: 'data:image/png;base64,cHJlcGFyZWQ=',
+        clearBackground: false,
+      },
+    })([[1]]);
+
+    expect(svg).not.toContain('<rect');
+    expect(svg).toContain('<image');
+  });
+
+  test.each([
+    'https://example.com/logo.png',
+    'file:///tmp/logo.png',
+    'blob:prepared-logo',
+    './logo.png',
+    'data:text/plain,logo',
+    'data:image/png,',
+    'data:image/png',
+  ])('rejects non-embedded SVG image source %s', (source) => {
+    expect(() =>
+      QRCodeSVGRenderer({
+        image: {source: source as `data:image/${string}`},
+      })([[1]]),
+    ).toThrow('QR code SVG image source must be an embedded data:image URL');
+  });
+
   test('renders only a background path when the matrix has no dark modules', () => {
     const svg = QRCodeSVGRenderer({size: 2, margin: 0})([
       [0, 0],

@@ -22,6 +22,7 @@ import {
   ɵisValidQRCodeMargin,
   ɵisValidQRCodeSize,
   ɵparseQRCodeStylingOptions,
+  ɵresolveQRCodeImageOverlay,
 } from '../src';
 import type {
   QRCodeAccessibilityOptions,
@@ -30,13 +31,16 @@ import type {
   QRCodeCornerSquareType,
   QRCodeCornersDotOptions,
   QRCodeCornersSquareOptions,
+  QRCodeDataImageURL,
   QRCodeDotType,
   QRCodeDotsOptions,
   QRCodeErrorCorrectionLevel,
+  QRCodeImageOverlayOptions,
   QRCodeInputData,
   QRCodeMatrixOptions,
   QRCodeOptions,
   QRCodeParsedStylingOptions,
+  QRCodeSVGImageOptions,
   QRCodeSVGOptions,
   QRCodeSVGRendererOptions,
   QRCodeStylingColors,
@@ -80,7 +84,13 @@ describe('public API types', () => {
     expectTypeOf<ExpectedParsedStylingOptions>().toMatchTypeOf<QRCodeParsedStylingOptions>();
     expectTypeOf<QRCodeSVGOptions>().toEqualTypeOf<QRCodeOptions<QRCodeSVGRendererOptions>>();
     expectTypeOf<QRCodeSVGOptions>().toEqualTypeOf<
-      QRCodeMatrixOptions & QRCodeStylingOptions & QRCodeAccessibilityOptions
+      QRCodeMatrixOptions &
+        QRCodeStylingOptions &
+        QRCodeAccessibilityOptions & {image?: QRCodeSVGImageOptions}
+    >();
+    expectTypeOf<QRCodeDataImageURL>().toMatchTypeOf<string>();
+    expectTypeOf<QRCodeSVGImageOptions>().toEqualTypeOf<
+      QRCodeImageOverlayOptions<QRCodeDataImageURL>
     >();
     expectTypeOf<QRCodeTextRendererOptions['colors']>().toEqualTypeOf<
       QRCodeStylingOptions['colors']
@@ -109,6 +119,7 @@ describe('public API types', () => {
     expectTypeOf(ɵisQRCodeCornerSquareType).parameter(0).toEqualTypeOf<unknown>();
     expectTypeOf(ɵisQRCodeCornerDotType).parameter(0).toEqualTypeOf<unknown>();
     expectTypeOf(ɵparseQRCodeStylingOptions).returns.toEqualTypeOf<QRCodeParsedStylingOptions>();
+    expectTypeOf(ɵresolveQRCodeImageOverlay).parameter(0).toEqualTypeOf<number>();
 
     expect(ɵECC_LEVELS).toEqual(['L', 'M', 'Q', 'H']);
     expect(ɵMODES).toEqual(['numeric', 'alphanumeric', 'octet']);
@@ -131,6 +142,7 @@ describe('public API types', () => {
     const legacyInternalNames = [
       'calculateQRCodeRenderedSize',
       'createQRCodeStylePlan',
+      'resolveQRCodeImageOverlay',
       'parseQRCodeStylingOptions',
       'isQRCodeColorHex',
       'isQRCodeCornerDotType',

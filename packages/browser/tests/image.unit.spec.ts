@@ -31,4 +31,27 @@ describe('QRCodeImageRenderer', () => {
     expectPixel(canvas, 25, 20, WHITE);
     expectPixel(canvas, 25, 25, BLACK);
   });
+
+  test('includes a prepared image overlay in PNG-backed image output', async () => {
+    const logo = document.createElement('canvas');
+    logo.width = 2;
+    logo.height = 1;
+    const logoContext = logo.getContext('2d')!;
+    logoContext.fillStyle = '#ff0000';
+    logoContext.fillRect(0, 0, 2, 1);
+
+    const image = QRCodeImageRenderer({
+      size: 10,
+      margin: 0,
+      image: {source: logo, size: 0.5, padding: 0},
+    })([
+      [1, 1],
+      [1, 1],
+    ]);
+    const canvas = await imageToCanvas(image);
+
+    expectPixel(canvas, 5, 5, WHITE);
+    expectPixel(canvas, 10, 7, WHITE);
+    expectPixel(canvas, 10, 8, {red: 255, green: 0, blue: 0, alpha: 255});
+  });
 });

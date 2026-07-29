@@ -1,3 +1,4 @@
+import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -14,6 +15,34 @@ const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
 );
 
 describe('SVG QR roundtrips', () => {
+  test('decodes SVG output with a small prepared image overlay', async () => {
+    const logo = await sharp({
+      create: {
+        width: 8,
+        height: 4,
+        channels: 4,
+        background: {r: 220, g: 38, b: 38, alpha: 1},
+      },
+    })
+      .png()
+      .toBuffer();
+    const source = `data:image/png;base64,${logo.toString('base64')}` as const;
+
+    await expect(
+      decodeSvgQRCode(
+        qrcode('prepared SVG image')
+          .errorCorrection('H')
+          .render(
+            QRCodeSVGRenderer({
+              size: 8,
+              margin: 4,
+              image: {source, size: 0.16, padding: 0.25},
+            }),
+          ),
+      ),
+    ).resolves.toBe('prepared SVG image');
+  });
+
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
     await expect(
       decodeSvgQRCode(

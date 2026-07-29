@@ -107,6 +107,26 @@ export type QRCodeStylingOptions = {
   cornersDotOptions?: QRCodeCornersDotOptions;
 };
 
+export type QRCodeImageOverlayOptions<TSource> = {
+  source: TSource;
+  size?: number;
+  padding?: number;
+  clearBackground?: boolean;
+};
+
+export type QRCodeResolvedImageOverlay<TSource> = {
+  source: TSource;
+  size: number;
+  padding: number;
+  clearBackground: boolean;
+  imageX: number;
+  imageY: number;
+  imageSize: number;
+  clearX: number;
+  clearY: number;
+  clearSize: number;
+};
+
 export type QRCodeParsedStylingOptions = {
   size: number;
   margin: number;

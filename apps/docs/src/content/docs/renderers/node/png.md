@@ -56,12 +56,47 @@ const png = qrcode('https://qrcodesdk.dev').render(
 | `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                |
 | `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                    |
 | `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                    |
+| `image.source`               |                 `Buffer` |        `undefined` | PNG bytes already loaded by the caller.           |
+| `image.size`                 |                 `number` |              `0.4` | Image box as a fraction of matrix width.          |
+| `image.padding`              |                 `number` |                `1` | Clear padding in QR module units.                 |
+| `image.clearBackground`      |                `boolean` |             `true` | Clears modules behind the image and padding.      |
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
 Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
 `extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
 is independent; omit it to inherit `colors.colorDark`.
+
+### Add prepared PNG bytes
+
+Read or download the PNG before invoking the renderer. `QRCodePNGRenderer` decodes the supplied
+bytes in memory but performs no filesystem or network I/O.
+
+```ts
+import {readFile} from 'node:fs/promises';
+
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const logo = await readFile('./logo.png');
+
+const png = qrcode('https://qrcodesdk.dev')
+  .errorCorrection('H')
+  .render(
+    QRCodePNGRenderer({
+      image: {
+        source: logo,
+        size: 0.3,
+        padding: 1,
+        clearBackground: true,
+      },
+    }),
+  );
+```
+
+Only PNG source bytes are accepted. The source is centered, resized without cropping, and
+alpha-composited into the opaque output. Although `size` values through `1` are valid, large
+overlays can prevent scanning.
 
 ## Common recipes
 

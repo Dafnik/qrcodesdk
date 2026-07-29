@@ -1,4 +1,5 @@
 import {
+  type QRCodeImageOverlayOptions,
   type QRCodeMatrix,
   type QRCodeOptions,
   type QRCodeRenderer,
@@ -6,9 +7,13 @@ import {
   type QRCodeStylingOptions,
   ɵcreateQRCodeStylePlan,
   ɵparseQRCodeStylingOptions,
+  ɵresolveQRCodeImageOverlay,
 } from '@qrcodesdk/core';
 
-export type QRCodeCanvasRendererOptions = QRCodeStylingOptions;
+export type QRCodeCanvasImageOptions = QRCodeImageOverlayOptions<CanvasImageSource>;
+export type QRCodeCanvasRendererOptions = QRCodeStylingOptions & {
+  image?: QRCodeCanvasImageOptions;
+};
 export type QRCodeCanvasOptions = QRCodeOptions<QRCodeCanvasRendererOptions>;
 
 export function QRCodeCanvasRenderer(
@@ -17,6 +22,7 @@ export function QRCodeCanvasRenderer(
   return (matrix: QRCodeMatrix) => {
     const styling = ɵparseQRCodeStylingOptions(options);
     const plan = ɵcreateQRCodeStylePlan(matrix, styling);
+    const image = ɵresolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
     const scale = plan.renderedSize / plan.viewSize;
     const canvas = document.createElement('canvas');
     canvas.width = plan.renderedSize;
@@ -34,8 +40,87 @@ export function QRCodeCanvasRenderer(
       drawPrimitive(context, plan.primitives[index]!, scale);
     }
 
+    if (image) {
+      const sourceSize = getCanvasImageSourceSize(image.source);
+      if (image.clearBackground) {
+        context.fillStyle = plan.backgroundColor;
+        context.fillRect(
+          image.clearX * scale,
+          image.clearY * scale,
+          image.clearSize * scale,
+          image.clearSize * scale,
+        );
+      }
+
+      const boxX = image.imageX * scale;
+      const boxY = image.imageY * scale;
+      const boxSize = image.imageSize * scale;
+      const imageScale = Math.min(boxSize / sourceSize.width, boxSize / sourceSize.height);
+      const width = sourceSize.width * imageScale;
+      const height = sourceSize.height * imageScale;
+
+      context.drawImage(
+        image.source,
+        boxX + (boxSize - width) / 2,
+        boxY + (boxSize - height) / 2,
+        width,
+        height,
+      );
+    }
+
     return canvas;
   };
+}
+
+type CanvasImageSourceDimensions = {
+  width: number;
+  height: number;
+};
+
+function getCanvasImageSourceSize(source: CanvasImageSource): CanvasImageSourceDimensions {
+  const candidate = source as unknown as Record<string, unknown>;
+
+  if (candidate['complete'] === false) {
+    throw new Error('QR code canvas image source must be loaded before rendering');
+  }
+
+  const dimensionPairs = [
+    ['naturalWidth', 'naturalHeight'],
+    ['videoWidth', 'videoHeight'],
+    ['displayWidth', 'displayHeight'],
+    ['width', 'height'],
+  ] as const;
+
+  for (const [widthKey, heightKey] of dimensionPairs) {
+    const width = candidate[widthKey];
+    const height = candidate[heightKey];
+    if (typeof width !== 'number' || typeof height !== 'number') continue;
+    if (width > 0 && height > 0) return {width, height};
+
+    throw new Error(
+      'QR code canvas image source must have positive intrinsic dimensions before rendering',
+    );
+  }
+
+  const width = getSVGAnimatedLength(candidate['width']);
+  const height = getSVGAnimatedLength(candidate['height']);
+  if (width !== undefined || height !== undefined) {
+    if (width !== undefined && height !== undefined && width > 0 && height > 0) {
+      return {width, height};
+    }
+    throw new Error(
+      'QR code canvas image source must have positive intrinsic dimensions before rendering',
+    );
+  }
+
+  throw new Error('QR code canvas image source must expose intrinsic dimensions before rendering');
+}
+
+function getSVGAnimatedLength(value: unknown): number | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+
+  const baseValue = (value as {baseVal?: {value?: unknown}}).baseVal?.value;
+  return typeof baseValue === 'number' ? baseValue : undefined;
 }
 
 function drawPrimitive(
