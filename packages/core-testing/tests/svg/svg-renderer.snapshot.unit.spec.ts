@@ -1,13 +1,18 @@
+import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-import type {QRCodeMatrix} from '@qrcodesdk/core';
+import type {QRCodeDataImageURL, QRCodeMatrix} from '@qrcodesdk/core';
 
 import {expectSvgToMatchFileSnapshot} from './svg-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/svg', import.meta.url));
+const LOGO_PNG = readFileSync(
+  fileURLToPath(new URL('../../../../apps/docs/public/logo-square.png', import.meta.url)),
+);
+const LOGO_DATA_URL = `data:image/png;base64,${LOGO_PNG.toString('base64')}` as QRCodeDataImageURL;
 
 describe('QRCodeSVGRenderer snapshots', () => {
   test('renders a compact hand-authored custom SVG snapshot', () => {
@@ -46,6 +51,21 @@ describe('QRCodeSVGRenderer snapshots', () => {
         }),
       ),
       join(SNAPSHOT_DIR, 'styled-custom.svg'),
+    );
+  });
+
+  test('renders a prepared image overlay SVG snapshot', () => {
+    expectSvgToMatchFileSnapshot(
+      qrcode('https://qrcodesdk.dev')
+        .config({errorCorrectionLevel: 'H'})
+        .render(
+          QRCodeSVGRenderer({
+            size: 8,
+            margin: 4,
+            image: {source: LOGO_DATA_URL},
+          }),
+        ),
+      join(SNAPSHOT_DIR, 'image-overlay-logo.svg'),
     );
   });
 });

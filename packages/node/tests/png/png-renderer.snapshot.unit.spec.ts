@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
@@ -9,6 +10,9 @@ import {QRCodePNGRenderer} from '../../src';
 import {expectPngToMatchFileSnapshot} from './png-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/png', import.meta.url));
+const LOGO_PNG = readFileSync(
+  fileURLToPath(new URL('../../../../apps/docs/public/logo-square.png', import.meta.url)),
+);
 
 describe('QRCodePNGRenderer snapshots', () => {
   test('renders a compact hand-authored custom PNG snapshot', () => {
@@ -44,6 +48,21 @@ describe('QRCodePNGRenderer snapshots', () => {
         }),
       ),
       join(SNAPSHOT_DIR, 'styled-custom.png'),
+    );
+  });
+
+  test('renders a prepared image overlay PNG snapshot', () => {
+    expectPngToMatchFileSnapshot(
+      qrcode('https://qrcodesdk.dev')
+        .config({errorCorrectionLevel: 'H'})
+        .render(
+          QRCodePNGRenderer({
+            size: 8,
+            margin: 4,
+            image: {source: LOGO_PNG},
+          }),
+        ),
+      join(SNAPSHOT_DIR, 'image-overlay-logo.png'),
     );
   });
 });
