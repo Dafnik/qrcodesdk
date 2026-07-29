@@ -31,20 +31,26 @@ export type {
 export {type QRCodeTextRendererOptions, QRCodeTextRenderer} from './text';
 export {type QRCodeSVGOptions, type QRCodeSVGRendererOptions, QRCodeSVGRenderer} from './svg';
 export {
-  calculateQRCodeRenderedSize,
-  isQRCodeCornerDotType,
-  isQRCodeCornerSquareType,
-  isQRCodeColorHex,
-  isQRCodeDotType,
-  isValidQRCodeMargin,
-  isValidQRCodeSize,
-  parseQRCodeStylingOptions,
-  QR_CODE_COLOR_HEX_PATTERN,
-  QR_CODE_DOT_TYPES,
-  QR_CODE_CORNER_SQUARE_TYPES,
-  QR_CODE_CORNER_DOT_TYPES,
+  calculateQRCodeRenderedSize as ɵcalculateQRCodeRenderedSize,
+  isQRCodeCornerDotType as ɵisQRCodeCornerDotType,
+  isQRCodeCornerSquareType as ɵisQRCodeCornerSquareType,
+  isQRCodeColorHex as ɵisQRCodeColorHex,
+  isQRCodeDotType as ɵisQRCodeDotType,
+  isValidQRCodeMargin as ɵisValidQRCodeMargin,
+  isValidQRCodeSize as ɵisValidQRCodeSize,
+  parseQRCodeStylingOptions as ɵparseQRCodeStylingOptions,
+  QR_CODE_COLOR_HEX_PATTERN as ɵQR_CODE_COLOR_HEX_PATTERN,
+  QR_CODE_DOT_TYPES as ɵQR_CODE_DOT_TYPES,
+  QR_CODE_CORNER_SQUARE_TYPES as ɵQR_CODE_CORNER_SQUARE_TYPES,
+  QR_CODE_CORNER_DOT_TYPES as ɵQR_CODE_CORNER_DOT_TYPES,
 } from './styling';
-export {createQRCodeStylePlan} from './style-plan';
+export {createQRCodeStylePlan as ɵcreateQRCodeStylePlan} from './style-plan';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';
-export {ECC_LEVELS} from './matrix/error-correction';
-export {MODES} from './matrix/mode';
+export {ECC_LEVELS as ɵECC_LEVELS} from './matrix/error-correction';
+export {MODES as ɵMODES} from './matrix/mode';
+export {generateQRCodeMatrixWithMetadata as ɵgenerateQRCodeMatrixWithMetadata} from './matrix/generate-qrcode-matrix';
+export type {
+  QRCodeMatrixGenerationMetadata as ɵQRCodeMatrixGenerationMetadata,
+  QRCodeMatrixMetadataRole as ɵQRCodeMatrixMetadataRole,
+  QRCodeMatrixModuleMetadata as ɵQRCodeMatrixModuleMetadata,
+} from './matrix/metadata';

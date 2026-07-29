@@ -1,0 +1,27 @@
+---
+import {Card} from '@astrojs/starlight/components';
+import {QRCodeExplain, QRCodeExplainControls} from '../angular/qrcode-explain.ts';
+---
+
+<script>
+  import {startQrQuerySync} from '../playground/query-sync.ts';
+
+  startQrQuerySync({
+    debounceMs: 150,
+  });
+</script>
+
+<section class="not-content w-full min-w-0" aria-label="Interactive QR code explanation">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+    <Card title="">
+      <QRCodeExplainControls client:load />
+    </Card>
+
+    <div class="lg:sticky lg:top-20">
+      <Card title="">
+        <QRCodeExplain client:load />
+      </Card>
+    </div>
+  </div>
+</section>

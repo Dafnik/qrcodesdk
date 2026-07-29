@@ -5,8 +5,8 @@ import {
   type QRCodeCornerDotType,
   type QRCodeCornerSquareType,
   type QRCodeDotType,
-  isQRCodeColorHex,
-  parseQRCodeStylingOptions,
+  ɵisQRCodeColorHex,
+  ɵparseQRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
 import {QR_CODE_STYLING_FIXTURES} from '../src';
@@ -94,7 +94,7 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
         mask: 0,
       });
 
-      const styling = parseQRCodeStylingOptions(fixture.styling);
+      const styling = ɵparseQRCodeStylingOptions(fixture.styling);
       expect(styling.size).toBe(12);
       expect(styling.margin).toBe(4);
 
@@ -104,9 +104,9 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
         styling.cornersSquareOptions.color,
         styling.cornersDotOptions.color,
       ];
-      expect(isQRCodeColorHex(styling.colors.colorLight)).toBe(true);
+      expect(ɵisQRCodeColorHex(styling.colors.colorLight)).toBe(true);
       for (const color of foregroundColors) {
-        expect(isQRCodeColorHex(color)).toBe(true);
+        expect(ɵisQRCodeColorHex(color)).toBe(true);
         expect(contrastRatio(color, styling.colors.colorLight)).toBeGreaterThanOrEqual(4.5);
       }
     }

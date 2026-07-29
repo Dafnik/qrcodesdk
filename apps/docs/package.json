@@ -14,7 +14,7 @@
     "preview": "astro preview",
     "check-types": "astro check",
     "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
-    "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs",
+    "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/explain/*.test.ts",
     "astro": "astro",
     "clean": "rm -rf .turbo dist .astro"
   },

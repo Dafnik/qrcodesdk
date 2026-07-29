@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
-import {createQRCodeStylePlan, parseQRCodeStylingOptions, qrcode} from '@qrcodesdk/core';
+import {qrcode, ɵcreateQRCodeStylePlan, ɵparseQRCodeStylingOptions} from '@qrcodesdk/core';
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 import {QRCodeCanvasRenderer} from '../src';
@@ -109,7 +109,7 @@ describe('QRCodeCanvasRenderer', () => {
       cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
       cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
     };
-    const plan = createQRCodeStylePlan(matrix, parseQRCodeStylingOptions(options));
+    const plan = ɵcreateQRCodeStylePlan(matrix, ɵparseQRCodeStylingOptions(options));
     const canvas = QRCodeCanvasRenderer(options)(matrix);
     const dataModule = plan.primitives.find(({role}) => role === 'dots')!;
 

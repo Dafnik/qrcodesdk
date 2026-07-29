@@ -4,8 +4,8 @@ import {
   type QRCodeDotType,
   type QRCodeMatrix,
   type QRCodeModuleStylePrimitive,
-  createQRCodeStylePlan,
-  parseQRCodeStylingOptions,
+  ɵcreateQRCodeStylePlan as createQRCodeStylePlan,
+  ɵparseQRCodeStylingOptions as parseQRCodeStylingOptions,
 } from '../src';
 
 describe('createQRCodeStylePlan', () => {

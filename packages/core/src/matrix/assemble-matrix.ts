@@ -9,7 +9,7 @@ import type {
 import {applyMaskToMatrix} from './apply-mask-to-matrix';
 import {createBaseMatrix} from './create-base-matrix';
 import {evaluateMatrix} from './evaluate-matrix';
-import {fillDataInMatrix} from './fill-data-in-matrix';
+import {type QRCodeDataModuleVisitor, fillDataInMatrix} from './fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from './fill-format-information-in-matrix';
 import {QR_CODE_MASKS} from './mask';
 
@@ -19,15 +19,32 @@ export function assembleQRCodeMatrix(
   codewords: QRCodeCodewords,
   requestedMask: QRCodeMask | undefined,
 ): QRCodeMatrix {
+  return assembleQRCodeMatrixWithDetails(version, errorCorrectionLevel, codewords, requestedMask)
+    .matrix;
+}
+
+export type QRCodeMatrixAssembly = {
+  readonly matrix: QRCodeMatrix;
+  readonly reserved: QRCodeReservedMatrix;
+  readonly mask: QRCodeMask;
+};
+
+export function assembleQRCodeMatrixWithDetails(
+  version: QRCodeVersion,
+  errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
+  codewords: QRCodeCodewords,
+  requestedMask: QRCodeMask | undefined,
+  visitDataModule?: QRCodeDataModuleVisitor,
+): QRCodeMatrixAssembly {
   const {matrix, reserved} = createBaseMatrix(version);
-  const unmaskedMatrix = fillDataInMatrix(matrix, reserved, codewords);
+  const unmaskedMatrix = fillDataInMatrix(matrix, reserved, codewords, visitDataModule);
   const selectedMask =
     requestedMask ?? selectBestMask(unmaskedMatrix, reserved, errorCorrectionLevel);
 
   applyMaskToMatrix(unmaskedMatrix, reserved, selectedMask);
   fillFormatInformationInMatrix(unmaskedMatrix, errorCorrectionLevel, selectedMask);
 
-  return unmaskedMatrix;
+  return {matrix: unmaskedMatrix, reserved, mask: selectedMask};
 }
 
 function selectBestMask(

@@ -1,5 +1,11 @@
 import type {QRCodeCodewords, QRCodePolynomial} from '../types';
 import {calculateECC} from './calculate-ecc';
+import type {QRCodeEncodedBitMetadata} from './metadata';
+
+type QRCodeCodewordsWithMetadata = {
+  readonly codewords: QRCodeCodewords;
+  readonly bitMetadata: readonly QRCodeEncodedBitMetadata[];
+};
 
 /**
  * Augments ECC code words to given code words. The resulting words are
@@ -20,6 +26,25 @@ export function augmentECCs(
   blockNumber: number,
   genPoly: QRCodePolynomial,
 ): QRCodeCodewords {
+  return augmentECCsInternal(poly, blockNumber, genPoly).codewords;
+}
+
+export function augmentECCsWithMetadata(
+  poly: QRCodeCodewords,
+  blockNumber: number,
+  genPoly: QRCodePolynomial,
+  dataBitMetadata: readonly QRCodeEncodedBitMetadata[],
+): QRCodeCodewordsWithMetadata {
+  const {codewords, bitMetadata} = augmentECCsInternal(poly, blockNumber, genPoly, dataBitMetadata);
+  return {codewords, bitMetadata: bitMetadata!};
+}
+
+function augmentECCsInternal(
+  poly: QRCodeCodewords,
+  blockNumber: number,
+  genPoly: QRCodePolynomial,
+  dataBitMetadata?: readonly QRCodeEncodedBitMetadata[],
+): {readonly codewords: QRCodeCodewords; readonly bitMetadata?: QRCodeEncodedBitMetadata[]} {
   const subSizes: number[] = [],
     subSize: number = (poly.length / blockNumber) | 0,
     pivot: number = blockNumber - (poly.length % blockNumber),
@@ -42,19 +67,47 @@ export function augmentECCs(
   }
 
   const result: QRCodeCodewords = [];
+  const bitMetadata: QRCodeEncodedBitMetadata[] | undefined =
+    dataBitMetadata === undefined ? undefined : [];
+  const pushDataCodeword = (sourceCodewordIndex: number): void => {
+    const codewordIndex = result.length;
+    result.push(poly[sourceCodewordIndex]!);
+    if (bitMetadata === undefined || dataBitMetadata === undefined) return;
+    const sourceBitOffset = sourceCodewordIndex * 8;
+    for (let bit = 0; bit < 8; bit++) {
+      bitMetadata.push({
+        ...dataBitMetadata[sourceBitOffset + bit]!,
+        codewordIndex,
+      });
+    }
+  };
+
   const numberOfItemsPerBlock = (poly.length / blockNumber) | 0;
   for (let i = 0; i < numberOfItemsPerBlock; i++) {
     for (let j = 0; j < blockNumber; j++) {
-      result.push(poly[subSizes[j]! + i]!);
+      pushDataCodeword(subSizes[j]! + i);
     }
   }
   for (let j = pivot; j < blockNumber; j++) {
-    result.push(poly[subSizes[j + 1]! - 1]!);
+    pushDataCodeword(subSizes[j + 1]! - 1);
   }
+
+  const errorCorrectionBitCount = genPoly.length * blockNumber * 8;
   for (let i = 0; i < genPoly.length; i++) {
     for (let j = 0; j < blockNumber; j++) {
+      const codewordIndex = result.length;
       result.push(eccs[j]![i]!);
+      if (bitMetadata !== undefined) {
+        for (let bit = 0; bit < 8; bit++) {
+          bitMetadata.push({
+            role: 'error-correction',
+            bitIndex: (j * genPoly.length + i) * 8 + bit,
+            bitCount: errorCorrectionBitCount,
+            codewordIndex,
+          });
+        }
+      }
     }
   }
-  return result;
+  return {codewords: result, bitMetadata};
 }

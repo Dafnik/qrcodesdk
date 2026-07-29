@@ -1,4 +1,3 @@
-import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {TitleCasePipe, UpperCasePipe} from '@angular/common';
 import {Component, computed, effect, inject, input, linkedSignal, model} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
@@ -17,7 +16,6 @@ import {HlmPopoverImports} from '@spartan-ng/helm/popover';
 import {HlmRadioGroupImports} from '@spartan-ng/helm/radio-group';
 import {HlmSelectImports} from '@spartan-ng/helm/select';
 import {HlmSwitchImports} from '@spartan-ng/helm/switch';
-import {HlmTextareaImports} from '@spartan-ng/helm/textarea';
 
 import type {QRCodeCornerDotType, QRCodeCornerSquareType, QRCodeDotType} from '@qrcodesdk/core';
 
@@ -28,6 +26,7 @@ import {
   resetQrConfig,
   updateQrConfig,
 } from '../playground-config.ts';
+import {QrMatrixControls} from './qr-matrix-controls.ts';
 
 @Component({
   template: `
@@ -134,117 +133,8 @@ export class PlaygroundColorInput {
           </hlm-radio-group>
         </div>
       </div>
-      <div hlmField>
-        <label hlmFieldLabel for="data">Data</label>
-        <textarea
-          id="data"
-          #autosize="cdkTextareaAutosize"
-          [ngModel]="currentConfig().data"
-          (ngModelChange)="updateQrConfig({data: $event})"
-          hlmTextarea
-          cdkTextareaAutosize></textarea>
-      </div>
+      <qr-matrix-controls />
       <div class="grid gap-4 md:grid-cols-2">
-        <div hlmField>
-          <label hlmFieldLabel for="mode">Mode</label>
-          <hlm-select
-            [ngModel]="currentConfig().mode"
-            (ngModelChange)="updateQrConfig({mode: $event})">
-            <hlm-select-trigger class="w-full" buttonId="mode">
-              <hlm-select-value placeholder="Auto" />
-            </hlm-select-trigger>
-            <hlm-select-content *hlmSelectPortal>
-              <hlm-select-group>
-                <hlm-select-label>Modes</hlm-select-label>
-                <hlm-select-item [value]="undefined">Auto</hlm-select-item>
-                <hlm-select-item value="numeric">Numeric</hlm-select-item>
-                <hlm-select-item value="alphanumeric">Alphanumeric</hlm-select-item>
-                <hlm-select-item value="octet">Octet</hlm-select-item>
-              </hlm-select-group>
-            </hlm-select-content>
-          </hlm-select>
-        </div>
-        <div hlmField>
-          <label hlmFieldLabel for="version">Version</label>
-          <hlm-select
-            [ngModel]="currentConfig().version"
-            (ngModelChange)="updateQrConfig({version: $event})">
-            <hlm-select-trigger class="w-full" buttonId="version">
-              <hlm-select-value placeholder="Auto" />
-            </hlm-select-trigger>
-            <hlm-select-content *hlmSelectPortal>
-              <hlm-select-group>
-                <hlm-select-label>Versions</hlm-select-label>
-                <hlm-select-item [value]="undefined">Auto</hlm-select-item>
-                @for (version of VERSION_OPTIONS; track version) {
-                  <hlm-select-item [value]="version">{{ version }}</hlm-select-item>
-                }
-              </hlm-select-group>
-            </hlm-select-content>
-          </hlm-select>
-        </div>
-        <div hlmField>
-          <label hlmFieldLabel for="errorCorrection">Error Correction</label>
-          <hlm-select
-            [ngModel]="currentConfig().errorCorrectionLevel"
-            (ngModelChange)="updateQrConfig({errorCorrectionLevel: $event})">
-            <hlm-select-trigger class="w-full" buttonId="errorCorrection">
-              <hlm-select-value placeholder="Auto" />
-            </hlm-select-trigger>
-            <hlm-select-content *hlmSelectPortal>
-              <hlm-select-group>
-                <hlm-select-label>Error Correction Levels</hlm-select-label>
-                <hlm-select-item [value]="undefined">Auto</hlm-select-item>
-                <hlm-select-item value="L">L</hlm-select-item>
-                <hlm-select-item value="M">M</hlm-select-item>
-                <hlm-select-item value="H">H</hlm-select-item>
-                <hlm-select-item value="Q">Q</hlm-select-item>
-              </hlm-select-group>
-            </hlm-select-content>
-          </hlm-select>
-        </div>
-        <div hlmField>
-          <label hlmFieldLabel for="mask">Mask</label>
-          <hlm-select
-            [ngModel]="currentConfig().mask"
-            (ngModelChange)="updateQrConfig({mask: $event})">
-            <hlm-select-trigger class="w-full" buttonId="mask">
-              <hlm-select-value placeholder="Auto" />
-            </hlm-select-trigger>
-            <hlm-select-content *hlmSelectPortal>
-              <hlm-select-group>
-                <hlm-select-label>Masks</hlm-select-label>
-                <hlm-select-item [value]="undefined">Auto</hlm-select-item>
-                @for (mask of MASK_OPTIONS; track mask) {
-                  <hlm-select-item [value]="mask">{{ mask }}</hlm-select-item>
-                }
-              </hlm-select-group>
-            </hlm-select-content>
-          </hlm-select>
-        </div>
-        <div hlmField>
-          <label hlmFieldLabel for="size">Size</label>
-          <input
-            id="size"
-            [ngModel]="currentConfig().size"
-            (ngModelChange)="updateQrConfig({size: $event})"
-            hlmInput
-            type="number"
-            min="1"
-            placeholder="8" />
-        </div>
-        <div hlmField>
-          <label hlmFieldLabel for="margin">Margin</label>
-          <input
-            id="margin"
-            [ngModel]="currentConfig().margin"
-            (ngModelChange)="updateQrConfig({margin: $event})"
-            hlmInput
-            type="number"
-            min="0"
-            placeholder="4" />
-        </div>
-
         <div hlmField>
           <label hlmFieldLabel for="darkColor">Dark Color</label>
           <playground-color-input
@@ -477,7 +367,6 @@ export class PlaygroundColorInput {
     HlmRadioGroupImports,
     HlmLabelImports,
     HlmFieldImports,
-    HlmTextareaImports,
     HlmSelectImports,
     HlmButtonImports,
     HlmInputImports,
@@ -486,9 +375,9 @@ export class PlaygroundColorInput {
     FormsModule,
     TitleCasePipe,
     UpperCasePipe,
-    CdkTextareaAutosize,
     NgIcon,
     PlaygroundColorInput,
+    QrMatrixControls,
   ],
 })
 export class PlaygroundControls {
@@ -532,8 +421,6 @@ export class PlaygroundControls {
 
   protected readonly packages: PlaygroundPackage[] = ['react', 'angular'];
   protected readonly outputs: PlaygroundOutput[] = ['svg', 'image', 'canvas'];
-  protected readonly VERSION_OPTIONS = Array.from({length: 40}, (_, index) => index + 1);
-  protected readonly MASK_OPTIONS = Array.from({length: 8}, (_, index) => index);
   protected readonly DARK_COLOR_PRESETS = [
     '#0A0A0A',
     '#171717',

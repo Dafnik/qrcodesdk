@@ -4,7 +4,18 @@ import type {
   QRCodeSupportedModeIndicator,
   QRCodeVersion,
 } from '../types';
+import type {QRCodeEncodedBitMetadata, QRCodeMatrixMetadataRole} from './metadata';
 import {MODE_TERMINATOR, getModeDefinition} from './mode';
+
+type QRCodeDataBitRole = Extract<
+  QRCodeMatrixMetadataRole,
+  'mode' | 'character-count' | 'payload' | 'terminator' | 'padding'
+>;
+
+type QRCodeEncodedDataWithMetadata = {
+  readonly codewords: QRCodeCodewords;
+  readonly bitMetadata: readonly QRCodeEncodedBitMetadata[];
+};
 
 /**
  * Returns the code words (sans ECC bits) for given data and configurations.
@@ -23,14 +34,55 @@ export function encode(
   data: QRCodeEncodedData,
   maxBufferLength: number,
 ): QRCodeCodewords {
+  return encodeData(version, mode, data, maxBufferLength).codewords;
+}
+
+export function encodeWithMetadata(
+  version: QRCodeVersion,
+  mode: QRCodeSupportedModeIndicator,
+  data: QRCodeEncodedData,
+  maxBufferLength: number,
+): QRCodeEncodedDataWithMetadata {
+  const roles: QRCodeDataBitRole[] = [];
+  const {codewords} = encodeData(version, mode, data, maxBufferLength, roles);
+  const roleCounts = countRoles(roles);
+  const roleOffsets = new Map<QRCodeDataBitRole, number>();
+  const bitMetadata = roles.map((role) => {
+    const bitIndex = roleOffsets.get(role) ?? 0;
+    roleOffsets.set(role, bitIndex + 1);
+    return {
+      role,
+      bitIndex,
+      bitCount: roleCounts.get(role)!,
+    } satisfies QRCodeEncodedBitMetadata;
+  });
+
+  return {codewords, bitMetadata};
+}
+
+function encodeData(
+  version: QRCodeVersion,
+  mode: QRCodeSupportedModeIndicator,
+  data: QRCodeEncodedData,
+  maxBufferLength: number,
+  roles?: QRCodeDataBitRole[],
+): {readonly codewords: QRCodeCodewords} {
   const definition = getModeDefinition(mode);
   const buffer: QRCodeCodewords = [];
+  const capacity = maxBufferLength * 8;
   let bits = 0,
     remaining = 8;
   const dataLength = data.length;
 
+  const record = function (role: QRCodeDataBitRole, bitCount: number): void {
+    if (roles === undefined || bitCount <= 0 || roles.length >= capacity) return;
+    const writableBitCount = Math.min(bitCount, capacity - roles.length);
+    for (let index = 0; index < writableBitCount; index++) roles.push(role);
+  };
+
   // this function is intentionally no-op when n=0.
-  const pack = function (x: number, n: number) {
+  const pack = function (x: number, n: number, role: QRCodeDataBitRole): void {
+    record(role, n);
     if (n >= remaining) {
       buffer.push(bits | (x >> (n -= remaining)));
       while (n >= 8) buffer.push((x >> (n -= 8)) & 255);
@@ -41,23 +93,38 @@ export function encode(
   };
 
   const dataNumberOfBits = definition.getCharacterCountBits(version);
-  pack(mode, 4);
-  pack(dataLength, dataNumberOfBits);
-  definition.encodePayload(data, pack);
+  pack(mode, 4, 'mode');
+  pack(dataLength, dataNumberOfBits, 'character-count');
+  definition.encodePayload(data, (value, bitCount) => pack(value, bitCount, 'payload'));
 
   const encodedDataBitLength = buffer.length * 8 + (8 - remaining);
-  if (encodedDataBitLength > maxBufferLength * 8) throw new Error('QRCode: Data too large');
+  if (encodedDataBitLength > capacity) throw new Error('QRCode: Data too large');
 
   // final bits. it is possible that adding terminator causes the buffer
   // to overflow, but then the buffer truncated to the maximum size will
   // be valid as the truncated terminator mode bits and padding is
   // identical in appearance (cf. JIS X 0510:2004 sec 8.4.8).
-  pack(MODE_TERMINATOR, 4);
-  if (remaining < 8) buffer.push(bits);
+  pack(MODE_TERMINATOR, 4, 'terminator');
+  if (remaining < 8) {
+    record('padding', remaining);
+    buffer.push(bits);
+  }
 
   // the padding to fill up the remaining space. we should not add any
   // words when the overflow already occurred.
-  while (buffer.length + 1 < maxBufferLength) buffer.push(0xec, 0x11);
-  if (buffer.length < maxBufferLength) buffer.push(0xec);
-  return buffer.slice(0, maxBufferLength);
+  while (buffer.length + 1 < maxBufferLength) {
+    record('padding', 16);
+    buffer.push(0xec, 0x11);
+  }
+  if (buffer.length < maxBufferLength) {
+    record('padding', 8);
+    buffer.push(0xec);
+  }
+  return {codewords: buffer.slice(0, maxBufferLength)};
+}
+
+function countRoles(roles: readonly QRCodeDataBitRole[]): ReadonlyMap<QRCodeDataBitRole, number> {
+  const counts = new Map<QRCodeDataBitRole, number>();
+  for (const role of roles) counts.set(role, (counts.get(role) ?? 0) + 1);
+  return counts;
 }

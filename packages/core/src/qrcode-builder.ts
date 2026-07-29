@@ -1,6 +1,4 @@
-import {assembleQRCodeMatrix} from './matrix/assemble-matrix';
-import {createQRCodeCodewords} from './matrix/create-qrcode-codewords';
-import {resolveQRCodeMatrixOptions} from './matrix/resolve-matrix-options';
+import {generateQRCodeMatrix} from './matrix/generate-qrcode-matrix';
 import type {
   QRCodeErrorCorrectionLevel,
   QRCodeInputData,
@@ -83,15 +81,7 @@ export class QRCodeBuilder<
   }
 
   matrix(this: QRCodeBuilder<HasData, R>): QRCodeMatrix {
-    const resolved = resolveQRCodeMatrixOptions(this._data, this._config);
-    const codewords = createQRCodeCodewords(resolved);
-
-    return assembleQRCodeMatrix(
-      resolved.version,
-      resolved.errorCorrectionLevel,
-      codewords,
-      resolved.mask,
-    );
+    return generateQRCodeMatrix(this._data, this._config);
   }
 
   render<TOutput>(this: QRCodeBuilder<HasData, R>, renderer: QRCodeRenderer<TOutput>): TOutput;

@@ -1,12 +1,12 @@
 import {
-  ECC_LEVELS,
-  MODES,
-  isQRCodeColorHex,
-  isQRCodeCornerDotType,
-  isQRCodeCornerSquareType,
-  isQRCodeDotType,
-  isValidQRCodeMargin,
-  isValidQRCodeSize,
+  ɵECC_LEVELS,
+  ɵMODES,
+  ɵisQRCodeColorHex,
+  ɵisQRCodeCornerDotType,
+  ɵisQRCodeCornerSquareType,
+  ɵisQRCodeDotType,
+  ɵisValidQRCodeMargin,
+  ɵisValidQRCodeSize,
 } from '@qrcodesdk/core';
 import type {QRCodeColorHex, QRCodeMask, QRCodeVersion} from '@qrcodesdk/core';
 
@@ -75,7 +75,7 @@ const QUERY_FIELD_CODECS = [
     'mode',
     (config) => config.mode,
     (config, mode) => setOptionalProperty(config, 'mode', mode),
-    (value, fallback) => parseOptionalStringUnion(value, MODES, fallback),
+    (value, fallback) => parseOptionalStringUnion(value, ɵMODES, fallback),
     serializeString,
   ),
   defineQueryField(
@@ -83,7 +83,7 @@ const QUERY_FIELD_CODECS = [
     (config) => config.errorCorrectionLevel,
     (config, errorCorrectionLevel) =>
       setOptionalProperty(config, 'errorCorrectionLevel', errorCorrectionLevel),
-    (value, fallback) => parseOptionalStringUnion(value, ECC_LEVELS, fallback),
+    (value, fallback) => parseOptionalStringUnion(value, ɵECC_LEVELS, fallback),
     serializeString,
   ),
   defineQueryField(
@@ -97,14 +97,14 @@ const QUERY_FIELD_CODECS = [
     'size',
     (config) => config.size,
     (config, size) => setOptionalProperty(config, 'size', size),
-    (value, fallback) => parseOptionalNumber(value, isValidQRCodeSize, fallback),
+    (value, fallback) => parseOptionalNumber(value, ɵisValidQRCodeSize, fallback),
     serializeNumber,
   ),
   defineQueryField(
     'margin',
     (config) => config.margin,
     (config, margin) => setOptionalProperty(config, 'margin', margin),
-    (value, fallback) => parseOptionalNumber(value, isValidQRCodeMargin, fallback),
+    (value, fallback) => parseOptionalNumber(value, ɵisValidQRCodeMargin, fallback),
     serializeNumber,
   ),
   defineQueryField(
@@ -140,7 +140,7 @@ const QUERY_FIELD_CODECS = [
     (config, type) => {
       config.dotsOptions = compactObject({...config.dotsOptions, type});
     },
-    (value, fallback) => parseOptionalGuardedString(value, isQRCodeDotType, fallback),
+    (value, fallback) => parseOptionalGuardedString(value, ɵisQRCodeDotType, fallback),
     serializeString,
   ),
   defineQueryField(
@@ -158,7 +158,7 @@ const QUERY_FIELD_CODECS = [
     (config, type) => {
       config.cornersSquareOptions = compactObject({...config.cornersSquareOptions, type});
     },
-    (value, fallback) => parseOptionalGuardedString(value, isQRCodeCornerSquareType, fallback),
+    (value, fallback) => parseOptionalGuardedString(value, ɵisQRCodeCornerSquareType, fallback),
     serializeString,
   ),
   defineQueryField(
@@ -176,7 +176,7 @@ const QUERY_FIELD_CODECS = [
     (config, type) => {
       config.cornersDotOptions = compactObject({...config.cornersDotOptions, type});
     },
-    (value, fallback) => parseOptionalGuardedString(value, isQRCodeCornerDotType, fallback),
+    (value, fallback) => parseOptionalGuardedString(value, ɵisQRCodeCornerDotType, fallback),
     serializeString,
   ),
   defineQueryField(
@@ -497,7 +497,7 @@ function parseOptionalColor(
 
   const normalized = value.startsWith('#') ? value : `#${value}`;
 
-  if (!isQRCodeColorHex(normalized)) {
+  if (!ɵisQRCodeColorHex(normalized)) {
     return fallback;
   }
 
@@ -540,7 +540,7 @@ function serializeColor(
   value: QRCodeColorHex | undefined,
   defaultValue: QRCodeColorHex | undefined,
 ): string | undefined {
-  if (value === undefined || !isQRCodeColorHex(value) || colorsEqual(value, defaultValue)) {
+  if (value === undefined || !ɵisQRCodeColorHex(value) || colorsEqual(value, defaultValue)) {
     return undefined;
   }
 

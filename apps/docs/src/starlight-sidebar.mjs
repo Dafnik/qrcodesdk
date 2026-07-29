@@ -6,6 +6,7 @@ export const STARLIGHT_SIDEBAR = [
     items: [
       {label: 'Overview', slug: ''},
       {label: 'Playground', slug: 'playground'},
+      {label: 'Explain QR Codes', slug: 'explain'},
       {label: 'Installation', slug: 'getting-started/installation'},
       {label: 'Credits', slug: 'getting-started/credits'},
     ],

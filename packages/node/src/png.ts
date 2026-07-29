@@ -6,8 +6,8 @@ import {
   type QRCodeRenderer,
   type QRCodeStylePrimitive,
   type QRCodeStylingOptions,
-  createQRCodeStylePlan,
-  parseQRCodeStylingOptions,
+  ɵcreateQRCodeStylePlan,
+  ɵparseQRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
 export type QRCodePNGRendererOptions = QRCodeStylingOptions;
@@ -20,8 +20,8 @@ type RGBColor = {
 
 export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
   return (matrix: QRCodeMatrix) => {
-    const styling = parseQRCodeStylingOptions(options);
-    const plan = createQRCodeStylePlan(matrix, styling);
+    const styling = ɵparseQRCodeStylingOptions(options);
+    const plan = ɵcreateQRCodeStylePlan(matrix, styling);
     const scale = plan.renderedSize / plan.viewSize;
     const png = new PNG({width: plan.renderedSize, height: plan.renderedSize});
     fillRect(png, 0, 0, plan.renderedSize, plan.renderedSize, hexColorToRGB(plan.backgroundColor));
