@@ -34,7 +34,7 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 
 ## Runtime compatibility
 
-> `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 language and built-in support, and a global `TextEncoder`.
+> `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
 
 | Runtime                         | Support policy                                         | CI verification                          |
 | ------------------------------- | ------------------------------------------------------ | ---------------------------------------- |

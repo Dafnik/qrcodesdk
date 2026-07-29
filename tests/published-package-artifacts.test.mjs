@@ -8,16 +8,10 @@ import {fileURLToPath} from 'node:url';
 import {promisify} from 'node:util';
 import {gunzipSync} from 'node:zlib';
 
+import {PACKAGE_POLICIES} from './fixtures/package-policies.mjs';
+
 const execFile = promisify(execFileCallback);
 const workspaceRoot = path.dirname(fileURLToPath(new URL('../package.json', import.meta.url)));
-const PACKAGE_POLICIES = [
-  {directory: 'angular', name: '@qrcodesdk/angular', nodeEngine: undefined, kind: 'angular'},
-  {directory: 'browser', name: '@qrcodesdk/browser', nodeEngine: undefined, kind: 'library'},
-  {directory: 'cli', name: '@qrcodesdk/cli', nodeEngine: '>=22.12.0', kind: 'cli'},
-  {directory: 'core', name: '@qrcodesdk/core', nodeEngine: undefined, kind: 'library'},
-  {directory: 'node', name: '@qrcodesdk/node', nodeEngine: '>=22.0.0', kind: 'library'},
-  {directory: 'react', name: '@qrcodesdk/react', nodeEngine: undefined, kind: 'library'},
-];
 
 function readTarEntries(gzippedTarball) {
   const tarball = gunzipSync(gzippedTarball);

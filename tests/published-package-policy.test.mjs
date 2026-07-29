@@ -4,17 +4,11 @@ import path from 'node:path';
 import {test} from 'node:test';
 import {fileURLToPath} from 'node:url';
 
+import {PACKAGE_POLICIES} from './fixtures/package-policies.mjs';
+
 const workspaceRoot = path.dirname(fileURLToPath(new URL('../package.json', import.meta.url)));
 const packagesDirectory = path.join(workspaceRoot, 'packages');
-
-const EXPECTED_PACKAGE_POLICIES = {
-  '@qrcodesdk/angular': {directory: 'angular', nodeEngine: undefined, kind: 'angular'},
-  '@qrcodesdk/browser': {directory: 'browser', nodeEngine: undefined, kind: 'library'},
-  '@qrcodesdk/cli': {directory: 'cli', nodeEngine: '>=22.12.0', kind: 'cli'},
-  '@qrcodesdk/core': {directory: 'core', nodeEngine: undefined, kind: 'library'},
-  '@qrcodesdk/node': {directory: 'node', nodeEngine: '>=22.0.0', kind: 'library'},
-  '@qrcodesdk/react': {directory: 'react', nodeEngine: undefined, kind: 'library'},
-};
+const packagePoliciesByName = new Map(PACKAGE_POLICIES.map(({name, ...policy}) => [name, policy]));
 
 async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, 'utf8'));
@@ -43,12 +37,12 @@ test('every published package follows its declared runtime metadata policy', asy
 
   assert.deepEqual(
     publishedPackages.map(({packageJson}) => packageJson.name).sort(),
-    Object.keys(EXPECTED_PACKAGE_POLICIES).sort(),
+    [...packagePoliciesByName.keys()].sort(),
     'Every public package must have an explicit runtime metadata policy',
   );
 
   for (const {directory, packageJson} of publishedPackages) {
-    const policy = EXPECTED_PACKAGE_POLICIES[packageJson.name];
+    const policy = packagePoliciesByName.get(packageJson.name);
     assert.equal(directory, policy.directory);
     assert.equal(packageJson.private, false);
     assert.equal(packageJson.sideEffects, false);

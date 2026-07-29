@@ -1,10 +1,9 @@
 ---
 import Default from '@astrojs/starlight/components/TableOfContents.astro';
-import type {Props} from '@astrojs/starlight/props';
 import {Icon} from '@astrojs/starlight/components';
 ---
 
-<Default {...Astro.props}><slot /></Default>
+<Default><slot /></Default>
 
 <div class="mt-8 rounded-lg border border-[var(--sl-color-gray-5)] bg-[var(--sl-color-bg-nav)] p-4">
   <h2 class="mb-2 text-[length:var(--sl-text-sm)] font-semibold text-[var(--sl-color-white)]">
