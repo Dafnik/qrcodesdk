@@ -5,8 +5,6 @@ import {writeFile as writeFileDefault} from 'node:fs/promises';
 import process from 'node:process';
 
 import {
-  ECC_LEVELS,
-  MODES,
   type QRCodeAccessibilityOptions,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
@@ -15,10 +13,12 @@ import {
   type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeVersion,
-  isQRCodeColorHex,
-  isValidQRCodeMargin,
-  isValidQRCodeSize,
   qrcode,
+  ɵECC_LEVELS,
+  ɵMODES,
+  ɵisQRCodeColorHex,
+  ɵisValidQRCodeMargin,
+  ɵisValidQRCodeSize,
 } from '@qrcodesdk/core';
 import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
@@ -183,7 +183,7 @@ async function resolveCliOptions(
     small: rawOptions.small ?? true,
     ansiColors: rawOptions.ansiColors ?? true,
     onlyAnsiColors: rawOptions.onlyAnsiColors ?? false,
-    mode: optionalEnum(rawOptions.mode, MODES, 'mode'),
+    mode: optionalEnum(rawOptions.mode, ɵMODES, 'mode'),
     errorCorrectionLevel: optionalErrorCorrectionLevel(rawOptions.errorCorrection),
     version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as
       QRCodeVersion | undefined,
@@ -422,13 +422,13 @@ function optionalErrorCorrectionLevel(
   value: string | undefined,
 ): QRCodeErrorCorrectionLevel | undefined {
   if (value === undefined) return undefined;
-  return requiredEnum(value.toUpperCase(), ECC_LEVELS, 'error-correction');
+  return requiredEnum(value.toUpperCase(), ɵECC_LEVELS, 'error-correction');
 }
 
 function optionalPositiveInteger(value: string | undefined, name: string): number | undefined {
   const parsed = optionalInteger(value, name);
   if (parsed === undefined) return undefined;
-  if (!isValidQRCodeSize(parsed)) {
+  if (!ɵisValidQRCodeSize(parsed)) {
     throw new CliError(`Invalid ${name}. Expected a positive integer.`);
   }
   return parsed;
@@ -437,7 +437,7 @@ function optionalPositiveInteger(value: string | undefined, name: string): numbe
 function optionalNonNegativeInteger(value: string | undefined, name: string): number | undefined {
   const parsed = optionalInteger(value, name);
   if (parsed === undefined) return undefined;
-  if (!isValidQRCodeMargin(parsed)) {
+  if (!ɵisValidQRCodeMargin(parsed)) {
     throw new CliError(`Invalid ${name}. Expected a non-negative integer.`);
   }
   return parsed;
@@ -467,7 +467,7 @@ function optionalInteger(value: string | undefined, name: string): number | unde
 
 function optionalHexColor(value: string | undefined, name: string): `#${string}` | undefined {
   if (value === undefined) return undefined;
-  if (!isQRCodeColorHex(value)) {
+  if (!ɵisQRCodeColorHex(value)) {
     throw new CliError(`Invalid ${name}. Expected a six-digit hex color like #111111.`);
   }
 

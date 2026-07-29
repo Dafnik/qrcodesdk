@@ -22,5 +22,6 @@
     "apps/docs/src/libs",
     "apps/docs/src/content/docs/advanced/performance.md"
   ],
+  "ignoreRegExpList": ["/ɵ[\\p{L}\\p{N}_]*/gu"],
   "version": "0.2"
 }

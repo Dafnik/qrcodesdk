@@ -1,7 +1,7 @@
 import {PNG} from 'pngjs';
 import {describe, expect, test} from 'vitest';
 
-import {createQRCodeStylePlan, parseQRCodeStylingOptions, qrcode} from '@qrcodesdk/core';
+import {qrcode, ɵcreateQRCodeStylePlan, ɵparseQRCodeStylingOptions} from '@qrcodesdk/core';
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 import {QRCodePNGRenderer} from '../../src';
@@ -116,7 +116,7 @@ describe('QRCodePNGRenderer', () => {
       cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
       cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
     };
-    const plan = createQRCodeStylePlan(matrix, parseQRCodeStylingOptions(options));
+    const plan = ɵcreateQRCodeStylePlan(matrix, ɵparseQRCodeStylingOptions(options));
     const png = readPng(QRCodePNGRenderer(options)(matrix));
     const dataModule = plan.primitives.find(({role}) => role === 'dots')!;
 

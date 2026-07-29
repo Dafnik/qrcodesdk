@@ -1,7 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
 import {
-  MODES,
+  ɵMODES as MODES,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMode,
   type QRCodeVersion,

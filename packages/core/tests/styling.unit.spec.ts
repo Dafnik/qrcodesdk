@@ -1,14 +1,14 @@
 import {describe, expect, test} from 'vitest';
 
 import {
-  calculateQRCodeRenderedSize,
-  isQRCodeColorHex,
-  isQRCodeCornerDotType,
-  isQRCodeCornerSquareType,
-  isQRCodeDotType,
-  isValidQRCodeMargin,
-  isValidQRCodeSize,
-  parseQRCodeStylingOptions,
+  ɵcalculateQRCodeRenderedSize as calculateQRCodeRenderedSize,
+  ɵisQRCodeColorHex as isQRCodeColorHex,
+  ɵisQRCodeCornerDotType as isQRCodeCornerDotType,
+  ɵisQRCodeCornerSquareType as isQRCodeCornerSquareType,
+  ɵisQRCodeDotType as isQRCodeDotType,
+  ɵisValidQRCodeMargin as isValidQRCodeMargin,
+  ɵisValidQRCodeSize as isValidQRCodeSize,
+  ɵparseQRCodeStylingOptions as parseQRCodeStylingOptions,
 } from '../src';
 import type {QRCodeStylingOptions} from '../src';
 

@@ -1,9 +1,9 @@
 import {
-  MODES,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
   type QRCodeMode,
   type QRCodeVersion,
+  ɵMODES,
 } from '@qrcodesdk/core';
 
 import type {QRCodeTestFixture} from './fixtures';
@@ -27,15 +27,15 @@ export type QRCodeCombination = Required<QRCodeTestFixture>;
 export type QRCodeAutoMaskCombination = Omit<QRCodeCombination, 'mask'>;
 
 export const TOTAL_QR_CODE_COMBINATIONS =
-  40 * ERROR_CORRECTION_LEVELS.length * MASKS.length * MODES.length;
+  40 * ERROR_CORRECTION_LEVELS.length * MASKS.length * ɵMODES.length;
 export const TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS =
-  40 * ERROR_CORRECTION_LEVELS.length * MODES.length;
+  40 * ERROR_CORRECTION_LEVELS.length * ɵMODES.length;
 
 export function* getAllQRCodeCombinations(): Generator<QRCodeCombination> {
   for (let version = 1; version <= 40; version += 1) {
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
       for (const mask of MASKS) {
-        for (const mode of MODES) {
+        for (const mode of ɵMODES) {
           yield {
             name: [
               `version-${String(version).padStart(2, '0')}`,
@@ -58,7 +58,7 @@ export function* getAllQRCodeCombinations(): Generator<QRCodeCombination> {
 export function* getAllQRCodeAutoMaskCombinations(): Generator<QRCodeAutoMaskCombination> {
   for (let version = 1; version <= 40; version += 1) {
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
-      for (const mode of MODES) {
+      for (const mode of ɵMODES) {
         yield {
           name: [
             `version-${String(version).padStart(2, '0')}`,

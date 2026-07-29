@@ -202,16 +202,10 @@ Color options use six-digit hash-prefixed values such as `#111827`. All renderer
 Feature colors independently inherit `colors.colorDark`. Visual shape options are supported by
 SVG, browser Canvas/Image, and Node PNG output; they do not affect terminal text geometry.
 
-## Styling validation and geometry
+## Styling contract
 
-`parseQRCodeStylingOptions()` applies the shared defaults and throws when the resolved styling is invalid. Applications that need non-throwing input validation can use `isValidQRCodeSize()`, `isValidQRCodeMargin()`, `isQRCodeColorHex()`, `isQRCodeDotType()`, `isQRCodeCornerSquareType()`, and `isQRCodeCornerDotType()`.
-
-Custom renderers can use `calculateQRCodeRenderedSize(matrix, styling)` to calculate and validate the square output dimension, including the quiet-zone margin.
-
-The built-in SVG, browser Canvas/Image, and Node PNG renderers all consume
-`createQRCodeStylePlan(matrix, styling)` as their platform-neutral drawing foundation. Its ordered
-primitives use QR-module coordinates and contain resolved roles, colors, shapes, and rotations for
-ordinary modules and canonical finder patterns.
+All built-in renderers apply shared defaults and validate resolved styling before producing output.
+Custom renderers receive the generated matrix and can define their own output geometry.
 
 ## Matrix output and custom renderers
 
@@ -236,35 +230,26 @@ const json = qrcode('renderer output').render(jsonRenderer);
 
 Renderers can be passed directly to `.render(renderer)` or stored with `.renderer(renderer).render()`.
 
-## Exported constants and styling primitives
+## Styling primitive types
 
-The low-level constants and style-plan types exported by `@qrcodesdk/core` are intentional public
-contracts. They are useful for building validated configuration controls and custom renderers
-without duplicating QRCodeSDK's supported values.
+The style-plan types exported by `@qrcodesdk/core` describe the platform-neutral primitives used
+inside the built-in visual renderers.
 
-| Export                             | Contract                                                                        |
-| ---------------------------------- | ------------------------------------------------------------------------------- |
-| `ECC_LEVELS`                       | Supported error correction names: `L`, `M`, `Q`, and `H`.                       |
-| `MODES`                            | Supported encoding modes: `numeric`, `alphanumeric`, and `octet`.               |
-| `QR_CODE_COLOR_HEX_PATTERN`        | Regular expression used to validate hash-prefixed six-digit hexadecimal colors. |
-| `QR_CODE_DOT_TYPES`                | Supported ordinary-module shapes.                                               |
-| `QR_CODE_CORNER_SQUARE_TYPES`      | Supported finder-ring shapes.                                                   |
-| `QR_CODE_CORNER_DOT_TYPES`         | Supported finder-center shapes.                                                 |
-| `QRCodeStylePlan`                  | Platform-neutral dimensions, background, curve flag, and ordered primitives.    |
-| `QRCodeStylePrimitive`             | Union of module, finder-ring, and finder-center primitives.                     |
-| `QRCodeModuleStylePrimitive`       | Shape, role, color, position, size, and rotation for an ordinary module.        |
-| `QRCodeFinderRingStylePrimitive`   | Styling primitive for a finder pattern's outer ring.                            |
-| `QRCodeFinderCenterStylePrimitive` | Styling primitive for a finder pattern's center.                                |
-| `QRCodeStyleRole`                  | Primitive role: `dots`, `cornersSquare`, or `cornersDot`.                       |
-| `QRCodeModuleShape`                | Resolved geometry used to draw an ordinary module.                              |
-| `QRCodeStyleRotation`              | Clockwise primitive rotation: `0`, `90`, `180`, or `270` degrees.               |
+| Export                             | Contract                                                                     |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| `QRCodeStylePlan`                  | Platform-neutral dimensions, background, curve flag, and ordered primitives. |
+| `QRCodeStylePrimitive`             | Union of module, finder-ring, and finder-center primitives.                  |
+| `QRCodeModuleStylePrimitive`       | Shape, role, color, position, size, and rotation for an ordinary module.     |
+| `QRCodeFinderRingStylePrimitive`   | Styling primitive for a finder pattern's outer ring.                         |
+| `QRCodeFinderCenterStylePrimitive` | Styling primitive for a finder pattern's center.                             |
+| `QRCodeStyleRole`                  | Primitive role: `dots`, `cornersSquare`, or `cornersDot`.                    |
+| `QRCodeModuleShape`                | Resolved geometry used to draw an ordinary module.                           |
+| `QRCodeStyleRotation`              | Clockwise primitive rotation: `0`, `90`, `180`, or `270` degrees.            |
 
 ## Public API
 
 ```ts
 import {
-  ECC_LEVELS,
-  MODES,
   type QRCodeAccessibilityOptions,
   QRCodeBuilder,
   type QRCodeColorHex,
@@ -299,22 +284,12 @@ import {
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeVersion,
-  QR_CODE_COLOR_HEX_PATTERN,
-  QR_CODE_CORNER_DOT_TYPES,
-  QR_CODE_CORNER_SQUARE_TYPES,
-  QR_CODE_DOT_TYPES,
-  calculateQRCodeRenderedSize,
-  createQRCodeStylePlan,
-  isQRCodeColorHex,
-  isQRCodeCornerDotType,
-  isQRCodeCornerSquareType,
-  isQRCodeDotType,
-  isValidQRCodeMargin,
-  isValidQRCodeSize,
-  parseQRCodeStylingOptions,
   qrcode,
 } from '@qrcodesdk/core';
 ```
+
+Exports whose names begin with `ɵ` are private integration contracts for QRCodeSDK's sibling
+packages. They are not part of the public API and can change without compatibility guarantees.
 
 ## Documentation
 

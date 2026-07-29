@@ -84,7 +84,30 @@ describe('explainQRCode', () => {
     assert.ok(countRole(numeric, 'padding') > 0);
   });
 
-  test('decodes all masks and automatic mask selection from format information', () => {
+  test('maps semantic bits to their physical zig-zag placement coordinates', () => {
+    const explanation = explainQRCode({data: '1', version: 1, mask: 0});
+
+    assert.deepEqual(
+      [
+        explanation.moduleGrid[20]![20],
+        explanation.moduleGrid[20]![19],
+        explanation.moduleGrid[19]![20],
+        explanation.moduleGrid[19]![19],
+      ].map(({role, bitIndex, codewordIndex}) => ({role, bitIndex, codewordIndex})),
+      [
+        {role: 'mode', bitIndex: 0, codewordIndex: 0},
+        {role: 'mode', bitIndex: 1, codewordIndex: 0},
+        {role: 'mode', bitIndex: 2, codewordIndex: 0},
+        {role: 'mode', bitIndex: 3, codewordIndex: 0},
+      ],
+    );
+    assert.equal(explanation.moduleGrid[20]![20]!.sourceValue, 0);
+    assert.equal(explanation.moduleGrid[20]![20]!.value, 1);
+    assert.equal(explanation.moduleGrid[19]![19]!.sourceValue, 1);
+    assert.equal(explanation.moduleGrid[19]![19]!.value, 0);
+  });
+
+  test('reports all forced masks and automatic mask selection', () => {
     for (let mask = 0; mask < 8; mask++) {
       const explanation = explainQRCode({
         data: 'MASK CHECK',
@@ -128,7 +151,16 @@ describe('explainQRCode', () => {
     assert.ok(new Set(dataModules.map(({codewordIndex}) => codewordIndex)).size > 1);
   });
 
-  test('validates data, size, and margin through public core APIs', () => {
+  test('preserves contextual functional-pattern groups', () => {
+    const explanation = explainQRCode({data: '1', version: 2, mask: 0});
+
+    assert.equal(explanation.groups.get('finder:top-left')?.label, 'Top Left finder pattern');
+    assert.equal(explanation.groups.get('separator:top-right')?.label, 'Top Right separator');
+    assert.equal(explanation.groups.get('alignment:18:18')?.label, 'Alignment pattern at (18, 18)');
+    assert.equal(explanation.groups.get('margin')?.label, 'Quiet zone');
+  });
+
+  test('validates data, size, and margin through shared core APIs', () => {
     assert.throws(
       () => explainQRCode({data: 'ABC', mode: 'numeric'}),
       /QRCode: Invalid data format/,

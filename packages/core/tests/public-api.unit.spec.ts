@@ -1,14 +1,27 @@
 import {describe, expect, expectTypeOf, test} from 'vitest';
 
+import * as core from '../src';
 import {
-  calculateQRCodeRenderedSize,
-  createQRCodeStylePlan,
-  isQRCodeColorHex,
-  isQRCodeCornerDotType,
-  isQRCodeCornerSquareType,
-  isQRCodeDotType,
-  isValidQRCodeMargin,
-  isValidQRCodeSize,
+  QRCodeBuilder,
+  QRCodeSVGRenderer,
+  QRCodeTextRenderer,
+  qrcode,
+  ɵECC_LEVELS,
+  ɵMODES,
+  ɵQR_CODE_COLOR_HEX_PATTERN,
+  ɵQR_CODE_CORNER_DOT_TYPES,
+  ɵQR_CODE_CORNER_SQUARE_TYPES,
+  ɵQR_CODE_DOT_TYPES,
+  ɵcalculateQRCodeRenderedSize,
+  ɵcreateQRCodeStylePlan,
+  ɵgenerateQRCodeMatrixWithMetadata,
+  ɵisQRCodeColorHex,
+  ɵisQRCodeCornerDotType,
+  ɵisQRCodeCornerSquareType,
+  ɵisQRCodeDotType,
+  ɵisValidQRCodeMargin,
+  ɵisValidQRCodeSize,
+  ɵparseQRCodeStylingOptions,
 } from '../src';
 import type {
   QRCodeAccessibilityOptions,
@@ -29,6 +42,9 @@ import type {
   QRCodeStylingColors,
   QRCodeStylingOptions,
   QRCodeTextRendererOptions,
+  ɵQRCodeMatrixGenerationMetadata,
+  ɵQRCodeMatrixMetadataRole,
+  ɵQRCodeMatrixModuleMetadata,
 } from '../src';
 
 describe('public API types', () => {
@@ -81,18 +97,64 @@ describe('public API types', () => {
     expectTypeOf<QRCodeCornerDotType>().toEqualTypeOf<QRCodeDotType | 'dot'>();
   });
 
-  test('exports styling validation and geometry utilities', () => {
-    expectTypeOf(isValidQRCodeSize).parameter(0).toEqualTypeOf<unknown>();
-    expectTypeOf(isValidQRCodeMargin).parameter(0).toEqualTypeOf<unknown>();
-    expectTypeOf(isQRCodeColorHex).parameter(0).toEqualTypeOf<unknown>();
-    expectTypeOf(calculateQRCodeRenderedSize).returns.toEqualTypeOf<number>();
-    expectTypeOf(createQRCodeStylePlan).parameter(0).toEqualTypeOf<import('../src').QRCodeMatrix>();
-    expectTypeOf(isQRCodeDotType).parameter(0).toEqualTypeOf<unknown>();
-    expectTypeOf(isQRCodeCornerSquareType).parameter(0).toEqualTypeOf<unknown>();
-    expectTypeOf(isQRCodeCornerDotType).parameter(0).toEqualTypeOf<unknown>();
+  test('exports styling validation and geometry utilities with internal prefixes', () => {
+    expectTypeOf(ɵisValidQRCodeSize).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(ɵisValidQRCodeMargin).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(ɵisQRCodeColorHex).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(ɵcalculateQRCodeRenderedSize).returns.toEqualTypeOf<number>();
+    expectTypeOf(ɵcreateQRCodeStylePlan)
+      .parameter(0)
+      .toEqualTypeOf<import('../src').QRCodeMatrix>();
+    expectTypeOf(ɵisQRCodeDotType).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(ɵisQRCodeCornerSquareType).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(ɵisQRCodeCornerDotType).parameter(0).toEqualTypeOf<unknown>();
+    expectTypeOf(ɵparseQRCodeStylingOptions).returns.toEqualTypeOf<QRCodeParsedStylingOptions>();
+
+    expect(ɵECC_LEVELS).toEqual(['L', 'M', 'Q', 'H']);
+    expect(ɵMODES).toEqual(['numeric', 'alphanumeric', 'octet']);
+    expect(ɵQR_CODE_COLOR_HEX_PATTERN.test('#123456')).toBe(true);
+    expect(ɵQR_CODE_DOT_TYPES).toContain('classy-rounded');
+    expect(ɵQR_CODE_CORNER_SQUARE_TYPES).toContain('dot');
+    expect(ɵQR_CODE_CORNER_DOT_TYPES).toContain('dot');
 
     const value: unknown = '#123456';
-    expect(isQRCodeColorHex(value)).toBe(true);
-    if (isQRCodeColorHex(value)) expectTypeOf(value).toEqualTypeOf<QRCodeColorHex>();
+    expect(ɵisQRCodeColorHex(value)).toBe(true);
+    if (ɵisQRCodeColorHex(value)) expectTypeOf(value).toEqualTypeOf<QRCodeColorHex>();
+  });
+
+  test('keeps primary runtime APIs public and prefixes package-internal exports', () => {
+    expect(qrcode).toBeTypeOf('function');
+    expect(QRCodeBuilder).toBeTypeOf('function');
+    expect(QRCodeSVGRenderer).toBeTypeOf('function');
+    expect(QRCodeTextRenderer).toBeTypeOf('function');
+
+    const legacyInternalNames = [
+      'calculateQRCodeRenderedSize',
+      'createQRCodeStylePlan',
+      'parseQRCodeStylingOptions',
+      'isQRCodeColorHex',
+      'isQRCodeCornerDotType',
+      'isQRCodeCornerSquareType',
+      'isQRCodeDotType',
+      'isValidQRCodeMargin',
+      'isValidQRCodeSize',
+      'ECC_LEVELS',
+      'MODES',
+      'QR_CODE_COLOR_HEX_PATTERN',
+      'QR_CODE_DOT_TYPES',
+      'QR_CODE_CORNER_SQUARE_TYPES',
+      'QR_CODE_CORNER_DOT_TYPES',
+    ];
+    for (const name of legacyInternalNames) expect(core).not.toHaveProperty(name);
+  });
+
+  test('exports prefixed QR matrix metadata contracts', () => {
+    expectTypeOf(
+      ɵgenerateQRCodeMatrixWithMetadata,
+    ).returns.toEqualTypeOf<ɵQRCodeMatrixGenerationMetadata>();
+    expectTypeOf<ɵQRCodeMatrixModuleMetadata['role']>().toEqualTypeOf<ɵQRCodeMatrixMetadataRole>();
+
+    const generated = ɵgenerateQRCodeMatrixWithMetadata('1', {version: 1, mask: 0});
+    expect(generated.moduleGrid).toHaveLength(21);
   });
 });

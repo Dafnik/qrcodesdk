@@ -4,8 +4,8 @@ import {
   type QRCodeRenderer,
   type QRCodeStylePrimitive,
   type QRCodeStylingOptions,
-  createQRCodeStylePlan,
-  parseQRCodeStylingOptions,
+  ɵcreateQRCodeStylePlan,
+  ɵparseQRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
 export type QRCodeCanvasRendererOptions = QRCodeStylingOptions;
@@ -15,8 +15,8 @@ export function QRCodeCanvasRenderer(
   options?: QRCodeCanvasRendererOptions,
 ): QRCodeRenderer<HTMLCanvasElement> {
   return (matrix: QRCodeMatrix) => {
-    const styling = parseQRCodeStylingOptions(options);
-    const plan = createQRCodeStylePlan(matrix, styling);
+    const styling = ɵparseQRCodeStylingOptions(options);
+    const plan = ɵcreateQRCodeStylePlan(matrix, styling);
     const scale = plan.renderedSize / plan.viewSize;
     const canvas = document.createElement('canvas');
     canvas.width = plan.renderedSize;
