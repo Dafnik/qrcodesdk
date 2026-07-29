@@ -3,14 +3,13 @@ import type {
   QRCodeMatrix,
   QRCodeOptions,
   QRCodeRenderer,
-  QRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
-import {QRCodeCanvasRenderer} from './canvas';
+import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from './canvas';
 import {downloadQRCode, ensureExtension} from './download-helper';
 import type {QRCodeDownloadRendererOptions} from './types';
 
-export type QRCodeImageRendererOptions = QRCodeStylingOptions & QRCodeAccessibilityOptions;
+export type QRCodeImageRendererOptions = QRCodeCanvasRendererOptions & QRCodeAccessibilityOptions;
 export type QRCodeImageOptions = QRCodeOptions<QRCodeImageRendererOptions>;
 
 export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<HTMLImageElement>;

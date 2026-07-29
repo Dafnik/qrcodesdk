@@ -196,23 +196,76 @@ export default function QRCodeDownloadImageExample() {
 
 ## Renderer options
 
-| Option                 | Components | Type                         |            Default |
-| ---------------------- | ---------- | ---------------------------- | -----------------: |
-| `size`                 | All        | `number`                     |                `5` |
-| `margin`               | All        | `number`                     |                `4` |
-| `colors.colorDark`     | All        | `string`                     |        `'#000000'` |
-| `colors.colorLight`    | All        | `string`                     |        `'#ffffff'` |
-| `dotsOptions`          | All        | `QRCodeDotsOptions`          | `{type: 'square'}` |
-| `cornersSquareOptions` | All        | `QRCodeCornersSquareOptions` | `{type: 'square'}` |
-| `cornersDotOptions`    | All        | `QRCodeCornersDotOptions`    | `{type: 'square'}` |
-| `alt`                  | SVG, Image | `string`                     |        `undefined` |
-| `ariaLabel`            | SVG, Image | `string`                     |        `undefined` |
-| `title`                | SVG, Image | `string`                     |        `undefined` |
+| Option                  | Components | Type                         |            Default |
+| ----------------------- | ---------- | ---------------------------- | -----------------: |
+| `size`                  | All        | `number`                     |                `5` |
+| `margin`                | All        | `number`                     |                `4` |
+| `colors.colorDark`      | All        | `string`                     |        `'#000000'` |
+| `colors.colorLight`     | All        | `string`                     |        `'#ffffff'` |
+| `dotsOptions`           | All        | `QRCodeDotsOptions`          | `{type: 'square'}` |
+| `cornersSquareOptions`  | All        | `QRCodeCornersSquareOptions` | `{type: 'square'}` |
+| `cornersDotOptions`     | All        | `QRCodeCornersDotOptions`    | `{type: 'square'}` |
+| `alt`                   | SVG, Image | `string`                     |        `undefined` |
+| `ariaLabel`             | SVG, Image | `string`                     |        `undefined` |
+| `title`                 | SVG, Image | `string`                     |        `undefined` |
+| `image.source`          | All        | Renderer-specific source     |        `undefined` |
+| `image.size`            | All        | `number`                     |              `0.4` |
+| `image.padding`         | All        | `number`                     |                `1` |
+| `image.clearBackground` | All        | `boolean`                    |             `true` |
 
-Color options use hash-prefixed values such as `#111827`. Image and Canvas output require a positive integer `size` and a non-negative integer `margin`.
+Color options use hash-prefixed values such as `#111827`. All built-in renderers require a positive safe integer `size` and a non-negative safe integer `margin`.
 
 Module, finder-ring, and finder-center options pass through to every component. Their optional
 colors independently inherit `colors.colorDark`.
+
+### Prepared center images
+
+Prepare browser image sources before rendering:
+
+```tsx
+import {useState} from 'react';
+
+import {QRCodeImage} from '@qrcodesdk/react';
+
+export function QRCodeWithLogo() {
+  const [logo, setLogo] = useState<HTMLImageElement>();
+
+  async function selectLogo(file: File) {
+    const source = new Image();
+    const localUrl = URL.createObjectURL(file);
+    source.src = localUrl;
+
+    try {
+      await source.decode();
+      setLogo(source);
+    } finally {
+      URL.revokeObjectURL(localUrl);
+    }
+  }
+
+  return (
+    <>
+      <input
+        accept="image/*"
+        type="file"
+        onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          if (file) void selectLogo(file);
+        }}
+      />
+      {logo ? (
+        <QRCodeImage
+          data="https://qrcodesdk.dev"
+          options={{errorCorrectionLevel: 'H', image: {source: logo, size: 0.3}}}
+        />
+      ) : null}
+    </>
+  );
+}
+```
+
+Use an embedded `data:image/...` URL for `QRCodeSVG`. Components never load paths or URLs
+themselves, and SVG/PNG downloads include the overlay.
 
 ## Download files
 

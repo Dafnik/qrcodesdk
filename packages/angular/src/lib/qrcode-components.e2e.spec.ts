@@ -192,6 +192,89 @@ describe('Angular QR code components', () => {
     expect(canvas.height).toBe(75);
   });
 
+  test('passes prepared image overlays through SVG, image, and canvas components', async () => {
+    const source = document.createElement('canvas');
+    source.width = 4;
+    source.height = 2;
+    const svgFixture = TestBed.createComponent(QRCodeSVGHost);
+    const imageFixture = TestBed.createComponent(QRCodeImageHost);
+    const canvasFixture = TestBed.createComponent(QRCodeCanvasHost);
+
+    svgFixture.componentRef.setInput('options', {
+      size: 2,
+      margin: 1,
+      image: {source: 'data:image/png;base64,cHJlcGFyZWQ=', size: 0.2},
+    });
+    imageFixture.componentRef.setInput('options', {
+      size: 2,
+      margin: 1,
+      image: {source, size: 0.2},
+    });
+    canvasFixture.componentRef.setInput('options', {
+      size: 2,
+      margin: 1,
+      image: {source, size: 0.2},
+    });
+    await Promise.all([
+      svgFixture.whenStable(),
+      imageFixture.whenStable(),
+      canvasFixture.whenStable(),
+    ]);
+
+    const embeddedImage = getRenderedElement<SVGImageElement>(svgFixture, 'svg image');
+    const firstImage = getRenderedElement<HTMLImageElement>(imageFixture, 'img');
+    const firstCanvas = getRenderedElement<HTMLCanvasElement>(canvasFixture, 'canvas');
+
+    expect(embeddedImage.getAttribute('href')).toBe('data:image/png;base64,cHJlcGFyZWQ=');
+    expect(svgFixture.nativeElement.querySelector('svg rect')).not.toBeNull();
+
+    imageFixture.componentRef.setInput('options', {
+      size: 2,
+      margin: 1,
+      image: {source, size: 0.3},
+    });
+    canvasFixture.componentRef.setInput('options', {
+      size: 2,
+      margin: 1,
+      image: {source, size: 0.3},
+    });
+    await Promise.all([imageFixture.whenStable(), canvasFixture.whenStable()]);
+
+    expect(getRenderedElement<HTMLImageElement>(imageFixture, 'img')).not.toBe(firstImage);
+    expect(getRenderedElement<HTMLCanvasElement>(canvasFixture, 'canvas')).not.toBe(firstCanvas);
+  });
+
+  test('downloads prepared SVG and PNG image overlays', async () => {
+    const source = document.createElement('canvas');
+    source.width = 2;
+    source.height = 1;
+    const svgFixture = TestBed.createComponent(QRCodeSVGHost);
+    const imageFixture = TestBed.createComponent(QRCodeImageHost);
+    const downloads = captureDownloads(vi);
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-overlay-svg');
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+    svgFixture.componentRef.setInput('options', {
+      size: 2,
+      margin: 1,
+      image: {source: 'data:image/png;base64,cHJlcGFyZWQ='},
+    });
+    imageFixture.componentRef.setInput('options', {
+      size: 2,
+      margin: 1,
+      image: {source},
+    });
+    await Promise.all([svgFixture.whenStable(), imageFixture.whenStable()]);
+
+    svgFixture.componentInstance.svgQRCode().download('overlay');
+    imageFixture.componentInstance.imageQRCode().download('overlay');
+
+    expect(downloads).toEqual([
+      {href: 'blob:qrcode-overlay-svg', filename: 'overlay.svg'},
+      {href: 'data:image/png;base64,qrcode', filename: 'overlay.png'},
+    ]);
+  });
+
   test('replaces existing rendered image when inputs change', () => {
     const fixture = TestBed.createComponent(QRCodeImageHost);
 

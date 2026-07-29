@@ -15,6 +15,21 @@ function expectPixel(png: PNG, x: number, y: number, rgba: ReturnType<typeof get
   expect(getPngPixel(png, x, y)).toEqual(rgba);
 }
 
+function createPreparedImage(
+  width: number,
+  height: number,
+  color: {red: number; green: number; blue: number; alpha: number},
+): Buffer {
+  const png = new PNG({width, height});
+  for (let index = 0; index < png.data.length; index += 4) {
+    png.data[index] = color.red;
+    png.data[index + 1] = color.green;
+    png.data[index + 2] = color.blue;
+    png.data[index + 3] = color.alpha;
+  }
+  return PNG.sync.write(png);
+}
+
 describe('QRCodePNGRenderer', () => {
   test('renders default PNG geometry from a hand-authored matrix', () => {
     const matrix: QRCodeMatrix = [
@@ -69,6 +84,75 @@ describe('QRCodePNGRenderer', () => {
     expect(png.width).toBe(4);
     expect(png.height).toBe(4);
     expect(Array.from(png.data)).toEqual(new Array<number>(4 * 4 * 4).fill(255));
+  });
+
+  test('centers and contains prepared PNG bytes without changing their aspect ratio', () => {
+    const png = readPng(
+      QRCodePNGRenderer({
+        size: 10,
+        margin: 0,
+        image: {
+          source: createPreparedImage(4, 2, {red: 255, green: 0, blue: 0, alpha: 255}),
+          size: 0.5,
+          padding: 0,
+        },
+      })([
+        [1, 1, 1, 1],
+        [1, 1, 1, 1],
+        [1, 1, 1, 1],
+        [1, 1, 1, 1],
+      ]),
+    );
+
+    expectPixel(png, 10, 10, {red: 255, green: 255, blue: 255, alpha: 255});
+    expectPixel(png, 20, 14, {red: 255, green: 255, blue: 255, alpha: 255});
+    expectPixel(png, 10, 15, {red: 255, green: 0, blue: 0, alpha: 255});
+    expectPixel(png, 29, 24, {red: 255, green: 0, blue: 0, alpha: 255});
+    expectPixel(png, 20, 25, {red: 255, green: 255, blue: 255, alpha: 255});
+  });
+
+  test('alpha-composites over QR modules when clearing is disabled', () => {
+    const transparentImage = createPreparedImage(1, 1, {
+      red: 255,
+      green: 0,
+      blue: 0,
+      alpha: 0,
+    });
+    const matrix: QRCodeMatrix = [
+      [1, 1],
+      [1, 1],
+    ];
+    const withoutClearing = readPng(
+      QRCodePNGRenderer({
+        size: 10,
+        margin: 0,
+        image: {source: transparentImage, size: 1, clearBackground: false},
+      })(matrix),
+    );
+    const withClearing = readPng(
+      QRCodePNGRenderer({
+        size: 10,
+        margin: 0,
+        image: {source: transparentImage, size: 1},
+      })(matrix),
+    );
+
+    expectPixel(withoutClearing, 10, 10, {red: 0, green: 0, blue: 0, alpha: 255});
+    expectPixel(withClearing, 10, 10, {red: 255, green: 255, blue: 255, alpha: 255});
+  });
+
+  test('rejects invalid prepared PNG sources with stable errors', () => {
+    expect(() =>
+      QRCodePNGRenderer({
+        image: {source: Buffer.from('not a png')},
+      })([[1]]),
+    ).toThrow('QR code PNG image source must contain valid PNG bytes');
+
+    expect(() =>
+      QRCodePNGRenderer({
+        image: {source: new Uint8Array() as unknown as Buffer},
+      })([[1]]),
+    ).toThrow('QR code PNG image source must be a Buffer containing PNG bytes');
   });
 
   test('rejects PNG dimensions that cannot map cleanly to pixels', () => {

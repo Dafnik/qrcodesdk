@@ -1,7 +1,9 @@
+import {resolveQRCodeImageOverlay} from './image-overlay';
 import {createQRCodeStylePlan} from './style-plan';
 import {parseQRCodeStylingOptions} from './styling';
 import type {
   QRCodeAccessibilityOptions,
+  QRCodeImageOverlayOptions,
   QRCodeMatrix,
   QRCodeOptions,
   QRCodeRenderer,
@@ -10,13 +12,22 @@ import type {
   QRCodeStylingOptions,
 } from './types';
 
-export type QRCodeSVGRendererOptions = QRCodeStylingOptions & QRCodeAccessibilityOptions;
+export type QRCodeDataImageURL = `data:image/${string}`;
+export type QRCodeSVGImageOptions = QRCodeImageOverlayOptions<QRCodeDataImageURL>;
+export type QRCodeSVGRendererOptions = QRCodeStylingOptions &
+  QRCodeAccessibilityOptions & {
+    image?: QRCodeSVGImageOptions;
+  };
 export type QRCodeSVGOptions = QRCodeOptions<QRCodeSVGRendererOptions>;
 
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
   return (matrix: QRCodeMatrix) => {
     const styling = parseQRCodeStylingOptions(options);
     const plan = createQRCodeStylePlan(matrix, styling);
+    const image = resolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
+    if (image && !isQRCodeDataImageURL(image.source)) {
+      throw new Error('QR code SVG image source must be an embedded data:image URL');
+    }
     const shapeRendering = !plan.hasCurves ? ' shape-rendering="crispEdges"' : '';
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${plan.renderedSize}" height="${plan.renderedSize}" viewBox="0 0 ${plan.viewSize} ${plan.viewSize}"${shapeRendering}`;
 
@@ -31,8 +42,33 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
       svg += `<path fill="${escapeAttributeValue(color)}" fill-rule="evenodd" d="${path}"/>`;
     }
 
+    if (image) {
+      if (image.clearBackground) {
+        svg += `<rect fill="${escapeAttributeValue(plan.backgroundColor)}" x="${formatNumber(
+          image.clearX,
+        )}" y="${formatNumber(image.clearY)}" width="${formatNumber(
+          image.clearSize,
+        )}" height="${formatNumber(image.clearSize)}"/>`;
+      }
+      svg += `<image href="${escapeAttributeValue(image.source)}" x="${formatNumber(
+        image.imageX,
+      )}" y="${formatNumber(image.imageY)}" width="${formatNumber(
+        image.imageSize,
+      )}" height="${formatNumber(image.imageSize)}" preserveAspectRatio="xMidYMid meet"/>`;
+    }
+
     return `${svg}</svg>`;
   };
+}
+
+function isQRCodeDataImageURL(value: unknown): value is QRCodeDataImageURL {
+  if (typeof value !== 'string' || !value.startsWith('data:')) return false;
+
+  const commaIndex = value.indexOf(',');
+  if (commaIndex < 0 || commaIndex === value.length - 1) return false;
+
+  const mediaType = value.slice(5, commaIndex).split(';', 1)[0];
+  return /^image\/[a-z0-9.+-]+$/i.test(mediaType ?? '');
 }
 
 type SVGPathGroup = {

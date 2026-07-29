@@ -56,6 +56,10 @@ const canvas = qrcode('https://qrcodesdk.dev').render(
 | `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                |
 | `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                    |
 | `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                    |
+| `image.source`               |      `CanvasImageSource` |        `undefined` | Image already loaded by the caller.               |
+| `image.size`                 |                 `number` |              `0.4` | Image box as a fraction of matrix width.          |
+| `image.padding`              |                 `number` |                `1` | Clear padding in QR module units.                 |
+| `image.clearBackground`      |                `boolean` |             `true` | Clears modules behind the image and padding.      |
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
@@ -63,7 +67,38 @@ Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, a
 `extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
 is independent; omit it to inherit `colors.colorDark`.
 
-Canvas output requires `size` to be a positive integer and `margin` to be a non-negative integer.
+Canvas output requires `size` to be a positive safe integer and `margin` to be a non-negative safe integer.
+
+### Add an already-loaded center image
+
+Load and decode the image before calling the QR renderer. The renderer remains synchronous and
+does not fetch URLs or attach image load listeners.
+
+```ts
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const logo = new Image();
+logo.src = '/logo.png';
+await logo.decode();
+
+const canvas = qrcode('https://qrcodesdk.dev')
+  .errorCorrection('H')
+  .render(
+    QRCodeCanvasRenderer({
+      image: {
+        source: logo,
+        size: 0.3,
+        padding: 1,
+        clearBackground: true,
+      },
+    }),
+  );
+```
+
+Any already-ready `CanvasImageSource`, such as an `HTMLImageElement`, canvas, or `ImageBitmap`, can
+be used. Unloaded and zero-sized sources throw immediately. Values through `size: 1` are accepted,
+but large overlays are likely to make the QR code impossible to scan.
 
 ## Common recipes
 

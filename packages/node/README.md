@@ -78,20 +78,40 @@ const png: Buffer = qrcode('https://qrcodesdk.dev').render(
 
 ## Options
 
-| Option                 | Type                         |            Default | Description                               |
-| ---------------------- | ---------------------------- | -----------------: | ----------------------------------------- |
-| `size`                 | `number`                     |                `5` | Pixel size of each QR module.             |
-| `margin`               | `number`                     |                `4` | Quiet-zone width in modules.              |
-| `colors.colorDark`     | `string`                     |        `'#000000'` | Dark module color.                        |
-| `colors.colorLight`    | `string`                     |        `'#ffffff'` | Background color.                         |
-| `dotsOptions`          | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary module shape and optional color. |
-| `cornersSquareOptions` | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color.     |
-| `cornersDotOptions`    | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color.   |
+| Option                  | Type                         |            Default | Description                               |
+| ----------------------- | ---------------------------- | -----------------: | ----------------------------------------- |
+| `size`                  | `number`                     |                `5` | Pixel size of each QR module.             |
+| `margin`                | `number`                     |                `4` | Quiet-zone width in modules.              |
+| `colors.colorDark`      | `string`                     |        `'#000000'` | Dark module color.                        |
+| `colors.colorLight`     | `string`                     |        `'#ffffff'` | Background color.                         |
+| `dotsOptions`           | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary module shape and optional color. |
+| `cornersSquareOptions`  | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color.     |
+| `cornersDotOptions`     | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color.   |
+| `image.source`          | `Buffer`                     |        `undefined` | PNG bytes loaded by the caller.           |
+| `image.size`            | `number`                     |              `0.4` | Relative centered image-box size.         |
+| `image.padding`         | `number`                     |                `1` | Clear padding in QR modules.              |
+| `image.clearBackground` | `boolean`                    |             `true` | Clears modules behind the image.          |
 
-Colors must be six-digit hex values such as `#111827`. `size` must be a positive integer and `margin` must be a non-negative integer.
+Colors must be six-digit hex values such as `#111827`. `size` must be a positive safe integer and `margin` must be a non-negative safe integer.
 
 All feature colors inherit `colors.colorDark` when omitted. Curves are rendered with deterministic
 subpixel coverage and blended into the opaque background.
+
+### Prepared PNG images
+
+Load PNG bytes before calling the renderer:
+
+```ts
+import {readFile} from 'node:fs/promises';
+
+const logo = await readFile('./logo.png');
+const png = qrcode('https://qrcodesdk.dev')
+  .errorCorrection('H')
+  .render(QRCodePNGRenderer({image: {source: logo, size: 0.3}}));
+```
+
+The renderer synchronously decodes and composites the provided buffer but performs no filesystem or
+network I/O. Only PNG source bytes are accepted.
 
 ## Save to disk
 
@@ -134,7 +154,11 @@ createServer((_request, response) => {
 ## Public API
 
 ```ts
-import {QRCodePNGRenderer, type QRCodePNGRendererOptions} from '@qrcodesdk/node';
+import {
+  type QRCodePNGImageOptions,
+  QRCodePNGRenderer,
+  type QRCodePNGRendererOptions,
+} from '@qrcodesdk/node';
 ```
 
 ## Documentation

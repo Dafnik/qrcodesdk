@@ -181,21 +181,25 @@ For framework-specific components, add:
 
 ## Renderer options
 
-| Option                 | Type                         |            Default | Description                                                 |
-| ---------------------- | ---------------------------- | -----------------: | ----------------------------------------------------------- |
-| `size`                 | `number`                     |                `5` | Pixel size or text scale of each QR module.                 |
-| `margin`               | `number`                     |                `4` | Quiet-zone width in modules.                                |
-| `colors.colorDark`     | `string`                     |        `'#000000'` | Dark module or ANSI foreground color.                       |
-| `colors.colorLight`    | `string`                     |        `'#ffffff'` | Background color for visual and ANSI text renderers.        |
-| `dotsOptions`          | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary-module shape and optional color for visual output. |
-| `cornersSquareOptions` | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color for visual output.     |
-| `cornersDotOptions`    | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color for visual output.   |
-| `small`                | `boolean`                    |             `true` | Packs two text-renderer rows into each terminal line.       |
-| `ansiColors`           | `boolean`                    |            `false` | Enables ANSI colors for terminal text.                      |
-| `onlyAnsiColors`       | `boolean`                    |            `false` | Uses ANSI background cells without UTF-8 block glyphs.      |
-| `alt`                  | `string`                     |        `undefined` | Adds an `alt` attribute to SVG output.                      |
-| `ariaLabel`            | `string`                     |        `undefined` | Adds an `aria-label` attribute to SVG output.               |
-| `title`                | `string`                     |        `undefined` | Adds a `title` attribute to SVG output.                     |
+| Option                  | Type                         |            Default | Description                                                 |
+| ----------------------- | ---------------------------- | -----------------: | ----------------------------------------------------------- |
+| `size`                  | `number`                     |                `5` | Pixel size or text scale of each QR module.                 |
+| `margin`                | `number`                     |                `4` | Quiet-zone width in modules.                                |
+| `colors.colorDark`      | `string`                     |        `'#000000'` | Dark module or ANSI foreground color.                       |
+| `colors.colorLight`     | `string`                     |        `'#ffffff'` | Background color for visual and ANSI text renderers.        |
+| `dotsOptions`           | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary-module shape and optional color for visual output. |
+| `cornersSquareOptions`  | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color for visual output.     |
+| `cornersDotOptions`     | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color for visual output.   |
+| `small`                 | `boolean`                    |             `true` | Packs two text-renderer rows into each terminal line.       |
+| `ansiColors`            | `boolean`                    |            `false` | Enables ANSI colors for terminal text.                      |
+| `onlyAnsiColors`        | `boolean`                    |            `false` | Uses ANSI background cells without UTF-8 block glyphs.      |
+| `alt`                   | `string`                     |        `undefined` | Adds an `alt` attribute to SVG output.                      |
+| `ariaLabel`             | `string`                     |        `undefined` | Adds an `aria-label` attribute to SVG output.               |
+| `title`                 | `string`                     |        `undefined` | Adds a `title` attribute to SVG output.                     |
+| `image.source`          | `QRCodeDataImageURL`         |        `undefined` | Embedded image data URL used by SVG output.                 |
+| `image.size`            | `number`                     |              `0.4` | Image-box side relative to the QR matrix area.              |
+| `image.padding`         | `number`                     |                `1` | Background-clearing padding in QR module units.             |
+| `image.clearBackground` | `boolean`                    |             `true` | Clears QR modules behind the image and padding.             |
 
 Color options use six-digit hash-prefixed values such as `#111827`. All renderers require a positive safe integer `size` and a non-negative safe integer `margin`. Terminal text is compact plain UTF-8 by default; ANSI styling and full-height `██` output are enabled independently with `ansiColors: true` and `small: false`. Use `onlyAnsiColors: true` for ANSI background cells containing spaces instead of UTF-8 block glyphs.
 
@@ -206,6 +210,28 @@ SVG, browser Canvas/Image, and Node PNG output; they do not affect terminal text
 
 All built-in renderers apply shared defaults and validate resolved styling before producing output.
 Custom renderers receive the generated matrix and can define their own output geometry.
+
+### Prepared SVG images
+
+SVG output accepts one centered image whose source is already embedded as a `data:image/...` URL.
+The renderer performs no URL or filesystem I/O.
+
+```ts
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+const response = await fetch('/logo.png');
+const bytes = new Uint8Array(await response.arrayBuffer());
+const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
+const source = `data:image/png;base64,${btoa(binary)}` as const;
+
+const svg = qrcode('https://qrcodesdk.dev', {
+  errorCorrectionLevel: 'H',
+}).render(QRCodeSVGRenderer({image: {source, size: 0.25}}));
+```
+
+The image is fitted without cropping. Large overlays, including the accepted maximum `size: 1`,
+can cover too many modules to scan; keep overlays small and test the final QR code with the intended
+scanners.
 
 ## Matrix output and custom renderers
 
@@ -257,11 +283,13 @@ import {
   type QRCodeCornerSquareType,
   type QRCodeCornersDotOptions,
   type QRCodeCornersSquareOptions,
+  type QRCodeDataImageURL,
   type QRCodeDotType,
   type QRCodeDotsOptions,
   type QRCodeErrorCorrectionLevel,
   type QRCodeFinderCenterStylePrimitive,
   type QRCodeFinderRingStylePrimitive,
+  type QRCodeImageOverlayOptions,
   type QRCodeInputData,
   type QRCodeMask,
   type QRCodeMatrix,
@@ -272,6 +300,7 @@ import {
   type QRCodeOptions,
   type QRCodeParsedStylingOptions,
   type QRCodeRenderer,
+  type QRCodeSVGImageOptions,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,

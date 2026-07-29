@@ -26,6 +26,7 @@ import {
   resetQrConfig,
   updateQrConfig,
 } from '../playground-config.ts';
+import {PlaygroundImageControls} from './image-controls.ts';
 import {QrMatrixControls} from './qr-matrix-controls.ts';
 
 @Component({
@@ -155,6 +156,14 @@ export class PlaygroundColorInput {
       </div>
 
       <hlm-accordion type="multiple">
+        <hlm-accordion-item isOpened>
+          <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
+            Center Image
+          </hlm-accordion-trigger>
+          <hlm-accordion-content>
+            <playground-image-controls />
+          </hlm-accordion-content>
+        </hlm-accordion-item>
         <hlm-accordion-item isOpened>
           <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
             Advanced Styling
@@ -377,6 +386,7 @@ export class PlaygroundColorInput {
     UpperCasePipe,
     NgIcon,
     PlaygroundColorInput,
+    PlaygroundImageControls,
     QrMatrixControls,
   ],
 })

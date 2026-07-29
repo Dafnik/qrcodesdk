@@ -18,8 +18,10 @@ export type {
   QRCodeRenderer,
   QRCodeFinderCenterStylePrimitive,
   QRCodeFinderRingStylePrimitive,
+  QRCodeImageOverlayOptions,
   QRCodeModuleShape,
   QRCodeModuleStylePrimitive,
+  QRCodeResolvedImageOverlay,
   QRCodeStylePlan,
   QRCodeStylePrimitive,
   QRCodeStyleRole,
@@ -29,7 +31,13 @@ export type {
   QRCodeVersion,
 } from './types';
 export {type QRCodeTextRendererOptions, QRCodeTextRenderer} from './text';
-export {type QRCodeSVGOptions, type QRCodeSVGRendererOptions, QRCodeSVGRenderer} from './svg';
+export {
+  type QRCodeDataImageURL,
+  type QRCodeSVGImageOptions,
+  type QRCodeSVGOptions,
+  type QRCodeSVGRendererOptions,
+  QRCodeSVGRenderer,
+} from './svg';
 export {
   calculateQRCodeRenderedSize as ɵcalculateQRCodeRenderedSize,
   isQRCodeCornerDotType as ɵisQRCodeCornerDotType,
@@ -45,6 +53,7 @@ export {
   QR_CODE_CORNER_DOT_TYPES as ɵQR_CODE_CORNER_DOT_TYPES,
 } from './styling';
 export {createQRCodeStylePlan as ɵcreateQRCodeStylePlan} from './style-plan';
+export {resolveQRCodeImageOverlay as ɵresolveQRCodeImageOverlay} from './image-overlay';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';
 export {ECC_LEVELS as ɵECC_LEVELS} from './matrix/error-correction';
 export {MODES as ɵMODES} from './matrix/mode';
