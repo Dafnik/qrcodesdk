@@ -4,7 +4,7 @@ import {FormsModule} from '@angular/forms';
 
 import {NanostoresService} from '@nanostores/angular';
 import {NgIcon, provideIcons} from '@ng-icons/core';
-import {lucideImage, lucideImagePlus, lucideTrash2} from '@ng-icons/lucide';
+import {lucideImage, lucideImagePlus, lucideQrCode, lucideTrash2} from '@ng-icons/lucide';
 import {HlmAlertImports} from '@spartan-ng/helm/alert';
 import {HlmButtonImports} from '@spartan-ng/helm/button';
 import {HlmFieldImports} from '@spartan-ng/helm/field';
@@ -16,6 +16,7 @@ import {
   playgroundImageStatus,
   playgroundPreparedImage,
   preparePlaygroundImage,
+  preparePlaygroundLogo,
   updatePlaygroundImage,
 } from '../playground-config.ts';
 
@@ -30,40 +31,41 @@ import {
     HlmSwitchImports,
     NgIcon,
   ],
-  providers: [provideIcons({lucideImage, lucideImagePlus, lucideTrash2})],
+  providers: [provideIcons({lucideImage, lucideImagePlus, lucideQrCode, lucideTrash2})],
   template: `
     <fieldset hlmFieldSet>
-      <legend hlmFieldLegend>Center image</legend>
       <p hlmFieldDescription>Upload and decode an image before it is passed to the QR renderer.</p>
 
-      <div class="border-border bg-muted/30 flex min-w-0 items-center gap-3 rounded-lg border p-3">
-        <div
-          class="border-border bg-background grid size-14 shrink-0 place-items-center overflow-hidden rounded-md border">
-          @if (preparedImage(); as image) {
-            <img
-              class="size-full object-contain"
-              [src]="image.dataUrl"
-              alt=""
-              width="56"
-              height="56" />
-          } @else {
-            <ng-icon class="text-muted-foreground text-xl" name="lucideImage" />
-          }
-        </div>
-
-        <div class="grid min-w-0 flex-1 gap-1">
-          <p class="truncate text-sm font-medium">
+      <div class="border-border bg-muted/30 grid min-w-0 gap-3 rounded-lg border p-3">
+        <div class="flex min-w-0 items-center gap-3">
+          <div
+            class="border-border bg-background grid size-14 shrink-0 place-items-center overflow-hidden rounded-md border">
             @if (preparedImage(); as image) {
-              {{ image.fileName }}
-            } @else if (status().state === 'loading') {
-              Preparing image…
+              <img
+                class="size-full object-contain"
+                [src]="image.dataUrl"
+                alt=""
+                width="56"
+                height="56" />
             } @else {
-              No image selected
+              <ng-icon class="text-muted-foreground text-xl" name="lucideImage" />
             }
-          </p>
-          <p class="text-muted-foreground text-xs">
-            The image remains local to this browser session.
-          </p>
+          </div>
+
+          <div class="grid min-w-0 flex-1 gap-1">
+            <p class="truncate text-sm font-medium">
+              @if (preparedImage(); as image) {
+                {{ image.fileName }}
+              } @else if (status().state === 'loading') {
+                Preparing image…
+              } @else {
+                No image selected
+              }
+            </p>
+            <p class="text-muted-foreground text-xs">
+              The image remains local to this browser session.
+            </p>
+          </div>
         </div>
 
         <input
@@ -72,28 +74,40 @@ import {
           (change)="selectImage($event)"
           type="file"
           accept="image/*" />
-        <button
-          [disabled]="status().state === 'loading'"
-          (click)="imageInput.click()"
-          hlmBtn
-          type="button"
-          variant="outline"
-          size="sm">
-          <ng-icon name="lucideImagePlus" />
-          {{ preparedImage() ? 'Replace' : 'Upload' }}
-        </button>
-        @if (preparedImage()) {
+        <div class="flex flex-wrap items-center gap-2">
           <button
-            (click)="removeImage(imageInput)"
-            aria-label="Remove center image"
-            title="Remove center image"
+            [disabled]="status().state === 'loading'"
+            (click)="useQRCodeSDKLogo()"
             hlmBtn
             type="button"
-            variant="ghost"
-            size="icon-sm">
-            <ng-icon name="lucideTrash2" />
+            variant="secondary"
+            size="sm">
+            <ng-icon name="lucideQrCode" />
+            Use QRCodeSDK logo
           </button>
-        }
+          <button
+            [disabled]="status().state === 'loading'"
+            (click)="imageInput.click()"
+            hlmBtn
+            type="button"
+            variant="outline"
+            size="sm">
+            <ng-icon name="lucideImagePlus" />
+            {{ preparedImage() ? 'Replace' : 'Upload' }}
+          </button>
+          @if (preparedImage()) {
+            <button
+              (click)="removeImage(imageInput)"
+              aria-label="Remove center image"
+              title="Remove center image"
+              hlmBtn
+              type="button"
+              variant="ghost"
+              size="icon-sm">
+              <ng-icon name="lucideTrash2" />
+            </button>
+          }
+        </div>
       </div>
 
       @if (status().state === 'error') {
@@ -110,7 +124,7 @@ import {
             <input
               id="image-size"
               [ngModel]="image.size"
-              (ngModelChange)="updatePlaygroundImage({size: $event})"
+              (ngModelChange)="updateImageSize($event)"
               hlmInput
               type="number"
               min="0.01"
@@ -124,7 +138,7 @@ import {
             <input
               id="image-padding"
               [ngModel]="image.padding"
-              (ngModelChange)="updatePlaygroundImage({padding: $event})"
+              (ngModelChange)="updateImagePadding($event)"
               hlmInput
               type="number"
               min="0"
@@ -170,6 +184,22 @@ export class PlaygroundImageControls {
 
     await preparePlaygroundImage(file);
     input.value = '';
+  }
+
+  protected async useQRCodeSDKLogo(): Promise<void> {
+    await preparePlaygroundLogo();
+  }
+
+  protected updateImageSize(value: number | null): void {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return;
+
+    updatePlaygroundImage({size: Math.min(1, Math.max(0.01, value))});
+  }
+
+  protected updateImagePadding(value: number | null): void {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return;
+
+    updatePlaygroundImage({padding: Math.max(0, value)});
   }
 
   protected removeImage(input: HTMLInputElement): void {

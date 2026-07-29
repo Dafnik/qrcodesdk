@@ -13,6 +13,7 @@ import {
   playgroundImageStatus,
   playgroundPreparedImage,
   preparePlaygroundImage,
+  preparePlaygroundLogo,
   resetQrConfig,
   updatePlaygroundImage,
 } from './playground-config.ts';
@@ -79,6 +80,18 @@ describe('playground prepared image options', () => {
     assert.deepEqual(playgroundImageStatus.get(), {
       state: 'error',
       message: 'Choose an image file.',
+    });
+  });
+
+  test('reports a stable error when the bundled logo cannot be loaded', async () => {
+    playgroundPreparedImage.set(preparedImage);
+
+    await preparePlaygroundLogo(async () => new Response(null, {status: 404}));
+
+    assert.equal(playgroundPreparedImage.get(), undefined);
+    assert.deepEqual(playgroundImageStatus.get(), {
+      state: 'error',
+      message: 'The QRCodeSDK logo could not be loaded.',
     });
   });
 });

@@ -47,6 +47,8 @@ export const playgroundPreparedImage = atom<PlaygroundPreparedImage | undefined>
 export const playgroundImageStatus = atom<PlaygroundImageStatus>({state: 'idle'});
 
 let imagePreparationVersion = 0;
+const playgroundLogoPath = '/logo-square.png';
+const playgroundLogoFileName = 'QRCodeSDK logo.png';
 
 function mergeOptionalObject<T extends object>(
   current: T | undefined,
@@ -110,6 +112,29 @@ export async function preparePlaygroundImage(file: File): Promise<void> {
   const preparationVersion = ++imagePreparationVersion;
   playgroundImageStatus.set({state: 'loading', fileName: file.name});
 
+  await preparePlaygroundImageFile(file, preparationVersion);
+}
+
+export async function preparePlaygroundLogo(fetchImage: typeof fetch = fetch): Promise<void> {
+  const preparationVersion = ++imagePreparationVersion;
+  playgroundImageStatus.set({state: 'loading', fileName: playgroundLogoFileName});
+
+  try {
+    const response = await fetchImage(playgroundLogoPath);
+    if (!response.ok) {
+      throw new Error('The QRCodeSDK logo could not be loaded.');
+    }
+
+    const file = new File([await response.blob()], playgroundLogoFileName, {type: 'image/png'});
+    if (preparationVersion !== imagePreparationVersion) return;
+
+    await preparePlaygroundImageFile(file, preparationVersion);
+  } catch (error) {
+    setPlaygroundImageError(preparationVersion, error);
+  }
+}
+
+async function preparePlaygroundImageFile(file: File, preparationVersion: number): Promise<void> {
   try {
     const dataUrl = await readFileAsDataImageURL(file);
     const element = await loadPreparedImage(dataUrl);
@@ -126,14 +151,18 @@ export async function preparePlaygroundImage(file: File): Promise<void> {
     playgroundImageStatus.set({state: 'ready'});
     updateQrConfig({errorCorrectionLevel: 'H'});
   } catch (error) {
-    if (preparationVersion !== imagePreparationVersion) return;
-
-    playgroundPreparedImage.set(undefined);
-    playgroundImageStatus.set({
-      state: 'error',
-      message: error instanceof Error ? error.message : 'The selected image could not be prepared.',
-    });
+    setPlaygroundImageError(preparationVersion, error);
   }
+}
+
+function setPlaygroundImageError(preparationVersion: number, error: unknown): void {
+  if (preparationVersion !== imagePreparationVersion) return;
+
+  playgroundPreparedImage.set(undefined);
+  playgroundImageStatus.set({
+    state: 'error',
+    message: error instanceof Error ? error.message : 'The selected image could not be prepared.',
+  });
 }
 
 export function updatePlaygroundImage(
@@ -251,19 +280,19 @@ function readFileAsDataImageURL(file: File): Promise<QRCodeDataImageURL> {
   });
 }
 
-function loadPreparedImage(dataUrl: QRCodeDataImageURL): Promise<HTMLImageElement> {
+async function loadPreparedImage(dataUrl: QRCodeDataImageURL): Promise<HTMLImageElement> {
   const image = new Image();
   image.src = dataUrl;
 
-  return image
-    .decode()
-    .then(() => {
-      if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-        throw new Error('The selected image has no usable dimensions.');
-      }
-      return image;
-    })
-    .catch(() => {
-      throw new Error('The selected image could not be decoded by this browser.');
-    });
+  try {
+    await image.decode();
+  } catch {
+    throw new Error('The selected image could not be decoded by this browser.');
+  }
+
+  if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+    throw new Error('The selected image has no usable dimensions.');
+  }
+
+  return image;
 }

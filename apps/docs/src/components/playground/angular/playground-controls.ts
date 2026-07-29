@@ -135,7 +135,6 @@ export class PlaygroundColorInput {
         </div>
       </div>
       <qr-matrix-controls />
-      <playground-image-controls />
       <div class="grid gap-4 md:grid-cols-2">
         <div hlmField>
           <label hlmFieldLabel for="darkColor">Dark Color</label>
@@ -157,6 +156,14 @@ export class PlaygroundColorInput {
       </div>
 
       <hlm-accordion type="multiple">
+        <hlm-accordion-item isOpened>
+          <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
+            Center Image
+          </hlm-accordion-trigger>
+          <hlm-accordion-content>
+            <playground-image-controls />
+          </hlm-accordion-content>
+        </hlm-accordion-item>
         <hlm-accordion-item isOpened>
           <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
             Advanced Styling
