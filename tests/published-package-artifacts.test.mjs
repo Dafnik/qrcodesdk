@@ -23,16 +23,66 @@ function readTarEntries(gzippedTarball) {
 
     const name = header.subarray(0, 100).toString('utf8').replace(/\0.*$/u, '');
     const prefix = header.subarray(345, 500).toString('utf8').replace(/\0.*$/u, '');
+    const modeText = header.subarray(100, 108).toString('ascii').replace(/\0.*$/u, '').trim();
+    const mode = Number.parseInt(modeText || '0', 8);
     const sizeText = header.subarray(124, 136).toString('ascii').replace(/\0.*$/u, '').trim();
     const size = Number.parseInt(sizeText || '0', 8);
     const entryName = prefix ? `${prefix}/${name}` : name;
     const dataOffset = offset + 512;
 
-    entries.set(entryName, tarball.subarray(dataOffset, dataOffset + size));
+    entries.set(entryName, {data: tarball.subarray(dataOffset, dataOffset + size), mode});
     offset = dataOffset + Math.ceil(size / 512) * 512;
   }
 
   return entries;
+}
+
+function collectStringTargets(value) {
+  if (typeof value === 'string') return [value];
+  if (Array.isArray(value)) return value.flatMap(collectStringTargets);
+  if (value && typeof value === 'object') {
+    return Object.values(value).flatMap(collectStringTargets);
+  }
+  return [];
+}
+
+function assertTargetExists(entries, packageName, field, target) {
+  const entryName = `package/${target.replace(/^\.\//u, '')}`;
+  assert.equal(
+    entries.has(entryName),
+    true,
+    `${packageName} ${field} target must exist: ${target}`,
+  );
+  return entries.get(entryName);
+}
+
+function assertPackageArtifacts(entries, packageJson) {
+  for (const target of collectStringTargets(packageJson.exports)) {
+    assertTargetExists(entries, packageJson.name, 'exports', target);
+  }
+
+  for (const field of ['module', 'types', 'typings']) {
+    for (const target of collectStringTargets(packageJson[field])) {
+      assertTargetExists(entries, packageJson.name, field, target);
+    }
+  }
+
+  for (const target of collectStringTargets(packageJson.bin)) {
+    const entry = assertTargetExists(entries, packageJson.name, 'bin', target);
+    assert.notEqual(
+      entry.mode & 0o111,
+      0,
+      `${packageJson.name} bin target must be executable: ${target}`,
+    );
+  }
+
+  for (const file of ['README.md', 'CHANGELOG.md', 'LICENSE']) {
+    assert.equal(
+      entries.has(`package/${file}`),
+      true,
+      `${packageJson.name} tarball must contain ${file}`,
+    );
+  }
 }
 
 function assertPackageMetadata(packageJson, policy) {
@@ -77,18 +127,11 @@ test('packed public packages preserve the runtime metadata contract', async () =
       const packageJsonEntry = entries.get('package/package.json');
       assert.ok(packageJsonEntry, `${policy.name} tarball must contain package/package.json`);
 
-      const packageJson = JSON.parse(packageJsonEntry.toString('utf8'));
+      const packageJson = JSON.parse(packageJsonEntry.data.toString('utf8'));
       assertPackageMetadata(packageJson, policy);
+      assertPackageArtifacts(entries, packageJson);
 
       if (policy.name === '@qrcodesdk/core') {
-        for (const file of [
-          'package/dist/index.mjs',
-          'package/dist/index.mjs.map',
-          'package/dist/index.d.mts',
-          'package/dist/index.d.mts.map',
-        ]) {
-          assert.equal(entries.has(file), true, `Core tarball must contain ${file}`);
-        }
         assert.equal(
           [...entries.keys()].some((entry) => entry.startsWith('package/runtime/')),
           false,
