@@ -1,0 +1,203 @@
+name: Core runtime compatibility
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_call:
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Build Core
+        run: pnpm turbo run build --filter=@qrcodesdk/core
+
+      - name: Smoke-test the emitted artifact
+        run: pnpm --filter @qrcodesdk/core test:runtime:dist
+
+      - name: Pack Core
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/core-package"
+          pnpm --dir packages/core pack --pack-destination "$RUNNER_TEMP/core-package"
+
+      - name: Upload Core distribution
+        uses: actions/upload-artifact@v7
+        with:
+          name: core-dist
+          path: packages/core/dist
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload Core package
+        uses: actions/upload-artifact@v7
+        with:
+          name: core-package
+          path: ${{ runner.temp }}/core-package/*.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  node:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 22.x
+          - 24.x
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: core-package
+          path: ${{ runner.temp }}/core-package
+
+      - name: Test the installed package
+        shell: bash
+        run: |
+          consumer="$RUNNER_TEMP/core-node-consumer"
+          mkdir -p "$consumer"
+          cp packages/core/runtime/assert-runtime.mjs packages/core/runtime/smoke-package.mjs "$consumer"
+          cd "$consumer"
+          npm init --yes
+          npm pkg set type=module
+          npm config set engine-strict true --location=project
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false "$RUNNER_TEMP/core-package/"*.tgz
+          node smoke-package.mjs
+
+  deno:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: core-package
+          path: ${{ runner.temp }}/core-package
+
+      - name: Test the installed package
+        shell: bash
+        run: |
+          consumer="$RUNNER_TEMP/core-deno-consumer"
+          mkdir -p "$consumer"
+          cp packages/core/runtime/assert-runtime.mjs packages/core/runtime/smoke-package.mjs "$consumer"
+          cd "$consumer"
+          npm init --yes
+          npm pkg set type=module
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false "$RUNNER_TEMP/core-package/"*.tgz
+          deno run --node-modules-dir=manual smoke-package.mjs
+
+  bun:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: core-package
+          path: ${{ runner.temp }}/core-package
+
+      - name: Test the installed package
+        shell: bash
+        run: |
+          consumer="$RUNNER_TEMP/core-bun-consumer"
+          mkdir -p "$consumer"
+          cp packages/core/runtime/assert-runtime.mjs packages/core/runtime/smoke-package.mjs "$consumer"
+          cd "$consumer"
+          echo '{"private":true,"type":"module"}' > package.json
+          bun add "$RUNNER_TEMP/core-package/"*.tgz
+          bun run smoke-package.mjs
+
+  browser:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Setup Playwright
+        uses: ./.github/actions/setup-playwright
+        with:
+          browsers: chromium firefox webkit
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: core-dist
+          path: packages/core/dist
+
+      - name: Test the raw artifact in browser engines
+        run: pnpm --filter @qrcodesdk/core test:runtime:browser
+
+  required:
+    name: required
+    if: always()
+    needs:
+      - build
+      - node
+      - deno
+      - bun
+      - browser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every runtime job
+        if: >-
+          needs.build.result != 'success' ||
+          needs.node.result != 'success' ||
+          needs.deno.result != 'success' ||
+          needs.bun.result != 'success' ||
+          needs.browser.result != 'success'
+        run: exit 1
+
+      - name: Report success
+        run: echo "Every Core runtime compatibility job succeeded."

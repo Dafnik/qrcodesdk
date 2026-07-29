@@ -10,7 +10,7 @@ related:
 
 Use this when you need a crisp, scalable QR code for web apps, dashboards, emails, documentation pages, server-rendered routes, or generated static assets.
 
-SVG is the best default for most user-facing QR codes because it stays sharp at any size and works in any JavaScript runtime.
+SVG is the best default for most user-facing QR codes because it stays sharp at any size. The Core artifact works in any runtime meeting its [documented ESM, ES2020, and `TextEncoder` contract](/packages/core/#runtime-compatibility).
 
 ## Minimal example
 

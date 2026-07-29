@@ -5,7 +5,9 @@
     "benchmark": "turbo run benchmark --filter=@repo/benchmarks",
     "build": "turbo run build",
     "start": "turbo run start",
-    "test": "turbo run test",
+    "test": "pnpm run test:package-policy && turbo run test",
+    "test:package-artifacts": "node --test tests/published-package-artifacts.test.mjs",
+    "test:package-policy": "node --test tests/published-package-policy.test.mjs",
     "test:coverage": "rm -rf .coverage coverage && mkdir -p .coverage/raw .coverage/merge coverage && turbo run test:coverage:raw && cp .coverage/raw/*/*.json .coverage/merge/ && nyc merge .coverage/merge coverage/coverage-final.json && nyc report --temp-dir coverage --report-dir coverage --reporter=text-summary --reporter=html --reporter=lcov",
     "check-types": "turbo run check-types",
     "clean": "turbo run clean",
@@ -14,7 +16,7 @@
     "cspell": "cspell \"**\" --gitignore --quiet",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "turbo run check",
+    "check": "pnpm run test:package-policy && turbo run check && pnpm run test:package-artifacts",
     "release:status": "changeset status --verbose",
     "release:version": "changeset version && pnpm install",
     "release:tag": "changeset tag",
@@ -37,6 +39,6 @@
   },
   "packageManager": "pnpm@11.11.0",
   "engines": {
-    "node": ">= 24.15.0"
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
   }
 }

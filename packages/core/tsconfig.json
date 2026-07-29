@@ -1,4 +1,8 @@
 {
+  "compilerOptions": {
+    "lib": ["es2020"],
+    "target": "es2020"
+  },
   "extends": "@repo/typescript-config/ts-library.json",
   "include": ["src"]
 }

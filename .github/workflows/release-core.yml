@@ -10,7 +10,11 @@ permissions:
   contents: write # Required for GitHub release action
 
 jobs:
+  runtime:
+    uses: ./.github/workflows/core-runtime.yml
+
   core:
+    needs: runtime
     uses: ./.github/workflows/release.yml
     with:
       lib: core

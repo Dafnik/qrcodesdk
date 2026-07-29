@@ -1,5 +1,10 @@
 name: 'Setup Playwright'
 description: 'Setup Playwright with caching, using pnpm (should already be installed)'
+inputs:
+  browsers:
+    description: 'Space-separated Playwright browser names to install'
+    required: false
+    default: 'chromium'
 runs:
   using: 'composite'
   steps:
@@ -28,28 +33,41 @@ runs:
         echo "PLAYWRIGHT_VERSION=$(jq -r '.devDependencies."playwright"' package.json)" >> $GITHUB_ENV
         cd -
 
-    # Cache the Playwright browser binary (only @qrcodesdk/browser test needs it).
-    # ponytail: system deps assumed present on the runner on a cache hit; if a
-    # future runner image drops them, add `playwright install-deps` to the hit path.
+    - name: Normalize browser cache key
+      shell: bash
+      env:
+        PLAYWRIGHT_BROWSERS: ${{ inputs.browsers }}
+      run: |
+        browser_key=$(xargs <<< "$PLAYWRIGHT_BROWSERS" | tr ' ' '-')
+        echo "PLAYWRIGHT_BROWSER_KEY=$browser_key" >> "$GITHUB_ENV"
+
+    # Cache the selected Playwright browser binaries. System dependencies are
+    # installed separately on cache hits because they are not part of this cache.
     - name: Cache Playwright
       id: playwright-cache
       uses: actions/cache@v6
       with:
         path: ~/.cache/ms-playwright
-        key: playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}
+        key: playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}-${{ env.PLAYWRIGHT_BROWSER_KEY }}
 
     - name: Install Playwright dependencies
       shell: bash
       if: steps.playwright-cache.outputs.cache-hit != 'true'
+      env:
+        PLAYWRIGHT_BROWSERS: ${{ inputs.browsers }}
       run: |
         cd packages/browser
-        pnpm exec playwright install chromium --with-deps
+        read -r -a browsers <<< "$PLAYWRIGHT_BROWSERS"
+        pnpm exec playwright install --with-deps "${browsers[@]}"
 
     # On a cache hit the binary is restored but the apt system deps aren't, so
     # install just those (fast) to avoid missing-library flakiness.
-    - name: Install Playwright dependencies
+    - name: Install Playwright system dependencies
       shell: bash
       if: steps.playwright-cache.outputs.cache-hit == 'true'
+      env:
+        PLAYWRIGHT_BROWSERS: ${{ inputs.browsers }}
       run: |
         cd packages/browser
-        pnpm exec playwright install-deps chromium
+        read -r -a browsers <<< "$PLAYWRIGHT_BROWSERS"
+        pnpm exec playwright install-deps "${browsers[@]}"

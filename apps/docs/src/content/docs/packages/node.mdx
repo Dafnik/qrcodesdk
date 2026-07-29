@@ -13,6 +13,12 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
 
+## Runtime requirements
+
+`@qrcodesdk/node` requires Node.js 22.0.0 or newer. Packed consumers are verified in CI on Node
+22.0.0 and the latest Node 24.x release. Installation through another package manager does not
+mean that the package is verified under that package manager's JavaScript runtime.
+
 ## Install
 
 <PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/node']} mode="add" />

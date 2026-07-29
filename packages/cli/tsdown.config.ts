@@ -11,4 +11,8 @@ export default defineConfig({
     bin: './src/bin.ts',
   },
   exports: false,
+  fixedExtension: true,
+  format: 'es',
+  platform: 'node',
+  target: 'node22.12.0',
 });

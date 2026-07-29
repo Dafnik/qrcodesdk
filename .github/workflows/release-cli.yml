@@ -10,7 +10,11 @@ permissions:
   contents: write # Required for GitHub release action
 
 jobs:
+  runtime:
+    uses: ./.github/workflows/node-package-runtime.yml
+
   cli:
+    needs: runtime
     uses: ./.github/workflows/release.yml
     with:
       lib: cli
