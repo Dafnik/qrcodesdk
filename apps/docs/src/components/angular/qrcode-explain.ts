@@ -438,7 +438,14 @@ export class QRCodeExplain {
     }
     const items: LegendItem[] =
       explanation.margin > 0
-        ? [{id: 'role:margin', role: 'margin', label: 'Quiet zone', count: explanation.margin}]
+        ? [
+            {
+              id: 'role:margin',
+              role: 'margin',
+              label: 'Quiet zone',
+              count: explanation.viewSize ** 2 - explanation.matrix.length ** 2,
+            },
+          ]
         : [];
     for (const role of QR_CODE_EXPLAIN_ROLE_ORDER) {
       const count = counts.get(role) ?? 0;
@@ -497,7 +504,16 @@ export class QRCodeExplain {
   }
 
   protected onSvgFocus(): void {
-    if (this.activeSelection() === undefined) this.selectKeyboardModule();
+    const selection = this.activeSelection();
+    if (selection?.module !== undefined) {
+      this.keyboardPosition.set({
+        row: selection.module.row,
+        column: selection.module.column,
+      });
+    } else if (selection === undefined) {
+      this.keyboardPosition.set({row: 0, column: 0});
+      this.selectKeyboardModule();
+    }
   }
 
   protected onBlur(): void {
@@ -632,11 +648,13 @@ export class QRCodeExplain {
     const position = this.keyboardPosition();
     const module = this.explanation()?.moduleGrid[position.row]?.[position.column];
     if (module !== undefined) {
-      this.previewSelection.set({
+      const selection = {
         groupId: module.groupId,
         role: module.role,
         module,
-      });
+      };
+      this.previewSelection.set(selection);
+      if (this.pinnedSelection() !== undefined) this.pinnedSelection.set(selection);
     }
   }
 
