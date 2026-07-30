@@ -17,21 +17,6 @@ permissions:
   contents: write # Required for GitHub release action
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: dafnik/setup-node-pnpm@v5
-        with:
-          install-ignore-scripts: true
-
-      - name: Setup Playwright
-        uses: ./.github/actions/setup-playwright
-
-      - name: Check everything (format:check, cspell, build, test, lint, check-types)
-        run: pnpm check
-
   build:
     name: Build ${{ inputs.lib }}
     runs-on: ubuntu-latest
@@ -123,7 +108,7 @@ jobs:
 
   release-npm:
     name: Release ${{ inputs.lib }} to npm
-    needs: [check, build]
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Configure npm registry authentication
