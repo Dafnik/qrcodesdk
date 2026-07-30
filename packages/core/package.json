@@ -1,7 +1,7 @@
 {
   "name": "@qrcodesdk/core",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Runtime-neutral QR code generation for any JavaScript runtime with native ESM, ES2020, and TextEncoder. Build matrices, SVG, terminal text, or custom output.",
   "sideEffects": false,
   "private": false,

@@ -1,7 +1,7 @@
 {
   "name": "@qrcodesdk/react",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "@qrcodesdk/react provides React components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.",
   "sideEffects": false,
   "private": false,
