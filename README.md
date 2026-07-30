@@ -1,3 +1,5 @@
+<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+
 # QRCodeSDK
 
 QRCodeSDK keeps QR code generation separate from presentation. Start with `qrcode()`, then output SVG, PNG, Canvas, image elements, terminal text, matrix data, or your own custom renderer.
