@@ -136,7 +136,7 @@ jobs:
           if [ "$published_version" = "$PACKAGE_VERSION" ]; then
             echo "${PACKAGE_NAME}@${PACKAGE_VERSION} is already published; skipping."
           else
-            npm publish npm-package/*.tgz --access public --provenance
+            npm publish ./npm-package/*.tgz --access public --provenance
           fi
 
   release-github:
