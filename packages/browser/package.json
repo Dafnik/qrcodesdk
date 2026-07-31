@@ -77,7 +77,7 @@
     "@repo/typescript-config": "workspace:*",
     "@vitest/browser-playwright": "4.1.10",
     "jsqr": "catalog:",
-    "playwright": "1.61.1",
+    "playwright": "1.62.0",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
