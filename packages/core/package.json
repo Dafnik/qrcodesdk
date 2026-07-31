@@ -76,7 +76,7 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "playwright": "1.61.1",
+    "playwright": "1.62.0",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
