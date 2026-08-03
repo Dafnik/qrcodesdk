@@ -156,28 +156,3 @@ serve({
   port: 3000,
 });
 ```
-
-## Output details
-
-The PNG renderer generates:
-
-- A square PNG image
-- Square or deterministically antialiased curved modules, depending on the selected feature types
-- A solid background using `colors.colorLight`
-- Independently colored data modules, finder rings, and finder centers
-- Fully opaque pixels
-- A Node.js `Buffer`
-
-The final image size is calculated as:
-
-```ts
-const imageSize = size * (moduleCount + 2 * margin);
-```
-
-For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
-
-```txt
-8 * (21 + 2 * 4) = 232
-```
-
-So the output PNG is `232 x 232` pixels.

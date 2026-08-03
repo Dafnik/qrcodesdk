@@ -70,6 +70,8 @@ Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, a
 `extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
 is independent; omit it to inherit `colors.colorDark`.
 
+## Common recipes
+
 ### Add a prepared center image
 
 The SVG renderer accepts an embedded `data:image/...` URL. Read or fetch the source and convert it
@@ -97,11 +99,46 @@ const svg = qrcode('https://qrcodesdk.dev')
   );
 ```
 
+In a browser, prepare a fetched image as a data URL with `FileReader`:
+
+```ts
+import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+function readBlobAsDataImageURL(blob: Blob): Promise<QRCodeDataImageURL> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result as QRCodeDataImageURL);
+      } else {
+        reject(new Error('Image preparation failed'));
+      }
+    });
+    reader.addEventListener('error', () => reject(new Error('Image preparation failed')));
+    reader.readAsDataURL(blob);
+  });
+}
+
+const response = await fetch('/logo.png');
+const logo = await readBlobAsDataImageURL(await response.blob());
+
+const svg = qrcode('https://qrcodesdk.dev')
+  .errorCorrection('H')
+  .render(
+    QRCodeSVGRenderer({
+      image: {
+        source: logo,
+        size: 0.3,
+        padding: 1,
+        clearBackground: true,
+      },
+    }),
+  );
+```
+
 The image is centered and contained without cropping. `size` must be greater than `0` and at most
 `1`; `padding` must be non-negative. Large images can make the code impossible to scan even with high
 error correction, so start near `0.3` and test with real scanners.
-
-## Common recipes
 
 ### Add accessibility labels
 
@@ -235,32 +272,4 @@ link.download = 'qrcode.svg';
 link.click();
 
 URL.revokeObjectURL(url);
-```
-
-## Output details
-
-The SVG renderer generates:
-
-- A square `<svg>` string
-- A light background path using `colors.colorLight`
-- Compact filled paths grouped by the resolved data-module, finder-ring, and finder-center colors
-- Merged, non-overlapping rectangles for compatible square modules and finder primitives
-- Curved primitive path segments in the same resolved-color groups
-- Even-odd paths so circular and rounded-square finder rings retain their holes
-- A `viewBox` measured in QR modules
-- Pixel `width` and `height` values derived from `size`, matrix size, and `margin`
-- Optional `alt`, `aria-label`, and `title` attributes
-
-SVG, browser Canvas/Image, and Node PNG renderers all create and consume a
-`QRCodeStylePlan`. The SVG renderer scans square cells into horizontal runs and merges vertically
-adjacent runs with matching positions and widths. Square-only plans use crisp-edge rendering;
-plans containing curves omit that override.
-
-Serialized SVG and snapshot compatibility is not guaranteed. Visual geometry and successful QR
-decoding are the compatibility targets.
-
-The final pixel size is calculated as:
-
-```ts
-const imageSize = size * (moduleCount + 2 * margin);
 ```
