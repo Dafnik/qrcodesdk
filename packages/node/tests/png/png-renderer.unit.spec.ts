@@ -165,6 +165,15 @@ describe('QRCodePNGRenderer', () => {
     expect(() => QRCodePNGRenderer({colors: {colorDark: '#xyz'}})([[1]])).toThrow(
       'QR code colorDark must be a 6-digit hex color',
     );
+    expect(() => QRCodePNGRenderer({compressionLevel: 10})([[1]])).toThrow(
+      'QR code PNG compressionLevel must be an integer from 0 to 9',
+    );
+  });
+
+  test('supports faster configurable PNG compression', () => {
+    const png = readPng(QRCodePNGRenderer({compressionLevel: 0})([[1]]));
+
+    expectPixel(png, 20, 20, {red: 0, green: 0, blue: 0, alpha: 255});
   });
 
   test('renders square feature colors and finder holes without partial coverage', () => {

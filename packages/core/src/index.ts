@@ -24,6 +24,8 @@ export type {
   QRCodeResolvedImageOverlay,
   QRCodeStylePlan,
   QRCodeStylePrimitive,
+  QRCodeStyleLayer,
+  QRCodeStyleRectangle,
   QRCodeStyleRole,
   QRCodeStyleRotation,
   QRCodeStylingColors,

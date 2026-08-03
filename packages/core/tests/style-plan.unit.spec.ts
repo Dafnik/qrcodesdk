@@ -28,6 +28,24 @@ describe('createQRCodeStylePlan', () => {
     expect(plan.primitives[0]).toMatchObject({x: 11, y: 11, shape: 'square'});
   });
 
+  test('compacts square modules into renderer-ready rectangles', () => {
+    const plan = createQRCodeStylePlan(
+      [
+        [1, 1],
+        [1, 1],
+      ],
+      parseQRCodeStylingOptions({size: 1, margin: 0}),
+    );
+
+    expect(plan.layers).toEqual([
+      {
+        color: '#000000',
+        curvedPrimitives: [],
+        rectangles: [{x: 0, y: 0, width: 2, height: 2}],
+      },
+    ]);
+  });
+
   test('keeps malformed and non-QR matrices in the ordinary dots role', () => {
     const matrix = createFinderMatrix();
     matrix[1]![1] = 1;

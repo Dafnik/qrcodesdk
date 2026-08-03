@@ -15,25 +15,69 @@ import {
 export type QRCodePNGImageOptions = QRCodeImageOverlayOptions<Buffer>;
 export type QRCodePNGRendererOptions = QRCodeStylingOptions & {
   image?: QRCodePNGImageOptions;
+  compressionLevel?: number;
 };
 
 type RGBColor = {
   red: number;
   green: number;
   blue: number;
+  rgba: Buffer;
 };
 
+type CoverageMask = {
+  width: number;
+  height: number;
+  coverage: Uint8Array;
+};
+
+const DECODED_IMAGE_CACHE = new WeakMap<Buffer, PNG>();
+
 export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
+  let resolvedStyling: ReturnType<typeof ɵparseQRCodeStylingOptions> | undefined;
+  let resolvedCompressionLevel: number | undefined;
+  const coverageMasks = new Map<string, CoverageMask>();
+  const colors = new Map<QRCodeColorHex, RGBColor>();
+
   return (matrix: QRCodeMatrix) => {
-    const styling = ɵparseQRCodeStylingOptions(options);
+    const styling = (resolvedStyling ??= ɵparseQRCodeStylingOptions(options));
+    const compressionLevel = (resolvedCompressionLevel ??= resolveCompressionLevel(
+      options?.compressionLevel,
+    ));
     const plan = ɵcreateQRCodeStylePlan(matrix, styling);
     const image = ɵresolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
     const scale = plan.renderedSize / plan.viewSize;
     const png = new PNG({width: plan.renderedSize, height: plan.renderedSize});
-    fillRect(png, 0, 0, plan.renderedSize, plan.renderedSize, hexColorToRGB(plan.backgroundColor));
+    const backgroundColor = hexColorToRGB(plan.backgroundColor, colors);
+    fillRect(png, 0, 0, plan.renderedSize, plan.renderedSize, backgroundColor);
 
-    for (let index = 0; index < plan.primitives.length; index++) {
-      rasterizePrimitive(png, plan.primitives[index]!, scale);
+    for (let layerIndex = 0; layerIndex < plan.layers.length; layerIndex++) {
+      const layer = plan.layers[layerIndex]!;
+      const color = hexColorToRGB(layer.color, colors);
+      for (let rectangleIndex = 0; rectangleIndex < layer.rectangles.length; rectangleIndex++) {
+        const rectangle = layer.rectangles[rectangleIndex]!;
+        fillRect(
+          png,
+          rectangle.x * scale,
+          rectangle.y * scale,
+          rectangle.width * scale,
+          rectangle.height * scale,
+          color,
+        );
+      }
+      for (
+        let primitiveIndex = 0;
+        primitiveIndex < layer.curvedPrimitives.length;
+        primitiveIndex++
+      ) {
+        rasterizePrimitive(
+          png,
+          layer.curvedPrimitives[primitiveIndex]!,
+          scale,
+          color,
+          coverageMasks,
+        );
+      }
     }
 
     if (image) {
@@ -43,14 +87,7 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
         const startY = Math.max(0, Math.floor(image.clearY * scale));
         const endX = Math.min(png.width, Math.ceil((image.clearX + image.clearSize) * scale));
         const endY = Math.min(png.height, Math.ceil((image.clearY + image.clearSize) * scale));
-        fillRect(
-          png,
-          startX,
-          startY,
-          endX - startX,
-          endY - startY,
-          hexColorToRGB(plan.backgroundColor),
-        );
+        fillRect(png, startX, startY, endX - startX, endY - startY, backgroundColor);
       }
       compositeImage(
         png,
@@ -61,8 +98,18 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
       );
     }
 
-    return PNG.sync.write(png);
+    return PNG.sync.write(png, {deflateLevel: compressionLevel});
   };
+}
+
+function resolveCompressionLevel(value: number | undefined): number {
+  const compressionLevel = value ?? 9;
+  if (!Number.isSafeInteger(compressionLevel) || compressionLevel < 0 || compressionLevel > 9) {
+    throw new Error(
+      `QR code PNG compressionLevel must be an integer from 0 to 9, received ${String(compressionLevel)}`,
+    );
+  }
+  return compressionLevel;
 }
 
 function decodeImageSource(source: Buffer): PNG {
@@ -70,8 +117,13 @@ function decodeImageSource(source: Buffer): PNG {
     throw new Error('QR code PNG image source must be a Buffer containing PNG bytes');
   }
 
+  const cached = DECODED_IMAGE_CACHE.get(source);
+  if (cached) return cached;
+
   try {
-    return PNG.sync.read(source);
+    const decoded = PNG.sync.read(source);
+    DECODED_IMAGE_CACHE.set(source, decoded);
+    return decoded;
   } catch (error) {
     throw new Error('QR code PNG image source must contain valid PNG bytes', {cause: error});
   }
@@ -89,6 +141,16 @@ function compositeImage(
   const height = Math.max(1, Math.round(source.height * scale));
   const startX = Math.round(boxX + (boxSize - width) / 2);
   const startY = Math.round(boxY + (boxSize - height) / 2);
+  const sourceX0s = new Int32Array(width);
+  const sourceX1s = new Int32Array(width);
+  const sourceXWeights = new Float64Array(width);
+  for (let targetX = 0; targetX < width; targetX++) {
+    const sourceX = ((targetX + 0.5) * source.width) / width - 0.5;
+    const sourceX0 = Math.floor(sourceX);
+    sourceX0s[targetX] = clamp(sourceX0, 0, source.width - 1) << 2;
+    sourceX1s[targetX] = clamp(sourceX0 + 1, 0, source.width - 1) << 2;
+    sourceXWeights[targetX] = sourceX - sourceX0;
+  }
 
   for (let targetY = 0; targetY < height; targetY++) {
     const outputY = startY + targetY;
@@ -99,40 +161,44 @@ function compositeImage(
     const y0 = clamp(sourceY0, 0, source.height - 1);
     const y1 = clamp(sourceY0 + 1, 0, source.height - 1);
     const yWeight = sourceY - sourceY0;
+    const inverseYWeight = 1 - yWeight;
+    const y0Offset = source.width * y0 * 4;
+    const y1Offset = source.width * y1 * 4;
 
     for (let targetX = 0; targetX < width; targetX++) {
       const outputX = startX + targetX;
       if (outputX < 0 || outputX >= target.width) continue;
 
-      const sourceX = ((targetX + 0.5) * source.width) / width - 0.5;
-      const sourceX0 = Math.floor(sourceX);
-      const x0 = clamp(sourceX0, 0, source.width - 1);
-      const x1 = clamp(sourceX0 + 1, 0, source.width - 1);
-      const xWeight = sourceX - sourceX0;
-      const topLeftWeight = (1 - xWeight) * (1 - yWeight);
-      const topRightWeight = xWeight * (1 - yWeight);
-      const bottomLeftWeight = (1 - xWeight) * yWeight;
+      const xWeight = sourceXWeights[targetX]!;
+      const inverseXWeight = 1 - xWeight;
+      const topLeftWeight = inverseXWeight * inverseYWeight;
+      const topRightWeight = xWeight * inverseYWeight;
+      const bottomLeftWeight = inverseXWeight * yWeight;
       const bottomRightWeight = xWeight * yWeight;
-      const samples = [
-        {x: x0, y: y0, weight: topLeftWeight},
-        {x: x1, y: y0, weight: topRightWeight},
-        {x: x0, y: y1, weight: bottomLeftWeight},
-        {x: x1, y: y1, weight: bottomRightWeight},
-      ] as const;
-
-      let alpha = 0;
-      let red = 0;
-      let green = 0;
-      let blue = 0;
-      for (const sample of samples) {
-        const sourceIndex = (source.width * sample.y + sample.x) << 2;
-        const sampleAlpha = source.data[sourceIndex + 3]! / 0xff;
-        const weightedAlpha = sampleAlpha * sample.weight;
-        alpha += weightedAlpha;
-        red += source.data[sourceIndex]! * weightedAlpha;
-        green += source.data[sourceIndex + 1]! * weightedAlpha;
-        blue += source.data[sourceIndex + 2]! * weightedAlpha;
-      }
+      const topLeftIndex = y0Offset + sourceX0s[targetX]!;
+      const topRightIndex = y0Offset + sourceX1s[targetX]!;
+      const bottomLeftIndex = y1Offset + sourceX0s[targetX]!;
+      const bottomRightIndex = y1Offset + sourceX1s[targetX]!;
+      const topLeftAlpha = (source.data[topLeftIndex + 3]! / 0xff) * topLeftWeight;
+      const topRightAlpha = (source.data[topRightIndex + 3]! / 0xff) * topRightWeight;
+      const bottomLeftAlpha = (source.data[bottomLeftIndex + 3]! / 0xff) * bottomLeftWeight;
+      const bottomRightAlpha = (source.data[bottomRightIndex + 3]! / 0xff) * bottomRightWeight;
+      const alpha = topLeftAlpha + topRightAlpha + bottomLeftAlpha + bottomRightAlpha;
+      const red =
+        source.data[topLeftIndex]! * topLeftAlpha +
+        source.data[topRightIndex]! * topRightAlpha +
+        source.data[bottomLeftIndex]! * bottomLeftAlpha +
+        source.data[bottomRightIndex]! * bottomRightAlpha;
+      const green =
+        source.data[topLeftIndex + 1]! * topLeftAlpha +
+        source.data[topRightIndex + 1]! * topRightAlpha +
+        source.data[bottomLeftIndex + 1]! * bottomLeftAlpha +
+        source.data[bottomRightIndex + 1]! * bottomRightAlpha;
+      const blue =
+        source.data[topLeftIndex + 2]! * topLeftAlpha +
+        source.data[topRightIndex + 2]! * topRightAlpha +
+        source.data[bottomLeftIndex + 2]! * bottomLeftAlpha +
+        source.data[bottomRightIndex + 2]! * bottomRightAlpha;
 
       const targetIndex = (target.width * outputY + outputX) << 2;
       const backgroundAlpha = 1 - alpha;
@@ -152,46 +218,77 @@ function clamp(value: number, minimum: number, maximum: number): number {
   return Math.max(minimum, Math.min(value, maximum));
 }
 
-function rasterizePrimitive(png: PNG, primitive: QRCodeStylePrimitive, scale: number): void {
-  const color = hexColorToRGB(primitive.color);
+function rasterizePrimitive(
+  png: PNG,
+  primitive: QRCodeStylePrimitive,
+  scale: number,
+  color: RGBColor,
+  coverageMasks: Map<string, CoverageMask>,
+): void {
   const startX = primitive.x * scale;
   const startY = primitive.y * scale;
-  const pixelSize = primitive.size * scale;
+  const mask = getCoverageMask(primitive, scale, coverageMasks);
 
-  if (primitive.shape === 'square') {
-    if (primitive.kind === 'finder-ring') {
-      fillRect(png, startX, startY, pixelSize, scale, color);
-      fillRect(png, startX, startY + pixelSize - scale, pixelSize, scale, color);
-      fillRect(png, startX, startY + scale, scale, pixelSize - 2 * scale, color);
-      fillRect(
-        png,
-        startX + pixelSize - scale,
-        startY + scale,
-        scale,
-        pixelSize - 2 * scale,
-        color,
-      );
-    } else {
-      fillRect(png, startX, startY, pixelSize, pixelSize, color);
+  for (let row = 0; row < mask.height; row++) {
+    for (let column = 0; column < mask.width; column++) {
+      const coveredSamples = mask.coverage[row * mask.width + column]!;
+      if (coveredSamples === 16) {
+        setPixel(png, startX + column, startY + row, color);
+      } else if (coveredSamples > 0) {
+        blendPixel(png, startX + column, startY + row, color, coveredSamples / 16);
+      }
     }
-    return;
   }
+}
 
-  for (let row = startY; row < startY + pixelSize; row++) {
-    for (let column = startX; column < startX + pixelSize; column++) {
+function getCoverageMask(
+  primitive: QRCodeStylePrimitive,
+  scale: number,
+  cache: Map<string, CoverageMask>,
+): CoverageMask {
+  const key = `${primitive.kind}:${primitive.shape}:${primitive.rotation}:${primitive.size}:${scale}`;
+  const cached = cache.get(key);
+  if (cached) return cached;
+
+  const width = primitive.size * scale;
+  const height = width;
+  const coverage = new Uint8Array(width * height);
+  for (let row = 0; row < height; row++) {
+    for (let column = 0; column < width; column++) {
       let coveredSamples = 0;
       for (let sampleRow = 0; sampleRow < 4; sampleRow++) {
         for (let sampleColumn = 0; sampleColumn < 4; sampleColumn++) {
-          const localX = (column - startX + (sampleColumn + 0.5) / 4) / scale;
-          const localY = (row - startY + (sampleRow + 0.5) / 4) / scale;
-          const point = inverseRotatePoint(localX, localY, primitive.size, primitive.rotation);
-          if (containsPrimitive(primitive, point.x, point.y)) coveredSamples++;
+          const localX = (column + (sampleColumn + 0.5) / 4) / scale;
+          const localY = (row + (sampleRow + 0.5) / 4) / scale;
+          let x: number;
+          let y: number;
+          switch (primitive.rotation) {
+            case 90:
+              x = localY;
+              y = primitive.size - localX;
+              break;
+            case 180:
+              x = primitive.size - localX;
+              y = primitive.size - localY;
+              break;
+            case 270:
+              x = primitive.size - localY;
+              y = localX;
+              break;
+            default:
+              x = localX;
+              y = localY;
+          }
+          if (containsPrimitive(primitive, x, y)) coveredSamples++;
         }
       }
-
-      if (coveredSamples > 0) blendPixel(png, column, row, color, coveredSamples / 16);
+      coverage[row * width + column] = coveredSamples;
     }
   }
+
+  const mask = {width, height, coverage};
+  cache.set(key, mask);
+  return mask;
 }
 
 function containsPrimitive(primitive: QRCodeStylePrimitive, x: number, y: number): boolean {
@@ -241,24 +338,6 @@ function containsPrimitive(primitive: QRCodeStylePrimitive, x: number, y: number
   }
 }
 
-function inverseRotatePoint(
-  x: number,
-  y: number,
-  size: number,
-  rotation: QRCodeStylePrimitive['rotation'],
-): {x: number; y: number} {
-  switch (rotation) {
-    case 90:
-      return {x: y, y: size - x};
-    case 180:
-      return {x: size - x, y: size - y};
-    case 270:
-      return {x: size - y, y: x};
-    default:
-      return {x, y};
-  }
-}
-
 function insideCircle(
   x: number,
   y: number,
@@ -298,6 +377,14 @@ function blendPixel(png: PNG, x: number, y: number, color: RGBColor, coverage: n
   png.data[index + 3] = 0xff;
 }
 
+function setPixel(png: PNG, x: number, y: number, color: RGBColor): void {
+  const index = (png.width * y + x) << 2;
+  png.data[index] = color.red;
+  png.data[index + 1] = color.green;
+  png.data[index + 2] = color.blue;
+  png.data[index + 3] = 0xff;
+}
+
 function fillRect(
   png: PNG,
   x: number,
@@ -306,23 +393,27 @@ function fillRect(
   height: number,
   color: RGBColor,
 ): void {
-  for (let row = y; row < y + height; row++) {
-    for (let column = x; column < x + width; column++) {
-      const index = (png.width * row + column) << 2;
-      png.data[index] = color.red;
-      png.data[index + 1] = color.green;
-      png.data[index + 2] = color.blue;
-      png.data[index + 3] = 0xff;
-    }
+  const startX = Math.max(0, x);
+  const startY = Math.max(0, y);
+  const endX = Math.min(png.width, x + width);
+  const endY = Math.min(png.height, y + height);
+  if (startX >= endX || startY >= endY) return;
+
+  for (let row = startY; row < endY; row++) {
+    const start = (png.width * row + startX) << 2;
+    png.data.fill(color.rgba, start, start + (endX - startX) * 4);
   }
 }
 
-function hexColorToRGB(value: QRCodeColorHex): RGBColor {
-  const hex = value.slice(1);
+function hexColorToRGB(value: QRCodeColorHex, cache: Map<QRCodeColorHex, RGBColor>): RGBColor {
+  const cached = cache.get(value);
+  if (cached) return cached;
 
-  return {
-    red: Number.parseInt(hex.slice(0, 2), 16),
-    green: Number.parseInt(hex.slice(2, 4), 16),
-    blue: Number.parseInt(hex.slice(4, 6), 16),
-  };
+  const hex = value.slice(1);
+  const red = Number.parseInt(hex.slice(0, 2), 16);
+  const green = Number.parseInt(hex.slice(2, 4), 16);
+  const blue = Number.parseInt(hex.slice(4, 6), 16);
+  const color = {red, green, blue, rgba: Buffer.from([red, green, blue, 0xff])};
+  cache.set(value, color);
+  return color;
 }

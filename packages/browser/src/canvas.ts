@@ -3,6 +3,7 @@ import {
   type QRCodeMatrix,
   type QRCodeOptions,
   type QRCodeRenderer,
+  type QRCodeStyleLayer,
   type QRCodeStylePrimitive,
   type QRCodeStylingOptions,
   ɵcreateQRCodeStylePlan,
@@ -19,8 +20,10 @@ export type QRCodeCanvasOptions = QRCodeOptions<QRCodeCanvasRendererOptions>;
 export function QRCodeCanvasRenderer(
   options?: QRCodeCanvasRendererOptions,
 ): QRCodeRenderer<HTMLCanvasElement> {
+  let resolvedStyling: ReturnType<typeof ɵparseQRCodeStylingOptions> | undefined;
+
   return (matrix: QRCodeMatrix) => {
-    const styling = ɵparseQRCodeStylingOptions(options);
+    const styling = (resolvedStyling ??= ɵparseQRCodeStylingOptions(options));
     const plan = ɵcreateQRCodeStylePlan(matrix, styling);
     const image = ɵresolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
     const scale = plan.renderedSize / plan.viewSize;
@@ -28,7 +31,7 @@ export function QRCodeCanvasRenderer(
     canvas.width = plan.renderedSize;
     canvas.height = plan.renderedSize;
 
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext('2d', {alpha: false});
     if (!context) {
       throw new Error('Canvas QR code renderer requires a 2D canvas context');
     }
@@ -36,8 +39,8 @@ export function QRCodeCanvasRenderer(
     context.fillStyle = plan.backgroundColor;
     context.fillRect(0, 0, plan.renderedSize, plan.renderedSize);
 
-    for (let index = 0; index < plan.primitives.length; index++) {
-      drawPrimitive(context, plan.primitives[index]!, scale);
+    for (let index = 0; index < plan.layers.length; index++) {
+      drawLayer(context, plan.layers[index]!, scale);
     }
 
     if (image) {
@@ -77,6 +80,13 @@ type CanvasImageSourceDimensions = {
   height: number;
 };
 
+const CANVAS_IMAGE_DIMENSION_PAIRS = [
+  ['naturalWidth', 'naturalHeight'],
+  ['videoWidth', 'videoHeight'],
+  ['displayWidth', 'displayHeight'],
+  ['width', 'height'],
+] as const;
+
 function getCanvasImageSourceSize(source: CanvasImageSource): CanvasImageSourceDimensions {
   const candidate = source as unknown as Record<string, unknown>;
 
@@ -84,14 +94,7 @@ function getCanvasImageSourceSize(source: CanvasImageSource): CanvasImageSourceD
     throw new Error('QR code canvas image source must be loaded before rendering');
   }
 
-  const dimensionPairs = [
-    ['naturalWidth', 'naturalHeight'],
-    ['videoWidth', 'videoHeight'],
-    ['displayWidth', 'displayHeight'],
-    ['width', 'height'],
-  ] as const;
-
-  for (const [widthKey, heightKey] of dimensionPairs) {
+  for (const [widthKey, heightKey] of CANVAS_IMAGE_DIMENSION_PAIRS) {
     const width = candidate[widthKey];
     const height = candidate[heightKey];
     if (typeof width !== 'number' || typeof height !== 'number') continue;
@@ -123,7 +126,32 @@ function getSVGAnimatedLength(value: unknown): number | undefined {
   return typeof baseValue === 'number' ? baseValue : undefined;
 }
 
-function drawPrimitive(
+function drawLayer(
+  context: CanvasRenderingContext2D,
+  layer: QRCodeStyleLayer,
+  scale: number,
+): void {
+  context.fillStyle = layer.color;
+  for (let index = 0; index < layer.rectangles.length; index++) {
+    const rectangle = layer.rectangles[index]!;
+    context.fillRect(
+      rectangle.x * scale,
+      rectangle.y * scale,
+      rectangle.width * scale,
+      rectangle.height * scale,
+    );
+  }
+
+  if (layer.curvedPrimitives.length === 0) return;
+
+  context.beginPath();
+  for (let index = 0; index < layer.curvedPrimitives.length; index++) {
+    addCurvedPrimitive(context, layer.curvedPrimitives[index]!, scale);
+  }
+  context.fill('evenodd');
+}
+
+function addCurvedPrimitive(
   context: CanvasRenderingContext2D,
   primitive: QRCodeStylePrimitive,
   scale: number,
@@ -131,24 +159,10 @@ function drawPrimitive(
   const x = primitive.x * scale;
   const y = primitive.y * scale;
   const size = primitive.size * scale;
+  const rotated = primitive.rotation !== 0;
 
-  if (primitive.shape === 'square') {
-    context.fillStyle = primitive.color;
-    if (primitive.kind === 'finder-ring') {
-      context.fillRect(x, y, size, scale);
-      context.fillRect(x, y + size - scale, size, scale);
-      context.fillRect(x, y + scale, scale, size - 2 * scale);
-      context.fillRect(x + size - scale, y + scale, scale, size - 2 * scale);
-    } else {
-      context.fillRect(x, y, size, size);
-    }
-    return;
-  }
-
-  context.save();
-  context.fillStyle = primitive.color;
-
-  if (primitive.rotation !== 0) {
+  if (rotated) {
+    context.save();
     const centerX = x + size / 2;
     const centerY = y + size / 2;
     context.translate(centerX, centerY);
@@ -156,7 +170,6 @@ function drawPrimitive(
     context.translate(-centerX, -centerY);
   }
 
-  context.beginPath();
   if (primitive.kind === 'finder-ring') {
     if (primitive.shape === 'dot') {
       addCircle(context, x, y, size);
@@ -171,22 +184,19 @@ function drawPrimitive(
         primitive.shape === 'extra-rounded' ? 1.5 * scale : 0,
       );
     }
-    context.fill('evenodd');
-    context.restore();
+    if (rotated) context.restore();
     return;
   }
 
   if (primitive.kind === 'finder-center') {
     if (primitive.shape === 'dot') addCircle(context, x, y, size);
     else addRoundedSquare(context, x, y, size, 0);
-    context.fill();
-    context.restore();
+    if (rotated) context.restore();
     return;
   }
 
   addModuleShape(context, primitive.shape, x, y, size);
-  context.fill();
-  context.restore();
+  if (rotated) context.restore();
 }
 
 function addModuleShape(

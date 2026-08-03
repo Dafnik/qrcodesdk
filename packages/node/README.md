@@ -93,6 +93,7 @@ const png: Buffer = qrcode('https://qrcodesdk.dev').render(
 | `cornersSquareOptions.color` | `string`                 | `colors.colorDark` | Color used for finder outer rings.                |
 | `cornersDotOptions.type`     | `QRCodeCornerDotType`    |         `'square'` | Shape used for finder centers.                    |
 | `cornersDotOptions.color`    | `string`                 | `colors.colorDark` | Color used for finder centers.                    |
+| `compressionLevel`           | `number`                 |                `9` | PNG compression from `0` (fast) to `9` (small).   |
 | `image.source`               | `Buffer`                 |        `undefined` | PNG bytes already loaded by the caller.           |
 | `image.size`                 | `number`                 |              `0.4` | Image box as a fraction of matrix width.          |
 | `image.padding`              | `number`                 |                `1` | Clear padding in QR module units.                 |
@@ -101,6 +102,7 @@ const png: Buffer = qrcode('https://qrcodesdk.dev').render(
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
 `Size` must be a positive safe integer and `margin` must be a non-negative safe integer.
+`compressionLevel` must be an integer from `0` through `9`.
 
 Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
 `extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
