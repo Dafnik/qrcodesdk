@@ -62,7 +62,7 @@
     "build": "tsdown",
     "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",
-    "test": "vitest --watch false",
+    "test": "vitest --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
     "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit",
     "lint": "eslint src tests --max-warnings 0",

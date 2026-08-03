@@ -17,7 +17,7 @@
     "test": "vitest --watch false",
     "test:coverage:raw": "vitest --coverage --mode coverage --watch false",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
-    "lint": "eslint src tests --max-warnings 0",
+    "lint": "eslint scripts src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist"
   },
   "dependencies": {

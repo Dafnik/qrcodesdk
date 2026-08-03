@@ -1,13 +1,7 @@
 import {playwright} from '@vitest/browser-playwright';
-import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'vitest/config';
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      tsdown: fileURLToPath(new URL('./tests/tsdown-shim.ts', import.meta.url)),
-    },
-  },
   test: {
     browser: {
       enabled: true,
