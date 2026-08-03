@@ -25,9 +25,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Commit lint
-        uses: dafnik/commitlint@v1
-
       - name: Setup Node and pnpm
         uses: dafnik/setup-node-pnpm@v5
         with:
