@@ -65,7 +65,7 @@
     "test": "vitest --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
     "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src tests --max-warnings 0",
+    "lint": "eslint src tests runtime --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
   },

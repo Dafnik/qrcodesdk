@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/runtime-packages"
-          for package in core browser node cli; do
+          for package in core browser node cli react angular; do
             pnpm --dir "packages/$package" pack --pack-destination "$RUNNER_TEMP/runtime-packages"
           done
 
@@ -241,6 +241,53 @@ jobs:
           QRCODESDK_CONSUMER: ${{ runner.temp }}/browser-consumer
         run: node packages/browser/runtime/smoke-package.mjs
 
+  framework-runtime:
+    name: ${{ matrix.framework }} ${{ matrix.version }} consumer
+    needs: verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - framework: react
+            version: '18'
+          - framework: react
+            version: '19'
+          - framework: angular
+            version: '20'
+          - framework: angular
+            version: '21'
+          - framework: angular
+            version: '22'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node and pnpm
+        uses: dafnik/setup-node-pnpm@v5
+        with:
+          node: 24
+          install-ignore-scripts: true
+
+      - name: Setup Playwright
+        uses: ./.github/actions/setup-playwright
+        with:
+          browsers: chromium
+
+      - name: Download runtime packages
+        uses: actions/download-artifact@v8
+        with:
+          name: runtime-packages
+          path: ${{ runner.temp }}/runtime-packages
+
+      - name: Test framework consumer
+        env:
+          QRCODESDK_FRAMEWORK: ${{ matrix.framework }}
+          QRCODESDK_FRAMEWORK_VERSION: ${{ matrix.version }}
+          QRCODESDK_PACKAGES: ${{ runner.temp }}/runtime-packages
+        run: node packages/browser/runtime/smoke-framework-package.mjs
+
   required:
     name: required
     if: always()
@@ -248,13 +295,15 @@ jobs:
       - verify
       - runtime
       - browser-runtime
+      - framework-runtime
     runs-on: ubuntu-latest
     steps:
       - name: Require every development job
         if: >-
           needs.verify.result != 'success' ||
           needs.runtime.result != 'success' ||
-          needs['browser-runtime'].result != 'success'
+          needs['browser-runtime'].result != 'success' ||
+          needs['framework-runtime'].result != 'success'
         run: exit 1
 
       - name: Report success

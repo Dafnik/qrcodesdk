@@ -10,6 +10,8 @@
 
 `@qrcodesdk/angular` provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
+It supports Angular 20 through 22.
+
 ## Install
 
 ```sh

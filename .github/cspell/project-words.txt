@@ -7,3 +7,4 @@ Grüße
 describedby
 fesm
 importmap
+networkidle
