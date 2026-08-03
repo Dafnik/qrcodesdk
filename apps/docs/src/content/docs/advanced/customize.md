@@ -5,7 +5,7 @@ description: Control QR code module shapes, colors, size, margin, accessibility 
 related:
   - ../renderers/core/text.md
   - ../renderers/core/svg.md
-  - ../renderers/node/png.md
+  - ../packages/node.mdx
   - ../renderers/browser/canvas.md
   - ../renderers/browser/image.md
   - ../packages/core.mdx
@@ -205,23 +205,3 @@ const svg = qrcode('HELLO WORLD')
 ```
 
 Versions range from `1` to `40`. Masks range from `0` to `7`.
-
-## Common recipe
-
-```ts
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-
-const svg = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(
-    QRCodeSVGRenderer({
-      size: 8,
-      margin: 4,
-      colors: {
-        colorDark: '#111827',
-        colorLight: '#ffffff',
-      },
-      ariaLabel: 'Scan to open qrcodesdk.dev',
-    }),
-  );
-```

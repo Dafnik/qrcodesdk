@@ -303,4 +303,4 @@ Successful file output writes a confirmation to standard error, leaving standard
 - [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
 - [Render Terminal Text](https://qrcodesdk.dev/renderers/core/text/)
 - [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
-- [Render PNG in Node.js](https://qrcodesdk.dev/renderers/node/png/)
+- [@qrcodesdk/node](https://qrcodesdk.dev/packages/node/)

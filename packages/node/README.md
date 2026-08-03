@@ -47,7 +47,18 @@ yarn add @qrcodesdk/core @qrcodesdk/node
 
 </details>
 
-## Render PNG output
+### Minimal example
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+```
+
+`QRCodePNGRenderer()` returns a Node.js `Buffer` containing a square, fully opaque PNG image.
+
+## Common options
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -68,46 +79,58 @@ const png: Buffer = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-`QRCodePNGRenderer()` returns a Node.js `Buffer` containing a square, fully opaque PNG image.
+### All options
 
-## Options
+| Option                       | Type                     |            Default | Description                                       |
+| ---------------------------- | ------------------------ | -----------------: | ------------------------------------------------- |
+| `size`                       | `number`                 |                `5` | Pixel size of each QR module.                     |
+| `margin`                     | `number`                 |                `4` | Quiet-zone margin around the QR code, in modules. |
+| `colors.colorDark`           | `string`                 |        `'#000000'` | Color used for dark QR modules.                   |
+| `colors.colorLight`          | `string`                 |        `'#ffffff'` | Background color.                                 |
+| `dotsOptions.type`           | `QRCodeDotType`          |         `'square'` | Shape used for ordinary data modules.             |
+| `dotsOptions.color`          | `string`                 | `colors.colorDark` | Color used for ordinary data modules.             |
+| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                |
+| `cornersSquareOptions.color` | `string`                 | `colors.colorDark` | Color used for finder outer rings.                |
+| `cornersDotOptions.type`     | `QRCodeCornerDotType`    |         `'square'` | Shape used for finder centers.                    |
+| `cornersDotOptions.color`    | `string`                 | `colors.colorDark` | Color used for finder centers.                    |
+| `image.source`               | `Buffer`                 |        `undefined` | PNG bytes already loaded by the caller.           |
+| `image.size`                 | `number`                 |              `0.4` | Image box as a fraction of matrix width.          |
+| `image.padding`              | `number`                 |                `1` | Clear padding in QR module units.                 |
+| `image.clearBackground`      | `boolean`                |             `true` | Clears modules behind the image and padding.      |
 
-| Option                  | Type                         |            Default | Description                               |
-| ----------------------- | ---------------------------- | -----------------: | ----------------------------------------- |
-| `size`                  | `number`                     |                `5` | Pixel size of each QR module.             |
-| `margin`                | `number`                     |                `4` | Quiet-zone width in modules.              |
-| `colors.colorDark`      | `string`                     |        `'#000000'` | Dark module color.                        |
-| `colors.colorLight`     | `string`                     |        `'#ffffff'` | Background color.                         |
-| `dotsOptions`           | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary module shape and optional color. |
-| `cornersSquareOptions`  | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color.     |
-| `cornersDotOptions`     | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color.   |
-| `image.source`          | `Buffer`                     |        `undefined` | PNG bytes loaded by the caller.           |
-| `image.size`            | `number`                     |              `0.4` | Relative centered image-box size.         |
-| `image.padding`         | `number`                     |                `1` | Clear padding in QR modules.              |
-| `image.clearBackground` | `boolean`                    |             `true` | Clears modules behind the image.          |
+Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
-Colors must be six-digit hex values such as `#111827`. `size` must be a positive safe integer and `margin` must be a non-negative safe integer.
+`Size` must be a positive safe integer and `margin` must be a non-negative safe integer.
 
-All feature colors inherit `colors.colorDark` when omitted. Curves are rendered with deterministic
-subpixel coverage and blended into the opaque background.
+Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
+`extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
+is independent; omit it to inherit `colors.colorDark`.
 
-### Prepared PNG images
+## Common recipes
 
-Load PNG bytes before calling the renderer:
+### Add prepared PNG images
+
+Read or download the PNG before invoking the renderer. `QRCodePNGRenderer` decodes the supplied
+bytes in memory but performs no filesystem or network I/O.
 
 ```ts
 import {readFile} from 'node:fs/promises';
 
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
 const logo = await readFile('./logo.png');
+
 const png = qrcode('https://qrcodesdk.dev')
   .errorCorrection('H')
-  .render(QRCodePNGRenderer({image: {source: logo, size: 0.3}}));
+  .render(QRCodePNGRenderer({image: {source: logo}}));
 ```
 
-The renderer synchronously decodes and composites the provided buffer but performs no filesystem or
-network I/O. Only PNG source bytes are accepted.
+Only PNG source bytes are accepted. The source is centered, resized without cropping, and
+alpha-composited into the opaque output. Although `size` values through `1` are valid, large
+overlays can prevent scanning.
 
-## Save to disk
+### Save to disk
 
 ```ts
 import {writeFile} from 'node:fs/promises';
@@ -120,7 +143,7 @@ const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 await writeFile('qrcode.png', png);
 ```
 
-## Send an HTTP response
+### Send an HTTP response
 
 The returned buffer can be sent from any Node.js HTTP framework as `image/png`:
 
@@ -139,6 +162,50 @@ createServer((_request, response) => {
   });
   response.end(png);
 }).listen(3000);
+```
+
+### Serve with Express
+
+```ts
+import express from 'express';
+
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const app = express();
+
+app.get('/qrcode.png', (_req, res) => {
+  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+
+  res.type('image/png').send(png);
+});
+
+app.listen(3000);
+```
+
+### Return from Hono
+
+```ts
+import {serve} from '@hono/node-server';
+import {Hono} from 'hono';
+
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const app = new Hono();
+
+app.get('/qrcode.png', (c) => {
+  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+
+  return c.body(png, 200, {
+    'Content-Type': 'image/png',
+  });
+});
+
+serve({
+  fetch: app.fetch,
+  port: 3000,
+});
 ```
 
 ## Runtime requirements
@@ -163,5 +230,4 @@ import {
 
 - [@qrcodesdk/node](https://qrcodesdk.dev/packages/node/)
 - [Installation](https://qrcodesdk.dev/getting-started/installation/)
-- [Render PNG in Node.js](https://qrcodesdk.dev/renderers/node/png/)
 - [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)

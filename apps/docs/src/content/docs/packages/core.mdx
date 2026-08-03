@@ -29,9 +29,7 @@ Learn more about the different packages in the [Installation](/getting-started/i
 | Browsers                        | Current evergreen browser families                                  | Playwright Chromium, Firefox, and WebKit |
 | Other runtimes and edge workers | Supported when they provide ESM, ES2020, and a global `TextEncoder` | Not individually verified                |
 
-Core has no Node, DOM, filesystem, or framework dependency. Every verified runtime executes the
-same published ESM artifact, and no polyfills are bundled. Playwright WebKit is the Safari-class
-engine check; it is not a claim that branded Safari runs in Linux CI.
+Core has no Node, DOM, filesystem, or framework dependency.
 
 Use [`@qrcodesdk/browser`](/packages/browser/) for DOM-dependent output and
 [`@qrcodesdk/node`](/packages/node/) for Node.js PNG buffers.
