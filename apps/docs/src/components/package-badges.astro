@@ -40,7 +40,7 @@ const badges = packageName ? createPackageBadges(packageName, {bundledSize: size
         ),
       )}
 
-      {worksWith && (
+      {worksWith?.length && (
         <div class="inline-flex overflow-hidden rounded-[3px] text-[11px] font-mono font-normal leading-5 text-white shadow-sm">
           <span class="bg-[#555] px-1">works with</span>
           <div class="bg-[#7469B6] px-1 flex items-center gap-1">

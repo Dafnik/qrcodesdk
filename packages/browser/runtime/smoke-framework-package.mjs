@@ -224,7 +224,12 @@ async function findTarballs(directory, packageNames) {
 
   return packageNames.map((packageName) => {
     const prefix = `qrcodesdk-${packageName}-`;
-    const matches = entries.filter((entry) => entry.startsWith(prefix) && entry.endsWith('.tgz'));
+    const matches = entries.filter(
+      (entry) =>
+        entry.startsWith(prefix) &&
+        /^\d/u.test(entry.slice(prefix.length)) &&
+        entry.endsWith('.tgz'),
+    );
 
     assert.equal(
       matches.length,

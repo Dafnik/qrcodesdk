@@ -108,7 +108,7 @@ function readBlobAsDataImageURL(blob: Blob): Promise<QRCodeDataImageURL> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => {
-      if (typeof reader.result === 'string') {
+      if (typeof reader.result === 'string' && reader.result.startsWith('data:image/')) {
         resolve(reader.result as QRCodeDataImageURL);
       } else {
         reject(new Error('Image preparation failed'));
@@ -120,6 +120,12 @@ function readBlobAsDataImageURL(blob: Blob): Promise<QRCodeDataImageURL> {
 }
 
 const response = await fetch('/logo.png');
+if (!response.ok) {
+  throw new Error(`Image request failed with status ${response.status}`);
+}
+if (!response.headers.get('content-type')?.toLowerCase().startsWith('image/')) {
+  throw new Error('Image request returned a non-image response');
+}
 const logo = await readBlobAsDataImageURL(await response.blob());
 
 const svg = qrcode('https://qrcodesdk.dev')

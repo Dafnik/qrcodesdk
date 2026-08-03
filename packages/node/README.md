@@ -210,7 +210,8 @@ serve({
 
 ## Runtime requirements
 
-`@qrcodesdk/node` requires Node.js 22.0.0 or newer.
+`@qrcodesdk/node` directly supports Node.js 22.0.0 or newer. Bun and Deno are supported through
+their Node.js compatibility layers.
 
 ## Package boundary
 

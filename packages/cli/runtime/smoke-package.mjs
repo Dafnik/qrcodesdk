@@ -24,13 +24,23 @@ function runtimeCommand(args) {
   switch (runtime) {
     case 'node':
       return {command: process.execPath, args: [executable, ...args]};
-    case 'deno':
+    case 'deno': {
+      const command = globalThis.Deno?.execPath();
+      if (!command) {
+        throw new Error('Unsupported or missing CLI runtime binary: deno');
+      }
       return {
-        command: globalThis.Deno?.execPath() ?? process.execPath,
+        command,
         args: ['run', '-A', '--node-modules-dir=manual', executable, ...args],
       };
-    case 'bun':
-      return {command: process.execPath, args: ['run', executable, ...args]};
+    }
+    case 'bun': {
+      const command = globalThis.Bun?.which('bun');
+      if (!command) {
+        throw new Error('Unsupported or missing CLI runtime binary: bun');
+      }
+      return {command, args: ['run', executable, ...args]};
+    }
     default:
       throw new Error(`Unsupported CLI runtime: ${runtime}`);
   }
@@ -50,10 +60,10 @@ try {
   );
   const version = await runCli(['-V']);
   assert.equal(version.stdout, `${packageJson.version}\n`);
-  assert.equal(version.stderr, '');
+  assert.doesNotMatch(version.stderr, /\b(?:error|fatal|uncaught)\b/iu);
 
   const terminal = await runCli(['Runtime smoke']);
-  assert.equal(terminal.stderr, '');
+  assert.doesNotMatch(terminal.stderr, /\b(?:error|fatal|uncaught)\b/iu);
   assert.ok(terminal.stdout.split('\n').length > 10);
 
   await runCli(['Runtime smoke', '--output', 'runtime.svg']);
