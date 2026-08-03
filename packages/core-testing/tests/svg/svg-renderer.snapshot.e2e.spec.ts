@@ -10,11 +10,10 @@ import {expectSvgToMatchFileSnapshot} from './svg-helpers';
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/svg', import.meta.url));
 
 describe('QRCodeSVGRenderer snapshots', () => {
+  const renderer = QRCodeSVGRenderer({size: 8, margin: 4});
   test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR SVG snapshot', (fixture) => {
     expectSvgToMatchFileSnapshot(
-      qrcode(fixture.data)
-        .config(fixture)
-        .render(QRCodeSVGRenderer({size: 8, margin: 4})),
+      qrcode(fixture.data).config(fixture).render(renderer),
       join(SNAPSHOT_DIR, `${fixture.name}.svg`),
     );
   });

@@ -11,24 +11,17 @@ async function decodeImageQRCode(image: HTMLImageElement): Promise<string> {
 }
 
 describe('QRCodeImageRenderer', () => {
+  const defaultRenderer = QRCodeImageRenderer({size: 4, margin: 4});
+
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name image output', async (fixture) => {
     await expect(
-      decodeImageQRCode(
-        qrcode()
-          .data(fixture.data)
-          .config(fixture)
-          .render(QRCodeImageRenderer({size: 4, margin: 4})),
-      ),
+      decodeImageQRCode(qrcode().data(fixture.data).config(fixture).render(defaultRenderer)),
     ).resolves.toBe(fixture.data);
   });
 
   test.each(JSQR_ROUNDTRIP_COMBINATIONS_TWO)('decodes $name image output', async (fixture) => {
     await expect(
-      decodeImageQRCode(
-        qrcode(fixture.data)
-          .config(fixture)
-          .render(QRCodeImageRenderer({size: 4, margin: 4})),
-      ),
+      decodeImageQRCode(qrcode(fixture.data).config(fixture).render(defaultRenderer)),
     ).resolves.toBe(fixture.data);
   });
 

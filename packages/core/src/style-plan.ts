@@ -103,7 +103,7 @@ function createSquareQRCodeStylePlan(
     backgroundColor: styling.colors.colorLight,
     hasCurves: false,
     get primitives() {
-      compatibilityPrimitives ??= createQRCodeStylePlanWithPrimitives(matrix, styling).primitives;
+      compatibilityPrimitives ??= createQRCodeStylePrimitives(matrix, styling).primitives;
       return compatibilityPrimitives;
     },
     layers: finishMutableStyleLayers(mutableLayers, gridWidth, viewSize),
@@ -114,8 +114,27 @@ function createQRCodeStylePlanWithPrimitives(
   matrix: QRCodeMatrix,
   styling: QRCodeParsedStylingOptions,
 ): QRCodeStylePlan {
+  const {hasCurves, primitives} = createQRCodeStylePrimitives(matrix, styling);
   const moduleCount = matrix.length;
   const viewSize = moduleCount + 2 * styling.margin;
+  const layers = createStyleLayers(primitives, viewSize);
+
+  return {
+    moduleCount,
+    viewSize,
+    renderedSize: calculateQRCodeRenderedSize(matrix, styling),
+    backgroundColor: styling.colors.colorLight,
+    hasCurves,
+    primitives,
+    layers,
+  };
+}
+
+function createQRCodeStylePrimitives(
+  matrix: QRCodeMatrix,
+  styling: QRCodeParsedStylingOptions,
+): {hasCurves: boolean; primitives: QRCodeStylePrimitive[]} {
+  const moduleCount = matrix.length;
   const finders = findFinderPatterns(matrix);
   const finderDarkCells = createFinderDarkCellMap(finders, moduleCount);
   const primitives: QRCodeStylePrimitive[] = [];
@@ -240,17 +259,7 @@ function createQRCodeStylePlanWithPrimitives(
     }
   }
 
-  const layers = createStyleLayers(primitives, viewSize);
-
-  return {
-    moduleCount,
-    viewSize,
-    renderedSize: calculateQRCodeRenderedSize(matrix, styling),
-    backgroundColor: styling.colors.colorLight,
-    hasCurves,
-    primitives,
-    layers,
-  };
+  return {hasCurves, primitives};
 }
 
 type MutableStyleLayer = {

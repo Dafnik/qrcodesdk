@@ -43,23 +43,17 @@ describe('SVG QR roundtrips', () => {
     ).resolves.toBe('prepared SVG image');
   });
 
+  const testSVGRenderer = QRCodeSVGRenderer({size: 4, margin: 4});
+
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
     await expect(
-      decodeSvgQRCode(
-        qrcode(fixture.data)
-          .config(fixture)
-          .render(QRCodeSVGRenderer({size: 4, margin: 4})),
-      ),
+      decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),
     ).resolves.toBe(fixture.data);
   });
 
   test.each(JSQR_ROUNDTRIP_COMBINATIONS)('decodes $name SVG output', async (fixture) => {
     await expect(
-      decodeSvgQRCode(
-        qrcode(fixture.data)
-          .config(fixture)
-          .render(QRCodeSVGRenderer({size: 4, margin: 4})),
-      ),
+      decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),
     ).resolves.toBe(fixture.data);
   });
 

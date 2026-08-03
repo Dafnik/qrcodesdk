@@ -30,25 +30,18 @@ describe('QRCodeCanvasRenderer', () => {
     ).toBe('prepared browser image');
   });
 
+  const defaultRenderer = QRCodeCanvasRenderer({size: 4, margin: 4});
+
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name canvas output', (fixture) => {
     expect(
-      decodeCanvasQRCode(
-        qrcode()
-          .data(fixture.data)
-          .config(fixture)
-          .render(QRCodeCanvasRenderer({size: 4, margin: 4})),
-      ),
+      decodeCanvasQRCode(qrcode().data(fixture.data).config(fixture).render(defaultRenderer)),
     ).toBe(fixture.data);
   });
 
   test.each(JSQR_ROUNDTRIP_COMBINATIONS_ONE)('decodes $name image output', async (fixture) => {
-    expect(
-      decodeCanvasQRCode(
-        qrcode(fixture.data)
-          .config(fixture)
-          .render(QRCodeCanvasRenderer({size: 4, margin: 4})),
-      ),
-    ).toBe(fixture.data);
+    expect(decodeCanvasQRCode(qrcode(fixture.data).config(fixture).render(defaultRenderer))).toBe(
+      fixture.data,
+    );
   });
 
   test.each(QR_CODE_STYLING_FIXTURES)('decodes $name canvas styling fixture', (fixture) => {

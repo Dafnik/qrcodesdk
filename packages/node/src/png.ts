@@ -31,11 +31,10 @@ type CoverageMask = {
   coverage: Uint8Array;
 };
 
-const DECODED_IMAGE_CACHE = new WeakMap<Buffer, PNG>();
-
 export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
   let resolvedStyling: ReturnType<typeof ɵparseQRCodeStylingOptions> | undefined;
   let resolvedCompressionLevel: number | undefined;
+  let decodedImage: PNG | undefined;
   const coverageMasks = new Map<string, CoverageMask>();
   const colors = new Map<QRCodeColorHex, RGBColor>();
 
@@ -81,7 +80,7 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
     }
 
     if (image) {
-      const source = decodeImageSource(image.source);
+      const source = (decodedImage ??= decodeImageSource(image.source));
       if (image.clearBackground) {
         const startX = Math.max(0, Math.floor(image.clearX * scale));
         const startY = Math.max(0, Math.floor(image.clearY * scale));
@@ -117,13 +116,8 @@ function decodeImageSource(source: Buffer): PNG {
     throw new Error('QR code PNG image source must be a Buffer containing PNG bytes');
   }
 
-  const cached = DECODED_IMAGE_CACHE.get(source);
-  if (cached) return cached;
-
   try {
-    const decoded = PNG.sync.read(source);
-    DECODED_IMAGE_CACHE.set(source, decoded);
-    return decoded;
+    return PNG.sync.read(source);
   } catch (error) {
     throw new Error('QR code PNG image source must contain valid PNG bytes', {cause: error});
   }
@@ -365,6 +359,8 @@ function insideRoundedSquare(
 }
 
 function blendPixel(png: PNG, x: number, y: number, color: RGBColor, coverage: number): void {
+  if (x < 0 || x >= png.width || y < 0 || y >= png.height) return;
+
   const index = (png.width * y + x) << 2;
   const backgroundCoverage = 1 - coverage;
   png.data[index] = Math.round(color.red * coverage + png.data[index]! * backgroundCoverage);
@@ -378,6 +374,8 @@ function blendPixel(png: PNG, x: number, y: number, color: RGBColor, coverage: n
 }
 
 function setPixel(png: PNG, x: number, y: number, color: RGBColor): void {
+  if (x < 0 || x >= png.width || y < 0 || y >= png.height) return;
+
   const index = (png.width * y + x) << 2;
   png.data[index] = color.red;
   png.data[index + 1] = color.green;

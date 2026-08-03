@@ -23,7 +23,7 @@ describe('PNG QR roundtrips', () => {
           .errorCorrection('H')
           .render(
             QRCodePNGRenderer({
-              size: 8,
+              size: 4,
               margin: 4,
               image: {
                 source: PNG.sync.write(logo),
@@ -36,14 +36,12 @@ describe('PNG QR roundtrips', () => {
     ).toBe('prepared Node image');
   });
 
+  const defaultRenderer = QRCodePNGRenderer({size: 4, margin: 4});
+
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name PNG output', (fixture) => {
-    expect(
-      decodePngQRCode(
-        qrcode(fixture.data)
-          .config(fixture)
-          .render(QRCodePNGRenderer({size: 8, margin: 4})),
-      ),
-    ).toBe(fixture.data);
+    expect(decodePngQRCode(qrcode(fixture.data).config(fixture).render(defaultRenderer))).toBe(
+      fixture.data,
+    );
   });
 
   test.each(QR_CODE_STYLING_FIXTURES)('decodes $name PNG styling fixture', (fixture) => {
