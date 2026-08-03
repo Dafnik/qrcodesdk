@@ -3,6 +3,14 @@ title: Builder API
 description: '@qrcodesdk/core provides runtime-neutral QR code generation for JavaScript runtimes with native ESM, ES2020, and TextEncoder.'
 
 packageName: '@qrcodesdk/core'
+
+worksWith:
+  - 'googlechrome'
+  - 'firefox'
+  - 'safari'
+  - 'node'
+  - 'bun'
+  - 'deno'
 ---
 
 `@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.

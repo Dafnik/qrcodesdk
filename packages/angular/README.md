@@ -4,7 +4,7 @@
 
 # @qrcodesdk/angular
 
-[![Open @qrcodesdk/angular on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/angular) ![@qrcodesdk/angular version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/angular install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/angular download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/angular Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/angular)
+[![Open @qrcodesdk/angular on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/angular) ![@qrcodesdk/angular version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/angular install size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&label=install%20size&style=shieldsio) ![@qrcodesdk/angular download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&label=download%2Fmo&style=shieldsio) [![@qrcodesdk/angular source code](https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&label=source%20code&value=GitHub%20%E2%86%97&style=shieldsio)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/angular)
 
 **[Live Demo](https://qrcodesdk.dev/playground/?package=angular)**
 
@@ -247,9 +247,9 @@ Pass prepared data through the existing `options` input. For browser output, fin
 only instantiate the component when the source is ready:
 
 ```ts
-readonly logo = signal<HTMLImageElement | undefined>(undefined);
+const logo = signal<HTMLImageElement | undefined>(undefined);
 
-async selectLogo(file: File | undefined) {
+async function selectLogo(file: File | undefined) {
   if (!file) return;
 
   const source = new Image();
