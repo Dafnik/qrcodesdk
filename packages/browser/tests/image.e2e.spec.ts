@@ -17,7 +17,7 @@ describe('QRCodeImageRenderer', () => {
         qrcode()
           .data(fixture.data)
           .config(fixture)
-          .render(QRCodeImageRenderer({size: 8, margin: 4})),
+          .render(QRCodeImageRenderer({size: 4, margin: 4})),
       ),
     ).resolves.toBe(fixture.data);
   });
@@ -27,7 +27,7 @@ describe('QRCodeImageRenderer', () => {
       decodeImageQRCode(
         qrcode(fixture.data)
           .config(fixture)
-          .render(QRCodeImageRenderer({size: 8, margin: 4})),
+          .render(QRCodeImageRenderer({size: 4, margin: 4})),
       ),
     ).resolves.toBe(fixture.data);
   });

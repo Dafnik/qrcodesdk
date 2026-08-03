@@ -21,7 +21,7 @@ describe('QRCodeCanvasRenderer', () => {
           .errorCorrection('H')
           .render(
             QRCodeCanvasRenderer({
-              size: 8,
+              size: 4,
               margin: 4,
               image: {source: logo, size: 0.16, padding: 0.25},
             }),
@@ -36,7 +36,7 @@ describe('QRCodeCanvasRenderer', () => {
         qrcode()
           .data(fixture.data)
           .config(fixture)
-          .render(QRCodeCanvasRenderer({size: 8, margin: 4})),
+          .render(QRCodeCanvasRenderer({size: 4, margin: 4})),
       ),
     ).toBe(fixture.data);
   });
@@ -46,7 +46,7 @@ describe('QRCodeCanvasRenderer', () => {
       decodeCanvasQRCode(
         qrcode(fixture.data)
           .config(fixture)
-          .render(QRCodeCanvasRenderer({size: 8, margin: 4})),
+          .render(QRCodeCanvasRenderer({size: 4, margin: 4})),
       ),
     ).toBe(fixture.data);
   });

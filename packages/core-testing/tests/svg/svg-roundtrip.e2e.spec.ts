@@ -18,7 +18,7 @@ describe('SVG QR roundtrips', () => {
   test('decodes SVG output with a small prepared image overlay', async () => {
     const logo = await sharp({
       create: {
-        width: 8,
+        width: 4,
         height: 4,
         channels: 4,
         background: {r: 220, g: 38, b: 38, alpha: 1},
@@ -34,7 +34,7 @@ describe('SVG QR roundtrips', () => {
           .errorCorrection('H')
           .render(
             QRCodeSVGRenderer({
-              size: 8,
+              size: 4,
               margin: 4,
               image: {source, size: 0.16, padding: 0.25},
             }),
@@ -48,7 +48,7 @@ describe('SVG QR roundtrips', () => {
       decodeSvgQRCode(
         qrcode(fixture.data)
           .config(fixture)
-          .render(QRCodeSVGRenderer({size: 8, margin: 4})),
+          .render(QRCodeSVGRenderer({size: 4, margin: 4})),
       ),
     ).resolves.toBe(fixture.data);
   });
@@ -58,7 +58,7 @@ describe('SVG QR roundtrips', () => {
       decodeSvgQRCode(
         qrcode(fixture.data)
           .config(fixture)
-          .render(QRCodeSVGRenderer({size: 8, margin: 4})),
+          .render(QRCodeSVGRenderer({size: 4, margin: 4})),
       ),
     ).resolves.toBe(fixture.data);
   });

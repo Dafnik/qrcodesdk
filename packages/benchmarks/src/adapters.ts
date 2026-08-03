@@ -11,7 +11,7 @@ import qrcodeSDKPackage from '@qrcodesdk/core/package.json' with {type: 'json'};
 
 import type {BenchmarkAdapter} from './types';
 
-export const SVG_PIXELS_PER_MODULE = 8;
+export const SVG_PIXELS_PER_MODULE = 4;
 export const SVG_QUIET_ZONE_MODULES = 4;
 
 type QRCodeGeneratorEncoder = typeof qrcodeGenerator.stringToBytes;
