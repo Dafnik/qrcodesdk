@@ -62,7 +62,7 @@ describe('QRCodeSVGRenderer snapshots', () => {
           QRCodeSVGRenderer({
             size: 8,
             margin: 4,
-            image: {source: LOGO_DATA_URL},
+            image: {source: LOGO_DATA_URL, padding: 0},
           }),
         ),
       join(SNAPSHOT_DIR, 'image-overlay-logo.svg'),
