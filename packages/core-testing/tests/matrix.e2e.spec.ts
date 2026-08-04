@@ -122,6 +122,20 @@ describe('qrcode().matrix()', () => {
     }
   });
 
+  test('matches the reference automatic mixed-mode segmentation', () => {
+    const fixture = {
+      name: 'mixed-mode',
+      data: 'ABCDE12345678?A1A',
+      version: 1 as const,
+      errorCorrectionLevel: 'M' as const,
+      mask: 0 as const,
+    };
+
+    expect(qrcode(fixture.data).config(fixture).matrix()).toEqual(
+      referenceMatrixQRCodePackage(fixture),
+    );
+  });
+
   test('matches reference matrices for every mask and ECC level', () => {
     for (const errorCorrectionLevel of ECC_LEVELS) {
       for (const mask of MASKS) {

@@ -46,7 +46,7 @@ export type QRCodeMatrixGenerationMetadata = {
   readonly matrix: QRCodeMatrix;
   readonly moduleGrid: readonly (readonly QRCodeMatrixModuleMetadata[])[];
   readonly version: QRCodeVersion;
-  readonly mode: QRCodeMode;
+  readonly mode: QRCodeMode | 'mixed';
   readonly errorCorrectionLevel: QRCodeErrorCorrectionLevel;
   readonly mask: QRCodeMask;
 };

@@ -47,7 +47,7 @@ export interface QRCodeExplanation {
   readonly moduleGrid: readonly (readonly QRCodeExplainModule[])[];
   readonly groups: ReadonlyMap<string, QRCodeExplainGroup>;
   readonly version: QRCodeVersion;
-  readonly mode: QRCodeMode;
+  readonly mode: QRCodeMode | 'mixed';
   readonly errorCorrectionLevel: QRCodeErrorCorrectionLevel;
   readonly mask: QRCodeMask;
   readonly size: number;

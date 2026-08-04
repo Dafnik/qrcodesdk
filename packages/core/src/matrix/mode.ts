@@ -32,11 +32,13 @@ export type QRCodeModeDefinition = {
   readonly indicator: QRCodeSupportedModeIndicator;
   readonly validate: (data: QRCodeInputData) => QRCodeEncodedData | undefined;
   readonly getCharacterCountBits: (version: QRCodeVersion) => number;
+  readonly getPayloadBitLength: (dataLength: number) => number;
   readonly getMaxDataLength: (numberOfBits: number) => number;
   readonly encodePayload: (data: QRCodeEncodedData, pack: PackBits) => void;
 };
 
 let cachedAlphanumericMap: Record<string, number> | undefined;
+let cachedTextEncoder: InstanceType<TextEncoderConstructor> | undefined;
 
 // Alphanumeric character mapping (JIS X 0510:2004 Table 5).
 export function getAlphanumericMap(): Record<string, number> {
@@ -52,6 +54,7 @@ const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinitio
       return NUMERIC_REGEXP.test(stringData) ? stringData : undefined;
     },
     getCharacterCountBits: (version) => (version < 10 ? 10 : version < 27 ? 12 : 14),
+    getPayloadBitLength: (dataLength) => ((dataLength / 3) | 0) * 10 + [0, 4, 7][dataLength % 3]!,
     getMaxDataLength: (numberOfBits) =>
       ((numberOfBits / 10) | 0) * 3 + (numberOfBits % 10 < 4 ? 0 : numberOfBits % 10 < 7 ? 1 : 2),
     encodePayload: (data, pack) => {
@@ -70,6 +73,7 @@ const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinitio
       return ALPHANUMERIC_REGEXP.test(stringData) ? stringData : undefined;
     },
     getCharacterCountBits: (version) => (version < 10 ? 9 : version < 27 ? 11 : 13),
+    getPayloadBitLength: (dataLength) => ((dataLength / 2) | 0) * 11 + (dataLength % 2) * 6,
     getMaxDataLength: (numberOfBits) =>
       ((numberOfBits / 11) | 0) * 2 + (numberOfBits % 11 < 6 ? 0 : 1),
     encodePayload: (data, pack) => {
@@ -90,12 +94,9 @@ const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinitio
   },
   [MODE_OCTET]: {
     indicator: MODE_OCTET,
-    validate: (data) => [
-      ...new (globalThis as unknown as {TextEncoder: TextEncoderConstructor}).TextEncoder().encode(
-        String(data),
-      ),
-    ],
+    validate: (data) => encodeUTF8(String(data)),
     getCharacterCountBits: (version) => (version < 10 ? 8 : 16),
+    getPayloadBitLength: (dataLength) => dataLength * 8,
     getMaxDataLength: (numberOfBits) => (numberOfBits / 8) | 0,
     encodePayload: (data, pack) => {
       const dataArray = data as number[];
@@ -131,6 +132,21 @@ export function validateData(
 ): QRCodeEncodedData | undefined {
   if (typeof data === 'number' && (!Number.isSafeInteger(data) || data < 0)) return undefined;
   return getModeDefinition(mode).validate(data);
+}
+
+export function isNumericData(data: string): boolean {
+  return NUMERIC_REGEXP.test(data);
+}
+
+export function isAlphanumericData(data: string): boolean {
+  return ALPHANUMERIC_REGEXP.test(data);
+}
+
+export function encodeUTF8(data: string): number[] {
+  cachedTextEncoder ??= new (
+    globalThis as unknown as {TextEncoder: TextEncoderConstructor}
+  ).TextEncoder();
+  return [...cachedTextEncoder.encode(data)];
 }
 
 function createAlphanumericMap(): Record<string, number> {

@@ -45,6 +45,13 @@ describe('SVG QR roundtrips', () => {
 
   const testSVGRenderer = QRCodeSVGRenderer({size: 4, margin: 4});
 
+  test.each(['ABCDE12345678?A1A', 'ABé12345678901234567890', 'AB✅🚀12345678901234567890'])(
+    'decodes automatic mixed-mode SVG output for %s',
+    async (data) => {
+      await expect(decodeSvgQRCode(qrcode(data).render(testSVGRenderer))).resolves.toBe(data);
+    },
+  );
+
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
     await expect(
       decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),

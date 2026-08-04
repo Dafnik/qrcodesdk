@@ -69,16 +69,19 @@ export function generateQRCodeMatrixWithMetadata(
     matrix,
     moduleGrid: moduleGrid as QRCodeMatrixModuleMetadata[][],
     version: resolved.version,
-    mode: resolveModeName(resolved.mode),
+    mode: resolveModeName(resolved.segments.map(({mode}) => mode)),
     errorCorrectionLevel: resolveErrorCorrectionLevelName(resolved.errorCorrectionLevel),
     mask,
   };
 }
 
-function resolveModeName(mode: number): QRCodeMode {
-  const name = MODES.find((candidate) => MODES_MAP[candidate] === mode);
-  if (name === undefined) throw new Error('QRCode: Unable to resolve encoded mode');
-  return name;
+function resolveModeName(modes: readonly number[]): QRCodeMode | 'mixed' {
+  const names = new Set(
+    modes.map((mode) => MODES.find((candidate) => MODES_MAP[candidate] === mode)),
+  );
+  if (names.has(undefined)) throw new Error('QRCode: Unable to resolve encoded mode');
+  if (names.size > 1) return 'mixed';
+  return names.values().next().value!;
 }
 
 function resolveErrorCorrectionLevelName(level: number): QRCodeErrorCorrectionLevel {

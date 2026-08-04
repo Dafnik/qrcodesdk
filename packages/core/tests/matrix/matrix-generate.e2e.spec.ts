@@ -55,6 +55,24 @@ describe('qrcode().matrix()', () => {
     expect(qrcode('1'.repeat(42)).mask(1).matrix()).toHaveLength(25);
   });
 
+  test('uses mixed modes automatically while explicit modes remain forced', () => {
+    const data = 'ABCD12345678901234567890abcd';
+    const automatic = qrcode(data).mask(1).matrix();
+    const forcedOctet = qrcode(data).mode('octet').mask(1).matrix();
+
+    expect(automatic).toHaveLength(25);
+    expect(forcedOctet).toHaveLength(29);
+    expect(qrcode(data).version(2).mask(1).matrix()).toEqual(automatic);
+    expect(qrcode(data).mode('octet').mode(undefined).mask(1).matrix()).toEqual(automatic);
+    expect(qrcode(data).config({mode: 'octet'}).config({mode: undefined}).mask(1).matrix()).toEqual(
+      automatic,
+    );
+    expect(qrcode('ABCDE12345678?A1A').version(1).matrix()).toHaveLength(21);
+    expect(() => qrcode('ABCDE12345678?A1AA').version(1).matrix()).toThrow(
+      'QRCode: Data too large',
+    );
+  });
+
   test('builder matrix and renderer paths use matrix generation', () => {
     const matrix = qrcode('123456789').mode('numeric').mask(1).matrix();
 

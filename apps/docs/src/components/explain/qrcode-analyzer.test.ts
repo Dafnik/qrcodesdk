@@ -70,6 +70,7 @@ describe('explainQRCode', () => {
     const alphanumeric = explainQRCode({data: 'HELLO', version: 1, mask: 0});
     const octet = explainQRCode({data: 'hello', version: 1, mask: 0});
     const utf8 = explainQRCode({data: 'Grüße', version: 2, mode: 'octet', mask: 0});
+    const mixed = explainQRCode({data: 'ABCDE12345678?A1A', version: 1, mask: 0});
 
     assert.equal(numeric.mode, 'numeric');
     assert.equal(countRole(numeric, 'mode'), 4);
@@ -80,6 +81,9 @@ describe('explainQRCode', () => {
     assert.equal(octet.mode, 'octet');
     assert.equal(countRole(octet, 'payload'), 40);
     assert.equal(countRole(utf8, 'payload'), new TextEncoder().encode('Grüße').length * 8);
+    assert.equal(mixed.mode, 'mixed');
+    assert.equal(countRole(mixed, 'mode'), 12);
+    assert.equal(countRole(mixed, 'character-count'), 27);
     assert.ok(countRole(numeric, 'terminator') > 0);
     assert.ok(countRole(numeric, 'padding') > 0);
   });

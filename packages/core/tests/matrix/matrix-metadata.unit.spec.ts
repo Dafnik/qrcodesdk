@@ -127,6 +127,20 @@ describe('QR code matrix generation metadata', () => {
     expect(countRole(numeric, 'padding')).toBeGreaterThan(0);
   });
 
+  test('reports and classifies mixed-mode segments', () => {
+    const generated = ɵgenerateQRCodeMatrixWithMetadata('ABCDE12345678?A1A', {
+      version: 1,
+      mask: 0,
+    });
+
+    expect(generated.mode).toBe('mixed');
+    expect(countRole(generated, 'mode')).toBe(12);
+    expect(countRole(generated, 'character-count')).toBe(27);
+    expect(countRole(generated, 'payload')).toBe(87);
+    expect(countRole(generated, 'terminator')).toBe(2);
+    expect(countRole(generated, 'padding')).toBe(0);
+  });
+
   test('handles truncated terminators, padding, ECC, and remainder bits', () => {
     const atCapacity = ɵgenerateQRCodeMatrixWithMetadata('1'.repeat(34), {
       version: 1,

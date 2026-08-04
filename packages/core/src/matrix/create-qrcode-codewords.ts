@@ -12,16 +12,14 @@ type QRCodeCodewordsWithMetadata = {
 };
 
 export function createQRCodeCodewords({
-  data,
-  mode,
+  segments,
   errorCorrectionLevel,
   version,
 }: QRCodeResolvedMatrixOptions): QRCodeCodewords {
   const versionConfig = VERSIONS[version] ?? [[-100]];
   const dataCodewords = encode(
     version,
-    mode,
-    data,
+    segments,
     getNumberOfAvailableBitsForData(version, errorCorrectionLevel) >> 3,
   );
   const generatorPolynomials = getGF256GeneratorPolynomials();
@@ -34,16 +32,14 @@ export function createQRCodeCodewords({
 }
 
 export function createQRCodeCodewordsWithMetadata({
-  data,
-  mode,
+  segments,
   errorCorrectionLevel,
   version,
 }: QRCodeResolvedMatrixOptions): QRCodeCodewordsWithMetadata {
   const versionConfig = VERSIONS[version] ?? [[-100]];
   const {codewords: dataCodewords, bitMetadata} = encodeWithMetadata(
     version,
-    mode,
-    data,
+    segments,
     getNumberOfAvailableBitsForData(version, errorCorrectionLevel) >> 3,
   );
   const generatorPolynomials = getGF256GeneratorPolynomials();

@@ -84,11 +84,15 @@ Use a mode when you know the shape of your data.
 | `alphanumeric` | Uppercase QR alphanumeric data such as `HELLO WORLD`. |
 | `octet`        | UTF-8 text, URLs, JSON, emoji, and general byte data. |
 
-If you do not provide a mode, the builder resolves one from the input.
+If you do not provide a mode, the builder automatically splits the input into the shortest-bit
+combination of numeric, alphanumeric, and octet segments. Setting a mode forces the entire payload
+to use that single mode. Mixed encoding is automatic; the builder does not accept manual segment
+arrays.
 
 QRCodeSDK implements QR Code Model 2 matrix generation for numeric, alphanumeric, and UTF-8
-octet payloads. Kanji mode and structured append are not supported, so this is a documented
-subset of ISO/IEC 18004 rather than full feature coverage.
+octet payloads, including automatic mixed-mode encoding. Kanji mode, ECI, and structured append
+are not supported, so this is a documented subset of ISO/IEC 18004 rather than full feature
+coverage.
 
 ### Methods
 
@@ -98,7 +102,7 @@ The builder is immutable. Each method returns a new builder with the updated opt
 | ---------------------------------------- | ------------------------------------------------------- | :------- |
 | `.data(value)`                           | Sets QR code input data.                                | -        |
 | `.config(options?: QRCodeMatrixOptions)` | Sets all matrix options in one call.                    | -        |
-| `.mode(mode)`                            | Sets the mode: `numeric`, `alphanumeric`, or `octet`.   | `Auto`   |
+| `.mode(mode)`                            | Forces `numeric`, `alphanumeric`, or `octet` mode.      | `Auto`   |
 | `.errorCorrection(level)`                | Sets the error correction level: `L`, `M`, `Q`, or `H`. | `M`      |
 | `.version(version)`                      | Pins a QR code version from `1` to `40`.                | `Auto`   |
 | `.mask(mask)`                            | Pins a mask from `0` to `7`.                            | `Auto`   |
