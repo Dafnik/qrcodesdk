@@ -93,10 +93,6 @@ All components accept:
 
 Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` and `QRCodeCanvasOptions` from `@qrcodesdk/browser`.
 
-The components treat `options` as immutable configuration and use its object identity to decide
-when to rebuild a renderer. Memoize options created inside a component with `useMemo`, especially
-for Canvas and Image output, to avoid repeating rasterization after unrelated parent renders.
-
 ## Matrix options
 
 The `options` prop combines the component's renderer options with the shared QR matrix options:
