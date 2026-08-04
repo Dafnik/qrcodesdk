@@ -164,28 +164,3 @@ canvas.toBlob((blob) => {
   URL.revokeObjectURL(url);
 }, 'image/png');
 ```
-
-## Output details
-
-The Canvas renderer generates:
-
-- A square `HTMLCanvasElement`
-- Square or antialiased curved modules, depending on the selected feature types
-- A solid background using `colors.colorLight`
-- Independently colored data modules, finder rings, and finder centers
-- Fully opaque pixels
-- Browser-owned PNG bytes when exported with `toBlob()` or `toDataURL('image/png')`
-
-The final canvas size is calculated as:
-
-```ts
-const imageSize = size * (moduleCount + 2 * margin);
-```
-
-For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
-
-```txt
-8 * (21 + 2 * 4) = 232
-```
-
-So the output canvas is `232 x 232` pixels.

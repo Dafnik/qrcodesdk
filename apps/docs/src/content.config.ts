@@ -10,6 +10,7 @@ export const collections = {
     schema: docsSchema({
       extend: z.object({
         packageName: z.string().optional(),
+        worksWith: z.array(z.string()).optional(),
         related: z.array(z.string()).optional(),
       }),
     }),

@@ -15,7 +15,7 @@ export const STARLIGHT_SIDEBAR = [
     label: 'Choose Your Output',
     items: [
       {label: 'Render SVG', slug: 'renderers/core/svg'},
-      {label: 'Render PNG in Node.js', slug: 'renderers/node/png'},
+      {label: 'Render PNG in Node.js', slug: 'packages/node'},
       {label: 'Render to Canvas', slug: 'renderers/browser/canvas'},
       {label: 'Render to an Image Element', slug: 'renderers/browser/image'},
       {label: 'Render Terminal Text', slug: 'renderers/core/text'},

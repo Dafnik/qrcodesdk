@@ -24,3 +24,4 @@ culori
 shieldsio
 bundlejs
 haspopup
+googlechrome

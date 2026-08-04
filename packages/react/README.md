@@ -4,7 +4,7 @@
 
 # @qrcodesdk/react
 
-[![Open @qrcodesdk/react on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/react?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/react) ![@qrcodesdk/react version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/react?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/react install size](<https://npmx.dev/api/registry/badge/size/@qrcodesdk/react?color=7469B6&label=install size&style=shieldsio>) ![@qrcodesdk/react download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/react?color=7469B6&label=download/mo&style=shieldsio) [![@qrcodesdk/react Source code](<https://npmx.dev/api/registry/badge/name/@qrcodesdk/react?color=7469B6&label=Source code&value=GitHub ↗&style=shieldsio>)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/react)
+[![Open @qrcodesdk/react on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/react?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/react) ![@qrcodesdk/react version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/react?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/react install size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/react?color=7469B6&label=install%20size&style=shieldsio) ![@qrcodesdk/react download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/react?color=7469B6&label=download%2Fmo&style=shieldsio) [![@qrcodesdk/react source code](https://npmx.dev/api/registry/badge/name/@qrcodesdk/react?color=7469B6&label=source%20code&value=GitHub%20%E2%86%97&style=shieldsio)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/react)
 
 **[Live Demo](https://qrcodesdk.dev/playground/?package=react)**
 

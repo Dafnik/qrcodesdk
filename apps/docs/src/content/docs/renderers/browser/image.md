@@ -180,31 +180,3 @@ link.href = image.src;
 link.download = 'qrcode.png';
 link.click();
 ```
-
-## Output details
-
-The Image renderer generates:
-
-- A square `HTMLImageElement`
-- A PNG data URL assigned to `image.src`
-- `width` and `height` values matching the rendered QR code size
-- Square or antialiased curved modules, depending on the selected feature types
-- A solid background using `colors.colorLight`
-- Independently colored data modules, finder rings, and finder centers
-- Optional `alt`, `aria-label`, and `title` attributes
-
-The image renderer uses the Canvas renderer internally, then converts the canvas to a PNG data URL with `canvas.toDataURL('image/png')`.
-
-The final image size is calculated as:
-
-```ts
-const imageSize = size * (moduleCount + 2 * margin);
-```
-
-For example, a QR matrix with `21` modules, `size: 8`, and `margin: 4` produces:
-
-```txt
-8 * (21 + 2 * 4) = 232
-```
-
-So the output image is `232 x 232` pixels.

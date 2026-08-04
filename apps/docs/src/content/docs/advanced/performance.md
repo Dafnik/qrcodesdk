@@ -11,12 +11,12 @@ All **qrcode-generator** rows use the repository patch that applies each fixture
 
 ## Benchmark environment
 
-- Generated: `2026-07-27T13:18:15.943Z`
-- Runtime: `v24.18.0` on `linux x64`
+- Generated: `2026-08-03T15:39:38.334Z`
+- Runtime: `v24.19.0` on `linux x64`
 - CPU: `AMD Ryzen 7 3700X 8-Core Processor` (16 logical cores)
-- Libraries: `qrcodesdk@0.0.0`, `qrcode@1.5.4`, `qrcode-generator-default@2.0.4`, `qrcode-generator@2.0.4`, `qrcode-generator-utf8@2.0.4`
+- Libraries: `qrcodesdk@0.0.1`, `qrcode@1.5.4`, `qrcode-generator-default@2.0.4`, `qrcode-generator@2.0.4`, `qrcode-generator-utf8@2.0.4`
 - Samples: 5 timed samples after 5 static warm-up passes and 1 exhaustive warm-up pass
-- SVG output: 8 px/module with a 4-module quiet zone
+- SVG output: 4 px/module with a 4-module quiet zone
 
 The charts show relative median time, where lower is better and QRCodeSDK is fixed at `1.00×`. Expand the exact benchmark data beneath each section for median time, min–max range, and throughput calculated from the median.
 
@@ -31,11 +31,11 @@ config:
 ---
 xychart horizontal
   accTitle: Matrix generation: Static fixtures ×1 — 16 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.67 times, generator default 4.31 times, generator TextEncoder 4.44 times, generator bundled UTF-8 4.31 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.58 times, generator default 3.94 times, generator TextEncoder 3.90 times, generator bundled UTF-8 4.01 times. Lower is better.
   title "Static fixtures ×1 — 16 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
-  y-axis "Time ÷ QRCodeSDK" 0 --> 5.5
-  bar [1.00, 1.67, 4.31, 4.44, 4.31]
+  y-axis "Time ÷ QRCodeSDK" 0 --> 5.0
+  bar [1.00, 1.58, 3.94, 3.90, 4.01]
 ```
 
 ```mermaid
@@ -47,11 +47,11 @@ config:
 ---
 xychart horizontal
   accTitle: Matrix generation: Static fixtures ×5 — 80 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.65 times, generator default 4.53 times, generator TextEncoder 4.31 times, generator bundled UTF-8 4.27 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.59 times, generator default 4.09 times, generator TextEncoder 4.11 times, generator bundled UTF-8 4.07 times. Lower is better.
   title "Static fixtures ×5 — 80 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
-  y-axis "Time ÷ QRCodeSDK" 0 --> 5.5
-  bar [1.00, 1.65, 4.53, 4.31, 4.27]
+  y-axis "Time ÷ QRCodeSDK" 0 --> 5.0
+  bar [1.00, 1.59, 4.09, 4.11, 4.07]
 ```
 
 ```mermaid
@@ -63,11 +63,11 @@ config:
 ---
 xychart horizontal
   accTitle: Matrix generation: Static fixtures ×10 — 160 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.78 times, generator default 4.40 times, generator TextEncoder 4.31 times, generator bundled UTF-8 4.26 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.67 times, generator default 4.14 times, generator TextEncoder 4.11 times, generator bundled UTF-8 4.06 times. Lower is better.
   title "Static fixtures ×10 — 160 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
-  y-axis "Time ÷ QRCodeSDK" 0 --> 5.5
-  bar [1.00, 1.78, 4.40, 4.31, 4.26]
+  y-axis "Time ÷ QRCodeSDK" 0 --> 5.0
+  bar [1.00, 1.67, 4.14, 4.11, 4.06]
 ```
 
 ```mermaid
@@ -79,11 +79,11 @@ config:
 ---
 xychart horizontal
   accTitle: Matrix generation: Static fixtures ×100 — 1,600 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 2.11 times, generator default 4.27 times, generator TextEncoder 4.31 times, generator bundled UTF-8 4.26 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.73 times, generator default 4.08 times, generator TextEncoder 4.10 times, generator bundled UTF-8 4.08 times. Lower is better.
   title "Static fixtures ×100 — 1,600 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
-  y-axis "Time ÷ QRCodeSDK" 0 --> 5.5
-  bar [1.00, 2.11, 4.27, 4.31, 4.26]
+  y-axis "Time ÷ QRCodeSDK" 0 --> 5.0
+  bar [1.00, 1.73, 4.08, 4.10, 4.08]
 ```
 
 ```mermaid
@@ -95,11 +95,11 @@ config:
 ---
 xychart horizontal
   accTitle: Matrix generation: Static fixtures ×500 — 8,000 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 2.68 times, generator default 4.32 times, generator TextEncoder 4.33 times, generator bundled UTF-8 4.27 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 2.61 times, generator default 4.12 times, generator TextEncoder 4.13 times, generator bundled UTF-8 4.06 times. Lower is better.
   title "Static fixtures ×500 — 8,000 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
-  y-axis "Time ÷ QRCodeSDK" 0 --> 5.5
-  bar [1.00, 2.68, 4.32, 4.33, 4.27]
+  y-axis "Time ÷ QRCodeSDK" 0 --> 5.0
+  bar [1.00, 2.61, 4.12, 4.13, 4.06]
 ```
 
 ```mermaid
@@ -111,11 +111,11 @@ config:
 ---
 xychart horizontal
   accTitle: Matrix generation: All combinations ×1 — 3,840 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.27 times, generator default 4.39 times, generator TextEncoder 4.38 times, generator bundled UTF-8 4.35 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.21 times, generator default 4.09 times, generator TextEncoder 4.10 times, generator bundled UTF-8 4.08 times. Lower is better.
   title "All combinations ×1 — 3,840 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
-  y-axis "Time ÷ QRCodeSDK" 0 --> 5.5
-  bar [1.00, 1.27, 4.39, 4.38, 4.35]
+  y-axis "Time ÷ QRCodeSDK" 0 --> 5.0
+  bar [1.00, 1.21, 4.09, 4.10, 4.08]
 ```
 
 <details>
@@ -123,36 +123,36 @@ xychart horizontal
 
 | Workload             | QR codes/sample | Library                                 | Median (ms) |      Min–max (ms) | QR codes/second | Time ÷ QRCodeSDK |
 | -------------------- | --------------: | --------------------------------------- | ----------: | ----------------: | --------------: | ---------------: |
-| Static fixtures ×1   |              16 | QRCodeSDK v0.0.0                        |       2.667 |       2.659–4.119 |           5,998 |            1.00× |
-| Static fixtures ×1   |              16 | qrcode v1.5.4                           |       4.465 |       4.455–5.065 |           3,583 |            1.67× |
-| Static fixtures ×1   |              16 | qrcode-generator (default) v2.0.4       |      11.503 |     11.014–11.736 |           1,391 |            4.31× |
-| Static fixtures ×1   |              16 | qrcode-generator (TextEncoder) v2.0.4   |      11.852 |     11.543–12.747 |           1,350 |            4.44× |
-| Static fixtures ×1   |              16 | qrcode-generator (bundled UTF-8) v2.0.4 |      11.495 |     11.303–11.701 |           1,392 |            4.31× |
-| Static fixtures ×5   |              80 | QRCodeSDK v0.0.0                        |      13.403 |     13.109–13.881 |           5,969 |            1.00× |
-| Static fixtures ×5   |              80 | qrcode v1.5.4                           |      22.050 |     21.931–23.719 |           3,628 |            1.65× |
-| Static fixtures ×5   |              80 | qrcode-generator (default) v2.0.4       |      60.753 |     57.553–61.089 |           1,317 |            4.53× |
-| Static fixtures ×5   |              80 | qrcode-generator (TextEncoder) v2.0.4   |      57.735 |     56.653–65.380 |           1,386 |            4.31× |
-| Static fixtures ×5   |              80 | qrcode-generator (bundled UTF-8) v2.0.4 |      57.269 |     55.761–58.016 |           1,397 |            4.27× |
-| Static fixtures ×10  |             160 | QRCodeSDK v0.0.0                        |      26.476 |     26.409–27.215 |           6,043 |            1.00× |
-| Static fixtures ×10  |             160 | qrcode v1.5.4                           |      47.166 |     42.813–51.226 |           3,392 |            1.78× |
-| Static fixtures ×10  |             160 | qrcode-generator (default) v2.0.4       |     116.483 |   111.636–119.980 |           1,374 |            4.40× |
-| Static fixtures ×10  |             160 | qrcode-generator (TextEncoder) v2.0.4   |     114.124 |   113.232–117.886 |           1,402 |            4.31× |
-| Static fixtures ×10  |             160 | qrcode-generator (bundled UTF-8) v2.0.4 |     112.714 |   111.614–114.962 |           1,420 |            4.26× |
-| Static fixtures ×100 |           1,600 | QRCodeSDK v0.0.0                        |     263.161 |   260.673–266.592 |           6,080 |            1.00× |
-| Static fixtures ×100 |           1,600 | qrcode v1.5.4                           |     555.124 |   478.087–588.005 |           2,882 |            2.11× |
-| Static fixtures ×100 |           1,600 | qrcode-generator (default) v2.0.4       |    1123.409 | 1106.258–1130.066 |           1,424 |            4.27× |
-| Static fixtures ×100 |           1,600 | qrcode-generator (TextEncoder) v2.0.4   |    1134.954 | 1127.019–1182.317 |           1,410 |            4.31× |
-| Static fixtures ×100 |           1,600 | qrcode-generator (bundled UTF-8) v2.0.4 |    1119.912 | 1118.325–1134.722 |           1,429 |            4.26× |
-| Static fixtures ×500 |           8,000 | QRCodeSDK v0.0.0                        |    1310.382 | 1297.086–1327.849 |           6,105 |            1.00× |
-| Static fixtures ×500 |           8,000 | qrcode v1.5.4                           |    3511.402 | 3267.776–3617.338 |           2,278 |            2.68× |
-| Static fixtures ×500 |           8,000 | qrcode-generator (default) v2.0.4       |    5656.480 | 5525.724–5740.960 |           1,414 |            4.32× |
-| Static fixtures ×500 |           8,000 | qrcode-generator (TextEncoder) v2.0.4   |    5679.890 | 5576.770–5807.218 |           1,408 |            4.33× |
-| Static fixtures ×500 |           8,000 | qrcode-generator (bundled UTF-8) v2.0.4 |    5597.301 | 5572.658–5912.671 |           1,429 |            4.27× |
-| All combinations ×1  |           3,840 | QRCodeSDK v0.0.0                        |     965.486 |  957.717–1125.197 |           3,977 |            1.00× |
-| All combinations ×1  |           3,840 | qrcode v1.5.4                           |    1223.852 | 1157.504–1268.569 |           3,138 |            1.27× |
-| All combinations ×1  |           3,840 | qrcode-generator (default) v2.0.4       |    4239.699 | 4199.437–4269.008 |             906 |            4.39× |
-| All combinations ×1  |           3,840 | qrcode-generator (TextEncoder) v2.0.4   |    4231.563 | 4205.253–4496.102 |             907 |            4.38× |
-| All combinations ×1  |           3,840 | qrcode-generator (bundled UTF-8) v2.0.4 |    4195.655 | 4153.943–4233.745 |             915 |            4.35× |
+| Static fixtures ×1   |              16 | QRCodeSDK v0.0.1                        |       2.866 |       2.777–3.427 |           5,582 |            1.00× |
+| Static fixtures ×1   |              16 | qrcode v1.5.4                           |       4.537 |       4.370–5.246 |           3,527 |            1.58× |
+| Static fixtures ×1   |              16 | qrcode-generator (default) v2.0.4       |      11.286 |     11.018–11.365 |           1,418 |            3.94× |
+| Static fixtures ×1   |              16 | qrcode-generator (TextEncoder) v2.0.4   |      11.187 |     11.083–11.484 |           1,430 |            3.90× |
+| Static fixtures ×1   |              16 | qrcode-generator (bundled UTF-8) v2.0.4 |      11.482 |     10.969–11.627 |           1,393 |            4.01× |
+| Static fixtures ×5   |              80 | QRCodeSDK v0.0.1                        |      13.753 |     13.669–14.030 |           5,817 |            1.00× |
+| Static fixtures ×5   |              80 | qrcode v1.5.4                           |      21.851 |     21.734–23.266 |           3,661 |            1.59× |
+| Static fixtures ×5   |              80 | qrcode-generator (default) v2.0.4       |      56.313 |     55.520–61.216 |           1,421 |            4.09× |
+| Static fixtures ×5   |              80 | qrcode-generator (TextEncoder) v2.0.4   |      56.508 |     56.320–60.125 |           1,416 |            4.11× |
+| Static fixtures ×5   |              80 | qrcode-generator (bundled UTF-8) v2.0.4 |      55.971 |     55.076–56.843 |           1,429 |            4.07× |
+| Static fixtures ×10  |             160 | QRCodeSDK v0.0.1                        |      27.399 |     27.366–27.605 |           5,840 |            1.00× |
+| Static fixtures ×10  |             160 | qrcode v1.5.4                           |      45.800 |     44.873–47.517 |           3,493 |            1.67× |
+| Static fixtures ×10  |             160 | qrcode-generator (default) v2.0.4       |     113.412 |   112.077–115.158 |           1,411 |            4.14× |
+| Static fixtures ×10  |             160 | qrcode-generator (TextEncoder) v2.0.4   |     112.600 |   111.679–114.461 |           1,421 |            4.11× |
+| Static fixtures ×10  |             160 | qrcode-generator (bundled UTF-8) v2.0.4 |     111.339 |   110.996–112.360 |           1,437 |            4.06× |
+| Static fixtures ×100 |           1,600 | QRCodeSDK v0.0.1                        |     274.948 |   273.460–328.763 |           5,819 |            1.00× |
+| Static fixtures ×100 |           1,600 | qrcode v1.5.4                           |     474.766 |   472.106–588.395 |           3,370 |            1.73× |
+| Static fixtures ×100 |           1,600 | qrcode-generator (default) v2.0.4       |    1121.267 | 1112.977–1220.036 |           1,427 |            4.08× |
+| Static fixtures ×100 |           1,600 | qrcode-generator (TextEncoder) v2.0.4   |    1126.766 | 1119.904–1139.869 |           1,420 |            4.10× |
+| Static fixtures ×100 |           1,600 | qrcode-generator (bundled UTF-8) v2.0.4 |    1122.087 | 1111.648–1154.516 |           1,426 |            4.08× |
+| Static fixtures ×500 |           8,000 | QRCodeSDK v0.0.1                        |    1372.356 | 1367.448–1397.900 |           5,829 |            1.00× |
+| Static fixtures ×500 |           8,000 | qrcode v1.5.4                           |    3583.740 | 3319.557–4032.701 |           2,232 |            2.61× |
+| Static fixtures ×500 |           8,000 | qrcode-generator (default) v2.0.4       |    5656.755 | 5577.567–5687.318 |           1,414 |            4.12× |
+| Static fixtures ×500 |           8,000 | qrcode-generator (TextEncoder) v2.0.4   |    5663.113 | 5607.343–5689.634 |           1,413 |            4.13× |
+| Static fixtures ×500 |           8,000 | qrcode-generator (bundled UTF-8) v2.0.4 |    5567.084 | 5561.776–5636.328 |           1,437 |            4.06× |
+| All combinations ×1  |           3,840 | QRCodeSDK v0.0.1                        |    1018.807 | 1012.780–1024.605 |           3,769 |            1.00× |
+| All combinations ×1  |           3,840 | qrcode v1.5.4                           |    1229.959 | 1099.938–1246.023 |           3,122 |            1.21× |
+| All combinations ×1  |           3,840 | qrcode-generator (default) v2.0.4       |    4165.604 | 4152.917–4197.176 |             922 |            4.09× |
+| All combinations ×1  |           3,840 | qrcode-generator (TextEncoder) v2.0.4   |    4176.569 | 4151.119–4210.150 |             919 |            4.10× |
+| All combinations ×1  |           3,840 | qrcode-generator (bundled UTF-8) v2.0.4 |    4158.805 | 4143.568–4301.101 |             923 |            4.08× |
 
 </details>
 
@@ -167,11 +167,11 @@ config:
 ---
 xychart horizontal
   accTitle: SVG generation: Static fixtures ×1 — 16 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.69 times, generator default 1.83 times, generator TextEncoder 1.83 times, generator bundled UTF-8 1.84 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.84 times, generator default 2.15 times, generator TextEncoder 2.16 times, generator bundled UTF-8 2.15 times. Lower is better.
   title "Static fixtures ×1 — 16 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
   y-axis "Time ÷ QRCodeSDK" 0 --> 3.0
-  bar [1.00, 0.69, 1.83, 1.83, 1.84]
+  bar [1.00, 0.84, 2.15, 2.16, 2.15]
 ```
 
 ```mermaid
@@ -183,11 +183,11 @@ config:
 ---
 xychart horizontal
   accTitle: SVG generation: Static fixtures ×5 — 80 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.68 times, generator default 1.87 times, generator TextEncoder 1.79 times, generator bundled UTF-8 1.68 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.96 times, generator default 2.31 times, generator TextEncoder 2.24 times, generator bundled UTF-8 2.21 times. Lower is better.
   title "Static fixtures ×5 — 80 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
   y-axis "Time ÷ QRCodeSDK" 0 --> 3.0
-  bar [1.00, 0.68, 1.87, 1.79, 1.68]
+  bar [1.00, 0.96, 2.31, 2.24, 2.21]
 ```
 
 ```mermaid
@@ -199,11 +199,11 @@ config:
 ---
 xychart horizontal
   accTitle: SVG generation: Static fixtures ×10 — 160 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.79 times, generator default 2.01 times, generator TextEncoder 1.94 times, generator bundled UTF-8 1.85 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.95 times, generator default 2.26 times, generator TextEncoder 2.21 times, generator bundled UTF-8 2.18 times. Lower is better.
   title "Static fixtures ×10 — 160 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
   y-axis "Time ÷ QRCodeSDK" 0 --> 3.0
-  bar [1.00, 0.79, 2.01, 1.94, 1.85]
+  bar [1.00, 0.95, 2.26, 2.21, 2.18]
 ```
 
 ```mermaid
@@ -215,11 +215,11 @@ config:
 ---
 xychart horizontal
   accTitle: SVG generation: Static fixtures ×100 — 1,600 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.88 times, generator default 1.82 times, generator TextEncoder 1.82 times, generator bundled UTF-8 1.80 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.09 times, generator default 2.21 times, generator TextEncoder 2.18 times, generator bundled UTF-8 2.15 times. Lower is better.
   title "Static fixtures ×100 — 1,600 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
   y-axis "Time ÷ QRCodeSDK" 0 --> 3.0
-  bar [1.00, 0.88, 1.82, 1.82, 1.80]
+  bar [1.00, 1.09, 2.21, 2.18, 2.15]
 ```
 
 ```mermaid
@@ -231,11 +231,11 @@ config:
 ---
 xychart horizontal
   accTitle: SVG generation: Static fixtures ×500 — 8,000 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.95 times, generator default 1.85 times, generator TextEncoder 1.83 times, generator bundled UTF-8 1.80 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 1.11 times, generator default 2.11 times, generator TextEncoder 2.09 times, generator bundled UTF-8 2.08 times. Lower is better.
   title "Static fixtures ×500 — 8,000 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
   y-axis "Time ÷ QRCodeSDK" 0 --> 3.0
-  bar [1.00, 0.95, 1.85, 1.83, 1.80]
+  bar [1.00, 1.11, 2.11, 2.09, 2.08]
 ```
 
 ```mermaid
@@ -247,11 +247,11 @@ config:
 ---
 xychart horizontal
   accTitle: SVG generation: All combinations ×1 — 3,840 QR codes/sample
-  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.60 times, generator default 1.68 times, generator TextEncoder 1.71 times, generator bundled UTF-8 1.70 times. Lower is better.
+  accDescr: Relative median time compared with QRCodeSDK. QRCodeSDK 1.00 times, qrcode 0.66 times, generator default 1.89 times, generator TextEncoder 1.90 times, generator bundled UTF-8 1.88 times. Lower is better.
   title "All combinations ×1 — 3,840 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"]
   y-axis "Time ÷ QRCodeSDK" 0 --> 3.0
-  bar [1.00, 0.60, 1.68, 1.71, 1.70]
+  bar [1.00, 0.66, 1.89, 1.90, 1.88]
 ```
 
 <details>
@@ -259,35 +259,35 @@ xychart horizontal
 
 | Workload             | QR codes/sample | Library                                 | Median (ms) |      Min–max (ms) | QR codes/second | Time ÷ QRCodeSDK |
 | -------------------- | --------------: | --------------------------------------- | ----------: | ----------------: | --------------: | ---------------: |
-| Static fixtures ×1   |              16 | QRCodeSDK v0.0.0                        |       8.511 |       7.786–9.095 |           1,880 |            1.00× |
-| Static fixtures ×1   |              16 | qrcode v1.5.4                           |       5.903 |       5.690–6.565 |           2,710 |            0.69× |
-| Static fixtures ×1   |              16 | qrcode-generator (default) v2.0.4       |      15.597 |     15.272–16.313 |           1,026 |            1.83× |
-| Static fixtures ×1   |              16 | qrcode-generator (TextEncoder) v2.0.4   |      15.538 |     14.662–17.329 |           1,030 |            1.83× |
-| Static fixtures ×1   |              16 | qrcode-generator (bundled UTF-8) v2.0.4 |      15.637 |     15.154–15.810 |           1,023 |            1.84× |
-| Static fixtures ×5   |              80 | QRCodeSDK v0.0.0                        |      44.130 |     39.395–47.931 |           1,813 |            1.00× |
-| Static fixtures ×5   |              80 | qrcode v1.5.4                           |      30.061 |     29.502–39.347 |           2,661 |            0.68× |
-| Static fixtures ×5   |              80 | qrcode-generator (default) v2.0.4       |      82.741 |     80.364–88.902 |             967 |            1.87× |
-| Static fixtures ×5   |              80 | qrcode-generator (TextEncoder) v2.0.4   |      79.101 |    77.572–100.862 |           1,011 |            1.79× |
-| Static fixtures ×5   |              80 | qrcode-generator (bundled UTF-8) v2.0.4 |      73.929 |     72.300–86.181 |           1,082 |            1.68× |
-| Static fixtures ×10  |             160 | QRCodeSDK v0.0.0                        |      78.720 |     75.721–81.836 |           2,033 |            1.00× |
-| Static fixtures ×10  |             160 | qrcode v1.5.4                           |      61.947 |     57.280–65.736 |           2,583 |            0.79× |
-| Static fixtures ×10  |             160 | qrcode-generator (default) v2.0.4       |     158.138 |   145.021–174.198 |           1,012 |            2.01× |
-| Static fixtures ×10  |             160 | qrcode-generator (TextEncoder) v2.0.4   |     152.719 |   149.233–184.141 |           1,048 |            1.94× |
-| Static fixtures ×10  |             160 | qrcode-generator (bundled UTF-8) v2.0.4 |     145.838 |   145.078–205.798 |           1,097 |            1.85× |
-| Static fixtures ×100 |           1,600 | QRCodeSDK v0.0.0                        |     790.683 |   750.911–811.539 |           2,024 |            1.00× |
-| Static fixtures ×100 |           1,600 | qrcode v1.5.4                           |     695.006 |   692.991–740.590 |           2,302 |            0.88× |
-| Static fixtures ×100 |           1,600 | qrcode-generator (default) v2.0.4       |    1435.690 | 1407.958–1454.331 |           1,114 |            1.82× |
-| Static fixtures ×100 |           1,600 | qrcode-generator (TextEncoder) v2.0.4   |    1441.405 | 1404.406–1501.463 |           1,110 |            1.82× |
-| Static fixtures ×100 |           1,600 | qrcode-generator (bundled UTF-8) v2.0.4 |    1425.804 | 1389.196–1496.321 |           1,122 |            1.80× |
-| Static fixtures ×500 |           8,000 | QRCodeSDK v0.0.0                        |    3816.529 | 3770.308–3846.487 |           2,096 |            1.00× |
-| Static fixtures ×500 |           8,000 | qrcode v1.5.4                           |    3637.001 | 3155.870–3908.043 |           2,200 |            0.95× |
-| Static fixtures ×500 |           8,000 | qrcode-generator (default) v2.0.4       |    7050.495 | 6891.395–7429.754 |           1,135 |            1.85× |
-| Static fixtures ×500 |           8,000 | qrcode-generator (TextEncoder) v2.0.4   |    6965.472 | 6938.583–7043.374 |           1,149 |            1.83× |
-| Static fixtures ×500 |           8,000 | qrcode-generator (bundled UTF-8) v2.0.4 |    6886.279 | 6751.915–6912.485 |           1,162 |            1.80× |
-| All combinations ×1  |           3,840 | QRCodeSDK v0.0.0                        |    3143.379 | 3095.780–3344.689 |           1,222 |            1.00× |
-| All combinations ×1  |           3,840 | qrcode v1.5.4                           |    1885.309 | 1833.538–1918.871 |           2,037 |            0.60× |
-| All combinations ×1  |           3,840 | qrcode-generator (default) v2.0.4       |    5294.433 | 5263.816–5374.409 |             725 |            1.68× |
-| All combinations ×1  |           3,840 | qrcode-generator (TextEncoder) v2.0.4   |    5386.337 | 5235.679–5520.745 |             713 |            1.71× |
-| All combinations ×1  |           3,840 | qrcode-generator (bundled UTF-8) v2.0.4 |    5332.930 | 5223.178–5513.856 |             720 |            1.70× |
+| Static fixtures ×1   |              16 | QRCodeSDK v0.0.1                        |       6.686 |       6.058–7.229 |           2,393 |            1.00× |
+| Static fixtures ×1   |              16 | qrcode v1.5.4                           |       5.588 |       5.502–5.735 |           2,863 |            0.84× |
+| Static fixtures ×1   |              16 | qrcode-generator (default) v2.0.4       |      14.350 |     13.422–15.105 |           1,115 |            2.15× |
+| Static fixtures ×1   |              16 | qrcode-generator (TextEncoder) v2.0.4   |      14.414 |     13.792–15.862 |           1,110 |            2.16× |
+| Static fixtures ×1   |              16 | qrcode-generator (bundled UTF-8) v2.0.4 |      14.373 |     14.166–16.084 |           1,113 |            2.15× |
+| Static fixtures ×5   |              80 | QRCodeSDK v0.0.1                        |      30.488 |     30.147–31.684 |           2,624 |            1.00× |
+| Static fixtures ×5   |              80 | qrcode v1.5.4                           |      29.344 |     28.418–30.768 |           2,726 |            0.96× |
+| Static fixtures ×5   |              80 | qrcode-generator (default) v2.0.4       |      70.501 |     69.087–74.433 |           1,135 |            2.31× |
+| Static fixtures ×5   |              80 | qrcode-generator (TextEncoder) v2.0.4   |      68.232 |     67.527–72.683 |           1,172 |            2.24× |
+| Static fixtures ×5   |              80 | qrcode-generator (bundled UTF-8) v2.0.4 |      67.239 |     67.149–69.780 |           1,190 |            2.21× |
+| Static fixtures ×10  |             160 | QRCodeSDK v0.0.1                        |      62.406 |     61.088–62.921 |           2,564 |            1.00× |
+| Static fixtures ×10  |             160 | qrcode v1.5.4                           |      59.357 |     56.626–70.798 |           2,696 |            0.95× |
+| Static fixtures ×10  |             160 | qrcode-generator (default) v2.0.4       |     141.092 |   137.626–176.802 |           1,134 |            2.26× |
+| Static fixtures ×10  |             160 | qrcode-generator (TextEncoder) v2.0.4   |     137.881 |   135.404–146.467 |           1,160 |            2.21× |
+| Static fixtures ×10  |             160 | qrcode-generator (bundled UTF-8) v2.0.4 |     136.034 |   134.762–145.862 |           1,176 |            2.18× |
+| Static fixtures ×100 |           1,600 | QRCodeSDK v0.0.1                        |     646.125 |   636.593–650.992 |           2,476 |            1.00× |
+| Static fixtures ×100 |           1,600 | qrcode v1.5.4                           |     707.374 |   675.279–737.249 |           2,262 |            1.09× |
+| Static fixtures ×100 |           1,600 | qrcode-generator (default) v2.0.4       |    1425.556 | 1383.182–1441.510 |           1,122 |            2.21× |
+| Static fixtures ×100 |           1,600 | qrcode-generator (TextEncoder) v2.0.4   |    1405.792 | 1381.202–1572.048 |           1,138 |            2.18× |
+| Static fixtures ×100 |           1,600 | qrcode-generator (bundled UTF-8) v2.0.4 |    1386.345 | 1377.800–1406.379 |           1,154 |            2.15× |
+| Static fixtures ×500 |           8,000 | QRCodeSDK v0.0.1                        |    3303.852 | 3211.391–3359.332 |           2,421 |            1.00× |
+| Static fixtures ×500 |           8,000 | qrcode v1.5.4                           |    3672.086 | 3647.899–4032.162 |           2,179 |            1.11× |
+| Static fixtures ×500 |           8,000 | qrcode-generator (default) v2.0.4       |    6968.085 | 6910.791–7194.710 |           1,148 |            2.11× |
+| Static fixtures ×500 |           8,000 | qrcode-generator (TextEncoder) v2.0.4   |    6909.480 | 6831.413–7214.761 |           1,158 |            2.09× |
+| Static fixtures ×500 |           8,000 | qrcode-generator (bundled UTF-8) v2.0.4 |    6876.602 | 6824.061–6975.016 |           1,163 |            2.08× |
+| All combinations ×1  |           3,840 | QRCodeSDK v0.0.1                        |    2827.653 | 2778.215–2859.712 |           1,358 |            1.00× |
+| All combinations ×1  |           3,840 | qrcode v1.5.4                           |    1877.959 | 1808.568–1966.021 |           2,045 |            0.66× |
+| All combinations ×1  |           3,840 | qrcode-generator (default) v2.0.4       |    5333.475 | 5254.850–5463.411 |             720 |            1.89× |
+| All combinations ×1  |           3,840 | qrcode-generator (TextEncoder) v2.0.4   |    5374.008 | 5233.207–5591.342 |             715 |            1.90× |
+| All combinations ×1  |           3,840 | qrcode-generator (bundled UTF-8) v2.0.4 |    5317.934 | 5258.342–5541.589 |             722 |            1.88× |
 
 </details>

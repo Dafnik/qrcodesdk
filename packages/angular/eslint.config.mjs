@@ -2,15 +2,16 @@ import {config} from '@repo/eslint-config/base';
 import angular from 'angular-eslint';
 
 const withFiles = (configs, files) => configs.map((entry) => ({...entry, files}));
+const angularTypeScriptFiles = ['src/**/*.ts', 'runtime/**/*.ts'];
 
 export default [
   ...config,
   {
     ignores: ['dist/**', '.angular/**', 'out-tsc/**'],
   },
-  ...withFiles(angular.configs.tsRecommended, ['src/**/*.ts']),
+  ...withFiles(angular.configs.tsRecommended, angularTypeScriptFiles),
   {
-    files: ['src/**/*.ts'],
+    files: angularTypeScriptFiles,
     processor: angular.processInlineTemplates,
     rules: {
       '@angular-eslint/component-selector': [

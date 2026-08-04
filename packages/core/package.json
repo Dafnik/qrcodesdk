@@ -64,9 +64,7 @@
     "build": "tsdown",
     "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",
-    "test": "vitest --watch false",
-    "test:runtime:dist": "node runtime/smoke-dist.mjs",
-    "test:runtime:browser": "node runtime/smoke-browser.mjs",
+    "test": "vitest --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
     "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint src tests runtime --max-warnings 0",
@@ -76,7 +74,6 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "playwright": "1.62.0",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

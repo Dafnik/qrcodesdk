@@ -86,6 +86,17 @@ describe('QRCodePNGRenderer', () => {
     expect(Array.from(png.data)).toEqual(new Array<number>(4 * 4 * 4).fill(255));
   });
 
+  test('clips curved modules outside the raster bounds', () => {
+    const png = readPng(
+      QRCodePNGRenderer({size: 4, margin: 0, dotsOptions: {type: 'dots'}})([
+        [0, 0, 1],
+        [0, 0],
+      ]),
+    );
+
+    expect(Array.from(png.data)).toEqual(new Array<number>(8 * 8 * 4).fill(255));
+  });
+
   test('centers and contains prepared PNG bytes without changing their aspect ratio', () => {
     const png = readPng(
       QRCodePNGRenderer({
@@ -141,6 +152,18 @@ describe('QRCodePNGRenderer', () => {
     expectPixel(withClearing, 10, 10, {red: 255, green: 255, blue: 255, alpha: 255});
   });
 
+  test('caches decoded image data independently per renderer instance', () => {
+    const source = createPreparedImage(1, 1, {red: 255, green: 0, blue: 0, alpha: 255});
+    const renderer = QRCodePNGRenderer({image: {source}});
+
+    expect(() => renderer([[1]])).not.toThrow();
+    source.fill(0);
+    expect(() => renderer([[1]])).not.toThrow();
+    expect(() => QRCodePNGRenderer({image: {source}})([[1]])).toThrow(
+      'QR code PNG image source must contain valid PNG bytes',
+    );
+  });
+
   test('rejects invalid prepared PNG sources with stable errors', () => {
     expect(() =>
       QRCodePNGRenderer({
@@ -165,6 +188,18 @@ describe('QRCodePNGRenderer', () => {
     expect(() => QRCodePNGRenderer({colors: {colorDark: '#xyz'}})([[1]])).toThrow(
       'QR code colorDark must be a 6-digit hex color',
     );
+    expect(() => QRCodePNGRenderer({compressionLevel: 10})([[1]])).toThrow(
+      'QR code PNG compressionLevel must be an integer from 0 to 9',
+    );
+  });
+
+  test('supports faster configurable PNG compression', () => {
+    const fast = QRCodePNGRenderer({compressionLevel: 0})([[1]]);
+    const compressed = QRCodePNGRenderer({compressionLevel: 9})([[1]]);
+    const png = readPng(fast);
+
+    expectPixel(png, 20, 20, {red: 0, green: 0, blue: 0, alpha: 255});
+    expect(fast.length).not.toBe(compressed.length);
   });
 
   test('renders square feature colors and finder holes without partial coverage', () => {

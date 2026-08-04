@@ -175,6 +175,19 @@ export type QRCodeFinderCenterStylePrimitive = QRCodeStylePrimitiveBase & {
 export type QRCodeStylePrimitive =
   QRCodeModuleStylePrimitive | QRCodeFinderRingStylePrimitive | QRCodeFinderCenterStylePrimitive;
 
+export type QRCodeStyleRectangle = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type QRCodeStyleLayer = {
+  color: QRCodeColorHex;
+  rectangles: readonly QRCodeStyleRectangle[];
+  curvedPrimitives: readonly QRCodeStylePrimitive[];
+};
+
 export type QRCodeStylePlan = {
   moduleCount: number;
   viewSize: number;
@@ -182,6 +195,7 @@ export type QRCodeStylePlan = {
   backgroundColor: QRCodeColorHex;
   hasCurves: boolean;
   primitives: readonly QRCodeStylePrimitive[];
+  layers: readonly QRCodeStyleLayer[];
 };
 
 export type QRCodeResolvedMatrixOptions = {

@@ -14,7 +14,7 @@ Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers
 | Renderer                                                | Output              | Best for                                              | Package              |
 | ------------------------------------------------------- | ------------------- | ----------------------------------------------------- | -------------------- |
 | [Render SVG](/renderers/core/svg/)                      | `string`            | Web apps, emails, dashboards, HTML, static assets     | `@qrcodesdk/core`    |
-| [Render PNG in Node.js](/renderers/node/png/)           | `Buffer`            | Servers, downloads, files, API responses, attachments | `@qrcodesdk/node`    |
+| [Render PNG in Node.js](/packages/node/)                | `Buffer`            | Servers, downloads, files, API responses, attachments | `@qrcodesdk/node`    |
 | [Render to Canvas](/renderers/browser/canvas/)          | `HTMLCanvasElement` | Browser DOM, canvas workflows, client-side downloads  | `@qrcodesdk/browser` |
 | [Render to an Image Element](/renderers/browser/image/) | `HTMLImageElement`  | Browser DOM, CSS styling, accessible image elements   | `@qrcodesdk/browser` |
 | [Render Terminal Text](/renderers/core/text/)           | `string`            | CLIs, logs, terminals, snapshot tests                 | `@qrcodesdk/core`    |

@@ -60,7 +60,7 @@ export function createPackageBadges(packageName, options = {}) {
       endpoint: 'downloads-month',
     }),
     createBadge(packageName, {
-      label: 'Source code',
+      label: 'source code',
       value: 'GitHub ↗',
       endpoint: 'name',
       href: `https://github.com/Dafnik/qrcodesdk/tree/main/packages/${packageDirectory}`,
@@ -88,5 +88,5 @@ function createBadge(packageName, {label, value, endpoint, href}) {
  * @param {{ label?: string, value?: string, endpoint: string }} options
  */
 function createBadgeImageUrl(packageName, {label, value, endpoint}) {
-  return `https://npmx.dev/api/registry/badge/${endpoint}/${packageName}?color=${BADGE_COLOR}${label ? `&label=${label}` : ''}${value ? `&value=${value}` : ''}&style=shieldsio`;
+  return `https://npmx.dev/api/registry/badge/${endpoint}/${packageName}?color=${BADGE_COLOR}${label ? `&label=${encodeURIComponent(label)}` : ''}${value ? `&value=${encodeURIComponent(value)}` : ''}&style=shieldsio`;
 }

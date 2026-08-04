@@ -1,4 +1,4 @@
-name: on branch push
+name: Development
 
 on:
   pull_request:
@@ -7,86 +7,24 @@ on:
       - main
       - develop
 
-# This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
   cancel-in-progress: true
 
 permissions:
-  pull-requests: write
+  contents: read
 
 jobs:
-  check-types:
+  verify:
+    name: Verify and build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-
-      - uses: dafnik/setup-node-pnpm@v5
-        with:
-          install-ignore-scripts: true
-
-      - name: Check types
-        run: pnpm check-types
-
-  prettier:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: dafnik/setup-node-pnpm@v5
-        with:
-          install-ignore-scripts: true
-
-      - name: Style check
-        run: pnpm format:check
-
-      - name: Generated README check
-        run: pnpm --filter docs check-readmes
-
-  eslint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: dafnik/setup-node-pnpm@v5
-        with:
-          install-ignore-scripts: true
-
-      - name: ESLint
-        run: pnpm lint
-
-  cspell:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: dafnik/setup-node-pnpm@v5
-        with:
-          install-ignore-scripts: true
-
-      - name: cspell
-        run: pnpm cspell
-
-  commitlint:
-    name: Commitlint Check
-    runs-on: ubuntu-latest
-    steps:
-      # Needed to get the commitlint config
-      - name: Checkout Repository
-        uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Commit lint
-        uses: dafnik/commitlint@v1
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: setup node and pnpm
+      - name: Setup Node and pnpm
         uses: dafnik/setup-node-pnpm@v5
         with:
           install-ignore-scripts: true
@@ -94,46 +32,281 @@ jobs:
       - name: Setup Playwright
         uses: ./.github/actions/setup-playwright
 
-      - name: test
+      - name: Check repository
+        run: pnpm check
+
+      - name: Pack runtime packages
         shell: bash
-        run: pnpm test
+        run: |
+          mkdir -p "$RUNNER_TEMP/runtime-packages"
+          for package in core browser node cli react angular; do
+            pnpm --dir "packages/$package" pack --pack-destination "$RUNNER_TEMP/runtime-packages"
+          done
 
-  build-libs:
-    name: Build libs
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: setup node and pnpm
-        uses: dafnik/setup-node-pnpm@v5
+      - name: Upload runtime packages
+        uses: actions/upload-artifact@v7
         with:
-          install-ignore-scripts: true
+          name: runtime-packages
+          path: ${{ runner.temp }}/runtime-packages/*.tgz
+          if-no-files-found: error
+          retention-days: 1
 
-      - name: build
-        run: pnpm build
-
-      - name: Verify published package artifacts
-        run: pnpm test:package-artifacts
-
-  build-docs:
-    name: Build docs
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: setup node and pnpm
-        uses: dafnik/setup-node-pnpm@v5
-        with:
-          install-ignore-scripts: true
-
-      - name: build docs
-        run: pnpm turbo run build --filter=docs
-
-      - name: Upload pages artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: ./apps/docs/dist/
+          path: apps/docs/dist
           retention-days: 1
+
+  runtime:
+    name: ${{ matrix.package }} on ${{ matrix.runtime }} ${{ matrix.version }}
+    needs: verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: core
+            runtime: node
+            version: 22.x
+          - package: core
+            runtime: node
+            version: 24.x
+          - package: core
+            runtime: deno
+            version: v2.x
+          - package: core
+            runtime: bun
+            version: latest
+          - package: node
+            runtime: node
+            version: 22.0.0
+          - package: node
+            runtime: node
+            version: 24.x
+          - package: node
+            runtime: deno
+            version: v2.x
+          - package: node
+            runtime: bun
+            version: latest
+          - package: cli
+            runtime: node
+            version: 22.12.0
+          - package: cli
+            runtime: node
+            version: 24.x
+          - package: cli
+            runtime: deno
+            version: v2.x
+          - package: cli
+            runtime: bun
+            version: latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        if: matrix.runtime == 'node'
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.version }}
+          package-manager-cache: false
+
+      - name: Setup Node for package installation
+        if: matrix.runtime == 'deno'
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Setup Deno
+        if: matrix.runtime == 'deno'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ matrix.version }}
+
+      - name: Setup Bun
+        if: matrix.runtime == 'bun'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ matrix.version }}
+
+      - name: Download runtime packages
+        uses: actions/download-artifact@v8
+        with:
+          name: runtime-packages
+          path: ${{ runner.temp }}/runtime-packages
+
+      - name: Test installed package
+        shell: bash
+        env:
+          PACKAGE: ${{ matrix.package }}
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          consumer="$RUNNER_TEMP/${PACKAGE}-${RUNTIME}-consumer"
+          mkdir -p "$consumer"
+          echo '{"private":true,"type":"module"}' > "$consumer/package.json"
+
+          case "$PACKAGE" in
+            core)
+              tarballs=("$RUNNER_TEMP/runtime-packages/qrcodesdk-core-"*.tgz)
+              cp packages/core/runtime/smoke-package.mjs "$consumer"
+              ;;
+            node)
+              tarballs=(
+                "$RUNNER_TEMP/runtime-packages/qrcodesdk-core-"*.tgz
+                "$RUNNER_TEMP/runtime-packages/qrcodesdk-node-"*.tgz
+              )
+              cp packages/node/runtime/smoke-package.mjs "$consumer"
+              ;;
+            cli)
+              tarballs=(
+                "$RUNNER_TEMP/runtime-packages/qrcodesdk-core-"*.tgz
+                "$RUNNER_TEMP/runtime-packages/qrcodesdk-node-"*.tgz
+                "$RUNNER_TEMP/runtime-packages/qrcodesdk-cli-"*.tgz
+              )
+              cp packages/cli/runtime/smoke-package.mjs "$consumer"
+              ;;
+          esac
+
+          cd "$consumer"
+          if [ "$RUNTIME" = 'bun' ]; then
+            bun add "${tarballs[@]}"
+          else
+            if [ "$RUNTIME" = 'node' ]; then
+              npm config set engine-strict true --location=project
+            fi
+            npm install --ignore-scripts --no-audit --no-fund --package-lock=false "${tarballs[@]}"
+          fi
+
+          case "$RUNTIME" in
+            node)
+              QRCODESDK_RUNTIME=node node smoke-package.mjs
+              ;;
+            deno)
+              QRCODESDK_RUNTIME=deno deno run -A --node-modules-dir=manual smoke-package.mjs
+              ;;
+            bun)
+              QRCODESDK_RUNTIME=bun bun run smoke-package.mjs
+              ;;
+          esac
+
+  browser-runtime:
+    name: Browser package on ${{ matrix.browser }}
+    needs: verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chromium
+          - firefox
+          - webkit
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node and pnpm
+        uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Setup Playwright
+        uses: ./.github/actions/setup-playwright
+        with:
+          browsers: ${{ matrix.browser }}
+
+      - name: Download runtime packages
+        uses: actions/download-artifact@v8
+        with:
+          name: runtime-packages
+          path: ${{ runner.temp }}/runtime-packages
+
+      - name: Install runtime packages
+        shell: bash
+        run: |
+          consumer="$RUNNER_TEMP/browser-consumer"
+          mkdir -p "$consumer"
+          echo '{"private":true,"type":"module"}' > "$consumer/package.json"
+          npm install --prefix "$consumer" --ignore-scripts --no-audit --no-fund --package-lock=false \
+            "$RUNNER_TEMP/runtime-packages/qrcodesdk-core-"*.tgz \
+            "$RUNNER_TEMP/runtime-packages/qrcodesdk-browser-"*.tgz
+
+      - name: Test installed packages
+        env:
+          QRCODESDK_BROWSER: ${{ matrix.browser }}
+          QRCODESDK_CONSUMER: ${{ runner.temp }}/browser-consumer
+        run: node packages/browser/runtime/smoke-package.mjs
+
+  framework-runtime:
+    name: ${{ matrix.framework }} ${{ matrix.version }} consumer
+    needs: verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - framework: react
+            version: '18'
+          - framework: react
+            version: '19'
+          - framework: angular
+            version: '20'
+          - framework: angular
+            version: '21'
+          - framework: angular
+            version: '22'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node and pnpm
+        uses: dafnik/setup-node-pnpm@v5
+        with:
+          node: 24
+          install-ignore-scripts: true
+
+      - name: Setup Playwright
+        uses: ./.github/actions/setup-playwright
+        with:
+          browsers: chromium
+
+      - name: Download runtime packages
+        uses: actions/download-artifact@v8
+        with:
+          name: runtime-packages
+          path: ${{ runner.temp }}/runtime-packages
+
+      - name: Test framework consumer
+        env:
+          QRCODESDK_FRAMEWORK: ${{ matrix.framework }}
+          QRCODESDK_FRAMEWORK_VERSION: ${{ matrix.version }}
+          QRCODESDK_PACKAGES: ${{ runner.temp }}/runtime-packages
+        run: node packages/browser/runtime/smoke-framework-package.mjs
+
+  required:
+    name: required
+    if: always()
+    needs:
+      - verify
+      - runtime
+      - browser-runtime
+      - framework-runtime
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every development job
+        if: >-
+          needs.verify.result != 'success' ||
+          needs.runtime.result != 'success' ||
+          needs['browser-runtime'].result != 'success' ||
+          needs['framework-runtime'].result != 'success'
+        run: exit 1
+
+      - name: Report success
+        run: echo 'Every development check succeeded.'
 
   deploy-docs:
     if: github.ref == 'refs/heads/main'
@@ -142,11 +315,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build-docs
+    needs: required
     permissions:
       actions: read
-      pages: write # to deploy to Pages
-      id-token: write # to verify the deployment originates from an appropriate source
+      pages: write
+      id-token: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

@@ -50,17 +50,17 @@
     "build": "ng build",
     "postbuild": "cp ../../LICENSE dist/angular",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test --watch false",
+    "test": "ng test --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
     "test:coverage:raw": "ng test --coverage --watch false",
-    "check-types": "ng build && tsc -p tsconfig.spec.json --noEmit",
-    "lint": "eslint src --max-warnings 0",
+    "check-types": "ngc -p tsconfig.lib.prod.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
+    "lint": "eslint src runtime --max-warnings 0",
     "clean": "rm -rf .turbo dist .angular"
   },
   "peerDependencies": {
     "@qrcodesdk/core": "workspace:^",
     "@qrcodesdk/browser": "workspace:^",
-    "@angular/common": "^22.0.0",
-    "@angular/core": "^22.0.0",
+    "@angular/common": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "rxjs": "^7.0.0"
   },
   "dependencies": {

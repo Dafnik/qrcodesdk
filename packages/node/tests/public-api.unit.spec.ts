@@ -10,5 +10,8 @@ describe('public API types', () => {
     expectTypeOf<QRCodePNGRendererOptions['image']>().toEqualTypeOf<
       QRCodePNGImageOptions | undefined
     >();
+    expectTypeOf<QRCodePNGRendererOptions['compressionLevel']>().toEqualTypeOf<
+      number | undefined
+    >();
   });
 });

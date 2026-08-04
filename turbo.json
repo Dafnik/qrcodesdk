@@ -1,6 +1,17 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "globalEnv": ["UPDATE_PNG_SNAPSHOTS", "UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"],
+  "globalDependencies": ["packages/core-testing/scripts/verify-package-artifact.mjs"],
+  "globalEnv": [
+    "QRCODESDK_BROWSER",
+    "QRCODESDK_CONSUMER",
+    "QRCODESDK_FRAMEWORK",
+    "QRCODESDK_FRAMEWORK_VERSION",
+    "QRCODESDK_PACKAGES",
+    "QRCODESDK_RUNTIME",
+    "UPDATE_PNG_SNAPSHOTS",
+    "UPDATE_SVG_SNAPSHOTS",
+    "UPDATE_TEXT_SNAPSHOTS"
+  ],
   "tasks": {
     "//#cspell": {
       "cache": false
@@ -45,7 +56,7 @@
       "persistent": true
     },
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["build", "^build"]
     },
     "test:coverage:raw": {
       "cache": false,

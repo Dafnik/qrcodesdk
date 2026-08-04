@@ -3,6 +3,11 @@ title: '@qrcodesdk/angular'
 description: '@qrcodesdk/angular provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.'
 packageName: '@qrcodesdk/angular'
 
+worksWith:
+  - 'googlechrome'
+  - 'firefox'
+  - 'safari'
+
 related:
   - ../advanced/customize.md
   - ../renderers/core/svg.md
@@ -18,6 +23,8 @@ import QRCodeSVG from '../../../components/astro/angular-examples/qrcode-svg.ast
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 `@qrcodesdk/angular` provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
+
+It supports Angular 20 through 22.
 
 ## Install
 
@@ -131,9 +138,9 @@ Pass prepared data through the existing `options` input. For browser output, fin
 only instantiate the component when the source is ready:
 
 ```ts
-readonly logo = signal<HTMLImageElement | undefined>(undefined);
+const logo = signal<HTMLImageElement | undefined>(undefined);
 
-async selectLogo(file: File | undefined) {
+async function selectLogo(file: File | undefined) {
   if (!file) return;
 
   const source = new Image();

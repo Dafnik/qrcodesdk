@@ -7,8 +7,8 @@ import type {
   QRCodeMatrix,
   QRCodeOptions,
   QRCodeRenderer,
+  QRCodeStyleLayer,
   QRCodeStylePrimitive,
-  QRCodeStyleRotation,
   QRCodeStylingOptions,
 } from './types';
 
@@ -21,8 +21,10 @@ export type QRCodeSVGRendererOptions = QRCodeStylingOptions &
 export type QRCodeSVGOptions = QRCodeOptions<QRCodeSVGRendererOptions>;
 
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
+  let resolvedStyling: ReturnType<typeof parseQRCodeStylingOptions> | undefined;
+
   return (matrix: QRCodeMatrix) => {
-    const styling = parseQRCodeStylingOptions(options);
+    const styling = (resolvedStyling ??= parseQRCodeStylingOptions(options));
     const plan = createQRCodeStylePlan(matrix, styling);
     const image = resolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
     if (image && !isQRCodeDataImageURL(image.source)) {
@@ -36,7 +38,7 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     if (options?.title) svg += ` title="${escapeAttributeValue(options.title)}"`;
 
     svg += `><path fill="${escapeAttributeValue(plan.backgroundColor)}" d="M0 0h${plan.viewSize}v${plan.viewSize}H0z"/>`;
-    const pathsByColor = createPathsByColor(plan.primitives, plan.viewSize);
+    const pathsByColor = createPathsByColor(plan.layers);
     for (let index = 0; index < pathsByColor.length; index++) {
       const {color, path} = pathsByColor[index]!;
       svg += `<path fill="${escapeAttributeValue(color)}" fill-rule="evenodd" d="${path}"/>`;
@@ -71,150 +73,68 @@ function isQRCodeDataImageURL(value: unknown): value is QRCodeDataImageURL {
   return /^image\/[a-z0-9.+-]+$/i.test(mediaType ?? '');
 }
 
-type SVGPathGroup = {
-  color: string;
-  squareCells: Uint8Array;
-  curvedPaths: string[];
-};
-
 type SVGPathByColor = {
   color: string;
   path: string;
 };
 
-function createPathsByColor(
-  primitives: readonly QRCodeStylePrimitive[],
-  viewSize: number,
-): SVGPathByColor[] {
-  let squareGridWidth = viewSize;
-  let squareGridHeight = viewSize;
-  for (let index = 0; index < primitives.length; index++) {
-    const primitive = primitives[index]!;
-    if (primitive.shape !== 'square') continue;
-    const size = primitive.kind === 'module' ? 1 : primitive.size;
-    squareGridWidth = Math.max(squareGridWidth, primitive.x + size);
-    squareGridHeight = Math.max(squareGridHeight, primitive.y + size);
-  }
-
-  const groupsByColor = new Map<string, SVGPathGroup>();
-  const groups: SVGPathGroup[] = [];
-
-  for (let index = 0; index < primitives.length; index++) {
-    const primitive = primitives[index]!;
-    let group = groupsByColor.get(primitive.color);
-    if (!group) {
-      group = {
-        color: primitive.color,
-        squareCells: new Uint8Array(squareGridWidth * squareGridHeight),
-        curvedPaths: [],
-      };
-      groupsByColor.set(primitive.color, group);
-      groups.push(group);
-    }
-
-    if (primitive.shape === 'square') {
-      addSquarePrimitiveCells(group.squareCells, squareGridWidth, primitive);
-    } else {
-      group.curvedPaths.push(primitiveToPath(primitive));
-    }
-  }
-
+function createPathsByColor(layers: readonly QRCodeStyleLayer[]): SVGPathByColor[] {
   const paths: SVGPathByColor[] = [];
-  for (let index = 0; index < groups.length; index++) {
-    const group = groups[index]!;
+  for (let index = 0; index < layers.length; index++) {
+    const layer = layers[index]!;
+    let path = '';
+    for (let rectangleIndex = 0; rectangleIndex < layer.rectangles.length; rectangleIndex++) {
+      const rectangle = layer.rectangles[rectangleIndex]!;
+      path += `M${rectangle.x} ${rectangle.y}h${rectangle.width}v${rectangle.height}h-${rectangle.width}Z`;
+    }
+    for (let primitiveIndex = 0; primitiveIndex < layer.curvedPrimitives.length; primitiveIndex++) {
+      path += primitiveToPath(layer.curvedPrimitives[primitiveIndex]!);
+    }
     paths.push({
-      color: group.color,
-      path: `${compactSquareCells(group.squareCells, squareGridWidth, squareGridHeight)}${group.curvedPaths.join('')}`,
+      color: layer.color,
+      path,
     });
   }
 
   return paths;
 }
 
-function addSquarePrimitiveCells(
-  cells: Uint8Array,
-  viewSize: number,
-  primitive: QRCodeStylePrimitive,
-): void {
-  const x = primitive.x;
-  const y = primitive.y;
+type LocalPathCommand =
+  | readonly ['M' | 'L', number, number]
+  | readonly ['A', number, 0 | 1, number, number]
+  | readonly ['Z'];
 
-  if (primitive.kind === 'module') {
-    cells[y * viewSize + x] = 1;
-    return;
-  }
-
-  if (primitive.kind === 'finder-center') {
-    for (let row = 0; row < primitive.size; row++) {
-      const start = (y + row) * viewSize + x;
-      cells.fill(1, start, start + primitive.size);
-    }
-    return;
-  }
-
-  const top = y * viewSize + x;
-  const bottom = (y + primitive.size - 1) * viewSize + x;
-  cells.fill(1, top, top + primitive.size);
-  cells.fill(1, bottom, bottom + primitive.size);
-  for (let row = 1; row < primitive.size - 1; row++) {
-    const start = (y + row) * viewSize + x;
-    cells[start] = 1;
-    cells[start + primitive.size - 1] = 1;
-  }
-}
-
-function compactSquareCells(cells: Uint8Array, width: number, height: number): string {
-  const rectangleXs: number[] = [];
-  const rectangleYs: number[] = [];
-  const rectangleWidths: number[] = [];
-  const rectangleHeights: number[] = [];
-  let previousWidths = new Uint16Array(width);
-  let previousRectangleIndexes = new Int32Array(width);
-  let currentWidths = new Uint16Array(width);
-  let currentRectangleIndexes = new Int32Array(width);
-
-  for (let y = 0; y < height; y++) {
-    currentWidths.fill(0);
-    const rowOffset = y * width;
-    let x = 0;
-
-    while (x < width) {
-      while (x < width && cells[rowOffset + x] === 0) x++;
-      if (x === width) break;
-
-      const start = x;
-      while (x < width && cells[rowOffset + x] === 1) x++;
-      const runWidth = x - start;
-      let rectangleIndex: number;
-
-      if (previousWidths[start] === runWidth) {
-        rectangleIndex = previousRectangleIndexes[start]!;
-        rectangleHeights[rectangleIndex]!++;
-      } else {
-        rectangleIndex = rectangleXs.length;
-        rectangleXs.push(start);
-        rectangleYs.push(y);
-        rectangleWidths.push(runWidth);
-        rectangleHeights.push(1);
-      }
-
-      currentWidths[start] = runWidth;
-      currentRectangleIndexes[start] = rectangleIndex;
-    }
-
-    [previousWidths, currentWidths] = [currentWidths, previousWidths];
-    [previousRectangleIndexes, currentRectangleIndexes] = [
-      currentRectangleIndexes,
-      previousRectangleIndexes,
-    ];
-  }
-
-  let path = '';
-  for (let index = 0; index < rectangleXs.length; index++) {
-    path += `M${rectangleXs[index]} ${rectangleYs[index]}h${rectangleWidths[index]}v${rectangleHeights[index]}h-${rectangleWidths[index]}Z`;
-  }
-  return path;
-}
+const SIDE_ROUNDED_COMMANDS = [
+  ['M', 0, 0],
+  ['L', 0, 1],
+  ['L', 0.5, 1],
+  ['A', 0.5, 0, 0.5, 0],
+  ['Z'],
+] as const satisfies readonly LocalPathCommand[];
+const CORNER_ROUNDED_COMMANDS = [
+  ['M', 0, 0],
+  ['L', 0, 1],
+  ['L', 1, 1],
+  ['L', 1, 0.5],
+  ['A', 0.5, 0, 0.5, 0],
+  ['Z'],
+] as const satisfies readonly LocalPathCommand[];
+const CORNER_EXTRA_ROUNDED_COMMANDS = [
+  ['M', 0, 0],
+  ['L', 0, 1],
+  ['L', 1, 1],
+  ['A', 1, 0, 0, 0],
+  ['Z'],
+] as const satisfies readonly LocalPathCommand[];
+const OPPOSITE_CORNERS_ROUNDED_COMMANDS = [
+  ['M', 0, 0],
+  ['L', 0, 0.5],
+  ['A', 0.5, 0, 0.5, 1],
+  ['L', 1, 1],
+  ['L', 1, 0.5],
+  ['A', 0.5, 0, 0.5, 0],
+  ['Z'],
+] as const satisfies readonly LocalPathCommand[];
 
 function primitiveToPath(primitive: QRCodeStylePrimitive): string {
   if (primitive.kind === 'finder-ring') {
@@ -242,49 +162,17 @@ function primitiveToPath(primitive: QRCodeStylePrimitive): string {
     case 'dot':
       return circlePath(primitive, primitive.size / 2);
     case 'side-rounded':
-      return localPath(primitive, [
-        ['M', 0, 0],
-        ['L', 0, 1],
-        ['L', 0.5, 1],
-        ['A', 0.5, 0, 0.5, 0],
-        ['Z'],
-      ]);
+      return localPath(primitive, SIDE_ROUNDED_COMMANDS);
     case 'corner-rounded':
-      return localPath(primitive, [
-        ['M', 0, 0],
-        ['L', 0, 1],
-        ['L', 1, 1],
-        ['L', 1, 0.5],
-        ['A', 0.5, 0, 0.5, 0],
-        ['Z'],
-      ]);
+      return localPath(primitive, CORNER_ROUNDED_COMMANDS);
     case 'corner-extra-rounded':
-      return localPath(primitive, [
-        ['M', 0, 0],
-        ['L', 0, 1],
-        ['L', 1, 1],
-        ['A', 1, 0, 0, 0],
-        ['Z'],
-      ]);
+      return localPath(primitive, CORNER_EXTRA_ROUNDED_COMMANDS);
     case 'opposite-corners-rounded':
-      return localPath(primitive, [
-        ['M', 0, 0],
-        ['L', 0, 0.5],
-        ['A', 0.5, 0, 0.5, 1],
-        ['L', 1, 1],
-        ['L', 1, 0.5],
-        ['A', 0.5, 0, 0.5, 0],
-        ['Z'],
-      ]);
+      return localPath(primitive, OPPOSITE_CORNERS_ROUNDED_COMMANDS);
     default:
       return roundedSquarePath(primitive, 0);
   }
 }
-
-type LocalPathCommand =
-  | readonly ['M' | 'L', number, number]
-  | readonly ['A', number, 0 | 1, number, number]
-  | readonly ['Z'];
 
 function localPath(primitive: QRCodeStylePrimitive, commands: readonly LocalPathCommand[]): string {
   let path = '';
@@ -295,17 +183,35 @@ function localPath(primitive: QRCodeStylePrimitive, commands: readonly LocalPath
       continue;
     }
 
+    const pointX = command[0] === 'A' ? command[3] : command[1];
+    const pointY = command[0] === 'A' ? command[4] : command[2];
+    let rotatedX: number;
+    let rotatedY: number;
+    switch (primitive.rotation) {
+      case 90:
+        rotatedX = 1 - pointY;
+        rotatedY = pointX;
+        break;
+      case 180:
+        rotatedX = 1 - pointX;
+        rotatedY = 1 - pointY;
+        break;
+      case 270:
+        rotatedX = pointY;
+        rotatedY = 1 - pointX;
+        break;
+      default:
+        rotatedX = pointX;
+        rotatedY = pointY;
+    }
+    const x = primitive.x + rotatedX * primitive.size;
+    const y = primitive.y + rotatedY * primitive.size;
+
     if (command[0] === 'A') {
-      const point = rotateLocalPoint(command[3], command[4], primitive.rotation);
-      const x = primitive.x + point.x * primitive.size;
-      const y = primitive.y + point.y * primitive.size;
       path += `A${formatNumber(command[1] * primitive.size)} ${formatNumber(
         command[1] * primitive.size,
       )} 0 ${command[2]} 0 ${formatPoint(x, y)}`;
     } else {
-      const point = rotateLocalPoint(command[1], command[2], primitive.rotation);
-      const x = primitive.x + point.x * primitive.size;
-      const y = primitive.y + point.y * primitive.size;
       path += `${command[0]}${formatPoint(x, y)}`;
     }
   }
@@ -342,23 +248,6 @@ function roundedSquarePath(primitive: QRCodeStylePrimitive, radius: number): str
     x,
     y + size - radius,
   )}V${formatNumber(y + radius)}A${radius} ${radius} 0 0 1 ${formatPoint(x + radius, y)}Z`;
-}
-
-function rotateLocalPoint(
-  x: number,
-  y: number,
-  rotation: QRCodeStyleRotation,
-): {x: number; y: number} {
-  switch (rotation) {
-    case 90:
-      return {x: 1 - y, y: x};
-    case 180:
-      return {x: 1 - x, y: 1 - y};
-    case 270:
-      return {x: y, y: 1 - x};
-    default:
-      return {x, y};
-  }
 }
 
 function formatPoint(x: number, y: number): string {

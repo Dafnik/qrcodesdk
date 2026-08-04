@@ -17,8 +17,10 @@ export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<H
 export function QRCodeImageRenderer(
   options?: QRCodeImageRendererOptions,
 ): QRCodeRenderer<HTMLImageElement> {
+  const canvasRenderer = QRCodeCanvasRenderer(options);
+
   return (matrix: QRCodeMatrix) => {
-    const canvas = QRCodeCanvasRenderer(options)(matrix);
+    const canvas = canvasRenderer(matrix);
     const image = document.createElement('img');
 
     image.src = canvas.toDataURL('image/png');
