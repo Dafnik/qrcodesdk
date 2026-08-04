@@ -84,7 +84,7 @@ document.querySelector('#qrcode')?.append(canvas);
 | `dotsOptions`           | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary module shape and optional color.     |
 | `cornersSquareOptions`  | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color.         |
 | `cornersDotOptions`     | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color.       |
-| `alt`                   | `string`                     |        `undefined` | Image `alt` attribute; Image renderer only.   |
+| `alt`                   | `string`                     |               `''` | Image `alt` attribute; Image renderer only.   |
 | `ariaLabel`             | `string`                     |        `undefined` | Image `aria-label`; Image renderer only.      |
 | `title`                 | `string`                     |        `undefined` | Image `title` attribute; Image renderer only. |
 | `image.source`          | `CanvasImageSource`          |        `undefined` | Image already loaded by the caller.           |
@@ -167,12 +167,14 @@ The renderer appends `.svg` when necessary, downloads an SVG `Blob`, revokes its
 ```ts
 import {
   type QRCodeCanvasImageOptions,
+  type QRCodeCanvasOptions,
   QRCodeCanvasRenderer,
   type QRCodeCanvasRendererOptions,
   QRCodeDownloadImageRenderer,
   type QRCodeDownloadImageRendererOptions,
   QRCodeDownloadSVGRenderer,
   type QRCodeDownloadSVGRendererOptions,
+  type QRCodeImageOptions,
   QRCodeImageRenderer,
   type QRCodeImageRendererOptions,
 } from '@qrcodesdk/browser';

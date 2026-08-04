@@ -6,6 +6,13 @@ import {QRCodeImageRenderer} from '../src';
 import {BLACK, WHITE, expectPixel, imageToCanvas} from './helper';
 
 describe('QRCodeImageRenderer', () => {
+  test('renders an explicit empty alt attribute by default', () => {
+    const image = QRCodeImageRenderer()([[1]]);
+
+    expect(image.hasAttribute('alt')).toBe(true);
+    expect(image.alt).toBe('');
+  });
+
   test('renders a PNG data URL image with real rasterized pixels', async () => {
     const matrix: QRCodeMatrix = [
       [1, 0],

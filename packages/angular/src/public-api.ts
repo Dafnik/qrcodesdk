@@ -2,6 +2,6 @@
  * Public API Surface of angular
  */
 
-export * from './lib/QRCodeCanvas';
-export * from './lib/QRCodeImage';
-export * from './lib/QRCodeSVG';
+export {QRCodeCanvas} from './lib/QRCodeCanvas';
+export {QRCodeImage} from './lib/QRCodeImage';
+export {QRCodeSVG} from './lib/QRCodeSVG';

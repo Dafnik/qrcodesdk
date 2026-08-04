@@ -5,7 +5,6 @@ description: Render a QR code as compact UTF-8 text with optional ANSI colors.
 related:
   - ../../advanced/customize.md
   - ./svg.md
-  - ../index.md
 ---
 
 Use this renderer for developer-facing QR output in terminals, CLIs, logs, text files, and deterministic snapshots. Compact and full block-glyph layouts require UTF-8 output; the ANSI-background-only layout does not emit block glyphs.

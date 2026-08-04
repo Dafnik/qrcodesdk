@@ -38,7 +38,7 @@ export function QRCodeDownloadImageRenderer(
   return (matrix: QRCodeMatrix) => {
     const image = options.renderer(matrix);
 
-    downloadQRCode(image.src, ensureExtension(options?.filename ?? 'qrcode', '.png'));
+    downloadQRCode(image.src, ensureExtension(options.filename ?? 'qrcode', '.png'));
   };
 }
 
@@ -46,7 +46,7 @@ function applyAccessibilityAttributes(
   image: HTMLImageElement,
   options: QRCodeAccessibilityOptions | undefined,
 ): void {
-  if (options?.alt !== undefined) image.alt = options.alt;
+  image.alt = options?.alt ?? '';
   if (options?.ariaLabel !== undefined) image.setAttribute('aria-label', options.ariaLabel);
   if (options?.title !== undefined) image.title = options.title;
 }

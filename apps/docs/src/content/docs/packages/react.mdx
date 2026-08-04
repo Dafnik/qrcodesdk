@@ -135,12 +135,20 @@ colors independently inherit `colors.colorDark`.
 Prepare browser image sources before rendering:
 
 ```tsx
-import {useState} from 'react';
+import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+import {useMemo, useState} from 'react';
 
 import {QRCodeImage} from '@qrcodesdk/react';
 
 export function QRCodeWithLogo() {
   const [logo, setLogo] = useState<HTMLImageElement>();
+  const options = useMemo<QRCodeImageOptions>(
+    () => ({
+      errorCorrectionLevel: 'H',
+      image: logo ? {source: logo, size: 0.3} : undefined,
+    }),
+    [logo],
+  );
 
   async function selectLogo(file: File) {
     const source = new Image();
@@ -166,10 +174,7 @@ export function QRCodeWithLogo() {
         }}
       />
       {logo ? (
-        <QRCodeImage
-          data="https://qrcodesdk.dev"
-          options={{errorCorrectionLevel: 'H', image: {source: logo, size: 0.3}}}
-        />
+        <QRCodeImage data="https://qrcodesdk.dev" options={options} />
       ) : null}
     </>
   );
@@ -212,3 +217,18 @@ The appropriate `.svg` or `.png` extension is appended when necessary.
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
 `QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+
+## Public API
+
+```ts
+import {
+  type QRCodeBaseProps,
+  QRCodeCanvas,
+  type QRCodeCanvasProps,
+  type QRCodeDownloadHandle,
+  QRCodeImage,
+  type QRCodeImageProps,
+  QRCodeSVG,
+  type QRCodeSVGProps,
+} from '@qrcodesdk/react';
+```

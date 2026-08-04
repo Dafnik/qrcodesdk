@@ -1,4 +1,14 @@
-import {Component, ElementRef, Renderer2, computed, effect, inject, input} from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
+import {
+  Component,
+  ElementRef,
+  PLATFORM_ID,
+  Renderer2,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 
 import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
 import {
@@ -14,6 +24,7 @@ import {
 })
 export class QRCodeSVG {
   private readonly renderer = inject(Renderer2);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);
 
   data = input.required<QRCodeInputData>();
@@ -36,6 +47,8 @@ export class QRCodeSVG {
   }
 
   public download(filename?: string): void {
+    if (!this.isBrowser) return;
+
     this.qrcodeBuilder().render(
       QRCodeDownloadSVGRenderer({
         renderer: this.svgRenderer(),

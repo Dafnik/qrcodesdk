@@ -74,7 +74,7 @@ describe('React QR code components', () => {
     ]);
   });
 
-  test('downloads SVG QR code output as SVG', () => {
+  test('downloads SVG QR code output as SVG', async () => {
     const svgQRCode = createRef<QRCodeDownloadHandle>();
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
@@ -89,6 +89,7 @@ describe('React QR code components', () => {
         filename: 'qrcodesdk.svg',
       },
     ]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 
@@ -174,7 +175,7 @@ describe('React QR code components', () => {
     });
   });
 
-  test('downloads prepared SVG and PNG image overlays', () => {
+  test('downloads prepared SVG and PNG image overlays', async () => {
     const source = document.createElement('canvas');
     source.width = 2;
     source.height = 1;
@@ -209,6 +210,8 @@ describe('React QR code components', () => {
       {href: 'blob:qrcode-overlay-svg', filename: 'overlay.svg'},
       {href: 'data:image/png;base64,qrcode', filename: 'overlay.png'},
     ]);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
   test('replaces existing rendered image when props change', async () => {

@@ -17,8 +17,8 @@ export function QRCodeDownloadSVGRenderer(
 
     const url = URL.createObjectURL(blob);
 
-    downloadQRCode(url, ensureExtension(options?.filename ?? 'qrcode', '.svg'));
+    downloadQRCode(url, ensureExtension(options.filename ?? 'qrcode', '.svg'));
 
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   };
 }

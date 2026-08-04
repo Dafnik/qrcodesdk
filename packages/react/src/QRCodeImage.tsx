@@ -3,11 +3,11 @@ import {
   type QRCodeImageOptions,
   QRCodeImageRenderer,
 } from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
 import {forwardRef, useEffect, useImperativeHandle, useMemo, useRef} from 'react';
 
 import {replaceElementChildren} from './replace-children';
 import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
-import {qrcode} from '@qrcodesdk/core';
 
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
 

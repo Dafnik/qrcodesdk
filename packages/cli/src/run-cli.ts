@@ -175,14 +175,20 @@ async function resolveCliOptions(
   const format = await resolveFormat(rawOptions.format, rawOptions.output, interactive, prompt);
   const output = await resolveOutput(format, rawOptions.output, interactive, prompt);
   const styling = resolveStyling(rawOptions);
+  const ansiColors = rawOptions.ansiColors ?? true;
+  const onlyAnsiColors = rawOptions.onlyAnsiColors ?? false;
+
+  if (onlyAnsiColors && !ansiColors) {
+    throw new CliError('Cannot combine --only-ansi-colors with --no-ansi-colors.');
+  }
 
   return {
     input,
     format,
     output,
     small: rawOptions.small ?? true,
-    ansiColors: rawOptions.ansiColors ?? true,
-    onlyAnsiColors: rawOptions.onlyAnsiColors ?? false,
+    ansiColors,
+    onlyAnsiColors,
     mode: optionalEnum(rawOptions.mode, ɵMODES, 'mode'),
     errorCorrectionLevel: optionalErrorCorrectionLevel(rawOptions.errorCorrection),
     version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as

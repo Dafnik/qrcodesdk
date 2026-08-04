@@ -189,6 +189,10 @@ serve({
 `@qrcodesdk/node` directly supports Node.js 22.0.0 or newer. Bun and Deno are supported through
 their Node.js compatibility layers.
 
+The public TypeScript API uses Node's global `Buffer` type. TypeScript consumers must include
+`@types/node` in their development dependencies and make Node types available in their TypeScript
+configuration.
+
 ## Package boundary
 
 `@qrcodesdk/node` provides Node-specific renderers and does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation and builder options.
