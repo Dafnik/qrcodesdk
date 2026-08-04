@@ -47,7 +47,7 @@ export interface QRCodeExplanation {
   readonly moduleGrid: readonly (readonly QRCodeExplainModule[])[];
   readonly groups: ReadonlyMap<string, QRCodeExplainGroup>;
   readonly version: QRCodeVersion;
-  readonly mode: QRCodeMode;
+  readonly mode: QRCodeMode | 'mixed';
   readonly errorCorrectionLevel: QRCodeErrorCorrectionLevel;
   readonly mask: QRCodeMask;
   readonly size: number;
@@ -63,6 +63,7 @@ export const QR_CODE_EXPLAIN_ROLE_ORDER = [
   'format',
   'version',
   'dark-module',
+  'eci',
   'mode',
   'character-count',
   'payload',
@@ -100,6 +101,10 @@ export const QR_CODE_EXPLAIN_ROLE_DETAILS = {
   'dark-module': {
     label: 'Dark module',
     description: 'A fixed dark reference module required by the QR specification.',
+  },
+  eci: {
+    label: 'UTF-8 ECI',
+    description: 'Assignment 26 declares UTF-8 for the following octet segments.',
   },
   mode: {
     label: 'Mode indicator',

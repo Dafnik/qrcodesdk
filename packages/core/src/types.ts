@@ -10,6 +10,11 @@ export type QRCodeCodewords = QRCodeCodeword[];
 export type QRCodePolynomial = QRCodeCodeword[];
 export type QRCodeEncodedData = string | QRCodeCodewords;
 
+export type QRCodeEncodedSegment = {
+  readonly mode: QRCodeSupportedModeIndicator;
+  readonly data: QRCodeEncodedData;
+};
+
 export type QRCodeSupportedModeIndicator = 1 | 2 | 4;
 export type QRCodeErrorCorrectionLevelValue = 0 | 1 | 2 | 3;
 
@@ -199,9 +204,8 @@ export type QRCodeStylePlan = {
 };
 
 export type QRCodeResolvedMatrixOptions = {
-  data: QRCodeEncodedData;
+  segments: readonly QRCodeEncodedSegment[];
   version: QRCodeVersion;
-  mode: QRCodeSupportedModeIndicator;
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue;
   mask: QRCodeMask | undefined;
 };

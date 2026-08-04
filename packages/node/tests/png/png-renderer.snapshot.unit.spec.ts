@@ -59,7 +59,7 @@ describe('QRCodePNGRenderer snapshots', () => {
           QRCodePNGRenderer({
             size: 8,
             margin: 4,
-            image: {source: LOGO_PNG},
+            image: {source: LOGO_PNG, padding: 0},
           }),
         ),
       join(SNAPSHOT_DIR, 'image-overlay-logo.png'),

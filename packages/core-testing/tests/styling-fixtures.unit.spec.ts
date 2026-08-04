@@ -91,7 +91,7 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
         version: 5,
         mode: 'octet',
         errorCorrectionLevel: 'H',
-        mask: 0,
+        mask: 3,
       });
 
       const styling = ɵparseQRCodeStylingOptions(fixture.styling);

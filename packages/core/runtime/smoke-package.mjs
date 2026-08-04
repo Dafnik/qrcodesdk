@@ -1,7 +1,7 @@
 import * as core from '@qrcodesdk/core';
 
 const EXPECTED_MATRIX_SIZE = 29;
-const EXPECTED_MATRIX_CHECKSUM = 321386907;
+const EXPECTED_MATRIX_CHECKSUM = 2910109323;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

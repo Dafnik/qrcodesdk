@@ -12,7 +12,7 @@ const STYLING_MATRIX_OPTIONS = {
   version: 5,
   mode: 'octet',
   errorCorrectionLevel: 'H',
-  mask: 0,
+  mask: 3,
 } as const satisfies QRCodeMatrixOptions;
 
 const DEFAULT_STYLING = {

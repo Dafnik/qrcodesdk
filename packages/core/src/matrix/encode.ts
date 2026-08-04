@@ -1,15 +1,16 @@
-import type {
-  QRCodeCodewords,
-  QRCodeEncodedData,
-  QRCodeSupportedModeIndicator,
-  QRCodeVersion,
-} from '../types';
+import type {QRCodeCodewords, QRCodeEncodedSegment, QRCodeVersion} from '../types';
 import type {QRCodeEncodedBitMetadata, QRCodeMatrixMetadataRole} from './metadata';
-import {MODE_TERMINATOR, getModeDefinition} from './mode';
+import {
+  ECI_UTF8_ASSIGNMENT,
+  MODE_ECI,
+  MODE_OCTET,
+  MODE_TERMINATOR,
+  getModeDefinition,
+} from './mode';
 
 type QRCodeDataBitRole = Extract<
   QRCodeMatrixMetadataRole,
-  'mode' | 'character-count' | 'payload' | 'terminator' | 'padding'
+  'eci' | 'mode' | 'character-count' | 'payload' | 'terminator' | 'padding'
 >;
 
 type QRCodeEncodedDataWithMetadata = {
@@ -23,28 +24,25 @@ type QRCodeEncodedDataWithMetadata = {
  * performed, and everything has to be checked before calling this function.
  *
  * @param {QRCodeVersion} version - The version number of the QR code.
- * @param {QRCodeSupportedModeIndicator} mode - The mode of encoding.
- * @param {QRCodeEncodedData} data - The data to encode.
+ * @param {readonly QRCodeEncodedSegment[]} segments - The data segments to encode.
  * @param {number} maxBufferLength - The maximum buffer length.
  * @returns {QRCodeCodewords} The code words for the given data.
  */
 export function encode(
   version: QRCodeVersion,
-  mode: QRCodeSupportedModeIndicator,
-  data: QRCodeEncodedData,
+  segments: readonly QRCodeEncodedSegment[],
   maxBufferLength: number,
 ): QRCodeCodewords {
-  return encodeData(version, mode, data, maxBufferLength).codewords;
+  return encodeData(version, segments, maxBufferLength).codewords;
 }
 
 export function encodeWithMetadata(
   version: QRCodeVersion,
-  mode: QRCodeSupportedModeIndicator,
-  data: QRCodeEncodedData,
+  segments: readonly QRCodeEncodedSegment[],
   maxBufferLength: number,
 ): QRCodeEncodedDataWithMetadata {
   const roles: QRCodeDataBitRole[] = [];
-  const {codewords} = encodeData(version, mode, data, maxBufferLength, roles);
+  const {codewords} = encodeData(version, segments, maxBufferLength, roles);
   const roleCounts = countRoles(roles);
   const roleOffsets = new Map<QRCodeDataBitRole, number>();
   const bitMetadata = roles.map((role) => {
@@ -62,17 +60,14 @@ export function encodeWithMetadata(
 
 function encodeData(
   version: QRCodeVersion,
-  mode: QRCodeSupportedModeIndicator,
-  data: QRCodeEncodedData,
+  segments: readonly QRCodeEncodedSegment[],
   maxBufferLength: number,
   roles?: QRCodeDataBitRole[],
 ): {readonly codewords: QRCodeCodewords} {
-  const definition = getModeDefinition(mode);
   const buffer: QRCodeCodewords = [];
   const capacity = maxBufferLength * 8;
   let bits = 0,
     remaining = 8;
-  const dataLength = data.length;
 
   const record = function (role: QRCodeDataBitRole, bitCount: number): void {
     if (roles === undefined || bitCount <= 0 || roles.length >= capacity) return;
@@ -92,10 +87,18 @@ function encodeData(
     if (n > 0) bits |= (x & ((1 << n) - 1)) << (remaining -= n);
   };
 
-  const dataNumberOfBits = definition.getCharacterCountBits(version);
-  pack(mode, 4, 'mode');
-  pack(dataLength, dataNumberOfBits, 'character-count');
-  definition.encodePayload(data, (value, bitCount) => pack(value, bitCount, 'payload'));
+  let hasWrittenUTF8ECI = false;
+  for (const segment of segments) {
+    if (segment.mode === MODE_OCTET && !hasWrittenUTF8ECI) {
+      pack(MODE_ECI, 4, 'eci');
+      pack(ECI_UTF8_ASSIGNMENT, 8, 'eci');
+      hasWrittenUTF8ECI = true;
+    }
+    const definition = getModeDefinition(segment.mode);
+    pack(segment.mode, 4, 'mode');
+    pack(segment.data.length, definition.getCharacterCountBits(version), 'character-count');
+    definition.encodePayload(segment.data, (value, bitCount) => pack(value, bitCount, 'payload'));
+  }
 
   const encodedDataBitLength = buffer.length * 8 + (8 - remaining);
   if (encodedDataBitLength > capacity) throw new Error('QRCode: Data too large');

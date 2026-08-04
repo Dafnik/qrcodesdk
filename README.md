@@ -199,3 +199,26 @@ pnpm turbo run check-performance --filter=docs
 ```sh
 pnpm benchmark
 ```
+
+### Updating snapshots
+
+#### Core
+
+```shell
+UPDATE_SVG_SNAPSHOTS=1 \
+UPDATE_TEXT_SNAPSHOTS=1 \
+pnpm --filter @repo/core-testing exec vitest run \
+tests/svg/svg-renderer.snapshot.e2e.spec.ts \
+tests/svg/svg-renderer.snapshot.unit.spec.ts \
+tests/text/text-renderer.snapshot.e2e.spec.ts \
+tests/text/text-renderer.snapshot.unit.spec.ts
+```
+
+#### Node
+
+```shell
+UPDATE_PNG_SNAPSHOTS=1 \
+pnpm --filter @qrcodesdk/node exec vitest run \
+tests/png/png-renderer.snapshot.e2e.spec.ts \
+tests/png/png-renderer.snapshot.unit.spec.ts
+```

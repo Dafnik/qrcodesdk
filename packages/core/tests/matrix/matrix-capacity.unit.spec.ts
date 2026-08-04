@@ -6,7 +6,6 @@ import {
   ECC_LEVEL_M,
   ECC_LEVEL_Q,
 } from '../../src/matrix/error-correction';
-import {getMaxDataLength} from '../../src/matrix/get-max-data-length';
 import {getNumberOfAvailableBitsByVersion} from '../../src/matrix/get-number-of-available-bits-by-version';
 import {getNumberOfAvailableBitsForData} from '../../src/matrix/get-number-of-available-bits-for-data';
 import {getSizeByVersion} from '../../src/matrix/get-size-by-version';
@@ -17,6 +16,8 @@ import {
   getModeDefinition,
 } from '../../src/matrix/mode';
 import {needsVersionInfo} from '../../src/matrix/needs-version-info';
+import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
+import {createSingleSegment, getSegmentsBitLength} from '../../src/matrix/segments';
 
 describe('capacity helpers', () => {
   test('returns QR sizes and version-info boundaries', () => {
@@ -51,11 +52,32 @@ describe('capacity helpers', () => {
   });
 
   test('calculates maximum data length by mode and ECC level', () => {
-    expect(getMaxDataLength(1, MODE_NUMERIC, ECC_LEVEL_L)).toBe(41);
-    expect(getMaxDataLength(1, MODE_ALPHANUMERIC, ECC_LEVEL_L)).toBe(25);
-    expect(getMaxDataLength(1, MODE_OCTET, ECC_LEVEL_L)).toBe(17);
-    expect(getMaxDataLength(1, MODE_OCTET, ECC_LEVEL_M)).toBe(14);
+    expect(
+      segmentsFitVersion([createSingleSegment(MODE_NUMERIC, '1'.repeat(41))!], 1, ECC_LEVEL_L),
+    ).toBe(true);
+    expect(
+      segmentsFitVersion([createSingleSegment(MODE_NUMERIC, '1'.repeat(42))!], 1, ECC_LEVEL_L),
+    ).toBe(false);
+    expect(
+      segmentsFitVersion([createSingleSegment(MODE_ALPHANUMERIC, 'A'.repeat(25))!], 1, ECC_LEVEL_L),
+    ).toBe(true);
+    expect(
+      segmentsFitVersion([createSingleSegment(MODE_ALPHANUMERIC, 'A'.repeat(26))!], 1, ECC_LEVEL_L),
+    ).toBe(false);
+    expect(
+      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(16))!], 1, ECC_LEVEL_L),
+    ).toBe(true);
+    expect(
+      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(17))!], 1, ECC_LEVEL_L),
+    ).toBe(false);
+    expect(
+      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(13))!], 1, ECC_LEVEL_M),
+    ).toBe(true);
+    expect(
+      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(14))!], 1, ECC_LEVEL_M),
+    ).toBe(false);
+    expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!])).toBe(32);
     // @ts-expect-error Exercise the runtime fallback for an unsupported mode.
-    expect(() => getMaxDataLength(1, -1, ECC_LEVEL_L)).toThrow('QRCode: Invalid mode');
+    expect(() => getSegmentsBitLength(1, [{mode: -1, data: ''}])).toThrow('QRCode: Invalid mode');
   });
 });
