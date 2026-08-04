@@ -60,7 +60,8 @@ const svg = builder.render(
 assert(svg.includes('width="62"'), 'Expected SVG width 62');
 assert(svg.includes('height="62"'), 'Expected SVG height 62');
 assert(svg.includes('viewBox="0 0 31 31"'), 'Expected SVG view box 31×31');
-assert(svg.includes('title="Runtime smoke"'), 'Expected the SVG title attribute');
+assert(svg.includes('role="img"'), 'Expected the SVG image role');
+assert(svg.includes('<title>Runtime smoke</title>'), 'Expected the SVG title element');
 
 const text = builder.render(core.QRCodeTextRenderer({size: 1, margin: 1}));
 const lines = text.split('\n');

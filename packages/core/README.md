@@ -191,9 +191,9 @@ For framework-specific components, add:
 | `small`                 | `boolean`                    |             `true` | Packs two text-renderer rows into each terminal line.       |
 | `ansiColors`            | `boolean`                    |            `false` | Enables ANSI colors for terminal text.                      |
 | `onlyAnsiColors`        | `boolean`                    |            `false` | Uses ANSI background cells without UTF-8 block glyphs.      |
-| `alt`                   | `string`                     |        `undefined` | Adds an `alt` attribute to SVG output.                      |
-| `ariaLabel`             | `string`                     |        `undefined` | Adds an `aria-label` attribute to SVG output.               |
-| `title`                 | `string`                     |        `undefined` | Adds a `title` attribute to SVG output.                     |
+| `alt`                   | `string`                     |        `undefined` | Fallback SVG accessible name when `ariaLabel` is omitted.   |
+| `ariaLabel`             | `string`                     |        `undefined` | Sets the SVG accessible name with `aria-label`.             |
+| `title`                 | `string`                     |        `undefined` | Adds a child `<title>` element to SVG output.               |
 | `image.source`          | `QRCodeDataImageURL`         |        `undefined` | Embedded image data URL used by SVG output.                 |
 | `image.size`            | `number`                     |              `0.4` | Image-box side relative to the QR matrix area.              |
 | `image.padding`         | `number`                     |                `1` | Background-clearing padding in QR module units.             |
@@ -203,6 +203,10 @@ Color options use six-digit hash-prefixed values such as `#111827`. All renderer
 
 Feature colors independently inherit `colors.colorDark`. Visual shape options are supported by
 SVG, browser Canvas/Image, and Node PNG output; they do not affect terminal text geometry.
+
+SVG output uses `role="img"`. When both are provided, `ariaLabel` takes precedence over `alt`.
+For SVG, `alt` is converted to an `aria-label` fallback instead of being emitted as an invalid
+attribute.
 
 ## Styling contract
 

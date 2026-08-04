@@ -4,7 +4,7 @@ description: Render a QR code as a scalable SVG string from @qrcodesdk/core.
 
 related:
   - ../../advanced/customize.md
-  - ../node/png.md
+  - ../../packages/node/
   - ../browser/image.md
 ---
 
@@ -44,25 +44,25 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-| Option                       |                     Type |            Default | Description                                       |
-| ---------------------------- | -----------------------: | -----------------: | ------------------------------------------------- |
-| `size`                       |                 `number` |                `5` | Pixel size of each QR module.                     |
-| `margin`                     |                 `number` |                `4` | Quiet-zone margin around the QR code, in modules. |
-| `colors.colorDark`           |                 `string` |        `'#000000'` | Color used for dark modules.                      |
-| `colors.colorLight`          |                 `string` |        `'#ffffff'` | Background color.                                 |
-| `dotsOptions.type`           |          `QRCodeDotType` |         `'square'` | Shape used for ordinary data modules.             |
-| `dotsOptions.color`          |                 `string` | `colors.colorDark` | Color used for ordinary data modules.             |
-| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                |
-| `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                |
-| `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                    |
-| `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                    |
-| `alt`                        |                 `string` |        `undefined` | Adds an `alt` attribute to the SVG.               |
-| `ariaLabel`                  |                 `string` |        `undefined` | Adds an `aria-label` attribute to the SVG.        |
-| `title`                      |                 `string` |        `undefined` | Adds a `title` attribute to the SVG.              |
-| `image.source`               |     `QRCodeDataImageURL` |        `undefined` | Prepared embedded image data URL.                 |
-| `image.size`                 |                 `number` |              `0.4` | Image box as a fraction of matrix width.          |
-| `image.padding`              |                 `number` |                `1` | Clear padding in QR module units.                 |
-| `image.clearBackground`      |                `boolean` |             `true` | Clears modules behind the image and padding.      |
+| Option                       |                     Type |            Default | Description                                           |
+| ---------------------------- | -----------------------: | -----------------: | ----------------------------------------------------- |
+| `size`                       |                 `number` |                `5` | Pixel size of each QR module.                         |
+| `margin`                     |                 `number` |                `4` | Quiet-zone margin around the QR code, in modules.     |
+| `colors.colorDark`           |                 `string` |        `'#000000'` | Color used for dark modules.                          |
+| `colors.colorLight`          |                 `string` |        `'#ffffff'` | Background color.                                     |
+| `dotsOptions.type`           |          `QRCodeDotType` |         `'square'` | Shape used for ordinary data modules.                 |
+| `dotsOptions.color`          |                 `string` | `colors.colorDark` | Color used for ordinary data modules.                 |
+| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                    |
+| `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                    |
+| `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                        |
+| `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                        |
+| `alt`                        |                 `string` |        `undefined` | Fallback accessible name when `ariaLabel` is omitted. |
+| `ariaLabel`                  |                 `string` |        `undefined` | Sets the SVG's accessible name with `aria-label`.     |
+| `title`                      |                 `string` |        `undefined` | Adds a child `<title>` element to the SVG.            |
+| `image.source`               |     `QRCodeDataImageURL` |        `undefined` | Prepared embedded image data URL.                     |
+| `image.size`                 |                 `number` |              `0.4` | Image box as a fraction of matrix width.              |
+| `image.padding`              |                 `number` |                `1` | Clear padding in QR module units.                     |
+| `image.clearBackground`      |                `boolean` |             `true` | Clears modules behind the image and padding.          |
 
 Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
 
@@ -160,6 +160,10 @@ const svg = qrcode('https://qrcodesdk.dev').render(
   }),
 );
 ```
+
+SVG output uses `role="img"`. `ariaLabel` takes precedence over `alt` when both are provided;
+`alt` is retained as a cross-renderer option and becomes `aria-label` in SVG output rather than an
+invalid SVG `alt` attribute.
 
 ### Save to disk (node)
 

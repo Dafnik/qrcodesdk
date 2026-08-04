@@ -57,7 +57,7 @@ const image = qrcode('https://qrcodesdk.dev').render(
 | `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                |
 | `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                    |
 | `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                    |
-| `alt`                        |                 `string` |        `undefined` | Adds an `alt` attribute to the image.             |
+| `alt`                        |                 `string` |               `''` | Sets `alt`; defaults to decorative empty text.    |
 | `ariaLabel`                  |                 `string` |        `undefined` | Adds an `aria-label` attribute to the image.      |
 | `title`                      |                 `string` |        `undefined` | Adds a `title` attribute to the image.            |
 | `image.source`               |      `CanvasImageSource` |        `undefined` | Image already loaded by the caller.               |

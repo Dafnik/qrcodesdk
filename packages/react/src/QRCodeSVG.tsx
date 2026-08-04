@@ -1,9 +1,8 @@
 import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
-import {type QRCodeSVGOptions, QRCodeSVGRenderer} from '@qrcodesdk/core';
+import {type QRCodeSVGOptions, QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 import {forwardRef, useImperativeHandle, useMemo} from 'react';
 
 import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
-import {qrcode} from '@qrcodesdk/core';
 
 export type QRCodeSVGProps = QRCodeBaseProps<QRCodeSVGOptions>;
 

@@ -1,4 +1,4 @@
-<!-- Generated from apps/docs/src/content/docs/packages/cli.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+<!-- Generated from apps/docs/src/content/docs/packages/cli.mdx. Run `pnpm turbo run generate-readmes --filter=docs` to update. -->
 
 <p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
 
@@ -275,9 +275,9 @@ qrc "HELLO WORLD" \
 | `--only-ansi-colors`                    | Use ANSI background cells without UTF-8 block glyphs.       | `false`     |
 | `--color-dark <#rrggbb>`                | Dark module color.                                          | `#000000`   |
 | `--color-light <#rrggbb>`               | Light module color.                                         | `#ffffff`   |
-| `--alt <text>`                          | SVG `alt` text.                                             | `undefined` |
-| `--aria-label <text>`                   | SVG `aria-label`.                                           | `undefined` |
-| `--title <text>`                        | SVG `title`.                                                | `undefined` |
+| `--alt <text>`                          | Fallback SVG accessible name.                               | `undefined` |
+| `--aria-label <text>`                   | SVG `aria-label` accessible name.                           | `undefined` |
+| `--title <text>`                        | SVG child `<title>` text.                                   | `undefined` |
 
 Colors must be six-digit hex values. `--size` must be positive and `--margin` must be non-negative. For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI background. With `--only-ansi-colors`, both become module background colors.
 

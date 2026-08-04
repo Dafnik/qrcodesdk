@@ -1,9 +1,9 @@
 import {type QRCodeCanvasOptions, QRCodeCanvasRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
 import {useEffect, useMemo, useRef} from 'react';
 
 import {replaceElementChildren} from './replace-children';
 import type {QRCodeBaseProps} from './types';
-import {qrcode} from '@qrcodesdk/core';
 
 export type QRCodeCanvasProps = QRCodeBaseProps<QRCodeCanvasOptions>;
 

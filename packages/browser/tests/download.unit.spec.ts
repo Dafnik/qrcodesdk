@@ -35,7 +35,7 @@ describe('download QR code renderers', () => {
     expect(downloads[0]?.filename).toBe('ticket.png');
   });
 
-  test('downloads SVG QR output as a revocable object URL', () => {
+  test('downloads SVG QR output before revoking its object URL on a later task', async () => {
     const downloads = captureDownloads(vi);
     const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
@@ -52,10 +52,14 @@ describe('download QR code renderers', () => {
         filename: 'ticket.svg',
       },
     ]);
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 
-  test('does not duplicate an existing SVG extension', () => {
+  test('does not duplicate an existing SVG extension', async () => {
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
@@ -66,5 +70,7 @@ describe('download QR code renderers', () => {
     })([[1]]);
 
     expect(downloads[0]?.filename).toBe('ticket.svg');
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
   });
 });

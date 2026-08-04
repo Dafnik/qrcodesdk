@@ -1,4 +1,4 @@
-import {Component, input, viewChild} from '@angular/core';
+import {Component, PLATFORM_ID, input, viewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
@@ -124,7 +124,7 @@ describe('Angular QR code components', () => {
     ]);
   });
 
-  test('downloads SVG QR code output as SVG', () => {
+  test('downloads SVG QR code output as SVG', async () => {
     const fixture = TestBed.createComponent(QRCodeSVGHost);
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
@@ -139,7 +139,19 @@ describe('Angular QR code components', () => {
         filename: 'qrcodesdk.svg',
       },
     ]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
+  });
+
+  test('skips SVG downloads outside the browser', () => {
+    TestBed.configureTestingModule({providers: [{provide: PLATFORM_ID, useValue: 'server'}]});
+    const fixture = TestBed.createComponent(QRCodeSVGHost);
+    const createObjectURL = vi.spyOn(URL, 'createObjectURL');
+
+    fixture.detectChanges();
+
+    expect(() => fixture.componentInstance.svgQRCode().download('qrcodesdk')).not.toThrow();
+    expect(createObjectURL).not.toHaveBeenCalled();
   });
 
   test('renders canvas QR code output', () => {
@@ -273,6 +285,8 @@ describe('Angular QR code components', () => {
       {href: 'blob:qrcode-overlay-svg', filename: 'overlay.svg'},
       {href: 'data:image/png;base64,qrcode', filename: 'overlay.png'},
     ]);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
   test('replaces existing rendered image when inputs change', () => {

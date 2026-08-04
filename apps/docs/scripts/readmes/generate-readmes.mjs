@@ -22,6 +22,7 @@ const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const DOCS_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
 const WORKSPACE_ROOT = path.resolve(DOCS_ROOT, '../..');
 const SITE_URL = 'https://qrcodesdk.dev';
+const GENERATE_COMMAND = 'pnpm turbo run generate-readmes --filter=docs';
 const README_LOGO =
   '<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>';
 
@@ -101,7 +102,7 @@ export async function generateReadme(mapping, options = {}) {
   tree.children.unshift(
     {
       type: 'html',
-      value: `<!-- Generated from ${toPosixPath(path.relative(workspaceRoot, sourcePath))}. Run \`pnpm --filter docs generate-readmes\` to update. -->`,
+      value: `<!-- Generated from ${toPosixPath(path.relative(workspaceRoot, sourcePath))}. Run \`${GENERATE_COMMAND}\` to update. -->`,
     },
     {
       type: 'html',
@@ -170,7 +171,7 @@ export async function assertReadmeCurrent(
 
   if (currentReadme !== generatedReadme) {
     throw new Error(
-      `${toPosixPath(path.relative(workspaceRoot, outputPath))} is stale. Run \`pnpm --filter docs generate-readmes\`.`,
+      `${toPosixPath(path.relative(workspaceRoot, outputPath))} is stale. Run \`${GENERATE_COMMAND}\`.`,
     );
   }
 }

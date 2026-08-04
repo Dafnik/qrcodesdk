@@ -31,13 +31,14 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
       throw new Error('QR code SVG image source must be an embedded data:image URL');
     }
     const shapeRendering = !plan.hasCurves ? ' shape-rendering="crispEdges"' : '';
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${plan.renderedSize}" height="${plan.renderedSize}" viewBox="0 0 ${plan.viewSize} ${plan.viewSize}"${shapeRendering}`;
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${plan.renderedSize}" height="${plan.renderedSize}" viewBox="0 0 ${plan.viewSize} ${plan.viewSize}" role="img"${shapeRendering}`;
 
-    if (options?.alt) svg += ` alt="${escapeAttributeValue(options.alt)}"`;
-    if (options?.ariaLabel) svg += ` aria-label="${escapeAttributeValue(options.ariaLabel)}"`;
-    if (options?.title) svg += ` title="${escapeAttributeValue(options.title)}"`;
+    const accessibleName = options?.ariaLabel ?? options?.alt;
+    if (accessibleName) svg += ` aria-label="${escapeAttributeValue(accessibleName)}"`;
 
-    svg += `><path fill="${escapeAttributeValue(plan.backgroundColor)}" d="M0 0h${plan.viewSize}v${plan.viewSize}H0z"/>`;
+    svg += '>';
+    if (options?.title) svg += `<title>${escapeTextContent(options.title)}</title>`;
+    svg += `<path fill="${escapeAttributeValue(plan.backgroundColor)}" d="M0 0h${plan.viewSize}v${plan.viewSize}H0z"/>`;
     const pathsByColor = createPathsByColor(plan.layers);
     for (let index = 0; index < pathsByColor.length; index++) {
       const {color, path} = pathsByColor[index]!;
@@ -265,6 +266,19 @@ function escapeAttributeValue(value: string): string {
         return '&amp;';
       case '"':
         return '&quot;';
+      case '<':
+        return '&lt;';
+      default:
+        return '&gt;';
+    }
+  });
+}
+
+function escapeTextContent(value: string): string {
+  return value.replace(/[&<>]/g, (character) => {
+    switch (character) {
+      case '&':
+        return '&amp;';
       case '<':
         return '&lt;';
       default:

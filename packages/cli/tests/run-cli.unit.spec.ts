@@ -214,14 +214,17 @@ describe('runCli', () => {
     expect(Array.from(visibleLines[0]!)).toHaveLength(42);
   });
 
-  test('rejects disabling ANSI with ANSI-background-only output', async () => {
+  test.each([
+    {name: '--no-ansi-colors', args: ['--no-ansi-colors']},
+    {name: '--ansi-colors false', args: ['--ansi-colors', 'false']},
+  ])('rejects $name with ANSI-background-only output', async ({args}) => {
     const runtime = createRuntime();
 
-    await expect(
-      runCli(['HELLO WORLD', '--only-ansi-colors', '--no-ansi-colors'], runtime),
-    ).resolves.toBe(1);
+    await expect(runCli(['HELLO WORLD', '--only-ansi-colors', ...args], runtime)).resolves.toBe(1);
 
-    expect(runtime.stderrText()).toContain('onlyAnsiColors requires ansiColors to be enabled');
+    expect(runtime.stderrText()).toContain(
+      'Cannot combine --only-ansi-colors with --no-ansi-colors.',
+    );
   });
 
   test('rejects invalid and missing renderer boolean values', async () => {

@@ -1,11 +1,13 @@
 import type {QRCodeMatrixOptions} from '@qrcodesdk/core';
 
-export interface QRCodeTestFixture extends QRCodeMatrixOptions {
-  name: string;
-  data: string;
-}
+export type QRCodeTestFixture = Readonly<
+  QRCodeMatrixOptions & {
+    readonly name: string;
+    readonly data: string;
+  }
+>;
 
-export const QR_CODE_TEST_FIXTURES: QRCodeTestFixture[] = [
+export const QR_CODE_TEST_FIXTURES = [
   {
     name: 'numeric',
     data: '1234567890',
@@ -121,4 +123,4 @@ export const QR_CODE_TEST_FIXTURES: QRCodeTestFixture[] = [
     mask: 2,
     errorCorrectionLevel: 'L',
   },
-];
+] as const satisfies readonly QRCodeTestFixture[];

@@ -3,5 +3,5 @@
     "types": ["node"]
   },
   "extends": "@repo/typescript-config/ts-library.json",
-  "include": ["src", "tests"]
+  "include": ["src"]
 }

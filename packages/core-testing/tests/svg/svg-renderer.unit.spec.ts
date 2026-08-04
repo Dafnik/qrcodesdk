@@ -32,7 +32,7 @@ describe('QRCodeSVGRenderer', () => {
     });
   });
 
-  test('renders custom sizing, margin, colors, and accessibility attributes', () => {
+  test('renders custom sizing, margin, colors, and accessible SVG markup', () => {
     const matrix: QRCodeMatrix = [
       [0, 1, 0],
       [1, 0, 1],
@@ -56,11 +56,13 @@ describe('QRCodeSVGRenderer', () => {
       width: '15',
       height: '15',
       viewBox: '0 0 5 5',
+      role: 'img',
       'shape-rendering': 'crispEdges',
-      alt: 'QR alt',
       'aria-label': 'QR aria',
-      title: 'QR title',
     });
+    expect(svgAttrs.alt).toBeUndefined();
+    expect(svgAttrs.title).toBeUndefined();
+    expect(svg).toContain('<title>QR title</title>');
     expect(paths).toHaveLength(2);
     expect(paths[0].attrs).toEqual({
       fill: '#eeeeee',
@@ -112,16 +114,26 @@ describe('QRCodeSVGRenderer', () => {
     expect(centerPath.attrs.d.match(/h3v3h-3Z/g)).toHaveLength(3);
   });
 
-  test('escapes SVG accessibility attribute values', () => {
+  test('escapes SVG accessibility values', () => {
     const svg = QRCodeSVGRenderer({
       alt: 'Scan "A&B" <now>',
       ariaLabel: 'Open "docs" & examples',
       title: 'QR <title>',
     })([[1]]);
 
-    expect(svg).toContain('alt="Scan &quot;A&amp;B&quot; &lt;now&gt;"');
+    expect(svg).not.toContain(' alt=');
     expect(svg).toContain('aria-label="Open &quot;docs&quot; &amp; examples"');
-    expect(svg).toContain('title="QR &lt;title&gt;"');
+    expect(svg).toContain('<title>QR &lt;title&gt;</title>');
+  });
+
+  test('uses alt as the accessible SVG name when ariaLabel is omitted', () => {
+    const svg = QRCodeSVGRenderer({alt: 'Scan "A&B" <now>'})([[1]]);
+
+    expect(extractSvgAttrs(svg)).toMatchObject({
+      role: 'img',
+      'aria-label': 'Scan &quot;A&amp;B&quot; &lt;now&gt;',
+    });
+    expect(svg).not.toContain(' alt=');
   });
 
   test('renders a centered embedded image after an optional clearing rectangle', () => {

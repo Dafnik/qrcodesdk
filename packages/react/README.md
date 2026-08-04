@@ -1,4 +1,4 @@
-<!-- Generated from apps/docs/src/content/docs/packages/react.mdx. Run `pnpm --filter docs generate-readmes` to update. -->
+<!-- Generated from apps/docs/src/content/docs/packages/react.mdx. Run `pnpm turbo run generate-readmes --filter=docs` to update. -->
 
 <p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
 
@@ -111,18 +111,21 @@ Most applications should let the builder select the mode, version, and mask auto
 ### SVG component
 
 ```tsx
+import type {QRCodeSVGOptions} from '@qrcodesdk/core';
+import {useMemo} from 'react';
+
 import {QRCodeSVG} from '@qrcodesdk/react';
 
 export default function QRCodeSVGExample() {
-  return (
-    <QRCodeSVG
-      data="https://qrcodesdk.dev"
-      options={{
-        title: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
-      }}
-    />
+  const options = useMemo<QRCodeSVGOptions>(
+    () => ({
+      title: 'QR code for qrcodesdk.dev',
+      ariaLabel: 'Scan to open qrcodesdk.dev',
+    }),
+    [],
   );
+
+  return <QRCodeSVG data="https://qrcodesdk.dev" options={options} />;
 }
 ```
 
@@ -130,15 +133,20 @@ export default function QRCodeSVGExample() {
 
 ```tsx
 import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+import {useMemo} from 'react';
+
 import {QRCodeImage} from '@qrcodesdk/react';
 
 export default function QRCodeImageExample() {
-  const options: QRCodeImageOptions = {
-    size: 8,
-    margin: 4,
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
-  };
+  const options = useMemo<QRCodeImageOptions>(
+    () => ({
+      size: 8,
+      margin: 4,
+      alt: 'QR code for qrcodesdk.dev',
+      ariaLabel: 'Scan to open qrcodesdk.dev',
+    }),
+    [],
+  );
 
   return <QRCodeImage data="https://qrcodesdk.dev" options={options} />;
 }
@@ -148,17 +156,22 @@ export default function QRCodeImageExample() {
 
 ```tsx
 import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
+import {useMemo} from 'react';
+
 import {QRCodeCanvas} from '@qrcodesdk/react';
 
 export default function QRCodeCanvasExample() {
-  const options: QRCodeCanvasOptions = {
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
-    },
-  };
+  const options = useMemo<QRCodeCanvasOptions>(
+    () => ({
+      size: 8,
+      margin: 4,
+      colors: {
+        colorDark: '#111827',
+        colorLight: '#ffffff',
+      },
+    }),
+    [],
+  );
 
   return <QRCodeCanvas data="https://qrcodesdk.dev" options={options} />;
 }
@@ -167,22 +180,18 @@ export default function QRCodeCanvasExample() {
 ### PNG download
 
 ```tsx
-import {useRef} from 'react';
+import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+import {useMemo, useRef} from 'react';
 
 import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/react';
 
 export default function QRCodeDownloadImageExample() {
   const qrcode = useRef<QRCodeDownloadHandle>(null);
+  const options = useMemo<QRCodeImageOptions>(() => ({alt: 'QR code for qrcodesdk.dev'}), []);
 
   return (
     <div className="flex flex-col items-center">
-      <QRCodeImage
-        data="https://qrcodesdk.dev"
-        options={{
-          alt: 'QR code for qrcodesdk.dev',
-        }}
-        ref={qrcode}
-      />
+      <QRCodeImage data="https://qrcodesdk.dev" options={options} ref={qrcode} />
       <button
         className="btn-primary"
         onClick={() => qrcode.current?.download('qrcodesdk')}
@@ -223,12 +232,20 @@ colors independently inherit `colors.colorDark`.
 Prepare browser image sources before rendering:
 
 ```tsx
-import {useState} from 'react';
+import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+import {useMemo, useState} from 'react';
 
 import {QRCodeImage} from '@qrcodesdk/react';
 
 export function QRCodeWithLogo() {
   const [logo, setLogo] = useState<HTMLImageElement>();
+  const options = useMemo<QRCodeImageOptions>(
+    () => ({
+      errorCorrectionLevel: 'H',
+      image: logo ? {source: logo, size: 0.3} : undefined,
+    }),
+    [logo],
+  );
 
   async function selectLogo(file: File) {
     const source = new Image();
@@ -254,10 +271,7 @@ export function QRCodeWithLogo() {
         }}
       />
       {logo ? (
-        <QRCodeImage
-          data="https://qrcodesdk.dev"
-          options={{errorCorrectionLevel: 'H', image: {source: logo, size: 0.3}}}
-        />
+        <QRCodeImage data="https://qrcodesdk.dev" options={options} />
       ) : null}
     </>
   );
@@ -300,6 +314,21 @@ The appropriate `.svg` or `.png` extension is appended when necessary.
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
 `QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+
+## Public API
+
+```ts
+import {
+  type QRCodeBaseProps,
+  QRCodeCanvas,
+  type QRCodeCanvasProps,
+  type QRCodeDownloadHandle,
+  QRCodeImage,
+  type QRCodeImageProps,
+  QRCodeSVG,
+  type QRCodeSVGProps,
+} from '@qrcodesdk/react';
+```
 
 ## Documentation
 

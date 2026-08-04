@@ -65,7 +65,7 @@
     "cli": "pnpm run build && node dist/bin.mjs",
     "test": "vitest --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
     "test:coverage:raw": "vitest --coverage --watch false",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint src tests runtime --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
