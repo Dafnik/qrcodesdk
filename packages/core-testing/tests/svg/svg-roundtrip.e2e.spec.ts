@@ -52,6 +52,15 @@ describe('SVG QR roundtrips', () => {
     },
   );
 
+  test.each(['Grüße aus Wien', '東京 ✅🚀'])(
+    'decodes forced UTF-8 octet SVG output for %s',
+    async (data) => {
+      await expect(
+        decodeSvgQRCode(qrcode(data).mode('octet').render(testSVGRenderer)),
+      ).resolves.toBe(data);
+    },
+  );
+
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
     await expect(
       decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),

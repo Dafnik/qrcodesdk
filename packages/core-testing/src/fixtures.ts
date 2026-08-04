@@ -117,7 +117,7 @@ export const QR_CODE_TEST_FIXTURES = [
   },
   {
     name: 'bytes-max-capacity',
-    data: 'A'.repeat(2_953),
+    data: 'A'.repeat(2_952),
     mode: 'octet',
     version: 40,
     mask: 2,

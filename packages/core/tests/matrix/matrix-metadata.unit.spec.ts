@@ -121,7 +121,9 @@ describe('QR code matrix generation metadata', () => {
     expect(countRole(numeric, 'payload')).toBe(17);
     expect(countRole(alphanumeric, 'character-count')).toBe(9);
     expect(countRole(alphanumeric, 'payload')).toBe(28);
+    expect(countRole(octet, 'eci')).toBe(12);
     expect(countRole(octet, 'payload')).toBe(40);
+    expect(countRole(utf8, 'eci')).toBe(12);
     expect(countRole(utf8, 'payload')).toBe(56);
     expect(countRole(numeric, 'terminator')).toBe(4);
     expect(countRole(numeric, 'padding')).toBeGreaterThan(0);
@@ -129,16 +131,17 @@ describe('QR code matrix generation metadata', () => {
 
   test('reports and classifies mixed-mode segments', () => {
     const generated = ɵgenerateQRCodeMatrixWithMetadata('ABCDE12345678?A1A', {
-      version: 1,
+      version: 2,
       mask: 0,
     });
 
     expect(generated.mode).toBe('mixed');
+    expect(countRole(generated, 'eci')).toBe(12);
     expect(countRole(generated, 'mode')).toBe(12);
     expect(countRole(generated, 'character-count')).toBe(27);
     expect(countRole(generated, 'payload')).toBe(87);
-    expect(countRole(generated, 'terminator')).toBe(2);
-    expect(countRole(generated, 'padding')).toBe(0);
+    expect(countRole(generated, 'terminator')).toBe(4);
+    expect(countRole(generated, 'padding')).toBeGreaterThan(0);
   });
 
   test('handles truncated terminators, padding, ECC, and remainder bits', () => {

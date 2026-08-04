@@ -8,8 +8,10 @@ import {
   qrcode,
 } from '../../src';
 import {ECC_LEVELS_MAP} from '../../src/matrix/error-correction';
-import {getMaxDataLength} from '../../src/matrix/get-max-data-length';
+import {getNumberOfAvailableBitsForData} from '../../src/matrix/get-number-of-available-bits-for-data';
 import {MODES_MAP} from '../../src/matrix/mode';
+import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
+import {createSingleSegment} from '../../src/matrix/segments';
 import {expectSquareBinaryMatrix} from './helpers';
 
 const ERROR_CORRECTION_LEVELS = [
@@ -31,7 +33,7 @@ const CAPACITY_CASES = Array.from({length: 40}, (_, index) => (index + 1) as QRC
         version,
         errorCorrectionLevel,
         mode,
-        capacity: getMaxDataLength(version, MODES_MAP[mode], ECC_LEVELS_MAP[errorCorrectionLevel]),
+        capacity: getSingleSegmentCapacity(version, mode, errorCorrectionLevel),
       })),
     ),
 );
@@ -67,10 +69,8 @@ describe('qrcode().matrix()', () => {
     expect(qrcode(data).config({mode: 'octet'}).config({mode: undefined}).mask(1).matrix()).toEqual(
       automatic,
     );
-    expect(qrcode('ABCDE12345678?A1A').version(1).matrix()).toHaveLength(21);
-    expect(() => qrcode('ABCDE12345678?A1AA').version(1).matrix()).toThrow(
-      'QRCode: Data too large',
-    );
+    expect(qrcode('ABCDE12345678?A1A').version(2).matrix()).toHaveLength(25);
+    expect(() => qrcode('ABCDE12345678?A1A').version(1).matrix()).toThrow('QRCode: Data too large');
   });
 
   test('builder matrix and renderer paths use matrix generation', () => {
@@ -196,3 +196,24 @@ describe('qrcode().matrix()', () => {
     expect(() => qrcode('ABC').mode('numeric').matrix()).toThrow(Error);
   });
 });
+
+function getSingleSegmentCapacity(
+  version: QRCodeVersion,
+  mode: QRCodeMode,
+  errorCorrectionLevel: QRCodeErrorCorrectionLevel,
+): number {
+  const modeIndicator = MODES_MAP[mode];
+  const dataCharacter = DATA_BY_MODE[mode];
+  const eccLevel = ECC_LEVELS_MAP[errorCorrectionLevel];
+  let minimum = 0;
+  let maximum = getNumberOfAvailableBitsForData(version, eccLevel);
+
+  while (minimum < maximum) {
+    const candidate = Math.ceil((minimum + maximum) / 2);
+    const segment = createSingleSegment(modeIndicator, dataCharacter.repeat(candidate))!;
+    if (segmentsFitVersion([segment], version, eccLevel)) minimum = candidate;
+    else maximum = candidate - 1;
+  }
+
+  return minimum;
+}

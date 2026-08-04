@@ -11,6 +11,9 @@ export const MODE_NUMERIC = 1,
   MODE_OCTET = 4 satisfies QRCodeSupportedModeIndicator;
 
 export const MODE_TERMINATOR = 0;
+export const MODE_ECI = 7;
+export const ECI_UTF8_ASSIGNMENT = 26;
+export const ECI_UTF8_BIT_LENGTH = 12;
 
 export const MODES_MAP: Record<QRCodeMode, QRCodeSupportedModeIndicator> = {
   numeric: MODE_NUMERIC,
@@ -33,7 +36,6 @@ export type QRCodeModeDefinition = {
   readonly validate: (data: QRCodeInputData) => QRCodeEncodedData | undefined;
   readonly getCharacterCountBits: (version: QRCodeVersion) => number;
   readonly getPayloadBitLength: (dataLength: number) => number;
-  readonly getMaxDataLength: (numberOfBits: number) => number;
   readonly encodePayload: (data: QRCodeEncodedData, pack: PackBits) => void;
 };
 
@@ -55,8 +57,6 @@ const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinitio
     },
     getCharacterCountBits: (version) => (version < 10 ? 10 : version < 27 ? 12 : 14),
     getPayloadBitLength: (dataLength) => ((dataLength / 3) | 0) * 10 + [0, 4, 7][dataLength % 3]!,
-    getMaxDataLength: (numberOfBits) =>
-      ((numberOfBits / 10) | 0) * 3 + (numberOfBits % 10 < 4 ? 0 : numberOfBits % 10 < 7 ? 1 : 2),
     encodePayload: (data, pack) => {
       const stringData = data as string;
       let index = 2;
@@ -74,8 +74,6 @@ const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinitio
     },
     getCharacterCountBits: (version) => (version < 10 ? 9 : version < 27 ? 11 : 13),
     getPayloadBitLength: (dataLength) => ((dataLength / 2) | 0) * 11 + (dataLength % 2) * 6,
-    getMaxDataLength: (numberOfBits) =>
-      ((numberOfBits / 11) | 0) * 2 + (numberOfBits % 11 < 6 ? 0 : 1),
     encodePayload: (data, pack) => {
       const alphanumericMap = getAlphanumericMap();
       const stringData = data as string;
@@ -97,7 +95,6 @@ const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinitio
     validate: (data) => encodeUTF8(String(data)),
     getCharacterCountBits: (version) => (version < 10 ? 8 : 16),
     getPayloadBitLength: (dataLength) => dataLength * 8,
-    getMaxDataLength: (numberOfBits) => (numberOfBits / 8) | 0,
     encodePayload: (data, pack) => {
       const dataArray = data as number[];
       for (let index = 0; index < dataArray.length; index++) {

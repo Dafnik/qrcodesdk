@@ -15,6 +15,7 @@ export type QRCodeMatrixMetadataRole =
   | 'format'
   | 'version'
   | 'dark-module'
+  | 'eci'
   | 'mode'
   | 'character-count'
   | 'payload'
@@ -26,7 +27,7 @@ export type QRCodeMatrixMetadataRole =
 export type QRCodeEncodedBitMetadata = {
   readonly role: Extract<
     QRCodeMatrixMetadataRole,
-    'mode' | 'character-count' | 'payload' | 'terminator' | 'padding' | 'error-correction'
+    'eci' | 'mode' | 'character-count' | 'payload' | 'terminator' | 'padding' | 'error-correction'
   >;
   readonly bitIndex: number;
   readonly bitCount: number;

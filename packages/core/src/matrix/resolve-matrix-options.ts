@@ -90,7 +90,7 @@ function validateVersion(version: number): asserts version is QRCodeVersion {
   }
 }
 
-function segmentsFitVersion(
+export function segmentsFitVersion(
   segments: QRCodeResolvedMatrixOptions['segments'],
   version: QRCodeVersion,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,

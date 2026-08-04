@@ -1,10 +1,16 @@
 import type {QRCodeCodewords, QRCodeEncodedSegment, QRCodeVersion} from '../types';
 import type {QRCodeEncodedBitMetadata, QRCodeMatrixMetadataRole} from './metadata';
-import {MODE_TERMINATOR, getModeDefinition} from './mode';
+import {
+  ECI_UTF8_ASSIGNMENT,
+  MODE_ECI,
+  MODE_OCTET,
+  MODE_TERMINATOR,
+  getModeDefinition,
+} from './mode';
 
 type QRCodeDataBitRole = Extract<
   QRCodeMatrixMetadataRole,
-  'mode' | 'character-count' | 'payload' | 'terminator' | 'padding'
+  'eci' | 'mode' | 'character-count' | 'payload' | 'terminator' | 'padding'
 >;
 
 type QRCodeEncodedDataWithMetadata = {
@@ -81,7 +87,13 @@ function encodeData(
     if (n > 0) bits |= (x & ((1 << n) - 1)) << (remaining -= n);
   };
 
+  let hasWrittenUTF8ECI = false;
   for (const segment of segments) {
+    if (segment.mode === MODE_OCTET && !hasWrittenUTF8ECI) {
+      pack(MODE_ECI, 4, 'eci');
+      pack(ECI_UTF8_ASSIGNMENT, 8, 'eci');
+      hasWrittenUTF8ECI = true;
+    }
     const definition = getModeDefinition(segment.mode);
     pack(segment.mode, 4, 'mode');
     pack(segment.data.length, definition.getCharacterCountBits(version), 'character-count');

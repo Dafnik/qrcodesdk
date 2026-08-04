@@ -108,9 +108,10 @@ to use that single mode. Mixed encoding is automatic; the builder does not accep
 arrays.
 
 QRCodeSDK implements QR Code Model 2 matrix generation for numeric, alphanumeric, and UTF-8
-octet payloads, including automatic mixed-mode encoding. Kanji mode, ECI, and structured append
-are not supported, so this is a documented subset of ISO/IEC 18004 rather than full feature
-coverage.
+octet payloads, including automatic mixed-mode encoding. Octet data is encoded as UTF-8 and
+preceded by ECI assignment 26 so scanners can interpret non-ASCII text consistently. Kanji mode
+and structured append are not supported, so this is a documented subset of ISO/IEC 18004 rather
+than full feature coverage.
 
 ### Methods
 

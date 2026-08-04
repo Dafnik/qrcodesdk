@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
 import {
+  ECI_UTF8_BIT_LENGTH,
   MODE_ALPHANUMERIC,
   MODE_NUMERIC,
   MODE_OCTET,
@@ -56,6 +57,7 @@ describe('mixed-mode segmentation', () => {
       {mode: MODE_OCTET, data: encodeUTF8('AB✅🚀')},
       {mode: MODE_NUMERIC, data: '1234567890'},
     ]);
+    expect(optimizeSegments('\ud800', 1)).toEqual([{mode: MODE_OCTET, data: [0xef, 0xbf, 0xbd]}]);
   });
 
   test('matches a brute-force minimum for short inputs', () => {
@@ -75,11 +77,12 @@ describe('mixed-mode segmentation', () => {
 
 function bruteForceMinimumBitLength(input: string, version: QRCodeVersion): number {
   const characters = Array.from(input);
-  const cache = new Map<number, number>();
+  const cache = new Map<string, number>();
 
-  const visit = (start: number): number => {
+  const visit = (start: number, hasUTF8ECI: boolean): number => {
     if (start === characters.length) return 0;
-    const cached = cache.get(start);
+    const key = `${start}:${Number(hasUTF8ECI)}`;
+    const cached = cache.get(key);
     if (cached !== undefined) return cached;
 
     let best = Number.POSITIVE_INFINITY;
@@ -89,15 +92,19 @@ function bruteForceMinimumBitLength(input: string, version: QRCodeVersion): numb
         const encoded = validateData(mode, text);
         if (encoded === undefined) continue;
         const segment = {mode, data: encoded} satisfies QRCodeEncodedSegment;
-        best = Math.min(best, getSegmentsBitLength(version, [segment]) + visit(end));
+        const introducesUTF8ECI = mode === MODE_OCTET && !hasUTF8ECI;
+        const segmentBitLength =
+          getSegmentsBitLength(version, [segment]) -
+          (mode === MODE_OCTET && !introducesUTF8ECI ? ECI_UTF8_BIT_LENGTH : 0);
+        best = Math.min(best, segmentBitLength + visit(end, hasUTF8ECI || mode === MODE_OCTET));
       }
     }
 
-    cache.set(start, best);
+    cache.set(key, best);
     return best;
   };
 
-  return visit(0);
+  return visit(0, false);
 }
 
 function* stringsOfLength(alphabet: readonly string[], length: number): Generator<string> {

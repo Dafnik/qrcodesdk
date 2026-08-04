@@ -47,7 +47,15 @@ describe('data validation and encoding', () => {
   });
 
   test('encodes octet data bytes directly', () => {
-    const expectedBits = ['0100', '00000010', '01000001', '11111111', '0000'].join('');
+    const expectedBits = [
+      '0111',
+      '00011010',
+      '0100',
+      '00000010',
+      '01000001',
+      '11111111',
+      '0000',
+    ].join('');
 
     expect(encode(1, [{mode: MODE_OCTET, data: [0x41, 0xff]}], 7)).toEqual(
       bitsToBytes(expectedBits, 7),
@@ -62,6 +70,8 @@ describe('data validation and encoding', () => {
       '0010',
       '000000010',
       '00111001101',
+      '0111',
+      '00011010',
       '0100',
       '00000001',
       '11111111',
@@ -86,7 +96,7 @@ describe('data validation and encoding', () => {
     expect(encode(40, [{mode: MODE_ALPHANUMERIC, data: 'A'.repeat(4_296)}], 2_956)).toHaveLength(
       2_956,
     );
-    expect(encode(40, [{mode: MODE_OCTET, data: Array(2_953).fill(0x41)}], 2_956)).toHaveLength(
+    expect(encode(40, [{mode: MODE_OCTET, data: Array(2_952).fill(0x41)}], 2_956)).toHaveLength(
       2_956,
     );
   });

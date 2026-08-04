@@ -5,10 +5,10 @@ import type {
   QRCodeVersion,
 } from '../types';
 import {
+  ECI_UTF8_BIT_LENGTH,
   MODE_ALPHANUMERIC,
   MODE_NUMERIC,
   MODE_OCTET,
-  encodeUTF8,
   getModeDefinition,
   isAlphanumericData,
   isNumericData,
@@ -22,6 +22,7 @@ type OptimizerState = {
   readonly remainder: number;
   readonly bitLength: number;
   readonly segmentCount: number;
+  readonly hasUTF8ECI: boolean;
   readonly previousKey: string | undefined;
   readonly startsSegment: boolean;
 };
@@ -80,7 +81,7 @@ export function getSegmentsBitLength(
   version: QRCodeVersion,
   segments: readonly QRCodeEncodedSegment[],
 ): number {
-  let bitLength = 0;
+  let bitLength = segments.some(({mode}) => mode === MODE_OCTET) ? ECI_UTF8_BIT_LENGTH : 0;
   for (const segment of segments) {
     const definition = getModeDefinition(segment.mode);
     bitLength +=
@@ -110,10 +111,12 @@ function createStartedState(
     remainder: initialRemainder(mode),
     bitLength:
       (previous?.bitLength ?? 0) +
+      (mode === MODE_OCTET && previous?.hasUTF8ECI !== true ? ECI_UTF8_BIT_LENGTH : 0) +
       4 +
       definition.getCharacterCountBits(version) +
       getFirstCharacterBitLength(mode, character),
     segmentCount: (previous?.segmentCount ?? 0) + 1,
+    hasUTF8ECI: previous?.hasUTF8ECI === true || mode === MODE_OCTET,
     previousKey,
     startsSegment: true,
   };
@@ -131,6 +134,7 @@ function appendToState(
       previous.bitLength +
       getAppendedCharacterBitLength(previous.mode, previous.remainder, character),
     segmentCount: previous.segmentCount,
+    hasUTF8ECI: previous.hasUTF8ECI,
     previousKey,
     startsSegment: false,
   };
@@ -184,8 +188,8 @@ function reconstructSegments(
   return result.reverse();
 }
 
-function stateKey(state: Pick<OptimizerState, 'mode' | 'remainder'>): string {
-  return `${state.mode}:${state.remainder}`;
+function stateKey(state: Pick<OptimizerState, 'mode' | 'remainder' | 'hasUTF8ECI'>): string {
+  return `${state.mode}:${state.remainder}:${Number(state.hasUTF8ECI)}`;
 }
 
 function initialRemainder(mode: SegmentMode): number {
@@ -215,5 +219,9 @@ function getAppendedCharacterBitLength(
 }
 
 function getUTF8ByteLength(value: string): number {
-  return encodeUTF8(value).length;
+  const codePoint = value.codePointAt(0)!;
+  if (codePoint <= 0x7f) return 1;
+  if (codePoint <= 0x7ff) return 2;
+  if (codePoint <= 0xffff) return 3;
+  return 4;
 }

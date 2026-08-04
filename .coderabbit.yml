@@ -1,4 +1,5 @@
 reviews:
   path_filters:
     - '!apps/docs/src/libs/**'
+    - '!**/__snapshots__/**'
     - '!**/pnpm-lock.yaml'
