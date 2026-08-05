@@ -69,7 +69,7 @@ All components accept:
 | `data`    | `string \| number`         | Required QR code payload.                   |
 | `options` | Component-specific options | Optional matrix and renderer configuration. |
 
-`options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, and `mask`. Renderer options match the corresponding QRCodeSDK renderer:
+`options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, `mask`, and `eci`. Renderer options match the corresponding QRCodeSDK renderer:
 
 - `QRCodeSVG` uses `QRCodeSVGOptions`.
 - `QRCodeImage` uses `QRCodeImageOptions`.
@@ -81,14 +81,18 @@ Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` an
 
 The `options` input combines the component's renderer options with the shared QR matrix options:
 
-| Option                 | Type                                     | Default   | Description             |
-| ---------------------- | ---------------------------------------- | --------- | ----------------------- |
-| `mode`                 | `'numeric' \| 'alphanumeric' \| 'octet'` | Automatic | Encoding mode.          |
-| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`               | `'M'`     | Error correction level. |
-| `version`              | `1` through `40`                         | Automatic | Pins the QR version.    |
-| `mask`                 | `0` through `7`                          | Automatic | Pins the QR mask.       |
+| Option                 | Type                                     | Default   | Description                            |
+| ---------------------- | ---------------------------------------- | --------- | -------------------------------------- |
+| `mode`                 | `'numeric' \| 'alphanumeric' \| 'octet'` | Automatic | Encoding mode.                         |
+| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`               | `'M'`     | Error correction level.                |
+| `version`              | `1` through `40`                         | Automatic | Pins the QR version.                   |
+| `mask`                 | `0` through `7`                          | Automatic | Pins the QR mask.                      |
+| `eci`                  | `boolean`                                | `false`   | Emits UTF-8 ECI 26 for octet segments. |
 
 Most applications should let the builder select the mode, version, and mask automatically.
+Octet bytes remain UTF-8 regardless of `eci`. Set `eci: true` to explicitly declare UTF-8 to
+scanners; the default saves 12 bits and may rely on scanner heuristics for non-ASCII text.
+Numeric and alphanumeric-only symbols are unaffected.
 
 ## Live examples
 

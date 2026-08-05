@@ -40,6 +40,7 @@ export function createSingleSegment(
 export function optimizeSegments(
   data: QRCodeInputData,
   version: QRCodeVersion,
+  eci: boolean,
 ): QRCodeEncodedSegment[] {
   const source = String(data);
   if (source.length === 0) return [{mode: MODE_NUMERIC, data: ''}];
@@ -56,7 +57,10 @@ export function optimizeSegments(
       if (!canEncodeCharacter(mode, character)) continue;
 
       if (previousStates === undefined) {
-        offerState(nextStates, createStartedState(mode, character, version, undefined, undefined));
+        offerState(
+          nextStates,
+          createStartedState(mode, character, version, eci, undefined, undefined),
+        );
         continue;
       }
 
@@ -64,7 +68,7 @@ export function optimizeSegments(
         const candidate =
           previous.mode === mode
             ? appendToState(previous, previousKey, character)
-            : createStartedState(mode, character, version, previous, previousKey);
+            : createStartedState(mode, character, version, eci, previous, previousKey);
         offerState(nextStates, candidate);
       }
     }
@@ -80,8 +84,9 @@ export function optimizeSegments(
 export function getSegmentsBitLength(
   version: QRCodeVersion,
   segments: readonly QRCodeEncodedSegment[],
+  eci: boolean,
 ): number {
-  let bitLength = segments.some(({mode}) => mode === MODE_OCTET) ? ECI_UTF8_BIT_LENGTH : 0;
+  let bitLength = eci && segments.some(({mode}) => mode === MODE_OCTET) ? ECI_UTF8_BIT_LENGTH : 0;
   for (const segment of segments) {
     const definition = getModeDefinition(segment.mode);
     bitLength +=
@@ -102,6 +107,7 @@ function createStartedState(
   mode: SegmentMode,
   character: string,
   version: QRCodeVersion,
+  eci: boolean,
   previous: OptimizerState | undefined,
   previousKey: string | undefined,
 ): OptimizerState {
@@ -111,7 +117,7 @@ function createStartedState(
     remainder: initialRemainder(mode),
     bitLength:
       (previous?.bitLength ?? 0) +
-      (mode === MODE_OCTET && previous?.hasUTF8ECI !== true ? ECI_UTF8_BIT_LENGTH : 0) +
+      (eci && mode === MODE_OCTET && previous?.hasUTF8ECI !== true ? ECI_UTF8_BIT_LENGTH : 0) +
       4 +
       definition.getCharacterCountBits(version) +
       getFirstCharacterBitLength(mode, character),

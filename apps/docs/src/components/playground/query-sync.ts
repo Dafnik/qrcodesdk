@@ -16,7 +16,7 @@ import {
   type PlaygroundPackage,
   defaultPlaygroundConfig,
   playgroundConfig,
-} from './playground-config';
+} from './playground-config.ts';
 
 const PLAYGROUND_PACKAGES = ['angular', 'react'] as const satisfies readonly PlaygroundPackage[];
 
@@ -92,6 +92,15 @@ const QUERY_FIELD_CODECS = [
     (config, mask) => setOptionalProperty(config, 'mask', mask),
     (value, fallback) => parseOptionalNumber(value, isQRCodeMask, fallback),
     serializeNumber,
+  ),
+  defineQueryField(
+    'eci',
+    (config) => config.eci ?? false,
+    (config, eci) => {
+      config.eci = eci;
+    },
+    parseBoolean,
+    serializeBoolean,
   ),
   defineQueryField(
     'size',
@@ -514,6 +523,12 @@ function parseOptionalString(
   return value === '' ? undefined : value;
 }
 
+function parseBoolean(value: string | null, fallback: boolean): boolean {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return fallback;
+}
+
 function serializeString(
   value: string | undefined,
   defaultValue: string | undefined,
@@ -533,6 +548,11 @@ function serializeNumber(
     return undefined;
   }
 
+  return String(value);
+}
+
+function serializeBoolean(value: boolean, defaultValue: boolean | undefined): string | undefined {
+  if (value === defaultValue) return undefined;
   return String(value);
 }
 

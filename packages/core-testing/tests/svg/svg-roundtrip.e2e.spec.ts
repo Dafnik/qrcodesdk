@@ -13,6 +13,9 @@ import {decodeSvgQRCode} from './svg-helpers';
 const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
   ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
 );
+const JSQR_ROUNDTRIP_ECI_ENABLED_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
+  ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
+);
 
 describe('SVG QR roundtrips', () => {
   test('decodes SVG output with a small prepared image overlay', async () => {
@@ -52,14 +55,16 @@ describe('SVG QR roundtrips', () => {
     },
   );
 
-  test.each(['Grüße aus Wien', '東京 ✅🚀'])(
-    'decodes forced UTF-8 octet SVG output for %s',
-    async (data) => {
-      await expect(
-        decodeSvgQRCode(qrcode(data).mode('octet').render(testSVGRenderer)),
-      ).resolves.toBe(data);
-    },
-  );
+  test.each(
+    ['Grüße aus Wien', '東京 ✅🚀'].flatMap((data) => [
+      {data, eci: false},
+      {data, eci: true},
+    ]),
+  )('decodes forced UTF-8 octet SVG output for $data with ECI $eci', async ({data, eci}) => {
+    await expect(
+      decodeSvgQRCode(qrcode(data).mode('octet').eci(eci).render(testSVGRenderer)),
+    ).resolves.toBe(data);
+  });
 
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
     await expect(
@@ -72,6 +77,15 @@ describe('SVG QR roundtrips', () => {
       decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),
     ).resolves.toBe(fixture.data);
   });
+
+  test.each(JSQR_ROUNDTRIP_ECI_ENABLED_COMBINATIONS)(
+    'decodes eci $name SVG output',
+    async (fixture) => {
+      await expect(
+        decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),
+      ).resolves.toBe(fixture.data);
+    },
+  );
 
   test.each(QR_CODE_STYLING_FIXTURES)('decodes $name SVG styling fixture', async (fixture) => {
     await expect(

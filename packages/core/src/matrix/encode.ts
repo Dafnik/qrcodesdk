@@ -32,17 +32,19 @@ export function encode(
   version: QRCodeVersion,
   segments: readonly QRCodeEncodedSegment[],
   maxBufferLength: number,
+  eci: boolean,
 ): QRCodeCodewords {
-  return encodeData(version, segments, maxBufferLength).codewords;
+  return encodeData(version, segments, maxBufferLength, eci).codewords;
 }
 
 export function encodeWithMetadata(
   version: QRCodeVersion,
   segments: readonly QRCodeEncodedSegment[],
   maxBufferLength: number,
+  eci: boolean,
 ): QRCodeEncodedDataWithMetadata {
   const roles: QRCodeDataBitRole[] = [];
-  const {codewords} = encodeData(version, segments, maxBufferLength, roles);
+  const {codewords} = encodeData(version, segments, maxBufferLength, eci, roles);
   const roleCounts = countRoles(roles);
   const roleOffsets = new Map<QRCodeDataBitRole, number>();
   const bitMetadata = roles.map((role) => {
@@ -62,6 +64,7 @@ function encodeData(
   version: QRCodeVersion,
   segments: readonly QRCodeEncodedSegment[],
   maxBufferLength: number,
+  eci: boolean,
   roles?: QRCodeDataBitRole[],
 ): {readonly codewords: QRCodeCodewords} {
   const buffer: QRCodeCodewords = [];
@@ -89,7 +92,7 @@ function encodeData(
 
   let hasWrittenUTF8ECI = false;
   for (const segment of segments) {
-    if (segment.mode === MODE_OCTET && !hasWrittenUTF8ECI) {
+    if (eci && segment.mode === MODE_OCTET && !hasWrittenUTF8ECI) {
       pack(MODE_ECI, 4, 'eci');
       pack(ECI_UTF8_ASSIGNMENT, 8, 'eci');
       hasWrittenUTF8ECI = true;

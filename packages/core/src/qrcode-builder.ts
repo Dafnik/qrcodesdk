@@ -76,6 +76,10 @@ export class QRCodeBuilder<
     return this.withConfig({mask});
   }
 
+  eci(enabled?: boolean): QRCodeBuilder<D, R> {
+    return this.withConfig({eci: enabled});
+  }
+
   renderer<TOutput>(renderer: QRCodeRenderer<TOutput>): QRCodeBuilder<D, HasRenderer<TOutput>> {
     return new QRCodeBuilder(this._data, this._config, renderer);
   }

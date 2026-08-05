@@ -69,8 +69,9 @@ describe('explainQRCode', () => {
     const numeric = explainQRCode({data: '12345', version: 1, mask: 0});
     const alphanumeric = explainQRCode({data: 'HELLO', version: 1, mask: 0});
     const octet = explainQRCode({data: 'hello', version: 1, mask: 0});
-    const utf8 = explainQRCode({data: 'Grüße', version: 2, mode: 'octet', mask: 0});
-    const mixed = explainQRCode({data: 'ABCDE12345678?A1A', version: 2, mask: 0});
+    const octetWithECI = explainQRCode({data: 'hello', version: 1, mask: 0, eci: true});
+    const utf8 = explainQRCode({data: 'Grüße', version: 2, mode: 'octet', mask: 0, eci: true});
+    const mixed = explainQRCode({data: 'ABCDE12345678?A1A', version: 2, mask: 0, eci: true});
 
     assert.equal(numeric.mode, 'numeric');
     assert.equal(countRole(numeric, 'mode'), 4);
@@ -79,7 +80,8 @@ describe('explainQRCode', () => {
     assert.equal(countRole(alphanumeric, 'character-count'), 9);
     assert.equal(countRole(alphanumeric, 'payload'), 28);
     assert.equal(octet.mode, 'octet');
-    assert.equal(countRole(octet, 'eci'), 12);
+    assert.equal(countRole(octet, 'eci'), 0);
+    assert.equal(countRole(octetWithECI, 'eci'), 12);
     assert.equal(countRole(octet, 'payload'), 40);
     assert.equal(countRole(utf8, 'eci'), 12);
     assert.equal(countRole(utf8, 'payload'), new TextEncoder().encode('Grüße').length * 8);

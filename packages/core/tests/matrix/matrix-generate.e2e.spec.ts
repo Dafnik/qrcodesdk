@@ -69,8 +69,30 @@ describe('qrcode().matrix()', () => {
     expect(qrcode(data).config({mode: 'octet'}).config({mode: undefined}).mask(1).matrix()).toEqual(
       automatic,
     );
-    expect(qrcode('ABCDE12345678?A1A').version(2).matrix()).toHaveLength(25);
-    expect(() => qrcode('ABCDE12345678?A1A').version(1).matrix()).toThrow('QRCode: Data too large');
+    expect(qrcode('ABCDE12345678?A1A').version(1).matrix()).toHaveLength(21);
+    expect(qrcode('ABCDE12345678?A1A').eci(true).matrix()).toHaveLength(25);
+    expect(() => qrcode('ABCDE12345678?A1A').eci(true).version(1).matrix()).toThrow(
+      'QRCode: Data too large',
+    );
+  });
+
+  test('keeps ECI opt-in, immutable, and resettable', () => {
+    const data = 'Grüße';
+    const optionsMatrix = qrcode(data).config({eci: true}).mask(0).matrix();
+    const methodMatrix = qrcode(data).eci(true).mask(0).matrix();
+    const defaultMatrix = qrcode(data).mask(0).matrix();
+
+    expect(methodMatrix).toEqual(optionsMatrix);
+    expect(methodMatrix).not.toEqual(defaultMatrix);
+    expect(qrcode(data).eci(false).mask(0).matrix()).toEqual(defaultMatrix);
+    expect(qrcode(data).eci(true).eci(undefined).mask(0).matrix()).toEqual(defaultMatrix);
+    expect(qrcode(data).config({eci: undefined}).mask(0).matrix()).toEqual(defaultMatrix);
+  });
+
+  test('does not change numeric or alphanumeric symbols when ECI is enabled', () => {
+    for (const data of ['1234567890', 'HELLO WORLD']) {
+      expect(qrcode(data).eci(true).mask(0).matrix()).toEqual(qrcode(data).mask(0).matrix());
+    }
   });
 
   test('builder matrix and renderer paths use matrix generation', () => {
@@ -97,6 +119,7 @@ describe('qrcode().matrix()', () => {
       original.errorCorrection('H'),
       original.version(2),
       original.mask(0),
+      original.eci(true),
     ];
 
     for (const builder of configuredBuilders) {
@@ -169,6 +192,13 @@ describe('qrcode().matrix()', () => {
         .mask(8 as never)
         .matrix(),
     ).toThrow('QRCode: Invalid mask');
+    for (const invalidECI of [0, 1, 'true', null]) {
+      expect(() =>
+        qrcode('abc')
+          .config({eci: invalidECI as never})
+          .matrix(),
+      ).toThrow('QRCode: Invalid ECI setting');
+    }
     expect(() => qrcode('1'.repeat(7_090)).mode('numeric').matrix()).toThrow(
       'QRCode: Data too large',
     );
@@ -211,7 +241,7 @@ function getSingleSegmentCapacity(
   while (minimum < maximum) {
     const candidate = Math.ceil((minimum + maximum) / 2);
     const segment = createSingleSegment(modeIndicator, dataCharacter.repeat(candidate))!;
-    if (segmentsFitVersion([segment], version, eccLevel)) minimum = candidate;
+    if (segmentsFitVersion([segment], version, eccLevel, false)) minimum = candidate;
     else maximum = candidate - 1;
   }
 

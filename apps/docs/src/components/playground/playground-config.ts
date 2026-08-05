@@ -38,6 +38,7 @@ export const defaultPlaygroundConfig: PlaygroundConfig = {
   data: 'https://qrcodesdk.dev',
   packageName: 'react',
   output: 'svg',
+  eci: false,
   size: 8,
   margin: 4,
 };
@@ -240,6 +241,7 @@ function rendererOptions(config: PlaygroundConfig) {
     mode: config.mode,
     errorCorrectionLevel: config.errorCorrectionLevel,
     mask: config.mask,
+    eci: config.eci,
     size: config.size,
     margin: config.margin,
     colors: config.colors,
