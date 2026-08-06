@@ -18,7 +18,6 @@
       "@spartan-ng/helm/separator": ["./src/libs/ui/separator/src/index.ts"],
       "@spartan-ng/helm/switch": ["./src/libs/ui/switch/src/index.ts"],
       "@spartan-ng/helm/textarea": ["./src/libs/ui/textarea/src/index.ts"],
-      "@spartan-ng/helm/toggle": ["./src/libs/ui/toggle/src/index.ts"],
       "@spartan-ng/helm/utils": ["./src/libs/ui/utils/src/index.ts"]
     }
   },

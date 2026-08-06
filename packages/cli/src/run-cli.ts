@@ -1,8 +1,8 @@
 import {cancel, isCancel, select, text} from '@clack/prompts';
-import chalk from 'chalk';
 import {Command, CommanderError, Option} from 'commander';
 import {writeFile as writeFileDefault} from 'node:fs/promises';
 import process from 'node:process';
+import {styleText} from 'node:util';
 
 import {
   type QRCodeAccessibilityOptions,
@@ -99,7 +99,7 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
     return 0;
   } catch (error) {
     if (error instanceof CliError) {
-      stderr.write(`${chalk.red('Error:')} ${error.message}\n`);
+      stderr.write(`${styleText('red', 'Error:')} ${error.message}\n`);
       return 1;
     }
 
@@ -108,7 +108,7 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
     }
 
     const message = error instanceof Error ? error.message : String(error);
-    stderr.write(`${chalk.red('Error:')} ${message}\n`);
+    stderr.write(`${styleText('red', 'Error:')} ${message}\n`);
     return 1;
   }
 
@@ -385,13 +385,13 @@ async function render(
     );
 
     await writeFile(requiredOutput(options), svg);
-    stderr.write(`${chalk.green('Wrote')} ${requiredOutput(options)}\n`);
+    stderr.write(`${styleText('green', 'Wrote')} ${requiredOutput(options)}\n`);
     return;
   }
 
   const png = builder.render(QRCodePNGRenderer(options.styling));
   await writeFile(requiredOutput(options), png);
-  stderr.write(`${chalk.green('Wrote')} ${requiredOutput(options)}\n`);
+  stderr.write(`${styleText('green', 'Wrote')} ${requiredOutput(options)}\n`);
 }
 
 function requiredOutput(options: ResolvedCliOptions): string {
