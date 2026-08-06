@@ -211,8 +211,6 @@ const QUERY_FIELD_CODECS = [
   ),
 ] as const satisfies readonly QueryFieldCodec[];
 
-const MANAGED_QUERY_PARAM_KEYS = QUERY_FIELD_CODECS.map(({key}) => key);
-
 export interface QrQuerySyncOptions {
   /**
    * Delay before store changes are reflected in the URL.
@@ -226,7 +224,6 @@ export interface QrQuerySyncOptions {
 }
 
 export interface WriteQrConfigToUrlOptions {
-  history?: 'replace' | 'push';
   omitDefaults?: boolean;
 }
 
@@ -266,7 +263,6 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
 
     updateTimer = setTimeout(() => {
       writeQrConfigToUrl(config, {
-        history: 'replace',
         omitDefaults,
       });
     }, debounceMs);
@@ -293,13 +289,6 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   };
 
   return activeCleanup;
-}
-
-/**
- * Stops URL synchronization when it has previously been started.
- */
-export function stopQrQuerySync(): void {
-  activeCleanup?.();
 }
 
 /**
@@ -344,7 +333,7 @@ export function writeQrConfigToUrl(
     return;
   }
 
-  const {history = 'replace', omitDefaults = true} = options;
+  const {omitDefaults = true} = options;
 
   const url = new URL(window.location.href);
 
@@ -358,11 +347,7 @@ export function writeQrConfigToUrl(
     return;
   }
 
-  if (history === 'push') {
-    window.history.pushState(window.history.state, '', url);
-  } else {
-    window.history.replaceState(window.history.state, '', url);
-  }
+  window.history.replaceState(window.history.state, '', url);
 }
 
 /**
@@ -380,41 +365,6 @@ export function writeQrConfigToSearchParams(
   }
 
   return params;
-}
-
-/**
- * Pushes the current store configuration as a meaningful browser-history entry.
- *
- * Useful for presets, reset actions, or an explicit "Apply" action.
- */
-export function pushCurrentQrConfigToUrl(omitDefaults = true): void {
-  writeQrConfigToUrl(playgroundConfig.get(), {
-    history: 'push',
-    omitDefaults,
-  });
-}
-
-/**
- * Removes every query parameter managed by the playground.
- *
- * Unrelated query parameters are preserved.
- */
-export function clearQrConfigQueryParams(history: 'replace' | 'push' = 'replace'): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  const url = new URL(window.location.href);
-
-  for (const key of MANAGED_QUERY_PARAM_KEYS) {
-    url.searchParams.delete(key);
-  }
-
-  if (history === 'push') {
-    window.history.pushState(window.history.state, '', url);
-  } else {
-    window.history.replaceState(window.history.state, '', url);
-  }
 }
 
 function defineQueryField<T>(

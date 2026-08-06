@@ -1,8 +1,1 @@
-import {config} from '@repo/eslint-config/base';
-
-export default [
-  ...config,
-  {
-    ignores: ['dist/**', 'coverage/**'],
-  },
-];
+export {config as default} from '@repo/eslint-config/base';

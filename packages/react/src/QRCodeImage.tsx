@@ -6,7 +6,6 @@ import {
 import {qrcode} from '@qrcodesdk/core';
 import {forwardRef, useEffect, useImperativeHandle, useMemo, useRef} from 'react';
 
-import {replaceElementChildren} from './replace-children';
 import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
 
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
@@ -22,7 +21,7 @@ export const QRCodeImage = forwardRef<QRCodeDownloadHandle, QRCodeImageProps>(fu
     const container = containerRef.current;
     if (!container) return;
 
-    replaceElementChildren(container, qrcode(data).config(options).render(imageRenderer));
+    container.replaceChildren(qrcode(data).config(options).render(imageRenderer));
   }, [data, imageRenderer, options]);
 
   useImperativeHandle(
