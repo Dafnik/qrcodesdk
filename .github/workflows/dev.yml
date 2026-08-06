@@ -21,9 +21,10 @@ jobs:
     steps:
       # Needed to get the commitlint config
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Run commitlint
         uses: dafnik/commitlint@v1
