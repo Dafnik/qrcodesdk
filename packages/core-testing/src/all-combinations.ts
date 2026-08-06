@@ -23,15 +23,14 @@ const DATA_BY_MODE = {
   octet: 'A',
 } as const satisfies Record<QRCodeMode, string>;
 
-export type QRCodeCombination = Required<QRCodeTestFixture>;
-export type QRCodeAutoMaskCombination = Omit<QRCodeCombination, 'mask'>;
+export type QRCodeAutoMaskCombination = Required<Omit<QRCodeTestFixture, 'mask'>>;
 
 export const TOTAL_QR_CODE_COMBINATIONS =
   40 * ERROR_CORRECTION_LEVELS.length * MASKS.length * ɵMODES.length;
 export const TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS =
   40 * ERROR_CORRECTION_LEVELS.length * ɵMODES.length;
 
-export function* getAllQRCodeCombinations(): Generator<QRCodeCombination> {
+export function* getAllQRCodeCombinations(): Generator<Required<QRCodeTestFixture>> {
   for (let version = 1; version <= 40; version += 1) {
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
       for (const mask of MASKS) {
@@ -48,6 +47,32 @@ export function* getAllQRCodeCombinations(): Generator<QRCodeCombination> {
             version: version as QRCodeVersion,
             mask,
             errorCorrectionLevel,
+            eci: false,
+          };
+        }
+      }
+    }
+  }
+}
+
+export function* getAllQRCodeECICombinations(): Generator<Required<QRCodeTestFixture>> {
+  for (let version = 1; version <= 40; version += 1) {
+    for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
+      for (const mask of MASKS) {
+        for (const mode of ɵMODES) {
+          yield {
+            name: [
+              `version-${String(version).padStart(2, '0')}`,
+              `ecc-${errorCorrectionLevel}`,
+              `mask-${mask}`,
+              `mode-${mode}`,
+            ].join('_'),
+            data: DATA_BY_MODE[mode].repeat(version),
+            mode,
+            version: version as QRCodeVersion,
+            mask,
+            errorCorrectionLevel,
+            eci: true,
           };
         }
       }
@@ -70,6 +95,7 @@ export function* getAllQRCodeAutoMaskCombinations(): Generator<QRCodeAutoMaskCom
           mode,
           version: version as QRCodeVersion,
           errorCorrectionLevel,
+          eci: false,
         };
       }
     }

@@ -7,6 +7,7 @@ import {NANOSTORES, NanostoresService} from '@nanostores/angular';
 import {HlmFieldImports} from '@spartan-ng/helm/field';
 import {HlmInputImports} from '@spartan-ng/helm/input';
 import {HlmSelectImports} from '@spartan-ng/helm/select';
+import {HlmSwitchImports} from '@spartan-ng/helm/switch';
 import {HlmTextareaImports} from '@spartan-ng/helm/textarea';
 
 import {playgroundConfig, updateQrConfig} from '../playground-config.ts';
@@ -20,6 +21,7 @@ import {playgroundConfig, updateQrConfig} from '../playground-config.ts';
     HlmInputImports,
     HlmSelectImports,
     HlmTextareaImports,
+    HlmSwitchImports,
   ],
   providers: [{provide: NANOSTORES, useClass: NanostoresService}],
   template: `
@@ -33,6 +35,21 @@ import {playgroundConfig, updateQrConfig} from '../playground-config.ts';
           (ngModelChange)="updateQrConfig({data: $event})"
           hlmTextarea
           cdkTextareaAutosize></textarea>
+      </div>
+
+      <div class="border-input rounded-md border p-4" hlmField>
+        <div class="flex items-center justify-between gap-4">
+          <div class="grid gap-1">
+            <label hlmFieldLabel for="eci">UTF-8 ECI</label>
+            <p hlmFieldDescription>
+              Emit assignment 26 before the first octet segment to explicitly declare UTF-8.
+            </p>
+          </div>
+          <hlm-switch
+            [checked]="currentConfig().eci ?? false"
+            (checkedChange)="updateQrConfig({eci: $event})"
+            inputId="eci" />
+        </div>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">

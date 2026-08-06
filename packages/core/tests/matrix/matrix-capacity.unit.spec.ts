@@ -53,31 +53,73 @@ describe('capacity helpers', () => {
 
   test('calculates maximum data length by mode and ECC level', () => {
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_NUMERIC, '1'.repeat(41))!], 1, ECC_LEVEL_L),
+      segmentsFitVersion(
+        [createSingleSegment(MODE_NUMERIC, '1'.repeat(41))!],
+        1,
+        ECC_LEVEL_L,
+        false,
+      ),
     ).toBe(true);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_NUMERIC, '1'.repeat(42))!], 1, ECC_LEVEL_L),
+      segmentsFitVersion(
+        [createSingleSegment(MODE_NUMERIC, '1'.repeat(42))!],
+        1,
+        ECC_LEVEL_L,
+        false,
+      ),
     ).toBe(false);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_ALPHANUMERIC, 'A'.repeat(25))!], 1, ECC_LEVEL_L),
+      segmentsFitVersion(
+        [createSingleSegment(MODE_ALPHANUMERIC, 'A'.repeat(25))!],
+        1,
+        ECC_LEVEL_L,
+        false,
+      ),
     ).toBe(true);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_ALPHANUMERIC, 'A'.repeat(26))!], 1, ECC_LEVEL_L),
+      segmentsFitVersion(
+        [createSingleSegment(MODE_ALPHANUMERIC, 'A'.repeat(26))!],
+        1,
+        ECC_LEVEL_L,
+        false,
+      ),
     ).toBe(false);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(16))!], 1, ECC_LEVEL_L),
+      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(17))!], 1, ECC_LEVEL_L, false),
     ).toBe(true);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(17))!], 1, ECC_LEVEL_L),
+      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(18))!], 1, ECC_LEVEL_L, false),
     ).toBe(false);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(13))!], 1, ECC_LEVEL_M),
+      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(14))!], 1, ECC_LEVEL_M, false),
     ).toBe(true);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(14))!], 1, ECC_LEVEL_M),
+      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(15))!], 1, ECC_LEVEL_M, false),
     ).toBe(false);
-    expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!])).toBe(32);
+    expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!], false)).toBe(20);
+    expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!], true)).toBe(32);
     // @ts-expect-error Exercise the runtime fallback for an unsupported mode.
-    expect(() => getSegmentsBitLength(1, [{mode: -1, data: ''}])).toThrow('QRCode: Invalid mode');
+    expect(() => getSegmentsBitLength(1, [{mode: -1, data: ''}], false)).toThrow(
+      'QRCode: Invalid mode',
+    );
+  });
+
+  test('charges the ECI header only for enabled octet segments', () => {
+    const octetLWithECI = createSingleSegment(MODE_OCTET, 'A'.repeat(16))!;
+    const octetL = createSingleSegment(MODE_OCTET, 'A'.repeat(17))!;
+    const octetMWithECI = createSingleSegment(MODE_OCTET, 'A'.repeat(13))!;
+    const octetM = createSingleSegment(MODE_OCTET, 'A'.repeat(14))!;
+    const octetMaxWithECI = createSingleSegment(MODE_OCTET, 'A'.repeat(2_952))!;
+    const octetMax = createSingleSegment(MODE_OCTET, 'A'.repeat(2_953))!;
+
+    expect(segmentsFitVersion([octetLWithECI], 1, ECC_LEVEL_L, true)).toBe(true);
+    expect(segmentsFitVersion([octetL], 1, ECC_LEVEL_L, false)).toBe(true);
+    expect(segmentsFitVersion([octetL], 1, ECC_LEVEL_L, true)).toBe(false);
+    expect(segmentsFitVersion([octetMWithECI], 1, ECC_LEVEL_M, true)).toBe(true);
+    expect(segmentsFitVersion([octetM], 1, ECC_LEVEL_M, false)).toBe(true);
+    expect(segmentsFitVersion([octetM], 1, ECC_LEVEL_M, true)).toBe(false);
+    expect(segmentsFitVersion([octetMaxWithECI], 40, ECC_LEVEL_L, true)).toBe(true);
+    expect(segmentsFitVersion([octetMax], 40, ECC_LEVEL_L, false)).toBe(true);
+    expect(segmentsFitVersion([octetMax], 40, ECC_LEVEL_L, true)).toBe(false);
   });
 });

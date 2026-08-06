@@ -282,6 +282,10 @@ function formatOptions(
     entries.push(`mask: ${config.mask}`);
   }
 
+  if (config.eci === true) {
+    entries.push('eci: true');
+  }
+
   if (config.output !== 'canvas') {
     if (config.alt) {
       entries.push(`alt: ${quote(config.alt)}`);

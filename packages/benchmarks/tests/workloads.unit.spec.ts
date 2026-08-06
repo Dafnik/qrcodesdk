@@ -16,7 +16,7 @@ describe('benchmark workloads', () => {
 
     expect(workloads).toHaveLength(STATIC_MULTIPLIERS.length);
     expect(workloads.map(({qrCodesPerSample}) => qrCodesPerSample)).toEqual([
-      16, 80, 160, 1_600, 8_000,
+      17, 85, 170, 1_700, 8_500,
     ]);
   });
 
@@ -29,7 +29,7 @@ describe('benchmark workloads', () => {
       repetitions: 1,
       qrCodesPerSample: TOTAL_QR_CODE_COMBINATIONS,
     });
-    expect(exhaustive?.fixtures).toHaveLength(3_840);
+    expect(exhaustive?.fixtures).toHaveLength(3840);
   });
 
   test('warms static fixtures and every QR code combination', () => {

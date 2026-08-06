@@ -37,9 +37,11 @@ import type {
   QRCodeErrorCorrectionLevel,
   QRCodeImageOverlayOptions,
   QRCodeInputData,
+  QRCodeMatrix,
   QRCodeMatrixOptions,
   QRCodeOptions,
   QRCodeParsedStylingOptions,
+  QRCodeResolvedMatrixOptions,
   QRCodeSVGImageOptions,
   QRCodeSVGOptions,
   QRCodeSVGRendererOptions,
@@ -60,7 +62,10 @@ describe('public API types', () => {
       mode?: string;
       errorCorrectionLevel?: string;
       mask?: number;
+      eci?: boolean;
     }>();
+    expectTypeOf<QRCodeResolvedMatrixOptions['eci']>().toEqualTypeOf<boolean>();
+    expectTypeOf(qrcode('data').eci(true).matrix()).toEqualTypeOf<QRCodeMatrix>();
   });
 
   test('exports canonical renderer and styling composition types', () => {

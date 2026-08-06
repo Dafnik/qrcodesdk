@@ -253,6 +253,18 @@ qrc "HELLO WORLD" \
   --output hello.svg
 ```
 
+Octet payload bytes remain UTF-8, while the explicit UTF-8 ECI declaration is disabled by default.
+Enable assignment 26 with a presence flag or an explicit boolean:
+
+```sh
+qrc "Grüße" --eci
+qrc "Grüße" --eci true
+```
+
+Use `--eci false` to disable it explicitly. Enabling ECI helps scanners interpret non-ASCII octet
+data without heuristics; leaving it disabled saves 12 bits and matches common generator behavior.
+Numeric and alphanumeric-only symbols are unaffected.
+
 ## Options
 
 | Option                                  | Description                                                 | Default     |
@@ -266,6 +278,7 @@ qrc "HELLO WORLD" \
 | `--error-correction <L\|M\|Q\|H>`       | Error correction level.                                     | `M`         |
 | `--version <1-40>`                      | Pin a QR code version.                                      | `Auto`      |
 | `--mask <0-7>`                          | Pin a QR code mask.                                         | `Auto`      |
+| `--eci [true\|false]`                   | Emit UTF-8 ECI assignment 26 for octet segments.            | `false`     |
 | `--size <number>`                       | Module size as a positive integer.                          | `1`         |
 | `--margin <number>`                     | Margin as a non-negative integer.                           | `2`         |
 | `--small <true\|false>`                 | Pack two QR rows into each terminal line.                   | `true`      |

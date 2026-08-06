@@ -38,6 +38,15 @@ describe('PNG QR roundtrips', () => {
 
   const defaultRenderer = QRCodePNGRenderer({size: 4, margin: 4});
 
+  test.each(
+    ['Grüße aus Wien', '東京 ✅🚀'].flatMap((data) => [
+      {data, eci: false},
+      {data, eci: true},
+    ]),
+  )('decodes UTF-8 PNG output for $data with ECI $eci', ({data, eci}) => {
+    expect(decodePngQRCode(qrcode(data).mode('octet').eci(eci).render(defaultRenderer))).toBe(data);
+  });
+
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name PNG output', (fixture) => {
     expect(decodePngQRCode(qrcode(fixture.data).config(fixture).render(defaultRenderer))).toBe(
       fixture.data,

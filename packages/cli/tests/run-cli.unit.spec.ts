@@ -88,6 +88,34 @@ describe('runCli', () => {
   });
 
   test.each([
+    {name: 'text', args: ['--no-ansi-colors']},
+    {name: 'SVG', args: ['--output', 'code.svg']},
+    {name: 'PNG', args: ['--output', 'code.png']},
+  ])('defaults $name output to no ECI and supports explicit opt-in', async ({args}) => {
+    const defaultRuntime = createRuntime();
+    const explicitFalseRuntime = createRuntime();
+    const enabledRuntime = createRuntime();
+    const explicitTrueRuntime = createRuntime();
+
+    await expect(runCli(['Grüße', '--mask', '0', ...args], defaultRuntime)).resolves.toBe(0);
+    await expect(
+      runCli(['Grüße', '--mask', '0', '--eci', 'false', ...args], explicitFalseRuntime),
+    ).resolves.toBe(0);
+    await expect(runCli(['Grüße', '--mask', '0', '--eci', ...args], enabledRuntime)).resolves.toBe(
+      0,
+    );
+    await expect(
+      runCli(['Grüße', '--mask', '0', '--eci', 'true', ...args], explicitTrueRuntime),
+    ).resolves.toBe(0);
+
+    const output = (runtime: ReturnType<typeof createRuntime>) =>
+      runtime.files[0]?.data ?? runtime.stdoutText();
+    expect(output(explicitFalseRuntime)).toEqual(output(defaultRuntime));
+    expect(output(enabledRuntime)).not.toEqual(output(defaultRuntime));
+    expect(output(explicitTrueRuntime)).toEqual(output(enabledRuntime));
+  });
+
+  test.each([
     {name: 'default options', args: [], small: true, ansiColors: true},
     {
       name: '--small true and --ansi-colors true',

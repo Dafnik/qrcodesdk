@@ -7,6 +7,15 @@ export type QRCodeTestFixture = Readonly<
   }
 >;
 
+export const QR_CODE_ECI_TEST_FIXTURE = {
+  name: 'bytes-utf8-eci',
+  data: 'Grüße ✅',
+  mode: 'octet',
+  eci: true,
+  version: 2,
+  mask: 5,
+} as const satisfies QRCodeTestFixture;
+
 export const QR_CODE_TEST_FIXTURES = [
   {
     name: 'numeric',
@@ -99,6 +108,7 @@ export const QR_CODE_TEST_FIXTURES = [
     version: 6,
     mask: 4,
   },
+  QR_CODE_ECI_TEST_FIXTURE,
   {
     name: 'numeric-max-capacity',
     data: '1'.repeat(7_089),
@@ -117,7 +127,7 @@ export const QR_CODE_TEST_FIXTURES = [
   },
   {
     name: 'bytes-max-capacity',
-    data: 'A'.repeat(2_952),
+    data: 'A'.repeat(2_953),
     mode: 'octet',
     version: 40,
     mask: 2,

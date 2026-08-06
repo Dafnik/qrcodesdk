@@ -34,6 +34,7 @@ type RawCliOptions = {
   readonly errorCorrection?: string;
   readonly version?: string;
   readonly mask?: string;
+  readonly eci?: boolean;
   readonly size?: string;
   readonly margin?: string;
   readonly small?: boolean;
@@ -132,6 +133,14 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       .option('--error-correction <level>', 'Error correction level: L, M, Q, or H')
       .option('--version <version>', 'Pin a QR code version from 1 to 40')
       .option('--mask <mask>', 'Pin a QR code mask from 0 to 7')
+      .addOption(
+        booleanOption(
+          '--eci [boolean]',
+          'Emit UTF-8 ECI assignment 26 for octet segments',
+          'eci',
+          false,
+        ),
+      )
       .option('--size <size>', 'Module size as a positive integer')
       .option('--margin <margin>', 'Margin as a non-negative integer')
       .addOption(booleanOption('--small <boolean>', 'Pack two QR rows per terminal line', 'small'))
@@ -194,6 +203,7 @@ async function resolveCliOptions(
     version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as
       QRCodeVersion | undefined,
     mask: optionalIntegerInRange(rawOptions.mask, 'mask', 0, 7) as QRCodeMask | undefined,
+    eci: rawOptions.eci ?? false,
     styling,
     alt: rawOptions.alt,
     ariaLabel: rawOptions.ariaLabel,
@@ -345,6 +355,7 @@ async function render(
     errorCorrectionLevel: options.errorCorrectionLevel,
     version: options.version,
     mask: options.mask,
+    eci: options.eci,
   });
 
   if (options.format === 'text') {
@@ -405,9 +416,14 @@ function optionalEnum<T extends string>(
   return requiredEnum(value, allowed, name);
 }
 
-function booleanOption(flags: string, description: string, name: string): Option {
+function booleanOption(
+  flags: string,
+  description: string,
+  name: string,
+  defaultValue = true,
+): Option {
   return new Option(flags, description)
-    .default(true)
+    .default(defaultValue)
     .argParser((value) => requiredBoolean(value, name));
 }
 

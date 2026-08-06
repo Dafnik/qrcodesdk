@@ -99,6 +99,7 @@ export type QRCodeMatrixOptions = {
   mode?: QRCodeMode;
   errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
   mask?: QRCodeMask;
+  eci?: boolean;
 };
 
 export type QRCodeOptions<TRendererOptions> = QRCodeMatrixOptions & TRendererOptions;
@@ -208,6 +209,7 @@ export type QRCodeResolvedMatrixOptions = {
   version: QRCodeVersion;
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue;
   mask: QRCodeMask | undefined;
+  eci: boolean;
 };
 
 export type QRCodeAccessibilityOptions = {

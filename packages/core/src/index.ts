@@ -12,6 +12,7 @@ export type {
   QRCodeMask,
   QRCodeMatrix,
   QRCodeMatrixOptions,
+  QRCodeResolvedMatrixOptions,
   QRCodeMode,
   QRCodeOptions,
   QRCodeParsedStylingOptions,

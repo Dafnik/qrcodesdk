@@ -7,6 +7,7 @@ import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeMatrix} from '@qrcode
 
 import {
   type QRCodeTestFixture,
+  QR_CODE_ECI_TEST_FIXTURE,
   QR_CODE_TEST_FIXTURES,
   TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS,
   TOTAL_QR_CODE_COMBINATIONS,
@@ -19,13 +20,8 @@ const MASKS: QRCodeMask[] = [0, 1, 2, 3, 4, 5, 6, 7];
 const ALL_QR_CODE_COMBINATIONS = [...getAllQRCodeCombinations()];
 const ALL_QR_CODE_AUTO_MASK_COMBINATIONS = [...getAllQRCodeAutoMaskCombinations()];
 
-// The reference packages encode UTF-8 bytes without ECI assignment 26, so octet matrices differ.
-const REFERENCE_QR_CODE_COMBINATIONS = ALL_QR_CODE_COMBINATIONS.filter(
-  ({mode}) => mode !== 'octet',
-);
-const REFERENCE_QR_CODE_AUTO_MASK_COMBINATIONS = ALL_QR_CODE_AUTO_MASK_COMBINATIONS.filter(
-  ({mode}) => mode !== 'octet',
-);
+const REFERENCE_QR_CODE_COMBINATIONS = ALL_QR_CODE_COMBINATIONS;
+const REFERENCE_QR_CODE_AUTO_MASK_COMBINATIONS = ALL_QR_CODE_AUTO_MASK_COMBINATIONS;
 
 // `qrcode` uses an asymmetric ceiling calculation for N4 density penalties. QRCodeSDK keeps
 // its symmetric N4 calculation, so these inputs intentionally choose a different best mask.
@@ -47,6 +43,18 @@ const AUTOMATIC_MASK_N3_DIVERGENCES = new Map<
 >([
   ['version-16_ecc-Q_mask-auto_mode-numeric', {qrcodeSdk: 4, reference: 2}],
   ['version-37_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 4, reference: 2}],
+]);
+
+// The same reference mask-scoring differences affect these newly comparable octet fixtures.
+const AUTOMATIC_MASK_OCTET_DIVERGENCES = new Map<
+  string,
+  {qrcodeSdk: QRCodeMask; reference: QRCodeMask}
+>([
+  ['version-01_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 0}],
+  ['version-06_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 0, reference: 4}],
+  ['version-18_ecc-M_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 0}],
+  ['version-18_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 0, reference: 4}],
+  ['version-37_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 2}],
 ]);
 
 function referenceMatrixQRCodePackage(fixture: QRCodeTestFixture): QRCodeMatrix {
@@ -117,12 +125,34 @@ describe('qrcode().matrix()', () => {
     expect(new Set(combinationKeys).size).toBe(TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS);
   });
 
-  test('matches reference matrices for explicit non-octet modes, ECC levels, versions, and masks', () => {
-    for (const fixture of QR_CODE_TEST_FIXTURES.filter(({mode}) => mode !== 'octet')) {
+  test('matches reference matrices for default fixtures that omit ECI', () => {
+    for (const fixture of QR_CODE_TEST_FIXTURES.filter(
+      (candidate) => !('eci' in candidate) || candidate.eci !== true,
+    )) {
       const matrix = qrcode(fixture.data).config(fixture).matrix();
       expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
       expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
     }
+  });
+
+  test('intentionally differs from reference generators when UTF-8 ECI is enabled', () => {
+    const matrix = qrcode(QR_CODE_ECI_TEST_FIXTURE.data).config(QR_CODE_ECI_TEST_FIXTURE).matrix();
+
+    expect(matrix).not.toEqual(referenceMatrixQRCodePackage(QR_CODE_ECI_TEST_FIXTURE));
+    expect(matrix).not.toEqual(referenceMatrixQRCodeGeneratorPackage(QR_CODE_ECI_TEST_FIXTURE));
+  });
+
+  test('matches the reference generator for automatic mixed-mode encoding without ECI', () => {
+    const fixture = {
+      name: 'mixed-mode-default-eci',
+      data: 'ABCDE12345678?A1A',
+      version: 1 as const,
+      mask: 0 as const,
+    };
+
+    expect(qrcode(fixture.data).config(fixture).matrix()).toEqual(
+      referenceMatrixQRCodePackage(fixture),
+    );
   });
 
   test('matches reference matrices for every mask and ECC level', () => {
@@ -189,7 +219,8 @@ describe('qrcode().matrix()', () => {
       const referenceMatrix = referenceMatrixQRCodePackage(fixture);
       const knownDivergence =
         AUTOMATIC_MASK_N3_DIVERGENCES.get(fixture.name) ??
-        AUTOMATIC_MASK_N4_DIVERGENCES.get(fixture.name);
+        AUTOMATIC_MASK_N4_DIVERGENCES.get(fixture.name) ??
+        AUTOMATIC_MASK_OCTET_DIVERGENCES.get(fixture.name);
 
       if (!knownDivergence) {
         expect(matrix).toEqual(referenceMatrix);

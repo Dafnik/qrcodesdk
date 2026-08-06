@@ -54,3 +54,15 @@ describe('generated playground image snippets', () => {
     }
   }
 });
+
+describe('generated playground ECI options', () => {
+  for (const packageName of ['react', 'angular'] as const) {
+    test(`${packageName} includes ECI only when enabled`, () => {
+      const disabled = generatePlaygroundCode(config(packageName, 'svg')).code;
+      const enabled = generatePlaygroundCode({...config(packageName, 'svg'), eci: true}).code;
+
+      assert.doesNotMatch(disabled, /eci:/);
+      assert.match(enabled, /eci: true/);
+    });
+  }
+});

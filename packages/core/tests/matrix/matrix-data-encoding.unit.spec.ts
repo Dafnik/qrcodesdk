@@ -35,18 +35,28 @@ describe('data validation and encoding', () => {
   test('encodes numeric mode with terminator and pad bytes', () => {
     const expectedBits = ['0001', '0000000001', '0001', '0000'].join('');
 
-    expect(encode(1, [{mode: MODE_NUMERIC, data: '1'}], 6)).toEqual(bitsToBytes(expectedBits, 6));
+    expect(encode(1, [{mode: MODE_NUMERIC, data: '1'}], 6, false)).toEqual(
+      bitsToBytes(expectedBits, 6),
+    );
   });
 
   test('encodes alphanumeric pairs and odd trailing characters', () => {
     const expectedBits = ['0010', '000000011', '00111001101', '001100', '0000'].join('');
 
-    expect(encode(1, [{mode: MODE_ALPHANUMERIC, data: 'ABC'}], 7)).toEqual(
+    expect(encode(1, [{mode: MODE_ALPHANUMERIC, data: 'ABC'}], 7, false)).toEqual(
       bitsToBytes(expectedBits, 7),
     );
   });
 
-  test('encodes octet data bytes directly', () => {
+  test('encodes octet data bytes directly without ECI by default', () => {
+    const expectedBits = ['0100', '00000010', '01000001', '11111111', '0000'].join('');
+
+    expect(encode(1, [{mode: MODE_OCTET, data: [0x41, 0xff]}], 6, false)).toEqual(
+      bitsToBytes(expectedBits, 6),
+    );
+  });
+
+  test('encodes UTF-8 ECI assignment 26 before the first octet segment when enabled', () => {
     const expectedBits = [
       '0111',
       '00011010',
@@ -57,12 +67,12 @@ describe('data validation and encoding', () => {
       '0000',
     ].join('');
 
-    expect(encode(1, [{mode: MODE_OCTET, data: [0x41, 0xff]}], 7)).toEqual(
+    expect(encode(1, [{mode: MODE_OCTET, data: [0x41, 0xff]}], 7, true)).toEqual(
       bitsToBytes(expectedBits, 7),
     );
   });
 
-  test('encodes mixed segments with one final terminator', () => {
+  test('encodes mixed segments with ECI exactly once and one final terminator', () => {
     const expectedBits = [
       '0001',
       '0000000010',
@@ -85,24 +95,46 @@ describe('data validation and encoding', () => {
           {mode: MODE_NUMERIC, data: '12'},
           {mode: MODE_ALPHANUMERIC, data: 'AB'},
           {mode: MODE_OCTET, data: [0xff]},
+          {mode: MODE_NUMERIC, data: '3'},
+          {mode: MODE_OCTET, data: [0x41]},
         ],
-        12,
+        16,
+        true,
       ),
-    ).toEqual(bitsToBytes(expectedBits, 12));
+    ).toEqual(
+      bitsToBytes(
+        [
+          expectedBits.slice(0, -4),
+          '0001',
+          '0000000001',
+          '0011',
+          '0100',
+          '00000001',
+          '01000001',
+          '0000',
+        ].join(''),
+        16,
+      ),
+    );
   });
 
   test('fits maximum-capacity payloads into the available data codewords', () => {
-    expect(encode(40, [{mode: MODE_NUMERIC, data: '1'.repeat(7_089)}], 2_956)).toHaveLength(2_956);
-    expect(encode(40, [{mode: MODE_ALPHANUMERIC, data: 'A'.repeat(4_296)}], 2_956)).toHaveLength(
+    expect(encode(40, [{mode: MODE_NUMERIC, data: '1'.repeat(7_089)}], 2_956, false)).toHaveLength(
       2_956,
     );
-    expect(encode(40, [{mode: MODE_OCTET, data: Array(2_952).fill(0x41)}], 2_956)).toHaveLength(
-      2_956,
-    );
+    expect(
+      encode(40, [{mode: MODE_ALPHANUMERIC, data: 'A'.repeat(4_296)}], 2_956, false),
+    ).toHaveLength(2_956);
+    expect(
+      encode(40, [{mode: MODE_OCTET, data: Array(2_953).fill(0x41)}], 2_956, false),
+    ).toHaveLength(2_956);
+    expect(
+      encode(40, [{mode: MODE_OCTET, data: Array(2_952).fill(0x41)}], 2_956, true),
+    ).toHaveLength(2_956);
   });
 
   test('rejects payload bits that exceed the data codeword buffer', () => {
-    expect(() => encode(1, [{mode: MODE_NUMERIC, data: '1'.repeat(35)}], 16)).toThrow(
+    expect(() => encode(1, [{mode: MODE_NUMERIC, data: '1'.repeat(35)}], 16, false)).toThrow(
       'QRCode: Data too large',
     );
   });

@@ -143,6 +143,7 @@ export function explainQRCode(config: QRCodeExplainConfig): QRCodeExplanation {
     version: config.version,
     errorCorrectionLevel: config.errorCorrectionLevel,
     mask: config.mask,
+    eci: config.eci,
   });
   const moduleGrid = generated.moduleGrid.map((row, rowIndex) =>
     row.map(

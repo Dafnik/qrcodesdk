@@ -110,10 +110,16 @@ describe('QR code matrix generation metadata', () => {
     const numeric = ɵgenerateQRCodeMatrixWithMetadata('12345', {version: 1, mask: 0});
     const alphanumeric = ɵgenerateQRCodeMatrixWithMetadata('HELLO', {version: 1, mask: 0});
     const octet = ɵgenerateQRCodeMatrixWithMetadata('hello', {version: 1, mask: 0});
+    const octetWithECI = ɵgenerateQRCodeMatrixWithMetadata('hello', {
+      version: 1,
+      mask: 0,
+      eci: true,
+    });
     const utf8 = ɵgenerateQRCodeMatrixWithMetadata('Grüße', {
       version: 2,
       mode: 'octet',
       mask: 0,
+      eci: true,
     });
 
     expect(countRole(numeric, 'mode')).toBe(4);
@@ -121,7 +127,8 @@ describe('QR code matrix generation metadata', () => {
     expect(countRole(numeric, 'payload')).toBe(17);
     expect(countRole(alphanumeric, 'character-count')).toBe(9);
     expect(countRole(alphanumeric, 'payload')).toBe(28);
-    expect(countRole(octet, 'eci')).toBe(12);
+    expect(countRole(octet, 'eci')).toBe(0);
+    expect(countRole(octetWithECI, 'eci')).toBe(12);
     expect(countRole(octet, 'payload')).toBe(40);
     expect(countRole(utf8, 'eci')).toBe(12);
     expect(countRole(utf8, 'payload')).toBe(56);
@@ -133,6 +140,7 @@ describe('QR code matrix generation metadata', () => {
     const generated = ɵgenerateQRCodeMatrixWithMetadata('ABCDE12345678?A1A', {
       version: 2,
       mask: 0,
+      eci: true,
     });
 
     expect(generated.mode).toBe('mixed');

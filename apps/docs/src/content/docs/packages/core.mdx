@@ -51,6 +51,7 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev')
   .mode('octet')
+  .eci(true)
   .errorCorrection('M')
   .version(4)
   .mask(2)
@@ -90,8 +91,8 @@ to use that single mode. Mixed encoding is automatic; the builder does not accep
 arrays.
 
 QRCodeSDK implements QR Code Model 2 matrix generation for numeric, alphanumeric, and UTF-8
-octet payloads, including automatic mixed-mode encoding. Octet data is encoded as UTF-8 and
-preceded by ECI assignment 26 so scanners can interpret non-ASCII text consistently.
+octet payloads, including automatic mixed-mode encoding. Octet payload bytes are always encoded as
+UTF-8. The UTF-8 ECI declaration is disabled by default.
 
 ### Methods
 
@@ -105,6 +106,7 @@ The builder is immutable. Each method returns a new builder with the updated opt
 | `.errorCorrection(level)`                | Sets the error correction level: `L`, `M`, `Q`, or `H`. | `M`      |
 | `.version(version)`                      | Pins a QR code version from `1` to `40`.                | `Auto`   |
 | `.mask(mask)`                            | Pins a mask from `0` to `7`.                            | `Auto`   |
+| `.eci(enabled?)`                         | Emits UTF-8 ECI assignment 26 for octet segments.       | `false`  |
 | `.matrix()`                              | Returns the generated `QRCodeMatrix`.                   | -        |
 | `.renderer(renderer)`                    | Stores a renderer for a later `.render()` call.         | -        |
 | `.render(renderer?)`                     | Generates the matrix and returns renderer output.       | -        |
@@ -117,8 +119,22 @@ qrcode('https://qrcodesdk.dev').config({
   errorCorrectionLevel: 'H',
   version: 4,
   mask: 2,
+  eci: true,
 });
 ```
+
+`QRCodeMatrixOptions` accepts `eci?: boolean`. You can also enable it with `.eci(true)`:
+
+```ts
+qrcode('Grüße ✅').eci(true);
+qrcode('Grüße ✅').config({eci: true});
+```
+
+Enabling ECI emits assignment 26 once, immediately before the first octet segment, so scanners
+receive an explicit UTF-8 declaration. Leaving it disabled saves 12 bits and matches common QR
+generators, but scanners may rely on heuristics for non-ASCII text. Numeric and
+alphanumeric-only symbols are identical with either setting. No ECI header is emitted when the
+generated symbol contains no octet segment.
 
 ### Error correction
 

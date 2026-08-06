@@ -10,13 +10,16 @@ import {
   createPlaygroundImageOptions,
   createPlaygroundSVGOptions,
   defaultPlaygroundConfig,
+  playgroundConfig,
   playgroundImageStatus,
   playgroundPreparedImage,
   preparePlaygroundImage,
   preparePlaygroundLogo,
   resetQrConfig,
   updatePlaygroundImage,
+  updateQrConfig,
 } from './playground-config.ts';
+import {hasQRCodeError} from './qrcode-error-checker.ts';
 
 const preparedImage: PlaygroundPreparedImage = {
   dataUrl: 'data:image/png;base64,cHJlcGFyZWQ=' as QRCodeDataImageURL,
@@ -40,12 +43,28 @@ describe('playground prepared image options', () => {
     assert.equal(svgOptions.image?.source, preparedImage.dataUrl);
     assert.equal(imageOptions.image?.source, preparedImage.element);
     assert.equal(canvasOptions.image?.source, preparedImage.element);
+    assert.equal(svgOptions.eci, false);
+    assert.equal(imageOptions.eci, false);
+    assert.equal(canvasOptions.eci, false);
     assert.deepEqual(svgOptions.image, {
       source: preparedImage.dataUrl,
       size: 0.3,
       padding: 0.5,
       clearBackground: false,
     });
+  });
+
+  test('forwards enabled ECI through every renderer and error-checking path', () => {
+    const config = {...defaultPlaygroundConfig, eci: true};
+
+    assert.equal(createPlaygroundSVGOptions(config, preparedImage).eci, true);
+    assert.equal(createPlaygroundImageOptions(config, preparedImage).eci, true);
+    assert.equal(createPlaygroundCanvasOptions(config, preparedImage).eci, true);
+    assert.equal(hasQRCodeError(config, undefined), undefined);
+    assert.match(
+      String(hasQRCodeError({...config, eci: 'true' as never}, undefined)),
+      /Invalid ECI setting/,
+    );
   });
 
   test('updates settings without replacing prepared sources', () => {
@@ -64,11 +83,13 @@ describe('playground prepared image options', () => {
   test('reset removes session-only image and status state', () => {
     playgroundPreparedImage.set(preparedImage);
     playgroundImageStatus.set({state: 'ready'});
+    updateQrConfig({eci: true});
 
     resetQrConfig();
 
     assert.equal(playgroundPreparedImage.get(), undefined);
     assert.deepEqual(playgroundImageStatus.get(), {state: 'idle'});
+    assert.equal(playgroundConfig.get().eci, false);
   });
 
   test('reports image preparation failures and removes a previous image', async () => {

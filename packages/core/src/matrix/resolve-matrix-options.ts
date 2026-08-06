@@ -17,6 +17,7 @@ export function resolveQRCodeMatrixOptions(
   options: QRCodeMatrixOptions = {},
 ): QRCodeResolvedMatrixOptions {
   validateInputData(data);
+  const eci = resolveECI(options.eci);
 
   const forcedMode = options.mode === undefined ? undefined : resolveMode(data, options.mode);
   const forcedSegment =
@@ -31,10 +32,11 @@ export function resolveQRCodeMatrixOptions(
     data,
     forcedSegment === undefined ? undefined : [forcedSegment],
     errorCorrectionLevel,
+    eci,
   );
   const mask = resolveMask(options.mask);
 
-  return {segments, errorCorrectionLevel, version, mask};
+  return {segments, errorCorrectionLevel, version, mask, eci};
 }
 
 function validateInputData(data: QRCodeInputData): void {
@@ -57,11 +59,12 @@ function resolveVersionAndSegments(
   data: QRCodeInputData,
   forcedSegments: QRCodeResolvedMatrixOptions['segments'] | undefined,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
+  eci: boolean,
 ): Pick<QRCodeResolvedMatrixOptions, 'segments' | 'version'> {
   if (requestedVersion !== undefined) {
     validateVersion(requestedVersion);
-    const segments = forcedSegments ?? optimizeSegments(data, requestedVersion);
-    if (!segmentsFitVersion(segments, requestedVersion, errorCorrectionLevel)) {
+    const segments = forcedSegments ?? optimizeSegments(data, requestedVersion, eci);
+    if (!segmentsFitVersion(segments, requestedVersion, errorCorrectionLevel, eci)) {
       throw new Error('QRCode: Data too large');
     }
     return {segments, version: requestedVersion};
@@ -72,10 +75,10 @@ function resolveVersionAndSegments(
     [10, 26],
     [27, 40],
   ] as const) {
-    const segments = forcedSegments ?? optimizeSegments(data, start);
+    const segments = forcedSegments ?? optimizeSegments(data, start, eci);
     for (let version = start; version <= end; version++) {
       const qrVersion = version as QRCodeVersion;
-      if (segmentsFitVersion(segments, qrVersion, errorCorrectionLevel)) {
+      if (segmentsFitVersion(segments, qrVersion, errorCorrectionLevel, eci)) {
         return {segments, version: qrVersion};
       }
     }
@@ -94,11 +97,18 @@ export function segmentsFitVersion(
   segments: QRCodeResolvedMatrixOptions['segments'],
   version: QRCodeVersion,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
+  eci: boolean,
 ): boolean {
   return (
-    getSegmentsBitLength(version, segments) <=
+    getSegmentsBitLength(version, segments, eci) <=
     getNumberOfAvailableBitsForData(version, errorCorrectionLevel)
   );
+}
+
+function resolveECI(eci: QRCodeMatrixOptions['eci']): boolean {
+  if (eci === undefined) return false;
+  if (typeof eci !== 'boolean') throw new Error('QRCode: Invalid ECI setting');
+  return eci;
 }
 
 function resolveMask(mask: QRCodeMatrixOptions['mask']): QRCodeMask | undefined {

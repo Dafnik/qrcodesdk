@@ -17,7 +17,7 @@ describe('mixed-mode segmentation', () => {
   test.each([1, 10, 27] as const)(
     'optimizes numeric, alphanumeric, and octet runs for version group starting at %s',
     (version) => {
-      const segments = optimizeSegments('ABCDE12345678?A1A', version);
+      const segments = optimizeSegments('ABCDE12345678?A1A', version, true);
 
       expect(segments).toEqual(
         version < 27
@@ -35,47 +35,52 @@ describe('mixed-mode segmentation', () => {
   );
 
   test('does not switch modes when segment headers cost more than they save', () => {
-    expect(optimizeSegments('ABCDE12FGHIJ', 1)).toEqual([
+    expect(optimizeSegments('ABCDE12FGHIJ', 1, false)).toEqual([
       {mode: MODE_ALPHANUMERIC, data: 'ABCDE12FGHIJ'},
     ]);
-    expect(optimizeSegments('abc12def', 1)).toEqual([
+    expect(optimizeSegments('abc12def', 1, false)).toEqual([
       {mode: MODE_OCTET, data: [0x61, 0x62, 0x63, 0x31, 0x32, 0x64, 0x65, 0x66]},
     ]);
   });
 
   test('preserves pure-mode, number, leading-zero, empty, and Unicode inputs', () => {
-    expect(optimizeSegments(12345, 1)).toEqual([{mode: MODE_NUMERIC, data: '12345'}]);
-    expect(optimizeSegments('00123', 1)).toEqual([{mode: MODE_NUMERIC, data: '00123'}]);
-    expect(optimizeSegments('HELLO WORLD', 1)).toEqual([
+    expect(optimizeSegments(12345, 1, false)).toEqual([{mode: MODE_NUMERIC, data: '12345'}]);
+    expect(optimizeSegments('00123', 1, false)).toEqual([{mode: MODE_NUMERIC, data: '00123'}]);
+    expect(optimizeSegments('HELLO WORLD', 1, false)).toEqual([
       {mode: MODE_ALPHANUMERIC, data: 'HELLO WORLD'},
     ]);
-    expect(optimizeSegments('hello', 1)).toEqual([
+    expect(optimizeSegments('hello', 1, false)).toEqual([
       {mode: MODE_OCTET, data: [0x68, 0x65, 0x6c, 0x6c, 0x6f]},
     ]);
-    expect(optimizeSegments('', 1)).toEqual([{mode: MODE_NUMERIC, data: ''}]);
-    expect(optimizeSegments('AB✅🚀1234567890', 1)).toEqual([
+    expect(optimizeSegments('', 1, false)).toEqual([{mode: MODE_NUMERIC, data: ''}]);
+    expect(optimizeSegments('AB✅🚀1234567890', 1, false)).toEqual([
       {mode: MODE_OCTET, data: encodeUTF8('AB✅🚀')},
       {mode: MODE_NUMERIC, data: '1234567890'},
     ]);
-    expect(optimizeSegments('\ud800', 1)).toEqual([{mode: MODE_OCTET, data: [0xef, 0xbf, 0xbd]}]);
+    expect(optimizeSegments('\ud800', 1, false)).toEqual([
+      {mode: MODE_OCTET, data: [0xef, 0xbf, 0xbd]},
+    ]);
   });
 
   test('matches a brute-force minimum for short inputs', () => {
     const alphabet = ['1', 'A', 'a'];
-    for (const version of [1, 10, 27] as const) {
-      for (let length = 1; length <= 5; length++) {
-        for (const input of stringsOfLength(alphabet, length)) {
-          const optimized = optimizeSegments(input, version);
-          expect(getSegmentsBitLength(version, optimized), `${version}: ${input}`).toBe(
-            bruteForceMinimumBitLength(input, version),
-          );
+    for (const eci of [false, true]) {
+      for (const version of [1, 10, 27] as const) {
+        for (let length = 1; length <= 5; length++) {
+          for (const input of stringsOfLength(alphabet, length)) {
+            const optimized = optimizeSegments(input, version, eci);
+            expect(
+              getSegmentsBitLength(version, optimized, eci),
+              `${eci}:${version}: ${input}`,
+            ).toBe(bruteForceMinimumBitLength(input, version, eci));
+          }
         }
       }
     }
   });
 });
 
-function bruteForceMinimumBitLength(input: string, version: QRCodeVersion): number {
+function bruteForceMinimumBitLength(input: string, version: QRCodeVersion, eci: boolean): number {
   const characters = Array.from(input);
   const cache = new Map<string, number>();
 
@@ -94,8 +99,8 @@ function bruteForceMinimumBitLength(input: string, version: QRCodeVersion): numb
         const segment = {mode, data: encoded} satisfies QRCodeEncodedSegment;
         const introducesUTF8ECI = mode === MODE_OCTET && !hasUTF8ECI;
         const segmentBitLength =
-          getSegmentsBitLength(version, [segment]) -
-          (mode === MODE_OCTET && !introducesUTF8ECI ? ECI_UTF8_BIT_LENGTH : 0);
+          getSegmentsBitLength(version, [segment], eci) -
+          (eci && mode === MODE_OCTET && !introducesUTF8ECI ? ECI_UTF8_BIT_LENGTH : 0);
         best = Math.min(best, segmentBitLength + visit(end, hasUTF8ECI || mode === MODE_OCTET));
       }
     }
