@@ -171,6 +171,7 @@ pnpm check-types
 
 ```sh
 pnpm test
+pnpm test:roundtrips
 pnpm test:coverage
 ```
 
