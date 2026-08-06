@@ -4,8 +4,8 @@ import type {
   QRCodeCornerSquareType,
   QRCodeDotType,
   QRCodeMatrix,
-  QRCodeParsedStylingOptions,
   QRCodeStylingOptions,
+  ɵQRCodeParsedStylingOptions,
 } from './types';
 
 export const QR_CODE_COLOR_HEX_PATTERN = /^#[0-9a-f]{6}$/i;
@@ -62,9 +62,9 @@ export function isQRCodeCornerDotType(value: unknown): value is QRCodeCornerDotT
 
 export function parseQRCodeStylingOptions(
   options?: QRCodeStylingOptions,
-): QRCodeParsedStylingOptions {
+): ɵQRCodeParsedStylingOptions {
   const colorDark = options?.colors?.colorDark ?? '#000000';
-  const styling: QRCodeParsedStylingOptions = {
+  const styling: ɵQRCodeParsedStylingOptions = {
     size: options?.size ?? 5,
     margin: options?.margin ?? 4,
     colors: {
@@ -91,7 +91,7 @@ export function parseQRCodeStylingOptions(
 
 export function calculateQRCodeRenderedSize(
   matrix: QRCodeMatrix,
-  styling: Pick<QRCodeParsedStylingOptions, 'size' | 'margin'>,
+  styling: Pick<ɵQRCodeParsedStylingOptions, 'size' | 'margin'>,
 ): number {
   validateQRCodeSize(styling.size);
   validateQRCodeMargin(styling.margin);
@@ -106,7 +106,7 @@ export function calculateQRCodeRenderedSize(
   return renderedSize;
 }
 
-function validateQRCodeStylingOptions(styling: QRCodeParsedStylingOptions): void {
+function validateQRCodeStylingOptions(styling: ɵQRCodeParsedStylingOptions): void {
   validateQRCodeSize(styling.size);
   validateQRCodeMargin(styling.margin);
   validateQRCodeColor('colorLight', styling.colors.colorLight);

@@ -1,4 +1,4 @@
-import type {QRCodeImageOverlayOptions, QRCodeResolvedImageOverlay} from './types';
+import type {QRCodeImageOverlayOptions, ɵQRCodeResolvedImageOverlay} from './types';
 
 const DEFAULT_IMAGE_SIZE = 0.4;
 const DEFAULT_IMAGE_PADDING = 1;
@@ -7,7 +7,7 @@ export function resolveQRCodeImageOverlay<TSource>(
   moduleCount: number,
   margin: number,
   options?: QRCodeImageOverlayOptions<TSource>,
-): QRCodeResolvedImageOverlay<TSource> | undefined {
+): ɵQRCodeResolvedImageOverlay<TSource> | undefined {
   if (!options) return undefined;
 
   if (options.source === undefined || options.source === null) {

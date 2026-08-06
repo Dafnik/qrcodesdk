@@ -5,8 +5,8 @@ import {
   type QRCodeImageOverlayOptions,
   type QRCodeMatrix,
   type QRCodeRenderer,
-  type QRCodeStylePrimitive,
   type QRCodeStylingOptions,
+  type ɵQRCodeStylePrimitive,
   ɵcreateQRCodeStylePlan,
   ɵparseQRCodeStylingOptions,
   ɵresolveQRCodeImageOverlay,
@@ -214,7 +214,7 @@ function clamp(value: number, minimum: number, maximum: number): number {
 
 function rasterizePrimitive(
   png: PNG,
-  primitive: QRCodeStylePrimitive,
+  primitive: ɵQRCodeStylePrimitive,
   scale: number,
   color: RGBColor,
   coverageMasks: Map<string, CoverageMask>,
@@ -236,7 +236,7 @@ function rasterizePrimitive(
 }
 
 function getCoverageMask(
-  primitive: QRCodeStylePrimitive,
+  primitive: ɵQRCodeStylePrimitive,
   scale: number,
   cache: Map<string, CoverageMask>,
 ): CoverageMask {
@@ -285,7 +285,7 @@ function getCoverageMask(
   return mask;
 }
 
-function containsPrimitive(primitive: QRCodeStylePrimitive, x: number, y: number): boolean {
+function containsPrimitive(primitive: ɵQRCodeStylePrimitive, x: number, y: number): boolean {
   if (primitive.kind === 'finder-ring') {
     if (primitive.shape === 'dot') {
       const outer = insideCircle(x, y, primitive.size / 2, primitive.size / 2, primitive.size / 2);
