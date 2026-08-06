@@ -13,10 +13,6 @@ import {decodeSvgQRCode} from './svg-helpers';
 const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
   ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
 );
-const JSQR_ROUNDTRIP_ECI_ENABLED_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
-  ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
-);
-
 describe('SVG QR roundtrips', () => {
   test('decodes SVG output with a small prepared image overlay', async () => {
     const logo = await sharp({
@@ -77,15 +73,6 @@ describe('SVG QR roundtrips', () => {
       decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),
     ).resolves.toBe(fixture.data);
   });
-
-  test.each(JSQR_ROUNDTRIP_ECI_ENABLED_COMBINATIONS)(
-    'decodes eci $name SVG output',
-    async (fixture) => {
-      await expect(
-        decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),
-      ).resolves.toBe(fixture.data);
-    },
-  );
 
   test.each(QR_CODE_STYLING_FIXTURES)('decodes $name SVG styling fixture', async (fixture) => {
     await expect(

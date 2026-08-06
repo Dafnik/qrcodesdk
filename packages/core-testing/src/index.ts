@@ -1,6 +1,7 @@
 export {
   getAllQRCodeAutoMaskCombinations,
   getAllQRCodeCombinations,
+  getAllQRCodeECICombinations,
   TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS,
   TOTAL_QR_CODE_COMBINATIONS,
 } from './all-combinations';
