@@ -220,7 +220,7 @@ importers:
         version: 4.3.3(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.8.1(supports-color@7.2.0))(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.0)(yaml@2.9.0))
       astro-mermaid:
         specifier: 2.1.0
-        version: 2.1.0(astro@7.1.5(@astrojs/markdown-remark@7.2.2(supports-color@7.2.0))(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@26.1.2)(jiti@2.7.0)(less@4.8.1(supports-color@7.2.0))(rollup@4.62.4)(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.0)(yaml@2.9.0))(mermaid@11.16.0)
+        version: 2.1.0(astro@7.1.5(@astrojs/markdown-remark@7.2.2(supports-color@7.2.0))(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@26.1.2)(jiti@2.7.0)(less@4.8.1(supports-color@7.2.0))(rollup@4.62.4)(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.0)(yaml@2.9.0))(mermaid@11.16.1)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1
@@ -231,8 +231,8 @@ importers:
         specifier: 4.0.2
         version: 4.0.2
       mermaid:
-        specifier: 11.16.0
-        version: 11.16.0
+        specifier: 11.16.1
+        version: 11.16.1
       nanostores:
         specifier: 1.4.1
         version: 1.4.1
@@ -8398,8 +8398,8 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
-  mermaid@11.16.0:
-    resolution: {integrity: sha512-Zvm3kbstgdpvIJPPItlL7fppIZ3kibvc1oZIGxdvk9t6UFz6flv+Jw7FtRGKwfcI8OckmH04LqG6LlS6X4B1pA==}
+  mermaid@11.16.1:
+    resolution: {integrity: sha512-TQsq6u22fAn3rek5VOubrhKPo1g5hwC3FXUN9hiyupTckcYiGuuKGkNQrKYwGJkXUxZdojwRG46gsSCFZMDp4g==}
 
   methods@1.1.2:
     resolution: {integrity: sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==}
@@ -16951,12 +16951,12 @@ snapshots:
       rehype-expressive-code: 0.44.1
       url-extras: 0.1.0
 
-  astro-mermaid@2.1.0(astro@7.1.5(@astrojs/markdown-remark@7.2.2(supports-color@7.2.0))(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@26.1.2)(jiti@2.7.0)(less@4.8.1(supports-color@7.2.0))(rollup@4.62.4)(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.0)(yaml@2.9.0))(mermaid@11.16.0):
+  astro-mermaid@2.1.0(astro@7.1.5(@astrojs/markdown-remark@7.2.2(supports-color@7.2.0))(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@26.1.2)(jiti@2.7.0)(less@4.8.1(supports-color@7.2.0))(rollup@4.62.4)(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.0)(yaml@2.9.0))(mermaid@11.16.1):
     dependencies:
       astro: 7.1.5(@astrojs/markdown-remark@7.2.2(supports-color@7.2.0))(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@26.1.2)(jiti@2.7.0)(less@4.8.1(supports-color@7.2.0))(rollup@4.62.4)(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.0)(yaml@2.9.0)
       import-meta-resolve: 4.2.0
       mdast-util-to-string: 4.0.0
-      mermaid: 11.16.0
+      mermaid: 11.16.1
       unist-util-visit: 5.1.0
 
   astro@7.1.5(@astrojs/markdown-remark@7.2.2(supports-color@7.2.0))(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@26.1.2)(jiti@2.7.0)(less@4.8.1(supports-color@7.2.0))(rollup@4.62.4)(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.0)(yaml@2.9.0):
@@ -20458,7 +20458,7 @@ snapshots:
 
   merge2@1.4.1: {}
 
-  mermaid@11.16.0:
+  mermaid@11.16.1:
     dependencies:
       '@braintree/sanitize-url': 7.1.2
       '@iconify/utils': 3.1.4
