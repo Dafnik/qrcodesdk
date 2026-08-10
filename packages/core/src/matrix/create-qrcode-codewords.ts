@@ -1,4 +1,4 @@
-import type {QRCodeCodewords, QRCodeResolvedMatrixOptions} from '../types';
+import type {QRCodeCodewords, ɵQRCodeResolvedMatrixOptions} from '../types';
 import {augmentECCs, augmentECCsWithMetadata} from './augment-eccs';
 import {encode, encodeWithMetadata} from './encode';
 import {getGF256GeneratorPolynomials} from './error-correction';
@@ -16,7 +16,7 @@ export function createQRCodeCodewords({
   errorCorrectionLevel,
   version,
   eci,
-}: QRCodeResolvedMatrixOptions): QRCodeCodewords {
+}: ɵQRCodeResolvedMatrixOptions): QRCodeCodewords {
   const versionConfig = VERSIONS[version] ?? [[-100]];
   const dataCodewords = encode(
     version,
@@ -38,7 +38,7 @@ export function createQRCodeCodewordsWithMetadata({
   errorCorrectionLevel,
   version,
   eci,
-}: QRCodeResolvedMatrixOptions): QRCodeCodewordsWithMetadata {
+}: ɵQRCodeResolvedMatrixOptions): QRCodeCodewordsWithMetadata {
   const versionConfig = VERSIONS[version] ?? [[-100]];
   const {codewords: dataCodewords, bitMetadata} = encodeWithMetadata(
     version,

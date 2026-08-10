@@ -1,5 +1,13 @@
 import {describe, expect, expectTypeOf, test} from 'vitest';
 
+// @ts-expect-error The unprefixed internal styling type is intentionally not exported.
+import type {QRCodeParsedStylingOptions as LegacyParsedStylingOptions} from '../src';
+// @ts-expect-error The unprefixed internal image type is intentionally not exported.
+import type {QRCodeResolvedImageOverlay as LegacyResolvedImageOverlay} from '../src';
+// @ts-expect-error The unprefixed internal matrix type is intentionally not exported.
+import type {QRCodeResolvedMatrixOptions as LegacyResolvedMatrixOptions} from '../src';
+// @ts-expect-error The unprefixed internal style-plan type is intentionally not exported.
+import type {QRCodeStylePlan as LegacyStylePlan} from '../src';
 import * as core from '../src';
 import {
   QRCodeBuilder,
@@ -40,17 +48,28 @@ import type {
   QRCodeMatrix,
   QRCodeMatrixOptions,
   QRCodeOptions,
-  QRCodeParsedStylingOptions,
-  QRCodeResolvedMatrixOptions,
   QRCodeSVGImageOptions,
   QRCodeSVGOptions,
   QRCodeSVGRendererOptions,
   QRCodeStylingColors,
   QRCodeStylingOptions,
   QRCodeTextRendererOptions,
+  ɵQRCodeFinderCenterStylePrimitive,
+  ɵQRCodeFinderRingStylePrimitive,
   ɵQRCodeMatrixGenerationMetadata,
   ɵQRCodeMatrixMetadataRole,
   ɵQRCodeMatrixModuleMetadata,
+  ɵQRCodeModuleShape,
+  ɵQRCodeModuleStylePrimitive,
+  ɵQRCodeParsedStylingOptions,
+  ɵQRCodeResolvedImageOverlay,
+  ɵQRCodeResolvedMatrixOptions,
+  ɵQRCodeStyleLayer,
+  ɵQRCodeStylePlan,
+  ɵQRCodeStylePrimitive,
+  ɵQRCodeStyleRectangle,
+  ɵQRCodeStyleRole,
+  ɵQRCodeStyleRotation,
 } from '../src';
 
 describe('public API types', () => {
@@ -64,7 +83,7 @@ describe('public API types', () => {
       mask?: number;
       eci?: boolean;
     }>();
-    expectTypeOf<QRCodeResolvedMatrixOptions['eci']>().toEqualTypeOf<boolean>();
+    expectTypeOf<ɵQRCodeResolvedMatrixOptions['eci']>().toEqualTypeOf<boolean>();
     expectTypeOf(qrcode('data').eci(true).matrix()).toEqualTypeOf<QRCodeMatrix>();
   });
 
@@ -85,8 +104,8 @@ describe('public API types', () => {
       cornersSquareOptions: Required<QRCodeCornersSquareOptions>;
       cornersDotOptions: Required<QRCodeCornersDotOptions>;
     };
-    expectTypeOf<QRCodeParsedStylingOptions>().toMatchTypeOf<ExpectedParsedStylingOptions>();
-    expectTypeOf<ExpectedParsedStylingOptions>().toMatchTypeOf<QRCodeParsedStylingOptions>();
+    expectTypeOf<ɵQRCodeParsedStylingOptions>().toMatchTypeOf<ExpectedParsedStylingOptions>();
+    expectTypeOf<ExpectedParsedStylingOptions>().toMatchTypeOf<ɵQRCodeParsedStylingOptions>();
     expectTypeOf<QRCodeSVGOptions>().toEqualTypeOf<QRCodeOptions<QRCodeSVGRendererOptions>>();
     expectTypeOf<QRCodeSVGOptions>().toEqualTypeOf<
       QRCodeMatrixOptions &
@@ -120,11 +139,31 @@ describe('public API types', () => {
     expectTypeOf(ɵcreateQRCodeStylePlan)
       .parameter(0)
       .toEqualTypeOf<import('../src').QRCodeMatrix>();
+    expectTypeOf(ɵcreateQRCodeStylePlan).parameter(1).toEqualTypeOf<ɵQRCodeParsedStylingOptions>();
+    expectTypeOf(ɵcreateQRCodeStylePlan).returns.toEqualTypeOf<ɵQRCodeStylePlan>();
     expectTypeOf(ɵisQRCodeDotType).parameter(0).toEqualTypeOf<unknown>();
     expectTypeOf(ɵisQRCodeCornerSquareType).parameter(0).toEqualTypeOf<unknown>();
     expectTypeOf(ɵisQRCodeCornerDotType).parameter(0).toEqualTypeOf<unknown>();
-    expectTypeOf(ɵparseQRCodeStylingOptions).returns.toEqualTypeOf<QRCodeParsedStylingOptions>();
+    expectTypeOf(ɵparseQRCodeStylingOptions).returns.toEqualTypeOf<ɵQRCodeParsedStylingOptions>();
     expectTypeOf(ɵresolveQRCodeImageOverlay).parameter(0).toEqualTypeOf<number>();
+    expectTypeOf(ɵresolveQRCodeImageOverlay(21, 4, {source: 'image'})).toEqualTypeOf<
+      ɵQRCodeResolvedImageOverlay<string> | undefined
+    >();
+    expectTypeOf<ɵQRCodeStylePlan['layers'][number]>().toEqualTypeOf<ɵQRCodeStyleLayer>();
+    expectTypeOf<ɵQRCodeStyleLayer['rectangles'][number]>().toEqualTypeOf<ɵQRCodeStyleRectangle>();
+    expectTypeOf<ɵQRCodeStylePlan['primitives'][number]>().toEqualTypeOf<ɵQRCodeStylePrimitive>();
+    expectTypeOf<
+      Extract<ɵQRCodeStylePrimitive, {kind: 'module'}>
+    >().toEqualTypeOf<ɵQRCodeModuleStylePrimitive>();
+    expectTypeOf<
+      Extract<ɵQRCodeStylePrimitive, {kind: 'finder-ring'}>
+    >().toEqualTypeOf<ɵQRCodeFinderRingStylePrimitive>();
+    expectTypeOf<
+      Extract<ɵQRCodeStylePrimitive, {kind: 'finder-center'}>
+    >().toEqualTypeOf<ɵQRCodeFinderCenterStylePrimitive>();
+    expectTypeOf<ɵQRCodeModuleStylePrimitive['shape']>().toEqualTypeOf<ɵQRCodeModuleShape>();
+    expectTypeOf<ɵQRCodeStylePrimitive['role']>().toMatchTypeOf<ɵQRCodeStyleRole>();
+    expectTypeOf<ɵQRCodeStylePrimitive['rotation']>().toEqualTypeOf<ɵQRCodeStyleRotation>();
 
     expect(ɵECC_LEVELS).toEqual(['L', 'M', 'Q', 'H']);
     expect(ɵMODES).toEqual(['numeric', 'alphanumeric', 'octet']);
@@ -139,6 +178,11 @@ describe('public API types', () => {
   });
 
   test('keeps primary runtime APIs public and prefixes package-internal exports', () => {
+    expectTypeOf<LegacyParsedStylingOptions>();
+    expectTypeOf<LegacyResolvedImageOverlay>();
+    expectTypeOf<LegacyResolvedMatrixOptions>();
+    expectTypeOf<LegacyStylePlan>();
+
     expect(qrcode).toBeTypeOf('function');
     expect(QRCodeBuilder).toBeTypeOf('function');
     expect(QRCodeSVGRenderer).toBeTypeOf('function');

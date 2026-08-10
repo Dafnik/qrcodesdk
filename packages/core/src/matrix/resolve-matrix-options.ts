@@ -3,8 +3,8 @@ import type {
   QRCodeInputData,
   QRCodeMask,
   QRCodeMatrixOptions,
-  QRCodeResolvedMatrixOptions,
   QRCodeVersion,
+  ɵQRCodeResolvedMatrixOptions,
 } from '../types';
 import {ECC_LEVELS_MAP} from './error-correction';
 import {getNumberOfAvailableBitsForData} from './get-number-of-available-bits-for-data';
@@ -15,7 +15,7 @@ import {createSingleSegment, getSegmentsBitLength, optimizeSegments} from './seg
 export function resolveQRCodeMatrixOptions(
   data: QRCodeInputData,
   options: QRCodeMatrixOptions = {},
-): QRCodeResolvedMatrixOptions {
+): ɵQRCodeResolvedMatrixOptions {
   validateInputData(data);
   const eci = resolveECI(options.eci);
 
@@ -57,10 +57,10 @@ function resolveErrorCorrectionLevel(
 function resolveVersionAndSegments(
   requestedVersion: QRCodeMatrixOptions['version'],
   data: QRCodeInputData,
-  forcedSegments: QRCodeResolvedMatrixOptions['segments'] | undefined,
+  forcedSegments: ɵQRCodeResolvedMatrixOptions['segments'] | undefined,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
   eci: boolean,
-): Pick<QRCodeResolvedMatrixOptions, 'segments' | 'version'> {
+): Pick<ɵQRCodeResolvedMatrixOptions, 'segments' | 'version'> {
   if (requestedVersion !== undefined) {
     validateVersion(requestedVersion);
     const segments = forcedSegments ?? optimizeSegments(data, requestedVersion, eci);
@@ -94,7 +94,7 @@ function validateVersion(version: number): asserts version is QRCodeVersion {
 }
 
 export function segmentsFitVersion(
-  segments: QRCodeResolvedMatrixOptions['segments'],
+  segments: ɵQRCodeResolvedMatrixOptions['segments'],
   version: QRCodeVersion,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
   eci: boolean,

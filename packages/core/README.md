@@ -278,22 +278,6 @@ const json = qrcode('renderer output').render(jsonRenderer);
 
 Renderers can be passed directly to `.render(renderer)` or stored with `.renderer(renderer).render()`.
 
-## Styling primitive types
-
-The style-plan types exported by `@qrcodesdk/core` describe the platform-neutral primitives used
-inside the built-in visual renderers.
-
-| Export                             | Contract                                                                     |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| `QRCodeStylePlan`                  | Platform-neutral dimensions, background, curve flag, and ordered primitives. |
-| `QRCodeStylePrimitive`             | Union of module, finder-ring, and finder-center primitives.                  |
-| `QRCodeModuleStylePrimitive`       | Shape, role, color, position, size, and rotation for an ordinary module.     |
-| `QRCodeFinderRingStylePrimitive`   | Styling primitive for a finder pattern's outer ring.                         |
-| `QRCodeFinderCenterStylePrimitive` | Styling primitive for a finder pattern's center.                             |
-| `QRCodeStyleRole`                  | Primitive role: `dots`, `cornersSquare`, or `cornersDot`.                    |
-| `QRCodeModuleShape`                | Resolved geometry used to draw an ordinary module.                           |
-| `QRCodeStyleRotation`              | Clockwise primitive rotation: `0`, `90`, `180`, or `270` degrees.            |
-
 ## Public API
 
 ```ts
@@ -309,27 +293,18 @@ import {
   type QRCodeDotType,
   type QRCodeDotsOptions,
   type QRCodeErrorCorrectionLevel,
-  type QRCodeFinderCenterStylePrimitive,
-  type QRCodeFinderRingStylePrimitive,
   type QRCodeImageOverlayOptions,
   type QRCodeInputData,
   type QRCodeMask,
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
   type QRCodeMode,
-  type QRCodeModuleShape,
-  type QRCodeModuleStylePrimitive,
   type QRCodeOptions,
-  type QRCodeParsedStylingOptions,
   type QRCodeRenderer,
   type QRCodeSVGImageOptions,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
-  type QRCodeStylePlan,
-  type QRCodeStylePrimitive,
-  type QRCodeStyleRole,
-  type QRCodeStyleRotation,
   type QRCodeStylingColors,
   type QRCodeStylingOptions,
   QRCodeTextRenderer,

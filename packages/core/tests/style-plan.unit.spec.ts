@@ -3,9 +3,9 @@ import {describe, expect, test} from 'vitest';
 import {
   type QRCodeDotType,
   type QRCodeMatrix,
-  type QRCodeModuleStylePrimitive,
   ɵcreateQRCodeStylePlan as createQRCodeStylePlan,
   ɵparseQRCodeStylingOptions as parseQRCodeStylingOptions,
+  type ɵQRCodeModuleStylePrimitive,
 } from '../src';
 
 describe('createQRCodeStylePlan', () => {
@@ -185,7 +185,7 @@ describe('createQRCodeStylePlan', () => {
 
 function modulePrimitives(matrix: QRCodeMatrix, type: QRCodeDotType) {
   return createQRCodeStylePlan(matrix, parseQRCodeStylingOptions({dotsOptions: {type}}))
-    .primitives as readonly QRCodeModuleStylePrimitive[];
+    .primitives as readonly ɵQRCodeModuleStylePrimitive[];
 }
 
 function createFinderMatrix(size = 21): QRCodeMatrix {

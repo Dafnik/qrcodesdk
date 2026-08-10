@@ -7,9 +7,9 @@ import type {
   QRCodeMatrix,
   QRCodeOptions,
   QRCodeRenderer,
-  QRCodeStyleLayer,
-  QRCodeStylePrimitive,
   QRCodeStylingOptions,
+  ɵQRCodeStyleLayer,
+  ɵQRCodeStylePrimitive,
 } from './types';
 
 export type QRCodeDataImageURL = `data:image/${string}`;
@@ -79,7 +79,7 @@ type SVGPathByColor = {
   path: string;
 };
 
-function createPathsByColor(layers: readonly QRCodeStyleLayer[]): SVGPathByColor[] {
+function createPathsByColor(layers: readonly ɵQRCodeStyleLayer[]): SVGPathByColor[] {
   const paths: SVGPathByColor[] = [];
   for (let index = 0; index < layers.length; index++) {
     const layer = layers[index]!;
@@ -137,7 +137,7 @@ const OPPOSITE_CORNERS_ROUNDED_COMMANDS = [
   ['Z'],
 ] as const satisfies readonly LocalPathCommand[];
 
-function primitiveToPath(primitive: QRCodeStylePrimitive): string {
+function primitiveToPath(primitive: ɵQRCodeStylePrimitive): string {
   if (primitive.kind === 'finder-ring') {
     return primitive.shape === 'dot'
       ? `${circlePath(primitive, primitive.size / 2)}${circlePath(
@@ -175,7 +175,10 @@ function primitiveToPath(primitive: QRCodeStylePrimitive): string {
   }
 }
 
-function localPath(primitive: QRCodeStylePrimitive, commands: readonly LocalPathCommand[]): string {
+function localPath(
+  primitive: ɵQRCodeStylePrimitive,
+  commands: readonly LocalPathCommand[],
+): string {
   let path = '';
   for (let index = 0; index < commands.length; index++) {
     const command = commands[index]!;
@@ -219,7 +222,7 @@ function localPath(primitive: QRCodeStylePrimitive, commands: readonly LocalPath
   return path;
 }
 
-function circlePath(primitive: QRCodeStylePrimitive, radius: number): string {
+function circlePath(primitive: ɵQRCodeStylePrimitive, radius: number): string {
   const centerX = primitive.x + primitive.size / 2;
   const centerY = primitive.y + primitive.size / 2;
   return `M${formatPoint(centerX, centerY - radius)}A${formatNumber(radius)} ${formatNumber(
@@ -229,7 +232,7 @@ function circlePath(primitive: QRCodeStylePrimitive, radius: number): string {
   )} 0 1 1 ${formatPoint(centerX, centerY - radius)}Z`;
 }
 
-function roundedSquarePath(primitive: QRCodeStylePrimitive, radius: number): string {
+function roundedSquarePath(primitive: ɵQRCodeStylePrimitive, radius: number): string {
   if (radius === 0) {
     return `M${formatPoint(primitive.x, primitive.y)}h${formatNumber(
       primitive.size,

@@ -3,9 +3,9 @@ import {
   type QRCodeMatrix,
   type QRCodeOptions,
   type QRCodeRenderer,
-  type QRCodeStyleLayer,
-  type QRCodeStylePrimitive,
   type QRCodeStylingOptions,
+  type ɵQRCodeStyleLayer,
+  type ɵQRCodeStylePrimitive,
   ɵcreateQRCodeStylePlan,
   ɵparseQRCodeStylingOptions,
   ɵresolveQRCodeImageOverlay,
@@ -128,7 +128,7 @@ function getSVGAnimatedLength(value: unknown): number | undefined {
 
 function drawLayer(
   context: CanvasRenderingContext2D,
-  layer: QRCodeStyleLayer,
+  layer: ɵQRCodeStyleLayer,
   scale: number,
 ): void {
   context.fillStyle = layer.color;
@@ -153,7 +153,7 @@ function drawLayer(
 
 function addCurvedPrimitive(
   context: CanvasRenderingContext2D,
-  primitive: QRCodeStylePrimitive,
+  primitive: ɵQRCodeStylePrimitive,
   scale: number,
 ): void {
   const x = primitive.x * scale;
@@ -201,7 +201,7 @@ function addCurvedPrimitive(
 
 function addModuleShape(
   context: CanvasRenderingContext2D,
-  shape: Extract<QRCodeStylePrimitive, {kind: 'module'}>['shape'],
+  shape: Extract<ɵQRCodeStylePrimitive, {kind: 'module'}>['shape'],
   x: number,
   y: number,
   size: number,
