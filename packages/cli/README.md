@@ -200,7 +200,7 @@ The equivalent explicit boolean forms are `--small false` and `--ansi-colors fal
 
 `--only-ansi-colors` ignores the `small` setting and implies ANSI output. It cannot be combined with `--no-ansi-colors` or `--ansi-colors false`.
 
-## Write SVG's
+## Write SVG files
 
 An `.svg` output path selects SVG automatically:
 
@@ -214,7 +214,7 @@ You can also set the format explicitly:
 qrc "https://qrcodesdk.dev" --format svg --output qrcode.svg
 ```
 
-## Write PNGs
+## Write PNG files
 
 An `.png` output path selects PNG automatically:
 
@@ -230,7 +230,7 @@ qrc "https://qrcodesdk.dev" --format png --output qrcode.png
 
 SVG and PNG output require `--output`. If the extension is not `.svg` or `.png`, pass `--format` explicitly.
 
-## Customize output
+## Configure generated files
 
 ```sh
 qrc "https://qrcodesdk.dev" \
@@ -243,7 +243,8 @@ qrc "https://qrcodesdk.dev" \
   --aria-label 'Scan to open qrcodesdk.dev'
 ```
 
-Most applications can leave the data mode, version, and mask on automatic selection. Pin them when you need a compatibility target or deterministic fixture:
+The CLI exposes matrix and visual settings as flags. Leave mode, version, and mask on automatic
+selection unless you need a compatibility target or deterministic fixture:
 
 ```sh
 qrc "HELLO WORLD" \
@@ -253,17 +254,16 @@ qrc "HELLO WORLD" \
   --output hello.svg
 ```
 
-Octet payload bytes remain UTF-8, while the explicit UTF-8 ECI declaration is disabled by default.
-Enable assignment 26 with a presence flag or an explicit boolean:
+Enable the UTF-8 ECI declaration with a presence flag or an explicit boolean:
 
 ```sh
 qrc "Grüße" --eci
 qrc "Grüße" --eci true
 ```
 
-Use `--eci false` to disable it explicitly. Enabling ECI helps scanners interpret non-ASCII octet
-data without heuristics; leaving it disabled saves 12 bits and matches common generator behavior.
-Numeric and alphanumeric-only symbols are unaffected.
+Use `--eci false` to disable it explicitly. For the behavior and tradeoffs behind these flags, see
+the [builder reference](https://qrcodesdk.dev/reference/builder/). For colors, size, margins, and scan-safety guidance,
+see [Customize output](https://qrcodesdk.dev/guides/customize/).
 
 ## Options
 
@@ -292,7 +292,9 @@ Numeric and alphanumeric-only symbols are unaffected.
 | `--aria-label <text>`                   | SVG `aria-label` accessible name.                           | `undefined` |
 | `--title <text>`                        | SVG child `<title>` text.                                   | `undefined` |
 
-Colors must be six-digit hex values. `--size` must be positive and `--margin` must be non-negative. For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI background. With `--only-ansi-colors`, both become module background colors.
+Colors must be six-digit hex values. `--size` must be positive and `--margin` must be non-negative.
+For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI
+background. With `--only-ansi-colors`, both become module background colors.
 
 ## Interactive and automated use
 
@@ -312,8 +314,8 @@ Successful file output writes a confirmation to standard error, leaving standard
 ## Documentation
 
 - [@qrcodesdk/cli](https://qrcodesdk.dev/packages/cli/)
-- [Installation](https://qrcodesdk.dev/getting-started/installation/)
-- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
-- [Render Terminal Text](https://qrcodesdk.dev/renderers/core/text/)
-- [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
+- [Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/)
+- [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [Terminal text renderer](https://qrcodesdk.dev/reference/renderers/text/)
+- [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
 - [@qrcodesdk/node](https://qrcodesdk.dev/packages/node/)

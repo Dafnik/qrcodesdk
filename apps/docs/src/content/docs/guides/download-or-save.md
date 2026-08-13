@@ -1,5 +1,5 @@
 ---
-title: Download or save a QR code
+title: Download or save a QR code as SVG or PNG
 description: Choose SVG or PNG, trigger browser and framework downloads, export Canvas, or write files in Node.js.
 docType: guide
 
@@ -13,7 +13,7 @@ related:
 
 Choose the file format first, then use the workflow for the runtime that owns the output.
 
-## Choose SVG or PNG
+## Choose whether to download SVG or PNG
 
 | Choose | When                                                                | Source output                                             |
 | ------ | ------------------------------------------------------------------- | --------------------------------------------------------- |

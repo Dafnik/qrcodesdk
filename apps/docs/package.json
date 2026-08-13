@@ -6,7 +6,8 @@
   "scripts": {
     "start": "astro dev",
     "build": "astro build",
-    "check": "pnpm run check-readmes",
+    "check": "pnpm run check-readmes && pnpm run check-documentation",
+    "check-documentation": "node scripts/documentation/audit-documentation.mjs",
     "check-performance": "node scripts/performance/generate-performance.mjs --check",
     "check-readmes": "node scripts/readmes/generate-readmes.mjs --check",
     "generate-performance": "node scripts/performance/generate-performance.mjs --write",
@@ -14,7 +15,7 @@
     "preview": "astro preview",
     "check-types": "astro check",
     "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
-    "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/explain/*.test.ts src/components/playground/*.test.ts",
+    "test": "node --test scripts/documentation/*.test.mjs scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/explain/*.test.ts src/components/playground/*.test.ts",
     "astro": "astro",
     "clean": "rm -rf .turbo dist .astro"
   },

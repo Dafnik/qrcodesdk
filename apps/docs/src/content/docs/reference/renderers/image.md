@@ -13,7 +13,7 @@ related:
 
 ## When to use
 
-Use `QRCodeImageRenderer` when browser code needs a CSS-styleable, accessible `HTMLImageElement`
+Use `QRCodeImageRenderer` when browser code needs a CSS-customizable, accessible `HTMLImageElement`
 rather than a drawing surface.
 
 ## Minimal example

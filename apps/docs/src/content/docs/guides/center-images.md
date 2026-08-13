@@ -14,7 +14,7 @@ related:
 A center image can brand a QR code, but it intentionally covers encoded modules. Prepare the source
 before rendering, keep the overlay modest, and test the final artifact with real scanners.
 
-## Prerequisites
+## Prepare a logo or center image
 
 - Start with a QR code that scans without an overlay.
 - Choose the renderer and prepare the source type it accepts.
@@ -179,7 +179,7 @@ export class QRCodeWithLogo {
 ## Verify the result
 
 Test the rendered or downloaded artifact—not only the preview—at the smallest expected size and
-after any screenshotting, image optimization, printing, or compression. Test several scanner apps
+after taking screenshots, optimizing images, printing, or compressing. Test several scanner apps
 and representative devices. If scanning is unreliable, reduce the image, restore padding and the
 four-module quiet zone, increase module size, simplify curved styling, or shorten the payload.
 

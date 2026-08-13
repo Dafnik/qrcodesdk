@@ -28,7 +28,11 @@ packageName: '@example/package'
 related: []
 ---
 
+import PackageComponents from './package-components.astro';
+
 Example package documentation.
+
+<PackageComponents className={true} selector={true} />
 `,
   );
 
@@ -43,6 +47,10 @@ Example package documentation.
   );
 
   assert.ok(content.includes(GENERATE_INSTRUCTION));
+  assert.ok(content.includes('`QRCodeSVG`'));
+  assert.ok(content.includes('`qrcode-svg`'));
+  assert.ok(content.includes('`className`'));
+  assert.ok(content.includes('`string \\| number`'));
   await assert.rejects(assertReadmeCurrent(content, output, docsRoot), {
     message: `README.md is stale. Run \`${GENERATE_COMMAND}\`.`,
   });

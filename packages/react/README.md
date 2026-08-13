@@ -8,9 +8,7 @@
 
 **[Live Demo](https://qrcodesdk.dev/playground/?package=react)**
 
-`@qrcodesdk/react` provides React components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
-
-It supports React and React DOM 18 and 19.
+React components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
 ## Install
 
@@ -69,46 +67,30 @@ export function App() {
 }
 ```
 
+## Version compatibility
+
+| @qrcodesdk/react | React               |
+| ---------------- | ------------------- |
+| `0.x.x`          | `^18.0.0` `^19.0.0` |
+
 ## Components
 
-| Component      | Output                                      | Download support |
-| -------------- | ------------------------------------------- | ---------------- |
-| `QRCodeSVG`    | Inline SVG inside a wrapper `<div>`         | SVG              |
-| `QRCodeImage`  | PNG-backed `<img>` inside a wrapper `<div>` | PNG              |
-| `QRCodeCanvas` | `<canvas>` inside a wrapper `<div>`         | None             |
+| Component      | Output               | Download support |
+| -------------- | -------------------- | ---------------- |
+| `QRCodeSVG`    | `Inline SVG element` | SVG              |
+| `QRCodeImage`  | `PNG-backed <img>`   | PNG              |
+| `QRCodeCanvas` | `<canvas> element`   | None             |
 
-All components accept:
+#### Options
 
-| Prop        | Type                       | Description                                     |
-| ----------- | -------------------------- | ----------------------------------------------- |
-| `data`      | `string \| number`         | Required QR code payload.                       |
-| `options`   | Component-specific options | Optional matrix and renderer configuration.     |
-| `className` | `string`                   | CSS class applied to the component wrapper div. |
+| Prop        | Type                         | Description                                     |
+| ----------- | ---------------------------- | ----------------------------------------------- |
+| `data`      | `string \| number`           | Required QR code payload.                       |
+| `options`   | `Component-specific options` | Optional matrix and renderer configuration.     |
+| `className` | `string`                     | CSS class applied to the component wrapper div. |
 
-`options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, `mask`, and `eci`. Renderer options match the corresponding QRCodeSDK renderer:
-
-- `QRCodeSVG` uses `QRCodeSVGOptions`.
-- `QRCodeImage` uses `QRCodeImageOptions`.
-- `QRCodeCanvas` uses `QRCodeCanvasOptions`.
-
-Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` and `QRCodeCanvasOptions` from `@qrcodesdk/browser`.
-
-## Matrix options
-
-The `options` prop combines the component's renderer options with the shared QR matrix options:
-
-| Option                 | Type                                     | Default   | Description                            |
-| ---------------------- | ---------------------------------------- | --------- | -------------------------------------- |
-| `mode`                 | `'numeric' \| 'alphanumeric' \| 'octet'` | Automatic | Encoding mode.                         |
-| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`               | `'M'`     | Error correction level.                |
-| `version`              | `1` through `40`                         | Automatic | Pins the QR version.                   |
-| `mask`                 | `0` through `7`                          | Automatic | Pins the QR mask.                      |
-| `eci`                  | `boolean`                                | `false`   | Emits UTF-8 ECI 26 for octet segments. |
-
-Most applications should let the builder select the mode, version, and mask automatically.
-Octet bytes remain UTF-8 regardless of `eci`. Set `eci: true` to explicitly declare UTF-8 to
-scanners; the default saves 12 bits and may rely on scanner heuristics for non-ASCII text.
-Numeric and alphanumeric-only symbols are unaffected.
+React passes `className` to the component's wrapper `<div>`. Use a React ref when you need a
+download handle; the rendered SVG, Image, or Canvas remains inside that wrapper.
 
 ## Live examples
 
@@ -207,83 +189,13 @@ export default function QRCodeDownloadImageExample() {
 }
 ```
 
-## Renderer options
+## Center images
 
-| Option                  | Components | Type                         |            Default |
-| ----------------------- | ---------- | ---------------------------- | -----------------: |
-| `size`                  | All        | `number`                     |                `5` |
-| `margin`                | All        | `number`                     |                `4` |
-| `colors.colorDark`      | All        | `string`                     |        `'#000000'` |
-| `colors.colorLight`     | All        | `string`                     |        `'#ffffff'` |
-| `dotsOptions`           | All        | `QRCodeDotsOptions`          | `{type: 'square'}` |
-| `cornersSquareOptions`  | All        | `QRCodeCornersSquareOptions` | `{type: 'square'}` |
-| `cornersDotOptions`     | All        | `QRCodeCornersDotOptions`    | `{type: 'square'}` |
-| `alt`                   | SVG, Image | `string`                     |        `undefined` |
-| `ariaLabel`             | SVG, Image | `string`                     |        `undefined` |
-| `title`                 | SVG, Image | `string`                     |        `undefined` |
-| `image.source`          | All        | Renderer-specific source     |        `undefined` |
-| `image.size`            | All        | `number`                     |              `0.4` |
-| `image.padding`         | All        | `number`                     |                `1` |
-| `image.clearBackground` | All        | `boolean`                    |             `true` |
-
-Color options use hash-prefixed values such as `#111827`. All built-in renderers require a positive safe integer `size` and a non-negative safe integer `margin`.
-
-Module, finder-ring, and finder-center options pass through to every component. Their optional
-colors independently inherit `colors.colorDark`.
-
-### Prepared center images
-
-Prepare browser image sources before rendering:
-
-```tsx
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-import {useMemo, useState} from 'react';
-
-import {QRCodeImage} from '@qrcodesdk/react';
-
-export function QRCodeWithLogo() {
-  const [logo, setLogo] = useState<HTMLImageElement>();
-  const options = useMemo<QRCodeImageOptions>(
-    () => ({
-      errorCorrectionLevel: 'H',
-      image: logo ? {source: logo, size: 0.3} : undefined,
-    }),
-    [logo],
-  );
-
-  async function selectLogo(file: File) {
-    const source = new Image();
-    const localUrl = URL.createObjectURL(file);
-    source.src = localUrl;
-
-    try {
-      await source.decode();
-      setLogo(source);
-    } finally {
-      URL.revokeObjectURL(localUrl);
-    }
-  }
-
-  return (
-    <>
-      <input
-        accept="image/*"
-        type="file"
-        onChange={(event) => {
-          const file = event.currentTarget.files?.[0];
-          if (file) void selectLogo(file);
-        }}
-      />
-      {logo ? (
-        <QRCodeImage data="https://qrcodesdk.dev" options={options} />
-      ) : null}
-    </>
-  );
-}
-```
-
-Use an embedded `data:image/...` URL for `QRCodeSVG`. Components never load paths or URLs
-themselves, and SVG/PNG downloads include the overlay.
+Load and decode a browser image first, store the resulting `HTMLImageElement` in state, and pass
+it through `options.image.source`. Updating that state rerenders the component with the prepared
+source. See
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#wire-prepared-sources-into-frameworks) for the complete
+React lifecycle.
 
 ## Download files
 
@@ -313,11 +225,21 @@ The appropriate `.svg` or `.png` extension is appended when necessary.
 
 `QRCodeCanvas` does not include a download method. Use `QRCodeImage` when you want built-in PNG download support.
 
+See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-react) for SVG, PNG, and manual
+Canvas downloads.
+
 ## Server-side rendering
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
 `QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+
+## Shared configuration
+
+The `options` prop combines matrix settings with the selected renderer's settings. Use the
+[builder reference](https://qrcodesdk.dev/reference/builder/) for encoding, version, mask, and error correction;
+[Customize output](https://qrcodesdk.dev/guides/customize/) for shared visual options; and the dedicated
+[renderer references](https://qrcodesdk.dev/reference/renderers/) for output-specific options and constraints.
 
 ## Public API
 
@@ -337,7 +259,9 @@ import {
 ## Documentation
 
 - [@qrcodesdk/react](https://qrcodesdk.dev/packages/react/)
-- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
-- [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
-- [Render to an Image Element](https://qrcodesdk.dev/renderers/browser/image/)
-- [Render to Canvas](https://qrcodesdk.dev/renderers/browser/canvas/)
+- [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [Add a center image](https://qrcodesdk.dev/guides/center-images/)
+- [Download or save a QR code as SVG or PNG](https://qrcodesdk.dev/guides/download-or-save/)
+- [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
+- [PNG-backed Image element renderer](https://qrcodesdk.dev/reference/renderers/image/)
+- [Canvas element renderer](https://qrcodesdk.dev/reference/renderers/canvas/)

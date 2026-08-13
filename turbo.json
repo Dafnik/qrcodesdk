@@ -32,6 +32,10 @@
       "cache": false,
       "dependsOn": ["//#format:check", "//#cspell", "build", "test", "lint", "check-types"]
     },
+    "check-documentation": {
+      "cache": false,
+      "dependsOn": ["build"]
+    },
     "check-performance": {
       "cache": false
     },
@@ -51,6 +55,11 @@
       "cache": false
     },
     "lint": {},
+    "preview": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "persistent": true
+    },
     "start": {
       "cache": false,
       "persistent": true

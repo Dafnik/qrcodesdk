@@ -101,7 +101,7 @@ each output.
 ## Add a center image
 
 SVG, Canvas, PNG-backed Image, Node.js PNG, React, and Angular accept prepared center-image sources,
-but their source types and loading lifecycles differ. Follow [Add a center image](/guides/center-images/)
+but their source types and loading behavior differ. Follow [Add a center image](/guides/center-images/)
 for preparation, sizing, padding, and framework-specific examples.
 
 ## Protect scan reliability

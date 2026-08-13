@@ -47,7 +47,7 @@ yarn add @qrcodesdk/core @qrcodesdk/node
 
 </details>
 
-### Minimal example
+## Minimal example
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -58,157 +58,11 @@ const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 
 `QRCodePNGRenderer()` returns a Node.js `Buffer` containing a square, fully opaque PNG image.
 
-## Common options
+## Work with PNG output
 
-```ts
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const png: Buffer = qrcode('https://qrcodesdk.dev').render(
-  QRCodePNGRenderer({
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
-    },
-    dotsOptions: {type: 'rounded'},
-    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
-    cornersDotOptions: {type: 'dot'},
-  }),
-);
-```
-
-### All options
-
-| Option                       | Type                     |            Default | Description                                       |
-| ---------------------------- | ------------------------ | -----------------: | ------------------------------------------------- |
-| `size`                       | `number`                 |                `5` | Pixel size of each QR module.                     |
-| `margin`                     | `number`                 |                `4` | Quiet-zone margin around the QR code, in modules. |
-| `colors.colorDark`           | `string`                 |        `'#000000'` | Color used for dark QR modules.                   |
-| `colors.colorLight`          | `string`                 |        `'#ffffff'` | Background color.                                 |
-| `dotsOptions.type`           | `QRCodeDotType`          |         `'square'` | Shape used for ordinary data modules.             |
-| `dotsOptions.color`          | `string`                 | `colors.colorDark` | Color used for ordinary data modules.             |
-| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                |
-| `cornersSquareOptions.color` | `string`                 | `colors.colorDark` | Color used for finder outer rings.                |
-| `cornersDotOptions.type`     | `QRCodeCornerDotType`    |         `'square'` | Shape used for finder centers.                    |
-| `cornersDotOptions.color`    | `string`                 | `colors.colorDark` | Color used for finder centers.                    |
-| `compressionLevel`           | `number`                 |                `9` | PNG compression from `0` (fast) to `9` (small).   |
-| `image.source`               | `Buffer`                 |        `undefined` | PNG bytes already loaded by the caller.           |
-| `image.size`                 | `number`                 |              `0.4` | Image box as a fraction of matrix width.          |
-| `image.padding`              | `number`                 |                `1` | Clear padding in QR module units.                 |
-| `image.clearBackground`      | `boolean`                |             `true` | Clears modules behind the image and padding.      |
-
-Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
-
-`Size` must be a positive safe integer and `margin` must be a non-negative safe integer.
-`compressionLevel` must be an integer from `0` through `9`.
-
-Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
-`extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
-is independent; omit it to inherit `colors.colorDark`.
-
-## Common recipes
-
-### Add prepared PNG images
-
-Read or download the PNG before invoking the renderer. `QRCodePNGRenderer` decodes the supplied
-bytes in memory but performs no filesystem or network I/O.
-
-```ts
-import {readFile} from 'node:fs/promises';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const logo = await readFile('./logo.png');
-
-const png = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(QRCodePNGRenderer({image: {source: logo}}));
-```
-
-Only PNG source bytes are accepted. The source is centered, resized without cropping, and
-alpha-composited into the opaque output. Although `size` values through `1` are valid, large
-overlays can prevent scanning.
-
-### Save to disk
-
-```ts
-import {writeFile} from 'node:fs/promises';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-await writeFile('qrcode.png', png);
-```
-
-### Send an HTTP response
-
-The returned buffer can be sent from any Node.js HTTP framework as `image/png`:
-
-```ts
-import {createServer} from 'node:http';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-createServer((_request, response) => {
-  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-  response.writeHead(200, {
-    'Content-Length': png.length,
-    'Content-Type': 'image/png',
-  });
-  response.end(png);
-}).listen(3000);
-```
-
-### Serve with Express
-
-```ts
-import express from 'express';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const app = express();
-
-app.get('/qrcode.png', (_req, res) => {
-  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-  res.type('image/png').send(png);
-});
-
-app.listen(3000);
-```
-
-### Return from Hono
-
-```ts
-import {serve} from '@hono/node-server';
-import {Hono} from 'hono';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const app = new Hono();
-
-app.get('/qrcode.png', (c) => {
-  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-  return c.body(png, 200, {
-    'Content-Type': 'image/png',
-  });
-});
-
-serve({
-  fetch: app.fetch,
-  port: 3000,
-});
-```
+See the [PNG Buffer renderer](https://qrcodesdk.dev/reference/renderers/png/) for compression, prepared PNG overlays,
+and exact constraints. Follow [Download or save](https://qrcodesdk.dev/guides/download-or-save/) to write the Buffer to
+disk or [Serve a QR code](https://qrcodesdk.dev/guides/server-output/) to return it as `image/png`.
 
 ## Runtime requirements
 
@@ -236,5 +90,8 @@ import {
 ## Documentation
 
 - [@qrcodesdk/node](https://qrcodesdk.dev/packages/node/)
-- [Installation](https://qrcodesdk.dev/getting-started/installation/)
-- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
+- [Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/)
+- [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [PNG Buffer renderer](https://qrcodesdk.dev/reference/renderers/png/)
+- [Download or save a QR code as SVG or PNG](https://qrcodesdk.dev/guides/download-or-save/)
+- [Serve a QR code](https://qrcodesdk.dev/guides/server-output/)
