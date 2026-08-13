@@ -15,6 +15,11 @@ related:
 Use `QRCodeSVGRenderer` for scalable output in web pages, email, print, generated assets, or HTTP
 responses. It is the recommended default when the consumer accepts SVG text.
 
+:::tip[Recommended default]
+Choose SVG when the consumer accepts it: output stays sharp at every size and the renderer has no
+browser or Node.js dependency.
+:::
+
 ## Minimal example
 
 ```ts
@@ -46,12 +51,15 @@ plus these SVG-specific fields:
 
 ## Renderer-specific constraints
 
+:::caution[Keep the application's trust boundary]
+Renderer-generated text is escaped, but inserting any HTML string into a document still requires
+the normal trust decision for that application.
+:::
+
 - `image.source` must be a non-empty embedded image data URL. The renderer does not read paths or
   fetch remote URLs.
 - Image `size` must be finite, greater than `0`, and at most `1`; padding must be finite and
   non-negative.
-- SVG text is escaped for accessibility values and the embedded image URL, but inserting any HTML
-  string into a document still requires the normal trust boundary for that application.
 - The renderer is runtime-neutral under the [Core compatibility contract](/packages/core/#runtime-compatibility).
 
 ## Related guides

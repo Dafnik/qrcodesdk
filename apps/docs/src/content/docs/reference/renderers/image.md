@@ -47,7 +47,11 @@ prepared `image` overlay as the
 
 ## Renderer-specific constraints
 
-- A browser DOM, Canvas 2D support, and PNG `canvas.toDataURL()` support are required.
+:::caution[Browser-only output]
+Create this renderer only where the DOM, Canvas 2D, and PNG `canvas.toDataURL()` APIs are available.
+For server output, choose SVG or the Node.js PNG renderer.
+:::
+
 - Rendering is synchronous; center-image sources must already be loaded and have positive intrinsic
   dimensions.
 - The PNG is encoded into the element's data URL. Use the

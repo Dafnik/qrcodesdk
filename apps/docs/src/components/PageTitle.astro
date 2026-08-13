@@ -1,9 +1,11 @@
 ---
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 import PackageBadges from './package-badges.astro';
+
+const docType = Astro.locals.starlightRoute.entry.data.docType;
 ---
 
-<div class="page-title-content">
+<div class="page-title-content" data-doc-type={docType}>
   <Default {...Astro.props}><slot /></Default>
 
   <PackageBadges />
