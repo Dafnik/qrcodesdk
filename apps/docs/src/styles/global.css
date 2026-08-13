@@ -180,32 +180,4 @@
     width: 100%;
     height: auto;
   }
-
-  table:not(:where(.not-content *)) {
-    width: 100%;
-  }
-}
-
-@media (min-width: 72rem) {
-  html:has(.page-title-content[data-doc-type='reference']) {
-    --sl-content-width: 56rem;
-  }
-}
-
-@media (min-width: 72rem) and (max-width: 89.999rem) {
-  html:has(.page-title-content[data-doc-type='reference']) .right-sidebar-container {
-    display: none;
-  }
-
-  html[data-has-sidebar][data-has-toc]:has(.page-title-content[data-doc-type='reference'])
-    .main-pane {
-    --sl-content-margin-inline: auto;
-    width: 100%;
-  }
-}
-
-@media (max-width: 38rem) {
-  .sl-markdown-content table:not(:where(.not-content *)) {
-    font-size: var(--sl-text-sm);
-  }
 }

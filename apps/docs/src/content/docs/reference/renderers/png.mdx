@@ -47,11 +47,6 @@ disables DEFLATE compression; `9` requests the highest level.
 
 ## Renderer-specific constraints
 
-:::note[Runtime requirement]
-The package requires Node.js 22 or newer. Bun and Deno use Node compatibility and are not covered
-by the package's Node.js CI compatibility job.
-:::
-
 - `compressionLevel` must be a safe integer from `0` through `9`.
 - `image.source` must be a Node.js `Buffer` containing valid PNG bytes. Other formats, paths, and
   URLs are not decoded.
