@@ -1,11 +1,137 @@
 ---
 title: Builder and matrix
-description: Reference for QRCodeSDK input data, matrix options, builder methods, and matrix output.
+description: Reference for QRCodeSDK input data, modes, ECI, matrix options, builder methods, and matrix output.
 docType: reference
+
+related:
+  - ../packages/core.mdx
+  - ../guides/customize.md
+  - ./custom-renderers.md
 ---
 
-The builder turns input data into a QR code matrix and passes that matrix to a renderer. See the
-[`@qrcodesdk/core` package overview](/packages/core/) for installation and runtime support.
+`qrcode()` creates an immutable builder from `@qrcodesdk/core`. Each configuration method returns a
+new builder; the original builder remains unchanged.
 
-The complete builder and matrix API is documented here as the canonical reference. Detailed option
-tables will be consolidated into this page as part of the Core reference split.
+## Input data
+
+The builder accepts a `string` or a non-negative safe integer. Use a string for values with leading
+zeroes or values outside JavaScript's safe-integer range.
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+
+qrcode('https://qrcodesdk.dev');
+qrcode(1234567890);
+qrcode().data('data supplied later');
+```
+
+QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, and UTF-8 octet data,
+including automatic mixed-mode segmentation.
+
+## Encoding modes
+
+| Mode           | Accepted data                 | Use it for                                     |
+| -------------- | ----------------------------- | ---------------------------------------------- |
+| `numeric`      | Digits only                   | Numeric identifiers and digit-only payloads    |
+| `alphanumeric` | QR alphanumeric character set | Uppercase text such as `HELLO WORLD`           |
+| `octet`        | UTF-8 bytes                   | URLs, JSON, emoji, lowercase, and general text |
+| omitted        | Any supported input           | Automatic shortest-bit segmentation; default   |
+
+Setting a mode forces the complete payload into that mode. When mode is omitted, the builder splits
+the payload into the shortest-bit combination of numeric, alphanumeric, and octet segments. Manual
+segment arrays are not accepted.
+
+## Matrix options
+
+`QRCodeMatrixOptions` contains only options that affect the encoded matrix:
+
+| Option                 | Type                                     | Default   | Constraint                                            |
+| ---------------------- | ---------------------------------------- | --------- | ----------------------------------------------------- |
+| `mode`                 | `'numeric' \| 'alphanumeric' \| 'octet'` | automatic | Forced mode must accept the entire payload            |
+| `eci`                  | `boolean`                                | `false`   | Only affects symbols containing octet segments        |
+| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`               | `'M'`     | Higher redundancy reduces payload capacity            |
+| `version`              | integer `1`–`40`                         | automatic | Pinned version must fit the encoded payload           |
+| `mask`                 | integer `0`–`7`                          | automatic | Pin only when deterministic matrix output is required |
+
+Set options individually or together:
+
+```ts
+const builder = qrcode('Grüße ✅').mode('octet').eci(true).errorCorrection('H').version(4).mask(2);
+
+const equivalent = qrcode('Grüße ✅').config({
+  mode: 'octet',
+  eci: true,
+  errorCorrectionLevel: 'H',
+  version: 4,
+  mask: 2,
+});
+```
+
+### ECI and UTF-8
+
+Octet payload bytes are always UTF-8. Enabling `eci` emits ECI assignment 26 once, immediately before
+the first octet segment, so scanners receive an explicit UTF-8 declaration. It adds 12 bits. With
+`eci: false`, scanners may rely on heuristics for non-ASCII text.
+
+No ECI header is emitted when a symbol contains no octet segment, so numeric- and
+alphanumeric-only symbols are identical with either setting.
+
+### Error correction
+
+The levels `L`, `M`, `Q`, and `H` add increasing amounts of redundant data. The default is `M`.
+Higher levels can tolerate more damaged or obscured modules, but reduce capacity and may select a
+larger version. For visual overlays, see the reliability guidance in
+[Customize appearance](/guides/customize/#protect-scan-reliability).
+
+### Version and mask
+
+Most applications should leave both values automatic. Pin them for fixtures, compatibility targets,
+or exact visual comparisons.
+
+When a pinned version cannot contain the payload, generation throws `QRCode: Data too large`.
+Removing the override helps only if a larger version can fit the payload. If automatic selection also
+fails, shorten or change the payload.
+
+## Builder methods
+
+| Method                     | Returns                   | Effect                                                         |
+| -------------------------- | ------------------------- | -------------------------------------------------------------- |
+| `.data(value)`             | a builder with data       | Sets or replaces the input                                     |
+| `.config(options?)`        | a configured builder      | Merges all supplied matrix options                             |
+| `.mode(mode?)`             | a configured builder      | Forces or clears the encoding mode                             |
+| `.eci(enabled?)`           | a configured builder      | Enables or clears the UTF-8 ECI declaration                    |
+| `.errorCorrection(level?)` | a configured builder      | Sets or clears the error correction level                      |
+| `.version(version?)`       | a configured builder      | Pins or clears the version                                     |
+| `.mask(mask?)`             | a configured builder      | Pins or clears the mask                                        |
+| `.matrix()`                | `QRCodeMatrix`            | Generates the matrix; requires data                            |
+| `.renderer(renderer)`      | a builder with a renderer | Stores a renderer for a later call                             |
+| `.render(renderer?)`       | renderer output           | Generates the matrix and invokes a supplied or stored renderer |
+
+The builder's types prevent `.matrix()` or `.render()` before data is set, and prevent `.render()`
+without either a stored or directly supplied renderer.
+
+## Matrix output and renderer contract
+
+`.matrix()` returns a two-dimensional `QRCodeMatrix`. Each module is `1` for dark or `0` for light.
+This is the only raw matrix-output contract.
+
+```ts
+import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
+
+const matrix: QRCodeMatrix = qrcode('custom output').matrix();
+```
+
+A `QRCodeRenderer<TOutput>` receives that matrix and returns `TOutput`:
+
+```ts
+import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
+
+const jsonRenderer: QRCodeRenderer<string> = (matrix) =>
+  JSON.stringify({size: matrix.length, matrix});
+
+const direct = qrcode('renderer output').render(jsonRenderer);
+const stored = qrcode('renderer output').renderer(jsonRenderer).render();
+```
+
+Built-in renderers follow the same function contract. Custom renderers own their output geometry,
+styling, validation, and return type; see [Custom renderers](/reference/custom-renderers/).

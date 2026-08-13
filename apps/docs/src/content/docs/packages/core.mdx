@@ -1,8 +1,7 @@
 ---
 title: '@qrcodesdk/core'
-description: '@qrcodesdk/core provides runtime-neutral QR code generation for JavaScript runtimes with native ESM, ES2020, and TextEncoder.'
+description: Runtime-neutral QR matrix generation with SVG string and terminal text renderers.
 docType: package
-
 packageName: '@qrcodesdk/core'
 
 worksWith:
@@ -12,9 +11,22 @@ worksWith:
   - 'node'
   - 'bun'
   - 'deno'
+
+related:
+  - ../reference/builder.mdx
+  - ../reference/renderers/svg.md
+  - ../reference/renderers/text.md
+  - ../guides/customize.md
 ---
 
-`@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK. It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
+import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
+
+`@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK. It converts data into a QR matrix
+and includes renderers for SVG strings and terminal text strings.
+
+## Install
+
+<PackageManagerTabs packages={['@qrcodesdk/core']} mode="add" />
 
 ## Quick start
 
@@ -24,226 +36,44 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
-Compare all packages in [Choose your setup](/getting-started/choose-your-setup/#choose-a-package).
+The result is an SVG `string`. See the [SVG renderer reference](/reference/renderers/svg/) for its
+options and constraints.
+
+## What Core adds
+
+| Capability                    | API                     | Return type    |
+| ----------------------------- | ----------------------- | -------------- |
+| Generate a QR matrix          | `qrcode(data).matrix()` | `QRCodeMatrix` |
+| Render scalable vector output | `QRCodeSVGRenderer`     | SVG `string`   |
+| Render terminal output        | `QRCodeTextRenderer`    | text `string`  |
+
+The complete input, matrix-option, builder-method, and matrix-output contracts live in
+[Builder and matrix](/reference/builder/). Shared visual options and scan-safety guidance live in
+[Customize appearance](/guides/customize/).
 
 ## Runtime compatibility
 
-> `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
-
-| Runtime                         | Support policy                                                      | CI verification                          |
-| ------------------------------- | ------------------------------------------------------------------- | ---------------------------------------- |
-| Node.js                         | All maintained LTS lines                                            | Latest Node 22.x and 24.x                |
-| Deno                            | Current stable major                                                | Latest Deno 2.x                          |
-| Bun                             | Current stable release                                              | Latest stable Bun                        |
-| Browsers                        | Current evergreen browser families                                  | Playwright Chromium, Firefox, and WebKit |
-| Other runtimes and edge workers | Supported when they provide ESM, ES2020, and a global `TextEncoder` | Not individually verified                |
-
-Core has no Node, DOM, filesystem, or framework dependency.
-
-Use [`@qrcodesdk/browser`](/packages/browser/) for DOM-dependent output and
-[`@qrcodesdk/node`](/packages/node/) for Node.js PNG buffers.
-
-## Builder API
-
-`qrcode()` accepts `string` or `number` input. The builder is immutable: every configuration method returns a new builder.
-
-```ts
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-
-const svg = qrcode('https://qrcodesdk.dev')
-  .mode('octet')
-  .eci(true)
-  .errorCorrection('M')
-  .version(4)
-  .mask(2)
-  .renderer(QRCodeSVGRenderer())
-  .render();
-```
-
-You can also create an empty builder and provide data later:
-
-```ts
-const builder = qrcode().data('https://qrcodesdk.dev');
-```
-
-### Data
-
-QRCodeSDK accepts `string` and `number` input.
-
-```ts
-qrcode('https://qrcodesdk.dev');
-qrcode(1234567890);
-```
-
-Number inputs must be non-negative safe integers. Use a string when the value has leading
-zeroes or exceeds JavaScript's safe integer range.
-
-Use a mode when you know the shape of your data.
-
-| Mode           | Best for                                              |
-| -------------- | ----------------------------------------------------- |
-| `numeric`      | Digits only.                                          |
-| `alphanumeric` | Uppercase QR alphanumeric data such as `HELLO WORLD`. |
-| `octet`        | UTF-8 text, URLs, JSON, emoji, and general byte data. |
-
-If you do not provide a mode, the builder automatically splits the input into the shortest-bit
-combination of numeric, alphanumeric, and octet segments. Setting a mode forces the entire payload
-to use that single mode. Mixed encoding is automatic; the builder does not accept manual segment
-arrays.
-
-QRCodeSDK implements QR Code Model 2 matrix generation for numeric, alphanumeric, and UTF-8
-octet payloads, including automatic mixed-mode encoding. Octet payload bytes are always encoded as
-UTF-8. The UTF-8 ECI declaration is disabled by default.
-
-### Methods
-
-The builder is immutable. Each method returns a new builder with the updated option.
-
-| Method                                   | Description                                             | Defaults |
-| ---------------------------------------- | ------------------------------------------------------- | :------- |
-| `.data(value)`                           | Sets QR code input data.                                | -        |
-| `.config(options?: QRCodeMatrixOptions)` | Sets all matrix options in one call.                    | -        |
-| `.mode(mode)`                            | Forces `numeric`, `alphanumeric`, or `octet` mode.      | `Auto`   |
-| `.errorCorrection(level)`                | Sets the error correction level: `L`, `M`, `Q`, or `H`. | `M`      |
-| `.version(version)`                      | Pins a QR code version from `1` to `40`.                | `Auto`   |
-| `.mask(mask)`                            | Pins a mask from `0` to `7`.                            | `Auto`   |
-| `.eci(enabled?)`                         | Emits UTF-8 ECI assignment 26 for octet segments.       | `false`  |
-| `.matrix()`                              | Returns the generated `QRCodeMatrix`.                   | -        |
-| `.renderer(renderer)`                    | Stores a renderer for a later `.render()` call.         | -        |
-| `.render(renderer?)`                     | Generates the matrix and returns renderer output.       | -        |
-
-For example, configure multiple matrix options together:
-
-```ts
-qrcode('https://qrcodesdk.dev').config({
-  mode: 'octet',
-  errorCorrectionLevel: 'H',
-  version: 4,
-  mask: 2,
-  eci: true,
-});
-```
-
-`QRCodeMatrixOptions` accepts `eci?: boolean`. You can also enable it with `.eci(true)`:
-
-```ts
-qrcode('Grüße ✅').eci(true);
-qrcode('Grüße ✅').config({eci: true});
-```
-
-Enabling ECI emits assignment 26 once, immediately before the first octet segment, so scanners
-receive an explicit UTF-8 declaration. Leaving it disabled saves 12 bits and matches common QR
-generators, but scanners may rely on heuristics for non-ASCII text. Numeric and
-alphanumeric-only symbols are identical with either setting. No ECI header is emitted when the
-generated symbol contains no octet segment.
-
-### Error correction
-
-The default error correction level is `M`.
-
-```ts
-qrcode('https://qrcodesdk.dev').errorCorrection('H');
-```
-
-Available levels are `L`, `M`, `Q`, and `H`. Higher levels can survive more damage, but they reduce capacity and can require a larger QR code version.
-
-### Version and mask
-
-Most applications should let the builder choose the version and mask automatically.
-
-```ts
-const matrix = qrcode('HELLO WORLD').mode('alphanumeric').version(1).mask(2).matrix();
-```
-
-Versions range from `1` to `40`. Masks range from `0` to `7`.
-
-Capacity depends on both the encoding mode and error correction level. When a pinned version
-cannot contain the payload, matrix generation throws `QRCode: Data too large`. Removing the
-version override helps only when a larger supported version can fit the payload. If automatic
-selection cannot fit any version, reduce or change the payload.
-
-## Matrix output
-
-Use `.matrix()` when you want to build your own renderer or inspect the QR code directly.
-
-```ts
-import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
-
-const matrix: QRCodeMatrix = qrcode('custom renderer').matrix();
-```
-
-A matrix is a two-dimensional array of modules. `1` means dark and `0` means light.
-
-## Built-in core renderers
-
-`@qrcodesdk/core` includes runtime-neutral renderers:
-
-- [Render SVG](/reference/renderers/svg/)
-- [Render Terminal Text](/reference/renderers/text/)
-
-For runtime-specific output, add:
-
-- [`@qrcodesdk/node`](/packages/node/) for PNG buffers
-- [`@qrcodesdk/browser`](/packages/browser/) for Canvas and Image elements
-
-For framework-specific components, add:
-
-- [`@qrcodesdk/angular`](/packages/angular/) for Angular
-- [`@qrcodesdk/react`](/packages/react/) for React
-
-## Styling contract
-
-All built-in renderers share one styling contract: `size` must be a positive safe integer,
-`margin` must be a non-negative safe integer, and colors must be hash-prefixed six-digit
-hexadecimal values.
-
-Each built-in renderer applies the shared defaults and validates resolved styling before producing
-output. Custom renderers receive the generated matrix and can define their own output geometry.
-
-### Prepared SVG images
-
-The SVG renderer accepts one centered image through
-`image: {source, size, padding, clearBackground}`. `source` must be an embedded
-`QRCodeDataImageURL`; create it before rendering. Core never reads image paths or fetches URLs.
-
-```ts
-import {readFile} from 'node:fs/promises';
-
-import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-
-const bytes = await readFile('./logo.png');
-const source = `data:image/png;base64,${bytes.toString('base64')}` as QRCodeDataImageURL;
-
-const svg = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(QRCodeSVGRenderer({image: {source, size: 0.3}}));
-```
-
-Image size defaults to `0.4`, clear padding to one module, and clearing to enabled. Large images
-can make QR codes impossible to scan; high error correction helps but is not a guarantee.
-
-## Matrix output and custom renderers
-
-Use `.matrix()` to inspect modules or take full control over rendering. A matrix is a two-dimensional array where `1` is dark and `0` is light.
-
-```ts
-import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
-
-const matrix: QRCodeMatrix = qrcode('custom output').matrix();
-```
-
-A renderer is any function that receives a matrix and returns an output value:
-
-```ts
-import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
-
-const jsonRenderer: QRCodeRenderer<string> = (matrix) =>
-  JSON.stringify({size: matrix.length, matrix});
-
-const json = qrcode('renderer output').render(jsonRenderer);
-```
-
-Renderers can be passed directly to `.render(renderer)` or stored with `.renderer(renderer).render()`.
+Core supports JavaScript runtimes with native ESM, ES2020, and a global `TextEncoder`. It has no
+Node.js, DOM, filesystem, or framework dependency.
+
+| Runtime                         | Support policy                                     | CI verification                          |
+| ------------------------------- | -------------------------------------------------- | ---------------------------------------- |
+| Node.js                         | Maintained LTS lines                               | Latest Node.js 22.x and 24.x             |
+| Deno                            | Current stable major                               | Latest Deno 2.x                          |
+| Bun                             | Current stable release                             | Latest stable Bun                        |
+| Browsers                        | Current evergreen browser families                 | Playwright Chromium, Firefox, and WebKit |
+| Other runtimes and edge workers | Supported when they meet the Core runtime contract | Not individually verified                |
+
+For runtime-specific output, add the owning package:
+
+| Package                                    | Additional output                                           | Return type                                     |
+| ------------------------------------------ | ----------------------------------------------------------- | ----------------------------------------------- |
+| [`@qrcodesdk/browser`](/packages/browser/) | Canvas element, PNG-backed Image element, browser downloads | `HTMLCanvasElement`, `HTMLImageElement`, `void` |
+| [`@qrcodesdk/node`](/packages/node/)       | PNG bytes                                                   | `Buffer`                                        |
+| [`@qrcodesdk/react`](/packages/react/)     | React SVG, Image, and Canvas components                     | React element                                   |
+| [`@qrcodesdk/angular`](/packages/angular/) | Angular SVG, Image, and Canvas components                   | Angular component                               |
+
+Compare every built-in output in [Renderer outputs](/reference/renderers/).
 
 ## Public API
 
@@ -281,5 +111,5 @@ import {
 } from '@qrcodesdk/core';
 ```
 
-Exports whose names begin with `ɵ` are private integration contracts for QRCodeSDK's sibling
-packages. They are not part of the public API and can change without compatibility guarantees.
+Exports whose names begin with `ɵ` are private integration contracts for QRCodeSDK sibling packages.
+They are not part of the public API and can change without compatibility guarantees.
