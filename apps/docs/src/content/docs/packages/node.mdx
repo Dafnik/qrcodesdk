@@ -14,6 +14,7 @@ related:
 ---
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
+import RenderOptions from '../../../components/packages/render-options.astro';
 
 Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
 
@@ -32,7 +33,11 @@ const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 
 `QRCodePNGRenderer()` returns a Node.js `Buffer` containing a square, fully opaque PNG image.
 
-## Common options
+## Renderer options
+
+<RenderOptions compressionLevel={true} accessibility={false} />
+
+### Example
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -52,35 +57,6 @@ const png: Buffer = qrcode('https://qrcodesdk.dev').render(
   }),
 );
 ```
-
-### All options
-
-| Option                       | Type                     |            Default | Description                                       |
-| ---------------------------- | ------------------------ | -----------------: | ------------------------------------------------- |
-| `size`                       | `number`                 |                `5` | Pixel size of each QR module.                     |
-| `margin`                     | `number`                 |                `4` | Quiet-zone margin around the QR code, in modules. |
-| `colors.colorDark`           | `string`                 |        `'#000000'` | Color used for dark QR modules.                   |
-| `colors.colorLight`          | `string`                 |        `'#ffffff'` | Background color.                                 |
-| `dotsOptions.type`           | `QRCodeDotType`          |         `'square'` | Shape used for ordinary data modules.             |
-| `dotsOptions.color`          | `string`                 | `colors.colorDark` | Color used for ordinary data modules.             |
-| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                |
-| `cornersSquareOptions.color` | `string`                 | `colors.colorDark` | Color used for finder outer rings.                |
-| `cornersDotOptions.type`     | `QRCodeCornerDotType`    |         `'square'` | Shape used for finder centers.                    |
-| `cornersDotOptions.color`    | `string`                 | `colors.colorDark` | Color used for finder centers.                    |
-| `compressionLevel`           | `number`                 |                `9` | PNG compression from `0` (fast) to `9` (small).   |
-| `image.source`               | `Buffer`                 |        `undefined` | PNG bytes already loaded by the caller.           |
-| `image.size`                 | `number`                 |              `0.4` | Image box as a fraction of matrix width.          |
-| `image.padding`              | `number`                 |                `1` | Clear padding in QR module units.                 |
-| `image.clearBackground`      | `boolean`                |             `true` | Clears modules behind the image and padding.      |
-
-Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
-
-`Size` must be a positive safe integer and `margin` must be a non-negative safe integer.
-`compressionLevel` must be an integer from `0` through `9`.
-
-Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
-`extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
-is independent; omit it to inherit `colors.colorDark`.
 
 ## Common recipes
 

@@ -17,6 +17,7 @@ related:
 ---
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
+import RenderOptions from '../../../components/packages/render-options.astro';
 
 `@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.
 
@@ -75,27 +76,7 @@ document.querySelector('#qrcode')?.append(canvas);
 
 ## Renderer options
 
-| Option                  | Type                         |            Default | Description                                   |
-| ----------------------- | ---------------------------- | -----------------: | --------------------------------------------- |
-| `size`                  | `number`                     |                `5` | Pixel size of each QR module.                 |
-| `margin`                | `number`                     |                `4` | Quiet-zone width in modules.                  |
-| `colors.colorDark`      | `string`                     |        `'#000000'` | Dark module color.                            |
-| `colors.colorLight`     | `string`                     |        `'#ffffff'` | Background color.                             |
-| `dotsOptions`           | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary module shape and optional color.     |
-| `cornersSquareOptions`  | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color.         |
-| `cornersDotOptions`     | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color.       |
-| `alt`                   | `string`                     |               `''` | Image `alt` attribute; Image renderer only.   |
-| `ariaLabel`             | `string`                     |        `undefined` | Image `aria-label`; Image renderer only.      |
-| `title`                 | `string`                     |        `undefined` | Image `title` attribute; Image renderer only. |
-| `image.source`          | `CanvasImageSource`          |        `undefined` | Image already loaded by the caller.           |
-| `image.size`            | `number`                     |              `0.4` | Relative centered image-box size.             |
-| `image.padding`         | `number`                     |                `1` | Clear padding in QR modules.                  |
-| `image.clearBackground` | `boolean`                    |             `true` | Clears modules behind the image.              |
-
-Color options use hash-prefixed values such as `#111827`. Browser pixel output requires a positive integer `size` and a non-negative integer `margin`.
-
-All feature colors inherit `colors.colorDark` when omitted. Shapes are shared by Canvas and Image
-output, including PNG downloads.
+<RenderOptions />
 
 ### Prepared center images
 

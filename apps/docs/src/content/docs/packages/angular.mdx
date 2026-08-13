@@ -21,10 +21,10 @@ import QRCodeDownloadImage from '../../../components/astro/angular-examples/qrco
 import QRCodeImage from '../../../components/astro/angular-examples/qrcode-image.astro';
 import QRCodeSVG from '../../../components/astro/angular-examples/qrcode-svg.astro';
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
+import PackageComponents from '../../../components/packages/package-components.astro';
+import RenderOptions from '../../../components/packages/render-options.astro';
 
-`@qrcodesdk/angular` provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
-
-It supports Angular 20 through 22.
+Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
 ## Install
 
@@ -54,28 +54,15 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
 export class App {}
 ```
 
+## Version compatibility
+
+| @qrcodesdk/angular | Angular                       |
+| ------------------ | ----------------------------- |
+| `0.x.x`            | `^20.0.0` `^21.0.0` `^22.0.0` |
+
 ## Components
 
-| Component      | Selector        | Output             | Download support |
-| -------------- | --------------- | ------------------ | ---------------- |
-| `QRCodeSVG`    | `qrcode-svg`    | Inline SVG element | SVG              |
-| `QRCodeImage`  | `qrcode-image`  | PNG-backed `<img>` | PNG              |
-| `QRCodeCanvas` | `qrcode-canvas` | `<canvas>` element | None             |
-
-All components accept:
-
-| Input     | Type                       | Description                                 |
-| --------- | -------------------------- | ------------------------------------------- |
-| `data`    | `string \| number`         | Required QR code payload.                   |
-| `options` | Component-specific options | Optional matrix and renderer configuration. |
-
-`options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, `mask`, and `eci`. Renderer options match the corresponding QRCodeSDK renderer:
-
-- `QRCodeSVG` uses `QRCodeSVGOptions`.
-- `QRCodeImage` uses `QRCodeImageOptions`.
-- `QRCodeCanvas` uses `QRCodeCanvasOptions`.
-
-Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` and `QRCodeCanvasOptions` from `@qrcodesdk/browser`.
+<PackageComponents />
 
 ## Matrix options
 
@@ -114,27 +101,7 @@ Numeric and alphanumeric-only symbols are unaffected.
 
 ## Renderer options
 
-| Option                  | Components | Type                         |            Default |
-| ----------------------- | ---------- | ---------------------------- | -----------------: |
-| `size`                  | All        | `number`                     |                `5` |
-| `margin`                | All        | `number`                     |                `4` |
-| `colors.colorDark`      | All        | `string`                     |        `'#000000'` |
-| `colors.colorLight`     | All        | `string`                     |        `'#ffffff'` |
-| `dotsOptions`           | All        | `QRCodeDotsOptions`          | `{type: 'square'}` |
-| `cornersSquareOptions`  | All        | `QRCodeCornersSquareOptions` | `{type: 'square'}` |
-| `cornersDotOptions`     | All        | `QRCodeCornersDotOptions`    | `{type: 'square'}` |
-| `alt`                   | SVG, Image | `string`                     |        `undefined` |
-| `ariaLabel`             | SVG, Image | `string`                     |        `undefined` |
-| `title`                 | SVG, Image | `string`                     |        `undefined` |
-| `image.source`          | All        | Renderer-specific source     |        `undefined` |
-| `image.size`            | All        | `number`                     |              `0.4` |
-| `image.padding`         | All        | `number`                     |                `1` |
-| `image.clearBackground` | All        | `boolean`                    |             `true` |
-
-Color options use hash-prefixed values such as `#111827`. All built-in renderers require a positive safe integer `size` and a non-negative safe integer `margin`.
-
-Module, finder-ring, and finder-center options pass through to every component. Their optional
-colors independently inherit `colors.colorDark`.
+<RenderOptions />
 
 ### Prepared center images
 

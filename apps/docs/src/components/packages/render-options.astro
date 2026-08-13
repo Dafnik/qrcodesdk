@@ -1,0 +1,137 @@
+---
+import {Code} from '@astrojs/starlight/components';
+
+interface Props {
+  accessibility?: boolean;
+  compression?: boolean;
+}
+
+const {accessibility = true, compressionLevel = false} = Astro.props;
+
+const options = [
+  ['`size`', 'All', '`number`', '`5`', 'Pixel size of each QR module.'],
+  ['`margin`', 'All', '`number`', '`4`', 'Quiet-zone width in modules.'],
+  ['`colors.colorDark`', 'All', '`string`', "`'#000000'`", 'Dark module color.'],
+  ['`colors.colorLight`', 'All', '`string`', "`'#ffffff'`", 'Background color.'],
+  [
+    '`dotsOptions`',
+    'All',
+    '`QRCodeDotsOptions`',
+    "`{type: 'square'}`",
+    'Ordinary module shape and optional color.',
+  ],
+  [
+    '`cornersSquareOptions`',
+    'All',
+    '`QRCodeCornersSquareOptions`',
+    "`{type: 'square'}`",
+    'Finder-ring shape and optional color.',
+  ],
+  [
+    '`cornersDotOptions`',
+    'All',
+    '`QRCodeCornersDotOptions`',
+    "`{type: 'square'}`",
+    'Finder-center shape and optional color.',
+  ],
+  [
+    '`image.source`',
+    'All',
+    'Renderer-specific source',
+    '`undefined`',
+    'Image already loaded by the caller.',
+  ],
+  ['`image.size`', 'All', '`number`', '`0.4`', 'Relative centered image-box size.'],
+  ['`image.padding`', 'All', '`number`', '`1`', 'Clear padding in QR modules.'],
+  ['`image.clearBackground`', 'All', '`boolean`', '`true`', 'Clears modules behind the image.'],
+  ...(accessibility
+    ? [
+        ['`alt`', 'SVG, Image', '`string`', '`undefined`', 'Image `alt` attribute.'],
+        ['`ariaLabel`', 'SVG, Image', '`string`', '`undefined`', 'Image `aria-label`.'],
+        ['`title`', 'SVG, Image', '`string`', '`undefined`', 'Image `title` attribute.'],
+      ]
+    : []),
+  ...(compressionLevel
+    ? [
+        [
+          '`compressionLevel`',
+          '',
+          '`number`',
+          '`9`',
+          'PNG compression from `0` (fast) to `9` (small).',
+        ],
+      ]
+    : []),
+];
+
+const optionTypes = `export type QRCodeDotsOptions = {
+  color?: QRCodeColorHex;
+  type?: QRCodeDotType;
+};
+
+export type QRCodeCornersSquareOptions = {
+  color?: QRCodeColorHex;
+  type?: QRCodeCornerSquareType;
+};
+
+export type QRCodeCornersDotOptions = {
+  color?: QRCodeColorHex;
+  type?: QRCodeCornerDotType;
+};`;
+---
+
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Type / Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {
+      options.map(([option, components, type, defaultValue, description]) => (
+        <tr>
+          <td>
+            <code>{option.replaceAll('`', '')}</code>
+            {components !== 'All' && components ? ` (${components})` : ''}
+          </td>
+          <td>
+            {type.startsWith('`') ? <code>{type.replaceAll('`', '')}</code> : type}
+            <br />
+            Default: <code>{defaultValue.replaceAll('`', '')}</code>
+          </td>
+          <td>{description}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<p>The following options are available for styling:</p>
+
+<Code code={optionTypes} lang="ts" />
+
+<h4>Restrictions</h4>
+
+<ul>
+  <li>
+    Color options use hash-prefixed values such as <code>#111827</code>.
+  </li>
+  <li>
+    <code>size</code> requires a positive safe integer (<code>&gt;0</code>) and
+    <code>margin</code> a non-negative safe integer (<code>&gt;=0</code>).
+  </li>
+  <li>
+    Module, finder-ring, and finder-center options pass through to every component. Their optional
+    colors independently inherit
+    <code>colors.colorDark</code>.
+  </li>
+  <li>
+    Data-module types are <code>square</code>, <code>rounded</code>,
+    <code>dots</code>, <code>classy</code>, <code>classy-rounded</code>, and
+    <code>extra-rounded</code>. Finder rings and centers additionally support
+    <code>dot</code>.
+  </li>
+</ul>

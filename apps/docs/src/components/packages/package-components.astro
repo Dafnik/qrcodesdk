@@ -1,0 +1,108 @@
+---
+interface Props {
+  className?: boolean;
+}
+
+const {className = false} = Astro.props;
+
+const components = [
+  {
+    component: 'QRCodeSVG',
+    selector: 'qrcode-svg',
+    output: 'Inline SVG element',
+    downloadSupport: 'SVG',
+  },
+  {
+    component: 'QRCodeImage',
+    selector: 'qrcode-image',
+    output: 'PNG-backed <img>',
+    downloadSupport: 'PNG',
+  },
+  {
+    component: 'QRCodeCanvas',
+    selector: 'qrcode-canvas',
+    output: '<canvas> element',
+    downloadSupport: 'None',
+  },
+];
+
+const props = [
+  {
+    prop: 'data',
+    type: 'string | number',
+    description: 'Required QR code payload.',
+  },
+  {
+    prop: 'options',
+    type: 'Component-specific options',
+    description: 'Optional matrix and renderer configuration.',
+  },
+  ...(className
+    ? [
+        {
+          prop: 'className',
+          type: 'string',
+          description: 'CSS class applied to the component wrapper div.',
+        },
+      ]
+    : []),
+];
+---
+
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Selector</th>
+      <th>Output</th>
+      <th>Download support</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {
+      components.map((item) => (
+        <tr>
+          <td>
+            <code>{item.component}</code>
+          </td>
+          <td>
+            <code>{item.selector}</code>
+          </td>
+          <td>
+            <code>{item.output}</code>
+          </td>
+          <td>{item.downloadSupport}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<h4>Options</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {
+      props.map((item) => (
+        <tr>
+          <td>
+            <code>{item.prop}</code>
+          </td>
+          <td>
+            <code>{item.type}</code>
+          </td>
+          <td>{item.description}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
