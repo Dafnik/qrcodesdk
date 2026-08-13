@@ -15,7 +15,6 @@ related:
 ---
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
-import RenderOptions from '../../../components/packages/render-options.astro';
 
 Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
 
@@ -34,132 +33,11 @@ const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 
 `QRCodePNGRenderer()` returns a Node.js `Buffer` containing a square, fully opaque PNG image.
 
-## Renderer options
+## Work with PNG output
 
-<RenderOptions compressionLevel={true} accessibility={false} />
-
-### Example
-
-```ts
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const png: Buffer = qrcode('https://qrcodesdk.dev').render(
-  QRCodePNGRenderer({
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
-    },
-    dotsOptions: {type: 'rounded'},
-    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
-    cornersDotOptions: {type: 'dot'},
-  }),
-);
-```
-
-## Common recipes
-
-### Add prepared PNG images
-
-Read or download the PNG before invoking the renderer. `QRCodePNGRenderer` decodes the supplied
-bytes in memory but performs no filesystem or network I/O.
-
-```ts
-import {readFile} from 'node:fs/promises';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const logo = await readFile('./logo.png');
-
-const png = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(QRCodePNGRenderer({image: {source: logo}}));
-```
-
-Only PNG source bytes are accepted. The source is centered, resized without cropping, and
-alpha-composited into the opaque output. Although `size` values through `1` are valid, large
-overlays can prevent scanning.
-
-### Save to disk
-
-```ts
-import {writeFile} from 'node:fs/promises';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-await writeFile('qrcode.png', png);
-```
-
-### Send an HTTP response
-
-The returned buffer can be sent from any Node.js HTTP framework as `image/png`:
-
-```ts
-import {createServer} from 'node:http';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-createServer((_request, response) => {
-  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-  response.writeHead(200, {
-    'Content-Length': png.length,
-    'Content-Type': 'image/png',
-  });
-  response.end(png);
-}).listen(3000);
-```
-
-### Serve with Express
-
-```ts
-import express from 'express';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const app = express();
-
-app.get('/qrcode.png', (_req, res) => {
-  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-  res.type('image/png').send(png);
-});
-
-app.listen(3000);
-```
-
-### Return from Hono
-
-```ts
-import {serve} from '@hono/node-server';
-import {Hono} from 'hono';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const app = new Hono();
-
-app.get('/qrcode.png', (c) => {
-  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-  return c.body(png, 200, {
-    'Content-Type': 'image/png',
-  });
-});
-
-serve({
-  fetch: app.fetch,
-  port: 3000,
-});
-```
+See the [PNG Buffer renderer](/reference/renderers/png/) for compression, prepared PNG overlays,
+and exact constraints. Follow [Download or save](/guides/download-or-save/) to write the Buffer to
+disk or [Serve a QR code](/guides/server-output/) to return it as `image/png`.
 
 ## Runtime requirements
 

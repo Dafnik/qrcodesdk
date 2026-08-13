@@ -18,7 +18,6 @@ related:
 ---
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
-import RenderOptions from '../../../components/packages/render-options.astro';
 
 `@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.
 
@@ -75,70 +74,16 @@ document.querySelector('#qrcode')?.append(canvas);
 
 `QRCodeCanvasRenderer()` returns an `HTMLCanvasElement` that you can insert into the DOM, draw into another canvas, or export with `toBlob()` or `toDataURL()`.
 
-## Renderer options
+## Configure and download output
 
-<RenderOptions />
+Each output has a dedicated reference for its return value, options, and browser constraints:
 
-### Prepared center images
+- [Canvas element](/reference/renderers/canvas/)
+- [PNG-backed Image element](/reference/renderers/image/)
+- [SVG and PNG download wrappers](/reference/renderers/browser-downloads/)
 
-Canvas and Image renderers accept an already-loaded `CanvasImageSource`. Finish loading before
-rendering; QRCodeSDK never fetches the source:
-
-```ts
-const logo = new Image();
-logo.src = '/logo.png';
-await logo.decode();
-
-const canvas = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(QRCodeCanvasRenderer({image: {source: logo, size: 0.3}}));
-```
-
-Unloaded or zero-sized sources throw synchronously. The overlay is also included in PNG downloads.
-See [Add a center image](/guides/center-images/) for sizing and scan-reliability
-guidance.
-
-## Download PNG
-
-Wrap an Image renderer with `QRCodeDownloadImageRenderer` to trigger a browser download:
-
-```ts
-import {QRCodeDownloadImageRenderer, QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-qrcode('https://qrcodesdk.dev').render(
-  QRCodeDownloadImageRenderer({
-    renderer: QRCodeImageRenderer({
-      alt: 'QR code for qrcodesdk.dev',
-    }),
-    filename: 'qrcode',
-  }),
-);
-```
-
-The renderer appends `.png` when necessary, clicks a temporary download link, and returns `void`.
-
-## Download SVG
-
-SVG strings come from `@qrcodesdk/core`. Wrap its renderer to download the result in the browser:
-
-```ts
-import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-
-qrcode('https://qrcodesdk.dev').render(
-  QRCodeDownloadSVGRenderer({
-    renderer: QRCodeSVGRenderer({
-      size: 4,
-      margin: 2,
-      ariaLabel: 'Scan to open qrcodesdk.dev',
-    }),
-    filename: 'qrcode',
-  }),
-);
-```
-
-The renderer appends `.svg` when necessary, downloads an SVG `Blob`, revokes its temporary object URL, and returns `void`.
+Follow [Add a center image](/guides/center-images/) to prepare a `CanvasImageSource`, and
+[Download or save](/guides/download-or-save/) for browser helpers and manual Canvas export.
 
 ## Package boundary
 
