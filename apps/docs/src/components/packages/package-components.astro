@@ -1,9 +1,10 @@
 ---
 interface Props {
   className?: boolean;
+  selector?: boolean;
 }
 
-const {className = false} = Astro.props;
+const {className = false, selector = false} = Astro.props;
 
 const components = [
   {
@@ -53,7 +54,7 @@ const props = [
   <thead>
     <tr>
       <th>Component</th>
-      <th>Selector</th>
+      {selector && <th>Selector</th>}
       <th>Output</th>
       <th>Download support</th>
     </tr>
@@ -66,9 +67,11 @@ const props = [
           <td>
             <code>{item.component}</code>
           </td>
-          <td>
-            <code>{item.selector}</code>
-          </td>
+          {selector && (
+            <td>
+              <code>{item.selector}</code>
+            </td>
+          )}
           <td>
             <code>{item.output}</code>
           </td>

@@ -11,6 +11,8 @@ worksWith:
 
 related:
   - ../guides/customize.md
+  - ../guides/center-images.md
+  - ../guides/download-or-save.md
   - ../reference/renderers/svg.md
   - ../reference/renderers/image.md
   - ../reference/renderers/canvas.md
@@ -23,7 +25,6 @@ import QRCodeImage from '../../../components/astro/react-examples/qrcode-image.a
 import QRCodeSVG from '../../../components/astro/react-examples/qrcode-svg.astro';
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 import PackageComponents from '../../../components/packages/package-components.astro';
-import RenderOptions from '../../../components/packages/render-options.astro';
 
 React components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
@@ -62,22 +63,8 @@ export function App() {
 
 <PackageComponents className={true} />
 
-## Matrix options
-
-The `options` prop combines the component's renderer options with the shared QR matrix options:
-
-| Option                 | Type                                     | Default   | Description                            |
-| ---------------------- | ---------------------------------------- | --------- | -------------------------------------- |
-| `mode`                 | `'numeric' \| 'alphanumeric' \| 'octet'` | Automatic | Encoding mode.                         |
-| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`               | `'M'`     | Error correction level.                |
-| `version`              | `1` through `40`                         | Automatic | Pins the QR version.                   |
-| `mask`                 | `0` through `7`                          | Automatic | Pins the QR mask.                      |
-| `eci`                  | `boolean`                                | `false`   | Emits UTF-8 ECI 26 for octet segments. |
-
-Most applications should let the builder select the mode, version, and mask automatically.
-Octet bytes remain UTF-8 regardless of `eci`. Set `eci: true` to explicitly declare UTF-8 to
-scanners; the default saves 12 bits and may rely on scanner heuristics for non-ASCII text.
-Numeric and alphanumeric-only symbols are unaffected.
+React passes `className` to the component's wrapper `<div>`. Use a React ref when you need a
+download handle; the rendered SVG, Image, or Canvas remains inside that wrapper.
 
 ## Live examples
 
@@ -97,63 +84,13 @@ Numeric and alphanumeric-only symbols are unaffected.
 
 <QRCodeDownloadImage />
 
-## Renderer options
+## Center images
 
-<RenderOptions />
-
-### Prepared center images
-
-Prepare browser image sources before rendering:
-
-```tsx
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-import {useMemo, useState} from 'react';
-
-import {QRCodeImage} from '@qrcodesdk/react';
-
-export function QRCodeWithLogo() {
-  const [logo, setLogo] = useState<HTMLImageElement>();
-  const options = useMemo<QRCodeImageOptions>(
-    () => ({
-      errorCorrectionLevel: 'H',
-      image: logo ? {source: logo, size: 0.3} : undefined,
-    }),
-    [logo],
-  );
-
-  async function selectLogo(file: File) {
-    const source = new Image();
-    const localUrl = URL.createObjectURL(file);
-    source.src = localUrl;
-
-    try {
-      await source.decode();
-      setLogo(source);
-    } finally {
-      URL.revokeObjectURL(localUrl);
-    }
-  }
-
-  return (
-    <>
-      <input
-        accept="image/*"
-        type="file"
-        onChange={(event) => {
-          const file = event.currentTarget.files?.[0];
-          if (file) void selectLogo(file);
-        }}
-      />
-      {logo ? (
-        <QRCodeImage data="https://qrcodesdk.dev" options={options} />
-      ) : null}
-    </>
-  );
-}
-```
-
-Use an embedded `data:image/...` URL for `QRCodeSVG`. Components never load paths or URLs
-themselves, and SVG/PNG downloads include the overlay.
+Load and decode a browser image first, store the resulting `HTMLImageElement` in state, and pass
+it through `options.image.source`. Updating that state rerenders the component with the prepared
+source. See
+[Add a center image](/guides/center-images/#wire-prepared-sources-into-frameworks) for the complete
+React lifecycle.
 
 ## Download files
 
@@ -183,11 +120,21 @@ The appropriate `.svg` or `.png` extension is appended when necessary.
 
 `QRCodeCanvas` does not include a download method. Use `QRCodeImage` when you want built-in PNG download support.
 
+See [Download or save](/guides/download-or-save/#download-from-react) for SVG, PNG, and manual
+Canvas downloads.
+
 ## Server-side rendering
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
 `QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+
+## Shared configuration
+
+The `options` prop combines matrix settings with the selected renderer's settings. Use the
+[builder reference](/reference/builder/) for encoding, version, mask, and error correction;
+[Customize output](/guides/customize/) for shared visual options; and the dedicated
+[renderer references](/reference/renderers/) for output-specific options and constraints.
 
 ## Public API
 
