@@ -6,80 +6,61 @@ docType: setup
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
-## Start with core
+Choose the smallest package set that produces the output your application needs. Core is the default
+when SVG or terminal text is enough; renderer and framework packages build on it.
 
-Use `@qrcodesdk/core` for runtime-neutral QR code generation.
+## Choose a package
+
+| Package                                    | Choose it for                                    | Outputs                                                                 |
+| ------------------------------------------ | ------------------------------------------------ | ----------------------------------------------------------------------- |
+| [`@qrcodesdk/core`](/packages/core/)       | Runtime-neutral generation and raw matrix access | SVG `string`, terminal text `string`, `QRCodeMatrix`                    |
+| [`@qrcodesdk/browser`](/packages/browser/) | Direct DOM output and client-side downloads      | `HTMLCanvasElement`, PNG-backed `HTMLImageElement`, SVG or PNG download |
+| [`@qrcodesdk/node`](/packages/node/)       | Server-side raster output                        | PNG `Buffer`                                                            |
+| [`@qrcodesdk/react`](/packages/react/)     | React and Next.js components                     | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
+| [`@qrcodesdk/angular`](/packages/angular/) | Standalone Angular components                    | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
+| [`@qrcodesdk/cli`](/packages/cli/)         | Terminal, shell, and CI workflows                | Terminal text, SVG file, PNG file                                       |
+
+For an output-first comparison with exact return types, see [Renderer outputs](/reference/renderers/).
+
+## Install Core
+
+Use this default when you need SVG, terminal text, or raw matrix output.
 
 <PackageManagerTabs packages={['@qrcodesdk/core']} mode="add" />
 
-```ts
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+## Install browser output
 
-const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
-```
-
-## Package guide
-
-| Package              | Install when you need                                 | Outputs                                                |
-| -------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
-| `@qrcodesdk/core`    | Runtime-neutral generation and common output formats. | `SVG` strings, terminal text strings, raw matrices.    |
-| `@qrcodesdk/cli`     | Command line generation from terminals and scripts.   | Terminal text, SVG files, PNG files.                   |
-| `@qrcodesdk/browser` | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`, downloads.    |
-| `@qrcodesdk/angular` | Angular components & download helpers.                | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, downloads. |
-| `@qrcodesdk/react`   | React components & download helpers.                  | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, downloads. |
-| `@qrcodesdk/node`    | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                          |
-
-## Add PNG output in Node.js
-
-<PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/node']} mode="add" />
-
-```ts
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-```
-
-Use PNG buffers for files, API responses, downloads, email attachments, and other integrations that expect `image/png` bytes.
-More information can be found [here](/packages/node/).
-
-## Add browser DOM output
+Add Canvas elements, PNG-backed Image elements, and browser download helpers.
 
 <PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/browser']} mode="add" />
 
-```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
+## Install Node.js PNG output
 
-const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({
-    alt: 'QR code for qrcodesdk.dev',
-  }),
-);
+<PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/node']} mode="add" />
 
-document.body.append(image);
-```
+## Install React components
 
-Use browser renderers when you want an `HTMLCanvasElement`, an `HTMLImageElement`, a client-side SVG or PNG download, or DOM/CSS integration.
-More information can be found [here](/packages/browser/).
+<PackageManagerTabs
+  packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/react']}
+  mode="add"
+/>
 
-## Use via the CLI
+React and React DOM are peer dependencies; use the versions already selected by your application.
+
+## Install Angular components
+
+<PackageManagerTabs
+  packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/angular']}
+  mode="add"
+/>
+
+Angular, RxJS, and their normal runtime dependencies are peers; use your application's versions.
+
+## Install the CLI
 
 <PackageManagerTabs packages={['@qrcodesdk/cli']} mode="addGlobal" />
 
-```sh
-qrc "https://qrcodesdk.dev"
-qrc "https://qrcodesdk.dev" --output qrcode.svg
-qrc "https://qrcodesdk.dev" --output qrcode.png
-```
-
-The CLI can print terminal text or write SVG and PNG files.
-More information can be found [here](/packages/cli/).
-
 ## Next steps
 
-- [Render in the Browser](/packages/browser/)
-- [Render on Node.js](/packages/node/)
-- [Render in Angular](/packages/angular/)
-- [Render in React](/packages/react/)
-- [Use the CLI](/packages/cli/)
+Open the package page linked in the table for its minimal example and package-specific behavior. If
+you chose Core, continue with the [SVG string renderer](/reference/renderers/svg/).
