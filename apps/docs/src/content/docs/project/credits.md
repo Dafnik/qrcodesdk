@@ -1,6 +1,7 @@
 ---
 title: Credits
 description: QRCodeSDK authorship, licensing, and acknowledgements.
+docType: concept
 ---
 
 QRCodeSDK is an MIT-licensed project created and maintained by [Dafnik](https://dafnik.me) within the [QRCodeSDK repository](https://github.com/Dafnik/qrcodesdk).

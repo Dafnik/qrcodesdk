@@ -1,10 +1,11 @@
 ---
 title: Render to an Image Element
 description: Render a QR code as an HTMLImageElement with @qrcodesdk/browser.
+docType: reference
 
 related:
   - ./canvas.md
-  - ../../advanced/customize.md
+  - ../../guides/customize.md
   - ../../packages/browser.mdx
 ---
 

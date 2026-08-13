@@ -1,9 +1,10 @@
 ---
 title: Render Terminal Text
 description: Render a QR code as compact UTF-8 text with optional ANSI colors.
+docType: reference
 
 related:
-  - ../../advanced/customize.md
+  - ../../guides/customize.md
   - ./svg.md
 ---
 

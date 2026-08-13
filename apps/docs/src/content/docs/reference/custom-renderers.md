@@ -1,9 +1,10 @@
 ---
 title: Custom Renderers
 description: Build your own QRCodeSDK renderer by converting a QR matrix into any output type.
+docType: reference
 
 related:
-  - ./customize.md
+  - ../guides/customize.md
   - ../packages/core.mdx
 ---
 
@@ -11,13 +12,13 @@ Renderers convert a QR matrix into an output value. QRCodeSDK includes renderers
 
 ## Choose a built-in renderer
 
-| Renderer                                                | Output              | Best for                                              | Package              |
-| ------------------------------------------------------- | ------------------- | ----------------------------------------------------- | -------------------- |
-| [Render SVG](/renderers/core/svg/)                      | `string`            | Web apps, emails, dashboards, HTML, static assets     | `@qrcodesdk/core`    |
-| [Render PNG in Node.js](/packages/node/)                | `Buffer`            | Servers, downloads, files, API responses, attachments | `@qrcodesdk/node`    |
-| [Render to Canvas](/renderers/browser/canvas/)          | `HTMLCanvasElement` | Browser DOM, canvas workflows, client-side downloads  | `@qrcodesdk/browser` |
-| [Render to an Image Element](/renderers/browser/image/) | `HTMLImageElement`  | Browser DOM, CSS styling, accessible image elements   | `@qrcodesdk/browser` |
-| [Render Terminal Text](/renderers/core/text/)           | `string`            | CLIs, logs, terminals, snapshot tests                 | `@qrcodesdk/core`    |
+| Renderer                                                  | Output              | Best for                                              | Package              |
+| --------------------------------------------------------- | ------------------- | ----------------------------------------------------- | -------------------- |
+| [Render SVG](/reference/renderers/svg/)                   | `string`            | Web apps, emails, dashboards, HTML, static assets     | `@qrcodesdk/core`    |
+| [Render PNG in Node.js](/packages/node/)                  | `Buffer`            | Servers, downloads, files, API responses, attachments | `@qrcodesdk/node`    |
+| [Render to Canvas](/reference/renderers/canvas/)          | `HTMLCanvasElement` | Browser DOM, canvas workflows, client-side downloads  | `@qrcodesdk/browser` |
+| [Render to an Image Element](/reference/renderers/image/) | `HTMLImageElement`  | Browser DOM, CSS styling, accessible image elements   | `@qrcodesdk/browser` |
+| [Render Terminal Text](/reference/renderers/text/)        | `string`            | CLIs, logs, terminals, snapshot tests                 | `@qrcodesdk/core`    |
 
 Browser downloads are recipes on the SVG and Image renderer pages: use the browser package to wrap `QRCodeSVGRenderer()` for `.svg` downloads, or `QRCodeImageRenderer()` for `.png` downloads.
 

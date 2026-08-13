@@ -1,0 +1,17 @@
+---
+title: Renderer outputs
+description: Compare QRCodeSDK renderers by package, runtime, output, and return type.
+docType: reference
+---
+
+Choose a renderer from the output your application needs. Each linked reference documents its exact
+return value, options, and runtime constraints.
+
+| Output                                                      | Return type         | Package              | Runtime                          |
+| ----------------------------------------------------------- | ------------------- | -------------------- | -------------------------------- |
+| [SVG string](/reference/renderers/svg/)                     | `string`            | `@qrcodesdk/core`    | Any supported JavaScript runtime |
+| [Terminal text](/reference/renderers/text/)                 | `string`            | `@qrcodesdk/core`    | Any UTF-8 text environment       |
+| [Canvas element](/reference/renderers/canvas/)              | `HTMLCanvasElement` | `@qrcodesdk/browser` | Browser DOM                      |
+| [PNG-backed Image element](/reference/renderers/image/)     | `HTMLImageElement`  | `@qrcodesdk/browser` | Browser DOM                      |
+| [Browser download](/reference/renderers/browser-downloads/) | `void`              | `@qrcodesdk/browser` | Browser DOM                      |
+| [PNG Buffer](/reference/renderers/png/)                     | `Buffer`            | `@qrcodesdk/node`    | Node.js-compatible runtime       |

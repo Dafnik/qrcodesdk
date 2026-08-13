@@ -7,7 +7,7 @@ const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const DOCS_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
 const WORKSPACE_ROOT = path.resolve(DOCS_ROOT, '../..');
 const DEFAULT_INPUT_PATH = path.join(WORKSPACE_ROOT, 'benchmark-results/latest.json');
-const DEFAULT_OUTPUT_PATH = path.join(DOCS_ROOT, 'src/content/docs/advanced/performance.md');
+const DEFAULT_OUTPUT_PATH = path.join(DOCS_ROOT, 'src/content/docs/learn/performance.md');
 const CATEGORIES = [
   ['matrix', 'Matrix generation'],
   ['svg', 'SVG generation'],
@@ -229,6 +229,7 @@ ${rows}
   const markdown = `---
 title: Performance
 description: Matrix and SVG generation benchmark results for QRCodeSDK and its reference libraries.
+docType: concept
 ---
 
 <!-- Generated from ${sourcePath}. Run \`pnpm turbo run generate-performance --filter=docs\` to update. -->

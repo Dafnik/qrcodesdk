@@ -1,6 +1,7 @@
 ---
 title: '@qrcodesdk/browser'
 description: Add Canvas, Image element, and browser download output for browser apps.
+docType: package
 packageName: '@qrcodesdk/browser'
 
 worksWith:
@@ -9,11 +10,11 @@ worksWith:
   - 'safari'
 
 related:
-  - ../getting-started/installation.mdx
-  - ../renderers/browser/canvas.md
-  - ../renderers/browser/image.md
-  - ../renderers/core/svg.md
-  - ../advanced/customize.md
+  - ../getting-started/choose-your-setup.mdx
+  - ../reference/renderers/canvas.md
+  - ../reference/renderers/image.md
+  - ../reference/renderers/svg.md
+  - ../guides/customize.md
 ---
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
@@ -94,7 +95,7 @@ const canvas = qrcode('https://qrcodesdk.dev')
 ```
 
 Unloaded or zero-sized sources throw synchronously. The overlay is also included in PNG downloads.
-See [Customize QR Codes](/advanced/customize/#prepared-center-images) for sizing and scan-reliability
+See [Customize appearance](/guides/customize/#prepared-center-images) for sizing and scan-reliability
 guidance.
 
 ## Download PNG

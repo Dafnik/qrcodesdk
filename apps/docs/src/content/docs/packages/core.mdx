@@ -1,6 +1,7 @@
 ---
-title: Builder API
+title: '@qrcodesdk/core'
 description: '@qrcodesdk/core provides runtime-neutral QR code generation for JavaScript runtimes with native ESM, ES2020, and TextEncoder.'
+docType: package
 
 packageName: '@qrcodesdk/core'
 
@@ -23,7 +24,7 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
-Learn more about the different packages in the [Installation](/getting-started/installation/#package-guide) section.
+Compare all packages in [Choose your setup](/getting-started/choose-your-setup/#package-guide).
 
 ## Runtime compatibility
 
@@ -177,8 +178,8 @@ A matrix is a two-dimensional array of modules. `1` means dark and `0` means lig
 
 `@qrcodesdk/core` includes runtime-neutral renderers:
 
-- [Render SVG](/renderers/core/svg/)
-- [Render Terminal Text](/renderers/core/text/)
+- [Render SVG](/reference/renderers/svg/)
+- [Render Terminal Text](/reference/renderers/text/)
 
 For runtime-specific output, add:
 

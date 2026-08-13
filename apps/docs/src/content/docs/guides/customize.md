@@ -1,13 +1,14 @@
 ---
-title: Customize QR Codes
+title: Customize appearance
 description: Control QR code module shapes, colors, size, margin, accessibility labels, error correction, version, and mask.
+docType: guide
 
 related:
-  - ../renderers/core/text.md
-  - ../renderers/core/svg.md
+  - ../reference/renderers/text.md
+  - ../reference/renderers/svg.md
   - ../packages/node.mdx
-  - ../renderers/browser/canvas.md
-  - ../renderers/browser/image.md
+  - ../reference/renderers/canvas.md
+  - ../reference/renderers/image.md
   - ../packages/core.mdx
 ---
 

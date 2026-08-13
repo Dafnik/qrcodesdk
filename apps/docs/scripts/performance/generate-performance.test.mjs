@@ -103,11 +103,12 @@ const REPORT = {
 test('generates accessible Mermaid charts and collapsible exact benchmark tables', async () => {
   const markdown = await generatePerformancePage(REPORT, {
     inputPath: '/workspace/benchmark-results/latest.json',
-    outputPath: '/workspace/apps/docs/src/content/docs/advanced/performance.md',
+    outputPath: '/workspace/apps/docs/src/content/docs/learn/performance.md',
     workspaceRoot: '/workspace',
   });
 
   assert.match(markdown, /^---\ntitle: Performance\n/);
+  assert.match(markdown, /docType: concept/);
   assert.match(markdown, /Generated from benchmark-results\/latest\.json/);
   assert.match(markdown, /pnpm turbo run generate-performance --filter=docs/);
   assert.match(markdown, /skips automatic mask evaluation/);

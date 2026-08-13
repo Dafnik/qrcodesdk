@@ -1,6 +1,7 @@
 ---
 title: QRCodeSDK
 description: Build QR codes with a single TypeScript-first API, then render them in the format your app needs.
+docType: overview
 template: splash
 hero:
   image:
@@ -9,7 +10,7 @@ hero:
   tagline: Build QR codes with a single TypeScript-first API, then render them in the format your app needs.
   actions:
     - text: Get started
-      link: /getting-started/installation/
+      link: /getting-started/choose-your-setup/
       icon: right-arrow
     - text: Playground
       link: /playground
@@ -50,22 +51,22 @@ SVG is the best default for most user-facing QR codes because it stays sharp at 
 <CardGrid>
   <LinkCard
     title="Render SVG"
-    href="/renderers/core/svg/"
+    href="/reference/renderers/svg/"
     description="Create a scalable SVG string from @qrcodesdk/core."
   />
   <LinkCard
     title="Render to Canvas"
-    href="/renderers/browser/canvas/"
+    href="/reference/renderers/canvas/"
     description="Create an HTMLCanvasElement in browser apps."
   />
   <LinkCard
     title="Render to an Image Element"
-    href="/renderers/browser/image/"
+    href="/reference/renderers/image/"
     description="Create an HTMLImageElement with a PNG data URL or trigger a browser PNG download."
   />
   <LinkCard
     title="Render Terminal Text"
-    href="/renderers/core/text/"
+    href="/reference/renderers/text/"
     description="Create compact terminal output for CLIs, logs, and snapshots."
   />
 </CardGrid>
@@ -100,12 +101,12 @@ const svg = qrcode('https://qrcodesdk.dev')
 <CardGrid>
   <LinkCard
     title="Installation"
-    href="/getting-started/installation/"
+    href="/getting-started/choose-your-setup/"
     description="Choose the package for your output format and runtime."
   />
   <LinkCard
     title="Customize QR Codes"
-    href="/advanced/customize/"
+    href="/guides/customize/"
     description="Set module and finder shapes, colors, size, margin, accessibility labels, error correction, version, and mask."
   />
   <LinkCard
@@ -120,7 +121,7 @@ const svg = qrcode('https://qrcodesdk.dev')
   />
   <LinkCard
     title="Custom Renderers"
-    href="/advanced/custom-renderers/"
+    href="/reference/custom-renderers/"
     description="Render the QR matrix into any output type."
   />
 </CardGrid>

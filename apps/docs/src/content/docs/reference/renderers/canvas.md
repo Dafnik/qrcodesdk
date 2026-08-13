@@ -1,10 +1,11 @@
 ---
 title: Render to Canvas
 description: Render a QR code as an HTMLCanvasElement with @qrcodesdk/browser.
+docType: reference
 
 related:
   - ./image.md
-  - ../../advanced/customize.md
+  - ../../guides/customize.md
   - ../../packages/browser.mdx
 ---
 
