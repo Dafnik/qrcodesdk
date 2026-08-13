@@ -1,11 +1,63 @@
 ---
 title: PNG Buffer renderer
-description: Reference for rendering PNG Buffer output with @qrcodesdk/node.
+description: Reference for rendering a PNG Buffer with QRCodePNGRenderer from @qrcodesdk/node.
 docType: reference
+
+related:
+  - ../../packages/node.mdx
+  - ../../guides/center-images.md
+  - ../../guides/download-or-save.md
+  - ../../guides/server-output.md
 ---
 
-`QRCodePNGRenderer` produces a PNG `Buffer` for files, HTTP responses, and attachments in
-Node.js-compatible runtimes.
+## When to use
 
-See the [`@qrcodesdk/node` package overview](/packages/node/) while this renderer reference is being
-consolidated.
+Use `QRCodePNGRenderer` when Node.js-compatible code needs PNG bytes for a file, HTTP response,
+attachment, object store, or another binary API.
+
+## Minimal example
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+```
+
+## Return value
+
+The renderer synchronously returns a Node.js `Buffer` containing a complete PNG file. Its pixel
+width and height are `size × (matrix width + 2 × margin)`.
+
+## Renderer-specific options
+
+`QRCodePNGRendererOptions` accepts the
+[shared visual options](/guides/customize/#shared-visual-options) plus:
+
+| Option                  | Type            | Default               | Effect                                             |
+| ----------------------- | --------------- | --------------------- | -------------------------------------------------- |
+| `compressionLevel`      | integer `0`–`9` | `9`                   | Sets the PNG DEFLATE compression level             |
+| `image.source`          | `Buffer`        | required with `image` | Supplies already-read PNG bytes for a center image |
+| `image.size`            | `number`        | `0.4`                 | Image box as a fraction of matrix width            |
+| `image.padding`         | `number`        | `1`                   | Clear padding measured in modules                  |
+| `image.clearBackground` | `boolean`       | `true`                | Clears modules behind the image and padding        |
+
+Compression changes encoding effort and file size, not the rendered QR modules. A level of `0`
+disables DEFLATE compression; `9` requests the highest level.
+
+## Renderer-specific constraints
+
+- `compressionLevel` must be a safe integer from `0` through `9`.
+- `image.source` must be a Node.js `Buffer` containing valid PNG bytes. Other formats, paths, and
+  URLs are not decoded.
+- Center images preserve aspect ratio, are composited with alpha, and are contained within the
+  configured square without cropping.
+- The package requires Node.js 22 or newer. Bun and Deno use Node compatibility and are not covered
+  by the package's Node.js CI compatibility job.
+
+## Related guides
+
+- [Customize appearance](/guides/customize/) for shared styling and scan safety.
+- [Add a center image](/guides/center-images/) for reading and sizing a PNG overlay.
+- [Download or save](/guides/download-or-save/) for writing the `Buffer` to disk.
+- [Serve a QR code](/guides/server-output/) for `image/png` HTTP responses.

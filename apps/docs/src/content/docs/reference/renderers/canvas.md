@@ -1,15 +1,19 @@
 ---
-title: Render to Canvas
-description: Render a QR code as an HTMLCanvasElement with @qrcodesdk/browser.
+title: Canvas element renderer
+description: Reference for rendering an HTMLCanvasElement with QRCodeCanvasRenderer from @qrcodesdk/browser.
 docType: reference
 
 related:
-  - ./image.md
-  - ../../guides/customize.md
   - ../../packages/browser.mdx
+  - ../../guides/customize.md
+  - ../../guides/center-images.md
+  - ./image.md
 ---
 
-Use this when you need a browser-owned `HTMLCanvasElement` that can be inserted into a page, drawn into another canvas, converted to image bytes, or downloaded as a PNG.
+## When to use
+
+Use `QRCodeCanvasRenderer` when browser code needs to draw, composite, inspect, or manually export
+raster output through the Canvas API.
 
 ## Minimal example
 
@@ -20,148 +24,36 @@ import {qrcode} from '@qrcodesdk/core';
 const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
 ```
 
-The returned value is an `HTMLCanvasElement` containing rasterized QR code pixels.
+## Return value
 
-## Common options
+The renderer synchronously returns a new `HTMLCanvasElement`. Its pixel width and height are both
+`size × (matrix width + 2 × margin)`. The backing context is opaque and filled with
+`colors.colorLight`.
 
-You can customize the canvas output by passing styling options to `QRCodeCanvasRenderer`.
+## Renderer-specific options
 
-```ts
-import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
+`QRCodeCanvasRendererOptions` accepts the
+[shared visual options](/guides/customize/#shared-visual-options) and a prepared overlay:
 
-const canvas = qrcode('https://qrcodesdk.dev').render(
-  QRCodeCanvasRenderer({
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
-    },
-    dotsOptions: {type: 'rounded'},
-    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
-    cornersDotOptions: {type: 'dot'},
-  }),
-);
-```
+| Option                  | Type                | Default               | Effect                                      |
+| ----------------------- | ------------------- | --------------------- | ------------------------------------------- |
+| `image.source`          | `CanvasImageSource` | required with `image` | Draws an already-ready browser image source |
+| `image.size`            | `number`            | `0.4`                 | Image box as a fraction of matrix width     |
+| `image.padding`         | `number`            | `1`                   | Clear padding measured in modules           |
+| `image.clearBackground` | `boolean`           | `true`                | Clears modules behind the image and padding |
 
-| Option                       |                     Type |            Default | Description                                       |
-| ---------------------------- | -----------------------: | -----------------: | ------------------------------------------------- |
-| `size`                       |                 `number` |                `5` | Pixel size of each QR module.                     |
-| `margin`                     |                 `number` |                `4` | Quiet-zone margin around the QR code, in modules. |
-| `colors.colorDark`           |                 `string` |        `'#000000'` | Color used for dark QR modules.                   |
-| `colors.colorLight`          |                 `string` |        `'#ffffff'` | Background color.                                 |
-| `dotsOptions.type`           |          `QRCodeDotType` |         `'square'` | Shape used for ordinary data modules.             |
-| `dotsOptions.color`          |                 `string` | `colors.colorDark` | Color used for ordinary data modules.             |
-| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                |
-| `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                |
-| `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                    |
-| `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                    |
-| `image.source`               |      `CanvasImageSource` |        `undefined` | Image already loaded by the caller.               |
-| `image.size`                 |                 `number` |              `0.4` | Image box as a fraction of matrix width.          |
-| `image.padding`              |                 `number` |                `1` | Clear padding in QR module units.                 |
-| `image.clearBackground`      |                `boolean` |             `true` | Clears modules behind the image and padding.      |
+## Renderer-specific constraints
 
-Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
+- A browser DOM, `document.createElement('canvas')`, and a 2D canvas context are required.
+- The renderer is synchronous. An image source must be loaded and expose positive intrinsic
+  dimensions before rendering; unloaded or zero-sized sources throw.
+- `image.source` may be any ready `CanvasImageSource`, such as an `HTMLImageElement`, another canvas,
+  or an `ImageBitmap`.
+- The Canvas element has no built-in accessible label. Add semantics where it is inserted, or choose
+  the [PNG-backed Image renderer](/reference/renderers/image/) for native image attributes.
 
-Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
-`extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
-is independent; omit it to inherit `colors.colorDark`.
+## Related guides
 
-Canvas output requires `size` to be a positive safe integer and `margin` to be a non-negative safe integer.
-
-### Add an already-loaded center image
-
-Load and decode the image before calling the QR renderer. The renderer remains synchronous and
-does not fetch URLs or attach image load listeners.
-
-```ts
-import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-const logo = new Image();
-logo.src = '/logo.png';
-await logo.decode();
-
-const canvas = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(
-    QRCodeCanvasRenderer({
-      image: {
-        source: logo,
-        size: 0.3,
-        padding: 1,
-        clearBackground: true,
-      },
-    }),
-  );
-```
-
-Any already-ready `CanvasImageSource`, such as an `HTMLImageElement`, canvas, or `ImageBitmap`, can
-be used. Unloaded and zero-sized sources throw immediately. Values through `size: 1` are accepted,
-but large overlays are likely to make the QR code impossible to scan.
-
-## Common recipes
-
-### Insert into the DOM
-
-```ts
-import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-const canvas = qrcode('https://qrcodesdk.dev').render(
-  QRCodeCanvasRenderer({
-    size: 8,
-    margin: 4,
-  }),
-);
-
-const container = document.querySelector('#qrcode');
-
-if (container) {
-  container.append(canvas);
-}
-```
-
-```html
-<div id="qrcode"></div>
-```
-
-### Draw into another canvas
-
-```ts
-import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-const qrCanvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
-const target = document.querySelector<HTMLCanvasElement>('#target');
-const context = target?.getContext('2d');
-
-if (target && context) {
-  target.width = qrCanvas.width;
-  target.height = qrCanvas.height;
-  context.drawImage(qrCanvas, 0, 0);
-}
-```
-
-### Download as PNG
-
-```ts
-import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
-
-canvas.toBlob((blob) => {
-  if (!blob) return;
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-
-  link.href = url;
-  link.download = 'qrcode.png';
-  link.click();
-
-  URL.revokeObjectURL(url);
-}, 'image/png');
-```
+- [Customize appearance](/guides/customize/) for shared styling and scan safety.
+- [Add a center image](/guides/center-images/) for loading browser image sources.
+- [Download or save](/guides/download-or-save/) for `toBlob()` export.

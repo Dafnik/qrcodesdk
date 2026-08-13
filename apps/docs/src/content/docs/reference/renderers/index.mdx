@@ -1,17 +1,26 @@
 ---
 title: Renderer outputs
-description: Compare QRCodeSDK renderers by package, runtime, output, and return type.
+description: Compare every built-in QRCodeSDK renderer by output, return type, package, runtime, and best use case.
 docType: reference
+
+related:
+  - ../../getting-started/choose-your-setup.mdx
+  - ../custom-renderers.md
 ---
 
-Choose a renderer from the output your application needs. Each linked reference documents its exact
-return value, options, and runtime constraints.
+Renderers convert the same `QRCodeMatrix` into different output values. Choose by the value your
+application needs, then install the owning package.
 
-| Output                                                      | Return type         | Package              | Runtime                          |
-| ----------------------------------------------------------- | ------------------- | -------------------- | -------------------------------- |
-| [SVG string](/reference/renderers/svg/)                     | `string`            | `@qrcodesdk/core`    | Any supported JavaScript runtime |
-| [Terminal text](/reference/renderers/text/)                 | `string`            | `@qrcodesdk/core`    | Any UTF-8 text environment       |
-| [Canvas element](/reference/renderers/canvas/)              | `HTMLCanvasElement` | `@qrcodesdk/browser` | Browser DOM                      |
-| [PNG-backed Image element](/reference/renderers/image/)     | `HTMLImageElement`  | `@qrcodesdk/browser` | Browser DOM                      |
-| [Browser download](/reference/renderers/browser-downloads/) | `void`              | `@qrcodesdk/browser` | Browser DOM                      |
-| [PNG Buffer](/reference/renderers/png/)                     | `Buffer`            | `@qrcodesdk/node`    | Node.js-compatible runtime       |
+| Output                                                          | Renderer                      | Return type         | Package              | Runtime                     | Best use case                                  |
+| --------------------------------------------------------------- | ----------------------------- | ------------------- | -------------------- | --------------------------- | ---------------------------------------------- |
+| [SVG string](/reference/renderers/svg/)                         | `QRCodeSVGRenderer`           | `string`            | `@qrcodesdk/core`    | Any Core-compatible runtime | Scalable web, email, print, and server output  |
+| [Terminal text](/reference/renderers/text/)                     | `QRCodeTextRenderer`          | `string`            | `@qrcodesdk/core`    | UTF-8 text environment      | Terminals, logs, CLIs, and snapshots           |
+| [Canvas element](/reference/renderers/canvas/)                  | `QRCodeCanvasRenderer`        | `HTMLCanvasElement` | `@qrcodesdk/browser` | Browser DOM                 | Drawing, compositing, and manual raster export |
+| [PNG-backed Image element](/reference/renderers/image/)         | `QRCodeImageRenderer`         | `HTMLImageElement`  | `@qrcodesdk/browser` | Browser DOM                 | Accessible DOM image and CSS workflows         |
+| [SVG browser download](/reference/renderers/browser-downloads/) | `QRCodeDownloadSVGRenderer`   | `void`              | `@qrcodesdk/browser` | Browser DOM                 | User-triggered scalable file download          |
+| [PNG browser download](/reference/renderers/browser-downloads/) | `QRCodeDownloadImageRenderer` | `void`              | `@qrcodesdk/browser` | Browser DOM                 | User-triggered raster file download            |
+| [PNG Buffer](/reference/renderers/png/)                         | `QRCodePNGRenderer`           | `Buffer`            | `@qrcodesdk/node`    | Node.js-compatible runtime  | Files, HTTP responses, and attachments         |
+
+Framework packages wrap the same output families in components: see
+[React and Next.js](/packages/react/) or [Angular](/packages/angular/). To produce another return
+type, implement the [custom renderer contract](/reference/custom-renderers/).

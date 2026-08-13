@@ -1,15 +1,20 @@
 ---
-title: Render to an Image Element
-description: Render a QR code as an HTMLImageElement with @qrcodesdk/browser.
+title: PNG-backed Image element renderer
+description: Reference for rendering an HTMLImageElement backed by a PNG data URL with @qrcodesdk/browser.
 docType: reference
 
 related:
-  - ./canvas.md
-  - ../../guides/customize.md
   - ../../packages/browser.mdx
+  - ../../guides/customize.md
+  - ../../guides/center-images.md
+  - ./canvas.md
+  - ./browser-downloads.mdx
 ---
 
-Use this when you need an `HTMLImageElement` that can be inserted into a browser page, styled with CSS, labeled for accessibility, or downloaded as a PNG.
+## When to use
+
+Use `QRCodeImageRenderer` when browser code needs a CSS-styleable, accessible `HTMLImageElement`
+rather than a drawing surface.
 
 ## Minimal example
 
@@ -17,167 +22,40 @@ Use this when you need an `HTMLImageElement` that can be inserted into a browser
 import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
-const image = qrcode('https://qrcodesdk.dev').render(QRCodeImageRenderer());
-```
-
-The returned value is an `HTMLImageElement` whose `src` is a PNG data URL.
-
-## Common options
-
-You can customize the image output by passing styling options to `QRCodeImageRenderer`.
-
-```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
 const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
-    },
-    dotsOptions: {type: 'rounded'},
-    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
-    cornersDotOptions: {type: 'dot'},
-    alt: 'QR code for qrcodesdk.dev',
-  }),
+  QRCodeImageRenderer({alt: 'Scan to open qrcodesdk.dev'}),
 );
 ```
 
-| Option                       |                     Type |            Default | Description                                       |
-| ---------------------------- | -----------------------: | -----------------: | ------------------------------------------------- |
-| `size`                       |                 `number` |                `5` | Pixel size of each QR module.                     |
-| `margin`                     |                 `number` |                `4` | Quiet-zone margin around the QR code, in modules. |
-| `colors.colorDark`           |                 `string` |        `'#000000'` | Color used for dark QR modules.                   |
-| `colors.colorLight`          |                 `string` |        `'#ffffff'` | Background color.                                 |
-| `dotsOptions.type`           |          `QRCodeDotType` |         `'square'` | Shape used for ordinary data modules.             |
-| `dotsOptions.color`          |                 `string` | `colors.colorDark` | Color used for ordinary data modules.             |
-| `cornersSquareOptions.type`  | `QRCodeCornerSquareType` |         `'square'` | Shape used for finder outer rings.                |
-| `cornersSquareOptions.color` |                 `string` | `colors.colorDark` | Color used for finder outer rings.                |
-| `cornersDotOptions.type`     |    `QRCodeCornerDotType` |         `'square'` | Shape used for finder centers.                    |
-| `cornersDotOptions.color`    |                 `string` | `colors.colorDark` | Color used for finder centers.                    |
-| `alt`                        |                 `string` |               `''` | Sets `alt`; defaults to decorative empty text.    |
-| `ariaLabel`                  |                 `string` |        `undefined` | Adds an `aria-label` attribute to the image.      |
-| `title`                      |                 `string` |        `undefined` | Adds a `title` attribute to the image.            |
-| `image.source`               |      `CanvasImageSource` |        `undefined` | Image already loaded by the caller.               |
-| `image.size`                 |                 `number` |              `0.4` | Image box as a fraction of matrix width.          |
-| `image.padding`              |                 `number` |                `1` | Clear padding in QR module units.                 |
-| `image.clearBackground`      |                `boolean` |             `true` | Clears modules behind the image and padding.      |
+## Return value
 
-Colors must be 6-digit hex values such as `'#000000'`, `'#ffffff'`, or `'#111827'`.
+The renderer synchronously returns a new `HTMLImageElement`. Its `src` is a PNG data URL generated
+from an intermediate Canvas element, and its width and height match that Canvas backing size.
+`alt` is always set and defaults to an empty string.
 
-Data-module types are `square`, `rounded`, `dots`, `classy`, `classy-rounded`, and
-`extra-rounded`. Finder rings and centers additionally support `dot`. Each feature color override
-is independent; omit it to inherit `colors.colorDark`.
+## Renderer-specific options
 
-Image output requires `size` to be a positive safe integer and `margin` to be a non-negative safe integer.
+The renderer accepts the [shared visual options](/guides/customize/#shared-visual-options), the same
+prepared `image` overlay as the
+[Canvas renderer](/reference/renderers/canvas/#renderer-specific-options), and these DOM attributes:
 
-### Add an already-loaded center image
+| Option      | Type     | Default     | Effect                                    |
+| ----------- | -------- | ----------- | ----------------------------------------- |
+| `alt`       | `string` | `''`        | Sets the Image element's `alt` property   |
+| `ariaLabel` | `string` | `undefined` | Sets an `aria-label` attribute            |
+| `title`     | `string` | `undefined` | Sets the Image element's `title` property |
 
-`QRCodeImageRenderer` uses the Canvas renderer internally, so it accepts the same prepared
-`CanvasImageSource`. Finish loading before rendering:
+## Renderer-specific constraints
 
-```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
+- A browser DOM, Canvas 2D support, and PNG `canvas.toDataURL()` support are required.
+- Rendering is synchronous; center-image sources must already be loaded and have positive intrinsic
+  dimensions.
+- The PNG is encoded into the element's data URL. Use the
+  [Canvas renderer](/reference/renderers/canvas/) when the next step needs direct drawing or
+  `toBlob()` rather than an Image element.
 
-const response = await fetch('/logo.png');
-const blob = await response.blob();
-const logo = await createImageBitmap(blob);
+## Related guides
 
-const image = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(
-    QRCodeImageRenderer({
-      image: {source: logo, size: 0.3, padding: 1},
-      alt: 'QR code for qrcodesdk.dev',
-    }),
-  );
-```
-
-The returned PNG-backed image and `QRCodeDownloadImageRenderer` downloads both include the
-overlay. QRCodeSDK never fetches the source. Keep overlays modest and test the result with real
-scanners.
-
-## Common recipes
-
-### Add accessibility labels
-
-For user-facing QR codes, provide a meaningful label so assistive technologies can describe what the code points to.
-
-```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
-    title: 'QR code for qrcodesdk.dev',
-  }),
-);
-```
-
-### Insert into the DOM
-
-```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({
-    alt: 'QR code for qrcodesdk.dev',
-  }),
-);
-
-const container = document.querySelector('#qrcode');
-
-if (container) {
-  container.append(image);
-}
-```
-
-```html
-<div id="qrcode"></div>
-```
-
-### Download as PNG
-
-Use `QRCodeDownloadImageRenderer` when a browser action should download the rendered image as a PNG.
-
-```ts
-import {QRCodeDownloadImageRenderer, QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-qrcode('https://qrcodesdk.dev').render(
-  QRCodeDownloadImageRenderer({
-    renderer: QRCodeImageRenderer({
-      alt: 'QR code for qrcodesdk.dev',
-    }),
-    filename: 'qrcode',
-  }),
-);
-```
-
-The download renderer appends `.png` when the filename does not already end with `.png`. It uses the wrapped image renderer's `image.src`, clicks a temporary download link, and returns `void`.
-
-Use the returned image element directly when you need to control the download link yourself.
-
-```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({
-    alt: 'QR code for qrcodesdk.dev',
-  }),
-);
-
-const link = document.createElement('a');
-
-link.href = image.src;
-link.download = 'qrcode.png';
-link.click();
-```
+- [Customize appearance](/guides/customize/) for shared styling, labels, and scan safety.
+- [Add a center image](/guides/center-images/) for preparing a `CanvasImageSource`.
+- [Download or save](/guides/download-or-save/) for PNG downloads.
