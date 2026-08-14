@@ -5,8 +5,6 @@ docType: reference
 
 related:
   - ../../packages/browser.mdx
-  - ../../guides/customize.md
-  - ../../guides/center-images.md
   - ./canvas.md
   - ./browser-downloads.mdx
 ---
@@ -57,6 +55,62 @@ For server output, choose SVG or the Node.js PNG renderer.
 - The PNG is encoded into the element's data URL. Use the
   [Canvas renderer](/reference/renderers/canvas/) when the next step needs direct drawing or
   `toBlob()` rather than an Image element.
+
+## Use the Image element in a browser
+
+### Insert and style it
+
+The returned value is already an `HTMLImageElement`, so it can be appended and styled like any
+other image:
+
+```ts
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const image = qrcode('https://qrcodesdk.dev').render(
+  QRCodeImageRenderer({
+    alt: 'QR code for qrcodesdk.dev',
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+    title: 'QR code for qrcodesdk.dev',
+  }),
+);
+
+image.className = 'qrcode';
+document.querySelector('#qrcode')?.append(image);
+```
+
+```html
+<div id="qrcode"></div>
+```
+
+```css
+.qrcode {
+  display: block;
+  width: min(100%, 20rem);
+  height: auto;
+}
+```
+
+### Use the PNG data URL
+
+Read `src` when another browser API needs the encoded PNG rather than the element:
+
+```ts
+import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const image = qrcode('https://qrcodesdk.dev').render(QRCodeImageRenderer());
+const response = await fetch(image.src);
+const png = await response.blob();
+
+await navigator.clipboard.write([
+  new ClipboardItem({
+    'image/png': png,
+  }),
+]);
+```
+
+The Clipboard API requires a secure context and may require a user gesture or permission.
 
 ## Related guides
 

@@ -44,13 +44,80 @@ The renderer synchronously returns a new `HTMLCanvasElement`. Its pixel width an
 
 ## Renderer-specific constraints
 
-- A browser DOM, `document.createElement('canvas')`, and a 2D canvas context are required.
+:::caution[Canvas APIs required]
+Create this renderer only where the browser DOM, `document.createElement('canvas')`, and a 2D
+Canvas context are available. For environments without Canvas, choose the runtime-neutral SVG
+renderer.
+:::
+
 - The renderer is synchronous. An image source must be loaded and expose positive intrinsic
   dimensions before rendering; unloaded or zero-sized sources throw.
 - `image.source` may be any ready `CanvasImageSource`, such as an `HTMLImageElement`, another canvas,
   or an `ImageBitmap`.
 - The Canvas element has no built-in accessible label. Add semantics where it is inserted, or choose
   the [PNG-backed Image renderer](/reference/renderers/image/) for native image attributes.
+
+## Use the Canvas element in a browser
+
+### Insert it into the DOM
+
+Append the returned element wherever the QR code should appear:
+
+```ts
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer({size: 8, margin: 4}));
+
+document.querySelector('#qrcode')?.append(canvas);
+```
+
+```html
+<div id="qrcode" role="img" aria-label="Scan to open qrcodesdk.dev"></div>
+```
+
+### Draw it into another Canvas
+
+Use the QR Canvas as a source for a larger composition:
+
+```ts
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const qrCanvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
+const target = document.querySelector<HTMLCanvasElement>('#target');
+const context = target?.getContext('2d');
+
+if (target && context) {
+  target.width = qrCanvas.width;
+  target.height = qrCanvas.height;
+  context.drawImage(qrCanvas, 0, 0);
+}
+```
+
+### Export it as PNG
+
+Convert the returned Canvas to a `Blob` for a manual download or upload:
+
+```ts
+import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
+
+canvas.toBlob((blob) => {
+  if (!blob) return;
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = 'qrcode.png';
+  link.click();
+
+  URL.revokeObjectURL(url);
+}, 'image/png');
+```
 
 ## Related guides
 
