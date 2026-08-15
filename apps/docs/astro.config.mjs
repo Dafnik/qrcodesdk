@@ -154,6 +154,7 @@ export default defineConfig({
         Footer: './src/components/footer.astro',
         PageTitle: './src/components/PageTitle.astro',
         Sidebar: './src/components/Sidebar.astro',
+        SiteTitle: './src/components/SiteTitle.astro',
         TableOfContents: './src/components/TableOfContents.astro',
       },
       social: [
