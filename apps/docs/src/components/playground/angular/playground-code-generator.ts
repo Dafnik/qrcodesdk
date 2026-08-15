@@ -4,7 +4,7 @@ import {
   type PlaygroundPreparedImage,
 } from '../playground-config.ts';
 
-export type HighlighterLang = 'angular-ts' | 'tsx';
+export type HighlighterLang = 'angular-ts' | 'tsx' | 'vue';
 
 export type CodePreview = {
   code: string;
@@ -48,9 +48,14 @@ export function generatePlaygroundCode(
   config: PlaygroundConfig,
   preparedImage?: PlaygroundPreparedImage,
 ): CodePreview {
-  return config.packageName === 'react'
-    ? generateReactCode(config, preparedImage)
-    : generateAngularCode(config, preparedImage);
+  switch (config.packageName) {
+    case 'react':
+      return generateReactCode(config, preparedImage);
+    case 'vue':
+      return generateVueCode(config, preparedImage);
+    case 'angular':
+      return generateAngularCode(config, preparedImage);
+  }
 }
 
 function generateReactCode(
@@ -141,6 +146,69 @@ ${hasImage ? `    <>\n${imageInput}${indent(body, 2)}\n    </>` : body}
   );
 }
 ${hasImage ? `\n${fileReaderHelper(config.output === 'svg')}` : ''}`,
+  };
+}
+
+function generateVueCode(
+  config: PlaygroundConfig,
+  preparedImage?: PlaygroundPreparedImage,
+): CodePreview {
+  const meta = META_BY_OUTPUT[config.output];
+  const hasDownload = meta.downloadLabel !== undefined;
+  const hasImage = preparedImage !== undefined;
+  const vueImports = [
+    ...(hasImage ? ['computed', 'shallowRef'] : []),
+    ...(hasDownload ? ['ref'] : []),
+  ];
+  const vueImport = vueImports.length > 0 ? `import {${vueImports.join(', ')}} from 'vue';\n` : '';
+  const componentImport = hasDownload
+    ? `import {${meta.componentName}, type QRCodeDownloadHandle} from '@qrcodesdk/vue';`
+    : `import {${meta.componentName}} from '@qrcodesdk/vue';`;
+  const optionsTypes =
+    hasImage && config.output === 'svg'
+      ? `QRCodeDataImageURL, ${meta.optionsType}`
+      : meta.optionsType;
+  const qrcodeRef = hasDownload ? `const qrcode = ref<QRCodeDownloadHandle | null>(null);\n` : '';
+  const optionsDeclaration = hasImage
+    ? `const imageSource = shallowRef<${
+        config.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
+      }>();
+const options = computed<${meta.optionsType} | undefined>(() => {
+  const source = imageSource.value;
+  if (!source) return undefined;
+
+  return ${formatOptions(config, 1, {source: 'source', preparedImage})};
+});
+
+${vueImagePreparation(config.output)}`
+    : `const options: ${meta.optionsType} = ${formatOptions(config, 1)};`;
+  const downloadButton = hasDownload
+    ? `  <button type="button" @click="qrcode?.download('qrcodesdk')">
+    ${meta.downloadLabel}
+  </button>
+`
+    : '';
+  const imageInput = hasImage
+    ? `  <input type="file" accept="image/*" @change="selectImage" />\n`
+    : '';
+  const conditional = hasImage ? ' v-if="options"' : '';
+  const refProperty = hasDownload ? ' ref="qrcode"' : '';
+
+  return {
+    lang: 'vue',
+    code: `<script setup lang="ts">
+import type {${optionsTypes}} from '${meta.optionsPackage}';
+${componentImport}
+${vueImport}
+
+const data = ${quote(config.data)};
+${qrcodeRef}${optionsDeclaration}
+${hasImage ? `\n${fileReaderHelper(config.output === 'svg')}` : ''}
+</script>
+
+<template>
+${imageInput}${downloadButton}  <${meta.componentName}${conditional}${refProperty} :data :options />
+</template>`,
   };
 }
 
@@ -336,6 +404,27 @@ function reactImagePreparation(output: PlaygroundOutput): string {
     const dataUrl = await readFileAsDataURL(file);
 ${preparedSource}
   }`;
+}
+
+function vueImagePreparation(output: PlaygroundOutput): string {
+  const preparedSource =
+    output === 'svg'
+      ? `  const image = new Image();
+  image.src = dataUrl;
+  await image.decode();
+  imageSource.value = dataUrl;`
+      : `  const image = new Image();
+  image.src = dataUrl;
+  await image.decode();
+  imageSource.value = image;`;
+
+  return `async function selectImage(event: Event): Promise<void> {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+
+  const dataUrl = await readFileAsDataURL(file);
+${preparedSource}
+}`;
 }
 
 function angularImagePreparation(output: PlaygroundOutput): string {

@@ -4,7 +4,8 @@
 declare module '*?includeContent' {
   import type {Type} from '@angular/core';
   import type {ComponentType} from 'react';
-  const component: Type<any> | ComponentType<any>;
+  import type {DefineComponent} from 'vue';
+  const component: Type<any> | ComponentType<any> | DefineComponent;
   export const content: string;
   export default component;
 }

@@ -9,7 +9,7 @@ import type {
   QRCodeStylingOptions,
 } from '@qrcodesdk/core';
 
-export type PlaygroundPackage = 'angular' | 'react';
+export type PlaygroundPackage = 'angular' | 'react' | 'vue';
 export type PlaygroundOutput = 'svg' | 'image' | 'canvas';
 
 export interface PlaygroundConfig

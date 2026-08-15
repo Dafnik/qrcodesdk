@@ -4,6 +4,7 @@ import {AngularPlaygroundPreview} from '../playground/angular/angular-playground
 import {PlaygroundControls} from '../playground/angular/playground-controls.ts';
 import {PlaygroundCode} from '../playground/angular/playground-code.ts';
 import QRCodeReactPlaygroundPreview from '../playground/QRCodeReactPlaygroundPreview';
+import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview.vue';
 ---
 
 <script>
@@ -24,6 +25,7 @@ import QRCodeReactPlaygroundPreview from '../playground/QRCodeReactPlaygroundPre
         <Card title="">
           <div class="min-h-96 grid content-center playground-preview-output">
             <QRCodeReactPlaygroundPreview client:only="react" />
+            <QRCodeVuePlaygroundPreview client:only="vue" />
             <AngularPlaygroundPreview client:load />
           </div>
         </Card>

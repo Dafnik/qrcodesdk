@@ -2,6 +2,7 @@
 import angular from '@analogjs/astro-angular';
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
+import vue from '@astrojs/vue';
 import tailwindcss from '@tailwindcss/vite';
 import mermaidIntegration from 'astro-mermaid';
 import {defineConfig} from 'astro/config';
@@ -169,6 +170,7 @@ export default defineConfig({
       },
     }),
     react(),
+    vue(),
     angular({
       useAngularHydration: false,
       vite: {

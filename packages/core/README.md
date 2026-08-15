@@ -94,6 +94,7 @@ For runtime-specific output, add the owning package:
 | [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       | PNG bytes                                                   | `Buffer`                                        |
 | [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         | Command line generation from terminals and scripts.         | Terminal text, SVG files, PNG files.            |
 | [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)     | React SVG, Image, and Canvas components                     | React element                                   |
+| [`@qrcodesdk/vue`](https://qrcodesdk.dev/packages/vue/)         | Vue SVG, Image, and Canvas components                       | Vue component                                   |
 | [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) | Angular SVG, Image, and Canvas components                   | Angular component                               |
 
 Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/reference/renderers/).

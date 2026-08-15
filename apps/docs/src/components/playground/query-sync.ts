@@ -18,7 +18,11 @@ import {
   playgroundConfig,
 } from './playground-config.ts';
 
-const PLAYGROUND_PACKAGES = ['angular', 'react'] as const satisfies readonly PlaygroundPackage[];
+const PLAYGROUND_PACKAGES = [
+  'angular',
+  'react',
+  'vue',
+] as const satisfies readonly PlaygroundPackage[];
 
 const PLAYGROUND_OUTPUTS = [
   'svg',

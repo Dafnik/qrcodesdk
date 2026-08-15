@@ -48,6 +48,11 @@ export const collections = {
         base: 'changelog/angular',
         changelog: '../../packages/angular/CHANGELOG.md',
       },
+      {
+        provider: 'changeset',
+        base: 'changelog/vue',
+        changelog: '../../packages/vue/CHANGELOG.md',
+      },
     ]),
   }),
 };

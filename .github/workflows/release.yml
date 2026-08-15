@@ -60,6 +60,10 @@ jobs:
               package_name="@qrcodesdk/react"
               package_dir="packages/react"
               ;;
+            vue)
+              package_name="@qrcodesdk/vue"
+              package_dir="packages/vue"
+              ;;
             *)
               echo "Unknown package: ${{ inputs.lib }}" >&2
               exit 1

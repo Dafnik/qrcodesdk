@@ -90,7 +90,7 @@ export class PlaygroundColorInput {
           class="bg-input/90 text-foreground inline-flex h-9 w-full rounded-md p-0.5"
           id="package-select">
           <hlm-radio-group
-            class="group after:bg-background relative grid w-full grid-cols-[1fr_1fr] gap-0 font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-sm after:transition-[translate,box-shadow] after:duration-300 after:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=angular]:after:translate-x-full data-[state=react]:after:translate-x-0 after:motion-reduce:transition-none"
+            class="group after:bg-background relative grid w-full grid-cols-3 gap-0 font-medium after:absolute after:inset-y-0 after:w-1/3 after:rounded-sm after:transition-[translate,box-shadow] after:duration-300 after:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=angular]:after:translate-x-[200%] data-[state=react]:after:translate-x-0 data-[state=vue]:after:translate-x-full after:motion-reduce:transition-none"
             [attr.data-state]="currentConfig().packageName"
             [ngModel]="currentConfig().packageName"
             (ngModelChange)="updateQrConfig({packageName: $event})">
@@ -429,7 +429,7 @@ export class PlaygroundControls {
     () => !!this.currentConfig().cornersDotOptions,
   );
 
-  protected readonly packages: PlaygroundPackage[] = ['react', 'angular'];
+  protected readonly packages: PlaygroundPackage[] = ['react', 'vue', 'angular'];
   protected readonly outputs: PlaygroundOutput[] = ['svg', 'image', 'canvas'];
   protected readonly DARK_COLOR_PRESETS = [
     '#0A0A0A',

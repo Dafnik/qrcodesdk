@@ -12,7 +12,10 @@ export function createExampleContent(filePath, fileContent) {
   const normalizedFileContent = fileContent.replace(/\t/g, '  ');
   const normalizedFilePath = filePath.replaceAll('\\', '/');
 
-  if (normalizedFilePath.includes('/src/components/react/')) {
+  if (
+    normalizedFilePath.includes('/src/components/react/') ||
+    normalizedFilePath.includes('/src/components/vue/')
+  ) {
     return normalizedFileContent;
   }
 

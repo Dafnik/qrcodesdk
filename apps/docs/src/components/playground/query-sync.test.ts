@@ -37,3 +37,19 @@ describe('playground ECI query synchronization', () => {
     assert.equal(disabled.has('eci'), false);
   });
 });
+
+describe('playground package query synchronization', () => {
+  test('round-trips Vue and rejects unknown packages', () => {
+    const vue = readQrConfigFromSearchParams(new URLSearchParams('package=vue'));
+    const unknown = readQrConfigFromSearchParams(new URLSearchParams('package=svelte'));
+
+    assert.equal(vue.packageName, 'vue');
+    assert.equal(
+      writeQrConfigToSearchParams(new URLSearchParams(), vue, defaultPlaygroundConfig).get(
+        'package',
+      ),
+      'vue',
+    );
+    assert.equal(unknown.packageName, defaultPlaygroundConfig.packageName);
+  });
+});

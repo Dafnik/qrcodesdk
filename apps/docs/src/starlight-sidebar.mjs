@@ -33,6 +33,11 @@ export const STARLIGHT_SIDEBAR = [
         collapsed: true,
         items: getPackageChangelogsSidebarLinks('angular'),
       },
+      {
+        label: '@qrcodesdk/vue',
+        collapsed: true,
+        items: getPackageChangelogsSidebarLinks('vue'),
+      },
     ],
   },
 ];

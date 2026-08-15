@@ -13,7 +13,7 @@
     "preview": "astro preview",
     "check-types": "astro check",
     "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0 && pnpm run check-readmes",
-    "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/explain/*.test.ts src/components/playground/*.test.ts",
+    "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/explain/*.test.ts src/components/playground/*.test.ts src/utils/*.test.mjs",
     "astro": "astro",
     "clean": "rm -rf .turbo dist .astro"
   },
@@ -25,16 +25,19 @@
     "@angular/platform-browser": "catalog:",
     "@angular/platform-server": "catalog:",
     "@astrojs/react": "6.0.2",
+    "@astrojs/vue": "7.0.2",
     "@astrojs/starlight-tailwind": "5.0.0",
     "@expressive-code/plugin-line-numbers": "0.44.1",
     "@nanostores/angular": "0.0.5",
     "@nanostores/react": "1.1.0",
+    "@nanostores/vue": "1.1.0",
     "@ng-icons/core": ">=32.0.0 <34.0.0",
     "@ng-icons/lucide": ">=32.0.0 <34.0.0",
     "@qrcodesdk/angular": "workspace:*",
     "@qrcodesdk/browser": "workspace:*",
     "@qrcodesdk/core": "workspace:*",
     "@qrcodesdk/react": "workspace:*",
+    "@qrcodesdk/vue": "workspace:*",
     "@shikijs/langs": "4.3.1",
     "@shikijs/themes": "4.3.1",
     "@spartan-ng/brain": "1.1.2",
@@ -55,7 +58,8 @@
     "starlight-page-context-action": "0.4.1",
     "tailwind-merge": "3.6.0",
     "tailwindcss": "4.3.3",
-    "tslib": "catalog:"
+    "tslib": "catalog:",
+    "vue": "catalog:"
   },
   "devDependencies": {
     "@analogjs/astro-angular": "3.0.0-alpha.64",
