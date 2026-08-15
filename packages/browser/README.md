@@ -1,10 +1,12 @@
 <!-- Generated from apps/docs/src/content/docs/packages/browser.mdx. Run `pnpm turbo run generate-readmes --filter=docs` to update. -->
 
-<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+<div align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></div>
 
 # @qrcodesdk/browser
 
 [![Open @qrcodesdk/browser on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/browser) ![@qrcodesdk/browser version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/browser?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/browser install size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/browser?color=7469B6&label=install%20size&style=shieldsio) ![@qrcodesdk/browser download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/browser?color=7469B6&label=download%2Fmo&style=shieldsio) [![@qrcodesdk/browser source code](https://npmx.dev/api/registry/badge/name/@qrcodesdk/browser?color=7469B6&label=source%20code&value=GitHub%20%E2%86%97&style=shieldsio)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/browser)
+
+**[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
 `@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.
 
@@ -47,6 +49,15 @@ yarn add @qrcodesdk/core @qrcodesdk/browser
 
 </details>
 
+## Choose an output
+
+| Need                            | Renderer                      | Return value        |
+| ------------------------------- | ----------------------------- | ------------------- |
+| Insert a PNG-backed image       | `QRCodeImageRenderer`         | `HTMLImageElement`  |
+| Draw or export with Canvas APIs | `QRCodeCanvasRenderer`        | `HTMLCanvasElement` |
+| Trigger an SVG download         | `QRCodeDownloadSVGRenderer`   | `void`              |
+| Trigger a PNG download          | `QRCodeDownloadImageRenderer` | `void`              |
+
 ## Render an Image element
 
 ```ts
@@ -55,15 +66,6 @@ import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
   QRCodeImageRenderer({
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
-    },
-    dotsOptions: {type: 'rounded'},
-    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
-    cornersDotOptions: {type: 'dot'},
     alt: 'QR code for qrcodesdk.dev',
     ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
@@ -74,112 +76,24 @@ document.body.append(image);
 
 `QRCodeImageRenderer()` returns an `HTMLImageElement`. Its `src` is a PNG data URL, and its `width` and `height` match the rendered QR code size.
 
-## Render a Canvas element
+[Learn here](https://qrcodesdk.dev/guides/browser-usage/) more about using the library in the browser.
 
-```ts
-import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
+## Configure and download output
 
-const canvas = qrcode('https://qrcodesdk.dev').render(
-  QRCodeCanvasRenderer({
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
-    },
-  }),
-);
+Each output has a dedicated reference for its return value, options, and browser constraints:
 
-document.querySelector('#qrcode')?.append(canvas);
-```
+- [Canvas element](https://qrcodesdk.dev/reference/renderers/canvas/)
+- [PNG-backed Image element](https://qrcodesdk.dev/reference/renderers/image/)
+- [SVG and PNG download wrappers](https://qrcodesdk.dev/reference/renderers/browser-downloads/)
 
-`QRCodeCanvasRenderer()` returns an `HTMLCanvasElement` that you can insert into the DOM, draw into another canvas, or export with `toBlob()` or `toDataURL()`.
+Follow [Add a center image](https://qrcodesdk.dev/guides/center-images/) to prepare a `CanvasImageSource`, and
+[Download or save](https://qrcodesdk.dev/guides/download-or-save/) for browser helpers and manual Canvas export.
 
-## Renderer options
+## Runtime constraints
 
-| Option                  | Type                         |            Default | Description                                   |
-| ----------------------- | ---------------------------- | -----------------: | --------------------------------------------- |
-| `size`                  | `number`                     |                `5` | Pixel size of each QR module.                 |
-| `margin`                | `number`                     |                `4` | Quiet-zone width in modules.                  |
-| `colors.colorDark`      | `string`                     |        `'#000000'` | Dark module color.                            |
-| `colors.colorLight`     | `string`                     |        `'#ffffff'` | Background color.                             |
-| `dotsOptions`           | `QRCodeDotsOptions`          | `{type: 'square'}` | Ordinary module shape and optional color.     |
-| `cornersSquareOptions`  | `QRCodeCornersSquareOptions` | `{type: 'square'}` | Finder-ring shape and optional color.         |
-| `cornersDotOptions`     | `QRCodeCornersDotOptions`    | `{type: 'square'}` | Finder-center shape and optional color.       |
-| `alt`                   | `string`                     |               `''` | Image `alt` attribute; Image renderer only.   |
-| `ariaLabel`             | `string`                     |        `undefined` | Image `aria-label`; Image renderer only.      |
-| `title`                 | `string`                     |        `undefined` | Image `title` attribute; Image renderer only. |
-| `image.source`          | `CanvasImageSource`          |        `undefined` | Image already loaded by the caller.           |
-| `image.size`            | `number`                     |              `0.4` | Relative centered image-box size.             |
-| `image.padding`         | `number`                     |                `1` | Clear padding in QR modules.                  |
-| `image.clearBackground` | `boolean`                    |             `true` | Clears modules behind the image.              |
-
-Color options use hash-prefixed values such as `#111827`. Browser pixel output requires a positive integer `size` and a non-negative integer `margin`.
-
-All feature colors inherit `colors.colorDark` when omitted. Shapes are shared by Canvas and Image
-output, including PNG downloads.
-
-### Prepared center images
-
-Canvas and Image renderers accept an already-loaded `CanvasImageSource`. Finish loading before
-rendering; QRCodeSDK never fetches the source:
-
-```ts
-const logo = new Image();
-logo.src = '/logo.png';
-await logo.decode();
-
-const canvas = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(QRCodeCanvasRenderer({image: {source: logo, size: 0.3}}));
-```
-
-Unloaded or zero-sized sources throw synchronously. The overlay is also included in PNG downloads.
-See [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/#prepared-center-images) for sizing and scan-reliability
-guidance.
-
-## Download PNG
-
-Wrap an Image renderer with `QRCodeDownloadImageRenderer` to trigger a browser download:
-
-```ts
-import {QRCodeDownloadImageRenderer, QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
-
-qrcode('https://qrcodesdk.dev').render(
-  QRCodeDownloadImageRenderer({
-    renderer: QRCodeImageRenderer({
-      alt: 'QR code for qrcodesdk.dev',
-    }),
-    filename: 'qrcode',
-  }),
-);
-```
-
-The renderer appends `.png` when necessary, clicks a temporary download link, and returns `void`.
-
-## Download SVG
-
-SVG strings come from `@qrcodesdk/core`. Wrap its renderer to download the result in the browser:
-
-```ts
-import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-
-qrcode('https://qrcodesdk.dev').render(
-  QRCodeDownloadSVGRenderer({
-    renderer: QRCodeSVGRenderer({
-      size: 4,
-      margin: 2,
-      ariaLabel: 'Scan to open qrcodesdk.dev',
-    }),
-    filename: 'qrcode',
-  }),
-);
-```
-
-The renderer appends `.svg` when necessary, downloads an SVG `Blob`, revokes its temporary object URL, and returns `void`.
+Create these renderers only where `document`, Canvas, and browser download APIs are available.
+For server rendering, defer them until hydration or use the runtime-neutral SVG renderer from
+`@qrcodesdk/core`. Use `@qrcodesdk/node` when you need PNG bytes without a DOM.
 
 ## Package boundary
 
@@ -206,8 +120,8 @@ import {
 ## Documentation
 
 - [@qrcodesdk/browser](https://qrcodesdk.dev/packages/browser/)
-- [Installation](https://qrcodesdk.dev/getting-started/installation/)
-- [Render to Canvas](https://qrcodesdk.dev/renderers/browser/canvas/)
-- [Render to an Image Element](https://qrcodesdk.dev/renderers/browser/image/)
-- [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
-- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
+- [Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/)
+- [Canvas element renderer](https://qrcodesdk.dev/reference/renderers/canvas/)
+- [PNG-backed Image element renderer](https://qrcodesdk.dev/reference/renderers/image/)
+- [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
+- [Customize appearance](https://qrcodesdk.dev/guides/customize/)

@@ -1,0 +1,64 @@
+---
+title: Browser download renderers
+description: Reference for QRCodeDownloadSVGRenderer and QRCodeDownloadImageRenderer from @qrcodesdk/browser.
+docType: reference
+
+related:
+  - ../../packages/browser.mdx
+  - ../../guides/download-or-save.md
+  - ./svg.md
+  - ./image.md
+---
+
+## When to use
+
+Use the download renderers inside a browser user action when the SDK should create and click a
+temporary download link. Use the SVG wrapper for scalable files and the Image wrapper for PNG files.
+
+## Minimal example
+
+```ts
+import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+qrcode('https://qrcodesdk.dev').render(
+  QRCodeDownloadSVGRenderer({
+    renderer: QRCodeSVGRenderer(),
+    filename: 'qrcode',
+  }),
+);
+```
+
+For PNG, wrap `QRCodeImageRenderer()` with `QRCodeDownloadImageRenderer()` instead.
+
+## Return value
+
+Both wrappers return `void`. Their effect is a browser download; they do not return the wrapped SVG
+string or Image element.
+
+## Renderer-specific options
+
+| Wrapper                       | `renderer` requirement                                             | `filename` default | Added extension |
+| ----------------------------- | ------------------------------------------------------------------ | ------------------ | --------------- |
+| `QRCodeDownloadSVGRenderer`   | `QRCodeRenderer<string>` such as `QRCodeSVGRenderer()`             | `'qrcode'`         | `.svg`          |
+| `QRCodeDownloadImageRenderer` | `QRCodeRenderer<HTMLImageElement>` such as `QRCodeImageRenderer()` | `'qrcode'`         | `.png`          |
+
+`renderer` is required. `filename` is optional; the wrapper appends its extension when the supplied
+name does not already end with that extension, using a case-insensitive check.
+
+## Renderer-specific constraints
+
+- Both wrappers require browser DOM download behavior and must be called in a context where the
+  browser permits a programmatic link click.
+- The SVG wrapper creates an `image/svg+xml;charset=utf-8` Blob and revokes its object URL on the next
+  task after triggering the download.
+- The PNG wrapper downloads the wrapped Image element's existing `src`; it does not re-encode it.
+- Wrapped renderer options, output validity, and runtime requirements remain the responsibility of
+  the wrapped renderer.
+
+## Related guides
+
+- [Download or save](/guides/download-or-save/) for choosing SVG or PNG and for framework component,
+  Canvas, and Node.js workflows.
+- [SVG string renderer](/reference/renderers/svg/) and
+  [PNG-backed Image element renderer](/reference/renderers/image/) for wrapped options.

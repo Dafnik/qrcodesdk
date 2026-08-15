@@ -1,6 +1,7 @@
 ---
 title: QRCodeSDK
 description: Build QR codes with a single TypeScript-first API, then render them in the format your app needs.
+docType: overview
 template: splash
 hero:
   image:
@@ -8,8 +9,8 @@ hero:
     file: ../../assets/logo-square.svg
   tagline: Build QR codes with a single TypeScript-first API, then render them in the format your app needs.
   actions:
-    - text: Get started
-      link: /getting-started/installation/
+    - text: Render your first QR code
+      link: /getting-started/choose-your-setup
       icon: right-arrow
     - text: Playground
       link: /playground
@@ -17,15 +18,13 @@ hero:
       variant: minimal
 ---
 
-import {CardGrid, LinkCard} from '@astrojs/starlight/components';
-
 import PackageManagerTabs from '../../components/package-manager-tabs.astro';
 
-## Install and render SVG
+## Install Core
 
 <PackageManagerTabs packages={['@qrcodesdk/core']} mode="add" />
 
-Render your first QR code.
+Render a scalable SVG string with the runtime-neutral Core package:
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -33,94 +32,25 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
-SVG is the best default for most user-facing QR codes because it stays sharp at any size and works in browsers, servers, emails and static assets.
+SVG is the recommended default for most user-facing QR codes: it stays sharp at any size and works
+in browsers, servers, email, and static assets. See the [SVG renderer reference](/reference/renderers/svg/)
+when you need its options or exact return contract.
 
-## Choose your framework
+## Choose by runtime and output
 
-<CardGrid>
-  <LinkCard title="Angular" href="/packages/angular/" description="Render QRCodes with Angular." />
-  <LinkCard title="React" href="/packages/react/" description="Render QRCodes with React." />
-  <LinkCard title="Node" href="/packages/node/" description="Render QRCodes with Node.js." />
-  <LinkCard title="Browser" href="/packages/browser/" description="Render QRCodes with Browser." />
-  <LinkCard title="Terminal" href="/packages/cli/" description="Render QRCodes with Terminal." />
-</CardGrid>
+| Where will it run?               | Output you need                                    | Start here                                 |
+| -------------------------------- | -------------------------------------------------- | ------------------------------------------ |
+| Any supported JavaScript runtime | SVG or terminal text strings                       | [`@qrcodesdk/core`](/packages/core/)       |
+| Browser DOM                      | Canvas, PNG-backed Image element, or file download | [`@qrcodesdk/browser`](/packages/browser/) |
+| Node.js-compatible runtime       | PNG `Buffer` for files or responses                | [`@qrcodesdk/node`](/packages/node/)       |
+| React or Next.js                 | SVG, Image, or Canvas component                    | [`@qrcodesdk/react`](/packages/react/)     |
+| Angular                          | SVG, Image, or Canvas component                    | [`@qrcodesdk/angular`](/packages/angular/) |
+| Terminal, shell script, or CI    | Terminal text, SVG file, or PNG file               | [`@qrcodesdk/cli`](/packages/cli/)         |
 
-## Choose your output
+[Choose your setup](/getting-started/choose-your-setup/) for the matching install command, or compare
+every built-in return type in [Renderer outputs](/reference/renderers/).
 
-<CardGrid>
-  <LinkCard
-    title="Render SVG"
-    href="/renderers/core/svg/"
-    description="Create a scalable SVG string from @qrcodesdk/core."
-  />
-  <LinkCard
-    title="Render to Canvas"
-    href="/renderers/browser/canvas/"
-    description="Create an HTMLCanvasElement in browser apps."
-  />
-  <LinkCard
-    title="Render to an Image Element"
-    href="/renderers/browser/image/"
-    description="Create an HTMLImageElement with a PNG data URL or trigger a browser PNG download."
-  />
-  <LinkCard
-    title="Render Terminal Text"
-    href="/renderers/core/text/"
-    description="Create compact terminal output for CLIs, logs, and snapshots."
-  />
-</CardGrid>
+## Next step
 
-## Customize the QR code
-
-Most renderers use the same styling options.
-
-```ts
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-
-const svg = qrcode('https://qrcodesdk.dev')
-  .errorCorrection('H')
-  .render(
-    QRCodeSVGRenderer({
-      size: 8,
-      margin: 4,
-      colors: {
-        colorDark: '#111827',
-        colorLight: '#ffffff',
-      },
-      dotsOptions: {type: 'rounded'},
-      cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
-      cornersDotOptions: {type: 'dot'},
-      ariaLabel: 'Scan to open qrcodesdk.dev',
-    }),
-  );
-```
-
-## Go deeper
-
-<CardGrid>
-  <LinkCard
-    title="Installation"
-    href="/getting-started/installation/"
-    description="Choose the package for your output format and runtime."
-  />
-  <LinkCard
-    title="Customize QR Codes"
-    href="/advanced/customize/"
-    description="Set module and finder shapes, colors, size, margin, accessibility labels, error correction, version, and mask."
-  />
-  <LinkCard
-    title="Playground"
-    href="/playground/"
-    description="Configure Angular and React components visually, preview output, and copy code."
-  />
-  <LinkCard
-    title="Builder API"
-    href="/packages/core/"
-    description="Use data modes, error correction, matrix output, and the immutable builder."
-  />
-  <LinkCard
-    title="Custom Renderers"
-    href="/advanced/custom-renderers/"
-    description="Render the QR matrix into any output type."
-  />
-</CardGrid>
+Try the [Playground](/playground/) to explore appearance visually, or follow
+[Customize appearance](/guides/customize/) to style the SVG you just rendered.

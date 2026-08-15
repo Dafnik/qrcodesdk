@@ -29,7 +29,6 @@
       "outputs": ["dist/**", "!.turbo/**", "!.astro-cache/**"]
     },
     "check": {
-      "cache": false,
       "dependsOn": ["//#format:check", "//#cspell", "build", "test", "lint", "check-types"]
     },
     "check-performance": {
@@ -51,6 +50,11 @@
       "cache": false
     },
     "lint": {},
+    "preview": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "persistent": true
+    },
     "start": {
       "cache": false,
       "persistent": true

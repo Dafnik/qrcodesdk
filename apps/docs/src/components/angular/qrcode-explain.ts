@@ -57,12 +57,7 @@ type LegendItem = {
   template: `
     <div class="grid gap-4">
       <div class="flex items-center justify-between gap-4">
-        <div>
-          <p class="text-muted-foreground font-mono text-xs tracking-[0.18em] uppercase">
-            Input signal
-          </p>
-          <h2 class="text-2xl font-bold">Configure</h2>
-        </div>
+        <h2 class="text-2xl font-bold">Configure</h2>
         <button (click)="resetQrConfig()" type="button" hlmBtn>
           Reset
           <ng-icon name="lucideRotateCcw" />

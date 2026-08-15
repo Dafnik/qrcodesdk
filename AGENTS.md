@@ -23,3 +23,5 @@ All types and utilities that are only exported to be used by another @qrcodesdk 
 (and are there not used for public consumption (function properties, return types)) should start with a `ɵ` prefix.
 
 Never create changesets! This is the work of a human.
+
+Also, checkout [DEVELOPMENT.md](./DEVELOPMENT.md)

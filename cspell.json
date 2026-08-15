@@ -18,9 +18,10 @@
     "pnpm-workspace.yaml",
     "pnpm-lock.yaml",
     "fixtures.ts",
+    "PLAN.md",
     "*.svg",
     "apps/docs/src/libs",
-    "apps/docs/src/content/docs/advanced/performance.md"
+    "apps/docs/src/content/docs/learn/performance.md"
   ],
   "ignoreRegExpList": ["/ɵ[\\p{L}\\p{N}_]*/gu"],
   "version": "0.2"

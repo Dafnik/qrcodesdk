@@ -1,16 +1,14 @@
 <!-- Generated from apps/docs/src/content/docs/packages/angular.mdx. Run `pnpm turbo run generate-readmes --filter=docs` to update. -->
 
-<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+<div align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></div>
 
 # @qrcodesdk/angular
 
 [![Open @qrcodesdk/angular on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/angular) ![@qrcodesdk/angular version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/angular?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/angular install size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/angular?color=7469B6&label=install%20size&style=shieldsio) ![@qrcodesdk/angular download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/angular?color=7469B6&label=download%2Fmo&style=shieldsio) [![@qrcodesdk/angular source code](https://npmx.dev/api/registry/badge/name/@qrcodesdk/angular?color=7469B6&label=source%20code&value=GitHub%20%E2%86%97&style=shieldsio)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/angular)
 
-**[Live Demo](https://qrcodesdk.dev/playground/?package=angular)**
+**[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground/?package=angular)**
 
-`@qrcodesdk/angular` provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
-
-It supports Angular 20 through 22.
+Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
 
 ## Install
 
@@ -72,45 +70,29 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
 export class App {}
 ```
 
+## Version compatibility
+
+| @qrcodesdk/angular | Angular                       |
+| ------------------ | ----------------------------- |
+| `0.x.x`            | `^20.0.0` `^21.0.0` `^22.0.0` |
+
 ## Components
 
-| Component      | Selector        | Output             | Download support |
-| -------------- | --------------- | ------------------ | ---------------- |
-| `QRCodeSVG`    | `qrcode-svg`    | Inline SVG element | SVG              |
-| `QRCodeImage`  | `qrcode-image`  | PNG-backed `<img>` | PNG              |
-| `QRCodeCanvas` | `qrcode-canvas` | `<canvas>` element | None             |
+| Component      | Selector        | Output               | Download support |
+| -------------- | --------------- | -------------------- | ---------------- |
+| `QRCodeSVG`    | `qrcode-svg`    | `Inline SVG element` | SVG              |
+| `QRCodeImage`  | `qrcode-image`  | `PNG-backed <img>`   | PNG              |
+| `QRCodeCanvas` | `qrcode-canvas` | `<canvas> element`   | None             |
 
-All components accept:
+### Options
 
-| Input     | Type                       | Description                                 |
-| --------- | -------------------------- | ------------------------------------------- |
-| `data`    | `string \| number`         | Required QR code payload.                   |
-| `options` | Component-specific options | Optional matrix and renderer configuration. |
+| Prop      | Type                         | Description                                 |
+| --------- | ---------------------------- | ------------------------------------------- |
+| `data`    | `string \| number`           | Required QR code payload.                   |
+| `options` | `Component-specific options` | Optional matrix and renderer configuration. |
 
-`options` supports shared matrix options such as `version`, `mode`, `errorCorrectionLevel`, `mask`, and `eci`. Renderer options match the corresponding QRCodeSDK renderer:
-
-- `QRCodeSVG` uses `QRCodeSVGOptions`.
-- `QRCodeImage` uses `QRCodeImageOptions`.
-- `QRCodeCanvas` uses `QRCodeCanvasOptions`.
-
-Import `QRCodeSVGOptions` from `@qrcodesdk/core`. Import `QRCodeImageOptions` and `QRCodeCanvasOptions` from `@qrcodesdk/browser`.
-
-## Matrix options
-
-The `options` input combines the component's renderer options with the shared QR matrix options:
-
-| Option                 | Type                                     | Default   | Description                            |
-| ---------------------- | ---------------------------------------- | --------- | -------------------------------------- |
-| `mode`                 | `'numeric' \| 'alphanumeric' \| 'octet'` | Automatic | Encoding mode.                         |
-| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`               | `'M'`     | Error correction level.                |
-| `version`              | `1` through `40`                         | Automatic | Pins the QR version.                   |
-| `mask`                 | `0` through `7`                          | Automatic | Pins the QR mask.                      |
-| `eci`                  | `boolean`                                | `false`   | Emits UTF-8 ECI 26 for octet segments. |
-
-Most applications should let the builder select the mode, version, and mask automatically.
-Octet bytes remain UTF-8 regardless of `eci`. Set `eci: true` to explicitly declare UTF-8 to
-scanners; the default saves 12 bits and may rely on scanner heuristics for non-ASCII text.
-Numeric and alphanumeric-only symbols are unaffected.
+All three components are standalone. Add the components you use to the host component's
+`imports` array, then bind `data` and `options` with normal Angular template syntax.
 
 ## Live examples
 
@@ -221,66 +203,12 @@ export class QRCodeDownloadImageExample {
 }
 ```
 
-## Renderer options
+## Center images
 
-| Option                  | Components | Type                         |            Default |
-| ----------------------- | ---------- | ---------------------------- | -----------------: |
-| `size`                  | All        | `number`                     |                `5` |
-| `margin`                | All        | `number`                     |                `4` |
-| `colors.colorDark`      | All        | `string`                     |        `'#000000'` |
-| `colors.colorLight`     | All        | `string`                     |        `'#ffffff'` |
-| `dotsOptions`           | All        | `QRCodeDotsOptions`          | `{type: 'square'}` |
-| `cornersSquareOptions`  | All        | `QRCodeCornersSquareOptions` | `{type: 'square'}` |
-| `cornersDotOptions`     | All        | `QRCodeCornersDotOptions`    | `{type: 'square'}` |
-| `alt`                   | SVG, Image | `string`                     |        `undefined` |
-| `ariaLabel`             | SVG, Image | `string`                     |        `undefined` |
-| `title`                 | SVG, Image | `string`                     |        `undefined` |
-| `image.source`          | All        | Renderer-specific source     |        `undefined` |
-| `image.size`            | All        | `number`                     |              `0.4` |
-| `image.padding`         | All        | `number`                     |                `1` |
-| `image.clearBackground` | All        | `boolean`                    |             `true` |
-
-Color options use hash-prefixed values such as `#111827`. All built-in renderers require a positive safe integer `size` and a non-negative safe integer `margin`.
-
-Module, finder-ring, and finder-center options pass through to every component. Their optional
-colors independently inherit `colors.colorDark`.
-
-### Prepared center images
-
-Pass prepared data through the existing `options` input. For browser output, finish decoding and
-only instantiate the component when the source is ready:
-
-```ts
-const logo = signal<HTMLImageElement | undefined>(undefined);
-
-async function selectLogo(file: File | undefined) {
-  if (!file) return;
-
-  const source = new Image();
-  const localUrl = URL.createObjectURL(file);
-  source.src = localUrl;
-
-  try {
-    await source.decode();
-    this.logo.set(source);
-  } finally {
-    URL.revokeObjectURL(localUrl);
-  }
-}
-```
-
-```angular-html
-<input #logoInput (change)="selectLogo(logoInput.files?.[0])" accept="image/*" type="file" />
-
-@if (logo(); as source) {
-  <qrcode-image
-    [options]="{errorCorrectionLevel: 'H', image: {source, size: 0.3}}"
-    data="https://qrcodesdk.dev" />
-}
-```
-
-Use an embedded `data:image/...` URL for `QRCodeSVG`. Components never load paths or URLs
-themselves, and SVG/PNG downloads include the overlay.
+Load and decode a browser image first, store the resulting `HTMLImageElement` in a signal, and
+instantiate the component inside an `@if` block once the signal has a value. See
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#wire-prepared-sources-into-frameworks) for the complete
+component and template.
 
 ## Download files
 
@@ -299,11 +227,21 @@ The appropriate `.svg` or `.png` extension is appended when necessary.
 
 `QRCodeCanvas` does not include a download method. Use `QRCodeImage` when you want built-in PNG download support.
 
+See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-angular) for template-reference
+downloads and manual Canvas export.
+
 ## Server-side rendering
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
 `QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+
+## Shared configuration
+
+The `options` input combines matrix settings with the selected renderer's settings. Use the
+[builder reference](https://qrcodesdk.dev/reference/builder/) for encoding, version, mask, and error correction;
+[Customize output](https://qrcodesdk.dev/guides/customize/) for shared visual options; and the dedicated
+[renderer references](https://qrcodesdk.dev/reference/renderers/) for output-specific options and constraints.
 
 ## Public API
 
@@ -316,7 +254,9 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 ## Documentation
 
 - [@qrcodesdk/angular](https://qrcodesdk.dev/packages/angular/)
-- [Customize QR Codes](https://qrcodesdk.dev/advanced/customize/)
-- [Render SVG](https://qrcodesdk.dev/renderers/core/svg/)
-- [Render to an Image Element](https://qrcodesdk.dev/renderers/browser/image/)
-- [Render to Canvas](https://qrcodesdk.dev/renderers/browser/canvas/)
+- [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [Add a center image](https://qrcodesdk.dev/guides/center-images/)
+- [Download or save a QR code as SVG or PNG](https://qrcodesdk.dev/guides/download-or-save/)
+- [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
+- [PNG-backed Image element renderer](https://qrcodesdk.dev/reference/renderers/image/)
+- [Canvas element renderer](https://qrcodesdk.dev/reference/renderers/canvas/)

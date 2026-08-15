@@ -24,7 +24,7 @@ const WORKSPACE_ROOT = path.resolve(DOCS_ROOT, '../..');
 const SITE_URL = 'https://qrcodesdk.dev';
 const GENERATE_COMMAND = 'pnpm turbo run generate-readmes --filter=docs';
 const README_LOGO =
-  '<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>';
+  '<div align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></div>';
 
 const markdownProcessor = unified()
   .use(remarkParse)
@@ -89,7 +89,9 @@ export async function generateReadme(mapping, options = {}) {
     contentRoot,
     siteUrl,
   });
-  const playground = relatedDocuments.find(({id}) => id === 'playground');
+  const playground = relatedDocuments.find(({id}) => id === 'playground') ?? {
+    url: 'https://qrcodesdk.dev/playground',
+  };
 
   tree.children = await transformChildren(tree.children, {
     sourcePath,
@@ -271,6 +273,10 @@ async function transformComponent(node, context) {
 
   if (componentName === 'PackageManagerTabs') {
     return createPackageManagerNodes(readStaticAttributes(node, context.sourcePath));
+  }
+
+  if (componentName === 'PackageComponents') {
+    return createPackageComponentNodes(readStaticAttributes(node, context.sourcePath));
   }
 
   const importPath = context.imports.get(componentName);
@@ -480,6 +486,44 @@ function createPackageManagerNodes(attributes) {
   ];
 }
 
+/** @param {Record<string, unknown>} attributes */
+function createPackageComponentNodes(attributes) {
+  const supportedAttributes = new Set(['className', 'selector']);
+  const unsupportedAttribute = Object.keys(attributes).find(
+    (attribute) => !supportedAttributes.has(attribute),
+  );
+
+  if (unsupportedAttribute) {
+    throw new Error(`PackageComponents does not support the ${unsupportedAttribute} attribute.`);
+  }
+
+  const className = optionalBoolean(attributes.className, 'PackageComponents className') ?? false;
+  const selector = optionalBoolean(attributes.selector, 'PackageComponents selector') ?? false;
+  const selectorHeader = selector ? ' Selector |' : '';
+  const selectorDivider = selector ? ' --- |' : '';
+  const selectorCells = selector
+    ? [' `qrcode-svg` |', ' `qrcode-image` |', ' `qrcode-canvas` |']
+    : ['', '', ''];
+  const classNameRow = className
+    ? '\n| `className` | `string` | CSS class applied to the component wrapper div. |'
+    : '';
+  const markdown = `| Component |${selectorHeader} Output | Download support |
+| --- |${selectorDivider} --- | --- |
+| \`QRCodeSVG\` |${selectorCells[0]} \`Inline SVG element\` | SVG |
+| \`QRCodeImage\` |${selectorCells[1]} \`PNG-backed <img>\` | PNG |
+| \`QRCodeCanvas\` |${selectorCells[2]} \`<canvas> element\` | None |
+
+### Options
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| \`data\` | \`string \\| number\` | Required QR code payload. |
+| \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${classNameRow}
+`;
+
+  return markdownProcessor.parse(markdown).children;
+}
+
 /** @param {string} packageName */
 function createBadgeNodes(packageName) {
   const badgeChildren = createPackageBadges(packageName).flatMap(({alt, imageUrl, href}, index) => {
@@ -512,6 +556,15 @@ function createPlaygroundNodes(playgroundUrl) {
             {
               type: 'strong',
               children: [
+                {
+                  type: 'link',
+                  url: 'https://qrcodesdk.dev',
+                  children: [{type: 'text', value: 'Documentation'}],
+                },
+                {
+                  type: 'text',
+                  value: ' | ',
+                },
                 {
                   type: 'link',
                   url: playgroundUrl,
@@ -584,6 +637,13 @@ function requireString(value, label, sourcePath) {
 function optionalString(value, label) {
   if (value === undefined) return undefined;
   return requireString(value, label);
+}
+
+/** @param {unknown} value @param {string} label */
+function optionalBoolean(value, label) {
+  if (value === undefined) return undefined;
+  if (typeof value !== 'boolean') throw new Error(`${label} must be a boolean.`);
+  return value;
 }
 
 /** @param {unknown} value @param {string} label */

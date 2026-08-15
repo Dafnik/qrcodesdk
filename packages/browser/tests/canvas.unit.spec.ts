@@ -34,6 +34,23 @@ describe('QRCodeCanvasRenderer', () => {
     expectPixel(canvas, 25, 25, BLACK);
   });
 
+  test('adds image semantics when the accessible label is non-empty', () => {
+    const canvas = QRCodeCanvasRenderer({ariaLabel: 'Scan to open qrcodesdk.dev'})([[1]]);
+
+    expect(canvas.getAttribute('role')).toBe('img');
+    expect(canvas.getAttribute('aria-label')).toBe('Scan to open qrcodesdk.dev');
+  });
+
+  test.each([undefined, '', ' \t\n '])(
+    'leaves the canvas unlabelled when ariaLabel is %j',
+    (ariaLabel) => {
+      const canvas = QRCodeCanvasRenderer({ariaLabel})([[1]]);
+
+      expect(canvas.hasAttribute('role')).toBe(false);
+      expect(canvas.hasAttribute('aria-label')).toBe(false);
+    },
+  );
+
   test('renders custom sizing, margin, and colors', () => {
     const matrix: QRCodeMatrix = [
       [0, 1, 0],

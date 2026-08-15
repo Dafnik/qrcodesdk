@@ -1,6 +1,7 @@
 ---
 title: Performance
 description: Matrix and SVG generation benchmark results for QRCodeSDK and its reference libraries.
+docType: concept
 ---
 
 <!-- Generated from benchmark-results/latest.json. Run `pnpm turbo run generate-performance --filter=docs` to update. -->
