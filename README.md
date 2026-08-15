@@ -1,45 +1,49 @@
-<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+<div align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></div>
 
 # QRCodeSDK
 
-QRCodeSDK keeps QR code generation separate from presentation. Start with `qrcode()`, then output SVG, PNG, Canvas, image elements, terminal text, matrix data, or your own custom renderer.
-
-## Package guide
-
-| Package                                                         | Install when you need                                 | Outputs                                                |
-| --------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
-| [`@qrcodesdk/core`](https://qrcodesdk.dev/packages/core/)       | Runtime-neutral generation and common output formats. | SVG strings, terminal text strings, raw matrices.      |
-| [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         | Command line generation from terminals and scripts.   | Terminal text, SVG files, PNG files.                   |
-| [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) | DOM elements and client-side browser workflows.       | `HTMLCanvasElement`, `HTMLImageElement`, downloads.    |
-| [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       | Server-side PNG generation in Node.js.                | PNG `Buffer`.                                          |
-| [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) | Angular components & download helpers.                | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, downloads. |
-| [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)     | React components & download helpers.                  | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, downloads. |
+Build QR codes with a single TypeScript-first API, then render them in the format your app needs.
 
 ## Install
-
-Start with Core for runtime-neutral SVG, terminal text, or matrix output.
 
 ```sh
 npm install @qrcodesdk/core
 ```
 
-Add the renderer package for your runtime:
-
 ```sh
-npm install @qrcodesdk/core @qrcodesdk/browser
-npm install @qrcodesdk/core @qrcodesdk/node
+pnpm add @qrcodesdk/core
 ```
 
-Framework packages use the same Core and Browser renderers:
+<details>
+<summary>Other package managers</summary>
+
+**vp**
 
 ```sh
-npm install @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
-npm install @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
+vp add @qrcodesdk/core
 ```
 
-## Quick starts
+**deno**
 
-### SVG in any JavaScript runtime
+```sh
+deno add @qrcodesdk/core
+```
+
+**bun**
+
+```sh
+bun add @qrcodesdk/core
+```
+
+**yarn**
+
+```sh
+yarn add @qrcodesdk/core
+```
+
+</details>
+
+Render a scalable SVG string with the runtime-neutral Core package:
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -47,179 +51,25 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
-### Browser Image element
+SVG is the recommended default for most user-facing QR codes: it stays sharp at any size and works
+in browsers, servers, email, and static assets. See the [SVG renderer reference](https://qrcodesdk.dev/reference/renderers/svg/)
+when you need its options or exact return contract.
 
-```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
-import {qrcode} from '@qrcodesdk/core';
+## Choose by runtime and output
 
-const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({alt: 'QR code for qrcodesdk.dev'}),
-);
+| Where will it run?               | Output you need                                    | Start here                                                      |
+| -------------------------------- | -------------------------------------------------- | --------------------------------------------------------------- |
+| Any supported JavaScript runtime | SVG or terminal text strings                       | [`@qrcodesdk/core`](https://qrcodesdk.dev/packages/core/)       |
+| Browser DOM                      | Canvas, PNG-backed Image element, or file download | [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) |
+| Node.js-compatible runtime       | PNG `Buffer` for files or responses                | [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       |
+| React or Next.js                 | SVG, Image, or Canvas component                    | [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)     |
+| Angular                          | SVG, Image, or Canvas component                    | [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) |
+| Terminal, shell script, or CI    | Terminal text, SVG file, or PNG file               | [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         |
 
-document.body.append(image);
-```
+[Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/) for the matching install command, or compare
+every built-in return type in [Renderer outputs](https://qrcodesdk.dev/reference/renderers/).
 
-### PNG in Node.js
+## Next step
 
-```ts
-import {writeFile} from 'node:fs/promises';
-
-import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
-
-const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
-
-await writeFile('qrcode.png', png);
-```
-
-### Angular
-
-```ts
-import {Component} from '@angular/core';
-
-import {QRCodeSVG} from '@qrcodesdk/angular';
-
-@Component({
-  selector: 'app-root',
-  imports: [QRCodeSVG],
-  template: `
-    <qrcode-svg data="https://qrcodesdk.dev" />
-  `,
-})
-export class App {}
-```
-
-### React
-
-```tsx
-import {QRCodeSVG} from '@qrcodesdk/react';
-
-export function App() {
-  return <QRCodeSVG data="https://qrcodesdk.dev" />;
-}
-```
-
-### CLI
-
-```sh
-npm install --global @qrcodesdk/cli
-qrc "https://qrcodesdk.dev" --output qrcode.svg
-```
-
-## Core concepts
-
-The immutable builder controls the QR matrix. Renderers control its presentation and output type.
-
-```ts
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-
-const svg = qrcode('HELLO WORLD')
-  .mode('alphanumeric')
-  .errorCorrection('H')
-  .render(
-    QRCodeSVGRenderer({
-      size: 8,
-      margin: 4,
-      colors: {
-        colorDark: '#111827',
-        colorLight: '#ffffff',
-      },
-      dotsOptions: {type: 'rounded'},
-      cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
-      cornersDotOptions: {type: 'dot'},
-    }),
-  );
-```
-
-SVG, browser Canvas/Image, and Node PNG output share these module and finder-pattern options.
-Feature colors inherit `colors.colorDark` when omitted. Terminal text output keeps its existing
-block geometry and is not affected by shape options.
-
-## Documentation
-
-- [Installation](https://qrcodesdk.dev/getting-started/installation/)
-- [Customize QR codes](https://qrcodesdk.dev/advanced/customize/)
-- [Builder API](https://qrcodesdk.dev/packages/core/)
-- [CLI](https://qrcodesdk.dev/packages/cli/)
-
-## Workspace development
-
-```sh
-pnpm install
-pnpm build
-```
-
-### Checks
-
-Run the following command to check for formatting, linting, spelling, type errors, build errors, and test failures:
-
-```shell
-pnpm check
-```
-
-### Linting
-
-```sh
-pnpm format:check
-pnpm lint
-pnpm cspell
-pnpm check-types
-```
-
-### Testing
-
-```sh
-pnpm test
-pnpm test:roundtrips
-pnpm test:coverage
-```
-
-### Docs
-
-Run the documentation site locally:
-
-```sh
-pnpm turbo run start --filter=docs
-```
-
-#### Generate and check readmes and performance files:
-
-```sh
-pnpm turbo run generate-readmes --filter=docs
-pnpm turbo run check-readmes --filter=docs
-```
-
-```sh
-pnpm turbo run generate-performance --filter=docs
-pnpm turbo run check-performance --filter=docs
-```
-
-### Benchmarks
-
-```sh
-pnpm benchmark
-```
-
-### Updating snapshots
-
-#### Core
-
-```shell
-UPDATE_SVG_SNAPSHOTS=1 \
-UPDATE_TEXT_SNAPSHOTS=1 \
-pnpm --filter @repo/core-testing exec vitest run \
-tests/svg/svg-renderer.snapshot.e2e.spec.ts \
-tests/svg/svg-renderer.snapshot.unit.spec.ts \
-tests/text/text-renderer.snapshot.e2e.spec.ts \
-tests/text/text-renderer.snapshot.unit.spec.ts
-```
-
-#### Node
-
-```shell
-UPDATE_PNG_SNAPSHOTS=1 \
-pnpm --filter @qrcodesdk/node exec vitest run \
-tests/png/png-renderer.snapshot.e2e.spec.ts \
-tests/png/png-renderer.snapshot.unit.spec.ts
-```
+Try the [Playground](https://qrcodesdk.dev/playground/) to explore appearance visually, or follow
+[Customize appearance](https://qrcodesdk.dev/guides/customize/) to style the SVG you just rendered.

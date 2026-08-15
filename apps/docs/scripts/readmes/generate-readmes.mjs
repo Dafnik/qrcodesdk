@@ -24,7 +24,7 @@ const WORKSPACE_ROOT = path.resolve(DOCS_ROOT, '../..');
 const SITE_URL = 'https://qrcodesdk.dev';
 const GENERATE_COMMAND = 'pnpm turbo run generate-readmes --filter=docs';
 const README_LOGO =
-  '<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>';
+  '<div align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></div>';
 
 const markdownProcessor = unified()
   .use(remarkParse)
@@ -89,7 +89,9 @@ export async function generateReadme(mapping, options = {}) {
     contentRoot,
     siteUrl,
   });
-  const playground = relatedDocuments.find(({id}) => id === 'playground');
+  const playground = relatedDocuments.find(({id}) => id === 'playground') ?? {
+    url: 'https://qrcodesdk.dev/playground',
+  };
 
   tree.children = await transformChildren(tree.children, {
     sourcePath,
@@ -554,6 +556,15 @@ function createPlaygroundNodes(playgroundUrl) {
             {
               type: 'strong',
               children: [
+                {
+                  type: 'link',
+                  url: 'https://qrcodesdk.dev',
+                  children: [{type: 'text', value: 'Documentation'}],
+                },
+                {
+                  type: 'text',
+                  value: ' | ',
+                },
                 {
                   type: 'link',
                   url: playgroundUrl,

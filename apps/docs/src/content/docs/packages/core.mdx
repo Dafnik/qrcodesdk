@@ -21,8 +21,8 @@ related:
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
-`@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK. It converts data into a QR matrix
-and includes renderers for SVG strings and terminal text strings.
+`@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK.
+It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
 
 ## Install
 
@@ -53,16 +53,16 @@ The complete input, matrix-option, builder-method, and matrix-output contracts l
 
 ## Runtime compatibility
 
-Core supports JavaScript runtimes with native ESM, ES2020, and a global `TextEncoder`. It has no
-Node.js, DOM, filesystem, or framework dependency.
+> `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
+> It has no Node.js, DOM, filesystem, or framework dependency.
 
-| Runtime                         | Support policy                                     | CI verification                          |
-| ------------------------------- | -------------------------------------------------- | ---------------------------------------- |
-| Node.js                         | Maintained LTS lines                               | Latest Node.js 22.x and 24.x             |
-| Deno                            | Current stable major                               | Latest Deno 2.x                          |
-| Bun                             | Current stable release                             | Latest stable Bun                        |
-| Browsers                        | Current evergreen browser families                 | Playwright Chromium, Firefox, and WebKit |
-| Other runtimes and edge workers | Supported when they meet the Core runtime contract | Not individually verified                |
+| Runtime                         | Support policy                                     |
+| ------------------------------- | -------------------------------------------------- |
+| Node.js                         | All maintained LTS lines                           |
+| Deno                            | Current stable major                               |
+| Bun                             | Current stable release                             |
+| Browsers                        | Current evergreen browser families                 |
+| Other runtimes and edge workers | Supported when they meet the Core runtime contract |
 
 For runtime-specific output, add the owning package:
 
@@ -70,6 +70,7 @@ For runtime-specific output, add the owning package:
 | ------------------------------------------ | ----------------------------------------------------------- | ----------------------------------------------- |
 | [`@qrcodesdk/browser`](/packages/browser/) | Canvas element, PNG-backed Image element, browser downloads | `HTMLCanvasElement`, `HTMLImageElement`, `void` |
 | [`@qrcodesdk/node`](/packages/node/)       | PNG bytes                                                   | `Buffer`                                        |
+| [`@qrcodesdk/cli`](/packages/cli/)         | Command line generation from terminals and scripts.         | Terminal text, SVG files, PNG files.            |
 | [`@qrcodesdk/react`](/packages/react/)     | React SVG, Image, and Canvas components                     | React element                                   |
 | [`@qrcodesdk/angular`](/packages/angular/) | Angular SVG, Image, and Canvas components                   | Angular component                               |
 

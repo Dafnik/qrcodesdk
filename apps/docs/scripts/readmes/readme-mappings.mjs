@@ -27,6 +27,12 @@ export const README_MAPPINGS = [
     codeLanguage: 'ts',
   },
   {
+    id: 'core',
+    source: 'src/content/docs/packages/core.mdx',
+    output: '../../packages/core/README.md',
+    codeLanguage: 'ts',
+  },
+  {
     id: 'cli',
     source: 'src/content/docs/packages/cli.mdx',
     output: '../../packages/cli/README.md',

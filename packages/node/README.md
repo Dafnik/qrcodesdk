@@ -1,10 +1,12 @@
 <!-- Generated from apps/docs/src/content/docs/packages/node.mdx. Run `pnpm turbo run generate-readmes --filter=docs` to update. -->
 
-<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+<div align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></div>
 
 # @qrcodesdk/node
 
 [![Open @qrcodesdk/node on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/node) ![@qrcodesdk/node version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/node?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/node install size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/node?color=7469B6&label=install%20size&style=shieldsio) ![@qrcodesdk/node download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/node?color=7469B6&label=download%2Fmo&style=shieldsio) [![@qrcodesdk/node source code](https://npmx.dev/api/registry/badge/name/@qrcodesdk/node?color=7469B6&label=source%20code&value=GitHub%20%E2%86%97&style=shieldsio)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/node)
+
+**[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
 Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
 

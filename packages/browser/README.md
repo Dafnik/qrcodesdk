@@ -1,10 +1,12 @@
 <!-- Generated from apps/docs/src/content/docs/packages/browser.mdx. Run `pnpm turbo run generate-readmes --filter=docs` to update. -->
 
-<p align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></p>
+<div align="center"><img src="https://qrcodesdk.dev/favicon.svg" alt="QRCodeSDK logo" width="240"></div>
 
 # @qrcodesdk/browser
 
 [![Open @qrcodesdk/browser on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/browser?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/browser) ![@qrcodesdk/browser version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/browser?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/browser install size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/browser?color=7469B6&label=install%20size&style=shieldsio) ![@qrcodesdk/browser download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/browser?color=7469B6&label=download%2Fmo&style=shieldsio) [![@qrcodesdk/browser source code](https://npmx.dev/api/registry/badge/name/@qrcodesdk/browser?color=7469B6&label=source%20code&value=GitHub%20%E2%86%97&style=shieldsio)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/browser)
+
+**[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
 `@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.
 
@@ -73,6 +75,8 @@ document.body.append(image);
 ```
 
 `QRCodeImageRenderer()` returns an `HTMLImageElement`. Its `src` is a PNG data URL, and its `width` and `height` match the rendered QR code size.
+
+[Learn here](https://qrcodesdk.dev/guides/browser-usage/) more about using the library in the browser.
 
 ## Configure and download output
 
