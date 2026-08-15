@@ -488,7 +488,7 @@ function createPackageManagerNodes(attributes) {
 
 /** @param {Record<string, unknown>} attributes */
 function createPackageComponentNodes(attributes) {
-  const supportedAttributes = new Set(['className', 'selector']);
+  const supportedAttributes = new Set(['classAttribute', 'className', 'selector']);
   const unsupportedAttribute = Object.keys(attributes).find(
     (attribute) => !supportedAttributes.has(attribute),
   );
@@ -497,6 +497,8 @@ function createPackageComponentNodes(attributes) {
     throw new Error(`PackageComponents does not support the ${unsupportedAttribute} attribute.`);
   }
 
+  const classAttribute =
+    optionalBoolean(attributes.classAttribute, 'PackageComponents classAttribute') ?? false;
   const className = optionalBoolean(attributes.className, 'PackageComponents className') ?? false;
   const selector = optionalBoolean(attributes.selector, 'PackageComponents selector') ?? false;
   const selectorHeader = selector ? ' Selector |' : '';
@@ -506,6 +508,9 @@ function createPackageComponentNodes(attributes) {
     : ['', '', ''];
   const classNameRow = className
     ? '\n| `className` | `string` | CSS class applied to the component wrapper div. |'
+    : '';
+  const classAttributeRow = classAttribute
+    ? '\n| `class` | `string \\| object \\| array` | Vue class binding applied to the component wrapper div. |'
     : '';
   const markdown = `| Component |${selectorHeader} Output | Download support |
 | --- |${selectorDivider} --- | --- |
@@ -518,7 +523,7 @@ function createPackageComponentNodes(attributes) {
 | Prop | Type | Description |
 | --- | --- | --- |
 | \`data\` | \`string \\| number\` | Required QR code payload. |
-| \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${classNameRow}
+| \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${classNameRow}${classAttributeRow}
 `;
 
   return markdownProcessor.parse(markdown).children;

@@ -1,6 +1,6 @@
 ---
 title: Add a center image
-description: Prepare and add a scan-safe center image across SVG, browser, Node.js, React, and Angular output.
+description: Prepare and add a scan-safe center image across SVG, browser, Node.js, React, Vue, and Angular output.
 docType: guide
 
 related:
@@ -53,6 +53,8 @@ the result will scan. Start around `0.2`–`0.3`, preserve padding, and increase
 | Node.js PNG                        | PNG `Buffer`                                         | Read or download valid PNG bytes before rendering                    |
 | React SVG                          | `QRCodeDataImageURL` in `options.image.source`       | Prepare outside render; memoize options when useful                  |
 | React Image or Canvas              | loaded `CanvasImageSource` in `options.image.source` | Store the decoded source in state before mounting output             |
+| Vue SVG                            | `QRCodeDataImageURL` in `options.image.source`       | Prepare before updating a ref or computed options                    |
+| Vue Image or Canvas                | loaded `CanvasImageSource` in `options.image.source` | Store the decoded source in a `shallowRef` before mounting output    |
 | Angular SVG                        | `QRCodeDataImageURL` in `[options]`                  | Prepare before updating the input                                    |
 | Angular Image or Canvas            | loaded `CanvasImageSource` in `[options]`            | Store the decoded source in a signal before rendering output         |
 
@@ -115,8 +117,8 @@ The Node renderer accepts PNG bytes only. It decodes and alpha-composites the so
 
 ## Wire prepared sources into frameworks
 
-React and Angular do not load image sources inside their QR components. Prepare browser sources in
-application state, then pass stable options after decoding.
+React, Vue, and Angular do not load image sources inside their QR components. Prepare browser
+sources in application state, then pass stable options after decoding.
 
 ```tsx
 import {useState} from 'react';
@@ -144,6 +146,32 @@ export function QRCodeWithLogo() {
     </button>
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import {computed, shallowRef} from 'vue';
+
+import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+import {QRCodeImage} from '@qrcodesdk/vue';
+
+const source = shallowRef<HTMLImageElement>();
+const options = computed<QRCodeImageOptions | undefined>(() =>
+  source.value ? {errorCorrectionLevel: 'H', image: {source: source.value, size: 0.3}} : undefined,
+);
+
+async function loadLogo(url: string) {
+  const image = new Image();
+  image.src = url;
+  await image.decode();
+  source.value = image;
+}
+</script>
+
+<template>
+  <QRCodeImage v-if="options" data="https://qrcodesdk.dev" :options="options" />
+  <button v-else type="button" @click="loadLogo('/logo.png')">Load logo</button>
+</template>
 ```
 
 ```ts

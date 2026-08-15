@@ -1,0 +1,18 @@
+name: release @qrcodesdk/vue
+
+on:
+  push:
+    tags:
+      - '@qrcodesdk/vue@**'
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: write # Required for GitHub release action
+
+jobs:
+  vue:
+    uses: ./.github/workflows/release.yml
+    with:
+      lib: vue
+    secrets:
+      npm_token: ${{ secrets.NPM_TOKEN }}

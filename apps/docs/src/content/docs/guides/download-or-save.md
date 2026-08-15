@@ -7,6 +7,7 @@ related:
   - ../reference/renderers/index.mdx
   - ../reference/renderers/browser-downloads.mdx
   - ../packages/react.mdx
+  - ../packages/vue.mdx
   - ../packages/angular.mdx
   - ../packages/cli.mdx
 ---
@@ -69,6 +70,27 @@ export function DownloadQRCode() {
 
 `QRCodeCanvas` has no download handle; export its Canvas output manually or render `QRCodeImage` for
 built-in PNG downloads.
+
+## Download from Vue
+
+Call `download(filename?)` through an SVG or Image component template ref:
+
+```vue
+<script setup lang="ts">
+import {ref} from 'vue';
+
+import {type QRCodeDownloadHandle, QRCodeImage} from '@qrcodesdk/vue';
+
+const qrcode = ref<QRCodeDownloadHandle | null>(null);
+</script>
+
+<template>
+  <button type="button" @click="qrcode?.download('qrcodesdk')">Download PNG</button>
+  <QRCodeImage ref="qrcode" data="https://qrcodesdk.dev" />
+</template>
+```
+
+Vue's Canvas component also has no download method.
 
 ## Download from Angular
 

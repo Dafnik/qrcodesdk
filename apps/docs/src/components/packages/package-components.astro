@@ -1,10 +1,11 @@
 ---
 interface Props {
+  classAttribute?: boolean;
   className?: boolean;
   selector?: boolean;
 }
 
-const {className = false, selector = false} = Astro.props;
+const {classAttribute = false, className = false, selector = false} = Astro.props;
 
 const components = [
   {
@@ -44,6 +45,15 @@ const props = [
           prop: 'className',
           type: 'string',
           description: 'CSS class applied to the component wrapper div.',
+        },
+      ]
+    : []),
+  ...(classAttribute
+    ? [
+        {
+          prop: 'class',
+          type: 'string | object | array',
+          description: 'Vue class binding applied to the component wrapper div.',
         },
       ]
     : []),

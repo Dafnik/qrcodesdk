@@ -15,6 +15,7 @@ const packageDirectory = process.env['QRCODESDK_PACKAGES'];
 const supportedVersions = {
   angular: new Set(['20', '21', '22']),
   react: new Set(['18', '19']),
+  vue: new Set(['3.3', '3.5']),
 };
 
 assert.ok(framework && supportedVersions[framework], `Unsupported framework: ${framework}`);
@@ -76,7 +77,28 @@ try {
       ],
       {cwd: consumerDirectory},
     );
-  } else {
+  } else if (framework === 'vue') {
+    await run('npm', ['create', 'vite@latest', 'vue-consumer', '--', '--template', 'vue-ts'], {
+      cwd: temporaryDirectory,
+    });
+    await copyFile(
+      path.join(repositoryDirectory, 'packages', 'vue', 'runtime', 'smoke-consumer.ts'),
+      path.join(consumerDirectory, 'src', 'main.ts'),
+    );
+    await run(
+      'npm',
+      [
+        'install',
+        '--ignore-scripts',
+        '--no-audit',
+        '--no-fund',
+        '--package-lock=false',
+        `vue@${frameworkVersion}`,
+        ...tarballs,
+      ],
+      {cwd: consumerDirectory},
+    );
+  } else if (framework === 'angular') {
     await run(
       'npx',
       [
@@ -115,9 +137,9 @@ try {
   await run('npm', ['run', 'build'], {cwd: consumerDirectory});
 
   const outputDirectory =
-    framework === 'react'
-      ? path.join(consumerDirectory, 'dist')
-      : path.join(consumerDirectory, 'dist', 'angular-consumer', 'browser');
+    framework === 'angular'
+      ? path.join(consumerDirectory, 'dist', 'angular-consumer', 'browser')
+      : path.join(consumerDirectory, 'dist');
   const staticServer = await serve(outputDirectory);
   server = staticServer.server;
   browser = await chromium.launch({headless: true});
@@ -192,7 +214,7 @@ try {
     };
   });
 
-  const frameworkName = framework === 'react' ? 'React' : 'Angular';
+  const frameworkName = {angular: 'Angular', react: 'React', vue: 'Vue'}[framework];
 
   assert.match(
     result.frameworkVersion ?? '',

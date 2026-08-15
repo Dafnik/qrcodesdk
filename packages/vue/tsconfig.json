@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "lib": ["es2020", "DOM", "DOM.Iterable"],
+    "outDir": "dist",
+    "target": "es2020"
+  },
+  "exclude": ["node_modules", "dist"],
+  "extends": "@repo/typescript-config/ts-library.json",
+  "include": ["src"]
+}

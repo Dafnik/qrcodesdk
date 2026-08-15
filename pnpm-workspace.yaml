@@ -28,6 +28,9 @@ catalog:
   '@types/node': 25.9.5
   '@types/react': 19.2.17
   '@types/react-dom': 19.2.3
+  '@vue/compiler-dom': 3.5.41
+  '@vue/server-renderer': 3.5.41
+  '@vue/test-utils': 2.4.11
   eslint: 9.39.5
   jsdom: 29.1.1
   jsqr: 1.4.0
@@ -36,6 +39,7 @@ catalog:
   qrcode-generator: 2.0.4
   react: 19.2.8
   react-dom: 19.2.8
+  vue: 3.5.41
   rxjs: 7.8.2
   sharp: 0.35.3
   tsdown: 0.22.14

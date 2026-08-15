@@ -32,14 +32,19 @@ function config(
 }
 
 describe('generated playground image snippets', () => {
-  for (const packageName of ['react', 'angular'] as const) {
+  for (const packageName of ['react', 'vue', 'angular'] as const) {
     test(`${packageName} SVG reads and decodes the file before conditional rendering`, () => {
       const {code} = generatePlaygroundCode(config(packageName, 'svg'), preparedImage);
 
       assert.match(code, /new FileReader\(\)/);
       assert.match(code, /await image\.decode\(\)/);
       assert.match(code, /source: (?:imageSource|source)/);
-      assert.match(code, packageName === 'react' ? /if \(!imageSource\)/ : /@if \(options\(\)/);
+      const conditionalRender = {
+        angular: /@if \(options\(\)/,
+        react: /if \(!imageSource\)/,
+        vue: /v-if="options"/,
+      }[packageName];
+      assert.match(code, conditionalRender);
     });
 
     for (const output of ['image', 'canvas'] as const) {
@@ -56,7 +61,7 @@ describe('generated playground image snippets', () => {
 });
 
 describe('generated playground ECI options', () => {
-  for (const packageName of ['react', 'angular'] as const) {
+  for (const packageName of ['react', 'vue', 'angular'] as const) {
     test(`${packageName} includes ECI only when enabled`, () => {
       const disabled = generatePlaygroundCode(config(packageName, 'svg')).code;
       const enabled = generatePlaygroundCode({...config(packageName, 'svg'), eci: true}).code;
@@ -65,4 +70,19 @@ describe('generated playground ECI options', () => {
       assert.match(enabled, /eci: true/);
     });
   }
+});
+
+describe('generated playground languages', () => {
+  test('generates an idiomatic Vue single-file component', () => {
+    const preview = generatePlaygroundCode(config('vue', 'image'));
+
+    assert.equal(preview.lang, 'vue');
+    assert.match(preview.code, /<script setup lang="ts">/);
+    assert.match(preview.code, /from '@qrcodesdk\/vue'/);
+    assert.match(preview.code, /ref="qrcode"/);
+    assert.match(preview.code, /:data="data"/);
+    assert.match(preview.code, /:options="options"/);
+    assert.doesNotMatch(preview.code, /:data(?:\s|\/|>)/);
+    assert.doesNotMatch(preview.code, /:options(?:\s|\/|>)/);
+  });
 });
