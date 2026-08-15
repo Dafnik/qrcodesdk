@@ -11,5 +11,5 @@ const options: QRCodeImageOptions = {
 </script>
 
 <template>
-  <QRCodeImage data="https://qrcodesdk.dev" :options />
+  <QRCodeImage data="https://qrcodesdk.dev" :options="options" />
 </template>

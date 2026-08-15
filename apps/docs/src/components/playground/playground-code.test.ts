@@ -80,5 +80,9 @@ describe('generated playground languages', () => {
     assert.match(preview.code, /<script setup lang="ts">/);
     assert.match(preview.code, /from '@qrcodesdk\/vue'/);
     assert.match(preview.code, /ref="qrcode"/);
+    assert.match(preview.code, /:data="data"/);
+    assert.match(preview.code, /:options="options"/);
+    assert.doesNotMatch(preview.code, /:data(?:\s|\/|>)/);
+    assert.doesNotMatch(preview.code, /:options(?:\s|\/|>)/);
   });
 });

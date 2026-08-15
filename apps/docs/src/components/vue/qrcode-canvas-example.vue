@@ -13,5 +13,5 @@ const options: QRCodeCanvasOptions = {
 </script>
 
 <template>
-  <QRCodeCanvas data="https://qrcodesdk.dev" :options />
+  <QRCodeCanvas data="https://qrcodesdk.dev" :options="options" />
 </template>

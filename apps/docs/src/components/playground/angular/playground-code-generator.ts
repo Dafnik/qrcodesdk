@@ -207,7 +207,7 @@ ${hasImage ? `\n${fileReaderHelper(config.output === 'svg')}` : ''}
 </script>
 
 <template>
-${imageInput}${downloadButton}  <${meta.componentName}${conditional}${refProperty} :data :options />
+${imageInput}${downloadButton}  <${meta.componentName}${conditional}${refProperty} :data="data" :options="options" />
 </template>`,
   };
 }

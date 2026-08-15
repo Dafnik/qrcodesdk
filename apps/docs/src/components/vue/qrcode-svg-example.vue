@@ -9,5 +9,5 @@ const options: QRCodeSVGOptions = {
 </script>
 
 <template>
-  <QRCodeSVG data="https://qrcodesdk.dev" :options />
+  <QRCodeSVG data="https://qrcodesdk.dev" :options="options" />
 </template>

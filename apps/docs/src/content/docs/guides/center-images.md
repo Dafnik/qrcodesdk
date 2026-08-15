@@ -169,7 +169,7 @@ async function loadLogo(url: string) {
 </script>
 
 <template>
-  <QRCodeImage v-if="options" data="https://qrcodesdk.dev" :options />
+  <QRCodeImage v-if="options" data="https://qrcodesdk.dev" :options="options" />
   <button v-else type="button" @click="loadLogo('/logo.png')">Load logo</button>
 </template>
 ```

@@ -9,7 +9,7 @@ const options: QRCodeImageOptions = {alt: 'QR code for qrcodesdk.dev'};
 
 <template>
   <div class="flex flex-col items-center">
-    <QRCodeImage ref="qrcode" data="https://qrcodesdk.dev" :options />
+    <QRCodeImage ref="qrcode" data="https://qrcodesdk.dev" :options="options" />
     <button class="btn-primary" type="button" @click="qrcode?.download('qrcodesdk')">
       Download PNG
     </button>
