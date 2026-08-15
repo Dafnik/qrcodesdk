@@ -46,15 +46,6 @@ catalogs:
     '@angular/platform-server':
       specifier: 22.0.8
       version: 22.0.8
-    '@sveltejs/package':
-      specifier: 2.5.8
-      version: 2.5.8
-    '@sveltejs/vite-plugin-svelte':
-      specifier: 7.3.0
-      version: 7.3.0
-    '@testing-library/svelte':
-      specifier: 5.4.2
-      version: 5.4.2
     '@types/node':
       specifier: 25.9.5
       version: 25.9.5
@@ -67,18 +58,9 @@ catalogs:
     '@types/react-dom':
       specifier: 19.2.3
       version: 19.2.3
-    '@vue/server-renderer':
-      specifier: 3.5.41
-      version: 3.5.41
-    '@vue/test-utils':
-      specifier: 2.4.11
-      version: 2.4.11
     eslint:
       specifier: 9.39.5
       version: 9.39.5
-    eslint-plugin-svelte:
-      specifier: 3.23.0
-      version: 3.23.0
     jsdom:
       specifier: 29.1.1
       version: 29.1.1
@@ -88,9 +70,6 @@ catalogs:
     prettier:
       specifier: 3.9.6
       version: 3.9.6
-    prettier-plugin-svelte:
-      specifier: 4.1.1
-      version: 4.1.1
     qrcode:
       specifier: 1.5.4
       version: 1.5.4
@@ -112,9 +91,6 @@ catalogs:
     svelte:
       specifier: 5.56.9
       version: 5.56.9
-    svelte-check:
-      specifier: 4.7.6
-      version: 4.7.6
     tsdown:
       specifier: 0.22.14
       version: 0.22.14
@@ -178,7 +154,7 @@ importers:
         specifier: 4.2.0
         version: 4.2.0(prettier@3.9.6)
       prettier-plugin-svelte:
-        specifier: 'catalog:'
+        specifier: 4.1.1
         version: 4.1.1(prettier@3.9.6)(svelte@5.56.9(@typescript-eslint/types@8.66.0))
       prettier-plugin-tailwindcss:
         specifier: 0.8.1
@@ -764,16 +740,16 @@ importers:
         specifier: workspace:*
         version: link:../typescript-config
       '@sveltejs/package':
-        specifier: 'catalog:'
+        specifier: 2.5.8
         version: 2.5.8(svelte@5.56.9(@typescript-eslint/types@8.66.0))
       '@sveltejs/vite-plugin-svelte':
-        specifier: 'catalog:'
+        specifier: 7.3.0
         version: 7.3.0(svelte@5.56.9(@typescript-eslint/types@8.66.0))(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.8.1(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.2)(yaml@2.9.0))
       '@testing-library/svelte':
-        specifier: 'catalog:'
+        specifier: 5.4.2
         version: 5.4.2(svelte@5.56.9(@typescript-eslint/types@8.66.0))(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.8.1(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.102.0)(terser@5.49.2)(yaml@2.9.0))(vitest@4.1.10)
       eslint-plugin-svelte:
-        specifier: 'catalog:'
+        specifier: 3.23.0
         version: 3.23.0(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(svelte@5.56.9(@typescript-eslint/types@8.66.0))
       jsdom:
         specifier: 'catalog:'
@@ -782,7 +758,7 @@ importers:
         specifier: 'catalog:'
         version: 5.56.9(@typescript-eslint/types@8.66.0)
       svelte-check:
-        specifier: 'catalog:'
+        specifier: 4.7.6
         version: 4.7.6(picomatch@4.0.5)(svelte@5.56.9(@typescript-eslint/types@8.66.0))(typescript@5.9.3)
       typescript:
         specifier: catalog:svelte-typescript
@@ -817,10 +793,10 @@ importers:
         specifier: workspace:*
         version: link:../typescript-config
       '@vue/server-renderer':
-        specifier: 'catalog:'
+        specifier: 3.5.41
         version: 3.5.41
       '@vue/test-utils':
-        specifier: 'catalog:'
+        specifier: 2.4.11
         version: 2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@7.0.2))
       jsdom:
         specifier: 'catalog:'
@@ -21278,7 +21254,7 @@ snapshots:
       acorn: 8.18.0
       eslint-visitor-keys: 3.4.3
       espree: 9.6.1
-      semver: 7.5.4
+      semver: 7.8.5
 
   jsonc-parser@2.3.1: {}
 
@@ -22470,7 +22446,7 @@ snapshots:
     dependencies:
       hosted-git-info: 9.0.3
       proc-log: 6.1.0
-      semver: 7.7.4
+      semver: 7.8.5
       validate-npm-package-name: 7.0.2
 
   npm-packlist@10.0.4:
