@@ -1,4 +1,5 @@
 import {
+  type QRCodeAccessibilityOptions,
   type QRCodeImageOverlayOptions,
   type QRCodeMatrix,
   type QRCodeOptions,
@@ -12,9 +13,10 @@ import {
 } from '@qrcodesdk/core';
 
 export type QRCodeCanvasImageOptions = QRCodeImageOverlayOptions<CanvasImageSource>;
-export type QRCodeCanvasRendererOptions = QRCodeStylingOptions & {
-  image?: QRCodeCanvasImageOptions;
-};
+export type QRCodeCanvasRendererOptions = QRCodeStylingOptions &
+  Pick<QRCodeAccessibilityOptions, 'ariaLabel'> & {
+    image?: QRCodeCanvasImageOptions;
+  };
 export type QRCodeCanvasOptions = QRCodeOptions<QRCodeCanvasRendererOptions>;
 
 export function QRCodeCanvasRenderer(
@@ -30,6 +32,8 @@ export function QRCodeCanvasRenderer(
     const canvas = document.createElement('canvas');
     canvas.width = plan.renderedSize;
     canvas.height = plan.renderedSize;
+    canvas.setAttribute('role', 'img');
+    if (options?.ariaLabel !== undefined) canvas.setAttribute('aria-label', options.ariaLabel);
 
     const context = canvas.getContext('2d', {alpha: false});
     if (!context) {

@@ -84,7 +84,7 @@ export class App {}
 | `QRCodeImage`  | `qrcode-image`  | `PNG-backed <img>`   | PNG              |
 | `QRCodeCanvas` | `qrcode-canvas` | `<canvas> element`   | None             |
 
-#### Options
+### Options
 
 | Prop      | Type                         | Description                                 |
 | --------- | ---------------------------- | ------------------------------------------- |

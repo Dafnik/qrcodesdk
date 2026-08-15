@@ -12,6 +12,7 @@ export const DOCUMENTATION_SIDEBAR = [
     items: [
       {label: 'Customize appearance', slug: 'guides/customize'},
       {label: 'Add a center image', slug: 'guides/center-images'},
+      {label: 'Browser Usage', slug: 'guides/browser-usage'},
       {label: 'Download or save', slug: 'guides/download-or-save'},
       {label: 'Serve a QR code', slug: 'guides/server-output'},
     ],

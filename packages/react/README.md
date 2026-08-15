@@ -81,7 +81,7 @@ export function App() {
 | `QRCodeImage`  | `PNG-backed <img>`   | PNG              |
 | `QRCodeCanvas` | `<canvas> element`   | None             |
 
-#### Options
+### Options
 
 | Prop        | Type                         | Description                                     |
 | ----------- | ---------------------------- | ----------------------------------------------- |

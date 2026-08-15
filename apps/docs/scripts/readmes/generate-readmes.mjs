@@ -511,7 +511,7 @@ function createPackageComponentNodes(attributes) {
 | \`QRCodeImage\` |${selectorCells[1]} \`PNG-backed <img>\` | PNG |
 | \`QRCodeCanvas\` |${selectorCells[2]} \`<canvas> element\` | None |
 
-#### Options
+### Options
 
 | Prop | Type | Description |
 | --- | --- | --- |

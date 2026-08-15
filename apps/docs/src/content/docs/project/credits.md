@@ -15,3 +15,7 @@ for driving broader progress in the JavaScript QR ecosystem.
 For validation, QRCodeSDK relies on `qrcode` and [`qrcode-generator`](https://github.com/kazuhikoarase/qrcode-generator) strictly as benchmarking baselines and correctness references.
 
 These credits reflect historical lineage and testing standards rather than runtime requirements. QRCodeSDK carries zero runtime dependencies on any credited package.
+
+:::caution[AI Disclaimer]
+AI tools were used to assist in the development of this project.
+:::
