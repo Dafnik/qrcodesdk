@@ -49,7 +49,7 @@ For `S = (matrix width + 2 × margin) × size`:
 | `colors.colorDark`  | six-digit hex color | `'#000000'` | Dark foreground or background when ANSI is active |
 | `colors.colorLight` | six-digit hex color | `'#ffffff'` | Light background when ANSI is active              |
 
-`onlyAnsiColors: true` implies ANSI styling and ignores `small`.
+`onlyAnsiColors: true` requires `ansiColors: true` and ignores `small`.
 
 ## Renderer-specific constraints
 
