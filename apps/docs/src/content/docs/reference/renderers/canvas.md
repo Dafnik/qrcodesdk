@@ -55,8 +55,9 @@ renderer.
   dimensions before rendering; unloaded or zero-sized sources throw.
 - `image.source` may be any ready `CanvasImageSource`, such as an `HTMLImageElement`, another canvas,
   or an `ImageBitmap`.
-- The Canvas element sets `role="img"` to the HTML element. For more accessibility controls use
-  the [PNG-backed Image renderer](/reference/renderers/image/) for native image attributes.
+- A non-empty `ariaLabel` sets `role="img"` and `aria-label` on the Canvas element. Without it, the
+  Canvas remains unlabelled. For more accessibility controls, use the
+  [PNG-backed Image renderer](/reference/renderers/image/) for native image attributes.
 
 ## Related guides
 

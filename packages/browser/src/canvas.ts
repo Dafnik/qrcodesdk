@@ -32,8 +32,10 @@ export function QRCodeCanvasRenderer(
     const canvas = document.createElement('canvas');
     canvas.width = plan.renderedSize;
     canvas.height = plan.renderedSize;
-    canvas.setAttribute('role', 'img');
-    if (options?.ariaLabel !== undefined) canvas.setAttribute('aria-label', options.ariaLabel);
+    if (options?.ariaLabel?.trim()) {
+      canvas.setAttribute('role', 'img');
+      canvas.setAttribute('aria-label', options.ariaLabel);
+    }
 
     const context = canvas.getContext('2d', {alpha: false});
     if (!context) {

@@ -88,7 +88,7 @@ The complete input, matrix-option, builder-method, and matrix-output contracts l
 
 For runtime-specific output, add the owning package:
 
-| Package                                                         | Additional output                                           | Return type                                     |
+| Package                                                         | Additional output                                           | Output                                          |
 | --------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------- |
 | [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) | Canvas element, PNG-backed Image element, browser downloads | `HTMLCanvasElement`, `HTMLImageElement`, `void` |
 | [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       | PNG bytes                                                   | `Buffer`                                        |
