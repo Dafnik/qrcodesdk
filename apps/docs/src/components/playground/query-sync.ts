@@ -21,6 +21,7 @@ import {
 const PLAYGROUND_PACKAGES = [
   'angular',
   'react',
+  'svelte',
   'vue',
 ] as const satisfies readonly PlaygroundPackage[];
 

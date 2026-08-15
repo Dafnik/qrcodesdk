@@ -64,6 +64,10 @@ jobs:
               package_name="@qrcodesdk/vue"
               package_dir="packages/vue"
               ;;
+            svelte)
+              package_name="@qrcodesdk/svelte"
+              package_dir="packages/svelte"
+              ;;
             *)
               echo "Unknown package: ${{ inputs.lib }}" >&2
               exit 1

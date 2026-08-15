@@ -220,8 +220,8 @@ export function updateQRCode(data: string) {
 ```
 
 If application state changes frequently, avoid recreating output for unrelated updates. Framework
-users can instead use the React, Vue, or Angular components, which integrate rendering with their
-normal component lifecycle.
+users can instead use the React, Vue, Svelte, or Angular components, which integrate rendering with
+their normal component lifecycle.
 
 ## Keep browser output reliable
 

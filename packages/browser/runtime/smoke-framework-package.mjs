@@ -15,6 +15,7 @@ const packageDirectory = process.env['QRCODESDK_PACKAGES'];
 const supportedVersions = {
   angular: new Set(['20', '21', '22']),
   react: new Set(['18', '19']),
+  svelte: new Set(['5.0', '5.56']),
   vue: new Set(['3.3', '3.5']),
 };
 
@@ -74,6 +75,39 @@ try {
         '--save-dev',
         `@types/react@${frameworkVersion}`,
         `@types/react-dom@${frameworkVersion}`,
+      ],
+      {cwd: consumerDirectory},
+    );
+  } else if (framework === 'svelte') {
+    await run(
+      'npm',
+      ['create', 'vite@latest', 'svelte-consumer', '--', '--template', 'svelte-ts'],
+      {
+        cwd: temporaryDirectory,
+      },
+    );
+    await copyFile(
+      path.join(repositoryDirectory, 'packages', 'svelte', 'runtime', 'smoke-consumer.svelte'),
+      path.join(consumerDirectory, 'src', 'smoke-consumer.svelte'),
+    );
+    await copyFile(
+      path.join(repositoryDirectory, 'packages', 'svelte', 'runtime', 'smoke-main.ts'),
+      path.join(consumerDirectory, 'src', 'main.ts'),
+    );
+    const minimumSvelte = frameworkVersion === '5.0';
+    await run(
+      'npm',
+      [
+        'install',
+        '--ignore-scripts',
+        '--no-audit',
+        '--no-fund',
+        '--package-lock=false',
+        `svelte@${frameworkVersion}`,
+        `@sveltejs/vite-plugin-svelte@${minimumSvelte ? '4' : '7'}`,
+        `vite@${minimumSvelte ? '5' : '8'}`,
+        'typescript@5.9',
+        ...tarballs,
       ],
       {cwd: consumerDirectory},
     );
@@ -214,7 +248,9 @@ try {
     };
   });
 
-  const frameworkName = {angular: 'Angular', react: 'React', vue: 'Vue'}[framework];
+  const frameworkName = {angular: 'Angular', react: 'React', svelte: 'Svelte', vue: 'Vue'}[
+    framework
+  ];
 
   assert.match(
     result.frameworkVersion ?? '',

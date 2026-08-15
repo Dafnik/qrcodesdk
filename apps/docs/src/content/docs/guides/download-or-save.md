@@ -8,6 +8,7 @@ related:
   - ../reference/renderers/browser-downloads.mdx
   - ../packages/react.mdx
   - ../packages/vue.mdx
+  - ../packages/svelte.mdx
   - ../packages/angular.mdx
   - ../packages/cli.mdx
 ---
@@ -91,6 +92,23 @@ const qrcode = ref<QRCodeDownloadHandle | null>(null);
 ```
 
 Vue's Canvas component also has no download method.
+
+## Download from Svelte
+
+Call `download(filename?)` through an SVG or Image component bound with `bind:this`:
+
+```svelte
+<script lang="ts">
+  import {type QRCodeDownloadHandle, QRCodeImage} from '@qrcodesdk/svelte';
+
+  let qrcode: QRCodeDownloadHandle | undefined;
+</script>
+
+<button type="button" onclick={() => qrcode?.download('qrcodesdk')}>Download PNG</button>
+<QRCodeImage bind:this={qrcode} data="https://qrcodesdk.dev" />
+```
+
+Svelte's Canvas component also has no download method.
 
 ## Download from Angular
 

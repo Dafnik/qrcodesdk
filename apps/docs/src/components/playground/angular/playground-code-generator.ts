@@ -4,7 +4,7 @@ import {
   type PlaygroundPreparedImage,
 } from '../playground-config.ts';
 
-export type HighlighterLang = 'angular-ts' | 'tsx' | 'vue';
+export type HighlighterLang = 'angular-ts' | 'svelte' | 'tsx' | 'vue';
 
 export type CodePreview = {
   code: string;
@@ -53,9 +53,68 @@ export function generatePlaygroundCode(
       return generateReactCode(config, preparedImage);
     case 'vue':
       return generateVueCode(config, preparedImage);
+    case 'svelte':
+      return generateSvelteCode(config, preparedImage);
     case 'angular':
       return generateAngularCode(config, preparedImage);
   }
+}
+
+function generateSvelteCode(
+  config: PlaygroundConfig,
+  preparedImage?: PlaygroundPreparedImage,
+): CodePreview {
+  const meta = META_BY_OUTPUT[config.output];
+  const hasDownload = meta.downloadLabel !== undefined;
+  const hasImage = preparedImage !== undefined;
+  const componentImport = hasDownload
+    ? `import {${meta.componentName}, type QRCodeDownloadHandle} from '@qrcodesdk/svelte';`
+    : `import {${meta.componentName}} from '@qrcodesdk/svelte';`;
+  const optionsTypes =
+    hasImage && config.output === 'svg'
+      ? `QRCodeDataImageURL, ${meta.optionsType}`
+      : meta.optionsType;
+  const qrcodeRef = hasDownload ? `let qrcode: QRCodeDownloadHandle | undefined;\n` : '';
+  const optionsDeclaration = hasImage
+    ? `let imageSource = $state<${
+        config.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
+      }>();
+const options: ${meta.optionsType} | undefined = $derived(
+  imageSource ? ${formatOptions(config, 1, {source: 'imageSource', preparedImage})} : undefined,
+);
+
+${svelteImagePreparation(config.output)}`
+    : `const options: ${meta.optionsType} = ${formatOptions(config, 1)};`;
+  const downloadButton = hasDownload
+    ? `  <button type="button" onclick={() => qrcode?.download('qrcodesdk')}>
+    ${meta.downloadLabel}
+  </button>
+`
+    : '';
+  const imageInput = hasImage
+    ? `<input type="file" accept="image/*" onchange={selectImage} />\n`
+    : '';
+  const bindProperty = hasDownload ? ' bind:this={qrcode}' : '';
+  const component = `<${meta.componentName}${bindProperty} {data} {options} />`;
+  const body = hasImage
+    ? `${imageInput}{#if options}
+${downloadButton}  ${component}
+{/if}`
+    : `${downloadButton}${component}`;
+
+  return {
+    lang: 'svelte',
+    code: `<script lang="ts">
+  import type {${optionsTypes}} from '${meta.optionsPackage}';
+  ${componentImport}
+
+  const data = ${quote(config.data)};
+  ${qrcodeRef}${optionsDeclaration.replaceAll('\n', '\n  ')}
+${hasImage ? `\n${indent(fileReaderHelper(config.output === 'svg'), 1)}` : ''}
+</script>
+
+${body}`,
+  };
 }
 
 function generateReactCode(
@@ -417,6 +476,27 @@ function vueImagePreparation(output: PlaygroundOutput): string {
   image.src = dataUrl;
   await image.decode();
   imageSource.value = image;`;
+
+  return `async function selectImage(event: Event): Promise<void> {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+
+  const dataUrl = await readFileAsDataURL(file);
+${preparedSource}
+}`;
+}
+
+function svelteImagePreparation(output: PlaygroundOutput): string {
+  const preparedSource =
+    output === 'svg'
+      ? `  const image = new Image();
+  image.src = dataUrl;
+  await image.decode();
+  imageSource = dataUrl;`
+      : `  const image = new Image();
+  image.src = dataUrl;
+  await image.decode();
+  imageSource = image;`;
 
   return `async function selectImage(event: Event): Promise<void> {
   const file = (event.target as HTMLInputElement).files?.[0];

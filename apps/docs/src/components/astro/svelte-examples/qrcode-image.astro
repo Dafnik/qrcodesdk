@@ -1,0 +1,8 @@
+---
+import QRCodeImageExample, {content} from '../../svelte/qrcode-image-example.svelte?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content} lang="svelte">
+  <QRCodeImageExample client:load />
+</QRCodeExample>

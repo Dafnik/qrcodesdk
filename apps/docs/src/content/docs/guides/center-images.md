@@ -1,6 +1,6 @@
 ---
 title: Add a center image
-description: Prepare and add a scan-safe center image across SVG, browser, Node.js, React, Vue, and Angular output.
+description: Prepare and add a scan-safe center image across SVG, browser, Node.js, React, Vue, Svelte, and Angular output.
 docType: guide
 
 related:
@@ -55,6 +55,8 @@ the result will scan. Start around `0.2`–`0.3`, preserve padding, and increase
 | React Image or Canvas              | loaded `CanvasImageSource` in `options.image.source` | Store the decoded source in state before mounting output             |
 | Vue SVG                            | `QRCodeDataImageURL` in `options.image.source`       | Prepare before updating a ref or computed options                    |
 | Vue Image or Canvas                | loaded `CanvasImageSource` in `options.image.source` | Store the decoded source in a `shallowRef` before mounting output    |
+| Svelte SVG                         | `QRCodeDataImageURL` in `options.image.source`       | Prepare before updating rune-mode state                              |
+| Svelte Image or Canvas             | loaded `CanvasImageSource` in `options.image.source` | Store the decoded source in `$state` before mounting output          |
 | Angular SVG                        | `QRCodeDataImageURL` in `[options]`                  | Prepare before updating the input                                    |
 | Angular Image or Canvas            | loaded `CanvasImageSource` in `[options]`            | Store the decoded source in a signal before rendering output         |
 
@@ -117,8 +119,8 @@ The Node renderer accepts PNG bytes only. It decodes and alpha-composites the so
 
 ## Wire prepared sources into frameworks
 
-React, Vue, and Angular do not load image sources inside their QR components. Prepare browser
-sources in application state, then pass stable options after decoding.
+React, Vue, Svelte, and Angular do not load image sources inside their QR components. Prepare
+browser sources in application state, then pass stable options after decoding.
 
 ```tsx
 import {useState} from 'react';
@@ -172,6 +174,31 @@ async function loadLogo(url: string) {
   <QRCodeImage v-if="options" data="https://qrcodesdk.dev" :options="options" />
   <button v-else type="button" @click="loadLogo('/logo.png')">Load logo</button>
 </template>
+```
+
+```svelte
+<script lang="ts">
+  import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+  import {QRCodeImage} from '@qrcodesdk/svelte';
+
+  let source = $state<HTMLImageElement>();
+  const options: QRCodeImageOptions | undefined = $derived(
+    source ? {errorCorrectionLevel: 'H', image: {source, size: 0.3}} : undefined,
+  );
+
+  async function loadLogo(url: string) {
+    const image = new Image();
+    image.src = url;
+    await image.decode();
+    source = image;
+  }
+</script>
+
+{#if options}
+  <QRCodeImage data="https://qrcodesdk.dev" {options} />
+{:else}
+  <button type="button" onclick={() => loadLogo('/logo.png')}>Load logo</button>
+{/if}
 ```
 
 ```ts

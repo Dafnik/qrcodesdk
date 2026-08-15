@@ -1,0 +1,144 @@
+---
+title: '@qrcodesdk/svelte'
+description: '@qrcodesdk/svelte provides Svelte components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.'
+docType: package
+packageName: '@qrcodesdk/svelte'
+
+worksWith:
+  - 'googlechrome'
+  - 'firefox'
+  - 'safari'
+
+related:
+  - ../guides/customize.md
+  - ../guides/center-images.md
+  - ../guides/download-or-save.md
+  - ../reference/renderers/svg.md
+  - ../reference/renderers/image.md
+  - ../reference/renderers/canvas.md
+  - ../playground.mdx?package=svelte
+---
+
+import QRCodeCanvas from '../../../components/astro/svelte-examples/qrcode-canvas.astro';
+import QRCodeDownloadImage from '../../../components/astro/svelte-examples/qrcode-download-image.astro';
+import QRCodeImage from '../../../components/astro/svelte-examples/qrcode-image.astro';
+import QRCodeSVG from '../../../components/astro/svelte-examples/qrcode-svg.astro';
+import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
+import PackageComponents from '../../../components/packages/package-components.astro';
+
+Svelte components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas
+elements.
+
+## Install
+
+<PackageManagerTabs
+  packages={['@qrcodesdk/svelte', '@qrcodesdk/core', '@qrcodesdk/browser']}
+  mode="add"
+/>
+
+## Quick start
+
+Import the components directly in a Svelte component:
+
+```svelte
+<script lang="ts">
+  import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/svelte';
+</script>
+
+<QRCodeSVG data="https://qrcodesdk.dev" />
+<QRCodeImage data="https://qrcodesdk.dev" />
+<QRCodeCanvas data="https://qrcodesdk.dev" />
+```
+
+## Version compatibility
+
+| @qrcodesdk/svelte | Svelte   |
+| ----------------- | -------- |
+| `0.x.x`           | `^5.0.0` |
+
+## Components
+
+<PackageComponents svelteClass={true} />
+
+The components forward `class`, `style`, and other native `<div>` attributes to their wrapper.
+Use `bind:this` when you need a download handle; the rendered SVG, Image, or Canvas remains inside
+that wrapper.
+
+## Live examples
+
+### SVG component
+
+<QRCodeSVG />
+
+### Image component
+
+<QRCodeImage />
+
+### Canvas component
+
+<QRCodeCanvas />
+
+### PNG download
+
+<QRCodeDownloadImage />
+
+## Center images
+
+Load and decode a browser image first, store it in rune-mode state, and pass it through
+`options.image.source`. Render the Image or Canvas component only after the source is ready. See
+[Add a center image](/guides/center-images/#wire-prepared-sources-into-frameworks) for a complete
+Svelte example.
+
+## Download files
+
+- `QRCodeSVG` exports `download(filename?)` and writes an SVG file through `bind:this`.
+- `QRCodeImage` exports `download(filename?)` and writes a PNG file through `bind:this`.
+
+```svelte
+<script lang="ts">
+  import {type QRCodeDownloadHandle, QRCodeImage} from '@qrcodesdk/svelte';
+
+  let qrcode: QRCodeDownloadHandle | undefined;
+</script>
+
+<button type="button" onclick={() => qrcode?.download('qrcodesdk')}>Download PNG</button>
+<QRCodeImage bind:this={qrcode} data="https://qrcodesdk.dev" />
+```
+
+The appropriate `.svg` or `.png` extension is appended when necessary.
+
+`QRCodeCanvas` does not include a download method. Use `QRCodeImage` when you want built-in PNG
+download support.
+
+See [Download or save](/guides/download-or-save/#download-from-svelte) for SVG, PNG, and manual
+Canvas downloads.
+
+## Server-side rendering
+
+`QRCodeSVG` produces runtime-neutral SVG and can render on the server.
+
+`QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they render an empty wrapper
+on the server and populate it after mounting in the browser. Their download methods also skip work
+outside the browser.
+
+## Shared configuration
+
+The `options` prop combines matrix settings with the selected renderer's settings. Use the
+[builder reference](/reference/builder/) for encoding, version, mask, and error correction;
+[Customize output](/guides/customize/) for shared visual options; and the dedicated
+[renderer references](/reference/renderers/) for output-specific options and constraints.
+
+## Public API
+
+```ts
+import {
+  type QRCodeBaseProps,
+  QRCodeCanvas,
+  type QRCodeCanvasProps,
+  type QRCodeDownloadHandle,
+  QRCodeImage,
+  type QRCodeImageProps,
+  QRCodeSVG,
+  type QRCodeSVGProps,
+} from '@qrcodesdk/svelte';
+```

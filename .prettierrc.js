@@ -5,6 +5,7 @@ module.exports = {
     'prettier-plugin-tailwindcss',
     'prettier-plugin-sort-json',
     'prettier-plugin-astro',
+    'prettier-plugin-svelte',
   ],
   printWidth: 100,
   singleQuote: true,
@@ -34,6 +35,12 @@ module.exports = {
       files: '*.astro',
       options: {
         parser: 'astro',
+      },
+    },
+    {
+      files: '*.svelte',
+      options: {
+        parser: 'svelte',
       },
     },
   ],

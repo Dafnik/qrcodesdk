@@ -1,0 +1,98 @@
+{
+  "name": "@qrcodesdk/svelte",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "@qrcodesdk/svelte provides Svelte components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.",
+  "sideEffects": false,
+  "private": false,
+  "license": "MIT",
+  "author": {
+    "name": "Dafnik",
+    "email": "contact@dafnik.me",
+    "url": "https://dafnik.me"
+  },
+  "keywords": [
+    "typescript",
+    "types",
+    "qr-code",
+    "qrcode",
+    "qr",
+    "code",
+    "esm",
+    "modules",
+    "module",
+    "svelte"
+  ],
+  "homepage": "https://qrcodesdk.dev/packages/svelte",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Dafnik/qrcodesdk.git",
+    "directory": "packages/svelte"
+  },
+  "bugs": {
+    "url": "https://github.com/Dafnik/qrcodesdk/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/Dafnik"
+    },
+    {
+      "type": "liberapay",
+      "url": "https://liberapay.com/Dafnik"
+    }
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "dist"
+  ],
+  "scripts": {
+    "build": "svelte-package",
+    "postbuild": "cp ../../LICENSE .",
+    "watch": "svelte-package --watch",
+    "test": "vitest --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
+    "test:coverage:raw": "vitest --coverage --watch false",
+    "check-types": "svelte-check --tsconfig ./tsconfig.json",
+    "lint": "eslint src tests runtime --max-warnings 0",
+    "clean": "rm -rf .turbo dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "peerDependencies": {
+    "@qrcodesdk/browser": "workspace:^",
+    "@qrcodesdk/core": "workspace:^",
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@qrcodesdk/browser": "workspace:*",
+    "@qrcodesdk/core": "workspace:*",
+    "@repo/core-testing": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@sveltejs/package": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@testing-library/svelte": "catalog:",
+    "eslint-plugin-svelte": "catalog:",
+    "jsdom": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "typescript": "catalog:svelte-typescript",
+    "typescript-eslint": "8.65.0",
+    "vite": "8.1.5",
+    "vitest": "catalog:"
+  }
+}

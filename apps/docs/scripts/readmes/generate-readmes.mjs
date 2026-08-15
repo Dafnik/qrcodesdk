@@ -488,7 +488,7 @@ function createPackageManagerNodes(attributes) {
 
 /** @param {Record<string, unknown>} attributes */
 function createPackageComponentNodes(attributes) {
-  const supportedAttributes = new Set(['classAttribute', 'className', 'selector']);
+  const supportedAttributes = new Set(['classAttribute', 'className', 'selector', 'svelteClass']);
   const unsupportedAttribute = Object.keys(attributes).find(
     (attribute) => !supportedAttributes.has(attribute),
   );
@@ -501,6 +501,8 @@ function createPackageComponentNodes(attributes) {
     optionalBoolean(attributes.classAttribute, 'PackageComponents classAttribute') ?? false;
   const className = optionalBoolean(attributes.className, 'PackageComponents className') ?? false;
   const selector = optionalBoolean(attributes.selector, 'PackageComponents selector') ?? false;
+  const svelteClass =
+    optionalBoolean(attributes.svelteClass, 'PackageComponents svelteClass') ?? false;
   const selectorHeader = selector ? ' Selector |' : '';
   const selectorDivider = selector ? ' --- |' : '';
   const selectorCells = selector
@@ -511,6 +513,9 @@ function createPackageComponentNodes(attributes) {
     : '';
   const classAttributeRow = classAttribute
     ? '\n| `class` | `string \\| object \\| array` | Vue class binding applied to the component wrapper div. |'
+    : '';
+  const svelteClassRow = svelteClass
+    ? '\n| `class` | `string` | CSS class applied to the component wrapper div. |'
     : '';
   const markdown = `| Component |${selectorHeader} Output | Download support |
 | --- |${selectorDivider} --- | --- |
@@ -523,7 +528,7 @@ function createPackageComponentNodes(attributes) {
 | Prop | Type | Description |
 | --- | --- | --- |
 | \`data\` | \`string \\| number\` | Required QR code payload. |
-| \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${classNameRow}${classAttributeRow}
+| \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${classNameRow}${classAttributeRow}${svelteClassRow}
 `;
 
   return markdownProcessor.parse(markdown).children;

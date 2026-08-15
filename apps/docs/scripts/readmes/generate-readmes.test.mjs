@@ -32,7 +32,7 @@ import PackageComponents from './package-components.astro';
 
 Example package documentation.
 
-<PackageComponents classAttribute={true} className={true} selector={true} />
+<PackageComponents classAttribute={true} className={true} selector={true} svelteClass={true} />
 `,
   );
 

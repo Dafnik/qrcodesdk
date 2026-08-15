@@ -18,6 +18,7 @@ when SVG or terminal text is enough; renderer and framework packages build on it
 | [`@qrcodesdk/node`](/packages/node/)       | Server-side raster output                        | PNG `Buffer`                                                            |
 | [`@qrcodesdk/react`](/packages/react/)     | React and Next.js components                     | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
 | [`@qrcodesdk/vue`](/packages/vue/)         | Vue components                                   | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
+| [`@qrcodesdk/svelte`](/packages/svelte/)   | Svelte components                                | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
 | [`@qrcodesdk/angular`](/packages/angular/) | Standalone Angular components                    | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
 | [`@qrcodesdk/cli`](/packages/cli/)         | Terminal, shell, and CI workflows                | Terminal text, SVG file, PNG file                                       |
 
@@ -56,6 +57,15 @@ React and React DOM are peer dependencies; use the versions already selected by 
 />
 
 Vue is a peer dependency; use the Vue 3 version already selected by your application.
+
+## Install Svelte components
+
+<PackageManagerTabs
+  packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/svelte']}
+  mode="add"
+/>
+
+Svelte is a peer dependency; use the Svelte 5 version already selected by your application.
 
 ## Install Angular components
 
