@@ -352,7 +352,7 @@ jobs:
     name: Deploy docs (preview)
     environment:
       name: preview-${{ github.event.pull_request.number }}
-      url: ${{ steps.deployment.outputs.NETLIFY_PREVIEW_URL }}
+      url: ${{ steps.deployment-url.outputs.NETLIFY_PREVIEW_URL }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -376,10 +376,6 @@ jobs:
           mkdir -p pages
           tar -xf pages-artifact/artifact.tar -C pages
 
-      # Sets the branch name as environment variable
-      - name: Get branch name
-        uses: nelonoel/branch-name@v1.0.1
-
       - name: Deploy to Netlify
         id: deployment
         uses: jsmrcaga/action-netlify-deploy@v2.4.0
@@ -390,7 +386,11 @@ jobs:
           NETLIFY_DEPLOY_MESSAGE: 'Deployed from GitHub action (PR #${{ github.event.pull_request.number }})'
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          deploy_alias: ${{ env.BRANCH_NAME }}
+          deploy_alias: pr-${{ github.event.pull_request.number }}
+
+      - name: Export deployment URL
+        id: deployment-url
+        run: echo "NETLIFY_PREVIEW_URL=$NETLIFY_PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
       - name: Create or update sticky pull request comment
         uses: marocchino/sticky-pull-request-comment@v3
@@ -400,7 +400,7 @@ jobs:
 
             🔎 **Commit:** ${{ github.sha }}
             📅 **Updated at:** ${{ steps.setup.outputs.current_date }}
-            ✅ **Preview URL:** <${{ steps.deployment.outputs.NETLIFY_PREVIEW_URL }}>
+            ✅ **Preview URL:** <${{ steps.deployment-url.outputs.NETLIFY_PREVIEW_URL }}>
 
   deploy-docs-prod:
     if: github.ref == 'refs/heads/main'
