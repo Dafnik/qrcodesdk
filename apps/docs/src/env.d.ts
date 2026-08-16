@@ -16,7 +16,8 @@ declare module '*.tsx?includeContent' {
 }
 
 declare module '*.svelte?includeContent' {
-  const component: any;
+  import type {Component} from 'svelte';
+  const component: Component & ((props: Record<string, unknown>) => ReturnType<Component>);
   export const content: string;
   export default component;
 }
