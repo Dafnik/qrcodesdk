@@ -354,6 +354,8 @@ jobs:
       name: preview-${{ github.event.pull_request.number }}
       url: ${{ steps.deployment.outputs.NETLIFY_PREVIEW_URL }}
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     needs: verify
     steps:
       - id: setup
