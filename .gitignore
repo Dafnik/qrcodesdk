@@ -27,6 +27,7 @@ coverage
 .vercel
 
 # Build Outputs
+.svelte-kit/
 .next/
 out/
 build

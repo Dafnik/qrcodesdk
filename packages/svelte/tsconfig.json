@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "lib": ["es2020", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "target": "es2020"
+  },
+  "exclude": ["node_modules", "dist"],
+  "extends": "@repo/typescript-config/ts-library.json",
+  "include": ["src", "tests", "svelte.config.js", "vitest.config.ts"]
+}

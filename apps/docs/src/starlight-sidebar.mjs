@@ -38,6 +38,11 @@ export const STARLIGHT_SIDEBAR = [
         collapsed: true,
         items: getPackageChangelogsSidebarLinks('vue'),
       },
+      {
+        label: '@qrcodesdk/svelte',
+        collapsed: true,
+        items: getPackageChangelogsSidebarLinks('svelte'),
+      },
     ],
   },
 ];

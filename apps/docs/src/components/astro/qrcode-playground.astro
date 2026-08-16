@@ -4,6 +4,7 @@ import {AngularPlaygroundPreview} from '../playground/angular/angular-playground
 import {PlaygroundControls} from '../playground/angular/playground-controls.ts';
 import {PlaygroundCode} from '../playground/angular/playground-code.ts';
 import QRCodeReactPlaygroundPreview from '../playground/QRCodeReactPlaygroundPreview';
+import QRCodeSveltePlaygroundPreview from '../playground/QRCodeSveltePlaygroundPreview.svelte';
 import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview.vue';
 ---
 
@@ -23,8 +24,9 @@ import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview
     <div class="xl:sticky xl:top-20">
       <div class="grid gap-8">
         <Card title="">
-          <div class="min-h-96 grid content-center playground-preview-output">
+          <div class="playground-preview-output grid min-h-96 content-center">
             <QRCodeReactPlaygroundPreview client:only="react" />
+            <QRCodeSveltePlaygroundPreview client:only="svelte" />
             <QRCodeVuePlaygroundPreview client:only="vue" />
             <AngularPlaygroundPreview client:load />
           </div>

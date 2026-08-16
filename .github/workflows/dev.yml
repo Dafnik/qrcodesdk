@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/runtime-packages"
-          for package in core browser node cli react angular vue; do
+          for package in core browser node cli react angular vue svelte; do
             pnpm --dir "packages/$package" pack --pack-destination "$RUNNER_TEMP/runtime-packages"
           done
 
@@ -295,6 +295,10 @@ jobs:
             version: '3.3'
           - framework: vue
             version: '3.5'
+          - framework: svelte
+            version: '5.0'
+          - framework: svelte
+            version: '5.56'
     steps:
       - uses: actions/checkout@v7
         with:

@@ -14,6 +14,7 @@ export function createExampleContent(filePath, fileContent) {
 
   if (
     normalizedFilePath.includes('/src/components/react/') ||
+    normalizedFilePath.includes('/src/components/svelte/') ||
     normalizedFilePath.includes('/src/components/vue/')
   ) {
     return normalizedFileContent;

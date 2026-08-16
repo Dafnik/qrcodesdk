@@ -2,6 +2,7 @@
 import angular from '@analogjs/astro-angular';
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
+import svelte from '@astrojs/svelte';
 import vue from '@astrojs/vue';
 import tailwindcss from '@tailwindcss/vite';
 import mermaidIntegration from 'astro-mermaid';
@@ -170,6 +171,7 @@ export default defineConfig({
       },
     }),
     react(),
+    svelte(),
     vue(),
     angular({
       useAngularHydration: false,

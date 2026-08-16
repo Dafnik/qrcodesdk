@@ -9,7 +9,7 @@
  * }
  *
  * Paths are resolved from apps/docs. Imported preview wrappers only need to
- * expose one `?includeContent` source, as the Angular, React, and Vue
+ * expose one `?includeContent` source, as the Angular, React, Svelte, and Vue
  * wrappers already do.
  *
  * @type {Array<{
@@ -61,5 +61,11 @@ export const README_MAPPINGS = [
     source: 'src/content/docs/packages/vue.mdx',
     output: '../../packages/vue/README.md',
     codeLanguage: 'vue',
+  },
+  {
+    id: 'svelte',
+    source: 'src/content/docs/packages/svelte.mdx',
+    output: '../../packages/svelte/README.md',
+    codeLanguage: 'svelte',
   },
 ];

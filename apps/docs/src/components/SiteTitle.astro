@@ -3,7 +3,7 @@ import {Badge} from '@astrojs/starlight/components';
 import Default from '@astrojs/starlight/components/SiteTitle.astro';
 ---
 
-<div class="flex gap-4 items-center">
+<div class="flex items-center gap-4">
   <Default {...Astro.props}><slot /></Default>
   <div>
     <Badge text="ALPHA" variant="caution" size="medium" />

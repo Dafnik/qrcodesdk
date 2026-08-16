@@ -64,6 +64,7 @@ when you need its options or exact return contract.
 | Node.js-compatible runtime       | PNG `Buffer` for files or responses                | [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       |
 | React or Next.js                 | SVG, Image, or Canvas component                    | [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)     |
 | Vue                              | SVG, Image, or Canvas component                    | [`@qrcodesdk/vue`](https://qrcodesdk.dev/packages/vue/)         |
+| Svelte                           | SVG, Image, or Canvas component                    | [`@qrcodesdk/svelte`](https://qrcodesdk.dev/packages/svelte/)   |
 | Angular                          | SVG, Image, or Canvas component                    | [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) |
 | Terminal, shell script, or CI    | Terminal text, SVG file, or PNG file               | [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         |
 

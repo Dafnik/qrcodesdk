@@ -39,9 +39,10 @@ describe('playground ECI query synchronization', () => {
 });
 
 describe('playground package query synchronization', () => {
-  test('round-trips Vue and rejects unknown packages', () => {
+  test('round-trips Vue and Svelte and rejects unknown packages', () => {
     const vue = readQrConfigFromSearchParams(new URLSearchParams('package=vue'));
-    const unknown = readQrConfigFromSearchParams(new URLSearchParams('package=svelte'));
+    const svelte = readQrConfigFromSearchParams(new URLSearchParams('package=svelte'));
+    const unknown = readQrConfigFromSearchParams(new URLSearchParams('package=solid'));
 
     assert.equal(vue.packageName, 'vue');
     assert.equal(
@@ -49,6 +50,13 @@ describe('playground package query synchronization', () => {
         'package',
       ),
       'vue',
+    );
+    assert.equal(svelte.packageName, 'svelte');
+    assert.equal(
+      writeQrConfigToSearchParams(new URLSearchParams(), svelte, defaultPlaygroundConfig).get(
+        'package',
+      ),
+      'svelte',
     );
     assert.equal(unknown.packageName, defaultPlaygroundConfig.packageName);
   });

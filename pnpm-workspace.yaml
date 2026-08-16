@@ -28,9 +28,6 @@ catalog:
   '@types/node': 25.9.5
   '@types/react': 19.2.17
   '@types/react-dom': 19.2.3
-  '@vue/compiler-dom': 3.5.41
-  '@vue/server-renderer': 3.5.41
-  '@vue/test-utils': 2.4.11
   eslint: 9.39.5
   jsdom: 29.1.1
   jsqr: 1.4.0
@@ -42,6 +39,7 @@ catalog:
   vue: 3.5.41
   rxjs: 7.8.2
   sharp: 0.35.3
+  svelte: 5.56.9
   tsdown: 0.22.14
   tslib: 2.8.1
   typescript: 7.0.2
@@ -50,6 +48,8 @@ catalog:
 catalogs:
   angular-typescript:
     typescript: 6.0.3
+  svelte-typescript:
+    typescript: 5.9.3
 
 minimumReleaseAgeExclude:
   - 'starlight-page-actions@0.7.0'
@@ -61,6 +61,9 @@ packageExtensions:
   '@analogjs/vite-plugin-angular@3.0.0-alpha.64':
     dependencies:
       typescript: 6.0.3
+  '@sveltejs/package@2.5.8':
+    dependencies:
+      typescript: 5.9.3
   '@phenomnomnominal/tsquery@6.2.0':
     peerDependencies:
       typescript: 6.0.3

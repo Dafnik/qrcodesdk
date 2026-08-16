@@ -1,0 +1,10 @@
+---
+import QRCodeCanvasExample, {
+  content,
+} from '../../svelte/qrcode-canvas-example.svelte?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content} lang="svelte">
+  <QRCodeCanvasExample client:load />
+</QRCodeExample>

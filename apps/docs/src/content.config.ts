@@ -53,6 +53,11 @@ export const collections = {
         base: 'changelog/vue',
         changelog: '../../packages/vue/CHANGELOG.md',
       },
+      {
+        provider: 'changeset',
+        base: 'changelog/svelte',
+        changelog: '../../packages/svelte/CHANGELOG.md',
+      },
     ]),
   }),
 };

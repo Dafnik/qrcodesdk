@@ -194,7 +194,7 @@ export default function QRCodeDownloadImageExample() {
 Load and decode a browser image first, store the resulting `HTMLImageElement` in state, and pass
 it through `options.image.source`. Updating that state rerenders the component with the prepared
 source. See
-[Add a center image](https://qrcodesdk.dev/guides/center-images/#wire-prepared-sources-into-frameworks) for the complete
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete
 React lifecycle.
 
 ## Download files

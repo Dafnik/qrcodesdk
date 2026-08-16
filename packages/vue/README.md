@@ -180,7 +180,7 @@ const options: QRCodeImageOptions = {alt: 'QR code for qrcodesdk.dev'};
 
 Load and decode a browser image first, store it in a `shallowRef`, and pass it through
 `options.image.source`. Render the Image or Canvas component only after the source is ready. See
-[Add a center image](https://qrcodesdk.dev/guides/center-images/#wire-prepared-sources-into-frameworks) for a complete
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#vue) for a complete
 Vue example.
 
 ## Download files

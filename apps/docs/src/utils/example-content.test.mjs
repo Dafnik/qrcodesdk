@@ -15,6 +15,20 @@ const message = 'Vue example';
     assert.equal(createExampleContent('/repo/src/components/vue/example.vue', source), source);
   });
 
+  test('preserves Svelte components', () => {
+    const source = `<script lang="ts">
+const message = 'Svelte example';
+</script>
+
+<p>{message}</p>
+`;
+
+    assert.equal(
+      createExampleContent('/repo/src/components/svelte/example.svelte', source),
+      source,
+    );
+  });
+
   test('removes Astro-only Angular providers', () => {
     const source = `export class Example {
   static clientProviders = [provideClientHydration()];
