@@ -51,12 +51,6 @@ catalogs:
   svelte-typescript:
     typescript: 5.9.3
 
-minimumReleaseAgeExclude:
-  - 'starlight-page-actions@0.7.0'
-  - tsdown@0.22.9
-  - '@angular/cdk@22.0.6'
-  - astro@7.1.4
-
 packageExtensions:
   '@analogjs/vite-plugin-angular@3.0.0-alpha.64':
     dependencies:
