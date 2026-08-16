@@ -2,10 +2,10 @@ module.exports = {
   plugins: [
     '@trivago/prettier-plugin-sort-imports',
     'prettier-plugin-organize-attributes',
-    'prettier-plugin-tailwindcss',
     'prettier-plugin-sort-json',
     'prettier-plugin-astro',
     'prettier-plugin-svelte',
+    'prettier-plugin-tailwindcss',
   ],
   printWidth: 100,
   singleQuote: true,

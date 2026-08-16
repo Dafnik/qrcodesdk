@@ -29,7 +29,7 @@ const badges = packageName ? createPackageBadges(packageName, {bundledSize: size
 
 {
   packageName && (
-    <div class="flex flex-wrap gap-1.5 items-center not-content">
+    <div class="not-content flex flex-wrap items-center gap-1.5">
       {badges.map(({alt, imageUrl, href}) =>
         href ? (
           <a href={href} target="_blank" rel="noopener noreferrer">
@@ -41,9 +41,9 @@ const badges = packageName ? createPackageBadges(packageName, {bundledSize: size
       )}
 
       {worksWith?.length && (
-        <div class="inline-flex overflow-hidden rounded-[3px] text-[11px] font-mono font-normal leading-5 text-white shadow-sm">
+        <div class="inline-flex overflow-hidden rounded-[3px] font-mono text-[11px] leading-5 font-normal text-white shadow-sm">
           <span class="bg-[#555] px-1">works with</span>
-          <div class="bg-[#7469B6] px-1 flex items-center gap-1">
+          <div class="flex items-center gap-1 bg-[#7469B6] px-1">
             {worksWith.map((env) => (
               <div class="relative h-4" style="aspect-ratio: 256 / 292">
                 <img
@@ -52,7 +52,7 @@ const badges = packageName ? createPackageBadges(packageName, {bundledSize: size
                   height="292"
                   alt={'This package works with ' + env}
                   title={'This package works with ' + env}
-                  class="h-4 select-none brightness-0 invert"
+                  class="h-4 brightness-0 invert select-none"
                 />
               </div>
             ))}
