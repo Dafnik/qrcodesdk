@@ -16,3 +16,5 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       lib: svelte
+    secrets:
+      npm_token: ${{ secrets.npm_token }}
