@@ -388,6 +388,17 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
           deploy_alias: pr-${{ github.event.pull_request.number }}
 
+      - name: Create or update failed deployment comment
+        if: ${{ failure() && steps.deployment.conclusion == 'failure' }}
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          message: |
+            The Netlify preview deployment failed and is currently unavailable.
+
+            🔎 **Commit:** ${{ github.sha }}
+            📅 **Updated at:** ${{ steps.setup.outputs.current_date }}
+            ❌ **Preview URL:** Unavailable
+
       - name: Export deployment URL
         id: deployment-url
         run: echo "NETLIFY_PREVIEW_URL=$NETLIFY_PREVIEW_URL" >> "$GITHUB_OUTPUT"
