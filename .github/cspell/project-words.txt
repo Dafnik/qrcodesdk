@@ -10,3 +10,4 @@ importmap
 networkidle
 FGHIJ
 roundtrips
+Streamable

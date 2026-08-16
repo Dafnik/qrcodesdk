@@ -58,6 +58,113 @@ return new Response(new Uint8Array(png), {
 The `Uint8Array` view preserves the PNG bytes for Web `Response` implementations. Node.js HTTP
 frameworks that accept `Buffer` can send `png` directly.
 
+## Express
+
+Set the media type before calling `send()`. Express accepts both the SVG string and PNG `Buffer`
+directly:
+
+```ts
+import express from 'express';
+
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const app = express();
+
+app.get('/qrcode.svg', (_request, response) => {
+  const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
+
+  response.set('Content-Type', 'image/svg+xml; charset=utf-8').send(svg);
+});
+
+app.get('/qrcode.png', (_request, response) => {
+  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+
+  response.type('image/png').send(png);
+});
+```
+
+## Fastify
+
+Fastify treats strings and Buffers as already serialized. Return the reply after setting its type:
+
+```ts
+import Fastify from 'fastify';
+
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const fastify = Fastify();
+
+fastify.get('/qrcode.svg', (_request, reply) => {
+  const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
+
+  return reply.type('image/svg+xml; charset=utf-8').send(svg);
+});
+
+fastify.get('/qrcode.png', (_request, reply) => {
+  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+
+  return reply.type('image/png').send(png);
+});
+```
+
+## NestJS
+
+Use `@Header()` for an SVG string. Wrap the PNG `Buffer` in `StreamableFile` so the controller stays
+compatible with both the Express and Fastify Nest adapters:
+
+```ts
+import {Controller, Get, Header, StreamableFile} from '@nestjs/common';
+
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+@Controller()
+export class QRCodeController {
+  @Get('qrcode.svg')
+  @Header('Content-Type', 'image/svg+xml; charset=utf-8')
+  svg(): string {
+    return qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
+  }
+
+  @Get('qrcode.png')
+  png(): StreamableFile {
+    const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+
+    return new StreamableFile(png, {type: 'image/png'});
+  }
+}
+```
+
+## Hono
+
+Hono can return the SVG string through its Web API-based context on any supported runtime. The PNG
+renderer comes from `@qrcodesdk/node`, so use that route only with a Node.js-compatible Hono runtime:
+
+```ts
+import {Hono} from 'hono';
+
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const app = new Hono();
+
+app.get('/qrcode.svg', (context) => {
+  const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
+
+  context.header('Content-Type', 'image/svg+xml; charset=utf-8');
+  return context.body(svg);
+});
+
+app.get('/qrcode.png', (context) => {
+  const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
+
+  context.header('Content-Type', 'image/png');
+  return context.body(new Uint8Array(png));
+});
+```
+
 ## Handle dynamic input safely
 
 Validate and bound user-controlled payloads before generation. Long payloads can require larger
