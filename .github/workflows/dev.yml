@@ -382,7 +382,7 @@ jobs:
 
       - name: Deploy to Netlify
         id: deployment
-        uses: jsmrcaga/action-netlify-deploy@master
+        uses: jsmrcaga/action-netlify-deploy@v2.4.0
         with:
           build_directory: pages
           install_command: 'echo Skipping installing the dependencies'
