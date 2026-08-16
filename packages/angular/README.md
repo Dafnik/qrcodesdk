@@ -207,7 +207,7 @@ export class QRCodeDownloadImageExample {
 
 Load and decode a browser image first, store the resulting `HTMLImageElement` in a signal, and
 instantiate the component inside an `@if` block once the signal has a value. See
-[Add a center image](https://qrcodesdk.dev/guides/center-images/#wire-prepared-sources-into-frameworks) for the complete
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#angular) for the complete
 component and template.
 
 ## Download files

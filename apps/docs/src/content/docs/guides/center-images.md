@@ -122,6 +122,8 @@ The Node renderer accepts PNG bytes only. It decodes and alpha-composites the so
 React, Vue, Svelte, and Angular do not load image sources inside their QR components. Prepare
 browser sources in application state, then pass stable options after decoding.
 
+### React
+
 ```tsx
 import {useState} from 'react';
 
@@ -150,6 +152,8 @@ export function QRCodeWithLogo() {
 }
 ```
 
+### Vue
+
 ```vue
 <script setup lang="ts">
 import {computed, shallowRef} from 'vue';
@@ -176,6 +180,8 @@ async function loadLogo(url: string) {
 </template>
 ```
 
+### Svelte
+
 ```svelte
 <script lang="ts">
   import type {QRCodeImageOptions} from '@qrcodesdk/browser';
@@ -201,7 +207,9 @@ async function loadLogo(url: string) {
 {/if}
 ```
 
-```ts
+### Angular
+
+```angular-ts
 import {Component, signal} from '@angular/core';
 
 import {QRCodeImage} from '@qrcodesdk/angular';
@@ -209,7 +217,13 @@ import {QRCodeImage} from '@qrcodesdk/angular';
 @Component({
   selector: 'app-qrcode-with-logo',
   imports: [QRCodeImage],
-  templateUrl: './qrcode-with-logo.html',
+  template: `
+    @if (source(); as image) {
+      <qrcode-image
+        [options]="{errorCorrectionLevel: 'H', image: {source: image, size: 0.3}}"
+        data="https://qrcodesdk.dev" />
+    }
+  `,
 })
 export class QRCodeWithLogo {
   readonly source = signal<HTMLImageElement | undefined>(undefined);
@@ -220,14 +234,6 @@ export class QRCodeWithLogo {
     await image.decode();
     this.source.set(image);
   }
-}
-```
-
-```angular-html
-@if (source(); as image) {
-  <qrcode-image
-    [options]="{errorCorrectionLevel: 'H', image: {source: image, size: 0.3}}"
-    data="https://qrcodesdk.dev" />
 }
 ```
 

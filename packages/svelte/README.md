@@ -99,7 +99,11 @@ that wrapper.
   import type {QRCodeSVGOptions} from '@qrcodesdk/core';
   import {QRCodeSVG} from '@qrcodesdk/svelte';
 
-  const options: QRCodeSVGOptions = {size: 8, margin: 2};
+  const options: QRCodeSVGOptions = {
+    size: 8,
+    margin: 2,
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+  };
 </script>
 
 <QRCodeSVG class="mx-auto" data="https://qrcodesdk.dev" {options} />
@@ -158,7 +162,7 @@ that wrapper.
 
 Load and decode a browser image first, store it in rune-mode state, and pass it through
 `options.image.source`. Render the Image or Canvas component only after the source is ready. See
-[Add a center image](https://qrcodesdk.dev/guides/center-images/#wire-prepared-sources-into-frameworks) for a complete
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#svelte) for a complete
 Svelte example.
 
 ## Download files
