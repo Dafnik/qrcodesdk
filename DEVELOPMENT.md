@@ -56,6 +56,12 @@ pnpm turbo run check-performance --filter=docs
 pnpm benchmark
 ```
 
+Run the focused matrix hot-path benchmarks:
+
+```sh
+pnpm turbo run benchmark:matrix --filter=@qrcodesdk/core
+```
+
 ### Updating snapshots
 
 #### Core

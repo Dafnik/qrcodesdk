@@ -22,7 +22,7 @@ function executePreparedWorkload(
   category: BenchmarkCategory,
   workload: BenchmarkWorkload,
 ): number {
-  const operation = category === 'matrix' ? adapter.matrix : adapter.svg;
+  const operation = category === 'svg' ? adapter.svg : adapter.matrix;
   let checksum = 0;
 
   for (let repetition = 0; repetition < workload.repetitions; repetition += 1) {

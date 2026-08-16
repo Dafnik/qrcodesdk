@@ -36,12 +36,14 @@ export function fillDataInMatrix(
     if (i == 6) i--; // skip the entire timing pattern column
     let jj = dir < 0 ? n - 1 : 0;
     for (let j = 0; j < n; j++) {
+      const matrixRow = matrix[jj]!;
+      const reservedRow = reserved[jj]!;
       for (let ii = i; ii > i - 2; --ii) {
-        if (!reserved[jj]![ii]) {
+        if (!reservedRow[ii]) {
           // may overflow, but (undefined >> x)
           // is 0, so it will auto-pad to zero.
           const sourceValue = (((buffer[k >> 3] ?? 0) >> (~k & 7)) & 1) as QRCodeModule;
-          matrix[jj]![ii] = sourceValue;
+          matrixRow[ii] = sourceValue;
           visitDataModule?.(jj, ii, k, sourceValue);
           ++k;
         }

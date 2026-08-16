@@ -9,14 +9,29 @@ export function applyMaskToMatrix(
   reserved: QRCodeReservedMatrix,
   mask: QRCodeMask,
 ): QRCodeMatrix {
-  const maskFunction = MASK_FUNCTIONS[mask];
   const n = matrix.length;
+
+  if (mask < 3) {
+    const rowStep = mask === 1 ? 2 : 1;
+    const columnStep = mask === 2 ? 3 : mask === 0 ? 2 : 1;
+    for (let i = 0; i < n; i += rowStep) {
+      const matrixRow = matrix[i]!;
+      const reservedRow = reserved[i]!;
+      const columnStart = mask === 0 ? i & 1 : 0;
+      for (let j = columnStart; j < n; j += columnStep) {
+        if (!reservedRow[j]) matrixRow[j] = (matrixRow[j]! ^ 1) as QRCodeModule;
+      }
+    }
+    return matrix;
+  }
+
+  const maskFunction = MASK_FUNCTIONS[mask]!;
   for (let i = 0; i < n; i++) {
     const matrixRow = matrix[i]!;
     const reservedRow = reserved[i]!;
     for (let j = 0; j < n; j++) {
-      if (!reservedRow[j]) {
-        matrixRow[j] = (matrixRow[j]! ^ (maskFunction!(i, j) ? 1 : 0)) as QRCodeModule;
+      if (!reservedRow[j] && maskFunction(i, j)) {
+        matrixRow[j] = (matrixRow[j]! ^ 1) as QRCodeModule;
       }
     }
   }

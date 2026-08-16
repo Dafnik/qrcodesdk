@@ -46,6 +46,14 @@ describe('benchmark runner', () => {
     expect(target.svg).not.toHaveBeenCalled();
   });
 
+  test('uses matrix generation for automatic fixtures', () => {
+    const target = adapter('qrcodesdk', 7);
+
+    expect(executeWorkload(target, 'automatic', workload)).toBe(42);
+    expect(target.matrix).toHaveBeenCalledTimes(6);
+    expect(target.svg).not.toHaveBeenCalled();
+  });
+
   test('rotates library order without mutating the source list', () => {
     const adapters = [adapter('qrcodesdk'), adapter('qrcode'), adapter('qrcode-generator')];
 

@@ -70,10 +70,14 @@ export async function writeBenchmarkReport(
 }
 
 export function printBenchmarkResults(results: readonly BenchmarkResult[]): void {
-  const categories: readonly BenchmarkCategory[] = ['matrix', 'svg'];
+  const categories = [
+    ['matrix', 'Matrix generation'],
+    ['automatic', 'Automatic matrix generation'],
+    ['svg', 'SVG generation'],
+  ] as const satisfies readonly (readonly [BenchmarkCategory, string])[];
 
-  for (const category of categories) {
-    console.log(`\n${category === 'matrix' ? 'Matrix generation' : 'SVG generation'}`);
+  for (const [category, title] of categories) {
+    console.log(`\n${title}`);
     console.table(
       results
         .filter((result) => result.category === category)

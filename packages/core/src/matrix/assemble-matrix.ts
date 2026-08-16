@@ -38,21 +38,24 @@ export function assembleQRCodeMatrixWithDetails(
 ): QRCodeMatrixAssembly {
   const {matrix, reserved} = createBaseMatrix(version);
   const unmaskedMatrix = fillDataInMatrix(matrix, reserved, codewords, visitDataModule);
-  const selectedMask =
-    requestedMask ?? selectBestMask(unmaskedMatrix, reserved, errorCorrectionLevel);
+  if (requestedMask === undefined) {
+    const selected = selectBestMask(unmaskedMatrix, reserved, errorCorrectionLevel);
+    return {matrix: selected.matrix, reserved, mask: selected.mask};
+  }
 
-  applyMaskToMatrix(unmaskedMatrix, reserved, selectedMask);
-  fillFormatInformationInMatrix(unmaskedMatrix, errorCorrectionLevel, selectedMask);
+  applyMaskToMatrix(unmaskedMatrix, reserved, requestedMask);
+  fillFormatInformationInMatrix(unmaskedMatrix, errorCorrectionLevel, requestedMask);
 
-  return {matrix: unmaskedMatrix, reserved, mask: selectedMask};
+  return {matrix: unmaskedMatrix, reserved, mask: requestedMask};
 }
 
 function selectBestMask(
   unmaskedMatrix: QRCodeMatrix,
   reserved: QRCodeReservedMatrix,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
-): QRCodeMask {
+): Pick<QRCodeMatrixAssembly, 'matrix' | 'mask'> {
   let bestMask: QRCodeMask = 0;
+  let bestMatrix: QRCodeMatrix | undefined;
   let bestScore = Number.POSITIVE_INFINITY;
 
   for (let index = 0; index < QR_CODE_MASKS.length; index++) {
@@ -65,10 +68,11 @@ function selectBestMask(
     if (score < bestScore) {
       bestScore = score;
       bestMask = mask;
+      bestMatrix = candidateMatrix;
     }
   }
 
-  return bestMask;
+  return {matrix: bestMatrix!, mask: bestMask};
 }
 
 function cloneMatrix(matrix: QRCodeMatrix): QRCodeMatrix {

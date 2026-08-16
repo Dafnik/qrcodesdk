@@ -1,6 +1,6 @@
 import type {QRCodeTestFixture} from '@repo/core-testing';
 
-export type BenchmarkCategory = 'matrix' | 'svg';
+export type BenchmarkCategory = 'matrix' | 'automatic' | 'svg';
 export type BenchmarkLibraryId =
   | 'qrcodesdk'
   | 'qrcode'
