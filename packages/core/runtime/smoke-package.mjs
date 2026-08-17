@@ -3,6 +3,10 @@ import * as core from '@qrcodesdk/core';
 const EXPECTED_MATRIX_SIZE = 29;
 const EXPECTED_MATRIX_CHECKSUM = 321386907;
 
+function logSuccess(message) {
+  globalThis.console.log(`  ✓ ${message}`);
+}
+
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -42,13 +46,17 @@ function assertMatrix(matrix) {
   );
 }
 
+globalThis.console.log('Testing the installed @qrcodesdk/core package');
+
 for (const exportName of ['qrcode', 'QRCodeSVGRenderer', 'QRCodeTextRenderer']) {
   assert(typeof core[exportName] === 'function', `Expected Core export ${exportName}`);
 }
+logSuccess('package exposes the qrcode builder and bundled renderers');
 
 const builder = core.qrcode('Runtime ✅ 你好').mode('octet').errorCorrection('H').mask(3);
 const matrix = builder.matrix();
 assertMatrix(matrix);
+logSuccess('builder creates the expected binary 29×29 matrix and checksum');
 
 const svg = builder.render(
   core.QRCodeSVGRenderer({
@@ -62,6 +70,7 @@ assert(svg.includes('height="62"'), 'Expected SVG height 62');
 assert(svg.includes('viewBox="0 0 31 31"'), 'Expected SVG view box 31×31');
 assert(svg.includes('role="img"'), 'Expected the SVG image role');
 assert(svg.includes('<title>Runtime smoke</title>'), 'Expected the SVG title element');
+logSuccess('SVG renderer produces the expected size, view box, role, and title');
 
 const text = builder.render(core.QRCodeTextRenderer({size: 1, margin: 1}));
 const lines = text.split('\n');
@@ -70,6 +79,7 @@ assert(
   lines.every((line) => line.length === 31),
   'Expected every terminal line to be 31 characters',
 );
+logSuccess('text renderer produces the expected 16×31 terminal output');
 
 const renderedChecksum = builder.render((renderedMatrix) => {
   assertMatrix(renderedMatrix);
@@ -79,3 +89,6 @@ assert(
   renderedChecksum === EXPECTED_MATRIX_CHECKSUM,
   'Expected the custom renderer to receive the same matrix',
 );
+logSuccess('custom renderer receives the unchanged QR matrix');
+
+globalThis.console.log('@qrcodesdk/core installed-package smoke test passed');

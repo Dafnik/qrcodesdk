@@ -20,6 +20,10 @@ const executable = path.join(
 const outputDirectory = await mkdtemp(path.join(tmpdir(), 'qrcodesdk-cli-runtime-'));
 const runtime = process.env['QRCODESDK_RUNTIME'] ?? 'node';
 
+function logSuccess(message) {
+  globalThis.console.log(`  ✓ ${message}`);
+}
+
 function runtimeCommand(args) {
   switch (runtime) {
     case 'node':
@@ -52,6 +56,8 @@ function runCli(args) {
 }
 
 try {
+  globalThis.console.log(`Testing the installed @qrcodesdk/cli package on ${runtime}`);
+
   const packageJson = JSON.parse(
     await readFile(
       path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'cli', 'package.json'),
@@ -61,17 +67,23 @@ try {
   const version = await runCli(['-V']);
   assert.equal(version.stdout, `${packageJson.version}\n`);
   assert.doesNotMatch(version.stderr, /\b(?:error|fatal|uncaught)\b/iu);
+  logSuccess(`version command reports installed package version ${packageJson.version}`);
 
   const terminal = await runCli(['Runtime smoke']);
   assert.doesNotMatch(terminal.stderr, /\b(?:error|fatal|uncaught)\b/iu);
   assert.ok(terminal.stdout.split('\n').length > 10);
+  logSuccess('default command renders a terminal QR code without errors');
 
   await runCli(['Runtime smoke', '--output', 'runtime.svg']);
   assert.match(await readFile(path.join(outputDirectory, 'runtime.svg'), 'utf8'), /<svg /u);
+  logSuccess('--output writes a valid SVG file');
 
   await runCli(['Runtime smoke', '--output', 'runtime.png']);
   const png = await readFile(path.join(outputDirectory, 'runtime.png'));
   assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  logSuccess('--output writes a valid PNG file');
+
+  globalThis.console.log(`@qrcodesdk/cli installed-package smoke test passed on ${runtime}`);
 } finally {
   await rm(outputDirectory, {recursive: true, force: true});
 }

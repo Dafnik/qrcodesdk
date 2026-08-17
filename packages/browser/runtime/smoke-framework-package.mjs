@@ -19,12 +19,21 @@ const supportedVersions = {
   vue: new Set(['3.3', '3.5']),
 };
 
+function logSuccess(message) {
+  globalThis.console.log(`  ✓ ${message}`);
+}
+
 assert.ok(framework && supportedVersions[framework], `Unsupported framework: ${framework}`);
 assert.ok(
   frameworkVersion && supportedVersions[framework].has(frameworkVersion),
   `Unsupported ${framework} version: ${frameworkVersion}`,
 );
 assert.ok(packageDirectory, 'QRCODESDK_PACKAGES must point to the packed package directory');
+
+const frameworkName = {angular: 'Angular', react: 'React', svelte: 'Svelte', vue: 'Vue'}[framework];
+globalThis.console.log(
+  `Testing installed @qrcodesdk/${framework} package with ${frameworkName} ${frameworkVersion}`,
+);
 
 const repositoryDirectory = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -41,6 +50,7 @@ let server;
 
 try {
   const tarballs = await findTarballs(packageDirectory, ['core', 'browser', framework]);
+  logSuccess('found exactly one packed tarball for each required QRCodeSDK package');
 
   if (framework === 'react') {
     await run('npm', ['create', 'vite@latest', 'react-consumer', '--', '--template', 'react-ts'], {
@@ -168,7 +178,10 @@ try {
     );
   }
 
+  logSuccess(`created a ${frameworkName} consumer and installed the packed packages`);
+
   await run('npm', ['run', 'build'], {cwd: consumerDirectory});
+  logSuccess('framework consumer builds successfully');
 
   const outputDirectory =
     framework === 'angular'
@@ -190,6 +203,7 @@ try {
   await page.locator('[data-testid="qrcode-svg"] svg').waitFor();
   await page.locator('[data-testid="qrcode-canvas"] canvas').waitFor();
   await page.locator('[data-testid="qrcode-image"] img').waitFor();
+  logSuccess('built consumer loads in Chromium and mounts all QR renderers');
 
   const result = await page.evaluate(async () => {
     const check = (value, message) => {
@@ -248,30 +262,37 @@ try {
     };
   });
 
-  const frameworkName = {angular: 'Angular', react: 'React', svelte: 'Svelte', vue: 'Vue'}[
-    framework
-  ];
-
   assert.match(
     result.frameworkVersion ?? '',
     new RegExp(`^${frameworkName} ${frameworkVersion}\\.`),
     `Expected ${frameworkName} ${frameworkVersion}, received ${result.frameworkVersion}`,
   );
+  logSuccess(`consumer runs with ${result.frameworkVersion}`);
+
   assert.equal(result.svgWidth, '46');
   assert.equal(result.svgHeight, '46');
   assert.ok(result.svgPaths > 0, 'Expected SVG QR paths');
+  logSuccess('SVG component renders the expected 46×46 QR code');
+
   assert.equal(result.canvasWidth, 46);
   assert.equal(result.canvasHeight, 46);
   assert.ok(result.hasDarkPixel, 'Expected dark canvas pixels');
   assert.ok(result.hasLightPixel, 'Expected light canvas pixels');
+  logSuccess('Canvas component renders the expected dimensions and pixel colors');
+
   assert.match(result.imageSource, /^data:image\/png;base64,/);
   assert.equal(result.imageWidth, 46);
   assert.equal(result.imageHeight, 46);
   assert.equal(result.imageAlt, 'Framework runtime QR code');
   assert.equal(result.imageAriaLabel, 'Framework runtime QR code');
-  assert.deepEqual(browserErrors, [], `Unexpected browser errors:\n${browserErrors.join('\n')}`);
+  logSuccess('Image component renders a loaded PNG with accessible text');
 
-  globalThis.console.log(`${result.frameworkVersion} installed-package smoke test passed`);
+  assert.deepEqual(browserErrors, [], `Unexpected browser errors:\n${browserErrors.join('\n')}`);
+  logSuccess('browser reports no page or console errors');
+
+  globalThis.console.log(
+    `@qrcodesdk/${framework} installed-package smoke test passed with ${result.frameworkVersion}`,
+  );
 } finally {
   await Promise.allSettled([browser?.close(), closeServer(server)]);
   await rm(temporaryDirectory, {recursive: true, force: true});
