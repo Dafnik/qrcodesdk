@@ -8,8 +8,14 @@ const browserName = process.env['QRCODESDK_BROWSER'];
 const consumerDirectory = process.env['QRCODESDK_CONSUMER'];
 const browserType = {chromium, firefox, webkit}[browserName];
 
+function logSuccess(message) {
+  globalThis.console.log(`  ✓ ${message}`);
+}
+
 assert.ok(browserType, `Unsupported browser runtime: ${browserName}`);
 assert.ok(consumerDirectory, 'QRCODESDK_CONSUMER must point to the installed package consumer');
+
+globalThis.console.log(`Testing the installed @qrcodesdk/browser package in ${browserName}`);
 
 const [coreSource, browserSource] = await Promise.all([
   readFile(
@@ -21,6 +27,7 @@ const [coreSource, browserSource] = await Promise.all([
     'utf8',
   ),
 ]);
+logSuccess('installed Core and Browser ESM bundles are readable');
 
 const browser = await browserType.launch({headless: true});
 
@@ -110,6 +117,14 @@ try {
     check(image.naturalWidth === 62 && image.naturalHeight === 62, 'Expected a loaded 62×62 PNG');
     check(image.alt === 'Runtime QR code', 'Expected image accessibility attributes');
   });
+
+  logSuccess('installed ESM bundles import in a real browser page');
+  logSuccess('Core builder creates the expected matrix and SVG output');
+  logSuccess('Canvas renderer creates a 62×62 canvas with dark and light pixels');
+  logSuccess('Image renderer creates a loaded 62×62 PNG with accessible alternative text');
+  globalThis.console.log(
+    `@qrcodesdk/browser installed-package smoke test passed in ${browserName}`,
+  );
 } finally {
   await browser.close();
 }
