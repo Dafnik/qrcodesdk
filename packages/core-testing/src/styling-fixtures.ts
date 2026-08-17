@@ -7,6 +7,14 @@ export type QRCodeStylingFixture = {
   readonly styling: QRCodeStylingOptions;
 };
 
+/**
+ * zxing-wasm 3.1.2 cannot locate this deliberately nonstandard dotted finder pattern.
+ * Keep the jsQR roundtrip and recheck this exclusion when zxing-wasm is upgraded.
+ */
+export const ɵZXING_UNSUPPORTED_STYLING_FIXTURE_NAMES = [
+  'dots-square_ring-dot_center-dots_palette-default',
+] as const;
+
 const STYLING_DATA = 'The quick brown fox jumps over the lazy dog';
 const STYLING_MATRIX_OPTIONS = {
   version: 5,

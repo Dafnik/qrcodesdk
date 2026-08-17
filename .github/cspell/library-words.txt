@@ -1,4 +1,5 @@
 zxing
+Barcodes
 serviceworker
 jsqr
 dontInvert
