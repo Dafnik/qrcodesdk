@@ -31,6 +31,9 @@ describe('benchmark workloads', () => {
     const workloads = createStaticWorkloads(QR_CODE_TEST_FIXTURES);
 
     expect(workloads).toHaveLength(STATIC_MULTIPLIERS.length);
+    for (const workload of workloads) {
+      expect(workload.qrCodesPerSample).toBe(QR_CODE_TEST_FIXTURES.length * workload.repetitions);
+    }
   });
 
   test('adds all QR code combinations as one exhaustive pass', () => {
@@ -50,6 +53,11 @@ describe('benchmark workloads', () => {
 
     expect(workloads).toHaveLength(STATIC_MULTIPLIERS.length);
     expect(workloads.some(({id}) => id === 'all-combinations')).toBe(false);
+    for (const workload of workloads) {
+      expect(workload.qrCodesPerSample).toBe(
+        AUTOMATIC_QR_CODE_TEST_FIXTURES.length * workload.repetitions,
+      );
+    }
   });
 
   test('warms static fixtures and every QR code combination', () => {

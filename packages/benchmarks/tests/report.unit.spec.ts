@@ -21,7 +21,7 @@ const result: BenchmarkResult = {
   category: 'matrix',
   workloadId: 'static-1',
   workloadLabel: 'Static fixtures ×1',
-  qrCodesPerSample: 16,
+  qrCodesPerSample: 17,
   libraryId: 'qrcodesdk',
   libraryLabel: 'QRCodeSDK',
   libraryVersion: '1.0.0',
@@ -29,7 +29,7 @@ const result: BenchmarkResult = {
   medianMs: 3,
   minMs: 1,
   maxMs: 5,
-  qrCodesPerSecond: 16_000 / 3,
+  qrCodesPerSecond: 17_000 / 3,
   timeVsQRCodeSDK: 1,
 };
 
