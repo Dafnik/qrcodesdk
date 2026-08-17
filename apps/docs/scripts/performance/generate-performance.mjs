@@ -10,6 +10,7 @@ const DEFAULT_INPUT_PATH = path.join(WORKSPACE_ROOT, 'benchmark-results/latest.j
 const DEFAULT_OUTPUT_PATH = path.join(DOCS_ROOT, 'src/content/docs/learn/performance.md');
 const CATEGORIES = [
   ['matrix', 'Matrix generation'],
+  ['automatic', 'Automatic matrix generation'],
   ['svg', 'SVG generation'],
 ];
 const LIBRARIES = [
@@ -62,7 +63,7 @@ function requireFiniteNumber(value, label) {
 export function validateBenchmarkReport(report) {
   const parsedReport = requireObject(report, 'Benchmark report');
 
-  if (parsedReport.schemaVersion !== 2) {
+  if (parsedReport.schemaVersion !== 3) {
     throw new Error(`Unsupported benchmark schema version: ${parsedReport.schemaVersion}.`);
   }
 
@@ -228,7 +229,7 @@ ${rows}
   const sourcePath = path.relative(workspaceRoot, inputPath).split(path.sep).join('/');
   const markdown = `---
 title: Performance
-description: Matrix and SVG generation benchmark results for QRCodeSDK and its reference libraries.
+description: Matrix, automatic matrix, and SVG generation benchmark results for QRCodeSDK and its reference libraries.
 docType: concept
 ---
 
@@ -236,7 +237,7 @@ docType: concept
 
 These results compare QRCodeSDK with **qrcode** and three **qrcode-generator** encoder configurations. Benchmarks are environment-specific and should be read as relative comparisons, not universal guarantees.
 
-All **qrcode-generator** rows use the repository patch that applies each fixture's explicit mask and skips automatic mask evaluation. The **default** row uses the package's stock low-byte converter, **TextEncoder** uses the platform encoder, and **bundled UTF-8** uses the package's handwritten UTF-8 converter. The default converter truncates UTF-16 code units, so its Unicode byte fixtures do not encode content equivalent to the other rows. TextEncoder and bundled UTF-8 produce the same bytes for the valid Unicode fixtures.
+The matrix and SVG fixtures supply explicit versions and masks. Their **qrcode-generator** rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them. The **default** row uses the package's stock low-byte converter, **TextEncoder** uses the platform encoder, and **bundled UTF-8** uses the package's handwritten UTF-8 converter. The default converter truncates UTF-16 code units, so its Unicode byte fixtures do not encode content equivalent to the other rows. TextEncoder and bundled UTF-8 produce the same bytes for the valid Unicode fixtures.
 
 ## Benchmark environment
 

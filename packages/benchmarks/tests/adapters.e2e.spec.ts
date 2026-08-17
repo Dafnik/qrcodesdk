@@ -5,6 +5,7 @@ import {describe, expect, test} from 'vitest';
 import {ɵMODES} from '@qrcodesdk/core';
 
 import {BENCHMARK_ADAPTERS} from '../src/adapters';
+import {AUTOMATIC_QR_CODE_TEST_FIXTURES} from '../src/workloads';
 
 describe('benchmark adapters', () => {
   const fixtures = ɵMODES.map((mode) =>
@@ -17,6 +18,16 @@ describe('benchmark adapters', () => {
       adapter.prepare?.();
       for (const fixture of fixtures) {
         expect(adapter.matrix(fixture)).toBe(17 + 4 * fixture.version!);
+      }
+    },
+  );
+
+  test.each(BENCHMARK_ADAPTERS)(
+    '$label automatically selects a version and mask for every static fixture',
+    (adapter) => {
+      adapter.prepare?.();
+      for (const fixture of AUTOMATIC_QR_CODE_TEST_FIXTURES) {
+        expect(adapter.matrix(fixture)).toBeGreaterThan(0);
       }
     },
   );

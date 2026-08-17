@@ -24,7 +24,7 @@ export function createBenchmarkReport(options: CreateBenchmarkReportOptions): Be
   const cpuList = cpus();
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     generatedAt: options.generatedAt ?? new Date().toISOString(),
     environment: {
       node: process.version,
@@ -70,10 +70,14 @@ export async function writeBenchmarkReport(
 }
 
 export function printBenchmarkResults(results: readonly BenchmarkResult[]): void {
-  const categories: readonly BenchmarkCategory[] = ['matrix', 'svg'];
+  const categories = [
+    ['matrix', 'Matrix generation'],
+    ['automatic', 'Automatic matrix generation'],
+    ['svg', 'SVG generation'],
+  ] as const satisfies readonly (readonly [BenchmarkCategory, string])[];
 
-  for (const category of categories) {
-    console.log(`\n${category === 'matrix' ? 'Matrix generation' : 'SVG generation'}`);
+  for (const [category, title] of categories) {
+    console.log(`\n${title}`);
     console.table(
       results
         .filter((result) => result.category === category)

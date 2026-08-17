@@ -23,6 +23,10 @@
       "cache": false,
       "dependsOn": ["build"]
     },
+    "benchmark:matrix": {
+      "cache": false,
+      "dependsOn": ["build"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],

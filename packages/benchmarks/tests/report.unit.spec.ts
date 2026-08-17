@@ -21,15 +21,15 @@ const result: BenchmarkResult = {
   category: 'matrix',
   workloadId: 'static-1',
   workloadLabel: 'Static fixtures ×1',
-  qrCodesPerSample: 16,
+  qrCodesPerSample: 17,
   libraryId: 'qrcodesdk',
   libraryLabel: 'QRCodeSDK',
   libraryVersion: '1.0.0',
-  samplesMs: [1, 2, 3, 4, 5, 6],
-  medianMs: 3.5,
+  samplesMs: [1, 2, 3, 4, 5],
+  medianMs: 3,
   minMs: 1,
-  maxMs: 6,
-  qrCodesPerSecond: 16_000 / 3.5,
+  maxMs: 5,
+  qrCodesPerSecond: 17_000 / 3,
   timeVsQRCodeSDK: 1,
 };
 
@@ -40,10 +40,10 @@ describe('benchmark report', () => {
       adapters,
       results: [result],
       checksum: 123,
-      samples: 6,
+      samples: 5,
       warmupStaticPasses: 5,
       warmupExhaustivePasses: 1,
-      staticFixtureCount: 16,
+      staticFixtureCount: 17,
       staticMultipliers: [1, 5, 10, 100, 500],
       exhaustiveFixtureCount: 3_840,
       svgPixelsPerModule: 8,
@@ -54,7 +54,7 @@ describe('benchmark report', () => {
     const parsed = JSON.parse(serialized) as typeof report;
 
     expect(parsed).toMatchObject({
-      schemaVersion: 2,
+      schemaVersion: 3,
       generatedAt: '2026-07-17T00:00:00.000Z',
       libraries: {
         qrcodesdk: '1.0.0',
@@ -64,7 +64,7 @@ describe('benchmark report', () => {
         'qrcode-generator-utf8': '1.0.0',
       },
       configuration: {
-        samples: 6,
+        samples: 5,
         warmupStaticPasses: 5,
         warmupExhaustivePasses: 1,
         exhaustiveFixtureCount: 3_840,
@@ -73,7 +73,7 @@ describe('benchmark report', () => {
       checksum: 123,
     });
     expect(parsed.environment.node).toBe(process.version);
-    expect(parsed.results[0]?.samplesMs).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(parsed.results[0]?.samplesMs).toEqual([1, 2, 3, 4, 5]);
     expect(serialized.endsWith('\n')).toBe(true);
   });
 });

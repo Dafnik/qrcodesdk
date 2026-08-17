@@ -13,19 +13,19 @@ import {
 const RESULT = {
   workloadId: 'static-1',
   workloadLabel: 'Static fixtures ×1',
-  qrCodesPerSample: 16,
+  qrCodesPerSample: 17,
   libraryId: 'qrcodesdk',
   libraryLabel: 'QRCodeSDK',
   libraryVersion: '1.2.3',
-  samplesMs: [2, 1, 3, 2, 1, 3],
+  samplesMs: [2, 1, 3, 2, 1],
   medianMs: 2,
   minMs: 1,
   maxMs: 3,
-  qrCodesPerSecond: 8000,
+  qrCodesPerSecond: 8500,
   timeVsQRCodeSDK: 1,
 };
 const REPORT = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   generatedAt: '2026-07-17T21:07:54.996Z',
   environment: {
     node: 'v24.18.0',
@@ -43,10 +43,10 @@ const REPORT = {
     'qrcode-generator-utf8': '2.0.4',
   },
   configuration: {
-    samples: 6,
+    samples: 5,
     warmupStaticPasses: 5,
     warmupExhaustivePasses: 1,
-    staticFixtureCount: 16,
+    staticFixtureCount: 17,
     staticMultipliers: [1],
     exhaustiveFixtureCount: 3840,
     svg: {
@@ -93,8 +93,10 @@ const REPORT = {
       category: 'matrix',
       workloadId: 'static-5',
       workloadLabel: 'Static fixtures ×5',
-      qrCodesPerSample: 80,
+      qrCodesPerSample: 85,
+      qrCodesPerSecond: 42_500,
     },
+    {...RESULT, category: 'automatic'},
     {...RESULT, category: 'svg', medianMs: 4, qrCodesPerSecond: 4000},
   ],
   checksum: 123,
@@ -112,18 +114,24 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
   assert.match(markdown, /Generated from benchmark-results\/latest\.json/);
   assert.match(markdown, /pnpm turbo run generate-performance --filter=docs/);
   assert.match(markdown, /skips automatic mask evaluation/);
+  assert.match(markdown, /automatic matrix fixtures omit both options/);
   assert.match(markdown, /default converter truncates UTF-16 code units/);
   assert.match(
     markdown,
-    /6 timed samples after 5 static warm-up passes and 1 exhaustive warm-up pass/,
+    /5 timed samples after 5 static warm-up passes and 1 exhaustive warm-up pass/,
   );
   assert.match(markdown, /## Matrix generation/);
+  assert.match(markdown, /## Automatic matrix generation/);
   assert.match(markdown, /## SVG generation/);
-  assert.equal(markdown.match(/```mermaid/g)?.length, 3);
+  assert.equal(markdown.match(/```mermaid/g)?.length, 4);
   assert.match(markdown, /xychart horizontal/);
   assert.match(markdown, /showDataLabel: true/);
   assert.match(markdown, /showDataLabelOutsideBar: true/);
-  assert.match(markdown, /accTitle: Matrix generation: Static fixtures ×1 — 16 QR codes\/sample/);
+  assert.match(markdown, /accTitle: Matrix generation: Static fixtures ×1 — 17 QR codes\/sample/);
+  assert.match(
+    markdown,
+    /accTitle: Automatic matrix generation: Static fixtures ×1 — 17 QR codes\/sample/,
+  );
   assert.match(markdown, /accDescr: Relative median time compared with QRCodeSDK\./);
   assert.match(
     markdown,
@@ -134,19 +142,19 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
   assert.ok(
     markdown.indexOf('title "Static fixtures ×1') < markdown.indexOf('title "Static fixtures ×5'),
   );
-  assert.equal(markdown.match(/<summary>Exact benchmark data<\/summary>/g)?.length, 2);
-  assert.match(markdown, /\| Static fixtures ×1 \|\s+16 \| QRCodeSDK v1\.2\.3\s+\|\s+2\.000/);
-  assert.match(markdown, /\| Static fixtures ×1 \|\s+16 \| QRCodeSDK v1\.2\.3\s+\|\s+4\.000/);
+  assert.equal(markdown.match(/<summary>Exact benchmark data<\/summary>/g)?.length, 3);
+  assert.match(markdown, /\| Static fixtures ×1 \|\s+17 \| QRCodeSDK v1\.2\.3\s+\|\s+2\.000/);
+  assert.match(markdown, /\| Static fixtures ×1 \|\s+17 \| QRCodeSDK v1\.2\.3\s+\|\s+4\.000/);
   assert.match(markdown, /qrcode-generator \(default\) v2\.0\.4/);
   assert.match(markdown, /qrcode-generator \(TextEncoder\) v2\.0\.4/);
   assert.match(markdown, /qrcode-generator \(bundled UTF-8\) v2\.0\.4/);
-  assert.match(markdown, /\|\s+8,000 \|\s+1\.00× \|/);
+  assert.match(markdown, /\|\s+8,500 \|\s+1\.00× \|/);
 });
 
 test('rejects unsupported or incomplete benchmark reports', () => {
   assert.throws(
-    () => validateBenchmarkReport({...REPORT, schemaVersion: 1}),
-    /Unsupported benchmark schema version: 1/,
+    () => validateBenchmarkReport({...REPORT, schemaVersion: 2}),
+    /Unsupported benchmark schema version: 2/,
   );
   assert.throws(() => validateBenchmarkReport({...REPORT, results: []}), /non-empty array/);
   assert.throws(

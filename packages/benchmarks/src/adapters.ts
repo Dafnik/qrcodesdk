@@ -26,17 +26,18 @@ const qrcodeGeneratorBundledUTF8Encoder = qrcodeGeneratorCommonJS.stringToBytesF
 function qrcodeSDKOptions(fixture: QRCodeTestFixture): QRCodeMatrixOptions {
   return {
     errorCorrectionLevel: fixture.errorCorrectionLevel,
-    mask: fixture.mask,
+    eci: fixture.eci,
     mode: fixture.mode,
-    version: fixture.version,
+    ...(fixture.mask === undefined ? {} : {mask: fixture.mask}),
+    ...(fixture.version === undefined ? {} : {version: fixture.version}),
   };
 }
 
 function qrcodeOptions(fixture: QRCodeTestFixture): QRCodeOptions {
   return {
     errorCorrectionLevel: fixture.errorCorrectionLevel ?? 'M',
-    maskPattern: fixture.mask,
-    version: fixture.version,
+    ...(fixture.mask === undefined ? {} : {maskPattern: fixture.mask}),
+    ...(fixture.version === undefined ? {} : {version: fixture.version}),
   };
 }
 
@@ -83,7 +84,8 @@ function qrcodeSVGOptions(fixture: QRCodeTestFixture): QRCodeToStringOptions {
 function createGeneratorQRCode(fixture: QRCodeTestFixture) {
   const qr = qrcodeGenerator(fixture.version ?? 0, fixture.errorCorrectionLevel ?? 'M');
   qr.addData(fixture.data, referenceModes(fixture.mode).qrcodeGenerator);
-  qr.make(fixture.mask);
+  if (fixture.mask === undefined) qr.make();
+  else qr.make(fixture.mask);
   return qr;
 }
 

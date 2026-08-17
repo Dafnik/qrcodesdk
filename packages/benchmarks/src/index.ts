@@ -7,17 +7,24 @@ import {executeWorkload, rotateAdapters, timedWorkload} from './runner';
 import {calculateTimeRatio, summarizeSamples} from './statistics';
 import type {BenchmarkCategory, BenchmarkLibraryId, BenchmarkResult} from './types';
 import {
+  BENCHMARK_SAMPLE_COUNT,
   STATIC_MULTIPLIERS,
   WARMUP_EXHAUSTIVE_PASSES,
   WARMUP_STATIC_PASSES,
+  createAutomaticBenchmarkWarmupWorkloads,
+  createAutomaticBenchmarkWorkloads,
   createBenchmarkWarmupWorkloads,
   createBenchmarkWorkloads,
 } from './workloads';
 
-const SAMPLE_COUNT = 5;
 const WORKSPACE_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
-const CATEGORIES = ['matrix', 'svg'] as const satisfies readonly BenchmarkCategory[];
 type BenchmarkSampleKey = `${BenchmarkCategory}:${string}:${BenchmarkLibraryId}`;
+
+type BenchmarkSuite = {
+  readonly category: BenchmarkCategory;
+  readonly workloads: ReturnType<typeof createBenchmarkWorkloads>;
+  readonly warmupWorkloads: ReturnType<typeof createBenchmarkWarmupWorkloads>;
+};
 
 function benchmarkSampleKey(
   category: BenchmarkCategory,
@@ -30,12 +37,21 @@ function benchmarkSampleKey(
 async function main(): Promise<void> {
   const workloads = createBenchmarkWorkloads();
   const warmupWorkloads = createBenchmarkWarmupWorkloads();
+  const suites: readonly BenchmarkSuite[] = [
+    {category: 'matrix', workloads, warmupWorkloads},
+    {
+      category: 'automatic',
+      workloads: createAutomaticBenchmarkWorkloads(),
+      warmupWorkloads: createAutomaticBenchmarkWarmupWorkloads(),
+    },
+    {category: 'svg', workloads, warmupWorkloads},
+  ];
   const samples = new Map<BenchmarkSampleKey, number[]>();
   const results: BenchmarkResult[] = [];
   let checksum = 0;
 
-  for (const category of CATEGORIES) {
-    for (const workload of warmupWorkloads) {
+  for (const {category, warmupWorkloads: categoryWarmupWorkloads} of suites) {
+    for (const workload of categoryWarmupWorkloads) {
       console.log(
         `[${category}] ${workload.label}: ${String(workload.qrCodesPerSample)} QR codes per library…`,
       );
@@ -45,12 +61,12 @@ async function main(): Promise<void> {
     }
   }
 
-  for (const category of CATEGORIES) {
-    for (const workload of workloads) {
-      for (let sampleIndex = 0; sampleIndex < SAMPLE_COUNT; sampleIndex += 1) {
+  for (const {category, workloads: categoryWorkloads} of suites) {
+    for (const workload of categoryWorkloads) {
+      for (let sampleIndex = 0; sampleIndex < BENCHMARK_SAMPLE_COUNT; sampleIndex += 1) {
         const adapters = rotateAdapters(BENCHMARK_ADAPTERS, sampleIndex);
         console.log(
-          `[${category}] ${workload.label}: sample ${String(sampleIndex + 1)}/${String(SAMPLE_COUNT)} (${adapters.map(({label}) => label).join(' → ')})`,
+          `[${category}] ${workload.label}: sample ${String(sampleIndex + 1)}/${String(BENCHMARK_SAMPLE_COUNT)} (${adapters.map(({label}) => label).join(' → ')})`,
         );
 
         for (const adapter of adapters) {
@@ -96,7 +112,7 @@ async function main(): Promise<void> {
     adapters: BENCHMARK_ADAPTERS,
     results,
     checksum,
-    samples: SAMPLE_COUNT,
+    samples: BENCHMARK_SAMPLE_COUNT,
     warmupStaticPasses: WARMUP_STATIC_PASSES,
     warmupExhaustivePasses: WARMUP_EXHAUSTIVE_PASSES,
     staticFixtureCount: QR_CODE_TEST_FIXTURES.length,

@@ -1,6 +1,6 @@
 import type {QRCodeTestFixture} from '@repo/core-testing';
 
-export type BenchmarkCategory = 'matrix' | 'svg';
+export type BenchmarkCategory = 'matrix' | 'automatic' | 'svg';
 export type BenchmarkLibraryId =
   | 'qrcodesdk'
   | 'qrcode'
@@ -45,7 +45,7 @@ export interface BenchmarkResult extends BenchmarkSummary {
 }
 
 export interface BenchmarkReport {
-  readonly schemaVersion: 2;
+  readonly schemaVersion: 3;
   readonly generatedAt: string;
   readonly environment: {
     readonly node: string;
