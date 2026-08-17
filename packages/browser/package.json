@@ -81,6 +81,7 @@
     "playwright": "1.62.0",
     "tsdown": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "zxing-wasm": "catalog:"
   }
 }
