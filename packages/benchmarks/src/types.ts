@@ -45,7 +45,7 @@ export interface BenchmarkResult extends BenchmarkSummary {
 }
 
 export interface BenchmarkReport {
-  readonly schemaVersion: 2;
+  readonly schemaVersion: 3;
   readonly generatedAt: string;
   readonly environment: {
     readonly node: string;

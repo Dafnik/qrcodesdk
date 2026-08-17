@@ -28,7 +28,7 @@ const result: BenchmarkResult = {
   samplesMs: [1, 2, 3, 4, 5],
   medianMs: 3,
   minMs: 1,
-  maxMs: 6,
+  maxMs: 5,
   qrCodesPerSecond: 16_000 / 3,
   timeVsQRCodeSDK: 1,
 };
@@ -54,7 +54,7 @@ describe('benchmark report', () => {
     const parsed = JSON.parse(serialized) as typeof report;
 
     expect(parsed).toMatchObject({
-      schemaVersion: 2,
+      schemaVersion: 3,
       generatedAt: '2026-07-17T00:00:00.000Z',
       libraries: {
         qrcodesdk: '1.0.0',

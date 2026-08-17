@@ -25,7 +25,7 @@ const RESULT = {
   timeVsQRCodeSDK: 1,
 };
 const REPORT = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   generatedAt: '2026-07-17T21:07:54.996Z',
   environment: {
     node: 'v24.18.0',
@@ -93,7 +93,8 @@ const REPORT = {
       category: 'matrix',
       workloadId: 'static-5',
       workloadLabel: 'Static fixtures ×5',
-      qrCodesPerSample: 80,
+      qrCodesPerSample: 85,
+      qrCodesPerSecond: 42_500,
     },
     {...RESULT, category: 'automatic'},
     {...RESULT, category: 'svg', medianMs: 4, qrCodesPerSecond: 4000},
@@ -152,8 +153,8 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
 
 test('rejects unsupported or incomplete benchmark reports', () => {
   assert.throws(
-    () => validateBenchmarkReport({...REPORT, schemaVersion: 1}),
-    /Unsupported benchmark schema version: 1/,
+    () => validateBenchmarkReport({...REPORT, schemaVersion: 2}),
+    /Unsupported benchmark schema version: 2/,
   );
   assert.throws(() => validateBenchmarkReport({...REPORT, results: []}), /non-empty array/);
   assert.throws(

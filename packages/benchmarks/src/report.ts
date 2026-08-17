@@ -24,7 +24,7 @@ export function createBenchmarkReport(options: CreateBenchmarkReportOptions): Be
   const cpuList = cpus();
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     generatedAt: options.generatedAt ?? new Date().toISOString(),
     environment: {
       node: process.version,

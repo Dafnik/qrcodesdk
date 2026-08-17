@@ -63,7 +63,7 @@ function requireFiniteNumber(value, label) {
 export function validateBenchmarkReport(report) {
   const parsedReport = requireObject(report, 'Benchmark report');
 
-  if (parsedReport.schemaVersion !== 2) {
+  if (parsedReport.schemaVersion !== 3) {
     throw new Error(`Unsupported benchmark schema version: ${parsedReport.schemaVersion}.`);
   }
 

@@ -8,9 +8,9 @@ pnpm benchmark
 
 The suite compares the production build of `@qrcodesdk/core` with `qrcode` and three
 `qrcode-generator` encoder configurations. It benchmarks native matrix generation and end-to-end
-SVG generation for the 17 static fixtures at 1, 5, 10, 100, and 500 repetitions, followed by one
-pass over all 3,840 QR code combinations. A third category benchmarks matrix generation for the
-same static fixtures with version and mask selection left automatic at the same repetition counts.
+SVG generation for the 17 static fixtures at 1, 10, and 500 repetitions, followed by one pass over
+all 3,840 QR code combinations. A third category benchmarks matrix generation for the same static
+fixtures with version and mask selection left automatic at 1, 10, and 100 repetitions.
 
 For matrix and SVG generation, all `qrcode-generator` configurations use the repository patch that
 accepts the fixture's explicit mask and skips automatic mask evaluation. The automatic matrix
