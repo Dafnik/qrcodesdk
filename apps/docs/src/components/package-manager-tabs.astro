@@ -1,5 +1,5 @@
 ---
-import {Tabs, TabItem, Code} from '@astrojs/starlight/components';
+import {Code} from '@astrojs/starlight/components';
 
 import {createPackageManagerCommands} from '../utils';
 
@@ -10,20 +10,101 @@ type Props = {
   mode: PackageManagerMode;
   command?: string;
   args?: string[];
-  syncKey?: string;
 };
 
-const {packages, mode, command, args = [], syncKey = 'package-manager'} = Astro.props as Props;
+const {packages, mode, command, args = []} = Astro.props as Props;
 
-const tabs = createPackageManagerCommands({packages, mode, command, args});
+const tabs = createPackageManagerCommands({
+  packages,
+  mode,
+  command,
+  args,
+});
+
+const id = `package-manager-${Math.random().toString(36).slice(2)}`;
 ---
 
-<Tabs syncKey={syncKey}>
+<div class="relative" data-package-manager>
+  <div class="absolute -top-2.75 right-1.25 z-10">
+    <label for={id} class="sr-only">Package manager</label>
+
+    <div class="relative inline-flex items-center">
+      <select
+        id={id}
+        aria-label="Select package manager"
+        class="h-6 w-auto cursor-pointer appearance-none rounded-md border border-white/10 bg-white/5 py-0 pr-6 pl-2.5 text-sm leading-none font-medium text-white transition outline-none hover:border-white/20 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/30">
+        {tabs.map(({label}, index) => <option value={String(index)}>{label}</option>)}
+      </select>
+
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        class="pointer-events-none absolute right-1.75 size-3.5 shrink-0 -translate-y-1/2 text-white/60">
+        <path
+          fill-rule="evenodd"
+          d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+          clip-rule="evenodd">
+        </path>
+      </svg>
+    </div>
+  </div>
+
   {
-    tabs.map(({label, command}) => (
-      <TabItem label={label}>
-        <Code lang="sh" code={command} />
-      </TabItem>
+    tabs.map(({command}, index) => (
+      <div data-command={index} hidden={index !== 0}>
+        <Code lang="sh" code={command} showLineNumbers={false} />
+      </div>
     ))
   }
-</Tabs>
+</div>
+
+<script>
+  const STORAGE_KEY = 'package-manager';
+
+  function updatePackageManagers(value: string) {
+    document.querySelectorAll('[data-package-manager]').forEach((root) => {
+      const select = root.querySelector('select');
+      const commands = root.querySelectorAll('[data-command]');
+
+      if (!(select instanceof HTMLSelectElement)) return;
+
+      // Ignore stored values that don't exist in this particular instance.
+      if (![...select.options].some((option) => option.value === value)) return;
+
+      select.value = value;
+
+      commands.forEach((command) => {
+        if (!(command instanceof HTMLElement)) return;
+
+        command.hidden = command.dataset.command !== value;
+      });
+    });
+  }
+
+  const storedValue = localStorage.getItem(STORAGE_KEY);
+
+  if (storedValue !== null) {
+    updatePackageManagers(storedValue);
+  }
+
+  document.querySelectorAll('[data-package-manager]').forEach((root) => {
+    const select = root.querySelector('select');
+
+    if (!(select instanceof HTMLSelectElement)) return;
+
+    select.addEventListener('change', () => {
+      localStorage.setItem(STORAGE_KEY, select.value);
+
+      // Sync every component instance in the current document.
+      updatePackageManagers(select.value);
+    });
+  });
+
+  // Sync across other tabs/windows.
+  window.addEventListener('storage', (event) => {
+    if (event.key !== STORAGE_KEY || event.newValue === null) return;
+
+    updatePackageManagers(event.newValue);
+  });
+</script>

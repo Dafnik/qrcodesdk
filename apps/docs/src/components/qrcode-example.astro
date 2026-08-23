@@ -4,13 +4,30 @@ import {Tabs, TabItem, Code} from '@astrojs/starlight/components';
 const {code, lang = 'angular-ts'} = Astro.props;
 ---
 
-<Tabs syncKey="qrcode-example">
-  <TabItem label="Code">
-    <Code lang={lang} code={code ?? ''} />
-  </TabItem>
-  <TabItem label="Preview">
-    <div class="flex flex-col items-center">
+<div class="live-code-layout not-content">
+  <div class="example-container">
+    <div>
       <slot />
     </div>
-  </TabItem>
-</Tabs>
+  </div>
+  <Code lang={lang} code={code ?? ''} />
+</div>
+
+<style>
+  .live-code-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .example-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5rem;
+    background: var(--ec-frm-edBg, var(--astro-code-color-background));
+    border-style: solid;
+    border-width: var(--ec-brdWd, 1px);
+    border-color: var(--ec-brdCol, var(--sl-color-gray-5));
+    border-bottom: none;
+  }
+</style>

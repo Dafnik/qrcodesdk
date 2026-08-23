@@ -1,0 +1,85 @@
+---
+import {Code, TabItem, Tabs} from '@astrojs/starlight/components';
+import PackageManagerTabs from './package-manager-tabs.astro';
+
+const coreExample = `import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+
+const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());`;
+
+const reactExample = `import {QRCodeSVG} from '@qrcodesdk/react';
+
+export function App() {
+  return <QRCodeSVG data="https://qrcodesdk.dev" />;
+}`;
+
+const vueExample = `<script setup lang="ts">
+import {QRCodeSVG} from '@qrcodesdk/vue';
+</script>
+
+<template>
+  <QRCodeSVG data="https://qrcodesdk.dev" />
+</template>`;
+
+const svelteExample = `<script lang="ts">
+  import {QRCodeSVG} from '@qrcodesdk/svelte';
+</script>
+
+<QRCodeSVG data="https://qrcodesdk.dev" />`;
+
+const angularExample = `import {Component} from '@angular/core';
+import {QRCodeSVG} from '@qrcodesdk/angular';
+
+@Component({
+  selector: 'app-root',
+  imports: [QRCodeSVG],
+  template: '<qrcode-svg data="https://qrcodesdk.dev" />',
+})
+export class App {}`;
+---
+
+<Tabs syncKey="getting-started-runtime">
+  <TabItem label="Core">
+    <PackageManagerTabs mode="add" packages={['@qrcodesdk/core']} />
+    <p>Render a scalable SVG string with the runtime-neutral Core package:</p>
+    <Code code={coreExample} lang="ts" />
+    <p>
+      SVG is the recommended default for most user-facing QR codes: it stays sharp at any size and
+      works in browsers, servers, email, and static assets. See the <a
+        href="/reference/renderers/svg/">
+        SVG renderer reference
+      </a> when you need its options or exact return contract.
+    </p>
+  </TabItem>
+  <TabItem label="React">
+    <PackageManagerTabs
+      mode="add"
+      packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/react']}
+    />
+    <p>Render an SVG component in React or Next.js:</p>
+    <Code code={reactExample} lang="tsx" />
+  </TabItem>
+  <TabItem label="Vue">
+    <PackageManagerTabs
+      mode="add"
+      packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/vue']}
+    />
+    <p>Render an SVG component in Vue:</p>
+    <Code code={vueExample} lang="vue" />
+  </TabItem>
+  <TabItem label="Svelte">
+    <PackageManagerTabs
+      mode="add"
+      packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/svelte']}
+    />
+    <p>Render an SVG component in Svelte:</p>
+    <Code code={svelteExample} lang="svelte" />
+  </TabItem>
+  <TabItem label="Angular">
+    <PackageManagerTabs
+      mode="add"
+      packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/angular']}
+    />
+    <p>Render a standalone SVG component in Angular:</p>
+    <Code code={angularExample} lang="ts" />
+  </TabItem>
+</Tabs>

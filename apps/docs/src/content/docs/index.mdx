@@ -18,23 +18,11 @@ hero:
       variant: minimal
 ---
 
-import PackageManagerTabs from '../../components/package-manager-tabs.astro';
+import GettingStartedTabs from '../../components/getting-started-tabs.astro';
 
-## Install Core
+## Start with your stack
 
-<PackageManagerTabs packages={['@qrcodesdk/core']} mode="add" />
-
-Render a scalable SVG string with the runtime-neutral Core package:
-
-```ts
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-
-const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
-```
-
-SVG is the recommended default for most user-facing QR codes: it stays sharp at any size and works
-in browsers, servers, email, and static assets. See the [SVG renderer reference](/reference/renderers/svg/)
-when you need its options or exact return contract.
+<GettingStartedTabs />
 
 ## Choose by runtime and output
 

@@ -6,7 +6,7 @@ import {QRCodeImage} from '@qrcodesdk/angular';
   selector: 'qrcode-angular-download-image-example',
   imports: [QRCodeImage],
   template: `
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center gap-2">
       <qrcode-image
         #qrcode
         [options]="{
