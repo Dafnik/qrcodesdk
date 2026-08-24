@@ -1,3 +1,4 @@
+import {QRCodeError} from '../error';
 import type {QRCodeCodewords, QRCodeEncodedSegment, QRCodeVersion} from '../types';
 import type {QRCodeEncodedBitMetadata, QRCodeMatrixMetadataRole} from './metadata';
 import {
@@ -104,7 +105,11 @@ function encodeData(
   }
 
   const encodedDataBitLength = buffer.length * 8 + (8 - remaining);
-  if (encodedDataBitLength > capacity) throw new Error('QRCode: Data too large');
+  if (encodedDataBitLength > capacity) {
+    throw new QRCodeError('DATA_TOO_LARGE', 'QRCode: Data too large', {
+      details: {encodedDataBitLength, capacity},
+    });
+  }
 
   // final bits. it is possible that adding terminator causes the buffer
   // to overflow, but then the buffer truncated to the maximum size will

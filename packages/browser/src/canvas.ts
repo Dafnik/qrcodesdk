@@ -1,5 +1,6 @@
 import {
   type QRCodeAccessibilityOptions,
+  QRCodeError,
   type QRCodeImageOverlayOptions,
   type QRCodeMatrix,
   type QRCodeOptions,
@@ -14,7 +15,7 @@ import {
 
 export type QRCodeCanvasImageOptions = QRCodeImageOverlayOptions<CanvasImageSource>;
 export type QRCodeCanvasRendererOptions = QRCodeStylingOptions &
-  Pick<QRCodeAccessibilityOptions, 'ariaLabel'> & {
+  Pick<QRCodeAccessibilityOptions, 'ariaLabel' | 'title'> & {
     image?: QRCodeCanvasImageOptions;
   };
 export type QRCodeCanvasOptions = QRCodeOptions<QRCodeCanvasRendererOptions>;
@@ -22,24 +23,44 @@ export type QRCodeCanvasOptions = QRCodeOptions<QRCodeCanvasRendererOptions>;
 export function QRCodeCanvasRenderer(
   options?: QRCodeCanvasRendererOptions,
 ): QRCodeRenderer<HTMLCanvasElement> {
-  let resolvedStyling: ReturnType<typeof ɵparseQRCodeStylingOptions> | undefined;
+  let resolvedOptions:
+    | {
+        styling: ReturnType<typeof ɵparseQRCodeStylingOptions>;
+        image: QRCodeCanvasImageOptions | undefined;
+        ariaLabel: string | undefined;
+        title: string | undefined;
+      }
+    | undefined;
 
   return (matrix: QRCodeMatrix) => {
-    const styling = (resolvedStyling ??= ɵparseQRCodeStylingOptions(options));
+    const resolved = (resolvedOptions ??= {
+      styling: ɵparseQRCodeStylingOptions(options),
+      image: options?.image ? {...options.image} : undefined,
+      ariaLabel: options?.ariaLabel,
+      title: options?.title,
+    });
+    const styling = resolved.styling;
     const plan = ɵcreateQRCodeStylePlan(matrix, styling);
-    const image = ɵresolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
+    const image = ɵresolveQRCodeImageOverlay(plan.moduleCount, styling.margin, resolved.image);
     const scale = plan.renderedSize / plan.viewSize;
     const canvas = document.createElement('canvas');
     canvas.width = plan.renderedSize;
     canvas.height = plan.renderedSize;
-    if (options?.ariaLabel?.trim()) {
+    const accessibleName = resolved.ariaLabel?.trim() || resolved.title?.trim();
+    if (accessibleName) {
       canvas.setAttribute('role', 'img');
-      canvas.setAttribute('aria-label', options.ariaLabel);
+      canvas.setAttribute('aria-label', accessibleName);
+      if (resolved.title !== undefined) canvas.title = resolved.title;
+    } else {
+      canvas.setAttribute('aria-hidden', 'true');
     }
 
     const context = canvas.getContext('2d', {alpha: false});
     if (!context) {
-      throw new Error('Canvas QR code renderer requires a 2D canvas context');
+      throw new QRCodeError(
+        'RENDER_FAILED',
+        'Canvas QR code renderer requires a 2D canvas context',
+      );
     }
 
     context.fillStyle = plan.backgroundColor;
@@ -97,7 +118,10 @@ function getCanvasImageSourceSize(source: CanvasImageSource): CanvasImageSourceD
   const candidate = source as unknown as Record<string, unknown>;
 
   if (candidate['complete'] === false) {
-    throw new Error('QR code canvas image source must be loaded before rendering');
+    throw new QRCodeError(
+      'INVALID_IMAGE_SOURCE',
+      'QR code canvas image source must be loaded before rendering',
+    );
   }
 
   for (const [widthKey, heightKey] of CANVAS_IMAGE_DIMENSION_PAIRS) {
@@ -106,7 +130,8 @@ function getCanvasImageSourceSize(source: CanvasImageSource): CanvasImageSourceD
     if (typeof width !== 'number' || typeof height !== 'number') continue;
     if (width > 0 && height > 0) return {width, height};
 
-    throw new Error(
+    throw new QRCodeError(
+      'INVALID_IMAGE_SOURCE',
       'QR code canvas image source must have positive intrinsic dimensions before rendering',
     );
   }
@@ -117,12 +142,16 @@ function getCanvasImageSourceSize(source: CanvasImageSource): CanvasImageSourceD
     if (width !== undefined && height !== undefined && width > 0 && height > 0) {
       return {width, height};
     }
-    throw new Error(
+    throw new QRCodeError(
+      'INVALID_IMAGE_SOURCE',
       'QR code canvas image source must have positive intrinsic dimensions before rendering',
     );
   }
 
-  throw new Error('QR code canvas image source must expose intrinsic dimensions before rendering');
+  throw new QRCodeError(
+    'INVALID_IMAGE_SOURCE',
+    'QR code canvas image source must expose intrinsic dimensions before rendering',
+  );
 }
 
 function getSVGAnimatedLength(value: unknown): number | undefined {

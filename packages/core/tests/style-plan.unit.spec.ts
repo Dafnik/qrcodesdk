@@ -188,7 +188,7 @@ function modulePrimitives(matrix: QRCodeMatrix, type: QRCodeDotType) {
     .primitives as readonly ɵQRCodeModuleStylePrimitive[];
 }
 
-function createFinderMatrix(size = 21): QRCodeMatrix {
+function createFinderMatrix(size = 21): Array<Array<0 | 1>> {
   const matrix = Array.from({length: size}, () => Array<0 | 1>(size).fill(0));
   for (const [originRow, originColumn] of [
     [0, 0],

@@ -33,6 +33,12 @@ export type {
   QRCodeStylingOptions,
   QRCodeVersion,
 } from './types';
+export {
+  type QRCodeErrorCode,
+  type QRCodeErrorOptions,
+  QR_CODE_ERROR_CODES,
+  QRCodeError,
+} from './error';
 export {type QRCodeTextRendererOptions, QRCodeTextRenderer} from './text';
 export {
   type QRCodeDataImageURL,
@@ -58,6 +64,19 @@ export {
 export {createQRCodeStylePlan as ɵcreateQRCodeStylePlan} from './style-plan';
 export {resolveQRCodeImageOverlay as ɵresolveQRCodeImageOverlay} from './image-overlay';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';
+export {
+  emailPayload,
+  geoPayload,
+  phonePayload,
+  smsPayload,
+  wifiPayload,
+  type QRCodeEmailPayload,
+  type QRCodeGeoPayload,
+  type QRCodePhonePayload,
+  type QRCodeSMSPayload,
+  type QRCodeWiFiEncryption,
+  type QRCodeWiFiPayload,
+} from './payload';
 export {ECC_LEVELS as ɵECC_LEVELS} from './matrix/error-correction';
 export {MODES as ɵMODES} from './matrix/mode';
 export {generateQRCodeMatrixWithMetadata as ɵgenerateQRCodeMatrixWithMetadata} from './matrix/generate-qrcode-matrix';

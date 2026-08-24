@@ -81,6 +81,17 @@ describe('Vue QR code components', () => {
     expect(canvas.height).toBe(46);
   });
 
+  test('renders decorative defaults and labeled Canvas output', () => {
+    const svg = mount(QRCodeSVG, {props: {data: 'DECORATIVE'}});
+    const canvas = mount(QRCodeCanvas, {
+      props: {data: 'LABELED', options: {title: 'Scan this code'}},
+    }).get('canvas');
+
+    expect(svg.get('svg').attributes('aria-hidden')).toBe('true');
+    expect(canvas.attributes('role')).toBe('img');
+    expect(canvas.attributes('aria-label')).toBe('Scan this code');
+  });
+
   test('passes styled options through SVG, image, and canvas components', () => {
     const styledOptions = {
       size: 2,

@@ -42,6 +42,8 @@ function createRuntime(): CliRuntime & {
   return {
     stdout: stdout.target,
     stderr: stderr.target,
+    stdoutIsTTY: true,
+    environment: {},
     interactive: false,
     async writeFile(path, data) {
       files.push({path, data});
@@ -85,6 +87,34 @@ describe('runCli', () => {
     await expect(runCli(['--input', 'HELLO WORLD'], runtime)).resolves.toBe(0);
 
     expect(runtime.stdoutText()).toContain('\u001b[38;2;0;0;0m');
+  });
+
+  test('disables ANSI when stdout is not a TTY', async () => {
+    const runtime = {...createRuntime(), stdoutIsTTY: false};
+
+    await expect(runCli(['HELLO WORLD'], runtime)).resolves.toBe(0);
+
+    expect(runtime.stdoutText()).not.toContain('\u001b[');
+  });
+
+  test('disables ANSI when NO_COLOR is present', async () => {
+    const runtime = {...createRuntime(), environment: {NO_COLOR: ''}};
+
+    await expect(runCli(['HELLO WORLD'], runtime)).resolves.toBe(0);
+
+    expect(runtime.stdoutText()).not.toContain('\u001b[');
+  });
+
+  test.each([
+    {args: ['--ansi-colors', 'true'], stdoutIsTTY: false, environment: {}},
+    {args: ['--ansi-colors', 'true'], stdoutIsTTY: true, environment: {NO_COLOR: '1'}},
+    {args: ['--only-ansi-colors'], stdoutIsTTY: false, environment: {NO_COLOR: '1'}},
+  ])('lets explicit ANSI flags override the output environment', async (configuration) => {
+    const runtime = {...createRuntime(), ...configuration};
+
+    await expect(runCli(['HELLO WORLD', ...configuration.args], runtime)).resolves.toBe(0);
+
+    expect(runtime.stdoutText()).toContain('\u001b[');
   });
 
   test.each([

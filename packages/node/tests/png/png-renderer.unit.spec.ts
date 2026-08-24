@@ -202,6 +202,33 @@ describe('QRCodePNGRenderer', () => {
     expect(fast.length).not.toBe(compressed.length);
   });
 
+  test('snapshots styling, image, and PNG options on first use', () => {
+    const source = createPreparedImage(1, 1, {red: 255, green: 0, blue: 0, alpha: 255});
+    const options = {
+      size: 2,
+      margin: 0,
+      colors: {colorDark: '#112233' as '#112233' | '#445566'},
+      image: {source, size: 0.2},
+      compressionLevel: 0,
+    };
+    const renderer = QRCodePNGRenderer(options);
+    const first = renderer([[1]]);
+
+    options.size = 4;
+    options.margin = 2;
+    options.colors.colorDark = '#445566';
+    options.image.source = createPreparedImage(1, 1, {
+      red: 0,
+      green: 255,
+      blue: 0,
+      alpha: 255,
+    });
+    options.image.size = 0.8;
+    options.compressionLevel = 9;
+
+    expect(renderer([[1]])).toEqual(first);
+  });
+
   test('renders square feature colors and finder holes without partial coverage', () => {
     const png = readPng(
       qrcode('square png').render(

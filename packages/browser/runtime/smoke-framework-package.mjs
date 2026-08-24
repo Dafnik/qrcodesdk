@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {createReadStream} from 'node:fs';
-import {copyFile, mkdtemp, readdir, rm, stat} from 'node:fs/promises';
+import {copyFile, cp, mkdtemp, readdir, rm, stat} from 'node:fs/promises';
 import {createServer} from 'node:http';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
@@ -53,12 +53,10 @@ try {
   logSuccess('found exactly one packed tarball for each required QRCodeSDK package');
 
   if (framework === 'react') {
-    await run('npm', ['create', 'vite@latest', 'react-consumer', '--', '--template', 'react-ts'], {
-      cwd: temporaryDirectory,
-    });
-    await copyFile(
-      path.join(repositoryDirectory, 'packages', 'react', 'runtime', 'smoke-consumer.tsx'),
-      path.join(consumerDirectory, 'src', 'main.tsx'),
+    await cp(
+      path.join(repositoryDirectory, 'packages', 'react', 'runtime', 'next-app'),
+      consumerDirectory,
+      {recursive: true},
     );
     await run(
       'npm',
@@ -68,6 +66,7 @@ try {
         '--no-audit',
         '--no-fund',
         '--package-lock=false',
+        'next@15.5.23',
         `react@${frameworkVersion}`,
         `react-dom@${frameworkVersion}`,
         ...tarballs,
@@ -186,7 +185,9 @@ try {
   const outputDirectory =
     framework === 'angular'
       ? path.join(consumerDirectory, 'dist', 'angular-consumer', 'browser')
-      : path.join(consumerDirectory, 'dist');
+      : framework === 'react'
+        ? path.join(consumerDirectory, 'out')
+        : path.join(consumerDirectory, 'dist');
   const staticServer = await serve(outputDirectory);
   server = staticServer.server;
   browser = await chromium.launch({headless: true});
@@ -198,6 +199,15 @@ try {
   page.on('console', (message) => {
     if (message.type() === 'error') browserErrors.push(message.text());
   });
+
+  const initialResponse = await globalThis.fetch(staticServer.origin);
+  const initialHTML = await initialResponse.text();
+  if (framework === 'react') {
+    assert.match(initialHTML, /data-testid="qrcode-svg"[^]*<svg/);
+    assert.doesNotMatch(initialHTML, /data-testid="qrcode-image"[^]*<img/);
+    assert.doesNotMatch(initialHTML, /data-testid="qrcode-canvas"[^]*<canvas/);
+    logSuccess('Next.js initial HTML contains SVG markup and permanent image and canvas wrappers');
+  }
 
   await page.goto(staticServer.origin, {waitUntil: 'networkidle'});
   await page.locator('[data-testid="qrcode-svg"] svg').waitFor();

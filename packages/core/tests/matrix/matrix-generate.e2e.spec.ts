@@ -111,6 +111,23 @@ describe('qrcode().matrix()', () => {
     expect(() => qrcode('123456789').render()).toThrow('QRCode: Renderer missing');
   });
 
+  test('caches one matrix for matrix and render calls', () => {
+    const renderedMatrices: unknown[] = [];
+    const builder = qrcode('cached matrix').renderer((matrix) => {
+      renderedMatrices.push(matrix);
+      return matrix;
+    });
+
+    const matrix = builder.matrix();
+
+    expect(builder.matrix()).toBe(matrix);
+    expect(builder.render()).toBe(matrix);
+    expect(builder.render()).toBe(matrix);
+    expect(renderedMatrices).toEqual([matrix, matrix]);
+    expect(builder.data('new data').matrix()).not.toBe(matrix);
+    expect(builder.errorCorrection('H').matrix()).not.toBe(matrix);
+  });
+
   test('builder configuration is immutable and retains the configured renderer', () => {
     const original = qrcode('123').renderer((matrix) => matrix.length);
     const configuredBuilders = [

@@ -79,6 +79,8 @@ type PromptAdapter = {
 export type CliRuntime = {
   readonly stdout?: WritableTarget;
   readonly stderr?: WritableTarget;
+  readonly stdoutIsTTY?: boolean;
+  readonly environment?: Readonly<Record<string, string | undefined>>;
   readonly interactive?: boolean;
   readonly writeFile?: (path: string, data: string | Uint8Array) => Promise<void>;
   readonly prompts?: PromptAdapter;
@@ -143,7 +145,9 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       )
       .option('--size <size>', 'Module size as a positive integer')
       .option('--margin <margin>', 'Margin as a non-negative integer')
-      .addOption(booleanOption('--small <boolean>', 'Pack two QR rows per terminal line', 'small'))
+      .addOption(
+        booleanOption('--small <boolean>', 'Pack two QR rows per terminal line', 'small', true),
+      )
       .option('--no-small', 'Render full-height terminal text')
       .addOption(
         booleanOption(
@@ -184,8 +188,11 @@ async function resolveCliOptions(
   const format = await resolveFormat(rawOptions.format, rawOptions.output, interactive, prompt);
   const output = await resolveOutput(format, rawOptions.output, interactive, prompt);
   const styling = resolveStyling(rawOptions);
-  const ansiColors = rawOptions.ansiColors ?? true;
   const onlyAnsiColors = rawOptions.onlyAnsiColors ?? false;
+  const environment = runtime.environment ?? process.env;
+  const stdoutIsTTY = runtime.stdoutIsTTY ?? process.stdout.isTTY === true;
+  const ansiColors =
+    rawOptions.ansiColors ?? (onlyAnsiColors || (!('NO_COLOR' in environment) && stdoutIsTTY));
 
   if (onlyAnsiColors && !ansiColors) {
     throw new CliError('Cannot combine --only-ansi-colors with --no-ansi-colors.');
@@ -420,11 +427,10 @@ function booleanOption(
   flags: string,
   description: string,
   name: string,
-  defaultValue = true,
+  defaultValue?: boolean,
 ): Option {
-  return new Option(flags, description)
-    .default(defaultValue)
-    .argParser((value) => requiredBoolean(value, name));
+  const option = new Option(flags, description).argParser((value) => requiredBoolean(value, name));
+  return defaultValue === undefined ? option : option.default(defaultValue);
 }
 
 function requiredBoolean(value: string, name: string): boolean {

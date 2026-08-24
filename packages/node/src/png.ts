@@ -2,6 +2,7 @@ import {PNG} from 'pngjs';
 
 import {
   type QRCodeColorHex,
+  QRCodeError,
   type QRCodeImageOverlayOptions,
   type QRCodeMatrix,
   type QRCodeRenderer,
@@ -32,19 +33,27 @@ type CoverageMask = {
 };
 
 export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
-  let resolvedStyling: ReturnType<typeof ɵparseQRCodeStylingOptions> | undefined;
-  let resolvedCompressionLevel: number | undefined;
+  let resolvedOptions:
+    | {
+        styling: ReturnType<typeof ɵparseQRCodeStylingOptions>;
+        image: QRCodePNGImageOptions | undefined;
+        compressionLevel: number;
+      }
+    | undefined;
   let decodedImage: PNG | undefined;
   const coverageMasks = new Map<string, CoverageMask>();
   const colors = new Map<QRCodeColorHex, RGBColor>();
 
   return (matrix: QRCodeMatrix) => {
-    const styling = (resolvedStyling ??= ɵparseQRCodeStylingOptions(options));
-    const compressionLevel = (resolvedCompressionLevel ??= resolveCompressionLevel(
-      options?.compressionLevel,
-    ));
+    const resolved = (resolvedOptions ??= {
+      styling: ɵparseQRCodeStylingOptions(options),
+      image: options?.image ? {...options.image} : undefined,
+      compressionLevel: resolveCompressionLevel(options?.compressionLevel),
+    });
+    const styling = resolved.styling;
+    const compressionLevel = resolved.compressionLevel;
     const plan = ɵcreateQRCodeStylePlan(matrix, styling);
-    const image = ɵresolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
+    const image = ɵresolveQRCodeImageOverlay(plan.moduleCount, styling.margin, resolved.image);
     const scale = plan.renderedSize / plan.viewSize;
     const png = new PNG({width: plan.renderedSize, height: plan.renderedSize});
     const backgroundColor = hexColorToRGB(plan.backgroundColor, colors);
@@ -104,8 +113,10 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
 function resolveCompressionLevel(value: number | undefined): number {
   const compressionLevel = value ?? 9;
   if (!Number.isSafeInteger(compressionLevel) || compressionLevel < 0 || compressionLevel > 9) {
-    throw new Error(
+    throw new QRCodeError(
+      'INVALID_OPTIONS',
       `QR code PNG compressionLevel must be an integer from 0 to 9, received ${String(compressionLevel)}`,
+      {details: {field: 'compressionLevel', value: compressionLevel}},
     );
   }
   return compressionLevel;
@@ -113,13 +124,20 @@ function resolveCompressionLevel(value: number | undefined): number {
 
 function decodeImageSource(source: Buffer): PNG {
   if (!Buffer.isBuffer(source)) {
-    throw new Error('QR code PNG image source must be a Buffer containing PNG bytes');
+    throw new QRCodeError(
+      'INVALID_IMAGE_SOURCE',
+      'QR code PNG image source must be a Buffer containing PNG bytes',
+    );
   }
 
   try {
     return PNG.sync.read(source);
   } catch (error) {
-    throw new Error('QR code PNG image source must contain valid PNG bytes', {cause: error});
+    throw new QRCodeError(
+      'INVALID_IMAGE_SOURCE',
+      'QR code PNG image source must contain valid PNG bytes',
+      {cause: error},
+    );
   }
 }
 

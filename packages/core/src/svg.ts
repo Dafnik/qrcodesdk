@@ -1,3 +1,4 @@
+import {QRCodeError} from './error';
 import {resolveQRCodeImageOverlay} from './image-overlay';
 import {createQRCodeStylePlan} from './style-plan';
 import {parseQRCodeStylingOptions} from './styling';
@@ -21,23 +22,43 @@ export type QRCodeSVGRendererOptions = QRCodeStylingOptions &
 export type QRCodeSVGOptions = QRCodeOptions<QRCodeSVGRendererOptions>;
 
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
-  let resolvedStyling: ReturnType<typeof parseQRCodeStylingOptions> | undefined;
+  let resolvedOptions:
+    | {
+        styling: ReturnType<typeof parseQRCodeStylingOptions>;
+        image: QRCodeSVGImageOptions | undefined;
+        alt: string | undefined;
+        ariaLabel: string | undefined;
+        title: string | undefined;
+      }
+    | undefined;
 
   return (matrix: QRCodeMatrix) => {
-    const styling = (resolvedStyling ??= parseQRCodeStylingOptions(options));
+    const resolved = (resolvedOptions ??= {
+      styling: parseQRCodeStylingOptions(options),
+      image: options?.image ? {...options.image} : undefined,
+      alt: options?.alt,
+      ariaLabel: options?.ariaLabel,
+      title: options?.title,
+    });
+    const styling = resolved.styling;
     const plan = createQRCodeStylePlan(matrix, styling);
-    const image = resolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
+    const image = resolveQRCodeImageOverlay(plan.moduleCount, styling.margin, resolved.image);
     if (image && !isQRCodeDataImageURL(image.source)) {
-      throw new Error('QR code SVG image source must be an embedded data:image URL');
+      throw new QRCodeError(
+        'INVALID_IMAGE_SOURCE',
+        'QR code SVG image source must be an embedded data:image URL',
+        {details: {source: image.source}},
+      );
     }
     const shapeRendering = !plan.hasCurves ? ' shape-rendering="crispEdges"' : '';
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${plan.renderedSize}" height="${plan.renderedSize}" viewBox="0 0 ${plan.viewSize} ${plan.viewSize}" role="img"${shapeRendering}`;
+    const accessibleName = resolved.ariaLabel ?? resolved.alt;
+    const isLabeled = Boolean(accessibleName?.trim() || resolved.title?.trim());
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${plan.renderedSize}" height="${plan.renderedSize}" viewBox="0 0 ${plan.viewSize} ${plan.viewSize}"${isLabeled ? ' role="img"' : ' aria-hidden="true"'}${shapeRendering}`;
 
-    const accessibleName = options?.ariaLabel ?? options?.alt;
     if (accessibleName) svg += ` aria-label="${escapeAttributeValue(accessibleName)}"`;
 
     svg += '>';
-    if (options?.title) svg += `<title>${escapeTextContent(options.title)}</title>`;
+    if (resolved.title) svg += `<title>${escapeTextContent(resolved.title)}</title>`;
     svg += `<path fill="${escapeAttributeValue(plan.backgroundColor)}" d="M0 0h${plan.viewSize}v${plan.viewSize}H0z"/>`;
     const pathsByColor = createPathsByColor(plan.layers);
     for (let index = 0; index < pathsByColor.length; index++) {

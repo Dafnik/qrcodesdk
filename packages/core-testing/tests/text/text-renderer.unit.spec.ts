@@ -163,4 +163,26 @@ describe('QRCodeTextRenderer', () => {
       'QR code colorLight must be a 6-digit hex color',
     );
   });
+
+  test('snapshots all text options on first use', () => {
+    const options = {
+      size: 1,
+      margin: 0,
+      small: false,
+      ansiColors: false,
+      onlyAnsiColors: false,
+      colors: {colorDark: '#112233' as '#112233' | '#445566'},
+    };
+    const renderer = QRCodeTextRenderer(options);
+    const first = renderer([[1]]);
+
+    options.size = 4;
+    options.margin = 3;
+    options.small = true;
+    options.ansiColors = true;
+    options.onlyAnsiColors = true;
+    options.colors.colorDark = '#445566';
+
+    expect(renderer([[1]])).toBe(first);
+  });
 });

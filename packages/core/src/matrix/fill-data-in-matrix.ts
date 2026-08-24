@@ -1,6 +1,5 @@
 import type {
   QRCodeCodewords,
-  QRCodeMatrix,
   QRCodeModule,
   QRCodeMutableMatrix,
   QRCodeReservedMatrix,
@@ -28,7 +27,7 @@ export function fillDataInMatrix(
   reserved: QRCodeReservedMatrix,
   buffer: QRCodeCodewords,
   visitDataModule?: QRCodeDataModuleVisitor,
-): QRCodeMatrix {
+): QRCodeMutableMatrix {
   const n = matrix.length;
   let k = 0,
     dir = -1;
@@ -52,5 +51,5 @@ export function fillDataInMatrix(
     }
     dir = -dir;
   }
-  return matrix as QRCodeMatrix;
+  return matrix;
 }

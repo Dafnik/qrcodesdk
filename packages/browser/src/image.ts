@@ -18,15 +18,21 @@ export function QRCodeImageRenderer(
   options?: QRCodeImageRendererOptions,
 ): QRCodeRenderer<HTMLImageElement> {
   const canvasRenderer = QRCodeCanvasRenderer(options);
+  let resolvedAccessibility: Required<QRCodeAccessibilityOptions> | undefined;
 
   return (matrix: QRCodeMatrix) => {
+    const accessibility = (resolvedAccessibility ??= {
+      alt: options?.alt ?? '',
+      ariaLabel: options?.ariaLabel ?? '',
+      title: options?.title ?? '',
+    });
     const canvas = canvasRenderer(matrix);
     const image = document.createElement('img');
 
     image.src = canvas.toDataURL('image/png');
     image.width = canvas.width;
     image.height = canvas.height;
-    applyAccessibilityAttributes(image, options);
+    applyAccessibilityAttributes(image, accessibility);
 
     return image;
   };
@@ -44,9 +50,9 @@ export function QRCodeDownloadImageRenderer(
 
 function applyAccessibilityAttributes(
   image: HTMLImageElement,
-  options: QRCodeAccessibilityOptions | undefined,
+  options: Required<QRCodeAccessibilityOptions>,
 ): void {
-  image.alt = options?.alt ?? '';
-  if (options?.ariaLabel !== undefined) image.setAttribute('aria-label', options.ariaLabel);
-  if (options?.title !== undefined) image.title = options.title;
+  image.alt = options.alt;
+  if (options.ariaLabel) image.setAttribute('aria-label', options.ariaLabel);
+  if (options.title) image.title = options.title;
 }

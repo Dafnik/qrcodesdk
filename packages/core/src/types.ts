@@ -1,7 +1,7 @@
 export type QRCodeInputData = string | number;
 
 export type QRCodeModule = 0 | 1;
-export type QRCodeMatrix = QRCodeModule[][];
+export type QRCodeMatrix = readonly (readonly QRCodeModule[])[];
 export type QRCodeMutableMatrix = QRCodeModule[][];
 export type QRCodeReservedMatrix = QRCodeModule[][];
 

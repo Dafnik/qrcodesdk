@@ -11,7 +11,7 @@ import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
 
 export const QRCodeImage = forwardRef<QRCodeDownloadHandle, QRCodeImageProps>(function QRCodeImage(
-  {data, options, className},
+  {data, options, ...wrapperProps},
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,5 +41,5 @@ export const QRCodeImage = forwardRef<QRCodeDownloadHandle, QRCodeImageProps>(fu
     [data, imageRenderer, options],
   );
 
-  return <div className={className} ref={containerRef} />;
+  return <div {...wrapperProps} ref={containerRef} />;
 });
