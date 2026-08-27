@@ -239,7 +239,7 @@ describe('QRCodeCanvasRenderer', () => {
     };
     const plan = ɵcreateQRCodeStylePlan(matrix, ɵparseQRCodeStylingOptions(options));
     const canvas = QRCodeCanvasRenderer(options)(matrix);
-    const dataModule = plan.primitives.find(({role}) => role === 'dots')!;
+    const dataModule = plan.layers.find(({color}) => color === '#112233')!.curvedPrimitives[0]!;
 
     expectPixel(canvas, (dataModule.x + 0.5) * 8, (dataModule.y + 0.5) * 8, {
       red: 17,

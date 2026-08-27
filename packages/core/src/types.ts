@@ -200,7 +200,6 @@ export type ɵQRCodeStylePlan = {
   renderedSize: number;
   backgroundColor: QRCodeColorHex;
   hasCurves: boolean;
-  primitives: readonly ɵQRCodeStylePrimitive[];
   layers: readonly ɵQRCodeStyleLayer[];
 };
 

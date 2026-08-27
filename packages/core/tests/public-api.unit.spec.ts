@@ -167,7 +167,9 @@ describe('public API types', () => {
     >();
     expectTypeOf<ɵQRCodeStylePlan['layers'][number]>().toEqualTypeOf<ɵQRCodeStyleLayer>();
     expectTypeOf<ɵQRCodeStyleLayer['rectangles'][number]>().toEqualTypeOf<ɵQRCodeStyleRectangle>();
-    expectTypeOf<ɵQRCodeStylePlan['primitives'][number]>().toEqualTypeOf<ɵQRCodeStylePrimitive>();
+    expectTypeOf<
+      ɵQRCodeStyleLayer['curvedPrimitives'][number]
+    >().toEqualTypeOf<ɵQRCodeStylePrimitive>();
     expectTypeOf<
       Extract<ɵQRCodeStylePrimitive, {kind: 'module'}>
     >().toEqualTypeOf<ɵQRCodeModuleStylePrimitive>();

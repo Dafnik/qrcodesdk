@@ -1,5 +1,7 @@
 ## Development
 
+You (the Agent) can make breaking changes. The project is currently in active development.
+
 Run all tasks and commands through Turbo from the workspace root so that dependencies are built in
 the correct order:
 

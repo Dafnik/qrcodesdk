@@ -121,43 +121,6 @@ function createPathsByColor(layers: readonly ɵQRCodeStyleLayer[]): SVGPathByCol
   return paths;
 }
 
-type LocalPathCommand =
-  | readonly ['M' | 'L', number, number]
-  | readonly ['A', number, 0 | 1, number, number]
-  | readonly ['Z'];
-
-const SIDE_ROUNDED_COMMANDS = [
-  ['M', 0, 0],
-  ['L', 0, 1],
-  ['L', 0.5, 1],
-  ['A', 0.5, 0, 0.5, 0],
-  ['Z'],
-] as const satisfies readonly LocalPathCommand[];
-const CORNER_ROUNDED_COMMANDS = [
-  ['M', 0, 0],
-  ['L', 0, 1],
-  ['L', 1, 1],
-  ['L', 1, 0.5],
-  ['A', 0.5, 0, 0.5, 0],
-  ['Z'],
-] as const satisfies readonly LocalPathCommand[];
-const CORNER_EXTRA_ROUNDED_COMMANDS = [
-  ['M', 0, 0],
-  ['L', 0, 1],
-  ['L', 1, 1],
-  ['A', 1, 0, 0, 0],
-  ['Z'],
-] as const satisfies readonly LocalPathCommand[];
-const OPPOSITE_CORNERS_ROUNDED_COMMANDS = [
-  ['M', 0, 0],
-  ['L', 0, 0.5],
-  ['A', 0.5, 0, 0.5, 1],
-  ['L', 1, 1],
-  ['L', 1, 0.5],
-  ['A', 0.5, 0, 0.5, 0],
-  ['Z'],
-] as const satisfies readonly LocalPathCommand[];
-
 function primitiveToPath(primitive: ɵQRCodeStylePrimitive): string {
   if (primitive.kind === 'finder-ring') {
     return primitive.shape === 'dot'
@@ -184,63 +147,69 @@ function primitiveToPath(primitive: ɵQRCodeStylePrimitive): string {
     case 'dot':
       return circlePath(primitive, primitive.size / 2);
     case 'side-rounded':
-      return localPath(primitive, SIDE_ROUNDED_COMMANDS);
+      return `M${localPoint(primitive, 0, 0)}L${localPoint(primitive, 0, 1)}L${localPoint(
+        primitive,
+        0.5,
+        1,
+      )}${localArc(primitive, 0.5, 0, 0.5, 0)}Z`;
     case 'corner-rounded':
-      return localPath(primitive, CORNER_ROUNDED_COMMANDS);
+      return `M${localPoint(primitive, 0, 0)}L${localPoint(primitive, 0, 1)}L${localPoint(
+        primitive,
+        1,
+        1,
+      )}L${localPoint(primitive, 1, 0.5)}${localArc(primitive, 0.5, 0, 0.5, 0)}Z`;
     case 'corner-extra-rounded':
-      return localPath(primitive, CORNER_EXTRA_ROUNDED_COMMANDS);
+      return `M${localPoint(primitive, 0, 0)}L${localPoint(primitive, 0, 1)}L${localPoint(
+        primitive,
+        1,
+        1,
+      )}${localArc(primitive, 1, 0, 0, 0)}Z`;
     case 'opposite-corners-rounded':
-      return localPath(primitive, OPPOSITE_CORNERS_ROUNDED_COMMANDS);
+      return `M${localPoint(primitive, 0, 0)}L${localPoint(
+        primitive,
+        0,
+        0.5,
+      )}${localArc(primitive, 0.5, 0, 0.5, 1)}L${localPoint(
+        primitive,
+        1,
+        1,
+      )}L${localPoint(primitive, 1, 0.5)}${localArc(primitive, 0.5, 0, 0.5, 0)}Z`;
     default:
       return roundedSquarePath(primitive, 0);
   }
 }
 
-function localPath(
-  primitive: ɵQRCodeStylePrimitive,
-  commands: readonly LocalPathCommand[],
-): string {
-  let path = '';
-  for (let index = 0; index < commands.length; index++) {
-    const command = commands[index]!;
-    if (command[0] === 'Z') {
-      path += 'Z';
-      continue;
+function localPoint(primitive: ɵQRCodeStylePrimitive, x: number, y: number): string {
+  switch (primitive.rotation) {
+    case 90: {
+      const previousX = x;
+      x = 1 - y;
+      y = previousX;
+      break;
     }
-
-    const pointX = command[0] === 'A' ? command[3] : command[1];
-    const pointY = command[0] === 'A' ? command[4] : command[2];
-    let rotatedX: number;
-    let rotatedY: number;
-    switch (primitive.rotation) {
-      case 90:
-        rotatedX = 1 - pointY;
-        rotatedY = pointX;
-        break;
-      case 180:
-        rotatedX = 1 - pointX;
-        rotatedY = 1 - pointY;
-        break;
-      case 270:
-        rotatedX = pointY;
-        rotatedY = 1 - pointX;
-        break;
-      default:
-        rotatedX = pointX;
-        rotatedY = pointY;
-    }
-    const x = primitive.x + rotatedX * primitive.size;
-    const y = primitive.y + rotatedY * primitive.size;
-
-    if (command[0] === 'A') {
-      path += `A${formatNumber(command[1] * primitive.size)} ${formatNumber(
-        command[1] * primitive.size,
-      )} 0 ${command[2]} 0 ${formatPoint(x, y)}`;
-    } else {
-      path += `${command[0]}${formatPoint(x, y)}`;
+    case 180:
+      x = 1 - x;
+      y = 1 - y;
+      break;
+    case 270: {
+      const previousX = x;
+      x = y;
+      y = 1 - previousX;
+      break;
     }
   }
-  return path;
+  return formatPoint(primitive.x + x * primitive.size, primitive.y + y * primitive.size);
+}
+
+function localArc(
+  primitive: ɵQRCodeStylePrimitive,
+  radius: number,
+  largeArc: 0 | 1,
+  x: number,
+  y: number,
+): string {
+  const scaledRadius = formatNumber(radius * primitive.size);
+  return `A${scaledRadius} ${scaledRadius} 0 ${largeArc} 0 ${localPoint(primitive, x, y)}`;
 }
 
 function circlePath(primitive: ɵQRCodeStylePrimitive, radius: number): string {

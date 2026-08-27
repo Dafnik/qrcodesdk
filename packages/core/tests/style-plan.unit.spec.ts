@@ -5,15 +5,23 @@ import {
   type QRCodeMatrix,
   ɵcreateQRCodeStylePlan as createQRCodeStylePlan,
   ɵparseQRCodeStylingOptions as parseQRCodeStylingOptions,
-  type ɵQRCodeModuleStylePrimitive,
 } from '../src';
 
 describe('createQRCodeStylePlan', () => {
-  test('creates resolved default primitives in module coordinates', () => {
+  test('creates resolved default layers in module coordinates', () => {
     const matrix = createFinderMatrix();
     matrix[10]![10] = 1;
 
-    const plan = createQRCodeStylePlan(matrix, parseQRCodeStylingOptions({size: 2, margin: 1}));
+    const plan = createQRCodeStylePlan(
+      matrix,
+      parseQRCodeStylingOptions({
+        size: 2,
+        margin: 1,
+        dotsOptions: {color: '#111111'},
+        cornersSquareOptions: {color: '#222222'},
+        cornersDotOptions: {color: '#333333'},
+      }),
+    );
 
     expect(plan).toMatchObject({
       moduleCount: 21,
@@ -22,10 +30,10 @@ describe('createQRCodeStylePlan', () => {
       backgroundColor: '#ffffff',
       hasCurves: false,
     });
-    expect(plan.primitives.filter(({role}) => role === 'dots')).toHaveLength(1);
-    expect(plan.primitives.filter(({kind}) => kind === 'finder-ring')).toHaveLength(3);
-    expect(plan.primitives.filter(({kind}) => kind === 'finder-center')).toHaveLength(3);
-    expect(plan.primitives[0]).toMatchObject({x: 11, y: 11, shape: 'square'});
+    expect(countLayerModules(plan.layers.find(({color}) => color === '#111111')!)).toBe(1);
+    expect(countLayerModules(plan.layers.find(({color}) => color === '#222222')!)).toBe(72);
+    expect(countLayerModules(plan.layers.find(({color}) => color === '#333333')!)).toBe(27);
+    expect(plan.layers[0]!.rectangles[0]).toMatchObject({x: 11, y: 11});
   });
 
   test('compacts square modules into renderer-ready rectangles', () => {
@@ -52,20 +60,30 @@ describe('createQRCodeStylePlan', () => {
     matrix[1]![15] = 1;
     matrix[15]![1] = 1;
 
-    const plan = createQRCodeStylePlan(matrix, parseQRCodeStylingOptions());
-
-    expect(plan.primitives.every(({kind, role}) => kind === 'module' && role === 'dots')).toBe(
-      true,
+    const plan = createQRCodeStylePlan(
+      matrix,
+      parseQRCodeStylingOptions({
+        cornersSquareOptions: {color: '#222222'},
+        cornersDotOptions: {color: '#333333'},
+      }),
     );
+
+    expect(plan.layers.map(({color}) => color)).toEqual(['#000000']);
   });
 
   test('recognizes canonical finder regions in any square matrix of at least 21 modules', () => {
     const matrix = createFinderMatrix(22);
 
-    const plan = createQRCodeStylePlan(matrix, parseQRCodeStylingOptions());
+    const plan = createQRCodeStylePlan(
+      matrix,
+      parseQRCodeStylingOptions({
+        cornersSquareOptions: {color: '#222222'},
+        cornersDotOptions: {color: '#333333'},
+      }),
+    );
 
-    expect(plan.primitives.filter(({kind}) => kind === 'finder-ring')).toHaveLength(3);
-    expect(plan.primitives.filter(({kind}) => kind === 'finder-center')).toHaveLength(3);
+    expect(countLayerModules(plan.layers.find(({color}) => color === '#222222')!)).toBe(72);
+    expect(countLayerModules(plan.layers.find(({color}) => color === '#333333')!)).toBe(27);
   });
 
   test.each([
@@ -76,16 +94,16 @@ describe('createQRCodeStylePlan', () => {
     ['dots', 'dot'],
     ['square', 'square'],
   ] as const)('resolves isolated %s modules to %s', (type, shape) => {
-    expect(modulePrimitives([[1]], type)[0]).toMatchObject({shape});
+    expect(renderedModules([[1]], type)[0]).toMatchObject({shape});
   });
 
   test('resolves neighbor-aware ends, corners, and dense modules', () => {
-    expect(modulePrimitives([[1, 1]], 'rounded')[0]).toMatchObject({
+    expect(renderedModules([[1, 1]], 'rounded')[0]).toMatchObject({
       shape: 'side-rounded',
       rotation: 180,
     });
     expect(
-      modulePrimitives(
+      renderedModules(
         [
           [1, 1],
           [1, 0],
@@ -94,7 +112,7 @@ describe('createQRCodeStylePlan', () => {
       )[0],
     ).toMatchObject({shape: 'corner-rounded', rotation: 270});
     expect(
-      modulePrimitives(
+      renderedModules(
         [
           [1, 1],
           [1, 0],
@@ -103,7 +121,7 @@ describe('createQRCodeStylePlan', () => {
       )[0],
     ).toMatchObject({shape: 'corner-extra-rounded', rotation: 270});
     expect(
-      modulePrimitives(
+      renderedModules(
         [
           [0, 1, 0],
           [1, 1, 1],
@@ -154,7 +172,7 @@ describe('createQRCodeStylePlan', () => {
   ] satisfies readonly (readonly [QRCodeDotType, string, QRCodeMatrix])[])(
     'keeps %s modules square with %s neighbors',
     (type, _neighbors, matrix) => {
-      expect(modulePrimitives(matrix, type)[1]).toMatchObject({shape: 'square', rotation: 0});
+      expect(renderedModules(matrix, type)[1]).toMatchObject({shape: 'square', rotation: 0});
     },
   );
 
@@ -163,29 +181,52 @@ describe('createQRCodeStylePlan', () => {
     const whole = createQRCodeStylePlan(
       matrix,
       parseQRCodeStylingOptions({
-        cornersSquareOptions: {type: 'extra-rounded'},
-        cornersDotOptions: {type: 'dot'},
+        cornersSquareOptions: {color: '#222222', type: 'extra-rounded'},
+        cornersDotOptions: {color: '#333333', type: 'dot'},
       }),
     );
     const modular = createQRCodeStylePlan(
       matrix,
       parseQRCodeStylingOptions({
-        cornersSquareOptions: {type: 'classy'},
-        cornersDotOptions: {type: 'rounded'},
+        cornersSquareOptions: {color: '#222222', type: 'classy'},
+        cornersDotOptions: {color: '#333333', type: 'rounded'},
       }),
     );
 
-    expect(whole.primitives.filter(({kind}) => kind === 'finder-ring')).toHaveLength(3);
-    expect(whole.primitives.filter(({kind}) => kind === 'finder-center')).toHaveLength(3);
-    expect(modular.primitives.filter(({role}) => role === 'cornersSquare')).toHaveLength(72);
-    expect(modular.primitives.filter(({role}) => role === 'cornersDot')).toHaveLength(27);
+    expect(whole.layers.find(({color}) => color === '#222222')!.curvedPrimitives).toHaveLength(3);
+    expect(whole.layers.find(({color}) => color === '#333333')!.curvedPrimitives).toHaveLength(3);
+    expect(countLayerModules(modular.layers.find(({color}) => color === '#222222')!)).toBe(72);
+    expect(countLayerModules(modular.layers.find(({color}) => color === '#333333')!)).toBe(27);
     expect(modular.hasCurves).toBe(true);
   });
 });
 
-function modulePrimitives(matrix: QRCodeMatrix, type: QRCodeDotType) {
-  return createQRCodeStylePlan(matrix, parseQRCodeStylingOptions({dotsOptions: {type}}))
-    .primitives as readonly ɵQRCodeModuleStylePrimitive[];
+function renderedModules(matrix: QRCodeMatrix, type: QRCodeDotType) {
+  const layer = createQRCodeStylePlan(
+    matrix,
+    parseQRCodeStylingOptions({margin: 0, dotsOptions: {type}}),
+  ).layers[0]!;
+  const modules = layer.curvedPrimitives.map(({shape, rotation, x, y}) => ({
+    shape,
+    rotation,
+    x,
+    y,
+  }));
+  for (const rectangle of layer.rectangles) {
+    for (let y = rectangle.y; y < rectangle.y + rectangle.height; y++) {
+      for (let x = rectangle.x; x < rectangle.x + rectangle.width; x++) {
+        modules.push({shape: 'square', rotation: 0, x, y});
+      }
+    }
+  }
+  return modules.sort((first, second) => first.y - second.y || first.x - second.x);
+}
+
+function countLayerModules(layer: ReturnType<typeof createQRCodeStylePlan>['layers'][number]) {
+  return (
+    layer.curvedPrimitives.length +
+    layer.rectangles.reduce((total, rectangle) => total + rectangle.width * rectangle.height, 0)
+  );
 }
 
 function createFinderMatrix(size = 21): Array<Array<0 | 1>> {

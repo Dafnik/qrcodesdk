@@ -1,6 +1,6 @@
 import type {QRCodeVersion} from '../types';
 import {needsVersionInfo} from './needs-version-info';
-import {VERSIONS} from './version-config';
+import {getAlignmentPatternCount} from './version-config';
 
 /**
  * Returns the number of bits available for code words in a given version.
@@ -42,14 +42,13 @@ export function getNumberOfAvailableBitsByVersion(version: QRCodeVersion): numbe
    *   if any, but 10m-20 (= 2(m-2)x5) of them overlaps with
    *   timing patterns.
    */
-  const v = VERSIONS[version] ?? [[-100]];
-  const alignmentPatterns = v[2]!;
+  const alignmentPatternCount = getAlignmentPatternCount(version);
   let numberOfBits = 16 * version * version + 128 * version + 64; // finder, timing and format info.
   if (needsVersionInfo(version)) numberOfBits -= 36; // version information
-  if (alignmentPatterns.length) {
+  if (alignmentPatternCount > 0) {
     // alignment patterns
     numberOfBits -=
-      25 * alignmentPatterns.length * alignmentPatterns.length - 10 * alignmentPatterns.length - 55;
+      25 * alignmentPatternCount * alignmentPatternCount - 10 * alignmentPatternCount - 55;
   }
   return numberOfBits;
 }

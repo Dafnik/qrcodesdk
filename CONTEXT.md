@@ -112,3 +112,13 @@ _Avoid_: Public API, unrestricted private implementation
 The likelihood that a rendered QR code can be decoded in its final medium and conditions. Valid
 customization does not guarantee scan reliability; the developer must test the final artifact.
 _Avoid_: Scan safety, decoding guarantee
+
+**Published package size**:
+The compressed and unpacked byte size of every file shipped in one registry package. It includes
+runtime JavaScript, type declarations, source maps, documentation, licenses, and package metadata.
+_Avoid_: Bundle size, runtime size
+
+**Consumer bundle size**:
+The bytes retained for one documented import and usage scenario after a production bundler applies
+tree shaking and minification. It depends on the selected API and does not describe install size.
+_Avoid_: Package size, entry-point size

@@ -264,7 +264,7 @@ describe('QRCodePNGRenderer', () => {
     };
     const plan = ɵcreateQRCodeStylePlan(matrix, ɵparseQRCodeStylingOptions(options));
     const png = readPng(QRCodePNGRenderer(options)(matrix));
-    const dataModule = plan.primitives.find(({role}) => role === 'dots')!;
+    const dataModule = plan.layers.find(({color}) => color === '#112233')!.curvedPrimitives[0]!;
 
     expectPixel(png, (dataModule.x + 0.5) * 8, (dataModule.y + 0.5) * 8, {
       red: 17,

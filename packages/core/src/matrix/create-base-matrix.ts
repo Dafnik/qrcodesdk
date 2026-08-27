@@ -8,7 +8,7 @@ import type {
 import {augmentBCH} from './augment-bch';
 import {getSizeByVersion} from './get-size-by-version';
 import {needsVersionInfo} from './needs-version-info';
-import {VERSIONS} from './version-config';
+import {getAlignmentPatternPositions} from './version-config';
 
 type QRCodeMatrixBuildState = {
   matrix: QRCodeMutableMatrix;
@@ -28,8 +28,7 @@ type QRCodeMatrixBuildState = {
  * @returns {QRCodeMatrixBuildState} The base matrix and the reserved portion matrix.
  */
 export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState {
-  const v = VERSIONS[version] ?? [[-100]],
-    sizeOfVersion = getSizeByVersion(version),
+  const sizeOfVersion = getSizeByVersion(version),
     matrix: QRCodeMutableMatrix = [],
     reserved: QRCodeReservedMatrix = [];
 
@@ -62,7 +61,7 @@ export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState
   }
 
   // alignment patterns
-  const alignmentPatterns = v[2]!,
+  const alignmentPatterns = getAlignmentPatternPositions(version),
     m = alignmentPatterns.length;
 
   for (let i = 0; i < m; i++) {

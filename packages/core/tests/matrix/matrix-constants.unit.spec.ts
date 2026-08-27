@@ -1,5 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
+import type {QRCodeVersion} from '../../src';
 import {
   ECC_LEVELS_MAP,
   ECC_LEVEL_H,
@@ -18,6 +19,53 @@ import {
   getAlphanumericMap,
   getModeDefinition,
 } from '../../src/matrix/mode';
+import {
+  getAlignmentPatternCount,
+  getAlignmentPatternPositions,
+} from '../../src/matrix/version-config';
+
+const EXPECTED_ALIGNMENT_PATTERN_POSITIONS = [
+  [],
+  [4, 16],
+  [4, 20],
+  [4, 24],
+  [4, 28],
+  [4, 32],
+  [4, 20, 36],
+  [4, 22, 40],
+  [4, 24, 44],
+  [4, 26, 48],
+  [4, 28, 52],
+  [4, 30, 56],
+  [4, 32, 60],
+  [4, 24, 44, 64],
+  [4, 24, 46, 68],
+  [4, 24, 48, 72],
+  [4, 28, 52, 76],
+  [4, 28, 54, 80],
+  [4, 28, 56, 84],
+  [4, 32, 60, 88],
+  [4, 26, 48, 70, 92],
+  [4, 24, 48, 72, 96],
+  [4, 28, 52, 76, 100],
+  [4, 26, 52, 78, 104],
+  [4, 30, 56, 82, 108],
+  [4, 28, 56, 84, 112],
+  [4, 32, 60, 88, 116],
+  [4, 24, 48, 72, 96, 120],
+  [4, 28, 52, 76, 100, 124],
+  [4, 24, 50, 76, 102, 128],
+  [4, 28, 54, 80, 106, 132],
+  [4, 32, 58, 84, 110, 136],
+  [4, 28, 56, 84, 112, 140],
+  [4, 32, 60, 88, 116, 144],
+  [4, 28, 52, 76, 100, 124, 148],
+  [4, 22, 48, 74, 100, 126, 152],
+  [4, 26, 52, 78, 104, 130, 156],
+  [4, 30, 56, 82, 108, 134, 160],
+  [4, 24, 52, 80, 108, 136, 164],
+  [4, 28, 56, 84, 112, 140, 168],
+] as const;
 
 describe('matrix constants', () => {
   test('exposes QR mode and ECC maps', () => {
@@ -96,5 +144,17 @@ describe('matrix constants', () => {
       [true, true, true, true, false],
       [true, false, false, false, true],
     ]);
+  });
+
+  test('derives every alignment pattern position from the QR version', () => {
+    for (let version = 1; version <= 40; version++) {
+      const qrVersion = version as QRCodeVersion;
+      expect(getAlignmentPatternPositions(qrVersion)).toEqual(
+        EXPECTED_ALIGNMENT_PATTERN_POSITIONS[version - 1],
+      );
+      expect(getAlignmentPatternCount(qrVersion)).toBe(
+        EXPECTED_ALIGNMENT_PATTERN_POSITIONS[version - 1]!.length,
+      );
+    }
   });
 });
