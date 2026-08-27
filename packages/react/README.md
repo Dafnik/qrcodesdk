@@ -176,7 +176,7 @@ export default function QRCodeDownloadImageExample() {
   const options = useMemo<QRCodeImageOptions>(() => ({alt: 'QR code for qrcodesdk.dev'}), []);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-2">
       <QRCodeImage data="https://qrcodesdk.dev" options={options} ref={qrcode} />
       <button
         className="btn-primary"
