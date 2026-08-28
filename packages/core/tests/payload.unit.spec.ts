@@ -33,6 +33,7 @@ describe('payload serializers', () => {
     expect(geoPayload({latitude: 48.2, longitude: 16.3, altitude: 183, uncertainty: 10})).toBe(
       'geo:48.2,16.3,183;u=10',
     );
+    expect(geoPayload({latitude: 1e-7, longitude: 0})).toBe('geo:0.0000001,0');
   });
 
   test('serializes escaped Wi-Fi payloads with useful encryption defaults', () => {

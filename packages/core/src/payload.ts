@@ -81,8 +81,9 @@ export function geoPayload(value: QRCodeGeoPayload): string {
 
   const coordinates = [value.latitude, value.longitude, value.altitude]
     .filter((coordinate): coordinate is number => coordinate !== undefined)
+    .map(formatDecimalLiteral)
     .join(',');
-  return `geo:${coordinates}${value.uncertainty === undefined ? '' : `;u=${value.uncertainty}`}`;
+  return `geo:${coordinates}${value.uncertainty === undefined ? '' : `;u=${formatDecimalLiteral(value.uncertainty)}`}`;
 }
 
 export function wifiPayload(value: QRCodeWiFiPayload): string {
@@ -138,6 +139,24 @@ function validateCoordinate(field: string, value: number, minimum: number, maxim
   if (!Number.isFinite(value) || value < minimum || value > maximum) {
     invalidPayload(field, value, `${field} must be from ${minimum} to ${maximum}`);
   }
+}
+
+function formatDecimalLiteral(value: number): string {
+  const literal = String(value);
+  const match = /^(-?)(\d+)(?:\.(\d+))?e([+-]?\d+)$/i.exec(literal);
+  if (match === null) return literal;
+
+  const sign = match[1]!;
+  const integer = match[2]!;
+  const fraction = match[3] ?? '';
+  const exponentText = match[4]!;
+  const digits = integer + fraction;
+  const decimalIndex = integer.length + Number(exponentText);
+  if (decimalIndex <= 0) return `${sign}0.${'0'.repeat(-decimalIndex)}${digits}`;
+  if (decimalIndex >= digits.length) {
+    return `${sign}${digits}${'0'.repeat(decimalIndex - digits.length)}`;
+  }
+  return `${sign}${digits.slice(0, decimalIndex)}.${digits.slice(decimalIndex)}`;
 }
 
 function validateText(field: string, value: string, allowEmpty: boolean): void {
