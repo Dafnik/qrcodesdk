@@ -1,10 +1,15 @@
-import {QR_CODE_TEST_FIXTURES, TOTAL_QR_CODE_COMBINATIONS} from '@repo/core-testing';
+import {
+  QR_CODE_STYLING_FIXTURES,
+  QR_CODE_TEST_FIXTURES,
+  TOTAL_QR_CODE_COMBINATIONS,
+} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {
   AUTOMATIC_QR_CODE_TEST_FIXTURES,
   BENCHMARK_SAMPLE_COUNT,
   STATIC_MULTIPLIERS,
+  STYLED_MULTIPLIERS,
   WARMUP_EXHAUSTIVE_PASSES,
   WARMUP_STATIC_PASSES,
   createAutomaticBenchmarkWarmupWorkloads,
@@ -12,6 +17,8 @@ import {
   createBenchmarkWarmupWorkloads,
   createBenchmarkWorkloads,
   createStaticWorkloads,
+  createStyledBenchmarkWarmupWorkloads,
+  createStyledBenchmarkWorkloads,
 } from '../src/workloads';
 
 describe('benchmark workloads', () => {
@@ -23,8 +30,16 @@ describe('benchmark workloads', () => {
     }
   });
 
-  test('uses five timed samples', () => {
-    expect(BENCHMARK_SAMPLE_COUNT).toBe(5);
+  test('uses three timed samples', () => {
+    expect(BENCHMARK_SAMPLE_COUNT).toBe(3);
+  });
+
+  test('uses the 1, 10, and 100 repetition counts', () => {
+    expect(STATIC_MULTIPLIERS).toEqual([1, 10, 100]);
+  });
+
+  test('uses the 1, 10, and 50 styled repetition counts', () => {
+    expect(STYLED_MULTIPLIERS).toEqual([1, 10, 50]);
   });
 
   test('expands every static multiplier to the expected QR count', () => {
@@ -85,5 +100,30 @@ describe('benchmark workloads', () => {
       repetitions: WARMUP_STATIC_PASSES,
       qrCodesPerSample: QR_CODE_TEST_FIXTURES.length * WARMUP_STATIC_PASSES,
     });
+  });
+
+  test('runs every styling fixture at the styled multipliers', () => {
+    const workloads = createStyledBenchmarkWorkloads();
+
+    expect(QR_CODE_STYLING_FIXTURES).toHaveLength(60);
+    expect(workloads.map(({repetitions}) => repetitions)).toEqual(STYLED_MULTIPLIERS);
+    for (const workload of workloads) {
+      expect(workload.fixtures).toBe(QR_CODE_STYLING_FIXTURES);
+      expect(workload.qrCodesPerSample).toBe(
+        QR_CODE_STYLING_FIXTURES.length * workload.repetitions,
+      );
+    }
+  });
+
+  test('warms every styling fixture for five passes', () => {
+    const workloads = createStyledBenchmarkWarmupWorkloads();
+
+    expect(workloads).toHaveLength(1);
+    expect(workloads[0]).toMatchObject({
+      id: 'warmup-styled-static',
+      repetitions: WARMUP_STATIC_PASSES,
+      qrCodesPerSample: QR_CODE_STYLING_FIXTURES.length * WARMUP_STATIC_PASSES,
+    });
+    expect(workloads[0]?.fixtures).toBe(QR_CODE_STYLING_FIXTURES);
   });
 });

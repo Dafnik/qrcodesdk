@@ -14,12 +14,15 @@
   "dependencies": {
     "@qrcodesdk/core": "workspace:*",
     "@repo/core-testing": "workspace:*",
+    "jsdom": "catalog:",
     "qrcode": "catalog:",
-    "qrcode-generator": "catalog:"
+    "qrcode-generator": "catalog:",
+    "qr-code-styling": "1.9.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/jsdom": "30.0.0",
     "@types/node": "catalog:",
     "@types/qrcode": "catalog:",
     "tsdown": "catalog:",

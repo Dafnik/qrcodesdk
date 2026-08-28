@@ -1,5 +1,7 @@
 import {
+  type QRCodeStylingFixture,
   type QRCodeTestFixture,
+  QR_CODE_STYLING_FIXTURES,
   QR_CODE_TEST_FIXTURES,
   getAllQRCodeCombinations,
 } from '@repo/core-testing';
@@ -11,8 +13,9 @@ export type AutomaticQRCodeTestFixture = Omit<QRCodeTestFixture, 'mask' | 'versi
   readonly version?: never;
 };
 
-export const BENCHMARK_SAMPLE_COUNT = 5;
-export const STATIC_MULTIPLIERS = [1, 10, 500];
+export const BENCHMARK_SAMPLE_COUNT = 3;
+export const STATIC_MULTIPLIERS = [1, 10, 100];
+export const STYLED_MULTIPLIERS = [1, 10, 50];
 export const ALL_QR_CODE_COMBINATIONS = [...getAllQRCodeCombinations()];
 export const AUTOMATIC_QR_CODE_TEST_FIXTURES: readonly AutomaticQRCodeTestFixture[] =
   QR_CODE_TEST_FIXTURES.map((fixture) => {
@@ -67,6 +70,32 @@ export function createStaticWorkloads(
   return multipliers.map((repetitions) => ({
     id: `static-${repetitions}`,
     label: `Static fixtures ×${repetitions}`,
+    fixtures,
+    repetitions,
+    qrCodesPerSample: fixtures.length * repetitions,
+  }));
+}
+
+export function createStyledBenchmarkWarmupWorkloads(
+  fixtures: readonly QRCodeStylingFixture[] = QR_CODE_STYLING_FIXTURES,
+): BenchmarkWorkload<QRCodeStylingFixture>[] {
+  return [
+    {
+      id: 'warmup-styled-static',
+      label: 'Styled fixtures warm-up',
+      fixtures,
+      repetitions: WARMUP_STATIC_PASSES,
+      qrCodesPerSample: fixtures.length * WARMUP_STATIC_PASSES,
+    },
+  ];
+}
+
+export function createStyledBenchmarkWorkloads(
+  fixtures: readonly QRCodeStylingFixture[] = QR_CODE_STYLING_FIXTURES,
+): BenchmarkWorkload<QRCodeStylingFixture>[] {
+  return STYLED_MULTIPLIERS.map((repetitions) => ({
+    id: `styled-${repetitions}`,
+    label: `Styled fixtures ×${repetitions}`,
     fixtures,
     repetitions,
     qrCodesPerSample: fixtures.length * repetitions,

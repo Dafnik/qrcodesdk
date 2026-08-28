@@ -42,24 +42,13 @@ describe('benchmark adapters', () => {
     },
   );
 
-  test('selects the configured qrcode-generator byte converter', () => {
-    const defaultAdapter = BENCHMARK_ADAPTERS.find(({id}) => id === 'qrcode-generator-default')!;
-    const textEncoderAdapter = BENCHMARK_ADAPTERS.find(({id}) => id === 'qrcode-generator')!;
-    const bundledUTF8Adapter = BENCHMARK_ADAPTERS.find(({id}) => id === 'qrcode-generator-utf8')!;
-    const inputs = ['ASCII', 'Café 世界', 'QR ✅🚀'];
+  test('restores the stock qrcode-generator byte converter before a workload', () => {
+    const adapter = BENCHMARK_ADAPTERS.find(({id}) => id === 'qrcode-generator')!;
+    qrcodeGenerator.stringToBytes = () => [999];
 
-    defaultAdapter.prepare?.();
-    const defaultBytes = inputs.map((input) => qrcodeGenerator.stringToBytes(input));
+    adapter.prepare?.();
 
-    textEncoderAdapter.prepare?.();
-    const textEncoderBytes = inputs.map((input) => qrcodeGenerator.stringToBytes(input));
-
-    bundledUTF8Adapter.prepare?.();
-    const bundledUTF8Bytes = inputs.map((input) => qrcodeGenerator.stringToBytes(input));
-
-    expect(defaultBytes[0]).toEqual(textEncoderBytes[0]);
-    expect(defaultBytes[1]).not.toEqual(textEncoderBytes[1]);
-    expect(defaultBytes[2]).not.toEqual(textEncoderBytes[2]);
-    expect(bundledUTF8Bytes).toEqual(textEncoderBytes);
+    expect(qrcodeGenerator.stringToBytes('ASCII')).toEqual([65, 83, 67, 73, 73]);
+    expect(qrcodeGenerator.stringToBytes('é')).toEqual([233]);
   });
 });

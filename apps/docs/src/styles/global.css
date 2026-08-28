@@ -144,17 +144,6 @@
   @apply h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pe-3 has-data-[icon=inline-start]:ps-3;
 }
 
-@media (max-width: 38rem) {
-  .sl-markdown-content {
-    pre.mermaid:has(svg[aria-roledescription='xychart']) {
-      justify-content: flex-start;
-    }
-    pre.mermaid svg[aria-roledescription='xychart'] {
-      min-width: 43.75rem;
-    }
-  }
-}
-
 .sl-markdown-content {
   ul {
     list-style-type: disc;
@@ -166,18 +155,7 @@
     padding-left: 1.5rem;
   }
 
-  pre.mermaid[data-processed] {
-    margin-block: 1rem 2rem;
-    padding: 1rem;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 0.75rem;
-    background: color-mix(in srgb, var(--sl-color-gray-7) 70%, transparent);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
-  }
-
-  pre.mermaid svg {
-    display: block;
-    width: 100%;
-    height: auto;
+  .mermaid .bar-plot-0 > text {
+    font-size: 16px !important;
   }
 }
