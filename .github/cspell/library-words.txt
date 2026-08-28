@@ -25,3 +25,4 @@ shieldsio
 bundlejs
 haspopup
 googlechrome
+JSDOM
