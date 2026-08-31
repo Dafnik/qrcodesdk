@@ -1,17 +1,9 @@
 ---
 interface Props {
-  classAttribute?: boolean;
-  className?: boolean;
   selector?: boolean;
-  svelteClass?: boolean;
 }
 
-const {
-  classAttribute = false,
-  className = false,
-  selector = false,
-  svelteClass = false,
-} = Astro.props;
+const {selector = false} = Astro.props;
 
 const components = [
   {
@@ -45,33 +37,6 @@ const props = [
     type: 'Component-specific options',
     description: 'Optional matrix and renderer configuration.',
   },
-  ...(className
-    ? [
-        {
-          prop: 'className',
-          type: 'string',
-          description: 'CSS class applied to the component wrapper div.',
-        },
-      ]
-    : []),
-  ...(classAttribute
-    ? [
-        {
-          prop: 'class',
-          type: 'string | object | array',
-          description: 'Vue class binding applied to the component wrapper div.',
-        },
-      ]
-    : []),
-  ...(svelteClass
-    ? [
-        {
-          prop: 'class',
-          type: 'string',
-          description: 'CSS class applied to the component wrapper div.',
-        },
-      ]
-    : []),
 ];
 ---
 
