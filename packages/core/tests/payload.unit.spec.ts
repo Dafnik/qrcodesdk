@@ -58,4 +58,31 @@ describe('payload serializers', () => {
       expect(error).toMatchObject({code: 'INVALID_INPUT', details: {field: expect.any(String)}});
     }
   });
+
+  test('redacts invalid Wi-Fi passwords from error details', () => {
+    expect.assertions(2);
+
+    try {
+      wifiPayload({ssid: 'Open', encryption: 'nopass', password: 'secret'});
+    } catch (error) {
+      expect(error).toMatchObject({
+        code: 'INVALID_INPUT',
+        details: {field: 'password', value: '[REDACTED]'},
+      });
+      expect(JSON.stringify(error)).not.toContain('secret');
+    }
+  });
+
+  test('preserves non-sensitive invalid values in error details', () => {
+    expect.assertions(1);
+
+    try {
+      geoPayload({latitude: 91, longitude: 0});
+    } catch (error) {
+      expect(error).toMatchObject({
+        code: 'INVALID_INPUT',
+        details: {field: 'latitude', value: 91},
+      });
+    }
+  });
 });

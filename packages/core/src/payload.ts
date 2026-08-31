@@ -171,6 +171,6 @@ function escapeWiFiValue(value: string): string {
 
 function invalidPayload(field: string, value: unknown, reason: string): never {
   throw new QRCodeError('INVALID_INPUT', `Invalid QR code payload: ${reason}`, {
-    details: {field, value, reason},
+    details: {field, value: field === 'password' ? '[REDACTED]' : value, reason},
   });
 }
