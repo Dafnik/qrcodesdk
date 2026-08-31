@@ -220,6 +220,7 @@ const statusSymbol = {
             {row.values.map((value, valueIndex) => (
               <td class:list={{recommended: valueIndex === 0}}>
                 <div class="cell-title">
+                  <span class="sr-only">{value.status}</span>
                   <span class:list={['status', value.status]} aria-hidden="true">
                     {statusSymbol[value.status]}
                   </span>
