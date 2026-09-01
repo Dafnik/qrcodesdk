@@ -285,6 +285,10 @@ jobs:
             version: '18'
           - framework: react
             version: '19'
+          - framework: next
+            version: '15'
+          - framework: next
+            version: '16'
           - framework: angular
             version: '20'
           - framework: angular

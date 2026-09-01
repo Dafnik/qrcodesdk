@@ -4,8 +4,6 @@
   "scripts": {
     "build": "next build"
   },
-  "dependencies": {
-    "next": "15.5.23"
-  },
+  "dependencies": {},
   "devDependencies": {}
 }
