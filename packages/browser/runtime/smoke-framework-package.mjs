@@ -14,6 +14,7 @@ const frameworkVersion = process.env['QRCODESDK_FRAMEWORK_VERSION'];
 const packageDirectory = process.env['QRCODESDK_PACKAGES'];
 const supportedVersions = {
   angular: new Set(['20', '21', '22']),
+  next: new Set(['15', '16']),
   react: new Set(['18', '19']),
   svelte: new Set(['5.0', '5.56']),
   vue: new Set(['3.3', '3.5']),
@@ -30,9 +31,16 @@ assert.ok(
 );
 assert.ok(packageDirectory, 'QRCODESDK_PACKAGES must point to the packed package directory');
 
-const frameworkName = {angular: 'Angular', react: 'React', svelte: 'Svelte', vue: 'Vue'}[framework];
+const frameworkName = {
+  angular: 'Angular',
+  next: 'Next.js',
+  react: 'React',
+  svelte: 'Svelte',
+  vue: 'Vue',
+}[framework];
+const packageName = framework === 'next' ? 'react' : framework;
 globalThis.console.log(
-  `Testing installed @qrcodesdk/${framework} package with ${frameworkName} ${frameworkVersion}`,
+  `Testing installed @qrcodesdk/${packageName} package with ${frameworkName} ${frameworkVersion}`,
 );
 
 const repositoryDirectory = path.resolve(
@@ -49,14 +57,16 @@ let browser;
 let server;
 
 try {
-  const tarballs = await findTarballs(packageDirectory, ['core', 'browser', framework]);
+  const tarballs = await findTarballs(packageDirectory, ['core', 'browser', packageName]);
   logSuccess('found exactly one packed tarball for each required QRCodeSDK package');
 
   if (framework === 'react') {
-    await cp(
-      path.join(repositoryDirectory, 'packages', 'react', 'runtime', 'next-app'),
-      consumerDirectory,
-      {recursive: true},
+    await run('npm', ['create', 'vite@latest', 'react-consumer', '--', '--template', 'react-ts'], {
+      cwd: temporaryDirectory,
+    });
+    await copyFile(
+      path.join(repositoryDirectory, 'packages', 'react', 'runtime', 'smoke-consumer.tsx'),
+      path.join(consumerDirectory, 'src', 'main.tsx'),
     );
     await run(
       'npm',
@@ -66,7 +76,6 @@ try {
         '--no-audit',
         '--no-fund',
         '--package-lock=false',
-        'next@15.5.23',
         `react@${frameworkVersion}`,
         `react-dom@${frameworkVersion}`,
         ...tarballs,
@@ -84,6 +93,43 @@ try {
         '--save-dev',
         `@types/react@${frameworkVersion}`,
         `@types/react-dom@${frameworkVersion}`,
+      ],
+      {cwd: consumerDirectory},
+    );
+  } else if (framework === 'next') {
+    await cp(
+      path.join(repositoryDirectory, 'packages', 'react', 'runtime', 'next-app'),
+      consumerDirectory,
+      {recursive: true},
+    );
+    await run(
+      'npm',
+      [
+        'install',
+        '--ignore-scripts',
+        '--no-audit',
+        '--no-fund',
+        '--package-lock=false',
+        `next@${frameworkVersion}`,
+        'react@19',
+        'react-dom@19',
+        ...tarballs,
+      ],
+      {cwd: consumerDirectory},
+    );
+    await run(
+      'npm',
+      [
+        'install',
+        '--ignore-scripts',
+        '--no-audit',
+        '--no-fund',
+        '--package-lock=false',
+        '--save-dev',
+        '@types/node@24',
+        '@types/react@19',
+        '@types/react-dom@19',
+        'typescript@5.9',
       ],
       {cwd: consumerDirectory},
     );
@@ -185,7 +231,7 @@ try {
   const outputDirectory =
     framework === 'angular'
       ? path.join(consumerDirectory, 'dist', 'angular-consumer', 'browser')
-      : framework === 'react'
+      : framework === 'next'
         ? path.join(consumerDirectory, 'out')
         : path.join(consumerDirectory, 'dist');
   const staticServer = await serve(outputDirectory);
@@ -202,7 +248,7 @@ try {
 
   const initialResponse = await globalThis.fetch(staticServer.origin);
   const initialHTML = await initialResponse.text();
-  if (framework === 'react') {
+  if (framework === 'next') {
     assert.match(initialHTML, /data-testid="qrcode-svg"[^]*<svg/);
     assert.doesNotMatch(initialHTML, /data-testid="qrcode-image"[^]*<img/);
     assert.doesNotMatch(initialHTML, /data-testid="qrcode-canvas"[^]*<canvas/);
@@ -272,10 +318,12 @@ try {
     };
   });
 
+  const renderedFrameworkName = framework === 'next' ? 'React' : frameworkName;
+  const renderedFrameworkVersion = framework === 'next' ? '19' : frameworkVersion;
   assert.match(
     result.frameworkVersion ?? '',
-    new RegExp(`^${frameworkName} ${frameworkVersion}\\.`),
-    `Expected ${frameworkName} ${frameworkVersion}, received ${result.frameworkVersion}`,
+    new RegExp(`^${renderedFrameworkName} ${renderedFrameworkVersion}\\.`),
+    `Expected ${renderedFrameworkName} ${renderedFrameworkVersion}, received ${result.frameworkVersion}`,
   );
   logSuccess(`consumer runs with ${result.frameworkVersion}`);
 
@@ -301,7 +349,7 @@ try {
   logSuccess('browser reports no page or console errors');
 
   globalThis.console.log(
-    `@qrcodesdk/${framework} installed-package smoke test passed with ${result.frameworkVersion}`,
+    `@qrcodesdk/${packageName} installed-package smoke test passed with ${frameworkName} ${frameworkVersion} and ${result.frameworkVersion}`,
   );
 } finally {
   await Promise.allSettled([browser?.close(), closeServer(server)]);
