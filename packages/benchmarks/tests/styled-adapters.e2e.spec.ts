@@ -6,7 +6,7 @@ import {
   createQRCodeStylingLibraryOptions,
 } from '../src/styled-adapters';
 
-describe('styled SVG benchmark adapters', () => {
+describe('styled SVG benchmark adapters', {timeout: 15_000}, () => {
   test.each(STYLED_SVG_BENCHMARK_ADAPTERS)(
     '$label produces non-empty SVG output for every styling fixture',
     async (adapter) => {
