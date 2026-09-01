@@ -86,6 +86,23 @@ describe('Svelte QR code components', () => {
     expect(canvas.height).toBe(46);
   });
 
+  test('renders decorative defaults and labeled Canvas output', async () => {
+    const svg = renderComponent(QRCodeSVG, {data: 'DECORATIVE'});
+    const canvas = renderComponent(QRCodeCanvas, {
+      data: 'LABELED',
+      options: {title: 'Scan this code'},
+    });
+
+    await waitFor(() => expect(canvas.container.querySelector('canvas')).not.toBeNull());
+
+    expect(renderedElement<SVGSVGElement>(svg.container, 'svg').getAttribute('aria-hidden')).toBe(
+      'true',
+    );
+    const canvasElement = renderedElement<HTMLCanvasElement>(canvas.container, 'canvas');
+    expect(canvasElement.getAttribute('role')).toBe('img');
+    expect(canvasElement.getAttribute('aria-label')).toBe('Scan this code');
+  });
+
   test('passes styled options through SVG, image, and canvas components', async () => {
     const styledOptions = {
       size: 2,

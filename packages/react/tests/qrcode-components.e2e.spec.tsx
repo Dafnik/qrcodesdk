@@ -104,6 +104,55 @@ describe('React QR code components', () => {
     expect(canvas.height).toBe(46);
   });
 
+  test('renders decorative defaults and labeled Canvas output', async () => {
+    const {container} = render(
+      <>
+        <QRCodeSVG data="DECORATIVE" />
+        <QRCodeCanvas data="LABELED" options={{title: 'Scan this code'}} />
+      </>,
+    );
+
+    await waitFor(() => expect(container.querySelector('canvas')).not.toBeNull());
+
+    expect(renderedElement<SVGSVGElement>(container, 'svg').getAttribute('aria-hidden')).toBe(
+      'true',
+    );
+    const canvas = renderedElement<HTMLCanvasElement>(container, 'canvas');
+    expect(canvas.getAttribute('role')).toBe('img');
+    expect(canvas.getAttribute('aria-label')).toBe('Scan this code');
+  });
+
+  test.each([
+    ['svg', QRCodeSVG],
+    ['image', QRCodeImage],
+    ['canvas', QRCodeCanvas],
+  ] as const)('forwards ordinary div props for %s output', async (_name, Component) => {
+    const onClick = vi.fn();
+    const {container} = render(
+      <Component
+        data="PROPS"
+        id="qrcode-wrapper"
+        className="custom-class"
+        style={{color: 'red'}}
+        title="Wrapper title"
+        data-purpose="download"
+        aria-label="QR wrapper"
+        onClick={onClick}
+      />,
+    );
+    const wrapper = renderedElement<HTMLDivElement>(container, '#qrcode-wrapper');
+
+    await waitFor(() => expect(wrapper.children).toHaveLength(1));
+    wrapper.click();
+
+    expect(wrapper.className).toBe('custom-class');
+    expect(wrapper.style.color).toBe('red');
+    expect(wrapper.title).toBe('Wrapper title');
+    expect(wrapper.dataset.purpose).toBe('download');
+    expect(wrapper.getAttribute('aria-label')).toBe('QR wrapper');
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
   test('passes styled options through SVG, image, and canvas components', async () => {
     const styledOptions = {
       size: 2,

@@ -1,26 +1,30 @@
-import type {QRCodeTestFixture} from '@repo/core-testing';
+import type {QRCodeStylingFixture, QRCodeTestFixture} from '@repo/core-testing';
 
-export type BenchmarkCategory = 'matrix' | 'automatic' | 'svg';
-export type BenchmarkLibraryId =
-  | 'qrcodesdk'
-  | 'qrcode'
-  | 'qrcode-generator'
-  | 'qrcode-generator-default'
-  | 'qrcode-generator-utf8';
+export type BenchmarkCategory = 'matrix' | 'automatic' | 'svg' | 'styled-svg';
+export type StandardBenchmarkCategory = Exclude<BenchmarkCategory, 'styled-svg'>;
+export type BenchmarkLibraryId = 'qrcodesdk' | 'qrcode' | 'qrcode-generator' | 'qr-code-styling';
 
-export interface BenchmarkAdapter {
+export interface BenchmarkLibrary {
   readonly id: BenchmarkLibraryId;
   readonly label: string;
   readonly version: string;
+}
+
+export interface BenchmarkAdapter extends BenchmarkLibrary {
   readonly prepare?: () => void;
   readonly matrix: (fixture: QRCodeTestFixture) => number;
   readonly svg: (fixture: QRCodeTestFixture) => number;
 }
 
-export interface BenchmarkWorkload {
+export interface StyledSVGAdapter extends BenchmarkLibrary {
+  readonly prepare?: () => void | Promise<void>;
+  readonly styledSvg: (fixture: QRCodeStylingFixture) => number | Promise<number>;
+}
+
+export interface BenchmarkWorkload<TFixture = QRCodeTestFixture> {
   readonly id: string;
   readonly label: string;
-  readonly fixtures: readonly QRCodeTestFixture[];
+  readonly fixtures: readonly TFixture[];
   readonly repetitions: number;
   readonly qrCodesPerSample: number;
 }
@@ -41,11 +45,10 @@ export interface BenchmarkResult extends BenchmarkSummary {
   readonly libraryLabel: string;
   readonly libraryVersion: string;
   readonly samplesMs: readonly number[];
-  readonly timeVsQRCodeSDK: number;
 }
 
 export interface BenchmarkReport {
-  readonly schemaVersion: 3;
+  readonly schemaVersion: 5;
   readonly generatedAt: string;
   readonly environment: {
     readonly node: string;
@@ -66,6 +69,12 @@ export interface BenchmarkReport {
     readonly svg: {
       readonly pixelsPerModule: number;
       readonly quietZoneModules: number;
+    };
+    readonly styledSvg: {
+      readonly fixtureCount: number;
+      readonly multipliers: readonly number[];
+      readonly dimensionsFromFixtures: true;
+      readonly automaticMaskSelection: true;
     };
   };
   readonly results: readonly BenchmarkResult[];

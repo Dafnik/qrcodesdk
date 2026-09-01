@@ -1,3 +1,4 @@
+import {QRCodeError} from './error';
 import {resolveQRCodeImageOverlay} from './image-overlay';
 import {createQRCodeStylePlan} from './style-plan';
 import {parseQRCodeStylingOptions} from './styling';
@@ -21,23 +22,43 @@ export type QRCodeSVGRendererOptions = QRCodeStylingOptions &
 export type QRCodeSVGOptions = QRCodeOptions<QRCodeSVGRendererOptions>;
 
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
-  let resolvedStyling: ReturnType<typeof parseQRCodeStylingOptions> | undefined;
+  let resolvedOptions:
+    | {
+        styling: ReturnType<typeof parseQRCodeStylingOptions>;
+        image: QRCodeSVGImageOptions | undefined;
+        alt: string | undefined;
+        ariaLabel: string | undefined;
+        title: string | undefined;
+      }
+    | undefined;
 
   return (matrix: QRCodeMatrix) => {
-    const styling = (resolvedStyling ??= parseQRCodeStylingOptions(options));
+    const resolved = (resolvedOptions ??= {
+      styling: parseQRCodeStylingOptions(options),
+      image: options?.image ? {...options.image} : undefined,
+      alt: options?.alt,
+      ariaLabel: options?.ariaLabel,
+      title: options?.title,
+    });
+    const styling = resolved.styling;
     const plan = createQRCodeStylePlan(matrix, styling);
-    const image = resolveQRCodeImageOverlay(plan.moduleCount, styling.margin, options?.image);
+    const image = resolveQRCodeImageOverlay(plan.moduleCount, styling.margin, resolved.image);
     if (image && !isQRCodeDataImageURL(image.source)) {
-      throw new Error('QR code SVG image source must be an embedded data:image URL');
+      throw new QRCodeError(
+        'INVALID_IMAGE_SOURCE',
+        'QR code SVG image source must be an embedded data:image URL',
+        {details: {source: image.source}},
+      );
     }
     const shapeRendering = !plan.hasCurves ? ' shape-rendering="crispEdges"' : '';
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${plan.renderedSize}" height="${plan.renderedSize}" viewBox="0 0 ${plan.viewSize} ${plan.viewSize}" role="img"${shapeRendering}`;
+    const accessibleName = resolved.ariaLabel ?? resolved.alt;
+    const isLabeled = Boolean(accessibleName?.trim() || resolved.title?.trim());
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${plan.renderedSize}" height="${plan.renderedSize}" viewBox="0 0 ${plan.viewSize} ${plan.viewSize}"${isLabeled ? ' role="img"' : ' aria-hidden="true"'}${shapeRendering}`;
 
-    const accessibleName = options?.ariaLabel ?? options?.alt;
     if (accessibleName) svg += ` aria-label="${escapeAttributeValue(accessibleName)}"`;
 
     svg += '>';
-    if (options?.title) svg += `<title>${escapeTextContent(options.title)}</title>`;
+    if (resolved.title) svg += `<title>${escapeTextContent(resolved.title)}</title>`;
     svg += `<path fill="${escapeAttributeValue(plan.backgroundColor)}" d="M0 0h${plan.viewSize}v${plan.viewSize}H0z"/>`;
     const pathsByColor = createPathsByColor(plan.layers);
     for (let index = 0; index < pathsByColor.length; index++) {
@@ -100,43 +121,6 @@ function createPathsByColor(layers: readonly ɵQRCodeStyleLayer[]): SVGPathByCol
   return paths;
 }
 
-type LocalPathCommand =
-  | readonly ['M' | 'L', number, number]
-  | readonly ['A', number, 0 | 1, number, number]
-  | readonly ['Z'];
-
-const SIDE_ROUNDED_COMMANDS = [
-  ['M', 0, 0],
-  ['L', 0, 1],
-  ['L', 0.5, 1],
-  ['A', 0.5, 0, 0.5, 0],
-  ['Z'],
-] as const satisfies readonly LocalPathCommand[];
-const CORNER_ROUNDED_COMMANDS = [
-  ['M', 0, 0],
-  ['L', 0, 1],
-  ['L', 1, 1],
-  ['L', 1, 0.5],
-  ['A', 0.5, 0, 0.5, 0],
-  ['Z'],
-] as const satisfies readonly LocalPathCommand[];
-const CORNER_EXTRA_ROUNDED_COMMANDS = [
-  ['M', 0, 0],
-  ['L', 0, 1],
-  ['L', 1, 1],
-  ['A', 1, 0, 0, 0],
-  ['Z'],
-] as const satisfies readonly LocalPathCommand[];
-const OPPOSITE_CORNERS_ROUNDED_COMMANDS = [
-  ['M', 0, 0],
-  ['L', 0, 0.5],
-  ['A', 0.5, 0, 0.5, 1],
-  ['L', 1, 1],
-  ['L', 1, 0.5],
-  ['A', 0.5, 0, 0.5, 0],
-  ['Z'],
-] as const satisfies readonly LocalPathCommand[];
-
 function primitiveToPath(primitive: ɵQRCodeStylePrimitive): string {
   if (primitive.kind === 'finder-ring') {
     return primitive.shape === 'dot'
@@ -163,63 +147,69 @@ function primitiveToPath(primitive: ɵQRCodeStylePrimitive): string {
     case 'dot':
       return circlePath(primitive, primitive.size / 2);
     case 'side-rounded':
-      return localPath(primitive, SIDE_ROUNDED_COMMANDS);
+      return `M${localPoint(primitive, 0, 0)}L${localPoint(primitive, 0, 1)}L${localPoint(
+        primitive,
+        0.5,
+        1,
+      )}${localArc(primitive, 0.5, 0, 0.5, 0)}Z`;
     case 'corner-rounded':
-      return localPath(primitive, CORNER_ROUNDED_COMMANDS);
+      return `M${localPoint(primitive, 0, 0)}L${localPoint(primitive, 0, 1)}L${localPoint(
+        primitive,
+        1,
+        1,
+      )}L${localPoint(primitive, 1, 0.5)}${localArc(primitive, 0.5, 0, 0.5, 0)}Z`;
     case 'corner-extra-rounded':
-      return localPath(primitive, CORNER_EXTRA_ROUNDED_COMMANDS);
+      return `M${localPoint(primitive, 0, 0)}L${localPoint(primitive, 0, 1)}L${localPoint(
+        primitive,
+        1,
+        1,
+      )}${localArc(primitive, 1, 0, 0, 0)}Z`;
     case 'opposite-corners-rounded':
-      return localPath(primitive, OPPOSITE_CORNERS_ROUNDED_COMMANDS);
+      return `M${localPoint(primitive, 0, 0)}L${localPoint(
+        primitive,
+        0,
+        0.5,
+      )}${localArc(primitive, 0.5, 0, 0.5, 1)}L${localPoint(
+        primitive,
+        1,
+        1,
+      )}L${localPoint(primitive, 1, 0.5)}${localArc(primitive, 0.5, 0, 0.5, 0)}Z`;
     default:
       return roundedSquarePath(primitive, 0);
   }
 }
 
-function localPath(
-  primitive: ɵQRCodeStylePrimitive,
-  commands: readonly LocalPathCommand[],
-): string {
-  let path = '';
-  for (let index = 0; index < commands.length; index++) {
-    const command = commands[index]!;
-    if (command[0] === 'Z') {
-      path += 'Z';
-      continue;
+function localPoint(primitive: ɵQRCodeStylePrimitive, x: number, y: number): string {
+  switch (primitive.rotation) {
+    case 90: {
+      const previousX = x;
+      x = 1 - y;
+      y = previousX;
+      break;
     }
-
-    const pointX = command[0] === 'A' ? command[3] : command[1];
-    const pointY = command[0] === 'A' ? command[4] : command[2];
-    let rotatedX: number;
-    let rotatedY: number;
-    switch (primitive.rotation) {
-      case 90:
-        rotatedX = 1 - pointY;
-        rotatedY = pointX;
-        break;
-      case 180:
-        rotatedX = 1 - pointX;
-        rotatedY = 1 - pointY;
-        break;
-      case 270:
-        rotatedX = pointY;
-        rotatedY = 1 - pointX;
-        break;
-      default:
-        rotatedX = pointX;
-        rotatedY = pointY;
-    }
-    const x = primitive.x + rotatedX * primitive.size;
-    const y = primitive.y + rotatedY * primitive.size;
-
-    if (command[0] === 'A') {
-      path += `A${formatNumber(command[1] * primitive.size)} ${formatNumber(
-        command[1] * primitive.size,
-      )} 0 ${command[2]} 0 ${formatPoint(x, y)}`;
-    } else {
-      path += `${command[0]}${formatPoint(x, y)}`;
+    case 180:
+      x = 1 - x;
+      y = 1 - y;
+      break;
+    case 270: {
+      const previousX = x;
+      x = y;
+      y = 1 - previousX;
+      break;
     }
   }
-  return path;
+  return formatPoint(primitive.x + x * primitive.size, primitive.y + y * primitive.size);
+}
+
+function localArc(
+  primitive: ɵQRCodeStylePrimitive,
+  radius: number,
+  largeArc: 0 | 1,
+  x: number,
+  y: number,
+): string {
+  const scaledRadius = formatNumber(radius * primitive.size);
+  return `A${scaledRadius} ${scaledRadius} 0 ${largeArc} 0 ${localPoint(primitive, x, y)}`;
 }
 
 function circlePath(primitive: ɵQRCodeStylePrimitive, radius: number): string {

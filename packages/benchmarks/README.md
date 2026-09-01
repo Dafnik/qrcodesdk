@@ -6,31 +6,31 @@ Run the complete benchmark suite from the workspace root:
 pnpm benchmark
 ```
 
-The suite compares the production build of `@qrcodesdk/core` with `qrcode` and three
-`qrcode-generator` encoder configurations. It benchmarks native matrix generation and end-to-end
-SVG generation for the 17 static fixtures at 1, 10, and 500 repetitions, followed by one pass over
-all 3,840 QR code combinations. A third category benchmarks matrix generation for the same static
-fixtures with version and mask selection left automatic at 1, 10, and 100 repetitions.
+The suite compares the production build of `@qrcodesdk/core` with `qrcode` and
+`qrcode-generator`. It measures native matrix generation and end-to-end SVG generation for the 17
+static fixtures at 1, 10, and 100 repetitions, followed by one pass over all 3,840 QR code
+combinations. Automatic matrix generation uses the same static fixtures without a fixed version or
+mask at 1, 10, and 100 repetitions.
 
-For matrix and SVG generation, all `qrcode-generator` configurations use the repository patch that
-accepts the fixture's explicit mask and skips automatic mask evaluation. The automatic matrix
-category omits both version and mask for every library. The configurations otherwise differ only in
-string-to-byte conversion:
+The `qrcode-generator` adapter uses the package's stock `stringToBytes` implementation. For matrix
+and SVG generation, the repository patch applies each fixture's explicit mask and skips automatic
+mask evaluation. The automatic matrix category omits both version and mask for every library.
 
-- **default** uses the package's stock low-byte converter without a UTF-8 override;
-- **TextEncoder** uses the platform `TextEncoder`, matching the previous benchmark configuration;
-- **bundled UTF-8** uses the package's handwritten `stringToBytesFuncs['UTF-8']` converter.
+Styled SVG generation compares `@qrcodesdk/core` with `qr-code-styling`. It runs all 60 fixtures
+from `packages/core-testing/src/styling-fixtures.ts` at 1, 10, and 50 repetitions. The
+`qr-code-styling` adapter renders SVG through a shared JSDOM environment and serializes it with
+`getRawData('svg')`. JSDOM starts before measurement. QRCodeSDK uses its public SVG renderer. Both
+adapters include matrix generation, styling, and SVG serialization in the timed operation.
 
-The default converter truncates UTF-16 code units and therefore does not preserve the Unicode byte
-fixtures. Its rows measure the stock converter's performance, not semantically equivalent Unicode
-QR code content. The TextEncoder and bundled UTF-8 configurations produce the same bytes for the
-valid Unicode fixtures.
+`qr-code-styling` has no public option for a fixed mask, so both styled adapters select the mask
+automatically. The adapter converts each fixture's module size and margin to matching pixel width,
+height, and margin values. It also maps global colors to the background and part-color fallbacks
+before applying explicit dot and finder colors.
 
-Before measurement, each library is warmed with five passes over the applicable static fixtures.
-The matrix and SVG categories also receive one pass over all 3,840 combinations. Every workload is
-then measured five times, with adapter order rotated so each configuration occupies each position
-once. Results are printed to the console and written to the ignored
-`benchmark-results/latest.json` file at the workspace root.
+Before measurement, each library receives five warm-up passes over the fixtures used by its
+category. The matrix and SVG categories also receive one pass over all 3,840 combinations. Every
+workload is measured three times. Adapter order rotates between samples. Results are printed to the
+console and written to the ignored `benchmark-results/latest.json` file at the workspace root.
 
 After reviewing a benchmark run, update the performance guide from the workspace root:
 

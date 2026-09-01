@@ -69,7 +69,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "@qrcodesdk/core": "workspace:^"
+    "@qrcodesdk/core": "workspace:~"
   },
   "devDependencies": {
     "@qrcodesdk/core": "workspace:*",

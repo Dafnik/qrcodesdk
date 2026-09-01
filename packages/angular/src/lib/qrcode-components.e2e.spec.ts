@@ -165,6 +165,21 @@ describe('Angular QR code components', () => {
     expect(canvas.height).toBe(46);
   });
 
+  test('renders decorative defaults and labeled Canvas output', async () => {
+    const svgFixture = TestBed.createComponent(QRCodeSVGHost);
+    const canvasFixture = TestBed.createComponent(QRCodeCanvasHost);
+
+    canvasFixture.componentRef.setInput('options', {title: 'Scan this code'});
+    await Promise.all([svgFixture.whenStable(), canvasFixture.whenStable()]);
+
+    expect(getRenderedElement<SVGSVGElement>(svgFixture, 'svg').getAttribute('aria-hidden')).toBe(
+      'true',
+    );
+    const canvas = getRenderedElement<HTMLCanvasElement>(canvasFixture, 'canvas');
+    expect(canvas.getAttribute('role')).toBe('img');
+    expect(canvas.getAttribute('aria-label')).toBe('Scan this code');
+  });
+
   test('passes styled options through SVG, image, and canvas components', () => {
     const styledOptions = {
       size: 3,

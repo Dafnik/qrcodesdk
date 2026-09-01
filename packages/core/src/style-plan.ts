@@ -39,7 +39,7 @@ export function createQRCodeStylePlan(
     return createSquareQRCodeStylePlan(matrix, styling);
   }
 
-  return createQRCodeStylePlanWithPrimitives(matrix, styling);
+  return createStyledQRCodeStylePlan(matrix, styling);
 }
 
 function createSquareQRCodeStylePlan(
@@ -95,50 +95,47 @@ function createSquareQRCodeStylePlan(
     }
   }
 
-  let compatibilityPrimitives: readonly ɵQRCodeStylePrimitive[] | undefined;
   return {
     moduleCount,
     viewSize,
     renderedSize: calculateQRCodeRenderedSize(matrix, styling),
     backgroundColor: styling.colors.colorLight,
     hasCurves: false,
-    get primitives() {
-      compatibilityPrimitives ??= createQRCodeStylePrimitives(matrix, styling).primitives;
-      return compatibilityPrimitives;
-    },
     layers: finishMutableStyleLayers(mutableLayers, gridWidth, viewSize),
   };
 }
 
-function createQRCodeStylePlanWithPrimitives(
+function createStyledQRCodeStylePlan(
   matrix: QRCodeMatrix,
   styling: ɵQRCodeParsedStylingOptions,
 ): ɵQRCodeStylePlan {
-  const {hasCurves, primitives} = createQRCodeStylePrimitives(matrix, styling);
   const moduleCount = matrix.length;
   const viewSize = moduleCount + 2 * styling.margin;
-  const layers = createStyleLayers(primitives, viewSize);
-
-  return {
-    moduleCount,
+  const gridWidth = Math.max(
     viewSize,
-    renderedSize: calculateQRCodeRenderedSize(matrix, styling),
-    backgroundColor: styling.colors.colorLight,
-    hasCurves,
-    primitives,
-    layers,
-  };
-}
-
-function createQRCodeStylePrimitives(
-  matrix: QRCodeMatrix,
-  styling: ɵQRCodeParsedStylingOptions,
-): {hasCurves: boolean; primitives: ɵQRCodeStylePrimitive[]} {
-  const moduleCount = matrix.length;
+    styling.margin + matrix.reduce((maximum, row) => Math.max(maximum, row.length), 0),
+  );
   const finders = findFinderPatterns(matrix);
   const finderDarkCells = createFinderDarkCellMap(finders, moduleCount);
-  const primitives: ɵQRCodeStylePrimitive[] = [];
+  const layersByColor = new Map<ɵQRCodeStylePrimitive['color'], MutableStyleLayer>();
+  const mutableLayers: MutableStyleLayer[] = [];
   let hasCurves = false;
+
+  const addPrimitive = (primitive: ɵQRCodeStylePrimitive): void => {
+    const layer = getMutableStyleLayer(
+      primitive.color,
+      gridWidth,
+      viewSize,
+      layersByColor,
+      mutableLayers,
+    );
+    if (primitive.shape === 'square') {
+      addSquarePrimitiveCells(layer.squareCells, gridWidth, primitive);
+    } else {
+      layer.curvedPrimitives.push(primitive);
+      hasCurves = true;
+    }
+  };
 
   const isOrdinaryDark = (row: number, column: number): boolean => {
     if (row < 0 || column < 0) return false;
@@ -155,10 +152,9 @@ function createQRCodeStylePrimitives(
       const rowOffset = row * moduleCount;
       for (let column = 0; column < matrixRow.length; column++) {
         if (!matrixRow[column] || finderDarkCells[rowOffset + column] === 1) continue;
-        primitives.push(
+        addPrimitive(
           createResolvedModulePrimitive(column, row, styling.margin, 'dots', dotsColor, shape, 0),
         );
-        if (shape !== 'square') hasCurves = true;
       }
     }
   } else {
@@ -179,8 +175,7 @@ function createQRCodeStylePrimitives(
           isOrdinaryDark(row - 1, column),
           isOrdinaryDark(row + 1, column),
         );
-        primitives.push(primitive);
-        if (primitive.shape !== 'square') hasCurves = true;
+        addPrimitive(primitive);
       }
     }
   }
@@ -199,8 +194,7 @@ function createQRCodeStylePrimitives(
         size: FINDER_SIZE,
         rotation: finder.rotation,
       };
-      primitives.push(primitive);
-      if (primitive.shape !== 'square') hasCurves = true;
+      addPrimitive(primitive);
     } else {
       forEachFinderRingCell((row, column) => {
         const primitive = createModulePrimitive(
@@ -215,8 +209,7 @@ function createQRCodeStylePrimitives(
           isFinderRingCell(row - 1, column),
           isFinderRingCell(row + 1, column),
         );
-        primitives.push(primitive);
-        if (primitive.shape !== 'square') hasCurves = true;
+        addPrimitive(primitive);
       });
     }
   }
@@ -235,8 +228,7 @@ function createQRCodeStylePrimitives(
         size: FINDER_CENTER_SIZE,
         rotation: finder.rotation,
       };
-      primitives.push(primitive);
-      if (primitive.shape !== 'square') hasCurves = true;
+      addPrimitive(primitive);
     } else {
       for (let row = 0; row < FINDER_CENTER_SIZE; row++) {
         for (let column = 0; column < FINDER_CENTER_SIZE; column++) {
@@ -252,14 +244,20 @@ function createQRCodeStylePrimitives(
             isFinderCenterModuleCell(row - 1, column),
             isFinderCenterModuleCell(row + 1, column),
           );
-          primitives.push(primitive);
-          if (primitive.shape !== 'square') hasCurves = true;
+          addPrimitive(primitive);
         }
       }
     }
   }
 
-  return {hasCurves, primitives};
+  return {
+    moduleCount,
+    viewSize,
+    renderedSize: calculateQRCodeRenderedSize(matrix, styling),
+    backgroundColor: styling.colors.colorLight,
+    hasCurves,
+    layers: finishMutableStyleLayers(mutableLayers, gridWidth, viewSize),
+  };
 }
 
 type MutableStyleLayer = {
@@ -267,41 +265,6 @@ type MutableStyleLayer = {
   squareCells: Uint8Array;
   curvedPrimitives: ɵQRCodeStylePrimitive[];
 };
-
-function createStyleLayers(
-  primitives: readonly ɵQRCodeStylePrimitive[],
-  viewSize: number,
-): ɵQRCodeStyleLayer[] {
-  let gridWidth = viewSize;
-  let gridHeight = viewSize;
-  for (let index = 0; index < primitives.length; index++) {
-    const primitive = primitives[index]!;
-    if (primitive.shape !== 'square') continue;
-    gridWidth = Math.max(gridWidth, primitive.x + primitive.size);
-    gridHeight = Math.max(gridHeight, primitive.y + primitive.size);
-  }
-
-  const layersByColor = new Map<ɵQRCodeStylePrimitive['color'], MutableStyleLayer>();
-  const mutableLayers: MutableStyleLayer[] = [];
-  for (let index = 0; index < primitives.length; index++) {
-    const primitive = primitives[index]!;
-    const layer = getMutableStyleLayer(
-      primitive.color,
-      gridWidth,
-      gridHeight,
-      layersByColor,
-      mutableLayers,
-    );
-
-    if (primitive.shape === 'square') {
-      addSquarePrimitiveCells(layer.squareCells, gridWidth, primitive);
-    } else {
-      layer.curvedPrimitives.push(primitive);
-    }
-  }
-
-  return finishMutableStyleLayers(mutableLayers, gridWidth, gridHeight);
-}
 
 function getMutableStyleLayer(
   color: ɵQRCodeStylePrimitive['color'],

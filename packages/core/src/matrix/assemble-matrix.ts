@@ -3,6 +3,7 @@ import type {
   QRCodeErrorCorrectionLevelValue,
   QRCodeMask,
   QRCodeMatrix,
+  QRCodeMutableMatrix,
   QRCodeReservedMatrix,
   QRCodeVersion,
 } from '../types';
@@ -50,7 +51,7 @@ export function assembleQRCodeMatrixWithDetails(
 }
 
 function selectBestMask(
-  unmaskedMatrix: QRCodeMatrix,
+  unmaskedMatrix: QRCodeMutableMatrix,
   reserved: QRCodeReservedMatrix,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
 ): Pick<QRCodeMatrixAssembly, 'matrix' | 'mask'> {
@@ -75,6 +76,6 @@ function selectBestMask(
   return {matrix: bestMatrix!, mask: bestMask};
 }
 
-function cloneMatrix(matrix: QRCodeMatrix): QRCodeMatrix {
-  return matrix.map((row) => row.slice()) as QRCodeMatrix;
+function cloneMatrix(matrix: QRCodeMatrix): QRCodeMutableMatrix {
+  return matrix.map((row) => row.slice());
 }

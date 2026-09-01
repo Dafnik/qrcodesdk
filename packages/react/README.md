@@ -89,8 +89,8 @@ export function App() {
 | `options`   | `Component-specific options` | Optional matrix and renderer configuration.     |
 | `className` | `string`                     | CSS class applied to the component wrapper div. |
 
-React passes `className` to the component's wrapper `<div>`. Use a React ref when you need a
-download handle; the rendered SVG, Image, or Canvas remains inside that wrapper.
+React passes `className`, `style`, and other fallthrough attributes to the component's wrapper `<div>`.
+Use a React ref when you need a download handle; the rendered SVG, Image, or Canvas remains inside that wrapper.
 
 ## Live examples
 

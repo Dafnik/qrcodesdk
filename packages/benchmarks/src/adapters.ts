@@ -1,5 +1,4 @@
 import type {QRCodeTestFixture} from '@repo/core-testing';
-import {createRequire} from 'node:module';
 import {create, toString} from 'qrcode';
 import type {QRCodeOptions, QRCodeSegment, QRCodeToStringOptions} from 'qrcode';
 import qrcodeGenerator from 'qrcode-generator';
@@ -14,14 +13,7 @@ import type {BenchmarkAdapter} from './types';
 export const SVG_PIXELS_PER_MODULE = 4;
 export const SVG_QUIET_ZONE_MODULES = 4;
 
-type QRCodeGeneratorEncoder = typeof qrcodeGenerator.stringToBytes;
-
 const qrcodeGeneratorDefaultEncoder = qrcodeGenerator.stringToBytes;
-const qrcodeGeneratorTextEncoder: QRCodeGeneratorEncoder = (value) =>
-  Array.from(new TextEncoder().encode(value));
-const require = createRequire(import.meta.url);
-const qrcodeGeneratorCommonJS = require('qrcode-generator') as typeof qrcodeGenerator;
-const qrcodeGeneratorBundledUTF8Encoder = qrcodeGeneratorCommonJS.stringToBytesFuncs['UTF-8']!;
 
 function qrcodeSDKOptions(fixture: QRCodeTestFixture): QRCodeMatrixOptions {
   return {
@@ -126,47 +118,23 @@ const qrcodeAdapter: BenchmarkAdapter = {
   },
 };
 
-function createQRCodeGeneratorAdapter(
-  id: BenchmarkAdapter['id'],
-  label: string,
-  encoder: QRCodeGeneratorEncoder,
-): BenchmarkAdapter {
-  return {
-    id,
-    label,
-    version: '2.0.4',
-    prepare: () => {
-      qrcodeGenerator.stringToBytes = encoder;
-    },
-    matrix: (fixture) => createGeneratorQRCode(fixture).getModuleCount(),
-    svg: (fixture) =>
-      createGeneratorQRCode(fixture).createSvgTag(
-        SVG_PIXELS_PER_MODULE,
-        SVG_PIXELS_PER_MODULE * SVG_QUIET_ZONE_MODULES,
-      ).length,
-  };
-}
-
-const qrcodeGeneratorDefaultAdapter = createQRCodeGeneratorAdapter(
-  'qrcode-generator-default',
-  'qrcode-generator (default)',
-  qrcodeGeneratorDefaultEncoder,
-);
-const qrcodeGeneratorTextEncoderAdapter = createQRCodeGeneratorAdapter(
-  'qrcode-generator',
-  'qrcode-generator (TextEncoder)',
-  qrcodeGeneratorTextEncoder,
-);
-const qrcodeGeneratorBundledUTF8Adapter = createQRCodeGeneratorAdapter(
-  'qrcode-generator-utf8',
-  'qrcode-generator (bundled UTF-8)',
-  qrcodeGeneratorBundledUTF8Encoder,
-);
+const qrcodeGeneratorAdapter: BenchmarkAdapter = {
+  id: 'qrcode-generator',
+  label: 'qrcode-generator',
+  version: '2.0.4',
+  prepare: () => {
+    qrcodeGenerator.stringToBytes = qrcodeGeneratorDefaultEncoder;
+  },
+  matrix: (fixture) => createGeneratorQRCode(fixture).getModuleCount(),
+  svg: (fixture) =>
+    createGeneratorQRCode(fixture).createSvgTag(
+      SVG_PIXELS_PER_MODULE,
+      SVG_PIXELS_PER_MODULE * SVG_QUIET_ZONE_MODULES,
+    ).length,
+};
 
 export const BENCHMARK_ADAPTERS = [
   qrcodeSDKAdapter,
   qrcodeAdapter,
-  qrcodeGeneratorDefaultAdapter,
-  qrcodeGeneratorTextEncoderAdapter,
-  qrcodeGeneratorBundledUTF8Adapter,
+  qrcodeGeneratorAdapter,
 ] as const satisfies readonly BenchmarkAdapter[];

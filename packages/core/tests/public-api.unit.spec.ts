@@ -11,6 +11,7 @@ import type {QRCodeStylePlan as LegacyStylePlan} from '../src';
 import * as core from '../src';
 import {
   QRCodeBuilder,
+  QRCodeError,
   QRCodeSVGRenderer,
   QRCodeTextRenderer,
   qrcode,
@@ -73,6 +74,20 @@ import type {
 } from '../src';
 
 describe('public API types', () => {
+  test('exports the shared error contract', () => {
+    const cause = new TypeError('cause');
+    const error = new QRCodeError('INVALID_OPTIONS', 'Invalid size', {
+      details: {field: 'size', value: 0},
+      cause,
+    });
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error.name).toBe('QRCodeError');
+    expect(error.code).toBe('INVALID_OPTIONS');
+    expect(error.details).toEqual({field: 'size', value: 0});
+    expect(error.cause).toBe(cause);
+  });
+
   test('exports user-facing matrix input types', () => {
     expectTypeOf<QRCodeInputData>().toEqualTypeOf<string | number>();
     expectTypeOf<QRCodeErrorCorrectionLevel>().toEqualTypeOf<'L' | 'M' | 'Q' | 'H'>();
@@ -85,6 +100,7 @@ describe('public API types', () => {
     }>();
     expectTypeOf<ɵQRCodeResolvedMatrixOptions['eci']>().toEqualTypeOf<boolean>();
     expectTypeOf(qrcode('data').eci(true).matrix()).toEqualTypeOf<QRCodeMatrix>();
+    expectTypeOf<QRCodeMatrix>().toEqualTypeOf<readonly (readonly (0 | 1)[])[]>();
   });
 
   test('exports canonical renderer and styling composition types', () => {
@@ -151,7 +167,9 @@ describe('public API types', () => {
     >();
     expectTypeOf<ɵQRCodeStylePlan['layers'][number]>().toEqualTypeOf<ɵQRCodeStyleLayer>();
     expectTypeOf<ɵQRCodeStyleLayer['rectangles'][number]>().toEqualTypeOf<ɵQRCodeStyleRectangle>();
-    expectTypeOf<ɵQRCodeStylePlan['primitives'][number]>().toEqualTypeOf<ɵQRCodeStylePrimitive>();
+    expectTypeOf<
+      ɵQRCodeStyleLayer['curvedPrimitives'][number]
+    >().toEqualTypeOf<ɵQRCodeStylePrimitive>();
     expectTypeOf<
       Extract<ɵQRCodeStylePrimitive, {kind: 'module'}>
     >().toEqualTypeOf<ɵQRCodeModuleStylePrimitive>();

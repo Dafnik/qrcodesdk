@@ -1,3 +1,4 @@
+import {QRCodeError} from './error';
 import {calculateQRCodeRenderedSize, parseQRCodeStylingOptions} from './styling';
 import type {QRCodeColorHex, QRCodeMatrix, QRCodeRenderer, QRCodeStylingOptions} from './types';
 
@@ -10,16 +11,35 @@ export type QRCodeTextRendererOptions = Pick<QRCodeStylingOptions, 'size' | 'mar
 };
 
 export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeRenderer<string> {
+  let resolvedOptions:
+    | {
+        styling: ReturnType<typeof parseQRCodeStylingOptions>;
+        small: boolean;
+        ansiColors: boolean;
+        onlyAnsiColors: boolean;
+      }
+    | undefined;
+
   return (matrix: QRCodeMatrix) => {
-    const styling = parseQRCodeStylingOptions(options);
+    const resolved = (resolvedOptions ??= {
+      styling: parseQRCodeStylingOptions(options),
+      small: options?.small ?? true,
+      ansiColors: options?.ansiColors ?? options?.onlyAnsiColors ?? false,
+      onlyAnsiColors: options?.onlyAnsiColors ?? false,
+    });
+    const styling = resolved.styling;
     const modSize = styling.size;
     const margin = styling.margin;
 
     const scaledSize = calculateQRCodeRenderedSize(matrix, styling);
 
-    if (options?.onlyAnsiColors === true) {
-      if (options.ansiColors === false) {
-        throw new Error('Text QR code onlyAnsiColors requires ansiColors to be enabled');
+    if (resolved.onlyAnsiColors) {
+      if (!resolved.ansiColors) {
+        throw new QRCodeError(
+          'INVALID_OPTIONS',
+          'Text QR code onlyAnsiColors requires ansiColors to be enabled',
+          {details: {field: 'onlyAnsiColors', requires: 'ansiColors'}},
+        );
       }
 
       return renderAnsiOnlyText(
@@ -32,12 +52,11 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
       );
     }
 
-    const rows =
-      (options?.small ?? true)
-        ? renderSmallText(matrix, scaledSize, margin, modSize)
-        : renderFullText(matrix, scaledSize, margin, modSize);
+    const rows = resolved.small
+      ? renderSmallText(matrix, scaledSize, margin, modSize)
+      : renderFullText(matrix, scaledSize, margin, modSize);
 
-    if (options?.ansiColors !== true) return rows.join('\n');
+    if (!resolved.ansiColors) return rows.join('\n');
 
     const ansiPrefix = createAnsiPrefix(styling.colors.colorDark, styling.colors.colorLight);
     return rows.map((row) => `${ansiPrefix}${row}${ANSI_RESET}`).join('\n');

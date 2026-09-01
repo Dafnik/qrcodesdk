@@ -1,0 +1,450 @@
+---
+type ComparisonValue = {
+  status: 'yes' | 'partial' | 'no' | 'note';
+  title: string;
+  detail: string;
+};
+
+type ComparisonRow = {
+  group: 'Foundation' | 'Output' | 'Product fit';
+  feature: string;
+  values: readonly [ComparisonValue, ComparisonValue, ComparisonValue, ComparisonValue];
+};
+
+const libraries = [
+  {
+    name: 'QRCodeSDK',
+    version: '0.0.1',
+    href: 'https://github.com/Dafnik/qrcodesdk',
+    recommended: true,
+  },
+  {
+    name: 'qrcode',
+    version: '1.5.4',
+    href: 'https://github.com/soldair/node-qrcode',
+    recommended: false,
+  },
+  {
+    name: 'qrcode-generator',
+    version: '2.0.4',
+    href: 'https://github.com/kazuhikoarase/qrcode-generator',
+    recommended: false,
+  },
+  {
+    name: 'qr-code-styling',
+    version: '1.9.2',
+    href: 'https://github.com/kozakdenys/qr-code-styling',
+    recommended: false,
+  },
+] as const;
+
+const rows: readonly ComparisonRow[] = [
+  {
+    group: 'Foundation',
+    feature: 'TypeScript story',
+    values: [
+      {status: 'yes', title: 'Native', detail: 'TypeScript source and bundled declarations'},
+      {status: 'partial', title: 'Community types', detail: 'Install @types/qrcode separately'},
+      {status: 'yes', title: 'Bundled types', detail: 'JavaScript package with declarations'},
+      {status: 'yes', title: 'Native', detail: 'TypeScript source and bundled declarations'},
+    ],
+  },
+  {
+    group: 'Foundation',
+    feature: 'Runtime model',
+    values: [
+      {
+        status: 'yes',
+        title: 'Split by runtime',
+        detail: 'Neutral core, browser, Node.js, and CLI packages',
+      },
+      {status: 'yes', title: 'All in one', detail: 'Node.js API plus a browser build'},
+      {
+        status: 'yes',
+        title: 'Runtime-light',
+        detail: 'ESM and CommonJS builds with no package dependencies',
+      },
+      {
+        status: 'partial',
+        title: 'Browser first',
+        detail: 'Node.js needs supplied JSDOM or Canvas implementations',
+      },
+    ],
+  },
+  {
+    group: 'Foundation',
+    feature: 'Framework components',
+    values: [
+      {status: 'yes', title: 'First party', detail: 'React, Vue, Svelte, and Angular'},
+      {status: 'no', title: 'None', detail: 'Call the library inside your component'},
+      {status: 'no', title: 'None', detail: 'Build around its imperative API'},
+      {
+        status: 'partial',
+        title: 'Examples',
+        detail: 'Examples, but no dedicated component packages',
+      },
+    ],
+  },
+  {
+    group: 'Foundation',
+    feature: 'Direct matrix access',
+    values: [
+      {status: 'yes', title: 'Typed matrix', detail: 'qrcode(data).matrix()'},
+      {status: 'yes', title: 'Create result', detail: 'QRCode.create() exposes module data'},
+      {status: 'yes', title: 'Cell methods', detail: 'getModuleCount() and isDark()'},
+      {status: 'no', title: 'No public API', detail: 'The renderer owns the generated matrix'},
+    ],
+  },
+  {
+    group: 'Output',
+    feature: 'SVG',
+    values: [
+      {status: 'yes', title: 'String', detail: 'Runtime-neutral and SSR-safe'},
+      {status: 'yes', title: 'String or file', detail: 'Browser and Node.js'},
+      {status: 'yes', title: 'String', detail: 'createSvgTag()'},
+      {status: 'yes', title: 'DOM and export', detail: 'SVG element plus Blob or Buffer export'},
+    ],
+  },
+  {
+    group: 'Output',
+    feature: 'Canvas',
+    values: [
+      {status: 'yes', title: 'Browser renderer', detail: 'Returns HTMLCanvasElement'},
+      {status: 'yes', title: 'Built in', detail: 'Browser canvas or supplied Node canvas'},
+      {status: 'partial', title: 'Bring a context', detail: 'Draws into CanvasRenderingContext2D'},
+      {status: 'yes', title: 'Primary output', detail: 'Canvas is the default render type'},
+    ],
+  },
+  {
+    group: 'Output',
+    feature: 'Server-side raster',
+    values: [
+      {status: 'yes', title: 'PNG Buffer', detail: 'Dedicated Node.js renderer'},
+      {status: 'yes', title: 'PNG', detail: 'Data URL, file, or writable stream'},
+      {status: 'partial', title: 'GIF data URL', detail: 'No built-in PNG Buffer renderer'},
+      {status: 'partial', title: 'Several formats', detail: 'Needs supplied Canvas and JSDOM'},
+    ],
+  },
+  {
+    group: 'Output',
+    feature: 'Terminal and CLI',
+    values: [
+      {status: 'yes', title: 'Both', detail: 'Text renderer plus qrc CLI'},
+      {status: 'yes', title: 'Both', detail: 'Terminal strings plus qrcode CLI'},
+      {status: 'partial', title: 'ASCII only', detail: 'createASCII(), no packaged CLI'},
+      {status: 'no', title: 'No', detail: 'Focused on visual browser output'},
+    ],
+  },
+  {
+    group: 'Product fit',
+    feature: 'Visual styling',
+    values: [
+      {
+        status: 'yes',
+        title: 'Strong',
+        detail: 'Module shapes, finder shapes, colors, and center images',
+      },
+      {status: 'partial', title: 'Basic', detail: 'Colors, scale, width, and margin'},
+      {status: 'partial', title: 'Minimal', detail: 'Cell size and margin helpers'},
+      {status: 'yes', title: 'Deepest', detail: 'Shapes, gradients, logos, and SVG extensions'},
+    ],
+  },
+  {
+    group: 'Product fit',
+    feature: 'Typed payload helpers',
+    values: [
+      {status: 'yes', title: 'Built in', detail: 'Email, phone, SMS, geo, and Wi-Fi'},
+      {status: 'no', title: 'No', detail: 'Pass a prepared string or segment list'},
+      {status: 'no', title: 'No', detail: 'Pass a prepared string'},
+      {status: 'no', title: 'No', detail: 'Pass a prepared string'},
+    ],
+  },
+  {
+    group: 'Product fit',
+    feature: 'Extension point',
+    values: [
+      {status: 'yes', title: 'Custom renderer', detail: 'Any matrix-to-output function'},
+      {status: 'partial', title: 'Matrix access', detail: 'Build on QRCode.create()'},
+      {
+        status: 'yes',
+        title: 'Cell-level control',
+        detail: 'Inspect cells or render into a 2D context',
+      },
+      {status: 'yes', title: 'SVG extensions', detail: 'Modify SVG through a callback'},
+    ],
+  },
+];
+
+const statusSymbol = {
+  yes: '+',
+  partial: '~',
+  no: '−',
+  note: '·',
+} as const;
+---
+
+<div class="table-frame" role="region" aria-label="QR code library comparison" tabindex="0">
+  <table>
+    <caption>
+      <span>Version snapshot: August 2026</span>
+      <span class="legend" aria-label="Status legend">
+        <span><i class="status yes">+</i> built in</span>
+        <span><i class="status partial">~</i> conditional</span>
+        <span><i class="status no">−</i> absent</span>
+      </span>
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Capability</th>
+        {
+          libraries.map((library) => (
+            <th scope="col" class:list={{recommended: library.recommended}}>
+              <a href={library.href}>{library.name}</a>
+              <small>v{library.version}</small>
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row, rowIndex) => (
+          <tr
+            class:list={{'group-start': rowIndex === 0 || rows[rowIndex - 1]?.group !== row.group}}>
+            <th scope="row">
+              {(rowIndex === 0 || rows[rowIndex - 1]?.group !== row.group) && (
+                <span>{row.group}</span>
+              )}
+              {row.feature}
+            </th>
+            {row.values.map((value, valueIndex) => (
+              <td class:list={{recommended: valueIndex === 0}}>
+                <div class="cell-title">
+                  <span class="sr-only">{value.status}</span>
+                  <span class:list={['status', value.status]} aria-hidden="true">
+                    {statusSymbol[value.status]}
+                  </span>
+                  <strong>{value.title}</strong>
+                </div>
+                <small>{value.detail}</small>
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .table-frame {
+    --line: color-mix(in srgb, var(--sl-color-gray-5), transparent 12%);
+    --paper: color-mix(in srgb, var(--sl-color-bg-nav), var(--sl-color-bg) 30%);
+    --highlight: color-mix(in srgb, var(--sl-color-accent-high), transparent 92%);
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin-top: 2rem;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 0.45rem;
+    background: var(--paper);
+    scrollbar-color: var(--sl-color-gray-4) transparent;
+  }
+
+  .table-frame:focus-visible {
+    outline: 2px solid var(--sl-color-accent-high);
+    outline-offset: 3px;
+  }
+
+  table {
+    width: 100%;
+    min-width: 66rem;
+    margin: 0;
+    border: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.8rem;
+  }
+
+  caption {
+    display: table-caption;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--sl-color-gray-2);
+    background: var(--sl-color-bg-nav);
+    font-family: ui-monospace, 'SFMono-Regular', monospace;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  caption,
+  .legend {
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  caption,
+  .legend,
+  .legend > span,
+  .cell-title {
+    display: flex;
+  }
+
+  .legend {
+    justify-content: flex-end;
+    letter-spacing: 0.04em;
+  }
+
+  .legend > span,
+  .cell-title {
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  th,
+  td {
+    min-width: 11rem;
+    padding: 1rem;
+    border: 0;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    text-align: left;
+  }
+
+  tr > :last-child {
+    border-right: 0;
+  }
+
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  thead th {
+    color: var(--sl-color-white);
+    background: var(--sl-color-bg-nav);
+  }
+
+  thead th:first-child {
+    position: sticky;
+    z-index: 2;
+    left: 0;
+  }
+
+  thead a {
+    display: block;
+    color: inherit;
+    font-size: 0.85rem;
+    font-weight: 750;
+    line-height: 1.25;
+    text-decoration-color: color-mix(in srgb, currentColor, transparent 55%);
+    text-underline-offset: 0.2em;
+    overflow-wrap: anywhere;
+  }
+
+  thead th small {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--sl-color-gray-2);
+    font-family: ui-monospace, 'SFMono-Regular', monospace;
+    font-size: 0.65rem;
+  }
+
+  tbody th {
+    position: sticky;
+    z-index: 1;
+    left: 0;
+    min-width: 10rem;
+    color: var(--sl-color-white);
+    background: var(--sl-color-bg-nav);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    box-shadow: 1px 0 var(--line);
+  }
+
+  tbody th span {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--sl-color-accent-high);
+    font-family: ui-monospace, 'SFMono-Regular', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .group-start > * {
+    border-top: 0.2rem solid color-mix(in srgb, var(--sl-color-accent-high), transparent 50%);
+  }
+
+  tbody tr:first-child > * {
+    border-top: 0;
+  }
+
+  .recommended {
+    background: var(--highlight);
+  }
+
+  thead .recommended {
+    color: var(--sl-color-accent-high);
+    background: color-mix(in srgb, var(--sl-color-accent-high), var(--sl-color-bg-nav) 89%);
+  }
+
+  .cell-title strong {
+    color: var(--sl-color-white);
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+
+  td small {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--sl-color-gray-2);
+    font-size: 0.7rem;
+    line-height: 1.5;
+  }
+
+  .status {
+    display: inline-grid;
+    flex: 0 0 auto;
+    width: 1.15rem;
+    height: 1.15rem;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-family: ui-monospace, 'SFMono-Regular', monospace;
+    font-size: 0.7rem;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .status.yes {
+    color: #42c9ad;
+  }
+
+  .status.partial {
+    color: #e9a847;
+  }
+
+  .status.no,
+  .status.note {
+    color: var(--sl-color-gray-3);
+  }
+
+  @media (max-width: 34rem) {
+    caption {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .legend {
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+  }
+</style>

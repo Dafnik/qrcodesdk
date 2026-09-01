@@ -25,9 +25,3 @@ export function summarizeSamples(
     qrCodesPerSecond: qrCodesPerSample / (medianMs / 1_000),
   };
 }
-
-export function calculateTimeRatio(medianMs: number, qrcodeSDKMedianMs: number): number {
-  if (medianMs < 0) throw new Error('Median time cannot be negative');
-  if (qrcodeSDKMedianMs <= 0) throw new Error('QRCodeSDK median time must be positive');
-  return medianMs / qrcodeSDKMedianMs;
-}

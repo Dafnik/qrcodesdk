@@ -1,0 +1,11 @@
+{
+  "name": "qrcodesdk-next-consumer",
+  "private": true,
+  "scripts": {
+    "build": "next build"
+  },
+  "dependencies": {
+    "next": "15.5.23"
+  },
+  "devDependencies": {}
+}

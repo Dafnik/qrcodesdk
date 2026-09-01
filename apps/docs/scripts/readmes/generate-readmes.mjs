@@ -97,6 +97,7 @@ export async function generateReadme(mapping, options = {}) {
     sourcePath,
     imports,
     codeLanguage,
+    packageName,
   });
 
   absolutizeLinks(tree, {sourcePath, contentRoot, siteUrl});
@@ -226,6 +227,7 @@ function resolveReadmeMapping(mapping, docsRoot) {
  *   sourcePath: string,
  *   imports: Map<string, string>,
  *   codeLanguage: string,
+ *   packageName: string,
  * }} context
  */
 async function transformChildren(children, context) {
@@ -262,6 +264,7 @@ async function transformChildren(children, context) {
  *   sourcePath: string,
  *   imports: Map<string, string>,
  *   codeLanguage: string,
+ *   packageName: string,
  * }} context
  */
 async function transformComponent(node, context) {
@@ -276,7 +279,10 @@ async function transformComponent(node, context) {
   }
 
   if (componentName === 'PackageComponents') {
-    return createPackageComponentNodes(readStaticAttributes(node, context.sourcePath));
+    return createPackageComponentNodes(
+      readStaticAttributes(node, context.sourcePath),
+      context.packageName,
+    );
   }
 
   const importPath = context.imports.get(componentName);
@@ -486,9 +492,9 @@ function createPackageManagerNodes(attributes) {
   ];
 }
 
-/** @param {Record<string, unknown>} attributes */
-function createPackageComponentNodes(attributes) {
-  const supportedAttributes = new Set(['classAttribute', 'className', 'selector', 'svelteClass']);
+/** @param {Record<string, unknown>} attributes @param {string} packageName */
+function createPackageComponentNodes(attributes, packageName) {
+  const supportedAttributes = new Set(['selector']);
   const unsupportedAttribute = Object.keys(attributes).find(
     (attribute) => !supportedAttributes.has(attribute),
   );
@@ -497,26 +503,21 @@ function createPackageComponentNodes(attributes) {
     throw new Error(`PackageComponents does not support the ${unsupportedAttribute} attribute.`);
   }
 
-  const classAttribute =
-    optionalBoolean(attributes.classAttribute, 'PackageComponents classAttribute') ?? false;
-  const className = optionalBoolean(attributes.className, 'PackageComponents className') ?? false;
   const selector = optionalBoolean(attributes.selector, 'PackageComponents selector') ?? false;
-  const svelteClass =
-    optionalBoolean(attributes.svelteClass, 'PackageComponents svelteClass') ?? false;
   const selectorHeader = selector ? ' Selector |' : '';
   const selectorDivider = selector ? ' --- |' : '';
   const selectorCells = selector
     ? [' `qrcode-svg` |', ' `qrcode-image` |', ' `qrcode-canvas` |']
     : ['', '', ''];
-  const classNameRow = className
-    ? '\n| `className` | `string` | CSS class applied to the component wrapper div. |'
-    : '';
-  const classAttributeRow = classAttribute
-    ? '\n| `class` | `string \\| object \\| array` | Vue class binding applied to the component wrapper div. |'
-    : '';
-  const svelteClassRow = svelteClass
-    ? '\n| `class` | `string` | CSS class applied to the component wrapper div. |'
-    : '';
+  const frameworkPropRow =
+    {
+      '@qrcodesdk/react':
+        '\n| `className` | `string` | CSS class applied to the component wrapper div. |',
+      '@qrcodesdk/vue':
+        '\n| `class` | `string \\| object \\| array` | Vue class binding applied to the component wrapper div. |',
+      '@qrcodesdk/svelte':
+        '\n| `class` | `string` | CSS class applied to the component wrapper div. |',
+    }[packageName] ?? '';
   const markdown = `| Component |${selectorHeader} Output | Download support |
 | --- |${selectorDivider} --- | --- |
 | \`QRCodeSVG\` |${selectorCells[0]} \`Inline SVG element\` | SVG |
@@ -528,7 +529,7 @@ function createPackageComponentNodes(attributes) {
 | Prop | Type | Description |
 | --- | --- | --- |
 | \`data\` | \`string \\| number\` | Required QR code payload. |
-| \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${classNameRow}${classAttributeRow}${svelteClassRow}
+| \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${frameworkPropRow}
 `;
 
   return markdownProcessor.parse(markdown).children;

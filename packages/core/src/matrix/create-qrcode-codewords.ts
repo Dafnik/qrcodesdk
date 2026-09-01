@@ -4,7 +4,7 @@ import {encode, encodeWithMetadata} from './encode';
 import {getGF256GeneratorPolynomials} from './error-correction';
 import {getNumberOfAvailableBitsForData} from './get-number-of-available-bits-for-data';
 import type {QRCodeEncodedBitMetadata} from './metadata';
-import {VERSIONS} from './version-config';
+import {getErrorCorrectionBlockCount, getErrorCorrectionCodewordsPerBlock} from './version-config';
 
 type QRCodeCodewordsWithMetadata = {
   readonly codewords: QRCodeCodewords;
@@ -17,7 +17,6 @@ export function createQRCodeCodewords({
   version,
   eci,
 }: ɵQRCodeResolvedMatrixOptions): QRCodeCodewords {
-  const versionConfig = VERSIONS[version] ?? [[-100]];
   const dataCodewords = encode(
     version,
     segments,
@@ -28,8 +27,8 @@ export function createQRCodeCodewords({
 
   return augmentECCs(
     dataCodewords,
-    versionConfig[1]![errorCorrectionLevel]!,
-    generatorPolynomials[versionConfig[0]![errorCorrectionLevel]!]!,
+    getErrorCorrectionBlockCount(version, errorCorrectionLevel),
+    generatorPolynomials[getErrorCorrectionCodewordsPerBlock(version, errorCorrectionLevel)]!,
   );
 }
 
@@ -39,7 +38,6 @@ export function createQRCodeCodewordsWithMetadata({
   version,
   eci,
 }: ɵQRCodeResolvedMatrixOptions): QRCodeCodewordsWithMetadata {
-  const versionConfig = VERSIONS[version] ?? [[-100]];
   const {codewords: dataCodewords, bitMetadata} = encodeWithMetadata(
     version,
     segments,
@@ -50,8 +48,8 @@ export function createQRCodeCodewordsWithMetadata({
 
   return augmentECCsWithMetadata(
     dataCodewords,
-    versionConfig[1]![errorCorrectionLevel]!,
-    generatorPolynomials[versionConfig[0]![errorCorrectionLevel]!]!,
+    getErrorCorrectionBlockCount(version, errorCorrectionLevel),
+    generatorPolynomials[getErrorCorrectionCodewordsPerBlock(version, errorCorrectionLevel)]!,
     bitMetadata,
   );
 }

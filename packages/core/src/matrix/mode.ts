@@ -1,3 +1,4 @@
+import {QRCodeError} from '../error';
 import type {
   QRCodeEncodedData,
   QRCodeInputData,
@@ -106,7 +107,11 @@ const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinitio
 
 export function getModeDefinition(mode: number | undefined): QRCodeModeDefinition {
   const definition = MODE_DEFINITIONS[mode as QRCodeSupportedModeIndicator];
-  if (!definition) throw new Error('QRCode: Invalid mode');
+  if (!definition) {
+    throw new QRCodeError('INVALID_OPTIONS', 'QRCode: Invalid mode', {
+      details: {field: 'mode', value: mode},
+    });
+  }
   return definition;
 }
 

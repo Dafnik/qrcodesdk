@@ -48,8 +48,46 @@ describe('QRCodeCanvasRenderer', () => {
 
       expect(canvas.hasAttribute('role')).toBe(false);
       expect(canvas.hasAttribute('aria-label')).toBe(false);
+      expect(canvas.getAttribute('aria-hidden')).toBe('true');
     },
   );
+
+  test('uses title as the canvas accessible name', () => {
+    const canvas = QRCodeCanvasRenderer({title: 'Scan this code'})([[1]]);
+
+    expect(canvas.getAttribute('role')).toBe('img');
+    expect(canvas.getAttribute('aria-label')).toBe('Scan this code');
+    expect(canvas.title).toBe('Scan this code');
+    expect(canvas.hasAttribute('aria-hidden')).toBe(false);
+  });
+
+  test('snapshots styling, image, and accessibility options on first use', () => {
+    const firstSource = createPreparedImage(1, 1, '#ff0000');
+    const options = {
+      size: 2,
+      margin: 0,
+      colors: {colorDark: '#112233' as '#112233' | '#445566'},
+      image: {source: firstSource as CanvasImageSource, size: 0.2},
+      ariaLabel: 'First label',
+      title: 'First title',
+    };
+    const renderer = QRCodeCanvasRenderer(options);
+    const first = renderer([[1]]);
+
+    options.size = 4;
+    options.margin = 2;
+    options.colors.colorDark = '#445566';
+    options.image.source = createPreparedImage(1, 1, '#00ff00');
+    options.image.size = 0.8;
+    options.ariaLabel = 'Second label';
+    options.title = 'Second title';
+    const second = renderer([[1]]);
+
+    expect(second.width).toBe(first.width);
+    expect(second.getAttribute('aria-label')).toBe('First label');
+    expect(second.title).toBe('First title');
+    expect(second.toDataURL()).toBe(first.toDataURL());
+  });
 
   test('renders custom sizing, margin, and colors', () => {
     const matrix: QRCodeMatrix = [
@@ -201,7 +239,7 @@ describe('QRCodeCanvasRenderer', () => {
     };
     const plan = ɵcreateQRCodeStylePlan(matrix, ɵparseQRCodeStylingOptions(options));
     const canvas = QRCodeCanvasRenderer(options)(matrix);
-    const dataModule = plan.primitives.find(({role}) => role === 'dots')!;
+    const dataModule = plan.layers.find(({color}) => color === '#112233')!.curvedPrimitives[0]!;
 
     expectPixel(canvas, (dataModule.x + 0.5) * 8, (dataModule.y + 0.5) * 8, {
       red: 17,

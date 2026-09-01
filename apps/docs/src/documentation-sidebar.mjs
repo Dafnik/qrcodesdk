@@ -34,6 +34,7 @@ export const DOCUMENTATION_SIDEBAR = [
     label: 'API and output reference',
     items: [
       {label: 'Builder and matrix', slug: 'reference/builder'},
+      {label: 'Payload helpers', slug: 'reference/payloads'},
       {
         label: 'Renderer outputs',
         items: [
@@ -54,6 +55,8 @@ export const DOCUMENTATION_SIDEBAR = [
     items: [
       {label: 'How QR codes work', slug: 'learn/how-qr-codes-work'},
       {label: 'Performance', slug: 'learn/performance'},
+      {label: 'Version and output policy', slug: 'project/release-policy'},
+      {label: 'Compare with other libraries', slug: 'learn/comparison'},
       {label: 'Credits', slug: 'project/credits'},
     ],
   },

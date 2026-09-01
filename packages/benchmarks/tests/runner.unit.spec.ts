@@ -1,8 +1,14 @@
-import type {QRCodeTestFixture} from '@repo/core-testing';
+import type {QRCodeStylingFixture, QRCodeTestFixture} from '@repo/core-testing';
 import {describe, expect, test, vi} from 'vitest';
 
-import {executeWorkload, rotateAdapters, timedWorkload} from '../src/runner';
-import type {BenchmarkAdapter, BenchmarkWorkload} from '../src/types';
+import {
+  executeStyledWorkload,
+  executeWorkload,
+  rotateAdapters,
+  timedStyledWorkload,
+  timedWorkload,
+} from '../src/runner';
+import type {BenchmarkAdapter, BenchmarkWorkload, StyledSVGAdapter} from '../src/types';
 
 const fixture: QRCodeTestFixture = {
   name: 'fixture',
@@ -10,6 +16,12 @@ const fixture: QRCodeTestFixture = {
   mode: 'numeric',
   version: 1,
   mask: 0,
+};
+const stylingFixture: QRCodeStylingFixture = {
+  name: 'styled-fixture',
+  data: '1',
+  matrixOptions: {version: 1, mode: 'numeric'},
+  styling: {size: 5, margin: 4},
 };
 
 function adapter(
@@ -24,6 +36,20 @@ function adapter(
     ...(prepare === undefined ? {} : {prepare}),
     matrix: vi.fn(() => value),
     svg: vi.fn(() => value * 2),
+  };
+}
+
+function styledAdapter(
+  id: StyledSVGAdapter['id'],
+  value = 1,
+  prepare?: StyledSVGAdapter['prepare'],
+): StyledSVGAdapter {
+  return {
+    id,
+    label: id,
+    version: '1.0.0',
+    ...(prepare === undefined ? {} : {prepare}),
+    styledSvg: vi.fn(async () => value),
   };
 }
 
@@ -65,21 +91,15 @@ describe('benchmark runner', () => {
     expect(adapters.map(({id}) => id)).toEqual(['qrcodesdk', 'qrcode', 'qrcode-generator']);
   });
 
-  test('balances every adapter position across five samples', () => {
-    const adapters = [
-      adapter('qrcodesdk'),
-      adapter('qrcode'),
-      adapter('qrcode-generator-default'),
-      adapter('qrcode-generator'),
-      adapter('qrcode-generator-utf8'),
-    ];
-    const rotations = Array.from({length: 5}, (_, sampleIndex) =>
+  test('balances every adapter position across a complete rotation', () => {
+    const adapters = [adapter('qrcodesdk'), adapter('qrcode'), adapter('qrcode-generator')];
+    const rotations = Array.from({length: adapters.length}, (_, sampleIndex) =>
       rotateAdapters(adapters, sampleIndex),
     );
 
     for (const target of adapters) {
       const positions = rotations.map((rotation) => rotation.indexOf(target));
-      expect(positions.sort()).toEqual([0, 1, 2, 3, 4]);
+      expect(positions.sort()).toEqual([0, 1, 2]);
     }
   });
 
@@ -112,5 +132,64 @@ describe('benchmark runner', () => {
       'clock-end',
     ]);
     clock.mockRestore();
+  });
+
+  test('awaits styled SVG generation and accumulates its checksum', async () => {
+    const target = styledAdapter('qrcodesdk', 7);
+    const workload: BenchmarkWorkload<QRCodeStylingFixture> = {
+      id: 'styled-test',
+      label: 'Styled test',
+      fixtures: [stylingFixture, stylingFixture],
+      repetitions: 3,
+      qrCodesPerSample: 6,
+    };
+
+    await expect(executeStyledWorkload(target, workload)).resolves.toBe(42);
+    expect(target.styledSvg).toHaveBeenCalledTimes(6);
+  });
+
+  test('prepares styled adapters before starting the timer', async () => {
+    const events: string[] = [];
+    const target = styledAdapter('qrcodesdk', 2, async () => {
+      events.push('prepare');
+    });
+    vi.mocked(target.styledSvg).mockImplementation(async () => {
+      events.push('operation');
+      return 2;
+    });
+    const workload: BenchmarkWorkload<QRCodeStylingFixture> = {
+      id: 'styled-test',
+      label: 'Styled test',
+      fixtures: [stylingFixture],
+      repetitions: 1,
+      qrCodesPerSample: 1,
+    };
+    const clock = vi.spyOn(process.hrtime, 'bigint');
+    clock.mockImplementationOnce(() => {
+      events.push('clock-start');
+      return 1n;
+    });
+    clock.mockImplementationOnce(() => {
+      events.push('clock-end');
+      return 2n;
+    });
+
+    await expect(timedStyledWorkload(target, workload)).resolves.toMatchObject({checksum: 2});
+    expect(events).toEqual(['prepare', 'clock-start', 'operation', 'clock-end']);
+    clock.mockRestore();
+  });
+
+  test('propagates styled SVG generation failures', async () => {
+    const target = styledAdapter('qr-code-styling');
+    vi.mocked(target.styledSvg).mockRejectedValue(new Error('render failed'));
+    const workload: BenchmarkWorkload<QRCodeStylingFixture> = {
+      id: 'styled-test',
+      label: 'Styled test',
+      fixtures: [stylingFixture],
+      repetitions: 1,
+      qrCodesPerSample: 1,
+    };
+
+    await expect(executeStyledWorkload(target, workload)).rejects.toThrow('render failed');
   });
 });

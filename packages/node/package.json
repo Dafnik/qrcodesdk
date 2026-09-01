@@ -72,7 +72,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "@qrcodesdk/core": "workspace:^"
+    "@qrcodesdk/core": "workspace:~"
   },
   "dependencies": {
     "pngjs": "7.0.0"

@@ -2,11 +2,11 @@ import {mkdir, writeFile} from 'node:fs/promises';
 import {arch, cpus, platform, release} from 'node:os';
 import {join} from 'node:path';
 
-import type {BenchmarkAdapter, BenchmarkCategory, BenchmarkReport, BenchmarkResult} from './types';
+import type {BenchmarkCategory, BenchmarkLibrary, BenchmarkReport, BenchmarkResult} from './types';
 
 export interface CreateBenchmarkReportOptions {
   readonly workspaceRoot: string;
-  readonly adapters: readonly BenchmarkAdapter[];
+  readonly libraries: readonly BenchmarkLibrary[];
   readonly results: readonly BenchmarkResult[];
   readonly checksum: number;
   readonly samples: number;
@@ -17,6 +17,8 @@ export interface CreateBenchmarkReportOptions {
   readonly exhaustiveFixtureCount: number;
   readonly svgPixelsPerModule: number;
   readonly svgQuietZoneModules: number;
+  readonly stylingFixtureCount: number;
+  readonly styledMultipliers: readonly number[];
   readonly generatedAt?: string;
 }
 
@@ -24,7 +26,7 @@ export function createBenchmarkReport(options: CreateBenchmarkReportOptions): Be
   const cpuList = cpus();
 
   return {
-    schemaVersion: 3,
+    schemaVersion: 5,
     generatedAt: options.generatedAt ?? new Date().toISOString(),
     environment: {
       node: process.version,
@@ -35,7 +37,7 @@ export function createBenchmarkReport(options: CreateBenchmarkReportOptions): Be
       cpuCount: cpuList.length,
     },
     libraries: Object.fromEntries(
-      options.adapters.map((adapter) => [adapter.id, adapter.version]),
+      options.libraries.map((library) => [library.id, library.version]),
     ) as BenchmarkReport['libraries'],
     configuration: {
       samples: options.samples,
@@ -47,6 +49,12 @@ export function createBenchmarkReport(options: CreateBenchmarkReportOptions): Be
       svg: {
         pixelsPerModule: options.svgPixelsPerModule,
         quietZoneModules: options.svgQuietZoneModules,
+      },
+      styledSvg: {
+        fixtureCount: options.stylingFixtureCount,
+        multipliers: options.styledMultipliers,
+        dimensionsFromFixtures: true,
+        automaticMaskSelection: true,
       },
     },
     results: options.results,
@@ -74,6 +82,7 @@ export function printBenchmarkResults(results: readonly BenchmarkResult[]): void
     ['matrix', 'Matrix generation'],
     ['automatic', 'Automatic matrix generation'],
     ['svg', 'SVG generation'],
+    ['styled-svg', 'Styled SVG generation'],
   ] as const satisfies readonly (readonly [BenchmarkCategory, string])[];
 
   for (const [category, title] of categories) {
@@ -88,7 +97,6 @@ export function printBenchmarkResults(results: readonly BenchmarkResult[]): void
           'Median (ms)': result.medianMs.toFixed(3),
           'Min–max (ms)': `${result.minMs.toFixed(3)}–${result.maxMs.toFixed(3)}`,
           'QR/s': Math.round(result.qrCodesPerSecond).toLocaleString('en-US'),
-          'Time ÷ SDK': `${result.timeVsQRCodeSDK.toFixed(2)}×`,
         })),
     );
   }

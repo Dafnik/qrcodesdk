@@ -1,3 +1,4 @@
+import {QRCodeError} from '../error';
 import type {
   QRCodeErrorCorrectionLevel,
   QRCodeInputData,
@@ -79,14 +80,22 @@ function resolveModeName(modes: readonly number[]): QRCodeMode | 'mixed' {
   const names = new Set(
     modes.map((mode) => MODES.find((candidate) => MODES_MAP[candidate] === mode)),
   );
-  if (names.has(undefined)) throw new Error('QRCode: Unable to resolve encoded mode');
+  if (names.has(undefined)) {
+    throw new QRCodeError('RENDER_FAILED', 'QRCode: Unable to resolve encoded mode', {
+      details: {modes},
+    });
+  }
   if (names.size > 1) return 'mixed';
   return names.values().next().value!;
 }
 
 function resolveErrorCorrectionLevelName(level: number): QRCodeErrorCorrectionLevel {
   const name = ECC_LEVELS.find((candidate) => ECC_LEVELS_MAP[candidate] === level);
-  if (name === undefined) throw new Error('QRCode: Unable to resolve ECC level');
+  if (name === undefined) {
+    throw new QRCodeError('RENDER_FAILED', 'QRCode: Unable to resolve ECC level', {
+      details: {level},
+    });
+  }
   return name;
 }
 
@@ -99,10 +108,16 @@ function validateMetadataGrid(
     for (let column = 0; column < moduleGrid.length; column++) {
       const isFunctional = functionalGrid[row]![column] !== undefined;
       if ((reserved[row]![column] === 1) !== isFunctional) {
-        throw new Error('QRCode: Functional metadata does not match reserved matrix modules');
+        throw new QRCodeError(
+          'RENDER_FAILED',
+          'QRCode: Functional metadata does not match reserved matrix modules',
+          {details: {row, column}},
+        );
       }
       if (moduleGrid[row]![column] === undefined) {
-        throw new Error('QRCode: Missing matrix module metadata');
+        throw new QRCodeError('RENDER_FAILED', 'QRCode: Missing matrix module metadata', {
+          details: {row, column},
+        });
       }
     }
   }

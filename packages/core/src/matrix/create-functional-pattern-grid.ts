@@ -2,7 +2,7 @@ import type {QRCodeVersion} from '../types';
 import {getQRCodeFormatInformationCoordinates} from './format-information';
 import type {QRCodeMatrixModuleMetadata} from './metadata';
 import {needsVersionInfo} from './needs-version-info';
-import {VERSIONS} from './version-config';
+import {getAlignmentPatternPositions} from './version-config';
 
 type QRCodeFunctionalPatternMetadata = Pick<QRCodeMatrixModuleMetadata, 'role' | 'groupId'>;
 type QRCodeFunctionalPatternGrid = (QRCodeFunctionalPatternMetadata | undefined)[][];
@@ -24,8 +24,7 @@ export function createQRCodeFunctionalPatternGrid(
     grid[index]![6] = {role: 'timing', groupId: 'timing'};
   }
 
-  const versionConfig = VERSIONS[version] ?? [[-100]];
-  const alignmentPatterns = versionConfig[2]!;
+  const alignmentPatterns = getAlignmentPatternPositions(version);
   const patternCount = alignmentPatterns.length;
   for (let rowIndex = 0; rowIndex < patternCount; rowIndex++) {
     const minimumColumnIndex = rowIndex === 0 || rowIndex === patternCount - 1 ? 1 : 0;

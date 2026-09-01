@@ -11,7 +11,10 @@ import {
 import {createBaseMatrix} from '../../src/matrix/create-base-matrix';
 import {ECC_LEVELS_MAP} from '../../src/matrix/error-correction';
 import {MASK_FUNCTIONS} from '../../src/matrix/mask';
-import {VERSIONS} from '../../src/matrix/version-config';
+import {
+  getErrorCorrectionBlockCount,
+  getErrorCorrectionCodewordsPerBlock,
+} from '../../src/matrix/version-config';
 
 const ERROR_CORRECTION_LEVELS = [
   'L',
@@ -193,8 +196,11 @@ describe('QR code matrix generation metadata', () => {
     }
 
     const eccModules = codewordModules.filter(({role}) => role === 'error-correction');
-    const eccCodewordsPerBlock = VERSIONS[version]![0]![errorCorrectionLevelValue]!;
-    const blockCount = VERSIONS[version]![1]![errorCorrectionLevelValue]!;
+    const eccCodewordsPerBlock = getErrorCorrectionCodewordsPerBlock(
+      version,
+      errorCorrectionLevelValue,
+    );
+    const blockCount = getErrorCorrectionBlockCount(version, errorCorrectionLevelValue);
     expect(
       Array.from({length: blockCount}, (_, blockIndex) => eccModules[blockIndex * 8]!.bitIndex),
     ).toEqual(

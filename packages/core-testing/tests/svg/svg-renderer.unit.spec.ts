@@ -136,6 +136,43 @@ describe('QRCodeSVGRenderer', () => {
     expect(svg).not.toContain(' alt=');
   });
 
+  test('hides unlabeled SVG output from the accessibility tree', () => {
+    const attrs = extractSvgAttrs(QRCodeSVGRenderer()([[1]]));
+
+    expect(attrs.role).toBeUndefined();
+    expect(attrs['aria-hidden']).toBe('true');
+  });
+
+  test('uses title as an accessible SVG label', () => {
+    const svg = QRCodeSVGRenderer({title: 'Scan this code'})([[1]]);
+
+    expect(extractSvgAttrs(svg)).toMatchObject({role: 'img'});
+    expect(svg).toContain('<title>Scan this code</title>');
+  });
+
+  test('snapshots styling, image, and accessibility options on first use', () => {
+    const options = {
+      size: 1,
+      margin: 0,
+      colors: {colorDark: '#112233' as '#112233' | '#445566'},
+      image: {source: 'data:image/png;base64,b25l' as `data:image/${string}`, size: 0.2},
+      ariaLabel: 'First label',
+      title: 'First title',
+    };
+    const renderer = QRCodeSVGRenderer(options);
+    const first = renderer([[1]]);
+
+    options.size = 4;
+    options.margin = 2;
+    options.colors.colorDark = '#445566';
+    options.image.source = 'data:image/png;base64,dHdv';
+    options.image.size = 0.8;
+    options.ariaLabel = 'Second label';
+    options.title = 'Second title';
+
+    expect(renderer([[1]])).toBe(first);
+  });
+
   test('renders a centered embedded image after an optional clearing rectangle', () => {
     const source = 'data:image/png;base64,cHJlcGFyZWQ=' as const;
     const svg = QRCodeSVGRenderer({

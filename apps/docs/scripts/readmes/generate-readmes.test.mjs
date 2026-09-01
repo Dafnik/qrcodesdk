@@ -22,9 +22,9 @@ test('generates README banners and stale-file errors with the Turbo command', as
   await writeFile(
     source,
     `---
-title: '@example/package'
+title: '@qrcodesdk/react'
 description: Example package.
-packageName: '@example/package'
+packageName: '@qrcodesdk/react'
 related: []
 ---
 
@@ -32,7 +32,7 @@ import PackageComponents from './package-components.astro';
 
 Example package documentation.
 
-<PackageComponents classAttribute={true} className={true} selector={true} svelteClass={true} />
+<PackageComponents selector={true} />
 `,
   );
 
@@ -50,7 +50,6 @@ Example package documentation.
   assert.ok(content.includes('`QRCodeSVG`'));
   assert.ok(content.includes('`qrcode-svg`'));
   assert.ok(content.includes('`className`'));
-  assert.ok(content.includes('`class`'));
   assert.ok(content.includes('`string \\| number`'));
   await assert.rejects(assertReadmeCurrent(content, output, docsRoot), {
     message: `README.md is stale. Run \`${GENERATE_COMMAND}\`.`,

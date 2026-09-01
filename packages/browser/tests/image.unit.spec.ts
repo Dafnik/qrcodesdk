@@ -61,4 +61,19 @@ describe('QRCodeImageRenderer', () => {
     expectPixel(canvas, 10, 7, WHITE);
     expectPixel(canvas, 10, 8, {red: 255, green: 0, blue: 0, alpha: 255});
   });
+
+  test('snapshots native accessibility options on first use', () => {
+    const options = {alt: 'First alt', ariaLabel: 'First aria', title: 'First title'};
+    const renderer = QRCodeImageRenderer(options);
+
+    renderer([[1]]);
+    options.alt = 'Second alt';
+    options.ariaLabel = 'Second aria';
+    options.title = 'Second title';
+    const image = renderer([[1]]);
+
+    expect(image.alt).toBe('First alt');
+    expect(image.getAttribute('aria-label')).toBe('First aria');
+    expect(image.title).toBe('First title');
+  });
 });

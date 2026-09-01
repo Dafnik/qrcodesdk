@@ -7,7 +7,7 @@ import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
 export type QRCodeSVGProps = QRCodeBaseProps<QRCodeSVGOptions>;
 
 export const QRCodeSVG = forwardRef<QRCodeDownloadHandle, QRCodeSVGProps>(function QRCodeSVG(
-  {data, options, className},
+  {data, options, ...wrapperProps},
   ref,
 ) {
   const svgRenderer = useMemo(() => QRCodeSVGRenderer(options), [options]);
@@ -33,5 +33,5 @@ export const QRCodeSVG = forwardRef<QRCodeDownloadHandle, QRCodeSVGProps>(functi
     [data, options, svgRenderer],
   );
 
-  return <div className={className} dangerouslySetInnerHTML={{__html: svg}} />;
+  return <div {...wrapperProps} dangerouslySetInnerHTML={{__html: svg}} />;
 });

@@ -74,6 +74,7 @@
     "@angular/compiler-cli": "catalog:",
     "@angular/core": "catalog:",
     "@angular/platform-browser": "catalog:",
+    "@angular/platform-server": "catalog:",
     "@qrcodesdk/browser": "workspace:*",
     "@qrcodesdk/core": "workspace:*",
     "@repo/core-testing": "workspace:*",

@@ -12,13 +12,13 @@ const CATEGORIES = [
   ['matrix', 'Matrix generation'],
   ['automatic', 'Automatic matrix generation'],
   ['svg', 'SVG generation'],
+  ['styled-svg', 'Styled SVG generation'],
 ];
 const LIBRARIES = [
   ['qrcodesdk', 'QRCodeSDK'],
   ['qrcode', 'qrcode'],
-  ['qrcode-generator-default', 'generator default'],
-  ['qrcode-generator', 'generator TextEncoder'],
-  ['qrcode-generator-utf8', 'generator bundled UTF-8'],
+  ['qrcode-generator', 'qrcode-generator'],
+  ['qr-code-styling', 'qr-code-styling'],
 ];
 const LIBRARY_ORDER = new Map(LIBRARIES.map(([libraryId], index) => [libraryId, index]));
 const LIBRARY_LABELS = new Map(LIBRARIES);
@@ -63,7 +63,7 @@ function requireFiniteNumber(value, label) {
 export function validateBenchmarkReport(report) {
   const parsedReport = requireObject(report, 'Benchmark report');
 
-  if (parsedReport.schemaVersion !== 3) {
+  if (parsedReport.schemaVersion !== 5) {
     throw new Error(`Unsupported benchmark schema version: ${parsedReport.schemaVersion}.`);
   }
 
@@ -87,6 +87,20 @@ export function validateBenchmarkReport(report) {
   const svgConfiguration = requireObject(configuration.svg, 'configuration.svg');
   requireFiniteNumber(svgConfiguration.pixelsPerModule, 'configuration.svg.pixelsPerModule');
   requireFiniteNumber(svgConfiguration.quietZoneModules, 'configuration.svg.quietZoneModules');
+  const styledSvgConfiguration = requireObject(configuration.styledSvg, 'configuration.styledSvg');
+  requireFiniteNumber(styledSvgConfiguration.fixtureCount, 'configuration.styledSvg.fixtureCount');
+  if (!Array.isArray(styledSvgConfiguration.multipliers)) {
+    throw new Error('configuration.styledSvg.multipliers must be an array.');
+  }
+  for (const [index, multiplier] of styledSvgConfiguration.multipliers.entries()) {
+    requireFiniteNumber(multiplier, `configuration.styledSvg.multipliers[${index}]`);
+  }
+  if (styledSvgConfiguration.dimensionsFromFixtures !== true) {
+    throw new Error('configuration.styledSvg.dimensionsFromFixtures must be true.');
+  }
+  if (styledSvgConfiguration.automaticMaskSelection !== true) {
+    throw new Error('configuration.styledSvg.automaticMaskSelection must be true.');
+  }
 
   if (!Array.isArray(parsedReport.results) || parsedReport.results.length === 0) {
     throw new Error('results must be a non-empty array.');
@@ -105,7 +119,6 @@ export function validateBenchmarkReport(report) {
     requireFiniteNumber(entry.minMs, `results[${index}].minMs`);
     requireFiniteNumber(entry.maxMs, `results[${index}].maxMs`);
     requireFiniteNumber(entry.qrCodesPerSecond, `results[${index}].qrCodesPerSecond`);
-    requireFiniteNumber(entry.timeVsQRCodeSDK, `results[${index}].timeVsQRCodeSDK`);
   }
 
   return parsedReport;
@@ -120,7 +133,7 @@ function formatInteger(value) {
 
 /** @param {Record<string, any>} result */
 function formatResultRow(result) {
-  return `| ${result.workloadLabel} | ${formatInteger(result.qrCodesPerSample)} | ${result.libraryLabel} v${result.libraryVersion} | ${result.medianMs.toFixed(3)} | ${result.minMs.toFixed(3)}–${result.maxMs.toFixed(3)} | ${formatInteger(result.qrCodesPerSecond)} | ${result.timeVsQRCodeSDK.toFixed(2)}× |`;
+  return `| ${result.workloadLabel} | ${formatInteger(result.qrCodesPerSample)} | ${result.libraryLabel} v${result.libraryVersion} | ${result.medianMs.toFixed(3)} | ${result.minMs.toFixed(3)}–${result.maxMs.toFixed(3)} | ${formatInteger(result.qrCodesPerSecond)} |`;
 }
 
 /** @param {Record<string, any>} left @param {Record<string, any>} right */
@@ -149,19 +162,32 @@ function formatChartLibraryLabel(result) {
   return LIBRARY_LABELS.get(result.libraryId) ?? result.libraryLabel;
 }
 
+/** @param {Record<string, any>} left @param {Record<string, any>} right */
+function compareThroughput(left, right) {
+  return right.qrCodesPerSecond - left.qrCodesPerSecond || compareLibraries(left, right);
+}
+
+/** @param {number} maximum */
+function chartAxisMaximum(maximum) {
+  const magnitude = 10 ** Math.floor(Math.log10(maximum));
+  const step = magnitude / 2;
+  return Math.ceil((maximum * 1.1) / step) * step;
+}
+
 /**
  * @param {Record<string, any>[]} results
  * @param {string} categoryTitle
- * @param {number} yAxisMaximum
  */
-function formatMermaidChart(results, categoryTitle, yAxisMaximum) {
-  const sortedResults = results.toSorted(compareLibraries);
+function formatMermaidChart(results, categoryTitle) {
+  const sortedResults = results.toSorted(compareThroughput);
   const [{workloadLabel, qrCodesPerSample}] = sortedResults;
   const libraryLabels = sortedResults.map(formatChartLibraryLabel);
-  const relativeTimes = sortedResults.map((result) => result.timeVsQRCodeSDK.toFixed(2));
+  const throughput = sortedResults.map((result) => Math.round(result.qrCodesPerSecond));
+  const yAxisMaximum = chartAxisMaximum(Math.max(...throughput));
   const accessibleValues = sortedResults
     .map(
-      (result) => `${formatChartLibraryLabel(result)} ${result.timeVsQRCodeSDK.toFixed(2)} times`,
+      (result) =>
+        `${formatChartLibraryLabel(result)} ${formatInteger(result.qrCodesPerSecond)} QR codes per second`,
     )
     .join(', ');
   const chartTitle = `${workloadLabel} — ${formatInteger(qrCodesPerSample)} QR codes/sample`;
@@ -175,11 +201,11 @@ config:
 ---
 xychart horizontal
   accTitle: ${categoryTitle}: ${chartTitle}
-  accDescr: Relative median time compared with QRCodeSDK. ${accessibleValues}. Lower is better.
+  accDescr: Throughput calculated from median time. ${accessibleValues}. Higher is better.
   title ${JSON.stringify(chartTitle)}
   x-axis "Library" [${libraryLabels.map((label) => JSON.stringify(label)).join(', ')}]
-  y-axis "Time ÷ QRCodeSDK" 0 --> ${yAxisMaximum.toFixed(1)}
-  bar [${relativeTimes.join(', ')}]
+  y-axis "QR codes/second" 0 --> ${String(yAxisMaximum)}
+  bar [${throughput.join(', ')}]
 \`\`\``;
 }
 
@@ -204,12 +230,8 @@ export async function generatePerformancePage(report, options = {}) {
       throw new Error(`No ${category} benchmark results were found.`);
     }
 
-    const maximumRelativeTime = Math.max(
-      ...categoryResults.map((result) => result.timeVsQRCodeSDK),
-    );
-    const yAxisMaximum = Math.ceil(maximumRelativeTime * 2) / 2 + 0.5;
     const charts = groupResultsByWorkload(categoryResults)
-      .map((results) => formatMermaidChart(results, title, yAxisMaximum))
+      .map((results) => formatMermaidChart(results, title))
       .join('\n\n');
     const rows = categoryResults.map(formatResultRow).join('\n');
 
@@ -220,8 +242,8 @@ ${charts}
 <details>
 <summary>Exact benchmark data</summary>
 
-| Workload | QR codes/sample | Library | Median (ms) | Min–max (ms) | QR codes/second | Time ÷ QRCodeSDK |
-| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| Workload | QR codes/sample | Library | Median (ms) | Min–max (ms) | QR codes/second |
+| --- | ---: | --- | ---: | ---: | ---: |
 ${rows}
 
 </details>`;
@@ -229,15 +251,17 @@ ${rows}
   const sourcePath = path.relative(workspaceRoot, inputPath).split(path.sep).join('/');
   const markdown = `---
 title: Performance
-description: Matrix, automatic matrix, and SVG generation benchmark results for QRCodeSDK and its reference libraries.
+description: Matrix, automatic matrix, SVG, and styled SVG generation benchmark results for QRCodeSDK and its reference libraries.
 docType: concept
 ---
 
 <!-- Generated from ${sourcePath}. Run \`pnpm turbo run generate-performance --filter=docs\` to update. -->
 
-These results compare QRCodeSDK with **qrcode** and three **qrcode-generator** encoder configurations. Benchmarks are environment-specific and should be read as relative comparisons, not universal guarantees.
+The matrix, automatic matrix, and SVG benchmarks compare QRCodeSDK with **qrcode** and **qrcode-generator** using its stock text encoder. Styled SVG generation compares QRCodeSDK with **qr-code-styling**. Benchmarks are environment-specific and should be read as relative comparisons, not universal guarantees.
 
-The matrix and SVG fixtures supply explicit versions and masks. Their **qrcode-generator** rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them. The **default** row uses the package's stock low-byte converter, **TextEncoder** uses the platform encoder, and **bundled UTF-8** uses the package's handwritten UTF-8 converter. The default converter truncates UTF-16 code units, so its Unicode byte fixtures do not encode content equivalent to the other rows. TextEncoder and bundled UTF-8 produce the same bytes for the valid Unicode fixtures.
+The matrix and SVG fixtures supply explicit versions and masks. The **qrcode-generator** rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them.
+
+Styled SVG generation uses all ${configuration.styledSvg.fixtureCount} shared styling fixtures at ${configuration.styledSvg.multipliers.join(', ')} repetitions. Both libraries select the mask automatically because **qr-code-styling** has no public mask option. Fixture module size and margin determine the matching pixel dimensions passed to **qr-code-styling**, which renders SVG through a shared JSDOM environment initialized before measurement.
 
 ## Benchmark environment
 
@@ -247,8 +271,9 @@ The matrix and SVG fixtures supply explicit versions and masks. Their **qrcode-g
 - Libraries: ${libraryVersions}
 - Samples: ${configuration.samples} timed samples after ${configuration.warmupStaticPasses} static warm-up passes and ${configuration.warmupExhaustivePasses} exhaustive warm-up pass${configuration.warmupExhaustivePasses === 1 ? '' : 'es'}
 - SVG output: ${configuration.svg.pixelsPerModule} px/module with a ${configuration.svg.quietZoneModules}-module quiet zone
+- Styled SVG fixtures: ${configuration.styledSvg.fixtureCount}, with fixture-derived dimensions and automatic mask selection
 
-The charts show relative median time, where lower is better and QRCodeSDK is fixed at \`1.00×\`. Expand the exact benchmark data beneath each section for median time, min–max range, and throughput calculated from the median.
+The charts show throughput calculated from the median time. Higher is better, and each chart lists the fastest library first. Expand the exact benchmark data beneath each section for median time, min–max range, and throughput.
 
 ${sections}
 `;

@@ -73,6 +73,9 @@ The complete input, matrix-option, builder-method, and matrix-output contracts l
 [Builder and matrix](https://qrcodesdk.dev/reference/builder/). Shared visual options and scan-safety guidance live in
 [Customize appearance](https://qrcodesdk.dev/guides/customize/).
 
+Typed helpers serialize common application values before generation. See
+[Payload helpers](https://qrcodesdk.dev/reference/payloads/) for email, phone, SMS, geographic, and Wi-Fi payloads.
+
 ## Runtime compatibility
 
 > `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
@@ -114,7 +117,11 @@ import {
   type QRCodeDataImageURL,
   type QRCodeDotType,
   type QRCodeDotsOptions,
+  type QRCodeEmailPayload,
+  QRCodeError,
+  type QRCodeErrorCode,
   type QRCodeErrorCorrectionLevel,
+  type QRCodeGeoPayload,
   type QRCodeImageOverlayOptions,
   type QRCodeInputData,
   type QRCodeMask,
@@ -122,7 +129,9 @@ import {
   type QRCodeMatrixOptions,
   type QRCodeMode,
   type QRCodeOptions,
+  type QRCodePhonePayload,
   type QRCodeRenderer,
+  type QRCodeSMSPayload,
   type QRCodeSVGImageOptions,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
@@ -132,17 +141,30 @@ import {
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeVersion,
+  type QRCodeWiFiPayload,
+  emailPayload,
+  geoPayload,
+  phonePayload,
   qrcode,
+  smsPayload,
+  wifiPayload,
 } from '@qrcodesdk/core';
 ```
 
 Exports whose names begin with `ɵ` are private integration contracts for QRCodeSDK sibling packages.
 They are not part of the public API and can change without compatibility guarantees.
 
+## Generated output stability
+
+Output is deterministic for one installed implementation, but matrix cells, SVG markup, and PNG
+bytes may change between QRCodeSDK releases. Pin exact package versions and keep fixtures when exact
+artifacts matter. See the [version and output policy](https://qrcodesdk.dev/project/release-policy/).
+
 ## Documentation
 
 - [@qrcodesdk/core](https://qrcodesdk.dev/packages/core/)
 - [Builder and matrix](https://qrcodesdk.dev/reference/builder/)
+- [Payload helpers](https://qrcodesdk.dev/reference/payloads/)
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
 - [Terminal text renderer](https://qrcodesdk.dev/reference/renderers/text/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)

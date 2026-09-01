@@ -6,7 +6,7 @@ import type {QRCodeBaseProps} from './types';
 
 export type QRCodeCanvasProps = QRCodeBaseProps<QRCodeCanvasOptions>;
 
-export function QRCodeCanvas({data, options, className}: QRCodeCanvasProps) {
+export function QRCodeCanvas({data, options, ...wrapperProps}: QRCodeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRenderer = useMemo(() => QRCodeCanvasRenderer(options), [options]);
 
@@ -17,5 +17,5 @@ export function QRCodeCanvas({data, options, className}: QRCodeCanvasProps) {
     container.replaceChildren(qrcode(data).config(options).render(canvasRenderer));
   }, [canvasRenderer, data, options]);
 
-  return <div className={className} ref={containerRef} />;
+  return <div {...wrapperProps} ref={containerRef} />;
 }

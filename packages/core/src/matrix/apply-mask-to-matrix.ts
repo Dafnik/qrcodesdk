@@ -1,14 +1,14 @@
-import type {QRCodeMask, QRCodeMatrix, QRCodeModule, QRCodeReservedMatrix} from '../types';
+import type {QRCodeMask, QRCodeModule, QRCodeMutableMatrix, QRCodeReservedMatrix} from '../types';
 import {MASK_FUNCTIONS} from './mask';
 
 /**
  * Applies a QR mask to the data portion of a matrix.
  */
 export function applyMaskToMatrix(
-  matrix: QRCodeMatrix,
+  matrix: QRCodeMutableMatrix,
   reserved: QRCodeReservedMatrix,
   mask: QRCodeMask,
-): QRCodeMatrix {
+): QRCodeMutableMatrix {
   const n = matrix.length;
 
   if (mask < 3) {

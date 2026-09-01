@@ -22,10 +22,9 @@ const RESULT = {
   minMs: 1,
   maxMs: 3,
   qrCodesPerSecond: 8500,
-  timeVsQRCodeSDK: 1,
 };
 const REPORT = {
-  schemaVersion: 3,
+  schemaVersion: 5,
   generatedAt: '2026-07-17T21:07:54.996Z',
   environment: {
     node: 'v24.18.0',
@@ -38,12 +37,11 @@ const REPORT = {
   libraries: {
     qrcodesdk: '1.2.3',
     qrcode: '1.5.4',
-    'qrcode-generator-default': '2.0.4',
     'qrcode-generator': '2.0.4',
-    'qrcode-generator-utf8': '2.0.4',
+    'qr-code-styling': '1.9.2',
   },
   configuration: {
-    samples: 5,
+    samples: 3,
     warmupStaticPasses: 5,
     warmupExhaustivePasses: 1,
     staticFixtureCount: 17,
@@ -52,6 +50,12 @@ const REPORT = {
     svg: {
       pixelsPerModule: 8,
       quietZoneModules: 4,
+    },
+    styledSvg: {
+      fixtureCount: 60,
+      multipliers: [1, 10, 50],
+      dimensionsFromFixtures: true,
+      automaticMaskSelection: true,
     },
   },
   results: [
@@ -62,31 +66,15 @@ const REPORT = {
       libraryId: 'qrcode',
       libraryLabel: 'qrcode',
       libraryVersion: '1.5.4',
-      timeVsQRCodeSDK: 1.5,
-    },
-    {
-      ...RESULT,
-      category: 'matrix',
-      libraryId: 'qrcode-generator-default',
-      libraryLabel: 'qrcode-generator (default)',
-      libraryVersion: '2.0.4',
-      timeVsQRCodeSDK: 4.25,
+      qrCodesPerSecond: 12_000,
     },
     {
       ...RESULT,
       category: 'matrix',
       libraryId: 'qrcode-generator',
-      libraryLabel: 'qrcode-generator (TextEncoder)',
+      libraryLabel: 'qrcode-generator',
       libraryVersion: '2.0.4',
-      timeVsQRCodeSDK: 4.5,
-    },
-    {
-      ...RESULT,
-      category: 'matrix',
-      libraryId: 'qrcode-generator-utf8',
-      libraryLabel: 'qrcode-generator (bundled UTF-8)',
-      libraryVersion: '2.0.4',
-      timeVsQRCodeSDK: 4.4,
+      qrCodesPerSecond: 4_000,
     },
     {
       ...RESULT,
@@ -98,6 +86,24 @@ const REPORT = {
     },
     {...RESULT, category: 'automatic'},
     {...RESULT, category: 'svg', medianMs: 4, qrCodesPerSecond: 4000},
+    {
+      ...RESULT,
+      category: 'styled-svg',
+      workloadId: 'styled-1',
+      workloadLabel: 'Styled fixtures ×1',
+      qrCodesPerSample: 60,
+    },
+    {
+      ...RESULT,
+      category: 'styled-svg',
+      workloadId: 'styled-1',
+      workloadLabel: 'Styled fixtures ×1',
+      qrCodesPerSample: 60,
+      libraryId: 'qr-code-styling',
+      libraryLabel: 'qr-code-styling',
+      libraryVersion: '1.9.2',
+      qrCodesPerSecond: 1_000,
+    },
   ],
   checksum: 123,
 };
@@ -115,15 +121,19 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
   assert.match(markdown, /pnpm turbo run generate-performance --filter=docs/);
   assert.match(markdown, /skips automatic mask evaluation/);
   assert.match(markdown, /automatic matrix fixtures omit both options/);
-  assert.match(markdown, /default converter truncates UTF-16 code units/);
+  assert.match(markdown, /qrcode-generator\*\* using its stock text encoder/);
+  assert.doesNotMatch(markdown, /TextEncoder|bundled UTF-8/);
+  assert.match(markdown, /all 60 shared styling fixtures at 1, 10, 50 repetitions/);
+  assert.match(markdown, /qr-code-styling\*\* has no public mask option/);
   assert.match(
     markdown,
-    /5 timed samples after 5 static warm-up passes and 1 exhaustive warm-up pass/,
+    /3 timed samples after 5 static warm-up passes and 1 exhaustive warm-up pass/,
   );
   assert.match(markdown, /## Matrix generation/);
   assert.match(markdown, /## Automatic matrix generation/);
   assert.match(markdown, /## SVG generation/);
-  assert.equal(markdown.match(/```mermaid/g)?.length, 4);
+  assert.match(markdown, /## Styled SVG generation/);
+  assert.equal(markdown.match(/```mermaid/g)?.length, 5);
   assert.match(markdown, /xychart horizontal/);
   assert.match(markdown, /showDataLabel: true/);
   assert.match(markdown, /showDataLabelOutsideBar: true/);
@@ -132,29 +142,28 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
     markdown,
     /accTitle: Automatic matrix generation: Static fixtures ×1 — 17 QR codes\/sample/,
   );
-  assert.match(markdown, /accDescr: Relative median time compared with QRCodeSDK\./);
-  assert.match(
-    markdown,
-    /x-axis "Library" \["QRCodeSDK", "qrcode", "generator default", "generator TextEncoder", "generator bundled UTF-8"\]/,
-  );
-  assert.match(markdown, /y-axis "Time ÷ QRCodeSDK" 0 --> 5\.0/);
-  assert.match(markdown, /bar \[1\.00, 1\.50, 4\.25, 4\.50, 4\.40\]/);
+  assert.match(markdown, /accDescr: Throughput calculated from median time\./);
+  assert.match(markdown, /Higher is better\./);
+  assert.match(markdown, /x-axis "Library" \["qrcode", "QRCodeSDK", "qrcode-generator"\]/);
+  assert.match(markdown, /x-axis "Library" \["QRCodeSDK", "qr-code-styling"\]/);
+  assert.match(markdown, /y-axis "QR codes\/second" 0 --> 15000/);
+  assert.match(markdown, /bar \[12000, 8500, 4000\]/);
   assert.ok(
     markdown.indexOf('title "Static fixtures ×1') < markdown.indexOf('title "Static fixtures ×5'),
   );
-  assert.equal(markdown.match(/<summary>Exact benchmark data<\/summary>/g)?.length, 3);
+  assert.equal(markdown.match(/<summary>Exact benchmark data<\/summary>/g)?.length, 4);
   assert.match(markdown, /\| Static fixtures ×1 \|\s+17 \| QRCodeSDK v1\.2\.3\s+\|\s+2\.000/);
   assert.match(markdown, /\| Static fixtures ×1 \|\s+17 \| QRCodeSDK v1\.2\.3\s+\|\s+4\.000/);
-  assert.match(markdown, /qrcode-generator \(default\) v2\.0\.4/);
-  assert.match(markdown, /qrcode-generator \(TextEncoder\) v2\.0\.4/);
-  assert.match(markdown, /qrcode-generator \(bundled UTF-8\) v2\.0\.4/);
-  assert.match(markdown, /\|\s+8,500 \|\s+1\.00× \|/);
+  assert.match(markdown, /qrcode-generator v2\.0\.4/);
+  assert.match(markdown, /qr-code-styling v1\.9\.2/);
+  assert.match(markdown, /\|\s+8,500 \|/);
+  assert.doesNotMatch(markdown, /Time ÷ QRCodeSDK|timeVsQRCodeSDK|1\.00×/);
 });
 
 test('rejects unsupported or incomplete benchmark reports', () => {
   assert.throws(
-    () => validateBenchmarkReport({...REPORT, schemaVersion: 2}),
-    /Unsupported benchmark schema version: 2/,
+    () => validateBenchmarkReport({...REPORT, schemaVersion: 4}),
+    /Unsupported benchmark schema version: 4/,
   );
   assert.throws(() => validateBenchmarkReport({...REPORT, results: []}), /non-empty array/);
   assert.throws(
@@ -172,6 +181,14 @@ test('rejects unsupported or incomplete benchmark reports', () => {
         configuration: {...REPORT.configuration, warmupExhaustivePasses: undefined},
       }),
     /configuration\.warmupExhaustivePasses must be a finite number/,
+  );
+  assert.throws(
+    () =>
+      validateBenchmarkReport({
+        ...REPORT,
+        configuration: {...REPORT.configuration, styledSvg: undefined},
+      }),
+    /configuration\.styledSvg must be an object/,
   );
 });
 

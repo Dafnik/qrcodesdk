@@ -67,7 +67,8 @@ Use full-height, double-width `██` modules when preferred:
 qrc "https://qrcodesdk.dev" --no-small
 ```
 
-Disable ANSI styling explicitly for logs, files, and redirected output:
+ANSI styling is disabled automatically when standard output is redirected or `NO_COLOR` is present.
+You can also disable it explicitly:
 
 ```sh
 qrc "https://qrcodesdk.dev" --no-ansi-colors
@@ -79,7 +80,7 @@ Render modules entirely as ANSI-colored spaces, without UTF-8 block glyphs:
 qrc "https://qrcodesdk.dev" --only-ansi-colors
 ```
 
-The equivalent explicit boolean forms are `--small false` and `--ansi-colors false`. Both options also accept `true`. Layout and ANSI styling are independent and affect text output only. Compact and full block layouts require UTF-8; ANSI-background-only output contains spaces and escape sequences instead. ANSI remains enabled by default when standard output is redirected; the CLI does not inspect TTY state or `NO_COLOR`.
+The equivalent explicit boolean forms are `--small false` and `--ansi-colors false`. Both options also accept `true`. Layout and ANSI styling are independent and affect text output only. Compact and full block layouts require UTF-8; ANSI-background-only output contains spaces and escape sequences instead. Explicit ANSI flags take precedence over `NO_COLOR` and TTY detection.
 
 `--only-ansi-colors` ignores the `small` setting and implies ANSI output. It cannot be combined with `--no-ansi-colors` or `--ansi-colors false`.
 
@@ -166,7 +167,7 @@ see [Customize output](/guides/customize/).
 | `--margin <number>`                     | Margin as a non-negative integer.                           | `2`         |
 | `--small <true\|false>`                 | Pack two QR rows into each terminal line.                   | `true`      |
 | `--no-small`                            | Alias for `--small false`.                                  | -           |
-| `--ansi-colors <true\|false>`           | Style terminal text with ANSI colors.                       | `true`      |
+| `--ansi-colors <true\|false>`           | Override environment-aware ANSI color detection.            | `Auto`      |
 | `--no-ansi-colors`                      | Alias for `--ansi-colors false`.                            | -           |
 | `--only-ansi-colors`                    | Use ANSI background cells without UTF-8 block glyphs.       | `false`     |
 | `--color-dark <#rrggbb>`                | Dark module color.                                          | `#000000`   |

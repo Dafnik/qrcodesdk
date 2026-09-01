@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
-import {calculateTimeRatio, median, summarizeSamples} from '../src/statistics';
+import {median, summarizeSamples} from '../src/statistics';
 
 describe('benchmark statistics', () => {
   test('calculates odd and even medians without mutating samples', () => {
@@ -20,15 +20,9 @@ describe('benchmark statistics', () => {
     });
   });
 
-  test('calculates time relative to the QRCodeSDK median', () => {
-    expect(calculateTimeRatio(25, 10)).toBe(2.5);
-    expect(calculateTimeRatio(10, 10)).toBe(1);
-  });
-
-  test('rejects invalid samples and baselines', () => {
+  test('rejects invalid samples', () => {
     expect(() => median([])).toThrow('empty sample');
     expect(() => summarizeSamples([], 1)).toThrow('empty sample');
     expect(() => summarizeSamples([1], 0)).toThrow('must be positive');
-    expect(() => calculateTimeRatio(1, 0)).toThrow('must be positive');
   });
 });

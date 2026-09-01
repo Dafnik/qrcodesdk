@@ -1,3 +1,4 @@
+import {QRCodeError} from './error';
 import type {
   QRCodeColorHex,
   QRCodeCornerDotType,
@@ -98,8 +99,10 @@ export function calculateQRCodeRenderedSize(
 
   const renderedSize = styling.size * (matrix.length + 2 * styling.margin);
   if (!Number.isSafeInteger(renderedSize) || renderedSize <= 0) {
-    throw new Error(
+    throw new QRCodeError(
+      'INVALID_OPTIONS',
       `QR code dimensions must be positive integers, received ${String(renderedSize)}`,
+      {details: {field: 'dimensions', value: renderedSize}},
     );
   }
 
@@ -129,19 +132,31 @@ function validateQRCodeStylingOptions(styling: ɵQRCodeParsedStylingOptions): vo
 
 function validateQRCodeSize(value: unknown): asserts value is number {
   if (!isValidQRCodeSize(value)) {
-    throw new Error(`QR code size must be a positive integer, received ${String(value)}`);
+    throw new QRCodeError(
+      'INVALID_OPTIONS',
+      `QR code size must be a positive integer, received ${String(value)}`,
+      {details: {field: 'size', value}},
+    );
   }
 }
 
 function validateQRCodeMargin(value: unknown): asserts value is number {
   if (!isValidQRCodeMargin(value)) {
-    throw new Error(`QR code margin must be a non-negative integer, received ${String(value)}`);
+    throw new QRCodeError(
+      'INVALID_OPTIONS',
+      `QR code margin must be a non-negative integer, received ${String(value)}`,
+      {details: {field: 'margin', value}},
+    );
   }
 }
 
 function validateQRCodeColor(name: string, value: unknown): asserts value is QRCodeColorHex {
   if (!isQRCodeColorHex(value)) {
-    throw new Error(`QR code ${name} must be a 6-digit hex color, received ${String(value)}`);
+    throw new QRCodeError(
+      'INVALID_OPTIONS',
+      `QR code ${name} must be a 6-digit hex color, received ${String(value)}`,
+      {details: {field: name, value}},
+    );
   }
 }
 
@@ -151,8 +166,10 @@ function validateQRCodeType<T extends string>(
   supportedTypes: readonly T[],
 ): asserts value is T {
   if (!supportedTypes.some((type) => type === value)) {
-    throw new Error(
+    throw new QRCodeError(
+      'INVALID_OPTIONS',
       `QR code ${name} must be one of ${supportedTypes.join(', ')}, received ${String(value)}`,
+      {details: {field: name, value, supportedValues: supportedTypes}},
     );
   }
 }
