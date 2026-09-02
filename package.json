@@ -24,8 +24,8 @@
   "devDependencies": {
     "@changesets/cli": "2.31.1",
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
-    "@vitest/coverage-v8": "4.1.10",
-    "cspell": "10.0.1",
+    "@vitest/coverage-v8": "4.1.11",
+    "cspell": "10.1.1",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "nyc": "18.0.0",
@@ -34,10 +34,10 @@
     "prettier-plugin-sort-json": "4.2.0",
     "prettier-plugin-svelte": "4.1.1",
     "prettier-plugin-tailwindcss": "0.8.1",
-    "turbo": "2.10.7",
+    "turbo": "2.10.12",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@11.17.0",
+  "packageManager": "pnpm@11.25.0",
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
   }
