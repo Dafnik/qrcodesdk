@@ -12,18 +12,18 @@ allowBuilds:
   sharp: true
 
 catalog:
-  '@angular/animations': 22.0.8
-  '@angular/build': 22.0.8
-  '@angular/cli': 22.0.8
-  '@angular/cdk': 22.0.6
-  '@angular/common': 22.0.8
-  '@angular/compiler': 22.0.8
-  '@angular/compiler-cli': 22.0.8
-  '@angular/core': 22.0.8
-  '@angular/forms': 22.0.8
-  '@angular/language-service': 22.0.8
-  '@angular/platform-browser': 22.0.8
-  '@angular/platform-server': 22.0.8
+  '@angular/animations': 22.1.4
+  '@angular/build': 22.1.6
+  '@angular/cli': 22.1.6
+  '@angular/cdk': 22.1.4
+  '@angular/common': 22.1.4
+  '@angular/compiler': 22.1.4
+  '@angular/compiler-cli': 22.1.4
+  '@angular/core': 22.1.4
+  '@angular/forms': 22.1.4
+  '@angular/language-service': 22.1.4
+  '@angular/platform-browser': 22.1.4
+  '@angular/platform-server': 22.1.4
   '@types/qrcode': 1.5.6
   '@types/node': 25.9.5
   '@types/react': 19.2.18
@@ -36,14 +36,14 @@ catalog:
   qrcode-generator: 2.0.4
   react: 19.2.8
   react-dom: 19.2.8
-  vue: 3.5.41
+  vue: 3.5.42
   rxjs: 7.8.2
-  sharp: 0.35.3
-  svelte: 5.56.9
+  sharp: 0.35.4
+  svelte: 5.57.0
   tsdown: 0.22.14
   tslib: 2.8.1
   typescript: 7.0.2
-  vitest: 4.1.10
+  vitest: 4.1.11
 
 catalogs:
   angular-typescript:
@@ -52,13 +52,13 @@ catalogs:
     typescript: 5.9.3
 
 packageExtensions:
-  '@analogjs/vite-plugin-angular@3.0.0-alpha.64':
+  '@analogjs/vite-plugin-angular@>=3.0.0-alpha.64 <3.0.0':
     dependencies:
       typescript: 6.0.3
-  '@sveltejs/package@2.5.8':
+  '@sveltejs/package@>=2.5.8':
     dependencies:
       typescript: 5.9.3
-  '@phenomnomnominal/tsquery@6.2.0':
+  '@phenomnomnominal/tsquery@>=6.2.0':
     peerDependencies:
       typescript: 6.0.3
 
