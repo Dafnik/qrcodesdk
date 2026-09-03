@@ -52,13 +52,13 @@ catalogs:
     typescript: 5.9.3
 
 packageExtensions:
-  '@analogjs/vite-plugin-angular@3.0.0-alpha.64':
+  '@analogjs/vite-plugin-angular@>=3.0.0-alpha.64 <3.0.0':
     dependencies:
       typescript: 6.0.3
-  '@sveltejs/package@2.5.8':
+  '@sveltejs/package@>=2.5.8':
     dependencies:
       typescript: 5.9.3
-  '@phenomnomnominal/tsquery@6.2.0':
+  '@phenomnomnominal/tsquery@>=6.2.0':
     peerDependencies:
       typescript: 6.0.3
 
