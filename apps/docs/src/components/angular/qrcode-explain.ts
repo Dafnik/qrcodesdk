@@ -419,10 +419,7 @@ export class QRCodeExplain {
     const explanation = this.explanation();
     if (selection === undefined || explanation === undefined || selection.role === 'margin')
       return [];
-    if (selection.groupId.startsWith('role:')) {
-      return explanation.modules.filter(({role}) => role === selection.role);
-    }
-    return explanation.groups.get(selection.groupId)?.modules ?? [];
+    return explanation.modules.filter(({role}) => role === selection.role);
   });
   protected readonly legendItems = computed<readonly LegendItem[]>(() => {
     const explanation = this.explanation();
@@ -574,23 +571,14 @@ export class QRCodeExplain {
 
   protected selectionLabel(selection: ExplainSelection): string {
     if (selection.role === 'margin') return 'Quiet zone';
-    if (selection.groupId.startsWith('role:')) {
-      return QR_CODE_EXPLAIN_ROLE_DETAILS[selection.role].label;
-    }
-    return (
-      this.explanation()?.groups.get(selection.groupId)?.label ??
-      QR_CODE_EXPLAIN_ROLE_DETAILS[selection.role].label
-    );
+    return QR_CODE_EXPLAIN_ROLE_DETAILS[selection.role].label;
   }
 
   protected selectionDescription(selection: ExplainSelection): string {
     if (selection.role === 'margin') {
       return 'A clear light border that helps scanners isolate the QR code from its surroundings.';
     }
-    return (
-      this.explanation()?.groups.get(selection.groupId)?.description ??
-      QR_CODE_EXPLAIN_ROLE_DETAILS[selection.role].description
-    );
+    return QR_CODE_EXPLAIN_ROLE_DETAILS[selection.role].description;
   }
 
   protected moduleSummary(module: QRCodeExplainModule | undefined): string {
@@ -605,8 +593,8 @@ export class QRCodeExplain {
       module.value === 1 ? 'rendered dark' : 'rendered light',
     ];
     if (module.sourceValue !== undefined) parts.push(`source bit ${module.sourceValue}`);
-    if (module.bitIndex !== undefined && module.bitCount !== undefined) {
-      parts.push(`bit ${module.bitIndex + 1}/${module.bitCount}`);
+    if (module.placementBitIndex !== undefined) {
+      parts.push(`placement bit ${module.placementBitIndex + 1}`);
     }
     if (module.codewordIndex !== undefined) parts.push(`codeword ${module.codewordIndex}`);
     return parts.join(' · ');

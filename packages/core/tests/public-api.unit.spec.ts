@@ -16,14 +16,17 @@ import {
   QRCodeTextRenderer,
   qrcode,
   ɵECC_LEVELS,
+  ɵECC_LEVELS_MAP,
   ɵMODES,
+  ɵMODES_MAP,
   ɵQR_CODE_COLOR_HEX_PATTERN,
   ɵQR_CODE_CORNER_DOT_TYPES,
   ɵQR_CODE_CORNER_SQUARE_TYPES,
   ɵQR_CODE_DOT_TYPES,
+  ɵassembleQRCodeMatrixWithDetails,
   ɵcalculateQRCodeRenderedSize,
+  ɵcreateQRCodeCodewords,
   ɵcreateQRCodeStylePlan,
-  ɵgenerateQRCodeMatrixWithMetadata,
   ɵisQRCodeColorHex,
   ɵisQRCodeCornerDotType,
   ɵisQRCodeCornerSquareType,
@@ -32,6 +35,7 @@ import {
   ɵisValidQRCodeSize,
   ɵparseQRCodeStylingOptions,
   ɵresolveQRCodeImageOverlay,
+  ɵresolveQRCodeMatrixOptions,
 } from '../src';
 import type {
   QRCodeAccessibilityOptions,
@@ -57,9 +61,6 @@ import type {
   QRCodeTextRendererOptions,
   ɵQRCodeFinderCenterStylePrimitive,
   ɵQRCodeFinderRingStylePrimitive,
-  ɵQRCodeMatrixGenerationMetadata,
-  ɵQRCodeMatrixMetadataRole,
-  ɵQRCodeMatrixModuleMetadata,
   ɵQRCodeModuleShape,
   ɵQRCodeModuleStylePrimitive,
   ɵQRCodeParsedStylingOptions,
@@ -184,7 +185,9 @@ describe('public API types', () => {
     expectTypeOf<ɵQRCodeStylePrimitive['rotation']>().toEqualTypeOf<ɵQRCodeStyleRotation>();
 
     expect(ɵECC_LEVELS).toEqual(['L', 'M', 'Q', 'H']);
+    expect(ɵECC_LEVELS_MAP).toEqual({L: 1, M: 0, Q: 3, H: 2});
     expect(ɵMODES).toEqual(['numeric', 'alphanumeric', 'octet']);
+    expect(ɵMODES_MAP).toEqual({numeric: 1, alphanumeric: 2, octet: 4});
     expect(ɵQR_CODE_COLOR_HEX_PATTERN.test('#123456')).toBe(true);
     expect(ɵQR_CODE_DOT_TYPES).toContain('classy-rounded');
     expect(ɵQR_CODE_CORNER_SQUARE_TYPES).toContain('dot');
@@ -219,6 +222,11 @@ describe('public API types', () => {
       'isValidQRCodeSize',
       'ECC_LEVELS',
       'MODES',
+      'MODES_MAP',
+      'ECC_LEVELS_MAP',
+      'assembleQRCodeMatrixWithDetails',
+      'createQRCodeCodewords',
+      'resolveQRCodeMatrixOptions',
       'QR_CODE_COLOR_HEX_PATTERN',
       'QR_CODE_DOT_TYPES',
       'QR_CODE_CORNER_SQUARE_TYPES',
@@ -227,13 +235,29 @@ describe('public API types', () => {
     for (const name of legacyInternalNames) expect(core).not.toHaveProperty(name);
   });
 
-  test('exports prefixed QR matrix metadata contracts', () => {
-    expectTypeOf(
-      ɵgenerateQRCodeMatrixWithMetadata,
-    ).returns.toEqualTypeOf<ɵQRCodeMatrixGenerationMetadata>();
-    expectTypeOf<ɵQRCodeMatrixModuleMetadata['role']>().toEqualTypeOf<ɵQRCodeMatrixMetadataRole>();
+  test('composes the prefixed raw QR matrix pipeline', () => {
+    for (const mask of [undefined, 0, 3, 7] as const) {
+      const options = {errorCorrectionLevel: 'Q', mask} as const;
+      const resolved = ɵresolveQRCodeMatrixOptions('PIPELINE', options);
+      const codewords = ɵcreateQRCodeCodewords(resolved);
+      const visits: Array<{row: number; column: number; bitIndex: number; sourceValue: number}> =
+        [];
+      const assembled = ɵassembleQRCodeMatrixWithDetails(
+        resolved.version,
+        resolved.errorCorrectionLevel,
+        codewords,
+        resolved.mask,
+        (row, column, bitIndex, sourceValue) => {
+          visits.push({row, column, bitIndex, sourceValue});
+        },
+      );
 
-    const generated = ɵgenerateQRCodeMatrixWithMetadata('1', {version: 1, mask: 0});
-    expect(generated.moduleGrid).toHaveLength(21);
+      expect(assembled.matrix).toEqual(qrcode('PIPELINE').config(options).matrix());
+      expect(visits).toHaveLength(
+        assembled.reserved.flat().filter((reserved) => reserved === 0).length,
+      );
+      expect(visits[0]).toMatchObject({bitIndex: 0});
+      expect(visits[visits.length - 1]).toMatchObject({bitIndex: visits.length - 1});
+    }
   });
 });

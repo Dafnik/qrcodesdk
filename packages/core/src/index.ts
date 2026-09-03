@@ -77,11 +77,11 @@ export {
   type QRCodeWiFiEncryption,
   type QRCodeWiFiPayload,
 } from './payload';
-export {ECC_LEVELS as ɵECC_LEVELS} from './matrix/error-correction';
-export {MODES as ɵMODES} from './matrix/mode';
-export {generateQRCodeMatrixWithMetadata as ɵgenerateQRCodeMatrixWithMetadata} from './matrix/generate-qrcode-matrix';
-export type {
-  QRCodeMatrixGenerationMetadata as ɵQRCodeMatrixGenerationMetadata,
-  QRCodeMatrixMetadataRole as ɵQRCodeMatrixMetadataRole,
-  QRCodeMatrixModuleMetadata as ɵQRCodeMatrixModuleMetadata,
-} from './matrix/metadata';
+export {assembleQRCodeMatrixWithDetails as ɵassembleQRCodeMatrixWithDetails} from './matrix/assemble-matrix';
+export {createQRCodeCodewords as ɵcreateQRCodeCodewords} from './matrix/create-qrcode-codewords';
+export {
+  ECC_LEVELS as ɵECC_LEVELS,
+  ECC_LEVELS_MAP as ɵECC_LEVELS_MAP,
+} from './matrix/error-correction';
+export {MODES as ɵMODES, MODES_MAP as ɵMODES_MAP} from './matrix/mode';
+export {resolveQRCodeMatrixOptions as ɵresolveQRCodeMatrixOptions} from './matrix/resolve-matrix-options';

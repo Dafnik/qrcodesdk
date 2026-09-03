@@ -1,9 +1,19 @@
 import assert from 'node:assert/strict';
 import {describe, test} from 'node:test';
 
-import {type QRCodeErrorCorrectionLevel, type QRCodeMask, qrcode} from '@qrcodesdk/core';
+import {
+  type QRCodeErrorCorrectionLevel,
+  type QRCodeMask,
+  type QRCodeMatrixOptions,
+  type QRCodeVersion,
+  qrcode,
+  ɵassembleQRCodeMatrixWithDetails,
+  ɵcreateQRCodeCodewords,
+  ɵresolveQRCodeMatrixOptions,
+} from '@qrcodesdk/core';
 
 import {
+  type QRCodeExplainConfig,
   type QRCodeExplainRole,
   type QRCodeExplanation,
   QR_CODE_EXPLAIN_ROLE_ORDER,
@@ -21,23 +31,43 @@ function countRole(explanation: QRCodeExplanation, role: QRCodeExplainRole): num
   return explanation.modules.filter((module) => module.role === role).length;
 }
 
+function getRawGeneration(data: string, options: QRCodeMatrixOptions = {}) {
+  const resolved = ɵresolveQRCodeMatrixOptions(data, options);
+  const codewords = ɵcreateQRCodeCodewords(resolved);
+  const assembled = ɵassembleQRCodeMatrixWithDetails(
+    resolved.version,
+    resolved.errorCorrectionLevel,
+    codewords,
+    resolved.mask,
+  );
+  return {resolved, codewords, assembled};
+}
+
 describe('explainQRCode', () => {
-  test('classifies every module for all versions and error-correction levels', () => {
+  test('classifies every module from raw generation results', () => {
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
       for (let version = 1; version <= 40; version++) {
-        const explanation = explainQRCode({
+        const config = {
           data: '1',
-          version: version as QRCodeExplanation['version'],
+          version: version as QRCodeVersion,
           errorCorrectionLevel,
           mask: 0,
           size: 8,
           margin: 4,
-        });
+        } as const satisfies QRCodeExplainConfig;
+        const explanation = explainQRCode(config);
+        const raw = getRawGeneration(config.data, config);
+        const functionalCount = raw.assembled.reserved.flat().filter((value) => value === 1).length;
+        const remainderCount =
+          explanation.matrix.length ** 2 - functionalCount - raw.codewords.length * 8;
 
         assert.equal(explanation.version, version);
         assert.equal(explanation.errorCorrectionLevel, errorCorrectionLevel);
         assert.equal(explanation.modules.length, explanation.matrix.length ** 2);
         assert.equal(explanation.moduleGrid.length, explanation.matrix.length);
+        assert.equal(countRole(explanation, 'functional'), functionalCount);
+        assert.equal(countRole(explanation, 'encoded'), raw.codewords.length * 8);
+        assert.equal(countRole(explanation, 'remainder'), remainderCount);
 
         for (const module of explanation.modules) {
           assert.ok(QR_CODE_EXPLAIN_ROLE_ORDER.includes(module.role));
@@ -47,76 +77,63 @@ describe('explainQRCode', () => {
     }
   });
 
-  test('identifies version-dependent function patterns', () => {
-    const version1 = explainQRCode({data: '1', version: 1, mask: 0});
-    const version2 = explainQRCode({data: '1', version: 2, mask: 0});
-    const version7 = explainQRCode({data: '1', version: 7, mask: 0});
-    const version32 = explainQRCode({data: '1', version: 32, mask: 0});
-    const version40 = explainQRCode({data: '1', version: 40, mask: 0});
-
-    assert.equal(countRole(version1, 'finder'), 147);
-    assert.equal(countRole(version1, 'separator'), 45);
-    assert.equal(countRole(version1, 'alignment'), 0);
-    assert.equal(countRole(version1, 'version'), 0);
-    assert.equal(countRole(version2, 'alignment'), 25);
-    assert.equal(countRole(version7, 'version'), 36);
-    assert.equal(countRole(version32, 'version'), 36);
-    assert.equal(countRole(version40, 'version'), 36);
-    assert.ok(countRole(version40, 'alignment') > countRole(version7, 'alignment'));
-  });
-
-  test('maps mode, character count, payload, terminator, and padding bits', () => {
-    const numeric = explainQRCode({data: '12345', version: 1, mask: 0});
-    const alphanumeric = explainQRCode({data: 'HELLO', version: 1, mask: 0});
-    const octet = explainQRCode({data: 'hello', version: 1, mask: 0});
-    const octetWithECI = explainQRCode({data: 'hello', version: 1, mask: 0, eci: true});
-    const utf8 = explainQRCode({data: 'Grüße', version: 2, mode: 'octet', mask: 0, eci: true});
-    const mixed = explainQRCode({data: 'ABCDE12345678?A1A', version: 2, mask: 0, eci: true});
+  test('reports resolved matrix and styling settings', () => {
+    const numeric = explainQRCode({data: '12345', version: 1, mask: 0, size: 8, margin: 4});
+    const octet = explainQRCode({data: 'hello', version: 1, mask: 1, mode: 'octet'});
+    const mixed = explainQRCode({data: 'ABCDE12345678?A1A', version: 2, mask: 2, eci: true});
 
     assert.equal(numeric.mode, 'numeric');
-    assert.equal(countRole(numeric, 'mode'), 4);
-    assert.equal(countRole(numeric, 'character-count'), 10);
-    assert.equal(countRole(numeric, 'payload'), 17);
-    assert.equal(countRole(alphanumeric, 'character-count'), 9);
-    assert.equal(countRole(alphanumeric, 'payload'), 28);
+    assert.equal(numeric.version, 1);
+    assert.equal(numeric.errorCorrectionLevel, 'M');
+    assert.equal(numeric.mask, 0);
+    assert.equal(numeric.size, 8);
+    assert.equal(numeric.margin, 4);
+    assert.equal(numeric.viewSize, numeric.matrix.length + 8);
     assert.equal(octet.mode, 'octet');
-    assert.equal(countRole(octet, 'eci'), 0);
-    assert.equal(countRole(octetWithECI, 'eci'), 12);
-    assert.equal(countRole(octet, 'payload'), 40);
-    assert.equal(countRole(utf8, 'eci'), 12);
-    assert.equal(countRole(utf8, 'payload'), new TextEncoder().encode('Grüße').length * 8);
     assert.equal(mixed.mode, 'mixed');
-    assert.equal(countRole(mixed, 'eci'), 12);
-    assert.equal(countRole(mixed, 'mode'), 12);
-    assert.equal(countRole(mixed, 'character-count'), 27);
-    assert.ok(countRole(numeric, 'terminator') > 0);
-    assert.ok(countRole(numeric, 'padding') > 0);
   });
 
-  test('maps semantic bits to their physical zig-zag placement coordinates', () => {
+  test('maps encoded bits to zig-zag coordinates and codewords', () => {
     const explanation = explainQRCode({data: '1', version: 1, mask: 0});
+    const encoded = explanation.modules
+      .filter((module) => module.role === 'encoded')
+      .sort((first, second) => first.placementBitIndex! - second.placementBitIndex!);
 
     assert.deepEqual(
+      encoded.slice(0, 4).map(({row, column, placementBitIndex, codewordIndex}) => ({
+        row,
+        column,
+        placementBitIndex,
+        codewordIndex,
+      })),
       [
-        explanation.moduleGrid[20]![20],
-        explanation.moduleGrid[20]![19],
-        explanation.moduleGrid[19]![20],
-        explanation.moduleGrid[19]![19],
-      ].map(({role, bitIndex, codewordIndex}) => ({role, bitIndex, codewordIndex})),
-      [
-        {role: 'mode', bitIndex: 0, codewordIndex: 0},
-        {role: 'mode', bitIndex: 1, codewordIndex: 0},
-        {role: 'mode', bitIndex: 2, codewordIndex: 0},
-        {role: 'mode', bitIndex: 3, codewordIndex: 0},
+        {row: 20, column: 20, placementBitIndex: 0, codewordIndex: 0},
+        {row: 20, column: 19, placementBitIndex: 1, codewordIndex: 0},
+        {row: 19, column: 20, placementBitIndex: 2, codewordIndex: 0},
+        {row: 19, column: 19, placementBitIndex: 3, codewordIndex: 0},
       ],
     );
-    assert.equal(explanation.moduleGrid[20]![20]!.sourceValue, 0);
-    assert.equal(explanation.moduleGrid[20]![20]!.value, 1);
-    assert.equal(explanation.moduleGrid[19]![19]!.sourceValue, 1);
-    assert.equal(explanation.moduleGrid[19]![19]!.value, 0);
+    for (let index = 0; index < encoded.length; index++) {
+      assert.equal(encoded[index]!.placementBitIndex, index);
+      assert.equal(encoded[index]!.codewordIndex, Math.floor(index / 8));
+      assert.notEqual(encoded[index]!.sourceValue, undefined);
+    }
   });
 
-  test('reports all forced masks and automatic mask selection', () => {
+  test('keeps source bits stable across masks while rendered values change', () => {
+    const mask0 = explainQRCode({data: 'MASK CHECK', version: 3, mask: 0});
+    const mask1 = explainQRCode({data: 'MASK CHECK', version: 3, mask: 1});
+    const encoded0 = mask0.modules.filter((module) => module.role === 'encoded');
+    const encoded1 = mask1.modules.filter((module) => module.role === 'encoded');
+
+    assert.deepEqual(
+      encoded0.map(({sourceValue}) => sourceValue),
+      encoded1.map(({sourceValue}) => sourceValue),
+    );
+    assert.ok(encoded0.some((module, index) => module.value !== encoded1[index]!.value));
+  });
+
+  test('reports forced masks and automatic mask selection', () => {
     for (let mask = 0; mask < 8; mask++) {
       const explanation = explainQRCode({
         data: 'MASK CHECK',
@@ -125,6 +142,13 @@ describe('explainQRCode', () => {
       });
       assert.equal(explanation.mask, mask);
       assert.equal(explanation.errorCorrectionLevel, 'Q');
+      assert.deepEqual(
+        explanation.matrix,
+        qrcode('MASK CHECK')
+          .errorCorrection('Q')
+          .mask(mask as QRCodeMask)
+          .matrix(),
+      );
     }
 
     const automatic = explainQRCode({data: 'AUTOMATIC MASK'});
@@ -136,37 +160,14 @@ describe('explainQRCode', () => {
     assert.deepEqual(automatic.matrix, forced);
   });
 
-  test('tracks interleaved data and error-correction codewords', () => {
-    const explanation = explainQRCode({
-      data: 'INTERLEAVED BLOCKS',
-      version: 10,
-      errorCorrectionLevel: 'H',
-      mask: 5,
-    });
-    const dataModules = explanation.modules.filter(
-      ({role}) =>
-        role === 'eci' ||
-        role === 'mode' ||
-        role === 'character-count' ||
-        role === 'payload' ||
-        role === 'terminator' ||
-        role === 'padding',
-    );
-    const eccModules = explanation.modules.filter(({role}) => role === 'error-correction');
-
-    assert.ok(dataModules.length > 0);
-    assert.ok(eccModules.length > 0);
-    assert.ok(dataModules.every(({codewordIndex}) => codewordIndex !== undefined));
-    assert.ok(eccModules.every(({codewordIndex}) => codewordIndex !== undefined));
-    assert.ok(new Set(dataModules.map(({codewordIndex}) => codewordIndex)).size > 1);
-  });
-
-  test('preserves contextual functional-pattern groups', () => {
+  test('groups the reduced module categories and quiet zone', () => {
     const explanation = explainQRCode({data: '1', version: 2, mask: 0});
 
-    assert.equal(explanation.groups.get('finder:top-left')?.label, 'Top Left finder pattern');
-    assert.equal(explanation.groups.get('separator:top-right')?.label, 'Top Right separator');
-    assert.equal(explanation.groups.get('alignment:18:18')?.label, 'Alignment pattern at (18, 18)');
+    for (const role of QR_CODE_EXPLAIN_ROLE_ORDER) {
+      const group = explanation.groups.get(role);
+      assert.equal(group?.role, role);
+      assert.equal(group?.modules.length, countRole(explanation, role));
+    }
     assert.equal(explanation.groups.get('margin')?.label, 'Quiet zone');
   });
 

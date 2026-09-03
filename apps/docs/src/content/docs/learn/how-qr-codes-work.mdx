@@ -1,6 +1,6 @@
 ---
 title: How QR codes work
-description: Explore how finder patterns, payload data, masks, and error correction become individual QR code modules.
+description: Explore how functional patterns and encoded bits become individual QR code modules.
 docType: concept
 tableOfContents: false
 head:
@@ -10,9 +10,8 @@ head:
 
 import QRCodeExplain from '../../../components/astro/qrcode-explain.astro';
 
-A QR code is more than a black-and-white grid. Its modules carry orientation targets, format
-metadata, encoded payload bits, padding, and Reed–Solomon error correction. Configure a symbol,
-then hover or focus any module to see its role. Click, tap, or press <kbd>Enter</kbd> to pin a
-selection.
+A QR code combines reserved functional modules with placed codeword bits. Some versions also need a
+few remainder bits to complete the placement path. Configure a symbol, then hover or focus any
+module to see which region it belongs to. Click, tap, or press <kbd>Enter</kbd> to pin a selection.
 
 <QRCodeExplain />
