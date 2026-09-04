@@ -2,13 +2,11 @@ import {QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import qrcodeGenerator from 'qrcode-generator';
 import {describe, expect, test} from 'vitest';
 
-import {ɵMODES} from '@qrcodesdk/core';
-
 import {BENCHMARK_ADAPTERS} from '../src/adapters';
 import {AUTOMATIC_QR_CODE_TEST_FIXTURES} from '../src/workloads';
 
 describe('benchmark adapters', () => {
-  const fixtures = ɵMODES.map((mode) =>
+  const fixtures = (['numeric', 'alphanumeric', 'octet'] as const).map((mode) =>
     QR_CODE_TEST_FIXTURES.find((fixture) => fixture.mode === mode)!,
   );
 

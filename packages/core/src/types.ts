@@ -64,32 +64,37 @@ export type QRCodeErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 export type QRCodeMode = 'numeric' | 'alphanumeric' | 'octet';
 export type QRCodeMask = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-export type QRCodeColorHex = `#${string}`;
+export type QRCodeColor = `#${string}`;
 
-export type QRCodeDotType =
-  'rounded' | 'dots' | 'classy' | 'classy-rounded' | 'square' | 'extra-rounded';
+export type QRCodeModuleShape =
+  'square' | 'circle' | 'rounded' | 'extra-rounded' | 'diagonal' | 'diagonal-rounded';
 
-export type QRCodeCornerSquareType = QRCodeDotType | 'dot';
-export type QRCodeCornerDotType = QRCodeDotType | 'dot';
+export type QRCodeFinderShape = 'square' | 'rounded' | 'extra-rounded' | 'circle';
 
-export type QRCodeDotsOptions = {
-  color?: QRCodeColorHex;
-  type?: QRCodeDotType;
+export type QRCodeVisualStyle = {
+  readonly moduleSize?: number;
+  readonly quietZone?: number;
+  readonly foreground?: QRCodeColor;
+  readonly background?: QRCodeColor;
+  readonly modules?: {
+    readonly shape?: QRCodeModuleShape;
+    readonly color?: QRCodeColor;
+  };
+  readonly finder?: {
+    readonly outer?: {
+      readonly shape?: QRCodeFinderShape;
+      readonly color?: QRCodeColor;
+    };
+    readonly center?: {
+      readonly shape?: QRCodeFinderShape;
+      readonly color?: QRCodeColor;
+    };
+  };
 };
 
-export type QRCodeCornersSquareOptions = {
-  color?: QRCodeColorHex;
-  type?: QRCodeCornerSquareType;
-};
-
-export type QRCodeCornersDotOptions = {
-  color?: QRCodeColorHex;
-  type?: QRCodeCornerDotType;
-};
-
-export type QRCodeStylingColors = {
-  colorLight: QRCodeColorHex;
-  colorDark: QRCodeColorHex;
+export type QRCodeTextStyle = {
+  readonly moduleSize?: number;
+  readonly quietZone?: number;
 };
 
 export type QRCodeRenderer<TOutput> = (matrix: QRCodeMatrix) => TOutput;
@@ -102,117 +107,90 @@ export type QRCodeMatrixOptions = {
   eci?: boolean;
 };
 
-export type QRCodeOptions<TRendererOptions> = QRCodeMatrixOptions & TRendererOptions;
-
-export type QRCodeStylingOptions = {
-  size?: number;
-  margin?: number;
-  colors?: Partial<QRCodeStylingColors>;
-  dotsOptions?: QRCodeDotsOptions;
-  cornersSquareOptions?: QRCodeCornersSquareOptions;
-  cornersDotOptions?: QRCodeCornersDotOptions;
-};
-
 export type QRCodeImageOverlayOptions<TSource> = {
-  source: TSource;
-  size?: number;
-  padding?: number;
-  clearBackground?: boolean;
+  readonly source: TSource;
+  readonly size?: number;
+  readonly padding?: number;
+  readonly clearBackground?: boolean;
 };
 
-export type ɵQRCodeResolvedImageOverlay<TSource> = {
-  source: TSource;
-  size: number;
-  padding: number;
-  clearBackground: boolean;
-  imageX: number;
-  imageY: number;
-  imageSize: number;
-  clearX: number;
-  clearY: number;
-  clearSize: number;
+export type QRCodeResolvedVisualStyle = {
+  moduleSize: number;
+  quietZone: number;
+  foreground: QRCodeColor;
+  background: QRCodeColor;
+  modules: {shape: QRCodeModuleShape; color: QRCodeColor};
+  finder: {
+    outer: {shape: QRCodeFinderShape; color: QRCodeColor};
+    center: {shape: QRCodeFinderShape; color: QRCodeColor};
+  };
 };
 
-export type ɵQRCodeParsedStylingOptions = {
-  size: number;
-  margin: number;
-  colors: QRCodeStylingColors;
-  dotsOptions: Required<QRCodeDotsOptions>;
-  cornersSquareOptions: Required<QRCodeCornersSquareOptions>;
-  cornersDotOptions: Required<QRCodeCornersDotOptions>;
-};
-
-export type ɵQRCodeStyleRole = 'dots' | 'cornersSquare' | 'cornersDot';
-export type ɵQRCodeStyleRotation = 0 | 90 | 180 | 270;
-export type ɵQRCodeModuleShape =
+export type QRCodeStyleRole = 'modules' | 'finderOuter' | 'finderCenter';
+export type QRCodeStyleRotation = 0 | 90 | 180 | 270;
+export type QRCodePaintShape =
   | 'square'
-  | 'dot'
+  | 'circle'
   | 'side-rounded'
   | 'corner-rounded'
   | 'corner-extra-rounded'
   | 'opposite-corners-rounded';
 
 type QRCodeStylePrimitiveBase = {
-  role: ɵQRCodeStyleRole;
-  color: QRCodeColorHex;
+  role: QRCodeStyleRole;
+  color: QRCodeColor;
   x: number;
   y: number;
   size: number;
-  rotation: ɵQRCodeStyleRotation;
+  rotation: QRCodeStyleRotation;
 };
 
-export type ɵQRCodeModuleStylePrimitive = QRCodeStylePrimitiveBase & {
+export type QRCodeModuleStylePrimitive = QRCodeStylePrimitiveBase & {
   kind: 'module';
-  shape: ɵQRCodeModuleShape;
+  shape: QRCodePaintShape;
 };
 
-export type ɵQRCodeFinderRingStylePrimitive = QRCodeStylePrimitiveBase & {
+export type QRCodeFinderRingStylePrimitive = QRCodeStylePrimitiveBase & {
   kind: 'finder-ring';
-  role: 'cornersSquare';
-  shape: 'dot' | 'square' | 'extra-rounded';
+  role: 'finderOuter';
+  shape: QRCodeFinderShape;
 };
 
-export type ɵQRCodeFinderCenterStylePrimitive = QRCodeStylePrimitiveBase & {
+export type QRCodeFinderCenterStylePrimitive = QRCodeStylePrimitiveBase & {
   kind: 'finder-center';
-  role: 'cornersDot';
-  shape: 'dot' | 'square';
+  role: 'finderCenter';
+  shape: QRCodeFinderShape;
 };
 
-export type ɵQRCodeStylePrimitive =
-  ɵQRCodeModuleStylePrimitive | ɵQRCodeFinderRingStylePrimitive | ɵQRCodeFinderCenterStylePrimitive;
+export type QRCodeStylePrimitive =
+  QRCodeModuleStylePrimitive | QRCodeFinderRingStylePrimitive | QRCodeFinderCenterStylePrimitive;
 
-export type ɵQRCodeStyleRectangle = {
+export type QRCodeStyleRectangle = {
   x: number;
   y: number;
   width: number;
   height: number;
 };
 
-export type ɵQRCodeStyleLayer = {
-  color: QRCodeColorHex;
-  rectangles: readonly ɵQRCodeStyleRectangle[];
-  curvedPrimitives: readonly ɵQRCodeStylePrimitive[];
+export type QRCodeStyleLayer = {
+  color: QRCodeColor;
+  rectangles: readonly QRCodeStyleRectangle[];
+  curvedPrimitives: readonly QRCodeStylePrimitive[];
 };
 
-export type ɵQRCodeStylePlan = {
+export type QRCodeStylePlan = {
   moduleCount: number;
   viewSize: number;
-  renderedSize: number;
-  backgroundColor: QRCodeColorHex;
+  outputSize: number;
+  backgroundColor: QRCodeColor;
   hasCurves: boolean;
-  layers: readonly ɵQRCodeStyleLayer[];
+  layers: readonly QRCodeStyleLayer[];
 };
 
-export type ɵQRCodeResolvedMatrixOptions = {
+export type QRCodeResolvedMatrixOptions = {
   segments: readonly QRCodeEncodedSegment[];
   version: QRCodeVersion;
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue;
   mask: QRCodeMask | undefined;
   eci: boolean;
-};
-
-export type QRCodeAccessibilityOptions = {
-  alt?: string;
-  ariaLabel?: string;
-  title?: string;
 };

@@ -7,9 +7,9 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '../src/lib/index.js';
 
-const svgOptions: QRCodeSVGOptions = {size: 2, margin: 1};
-const imageOptions: QRCodeImageOptions = {size: 2, margin: 1};
-const canvasOptions: QRCodeCanvasOptions = {size: 2, margin: 1};
+const svgOptions: QRCodeSVGOptions = {style: {moduleSize: 2, quietZone: 1}};
+const imageOptions: QRCodeImageOptions = {style: {moduleSize: 2, quietZone: 1}};
+const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}};
 
 describe('Svelte QR code server rendering', () => {
   test('renders SVG but no browser elements during SSR', () => {

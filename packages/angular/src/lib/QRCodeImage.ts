@@ -18,6 +18,7 @@ import {
 import {type QRCodeInputData, qrcode} from '@qrcodesdk/core';
 
 import {replaceElementChildren} from './render-element';
+import {splitOptions} from './split-options';
 
 @Component({
   selector: 'qrcode-image',
@@ -32,10 +33,11 @@ export class QRCodeImage {
 
   options = input<QRCodeImageOptions>();
 
-  readonly imageRenderer = computed(() => QRCodeImageRenderer(this.options()));
+  readonly resolvedOptions = computed(() => splitOptions(this.options()));
+  readonly imageRenderer = computed(() => QRCodeImageRenderer(this.resolvedOptions()[1]));
 
   readonly qrcodeBuilder = computed(() =>
-    qrcode(this.data()).config(this.options()).renderer(this.imageRenderer()),
+    qrcode(this.data()).config(this.resolvedOptions()[0]).renderer(this.imageRenderer()),
   );
 
   constructor() {

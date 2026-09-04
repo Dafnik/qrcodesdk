@@ -6,10 +6,11 @@ import {QRCodeImage} from '@qrcodesdk/react';
 export default function QRCodeImageExample() {
   const options = useMemo<QRCodeImageOptions>(
     () => ({
-      size: 8,
-      margin: 4,
-      alt: 'QR code for qrcodesdk.dev',
-      ariaLabel: 'Scan to open qrcodesdk.dev',
+      style: {moduleSize: 8, quietZone: 4},
+      accessibility: {
+        alt: 'QR code for qrcodesdk.dev',
+        ariaLabel: 'Scan to open qrcodesdk.dev',
+      },
     }),
     [],
   );

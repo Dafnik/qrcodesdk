@@ -5,7 +5,10 @@ import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/react';
 
 export default function QRCodeDownloadImageExample() {
   const qrcode = useRef<QRCodeDownloadHandle>(null);
-  const options = useMemo<QRCodeImageOptions>(() => ({alt: 'QR code for qrcodesdk.dev'}), []);
+  const options = useMemo<QRCodeImageOptions>(
+    () => ({accessibility: {alt: 'QR code for qrcodesdk.dev'}}),
+    [],
+  );
 
   return (
     <div className="flex flex-col items-center gap-2">

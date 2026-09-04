@@ -10,7 +10,7 @@ import {expectSvgToMatchFileSnapshot} from './svg-helpers';
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/svg', import.meta.url));
 
 describe('QRCodeSVGRenderer snapshots', () => {
-  const renderer = QRCodeSVGRenderer({size: 8, margin: 4});
+  const renderer = QRCodeSVGRenderer({style: {moduleSize: 8, quietZone: 4}});
   test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR SVG snapshot', (fixture) => {
     expectSvgToMatchFileSnapshot(
       qrcode(fixture.data).config(fixture).render(renderer),
@@ -20,7 +20,9 @@ describe('QRCodeSVGRenderer snapshots', () => {
 
   test.each(QR_CODE_STYLING_FIXTURES)('matches $name SVG styling snapshot', (fixture) => {
     expectSvgToMatchFileSnapshot(
-      qrcode(fixture.data).config(fixture.matrixOptions).render(QRCodeSVGRenderer(fixture.styling)),
+      qrcode(fixture.data)
+        .config(fixture.matrixOptions)
+        .render(QRCodeSVGRenderer({style: fixture.styling})),
       join(SNAPSHOT_DIR, 'styling', `${fixture.name}.svg`),
     );
   });

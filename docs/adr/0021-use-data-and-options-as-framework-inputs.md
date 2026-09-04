@@ -3,4 +3,6 @@
 Framework components permanently accept one `data` input and one `options` input for QR code
 behavior. They do not duplicate renderer and matrix settings as individual component props, which
 keeps the configuration model consistent across frameworks and avoids collisions with ordinary
-component-host attributes such as `title`.
+component-host attributes such as `title`. Matrix configuration is nested under `options.matrix`;
+renderer concerns such as `style`, `accessibility`, and `image` remain adjacent to it and are passed
+only to the owning renderer.

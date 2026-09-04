@@ -1,6 +1,6 @@
 ---
 title: Terminal text renderer
-description: Reference for compact, full-height, and ANSI terminal strings from QRCodeTextRenderer.
+description: Reference for compact, full, and ANSI terminal strings from QRCodeTextRenderer.
 docType: reference
 
 related:
@@ -9,59 +9,43 @@ related:
   - ./svg.md
 ---
 
-## When to use
-
-Use `QRCodeTextRenderer` for developer-facing QR codes in terminals, CLIs, logs, text files, and
-deterministic snapshots.
-
-## Minimal example
+`QRCodeTextRenderer` returns a string with no trailing newline. It exposes only the dimensions a
+terminal can represent through `QRCodeTextStyle`; graphical colors and shapes are not accepted.
 
 ```ts
 import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
 
-const text = qrcode('HELLO WORLD').render(QRCodeTextRenderer());
-
-console.log(text);
+const text = qrcode('HELLO WORLD').render(
+  QRCodeTextRenderer({
+    style: {moduleSize: 1, quietZone: 2},
+    layout: 'compact',
+    ansi: true,
+  }),
+);
 ```
 
-## Return value
+## Options
 
-The renderer returns a `string` joined with `\n` and no trailing newline. Compact output uses `▀`,
-`▄`, `█`, and spaces to represent two scaled QR rows per terminal line.
+| Option             | Default     | Effect                                                                  |
+| ------------------ | ----------- | ----------------------------------------------------------------------- |
+| `style.moduleSize` | `5`         | Positive integer module scale                                           |
+| `style.quietZone`  | `4`         | Non-negative integer border in modules                                  |
+| `layout`           | `'compact'` | `'compact'` packs two rows per line; `'full'` uses two cells per module |
+| `ansi`             | `false`     | `true`, `false`, or an ANSI configuration object                        |
+| `ansi.mode`        | `'blocks'`  | `'blocks'` uses glyphs; `'background'` uses colored spaces              |
+| `ansi.foreground`  | `'#000000'` | RGB or RGBA hexadecimal dark color                                      |
+| `ansi.background`  | `'#ffffff'` | RGB or RGBA hexadecimal light color                                     |
 
-For `S = (matrix width + 2 × margin) × size`:
+An ANSI object enables ANSI output. Background mode has fixed full-cell geometry and therefore
+rejects an explicitly supplied `layout`. The renderer does not inspect TTY state or `NO_COLOR`;
+callers such as the CLI choose that policy before creating it.
 
-| Layout                 | Visible width |    Line count | Representation                                |
-| ---------------------- | ------------: | ------------: | --------------------------------------------- |
-| `small: true`          |           `S` | `ceil(S / 2)` | UTF-8 half/full block characters              |
-| `small: false`         |       `2 × S` |           `S` | `██` or two spaces                            |
-| `onlyAnsiColors: true` |       `2 × S` |           `S` | Two ANSI-background-colored spaces per module |
+Terminals have no alpha channel. RGBA background colors are composited over white, then RGBA
+foreground colors are composited over that resolved background before 24-bit ANSI sequences are
+written. Alpha is therefore deterministic and never silently discarded.
 
-## Renderer-specific options
+For `S = (matrix width + 2 × quietZone) × moduleSize`, compact output is `S` cells wide and
+`ceil(S / 2)` lines high. Full and ANSI-background output are `2 × S` cells wide and `S` lines high.
 
-| Option              | Type                | Default     | Effect                                            |
-| ------------------- | ------------------- | ----------- | ------------------------------------------------- |
-| `size`              | `number`            | `5`         | Positive integer module scale                     |
-| `margin`            | `number`            | `4`         | Non-negative integer quiet zone in modules        |
-| `small`             | `boolean`           | `true`      | Packs two scaled rows into each terminal line     |
-| `ansiColors`        | `boolean`           | `false`     | Adds 24-bit ANSI foreground/background colors     |
-| `onlyAnsiColors`    | `boolean`           | `false`     | Uses colored space cells without block glyphs     |
-| `colors.colorDark`  | six-digit hex color | `'#000000'` | Dark foreground or background when ANSI is active |
-| `colors.colorLight` | six-digit hex color | `'#ffffff'` | Light background when ANSI is active              |
-
-`onlyAnsiColors: true` requires `ansiColors: true` and ignores `small`.
-
-## Renderer-specific constraints
-
-- Compact and full layouts require a UTF-8 output environment for their block glyphs.
-- `onlyAnsiColors: true` with `ansiColors: false` throws an error.
-- The renderer does not inspect TTY state, `NO_COLOR`, or related environment variables.
-- ANSI sequences add invisible bytes but do not change the visible dimensions above. Every styled
-  line ends with an ANSI reset.
-- The Core API defaults ANSI colors to off. The CLI intentionally enables them by default.
-
-## Related guides
-
-- [Customize appearance](/guides/customize/) for the shared quiet-zone and color rules.
-- [CLI package](/packages/cli/) for terminal commands, flags, stdout, and file behavior.
-- [Download or save](/guides/download-or-save/) for choosing text, SVG, or PNG files.
+Renderer options are validated and copied at factory creation. Unknown keys and unsupported
+combinations throw immediately.

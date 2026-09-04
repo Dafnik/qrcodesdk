@@ -12,11 +12,11 @@ import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
 })
 export class QRCodeCanvasExample {
   protected readonly options: QRCodeCanvasOptions = {
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
+    style: {
+      moduleSize: 8,
+      quietZone: 4,
+      foreground: '#111827',
+      background: '#ffffff',
     },
   };
 }

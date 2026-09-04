@@ -412,7 +412,7 @@ export class QRCodeExplain {
   protected readonly tooltipPosition = signal<TooltipPosition>({x: 0, y: 0, below: false});
   protected readonly renderedPixelSize = computed(() => {
     const explanation = this.explanation();
-    return explanation === undefined ? 0 : explanation.viewSize * explanation.size;
+    return explanation === undefined ? 0 : explanation.viewSize * explanation.moduleSize;
   });
   protected readonly activeModules = computed<readonly QRCodeExplainModule[]>(() => {
     const selection = this.activeSelection();
@@ -429,7 +429,7 @@ export class QRCodeExplain {
       counts.set(module.role, (counts.get(module.role) ?? 0) + 1);
     }
     const items: LegendItem[] =
-      explanation.margin > 0
+      explanation.quietZone > 0
         ? [
             {
               id: 'role:margin',

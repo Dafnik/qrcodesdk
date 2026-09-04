@@ -1,14 +1,10 @@
-import {
-  ɵECC_LEVELS,
-  ɵMODES,
-  ɵisQRCodeColorHex,
-  ɵisQRCodeCornerDotType,
-  ɵisQRCodeCornerSquareType,
-  ɵisQRCodeDotType,
-  ɵisValidQRCodeMargin,
-  ɵisValidQRCodeSize,
+import type {
+  QRCodeColor,
+  QRCodeFinderShape,
+  QRCodeMask,
+  QRCodeModuleShape,
+  QRCodeVersion,
 } from '@qrcodesdk/core';
-import type {QRCodeColorHex, QRCodeMask, QRCodeVersion} from '@qrcodesdk/core';
 
 import {
   type PlaygroundConfig,
@@ -30,6 +26,22 @@ const PLAYGROUND_OUTPUTS = [
   'image',
   'canvas',
 ] as const satisfies readonly PlaygroundOutput[];
+const MODES = ['numeric', 'alphanumeric', 'octet'] as const;
+const ERROR_CORRECTION_LEVELS = ['L', 'M', 'Q', 'H'] as const;
+const MODULE_SHAPES = [
+  'square',
+  'circle',
+  'rounded',
+  'extra-rounded',
+  'diagonal',
+  'diagonal-rounded',
+] as const satisfies readonly QRCodeModuleShape[];
+const FINDER_SHAPES = [
+  'square',
+  'rounded',
+  'extra-rounded',
+  'circle',
+] as const satisfies readonly QRCodeFinderShape[];
 
 interface QueryFieldCodec {
   readonly key: string;
@@ -80,7 +92,7 @@ const QUERY_FIELD_CODECS = [
     'mode',
     (config) => config.mode,
     (config, mode) => setOptionalProperty(config, 'mode', mode),
-    (value, fallback) => parseOptionalStringUnion(value, ɵMODES, fallback),
+    (value, fallback) => parseOptionalStringUnion(value, MODES, fallback),
     serializeString,
   ),
   defineQueryField(
@@ -88,7 +100,7 @@ const QUERY_FIELD_CODECS = [
     (config) => config.errorCorrectionLevel,
     (config, errorCorrectionLevel) =>
       setOptionalProperty(config, 'errorCorrectionLevel', errorCorrectionLevel),
-    (value, fallback) => parseOptionalStringUnion(value, ɵECC_LEVELS, fallback),
+    (value, fallback) => parseOptionalStringUnion(value, ERROR_CORRECTION_LEVELS, fallback),
     serializeString,
   ),
   defineQueryField(
@@ -108,89 +120,85 @@ const QUERY_FIELD_CODECS = [
     serializeBoolean,
   ),
   defineQueryField(
-    'size',
-    (config) => config.size,
-    (config, size) => setOptionalProperty(config, 'size', size),
-    (value, fallback) => parseOptionalNumber(value, ɵisValidQRCodeSize, fallback),
+    'module-size',
+    (config) => config.moduleSize,
+    (config, moduleSize) => setOptionalProperty(config, 'moduleSize', moduleSize),
+    (value, fallback) => parseOptionalNumber(value, isPositiveInteger, fallback),
     serializeNumber,
   ),
   defineQueryField(
-    'margin',
-    (config) => config.margin,
-    (config, margin) => setOptionalProperty(config, 'margin', margin),
-    (value, fallback) => parseOptionalNumber(value, ɵisValidQRCodeMargin, fallback),
+    'quiet-zone',
+    (config) => config.quietZone,
+    (config, quietZone) => setOptionalProperty(config, 'quietZone', quietZone),
+    (value, fallback) => parseOptionalNumber(value, isNonNegativeInteger, fallback),
     serializeNumber,
   ),
   defineQueryField(
-    'light',
-    (config) => config.colors?.colorLight,
-    (config, colorLight) => {
-      config.colors = compactObject({...config.colors, colorLight});
-    },
+    'background',
+    (config) => config.background,
+    (config, background) => setOptionalProperty(config, 'background', background),
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
-    'dark',
-    (config) => config.colors?.colorDark,
-    (config, colorDark) => {
-      config.colors = compactObject({...config.colors, colorDark});
-    },
+    'foreground',
+    (config) => config.foreground,
+    (config, foreground) => setOptionalProperty(config, 'foreground', foreground),
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
-    'dots-color',
-    (config) => config.dotsOptions?.color,
+    'modules-color',
+    (config) => config.modules?.color,
     (config, color) => {
-      config.dotsOptions = compactObject({...config.dotsOptions, color});
+      config.modules = compactObject({...config.modules, color});
     },
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
-    'dots-type',
-    (config) => config.dotsOptions?.type,
-    (config, type) => {
-      config.dotsOptions = compactObject({...config.dotsOptions, type});
+    'modules-shape',
+    (config) => config.modules?.shape,
+    (config, shape) => {
+      config.modules = compactObject({...config.modules, shape});
     },
-    (value, fallback) => parseOptionalGuardedString(value, ɵisQRCodeDotType, fallback),
+    (value, fallback) => parseOptionalStringUnion(value, MODULE_SHAPES, fallback),
     serializeString,
   ),
   defineQueryField(
-    'corner-square-color',
-    (config) => config.cornersSquareOptions?.color,
+    'finder-outer-color',
+    (config) => config.finder?.outer?.color,
     (config, color) => {
-      config.cornersSquareOptions = compactObject({...config.cornersSquareOptions, color});
+      config.finder = {...config.finder, outer: compactObject({...config.finder?.outer, color})};
     },
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
-    'corner-square-type',
-    (config) => config.cornersSquareOptions?.type,
-    (config, type) => {
-      config.cornersSquareOptions = compactObject({...config.cornersSquareOptions, type});
+    'finder-outer-shape',
+    (config) => config.finder?.outer?.shape,
+    (config, shape) => {
+      config.finder = {...config.finder, outer: compactObject({...config.finder?.outer, shape})};
     },
-    (value, fallback) => parseOptionalGuardedString(value, ɵisQRCodeCornerSquareType, fallback),
+    (value, fallback) => parseOptionalStringUnion(value, FINDER_SHAPES, fallback),
     serializeString,
   ),
   defineQueryField(
-    'corner-dot-color',
-    (config) => config.cornersDotOptions?.color,
+    'finder-center-color',
+    (config) => config.finder?.center?.color,
     (config, color) => {
-      config.cornersDotOptions = compactObject({...config.cornersDotOptions, color});
+      config.finder = {...config.finder, center: compactObject({...config.finder?.center, color})};
     },
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
-    'corner-dot-type',
-    (config) => config.cornersDotOptions?.type,
-    (config, type) => {
-      config.cornersDotOptions = compactObject({...config.cornersDotOptions, type});
+    'finder-center-shape',
+    (config) => config.finder?.center?.shape,
+    (config, shape) => {
+      config.finder = {...config.finder, center: compactObject({...config.finder?.center, shape})};
     },
-    (value, fallback) => parseOptionalGuardedString(value, ɵisQRCodeCornerDotType, fallback),
+    (value, fallback) => parseOptionalStringUnion(value, FINDER_SHAPES, fallback),
     serializeString,
   ),
   defineQueryField(
@@ -425,18 +433,6 @@ function parseOptionalStringUnion<const T extends string>(
   return supportedValues.includes(value as T) ? (value as T) : fallback;
 }
 
-function parseOptionalGuardedString<T extends string>(
-  value: string | null,
-  guard: (value: unknown) => value is T,
-  fallback: T | undefined,
-): T | undefined {
-  if (value === null) {
-    return fallback;
-  }
-
-  return guard(value) ? value : fallback;
-}
-
 function parseOptionalNumber<T extends number>(
   value: string | null,
   guard: (value: unknown) => value is T,
@@ -453,19 +449,19 @@ function parseOptionalNumber<T extends number>(
 
 function parseOptionalColor(
   value: string | null,
-  fallback: QRCodeColorHex | undefined,
-): QRCodeColorHex | undefined {
+  fallback: QRCodeColor | undefined,
+): QRCodeColor | undefined {
   if (value === null || value.trim() === '') {
     return fallback;
   }
 
   const normalized = value.startsWith('#') ? value : `#${value}`;
 
-  if (!ɵisQRCodeColorHex(normalized)) {
+  if (!isQRCodeColor(normalized)) {
     return fallback;
   }
 
-  return normalized.toLowerCase() as QRCodeColorHex;
+  return normalized.toLowerCase() as QRCodeColor;
 }
 
 function parseOptionalString(
@@ -512,10 +508,10 @@ function serializeBoolean(value: boolean, defaultValue: boolean | undefined): st
 }
 
 function serializeColor(
-  value: QRCodeColorHex | undefined,
-  defaultValue: QRCodeColorHex | undefined,
+  value: QRCodeColor | undefined,
+  defaultValue: QRCodeColor | undefined,
 ): string | undefined {
-  if (value === undefined || !ɵisQRCodeColorHex(value) || colorsEqual(value, defaultValue)) {
+  if (value === undefined || !isQRCodeColor(value) || colorsEqual(value, defaultValue)) {
     return undefined;
   }
 
@@ -523,7 +519,7 @@ function serializeColor(
   return value.slice(1).toLowerCase();
 }
 
-function colorsEqual(first: QRCodeColorHex, second: QRCodeColorHex | undefined): boolean {
+function colorsEqual(first: QRCodeColor, second: QRCodeColor | undefined): boolean {
   return second !== undefined && first.toLowerCase() === second.toLowerCase();
 }
 
@@ -546,8 +542,10 @@ type OptionalPlaygroundConfigKey =
   | 'mode'
   | 'errorCorrectionLevel'
   | 'mask'
-  | 'size'
-  | 'margin'
+  | 'moduleSize'
+  | 'quietZone'
+  | 'foreground'
+  | 'background'
   | 'alt'
   | 'ariaLabel'
   | 'title';
@@ -567,15 +565,24 @@ function setOptionalProperty<K extends OptionalPlaygroundConfigKey>(
 function clonePlaygroundConfig(config: PlaygroundConfig): PlaygroundConfig {
   return {
     ...config,
-
-    colors: config.colors ? {...config.colors} : undefined,
-
-    dotsOptions: config.dotsOptions ? {...config.dotsOptions} : undefined,
-
-    cornersSquareOptions: config.cornersSquareOptions
-      ? {...config.cornersSquareOptions}
+    modules: config.modules ? {...config.modules} : undefined,
+    finder: config.finder
+      ? {
+          outer: config.finder.outer ? {...config.finder.outer} : undefined,
+          center: config.finder.center ? {...config.finder.center} : undefined,
+        }
       : undefined,
-
-    cornersDotOptions: config.cornersDotOptions ? {...config.cornersDotOptions} : undefined,
   };
+}
+
+function isPositiveInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}
+
+function isQRCodeColor(value: unknown): value is QRCodeColor {
+  return typeof value === 'string' && /^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i.test(value);
 }

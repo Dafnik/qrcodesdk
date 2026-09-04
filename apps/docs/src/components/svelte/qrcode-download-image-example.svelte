@@ -3,7 +3,7 @@
   import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/svelte';
 
   let qrcode: QRCodeDownloadHandle | undefined;
-  const options: QRCodeImageOptions = {alt: 'QR code for qrcodesdk.dev'};
+  const options: QRCodeImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};
 </script>
 
 <div class="flex flex-col items-center gap-2">

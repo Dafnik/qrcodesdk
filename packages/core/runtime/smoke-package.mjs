@@ -1,4 +1,5 @@
 import * as core from '@qrcodesdk/core';
+import * as drawing from '@qrcodesdk/core/drawing';
 
 const EXPECTED_MATRIX_SIZE = 29;
 const EXPECTED_MATRIX_CHECKSUM = 321386907;
@@ -48,6 +49,14 @@ function assertMatrix(matrix) {
 
 globalThis.console.log('Testing the installed @qrcodesdk/core package');
 
+assert(
+  [...Object.keys(core), ...Object.keys(drawing)].every(
+    (name) => !name.startsWith(String.fromCodePoint(0x275)),
+  ),
+  'Expected package entry points to contain no internal exports',
+);
+logSuccess('root and drawing subpath resolve without internal runtime exports');
+
 for (const exportName of ['qrcode', 'QRCodeSVGRenderer', 'QRCodeTextRenderer']) {
   assert(typeof core[exportName] === 'function', `Expected Core export ${exportName}`);
 }
@@ -60,9 +69,8 @@ logSuccess('builder creates the expected binary 29×29 matrix and checksum');
 
 const svg = builder.render(
   core.QRCodeSVGRenderer({
-    size: 2,
-    margin: 1,
-    title: 'Runtime smoke',
+    style: {moduleSize: 2, quietZone: 1},
+    accessibility: {title: 'Runtime smoke'},
   }),
 );
 assert(svg.includes('width="62"'), 'Expected SVG width 62');
@@ -72,7 +80,7 @@ assert(svg.includes('role="img"'), 'Expected the SVG image role');
 assert(svg.includes('<title>Runtime smoke</title>'), 'Expected the SVG title element');
 logSuccess('SVG renderer produces the expected size, view box, role, and title');
 
-const text = builder.render(core.QRCodeTextRenderer({size: 1, margin: 1}));
+const text = builder.render(core.QRCodeTextRenderer({style: {moduleSize: 1, quietZone: 1}}));
 const lines = text.split('\n');
 assert(lines.length === 16, 'Expected terminal text to contain 16 lines');
 assert(

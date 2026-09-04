@@ -17,7 +17,7 @@ import {HlmRadioGroupImports} from '@spartan-ng/helm/radio-group';
 import {HlmSelectImports} from '@spartan-ng/helm/select';
 import {HlmSwitchImports} from '@spartan-ng/helm/switch';
 
-import type {QRCodeCornerDotType, QRCodeCornerSquareType, QRCodeDotType} from '@qrcodesdk/core';
+import type {QRCodeFinderShape, QRCodeModuleShape} from '@qrcodesdk/core';
 
 import {
   type PlaygroundOutput,
@@ -140,8 +140,8 @@ export class PlaygroundColorInput {
           <label hlmFieldLabel for="darkColor">Dark Color</label>
           <playground-color-input
             [presets]="DARK_COLOR_PRESETS"
-            [color]="colorDark()"
-            (colorChange)="updateQrConfig({colors: {colorDark: $event}})"
+            [color]="foreground()"
+            (colorChange)="updateQrConfig({foreground: $event})"
             buttonId="darkColor" />
         </div>
 
@@ -149,8 +149,8 @@ export class PlaygroundColorInput {
           <label hlmFieldLabel for="lightColor">Light Color</label>
           <playground-color-input
             [presets]="LIGHT_COLOR_PRESETS"
-            [color]="colorLight()"
-            (colorChange)="updateQrConfig({colors: {colorLight: $event}})"
+            [color]="background()"
+            (colorChange)="updateQrConfig({background: $event})"
             buttonId="lightColor" />
         </div>
       </div>
@@ -172,7 +172,7 @@ export class PlaygroundColorInput {
             <div class="grid gap-4 py-2 md:grid-cols-2">
               <div
                 class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
-                [attr.data-checked]="overrideDot() ? 'true' : 'false'">
+                [attr.data-checked]="overrideModules() ? 'true' : 'false'">
                 <label
                   class="grid w-full gap-2 p-4 has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-70"
                   for="override-dot"
@@ -184,25 +184,28 @@ export class PlaygroundColorInput {
                         (Data modules)
                       </span>
                     </div>
-                    <hlm-switch [(checked)]="overrideDot" inputId="override-dot" />
+                    <hlm-switch [(checked)]="overrideModules" inputId="override-dot" />
                   </div>
 
                   <div class="grid gap-2 md:grid-cols-2">
                     <div hlmField>
-                      <label hlmFieldLabel for="dotType">Type</label>
+                      <label hlmFieldLabel for="moduleShape">Type</label>
                       <hlm-select
-                        [disabled]="!overrideDot()"
-                        [ngModel]="dotType()"
-                        (ngModelChange)="updateQrConfig({dotsOptions: {type: $event}})">
-                        <hlm-select-trigger class="w-full" buttonId="dotType">
+                        [disabled]="!overrideModules()"
+                        [ngModel]="moduleShape()"
+                        (ngModelChange)="updateQrConfig({modules: {shape: $event}})">
+                        <hlm-select-trigger class="w-full" buttonId="moduleShape">
                           <hlm-select-value placeholder="Auto" />
                         </hlm-select-trigger>
                         <hlm-select-content *hlmSelectPortal>
                           <hlm-select-group>
                             <hlm-select-label>Dot type</hlm-select-label>
-                            @for (dotTypeOption of DOT_TYPE_OPTIONS; track dotTypeOption) {
-                              <hlm-select-item [value]="dotTypeOption">
-                                {{ dotTypeOption }}
+                            @for (
+                              moduleShapeOption of MODULE_SHAPE_OPTIONS;
+                              track moduleShapeOption
+                            ) {
+                              <hlm-select-item [value]="moduleShapeOption">
+                                {{ moduleShapeOption }}
                               </hlm-select-item>
                             }
                           </hlm-select-group>
@@ -210,23 +213,23 @@ export class PlaygroundColorInput {
                       </hlm-select>
                     </div>
                     <div hlmField>
-                      <label hlmFieldLabel for="dotColor">Color</label>
+                      <label hlmFieldLabel for="moduleColor">Color</label>
                       <playground-color-input
                         [presets]="DARK_COLOR_PRESETS"
-                        [color]="dotColor()"
-                        [disabled]="!overrideDot()"
-                        (colorChange)="updateQrConfig({dotsOptions: {color: $event}})"
-                        buttonId="dotColor" />
+                        [color]="moduleColor()"
+                        [disabled]="!overrideModules()"
+                        (colorChange)="updateQrConfig({modules: {color: $event}})"
+                        buttonId="moduleColor" />
                     </div>
                   </div>
                 </label>
               </div>
               <div
                 class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
-                [attr.data-checked]="overrideCornersSquare() ? 'true' : 'false'">
+                [attr.data-checked]="overrideFinderOuter() ? 'true' : 'false'">
                 <label
                   class="grid w-full gap-2 p-4 has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-70"
-                  for="override-corners-square"
+                  for="override-finder-outer"
                   hlmLabel>
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
@@ -235,18 +238,16 @@ export class PlaygroundColorInput {
                         (Finder squares)
                       </span>
                     </div>
-                    <hlm-switch
-                      [(checked)]="overrideCornersSquare"
-                      inputId="override-corners-square" />
+                    <hlm-switch [(checked)]="overrideFinderOuter" inputId="override-finder-outer" />
                   </div>
 
                   <div class="grid gap-2 md:grid-cols-2">
                     <div hlmField>
                       <label hlmFieldLabel for="cornerSquareType">Type</label>
                       <hlm-select
-                        [disabled]="!overrideCornersSquare()"
-                        [ngModel]="cornersSquareType()"
-                        (ngModelChange)="updateQrConfig({cornersSquareOptions: {type: $event}})">
+                        [disabled]="!overrideFinderOuter()"
+                        [ngModel]="finderOuterType()"
+                        (ngModelChange)="updateQrConfig({finder: {outer: {shape: $event}}})">
                         <hlm-select-trigger class="w-full" buttonId="cornerSquareType">
                           <hlm-select-value placeholder="Auto" />
                         </hlm-select-trigger>
@@ -254,7 +255,7 @@ export class PlaygroundColorInput {
                           <hlm-select-group>
                             <hlm-select-label>Corners square type</hlm-select-label>
                             @for (
-                              cornerSquareTypeOption of CORNER_SQUARE_TYPE_OPTIONS;
+                              cornerSquareTypeOption of FINDER_OUTER_SHAPE_OPTIONS;
                               track cornerSquareTypeOption
                             ) {
                               <hlm-select-item [value]="cornerSquareTypeOption">
@@ -269,9 +270,9 @@ export class PlaygroundColorInput {
                       <label hlmFieldLabel for="cornerSquareColor">Color</label>
                       <playground-color-input
                         [presets]="DARK_COLOR_PRESETS"
-                        [color]="cornersSquareColor()"
-                        [disabled]="!overrideCornersSquare()"
-                        (colorChange)="updateQrConfig({cornersSquareOptions: {color: $event}})"
+                        [color]="finderOuterColor()"
+                        [disabled]="!overrideFinderOuter()"
+                        (colorChange)="updateQrConfig({finder: {outer: {color: $event}}})"
                         buttonId="cornerSquareColor" />
                     </div>
                   </div>
@@ -279,10 +280,10 @@ export class PlaygroundColorInput {
               </div>
               <div
                 class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
-                [attr.data-checked]="overrideCornersDot() ? 'true' : 'false'">
+                [attr.data-checked]="overrideFinderCenter() ? 'true' : 'false'">
                 <label
                   class="grid w-full gap-2 p-4 has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-70"
-                  for="override-corners-dot"
+                  for="override-finder-center"
                   hlmLabel>
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
@@ -291,16 +292,18 @@ export class PlaygroundColorInput {
                         (Finder dots)
                       </span>
                     </div>
-                    <hlm-switch [(checked)]="overrideCornersDot" inputId="override-corners-dot" />
+                    <hlm-switch
+                      [(checked)]="overrideFinderCenter"
+                      inputId="override-finder-center" />
                   </div>
 
                   <div class="grid gap-2 md:grid-cols-2">
                     <div hlmField>
                       <label hlmFieldLabel for="cornerDotType">Type</label>
                       <hlm-select
-                        [disabled]="!overrideCornersDot()"
-                        [ngModel]="cornersDotType()"
-                        (ngModelChange)="updateQrConfig({cornersDotOptions: {type: $event}})">
+                        [disabled]="!overrideFinderCenter()"
+                        [ngModel]="finderCenterType()"
+                        (ngModelChange)="updateQrConfig({finder: {center: {shape: $event}}})">
                         <hlm-select-trigger class="w-full" buttonId="cornerDotType">
                           <hlm-select-value placeholder="Auto" />
                         </hlm-select-trigger>
@@ -308,7 +311,7 @@ export class PlaygroundColorInput {
                           <hlm-select-group>
                             <hlm-select-label>Corners dot type</hlm-select-label>
                             @for (
-                              cornerDotTypeOptions of CORNER_DOT_TYPE_OPTIONS;
+                              cornerDotTypeOptions of CORNER_MODULE_SHAPE_OPTIONS;
                               track cornerDotTypeOptions
                             ) {
                               <hlm-select-item [value]="cornerDotTypeOptions">
@@ -323,9 +326,9 @@ export class PlaygroundColorInput {
                       <label hlmFieldLabel for="cornerDotColor">Color</label>
                       <playground-color-input
                         [presets]="DARK_COLOR_PRESETS"
-                        [color]="cornersDotColor()"
-                        [disabled]="!overrideCornersDot()"
-                        (colorChange)="updateQrConfig({cornersDotOptions: {color: $event}})"
+                        [color]="finderCenterColor()"
+                        [disabled]="!overrideFinderCenter()"
+                        (colorChange)="updateQrConfig({finder: {center: {color: $event}}})"
                         buttonId="cornerDotColor" />
                     </div>
                   </div>
@@ -398,35 +401,27 @@ export class PlaygroundControls {
   protected readonly currentConfig = toSignal(this.nanostores.useStore(playgroundConfig), {
     requireSync: true,
   });
-  protected readonly colorDark = computed(
-    () => this.currentConfig().colors?.colorDark ?? '#000000',
+  protected readonly foreground = computed(() => this.currentConfig().foreground ?? '#000000');
+  protected readonly background = computed(() => this.currentConfig().background ?? '#FFFFFF');
+  protected readonly moduleShape = computed(() => this.currentConfig().modules?.shape ?? 'square');
+  protected readonly moduleColor = computed(() => this.currentConfig().modules?.color ?? '#000000');
+  protected readonly finderOuterType = computed(
+    () => this.currentConfig().finder?.outer?.shape ?? 'square',
   );
-  protected readonly colorLight = computed(
-    () => this.currentConfig().colors?.colorLight ?? '#FFFFFF',
+  protected readonly finderOuterColor = computed(
+    () => this.currentConfig().finder?.outer?.color ?? '#000000',
   );
-  protected readonly dotType = computed(() => this.currentConfig().dotsOptions?.type ?? 'square');
-  protected readonly dotColor = computed(
-    () => this.currentConfig().dotsOptions?.color ?? '#000000',
+  protected readonly finderCenterType = computed(
+    () => this.currentConfig().finder?.center?.shape ?? 'square',
   );
-  protected readonly cornersSquareType = computed(
-    () => this.currentConfig().cornersSquareOptions?.type ?? 'square',
-  );
-  protected readonly cornersSquareColor = computed(
-    () => this.currentConfig().cornersSquareOptions?.color ?? '#000000',
-  );
-  protected readonly cornersDotType = computed(
-    () => this.currentConfig().cornersDotOptions?.type ?? 'square',
-  );
-  protected readonly cornersDotColor = computed(
-    () => this.currentConfig().cornersDotOptions?.color ?? '#000000',
+  protected readonly finderCenterColor = computed(
+    () => this.currentConfig().finder?.center?.color ?? '#000000',
   );
 
-  protected readonly overrideDot = linkedSignal(() => !!this.currentConfig().dotsOptions);
-  protected readonly overrideCornersSquare = linkedSignal(
-    () => !!this.currentConfig().cornersSquareOptions,
-  );
-  protected readonly overrideCornersDot = linkedSignal(
-    () => !!this.currentConfig().cornersDotOptions,
+  protected readonly overrideModules = linkedSignal(() => !!this.currentConfig().modules);
+  protected readonly overrideFinderOuter = linkedSignal(() => !!this.currentConfig().finder?.outer);
+  protected readonly overrideFinderCenter = linkedSignal(
+    () => !!this.currentConfig().finder?.center,
   );
 
   protected readonly packages: PlaygroundPackage[] = ['react', 'vue', 'svelte', 'angular'];
@@ -452,47 +447,41 @@ export class PlaygroundControls {
     '#C0C0C0',
   ] as const;
 
-  protected readonly DOT_TYPE_OPTIONS = [
+  protected readonly MODULE_SHAPE_OPTIONS = [
     'square',
     'rounded',
-    'dots',
-    'classy',
-    'classy-rounded',
+    'circle',
+    'diagonal',
+    'diagonal-rounded',
     'extra-rounded',
-  ] as const satisfies QRCodeDotType[];
-  protected readonly CORNER_SQUARE_TYPE_OPTIONS = [
+  ] as const satisfies QRCodeModuleShape[];
+  protected readonly FINDER_OUTER_SHAPE_OPTIONS = [
     'square',
-    'dot',
     'extra-rounded',
     'rounded',
-    'dots',
-    'classy',
-    'classy-rounded',
-  ] as const satisfies readonly QRCodeCornerSquareType[];
-  protected readonly CORNER_DOT_TYPE_OPTIONS = [
+    'circle',
+  ] as const satisfies readonly QRCodeFinderShape[];
+  protected readonly CORNER_MODULE_SHAPE_OPTIONS = [
     'square',
-    'dot',
     'rounded',
-    'dots',
-    'classy',
-    'classy-rounded',
     'extra-rounded',
-  ] as const satisfies readonly QRCodeCornerDotType[];
+    'circle',
+  ] as const satisfies readonly QRCodeFinderShape[];
 
   constructor() {
     effect(() => {
-      if (!this.overrideDot()) {
-        updateQrConfig({dotsOptions: undefined});
+      if (!this.overrideModules() && this.currentConfig().modules !== undefined) {
+        updateQrConfig({modules: undefined});
       }
     });
     effect(() => {
-      if (!this.overrideCornersSquare()) {
-        updateQrConfig({cornersSquareOptions: undefined});
+      if (!this.overrideFinderOuter() && this.currentConfig().finder?.outer !== undefined) {
+        updateQrConfig({finder: {...this.currentConfig().finder, outer: undefined}});
       }
     });
     effect(() => {
-      if (!this.overrideCornersDot()) {
-        updateQrConfig({cornersDotOptions: undefined});
+      if (!this.overrideFinderCenter() && this.currentConfig().finder?.center !== undefined) {
+        updateQrConfig({finder: {...this.currentConfig().finder, center: undefined}});
       }
     });
   }

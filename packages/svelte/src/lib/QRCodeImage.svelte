@@ -3,23 +3,25 @@
   import {qrcode} from '@qrcodesdk/core';
 
   import type {QRCodeImageProps} from './types.js';
+  import {splitOptions} from './split-options.js';
 
   let {data, options, ...attributes}: QRCodeImageProps = $props();
   let container = $state<HTMLDivElement>();
 
-  const imageRenderer = $derived(QRCodeImageRenderer(options));
+  const resolvedOptions = $derived(splitOptions(options));
+  const imageRenderer = $derived(QRCodeImageRenderer(resolvedOptions[1]));
 
   $effect(() => {
     if (!container) return;
 
-    container.replaceChildren(qrcode(data).config(options).render(imageRenderer));
+    container.replaceChildren(qrcode(data).config(resolvedOptions[0]).render(imageRenderer));
   });
 
   export function download(filename = '') {
     if (typeof document === 'undefined') return;
 
     qrcode(data)
-      .config(options)
+      .config(resolvedOptions[0])
       .render(
         QRCodeDownloadImageRenderer({renderer: imageRenderer, filename: filename || undefined}),
       );

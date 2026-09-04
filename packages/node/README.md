@@ -58,7 +58,8 @@ import {QRCodePNGRenderer} from '@qrcodesdk/node';
 const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 ```
 
-`QRCodePNGRenderer()` returns a Node.js `Buffer` containing a square, fully opaque PNG image.
+`QRCodePNGRenderer()` returns a Node.js `Buffer` containing a square PNG image. RGB and RGBA style
+colors are preserved, including transparent backgrounds.
 
 ## Work with PNG output
 

@@ -100,9 +100,8 @@ that wrapper.
   import {QRCodeSVG} from '@qrcodesdk/svelte';
 
   const options: QRCodeSVGOptions = {
-    size: 8,
-    margin: 2,
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    style: {moduleSize: 8, quietZone: 2},
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
   };
 </script>
 
@@ -117,9 +116,8 @@ that wrapper.
   import {QRCodeImage} from '@qrcodesdk/svelte';
 
   const options: QRCodeImageOptions = {
-    size: 8,
-    margin: 2,
-    alt: 'QR code for qrcodesdk.dev',
+    style: {moduleSize: 8, quietZone: 2},
+    accessibility: {alt: 'QR code for qrcodesdk.dev'},
   };
 </script>
 
@@ -133,7 +131,7 @@ that wrapper.
   import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
   import {QRCodeCanvas} from '@qrcodesdk/svelte';
 
-  const options: QRCodeCanvasOptions = {size: 8, margin: 2};
+  const options: QRCodeCanvasOptions = {style: {moduleSize: 8, quietZone: 2}};
 </script>
 
 <QRCodeCanvas class="mx-auto" data="https://qrcodesdk.dev" {options} />
@@ -147,7 +145,7 @@ that wrapper.
   import {type QRCodeDownloadHandle, QRCodeImage} from '@qrcodesdk/svelte';
 
   let qrcode: QRCodeDownloadHandle | undefined;
-  const options: QRCodeImageOptions = {alt: 'QR code for qrcodesdk.dev'};
+  const options: QRCodeImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};
 </script>
 
 <div class="flex flex-col items-center gap-2">

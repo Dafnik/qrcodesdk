@@ -1,7 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
 import {
-  ɵMODES as MODES,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMode,
   type QRCodeVersion,
@@ -13,6 +12,8 @@ import {MODES_MAP} from '../../src/matrix/mode';
 import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
 import {createSingleSegment} from '../../src/matrix/segments';
 import {expectSquareBinaryMatrix} from './helpers';
+
+const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
 
 const ERROR_CORRECTION_LEVELS = [
   'L',

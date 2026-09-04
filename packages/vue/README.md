@@ -101,8 +101,10 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {QRCodeSVG} from '@qrcodesdk/vue';
 
 const options: QRCodeSVGOptions = {
-  title: 'QR code for qrcodesdk.dev',
-  ariaLabel: 'Scan to open qrcodesdk.dev',
+  accessibility: {
+    title: 'QR code for qrcodesdk.dev',
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+  },
 };
 </script>
 
@@ -119,10 +121,11 @@ import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 import {QRCodeImage} from '@qrcodesdk/vue';
 
 const options: QRCodeImageOptions = {
-  size: 8,
-  margin: 4,
-  alt: 'QR code for qrcodesdk.dev',
-  ariaLabel: 'Scan to open qrcodesdk.dev',
+  style: {moduleSize: 8, quietZone: 4},
+  accessibility: {
+    alt: 'QR code for qrcodesdk.dev',
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+  },
 };
 </script>
 
@@ -139,11 +142,11 @@ import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
 import {QRCodeCanvas} from '@qrcodesdk/vue';
 
 const options: QRCodeCanvasOptions = {
-  size: 8,
-  margin: 4,
-  colors: {
-    colorDark: '#111827',
-    colorLight: '#ffffff',
+  style: {
+    moduleSize: 8,
+    quietZone: 4,
+    foreground: '#111827',
+    background: '#ffffff',
   },
 };
 </script>
@@ -163,7 +166,7 @@ import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 import {type QRCodeDownloadHandle, QRCodeImage} from '@qrcodesdk/vue';
 
 const qrcode = ref<QRCodeDownloadHandle | null>(null);
-const options: QRCodeImageOptions = {alt: 'QR code for qrcodesdk.dev'};
+const options: QRCodeImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};
 </script>
 
 <template>

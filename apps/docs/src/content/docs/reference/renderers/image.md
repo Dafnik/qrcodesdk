@@ -21,7 +21,7 @@ import {QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({alt: 'Scan to open qrcodesdk.dev'}),
+  QRCodeImageRenderer({accessibility: {alt: 'Scan to open qrcodesdk.dev'}}),
 );
 ```
 
@@ -35,14 +35,15 @@ from an intermediate Canvas element, and its width and height match that Canvas 
 
 ## Renderer-specific options
 
-The renderer accepts the [shared visual options](/guides/customize/#shared-visual-options), the same
+The renderer accepts the [shared visual style](/guides/customize/#shared-visual-style), the same
 prepared `image` overlay and `ariaLabel` as the
 [Canvas renderer](/reference/renderers/canvas/#renderer-specific-options), and these DOM attributes:
 
-| Option  | Type     | Default     | Effect                                    |
-| ------- | -------- | ----------- | ----------------------------------------- |
-| `alt`   | `string` | `''`        | Sets the Image element's `alt` property   |
-| `title` | `string` | `undefined` | Sets the Image element's `title` property |
+| Option                    | Type     | Default     | Effect                                           |
+| ------------------------- | -------- | ----------- | ------------------------------------------------ |
+| `accessibility.alt`       | `string` | `''`        | Sets the Image element's `alt` property          |
+| `accessibility.ariaLabel` | `string` | `undefined` | Sets `aria-label` and meaningful image semantics |
+| `accessibility.title`     | `string` | `undefined` | Sets the Image element's `title` property        |
 
 ## Renderer-specific constraints
 
@@ -53,6 +54,8 @@ For server output, choose SVG or the Node.js PNG renderer.
 
 - Rendering is synchronous; center-image sources must already be loaded and have positive intrinsic
   dimensions.
+- Options are validated and copied when `QRCodeImageRenderer()` is called. The prepared image
+  source is retained by identity and checked when rendering.
 - The PNG is encoded into the element's data URL. Use the
   [Canvas renderer](/reference/renderers/canvas/) when the next step needs direct drawing or
   `toBlob()` rather than an Image element.

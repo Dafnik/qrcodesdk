@@ -3,17 +3,19 @@
   import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
   import type {QRCodeSVGProps} from './types.js';
+  import {splitOptions} from './split-options.js';
 
   let {data, options, ...attributes}: QRCodeSVGProps = $props();
 
-  const svgRenderer = $derived(QRCodeSVGRenderer(options));
-  const svg = $derived(qrcode(data).config(options).render(svgRenderer));
+  const resolvedOptions = $derived(splitOptions(options));
+  const svgRenderer = $derived(QRCodeSVGRenderer(resolvedOptions[1]));
+  const svg = $derived(qrcode(data).config(resolvedOptions[0]).render(svgRenderer));
 
   export function download(filename = '') {
     if (typeof document === 'undefined') return;
 
     qrcode(data)
-      .config(options)
+      .config(resolvedOptions[0])
       .render(QRCodeDownloadSVGRenderer({renderer: svgRenderer, filename: filename || undefined}));
   }
 </script>

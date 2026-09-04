@@ -65,8 +65,15 @@ _Avoid_: Output width, fixed size
 
 **Shared visual styling**:
 Appearance options with equivalent geometry and color behavior across SVG, Canvas, browser Image,
-and Node PNG output. Output-specific CSS features are outside the shared styling model.
+and Node PNG output. Text styling is a smaller separate contract, while download renderers and
+output-specific options such as accessibility, image overlays, compression, and ANSI behavior are
+outside shared visual styling.
 _Avoid_: Renderer-specific styling
+
+**Styled drawing**:
+An immutable, renderer-neutral description of a QR code matrix with shared visual styling applied.
+Graphical renderers paint the same styled drawing into their output formats.
+_Avoid_: Style plan, renderer-specific geometry
 
 **Prepared image source**:
 Image content that the developer has already loaded or decoded into the source type required by a
@@ -102,11 +109,6 @@ _Avoid_: Rendered output element
 A rendered QR code intentionally excluded from the accessibility tree because nearby content
 already provides its meaning or action. Unlabeled visual output is decorative by default.
 _Avoid_: Unnamed image
-
-**Sibling integration contract**:
-An export prefixed with `ɵ` that QRCodeSDK packages use to integrate with each other. It is not a
-public consumer API, but it remains compatible within its declared Core patch line.
-_Avoid_: Public API, unrestricted private implementation
 
 **Scan reliability**:
 The likelihood that a rendered QR code can be decoded in its final medium and conditions. Valid

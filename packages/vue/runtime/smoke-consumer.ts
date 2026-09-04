@@ -2,11 +2,13 @@ import {createApp, h, version} from 'vue';
 
 import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/vue';
 
-const options = {size: 2, margin: 1};
+const options = {style: {moduleSize: 2, quietZone: 1}};
 const imageOptions = {
   ...options,
-  alt: 'Framework runtime QR code',
-  ariaLabel: 'Framework runtime QR code',
+  accessibility: {
+    alt: 'Framework runtime QR code',
+    ariaLabel: 'Framework runtime QR code',
+  },
 };
 
 createApp({

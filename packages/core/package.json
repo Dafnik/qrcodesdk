@@ -53,6 +53,7 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
+    "./drawing": "./dist/drawing/index.mjs",
     "./package.json": "./package.json"
   },
   "files": [
@@ -62,6 +63,7 @@
   ],
   "scripts": {
     "benchmark:matrix": "vitest bench --run benchmarks/matrix-hot-path.bench.ts",
+    "benchmark:styler": "vitest bench --run benchmarks/styler-hot-path.bench.ts",
     "build": "tsdown",
     "check-size": "node scripts/check-size.mjs",
     "postbuild": "cp ../../LICENSE .",

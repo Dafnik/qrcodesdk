@@ -15,17 +15,22 @@ export function hasQRCodeError(
   preparedImage: PlaygroundPreparedImage | undefined = playgroundPreparedImage.get(),
 ) {
   try {
-    const builder = qrcode(config.data).config(config);
     switch (config.output) {
-      case 'canvas':
-        builder.render(QRCodeCanvasRenderer(createPlaygroundCanvasOptions(config, preparedImage)));
+      case 'canvas': {
+        const {matrix, ...rendererOptions} = createPlaygroundCanvasOptions(config, preparedImage);
+        qrcode(config.data).config(matrix).render(QRCodeCanvasRenderer(rendererOptions));
         break;
-      case 'image':
-        builder.render(QRCodeImageRenderer(createPlaygroundImageOptions(config, preparedImage)));
+      }
+      case 'image': {
+        const {matrix, ...rendererOptions} = createPlaygroundImageOptions(config, preparedImage);
+        qrcode(config.data).config(matrix).render(QRCodeImageRenderer(rendererOptions));
         break;
-      case 'svg':
-        builder.render(QRCodeSVGRenderer(createPlaygroundSVGOptions(config, preparedImage)));
+      }
+      case 'svg': {
+        const {matrix, ...rendererOptions} = createPlaygroundSVGOptions(config, preparedImage);
+        qrcode(config.data).config(matrix).render(QRCodeSVGRenderer(rendererOptions));
         break;
+      }
     }
 
     return undefined;

@@ -1,175 +1,164 @@
 import {QRCodeError} from './error';
 import type {
-  QRCodeColorHex,
-  QRCodeCornerDotType,
-  QRCodeCornerSquareType,
-  QRCodeDotType,
+  QRCodeColor,
+  QRCodeFinderShape,
   QRCodeMatrix,
-  QRCodeStylingOptions,
-  ɵQRCodeParsedStylingOptions,
+  QRCodeModuleShape,
+  QRCodeResolvedVisualStyle,
+  QRCodeTextStyle,
+  QRCodeVisualStyle,
 } from './types';
 
-export const QR_CODE_COLOR_HEX_PATTERN = /^#[0-9a-f]{6}$/i;
-export const QR_CODE_DOT_TYPES = [
-  'rounded',
-  'dots',
-  'classy',
-  'classy-rounded',
+const COLOR_PATTERN = /^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i;
+const MODULE_SHAPES = [
   'square',
-  'extra-rounded',
-] as const satisfies readonly QRCodeDotType[];
-export const QR_CODE_CORNER_SQUARE_TYPES = [
-  'dot',
-  'square',
-  'extra-rounded',
+  'circle',
   'rounded',
-  'dots',
-  'classy',
-  'classy-rounded',
-] as const satisfies readonly QRCodeCornerSquareType[];
-export const QR_CODE_CORNER_DOT_TYPES = [
-  'dot',
+  'extra-rounded',
+  'diagonal',
+  'diagonal-rounded',
+] as const satisfies readonly QRCodeModuleShape[];
+const FINDER_SHAPES = [
   'square',
   'rounded',
-  'dots',
-  'classy',
-  'classy-rounded',
   'extra-rounded',
-] as const satisfies readonly QRCodeCornerDotType[];
+  'circle',
+] as const satisfies readonly QRCodeFinderShape[];
 
-export function isValidQRCodeSize(value: unknown): value is number {
-  return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
-}
+export type QRCodeRGBA = readonly [red: number, green: number, blue: number, alpha: number];
 
-export function isValidQRCodeMargin(value: unknown): value is number {
-  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
-}
+export function resolveQRCodeVisualStyle(style?: QRCodeVisualStyle): QRCodeResolvedVisualStyle {
+  assertKnownKeys(style, 'style', [
+    'moduleSize',
+    'quietZone',
+    'foreground',
+    'background',
+    'modules',
+    'finder',
+  ]);
+  assertKnownKeys(style?.modules, 'style.modules', ['shape', 'color']);
+  assertKnownKeys(style?.finder, 'style.finder', ['outer', 'center']);
+  assertKnownKeys(style?.finder?.outer, 'style.finder.outer', ['shape', 'color']);
+  assertKnownKeys(style?.finder?.center, 'style.finder.center', ['shape', 'color']);
 
-export function isQRCodeColorHex(value: unknown): value is QRCodeColorHex {
-  return typeof value === 'string' && QR_CODE_COLOR_HEX_PATTERN.test(value);
-}
+  const moduleSize = style?.moduleSize ?? 5;
+  const quietZone = style?.quietZone ?? 4;
+  const foreground = style?.foreground ?? '#000000';
+  const background = style?.background ?? '#ffffff';
+  const moduleShape = style?.modules?.shape ?? 'square';
+  const finderOuterShape = style?.finder?.outer?.shape ?? 'square';
+  const finderCenterShape = style?.finder?.center?.shape ?? 'square';
 
-export function isQRCodeDotType(value: unknown): value is QRCodeDotType {
-  return QR_CODE_DOT_TYPES.some((type) => type === value);
-}
+  validatePositiveInteger('style.moduleSize', moduleSize);
+  validateNonNegativeInteger('style.quietZone', quietZone);
+  validateColor('style.foreground', foreground);
+  validateColor('style.background', background);
+  validateColor('style.modules.color', style?.modules?.color ?? foreground);
+  validateColor('style.finder.outer.color', style?.finder?.outer?.color ?? foreground);
+  validateColor('style.finder.center.color', style?.finder?.center?.color ?? foreground);
+  validateEnum('style.modules.shape', moduleShape, MODULE_SHAPES);
+  validateEnum('style.finder.outer.shape', finderOuterShape, FINDER_SHAPES);
+  validateEnum('style.finder.center.shape', finderCenterShape, FINDER_SHAPES);
 
-export function isQRCodeCornerSquareType(value: unknown): value is QRCodeCornerSquareType {
-  return QR_CODE_CORNER_SQUARE_TYPES.some((type) => type === value);
-}
-
-export function isQRCodeCornerDotType(value: unknown): value is QRCodeCornerDotType {
-  return QR_CODE_CORNER_DOT_TYPES.some((type) => type === value);
-}
-
-export function parseQRCodeStylingOptions(
-  options?: QRCodeStylingOptions,
-): ɵQRCodeParsedStylingOptions {
-  const colorDark = options?.colors?.colorDark ?? '#000000';
-  const styling: ɵQRCodeParsedStylingOptions = {
-    size: options?.size ?? 5,
-    margin: options?.margin ?? 4,
-    colors: {
-      colorLight: options?.colors?.colorLight ?? '#ffffff',
-      colorDark,
-    },
-    dotsOptions: {
-      color: options?.dotsOptions?.color ?? colorDark,
-      type: options?.dotsOptions?.type ?? 'square',
-    },
-    cornersSquareOptions: {
-      color: options?.cornersSquareOptions?.color ?? colorDark,
-      type: options?.cornersSquareOptions?.type ?? 'square',
-    },
-    cornersDotOptions: {
-      color: options?.cornersDotOptions?.color ?? colorDark,
-      type: options?.cornersDotOptions?.type ?? 'square',
+  return {
+    moduleSize,
+    quietZone,
+    foreground,
+    background,
+    modules: {shape: moduleShape, color: style?.modules?.color ?? foreground},
+    finder: {
+      outer: {shape: finderOuterShape, color: style?.finder?.outer?.color ?? foreground},
+      center: {shape: finderCenterShape, color: style?.finder?.center?.color ?? foreground},
     },
   };
-
-  validateQRCodeStylingOptions(styling);
-  return styling;
 }
 
-export function calculateQRCodeRenderedSize(
+export function resolveQRCodeTextStyle(style?: QRCodeTextStyle): Required<QRCodeTextStyle> {
+  assertKnownKeys(style, 'style', ['moduleSize', 'quietZone']);
+  const moduleSize = style?.moduleSize ?? 5;
+  const quietZone = style?.quietZone ?? 4;
+  validatePositiveInteger('style.moduleSize', moduleSize);
+  validateNonNegativeInteger('style.quietZone', quietZone);
+  return {moduleSize, quietZone};
+}
+
+export function calculateQRCodeOutputSize(
   matrix: QRCodeMatrix,
-  styling: Pick<ɵQRCodeParsedStylingOptions, 'size' | 'margin'>,
+  style: Pick<Required<QRCodeTextStyle>, 'moduleSize' | 'quietZone'>,
 ): number {
-  validateQRCodeSize(styling.size);
-  validateQRCodeMargin(styling.margin);
-
-  const renderedSize = styling.size * (matrix.length + 2 * styling.margin);
-  if (!Number.isSafeInteger(renderedSize) || renderedSize <= 0) {
+  const outputSize = style.moduleSize * (matrix.length + 2 * style.quietZone);
+  if (!Number.isSafeInteger(outputSize) || outputSize <= 0) {
     throw new QRCodeError(
       'INVALID_OPTIONS',
-      `QR code dimensions must be positive integers, received ${String(renderedSize)}`,
-      {details: {field: 'dimensions', value: renderedSize}},
+      `QR code dimensions must be positive safe integers, received ${String(outputSize)}`,
+      {details: {field: 'dimensions', value: outputSize}},
     );
   }
-
-  return renderedSize;
+  return outputSize;
 }
 
-function validateQRCodeStylingOptions(styling: ɵQRCodeParsedStylingOptions): void {
-  validateQRCodeSize(styling.size);
-  validateQRCodeMargin(styling.margin);
-  validateQRCodeColor('colorLight', styling.colors.colorLight);
-  validateQRCodeColor('colorDark', styling.colors.colorDark);
-  validateQRCodeColor('dotsOptions.color', styling.dotsOptions.color);
-  validateQRCodeColor('cornersSquareOptions.color', styling.cornersSquareOptions.color);
-  validateQRCodeColor('cornersDotOptions.color', styling.cornersDotOptions.color);
-  validateQRCodeType('dotsOptions.type', styling.dotsOptions.type, QR_CODE_DOT_TYPES);
-  validateQRCodeType(
-    'cornersSquareOptions.type',
-    styling.cornersSquareOptions.type,
-    QR_CODE_CORNER_SQUARE_TYPES,
-  );
-  validateQRCodeType(
-    'cornersDotOptions.type',
-    styling.cornersDotOptions.type,
-    QR_CODE_CORNER_DOT_TYPES,
-  );
+export function parseQRCodeColor(color: QRCodeColor): QRCodeRGBA {
+  const hexadecimal = color.slice(1);
+  return [
+    Number.parseInt(hexadecimal.slice(0, 2), 16),
+    Number.parseInt(hexadecimal.slice(2, 4), 16),
+    Number.parseInt(hexadecimal.slice(4, 6), 16),
+    hexadecimal.length === 8 ? Number.parseInt(hexadecimal.slice(6, 8), 16) : 255,
+  ];
 }
 
-function validateQRCodeSize(value: unknown): asserts value is number {
-  if (!isValidQRCodeSize(value)) {
-    throw new QRCodeError(
-      'INVALID_OPTIONS',
-      `QR code size must be a positive integer, received ${String(value)}`,
-      {details: {field: 'size', value}},
-    );
+export function assertKnownKeys(
+  value: object | undefined,
+  path: string,
+  knownKeys: readonly string[],
+): void {
+  if (!value) return;
+  const known = new Set(knownKeys);
+  const unknown = Object.keys(value).find((key) => !known.has(key));
+  if (unknown !== undefined) {
+    const field = `${path}.${unknown}`;
+    throw new QRCodeError('INVALID_OPTIONS', `Unknown QR code option ${field}`, {
+      details: {field, value: (value as Record<string, unknown>)[unknown]},
+    });
   }
 }
 
-function validateQRCodeMargin(value: unknown): asserts value is number {
-  if (!isValidQRCodeMargin(value)) {
-    throw new QRCodeError(
-      'INVALID_OPTIONS',
-      `QR code margin must be a non-negative integer, received ${String(value)}`,
-      {details: {field: 'margin', value}},
-    );
+function validatePositiveInteger(field: string, value: unknown): asserts value is number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) {
+    throwInvalid(field, 'a positive safe integer', value);
   }
 }
 
-function validateQRCodeColor(name: string, value: unknown): asserts value is QRCodeColorHex {
-  if (!isQRCodeColorHex(value)) {
-    throw new QRCodeError(
-      'INVALID_OPTIONS',
-      `QR code ${name} must be a 6-digit hex color, received ${String(value)}`,
-      {details: {field: name, value}},
-    );
+function validateNonNegativeInteger(field: string, value: unknown): asserts value is number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) {
+    throwInvalid(field, 'a non-negative safe integer', value);
   }
 }
 
-function validateQRCodeType<T extends string>(
-  name: string,
+function validateColor(field: string, value: unknown): asserts value is QRCodeColor {
+  if (typeof value !== 'string' || !COLOR_PATTERN.test(value)) {
+    throwInvalid(field, 'an RGB or RGBA hex color', value);
+  }
+}
+
+function validateEnum<T extends string>(
+  field: string,
   value: unknown,
-  supportedTypes: readonly T[],
+  values: readonly T[],
 ): asserts value is T {
-  if (!supportedTypes.some((type) => type === value)) {
+  if (!values.some((candidate) => candidate === value)) {
     throw new QRCodeError(
       'INVALID_OPTIONS',
-      `QR code ${name} must be one of ${supportedTypes.join(', ')}, received ${String(value)}`,
-      {details: {field: name, value, supportedValues: supportedTypes}},
+      `QR code ${field} must be one of ${values.join(', ')}, received ${String(value)}`,
+      {details: {field, value, supportedValues: values}},
     );
   }
+}
+
+function throwInvalid(field: string, expected: string, value: unknown): never {
+  throw new QRCodeError(
+    'INVALID_OPTIONS',
+    `QR code ${field} must be ${expected}, received ${String(value)}`,
+    {details: {field, value}},
+  );
 }

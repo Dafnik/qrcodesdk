@@ -92,8 +92,10 @@ const qrcodeSDKAdapter: BenchmarkAdapter = {
       .config(qrcodeSDKOptions(fixture))
       .render(
         QRCodeSVGRenderer({
-          margin: SVG_QUIET_ZONE_MODULES,
-          size: SVG_PIXELS_PER_MODULE,
+          style: {
+            moduleSize: SVG_PIXELS_PER_MODULE,
+            quietZone: SVG_QUIET_ZONE_MODULES,
+          },
         }),
       ).length,
 };

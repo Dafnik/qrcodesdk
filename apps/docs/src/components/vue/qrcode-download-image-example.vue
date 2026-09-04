@@ -4,7 +4,7 @@ import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/vue';
 import {ref} from 'vue';
 
 const qrcode = ref<QRCodeDownloadHandle | null>(null);
-const options: QRCodeImageOptions = {alt: 'QR code for qrcodesdk.dev'};
+const options: QRCodeImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};
 </script>
 
 <template>

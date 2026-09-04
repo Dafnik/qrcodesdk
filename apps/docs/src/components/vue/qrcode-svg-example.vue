@@ -3,8 +3,10 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {QRCodeSVG} from '@qrcodesdk/vue';
 
 const options: QRCodeSVGOptions = {
-  title: 'QR code for qrcodesdk.dev',
-  ariaLabel: 'Scan to open qrcodesdk.dev',
+  accessibility: {
+    title: 'QR code for qrcodesdk.dev',
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+  },
 };
 </script>
 

@@ -15,14 +15,16 @@ describe('QRCodePNGRenderer snapshots', () => {
     expectPngToMatchFileSnapshot(
       qrcode(fixture.data)
         .config(fixture)
-        .render(QRCodePNGRenderer({size: 8, margin: 4})),
+        .render(QRCodePNGRenderer({style: {moduleSize: 8, quietZone: 4}})),
       join(SNAPSHOT_DIR, `${fixture.name}.png`),
     );
   });
 
   test.each(QR_CODE_STYLING_FIXTURES)('matches $name PNG styling snapshot', (fixture) => {
     expectPngToMatchFileSnapshot(
-      qrcode(fixture.data).config(fixture.matrixOptions).render(QRCodePNGRenderer(fixture.styling)),
+      qrcode(fixture.data)
+        .config(fixture.matrixOptions)
+        .render(QRCodePNGRenderer({style: fixture.styling})),
       join(SNAPSHOT_DIR, 'styling', `${fixture.name}.png`),
     );
   });

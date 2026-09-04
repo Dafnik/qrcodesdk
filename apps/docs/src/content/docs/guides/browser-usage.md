@@ -48,7 +48,7 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
   QRCodeSVGRenderer({
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
   }),
 );
 
@@ -75,7 +75,7 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(
   QRCodeSVGRenderer({
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
   }),
 );
 
@@ -113,9 +113,11 @@ import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
   QRCodeImageRenderer({
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
-    title: 'QR code for qrcodesdk.dev',
+    accessibility: {
+      alt: 'QR code for qrcodesdk.dev',
+      ariaLabel: 'Scan to open qrcodesdk.dev',
+      title: 'QR code for qrcodesdk.dev',
+    },
   }),
 );
 
@@ -169,10 +171,12 @@ Give the Canvas its own accessible name, then append it wherever the QR code sho
 import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
-const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer({size: 8, margin: 4}));
-
-canvas.setAttribute('role', 'img');
-canvas.setAttribute('aria-label', 'Scan to open qrcodesdk.dev');
+const canvas = qrcode('https://qrcodesdk.dev').render(
+  QRCodeCanvasRenderer({
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+  }),
+);
 document.querySelector('#qrcode')?.append(canvas);
 ```
 
@@ -212,7 +216,7 @@ const container = document.querySelector('#qrcode');
 
 export function updateQRCode(data: string) {
   const image = qrcode(data).render(
-    QRCodeImageRenderer({alt: '', ariaLabel: `Scan to open ${data}`}),
+    QRCodeImageRenderer({accessibility: {alt: '', ariaLabel: `Scan to open ${data}`}}),
   );
 
   container?.replaceChildren(image);
@@ -225,10 +229,10 @@ their normal component lifecycle.
 
 ## Keep browser output reliable
 
-- Keep the default four-module margin clear of nearby text, borders, and other UI.
+- Keep the default four-module quiet zone clear of nearby text, borders, and other UI.
 - Give meaningful SVG, Image or Canvas output an accessible label.
 - Use CSS to shrink output responsively, but do not enlarge Image or Canvas output beyond its
-  rendered pixel dimensions. Increase the renderer's `size` when more raster resolution is needed.
+  rendered pixel dimensions. Increase `style.moduleSize` when more raster resolution is needed.
 - Scan-test the final page at its smallest supported viewport and after any CSS transforms, browser
   zoom, screenshots, or image compression.
 

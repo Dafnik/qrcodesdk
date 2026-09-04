@@ -107,20 +107,14 @@ Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/refere
 
 ```ts
 import {
-  type QRCodeAccessibilityOptions,
   QRCodeBuilder,
-  type QRCodeColorHex,
-  type QRCodeCornerDotType,
-  type QRCodeCornerSquareType,
-  type QRCodeCornersDotOptions,
-  type QRCodeCornersSquareOptions,
+  type QRCodeColor,
   type QRCodeDataImageURL,
-  type QRCodeDotType,
-  type QRCodeDotsOptions,
   type QRCodeEmailPayload,
   QRCodeError,
   type QRCodeErrorCode,
   type QRCodeErrorCorrectionLevel,
+  type QRCodeFinderShape,
   type QRCodeGeoPayload,
   type QRCodeImageOverlayOptions,
   type QRCodeInputData,
@@ -128,20 +122,24 @@ import {
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
   type QRCodeMode,
-  type QRCodeOptions,
+  type QRCodeModuleShape,
   type QRCodePhonePayload,
   type QRCodeRenderer,
   type QRCodeSMSPayload,
+  type QRCodeSVGAccessibilityOptions,
   type QRCodeSVGImageOptions,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
-  type QRCodeStylingColors,
-  type QRCodeStylingOptions,
+  type QRCodeTextANSIBackgroundOptions,
+  type QRCodeTextANSIOptions,
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
+  type QRCodeTextStyle,
   type QRCodeVersion,
+  type QRCodeVisualStyle,
   type QRCodeWiFiPayload,
+  createQRCodeStyler,
   emailPayload,
   geoPayload,
   phonePayload,
@@ -151,8 +149,9 @@ import {
 } from '@qrcodesdk/core';
 ```
 
-Exports whose names begin with `ɵ` are private integration contracts for QRCodeSDK sibling packages.
-They are not part of the public API and can change without compatibility guarantees.
+Custom graphical renderers can import `QRCodeStyler`, `QRCodeDrawing`, and
+`QRCodeDrawingTarget` from the stable `@qrcodesdk/core/drawing` subpath. Those low-level types are
+deliberately not re-exported from the package root.
 
 ## Generated output stability
 

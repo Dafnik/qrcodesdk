@@ -18,6 +18,8 @@ import {
   qrcode,
 } from '@qrcodesdk/core';
 
+import {splitOptions} from './split-options';
+
 @Component({
   selector: 'qrcode-svg',
   template: '',
@@ -31,10 +33,11 @@ export class QRCodeSVG {
 
   options = input<QRCodeSVGOptions>();
 
-  readonly svgRenderer = computed(() => QRCodeSVGRenderer(this.options()));
+  readonly resolvedOptions = computed(() => splitOptions(this.options()));
+  readonly svgRenderer = computed(() => QRCodeSVGRenderer(this.resolvedOptions()[1]));
 
   readonly qrcodeBuilder = computed(() =>
-    qrcode(this.data()).config(this.options()).renderer(this.svgRenderer()),
+    qrcode(this.data()).config(this.resolvedOptions()[0]).renderer(this.svgRenderer()),
   );
 
   constructor() {
