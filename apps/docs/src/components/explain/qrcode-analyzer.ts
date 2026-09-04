@@ -154,7 +154,15 @@ function createModule(
   if (placement === undefined) throwInvalidPlacement(row, column);
 
   if (placement.placementBitIndex >= codewordBitCount) {
-    return {key: `${row}:${column}`, row, column, value, role: 'remainder', groupId: 'remainder'};
+    return {
+      key: `${row}:${column}`,
+      row,
+      column,
+      value,
+      role: 'remainder',
+      groupId: 'remainder',
+      placementBitIndex: placement.placementBitIndex,
+    };
   }
 
   return {
