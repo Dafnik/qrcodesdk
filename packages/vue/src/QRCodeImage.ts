@@ -16,6 +16,7 @@ import {
 } from '@qrcodesdk/browser';
 import {type QRCodeInputData, qrcode} from '@qrcodesdk/core';
 
+import {splitOptions} from './split-options';
 import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
 
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
@@ -40,8 +41,9 @@ export const QRCodeImage = defineComponent({
           const host = container.value;
           if (!host) return;
 
+          const [matrixOptions, rendererOptions] = splitOptions(props.options);
           host.replaceChildren(
-            qrcode(props.data).config(props.options).render(QRCodeImageRenderer(props.options)),
+            qrcode(props.data).config(matrixOptions).render(QRCodeImageRenderer(rendererOptions)),
           );
         },
         {deep: true, immediate: true},
@@ -54,9 +56,10 @@ export const QRCodeImage = defineComponent({
       download(filename?: string) {
         if (typeof document === 'undefined') return;
 
-        const imageRenderer = QRCodeImageRenderer(props.options);
+        const [matrixOptions, rendererOptions] = splitOptions(props.options);
+        const imageRenderer = QRCodeImageRenderer(rendererOptions);
         qrcode(props.data)
-          .config(props.options)
+          .config(matrixOptions)
           .render(QRCodeDownloadImageRenderer({renderer: imageRenderer, filename}));
       },
     };

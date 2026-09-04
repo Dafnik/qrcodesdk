@@ -5,20 +5,14 @@ import process from 'node:process';
 import {styleText} from 'node:util';
 
 import {
-  type QRCodeAccessibilityOptions,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
   type QRCodeMatrixOptions,
   QRCodeSVGRenderer,
-  type QRCodeStylingOptions,
   QRCodeTextRenderer,
   type QRCodeVersion,
+  type QRCodeVisualStyle,
   qrcode,
-  ɵECC_LEVELS,
-  ɵMODES,
-  ɵisQRCodeColorHex,
-  ɵisValidQRCodeMargin,
-  ɵisValidQRCodeSize,
 } from '@qrcodesdk/core';
 import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
@@ -35,29 +29,27 @@ type RawCliOptions = {
   readonly version?: string;
   readonly mask?: string;
   readonly eci?: boolean;
-  readonly size?: string;
-  readonly margin?: string;
-  readonly small?: boolean;
-  readonly ansiColors?: boolean;
-  readonly onlyAnsiColors?: boolean;
-  readonly colorDark?: string;
-  readonly colorLight?: string;
-  readonly alt?: string;
+  readonly moduleSize?: string;
+  readonly quietZone?: string;
+  readonly layout?: string;
+  readonly ansi?: string;
+  readonly foreground?: string;
+  readonly background?: string;
   readonly ariaLabel?: string;
   readonly title?: string;
 };
 
 type ResolvedCliOptions = Readonly<
-  QRCodeMatrixOptions &
-    QRCodeAccessibilityOptions & {
-      readonly input: string;
-      readonly format: OutputFormat;
-      readonly output?: string;
-      readonly small: boolean;
-      readonly ansiColors: boolean;
-      readonly onlyAnsiColors: boolean;
-      readonly styling: QRCodeStylingOptions;
-    }
+  QRCodeMatrixOptions & {
+    readonly ariaLabel?: string;
+    readonly title?: string;
+    readonly input: string;
+    readonly format: OutputFormat;
+    readonly output?: string;
+    readonly layout: 'compact' | 'full';
+    readonly ansi: false | 'blocks' | 'background';
+    readonly style: QRCodeVisualStyle;
+  }
 >;
 
 export type WritableTarget = {
@@ -90,6 +82,10 @@ class CliError extends Error {}
 
 const outputFormats = ['text', 'svg', 'png'] as const;
 const fileOutputFormats = ['svg', 'png'] as const;
+const modes = ['numeric', 'alphanumeric', 'octet'] as const;
+const errorCorrectionLevels = ['L', 'M', 'Q', 'H'] as const;
+const layouts = ['compact', 'full'] as const;
+const ansiModes = ['off', 'blocks', 'background'] as const;
 
 export async function runCli(argv: readonly string[], runtime: CliRuntime = {}): Promise<number> {
   const stdout = runtime.stdout ?? process.stdout;
@@ -143,24 +139,12 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
           false,
         ),
       )
-      .option('--size <size>', 'Module size as a positive integer')
-      .option('--margin <margin>', 'Margin as a non-negative integer')
-      .addOption(
-        booleanOption('--small <boolean>', 'Pack two QR rows per terminal line', 'small', true),
-      )
-      .option('--no-small', 'Render full-height terminal text')
-      .addOption(
-        booleanOption(
-          '--ansi-colors <boolean>',
-          'Style terminal text with ANSI colors',
-          'ansi-colors',
-        ),
-      )
-      .option('--no-ansi-colors', 'Render terminal text without ANSI colors')
-      .option('--only-ansi-colors', 'Render terminal text with ANSI background colors only')
-      .option('--color-dark <hex>', 'Dark module color as #rrggbb')
-      .option('--color-light <hex>', 'Light module color as #rrggbb')
-      .option('--alt <text>', 'SVG alt text')
+      .option('--module-size <size>', 'Module size as a positive integer')
+      .option('--quiet-zone <size>', 'Quiet zone as a non-negative integer')
+      .option('--layout <layout>', 'Text layout: compact or full')
+      .option('--ansi <mode>', 'ANSI mode: off, blocks, or background')
+      .option('--foreground <hex>', 'Foreground color as #rrggbb or #rrggbbaa')
+      .option('--background <hex>', 'Background color as #rrggbb or #rrggbbaa')
       .option('--aria-label <text>', 'SVG aria-label')
       .option('--title <text>', 'SVG title')
       .configureOutput({
@@ -187,32 +171,33 @@ async function resolveCliOptions(
   const input = await resolveInput(positionalInput, rawOptions.input, interactive, prompt);
   const format = await resolveFormat(rawOptions.format, rawOptions.output, interactive, prompt);
   const output = await resolveOutput(format, rawOptions.output, interactive, prompt);
-  const styling = resolveStyling(rawOptions);
-  const onlyAnsiColors = rawOptions.onlyAnsiColors ?? false;
+  const style = resolveStyle(rawOptions);
   const environment = runtime.environment ?? process.env;
   const stdoutIsTTY = runtime.stdoutIsTTY ?? process.stdout.isTTY === true;
-  const ansiColors =
-    rawOptions.ansiColors ?? (onlyAnsiColors || (!('NO_COLOR' in environment) && stdoutIsTTY));
-
-  if (onlyAnsiColors && !ansiColors) {
-    throw new CliError('Cannot combine --only-ansi-colors with --no-ansi-colors.');
+  const defaultANSI = !('NO_COLOR' in environment) && stdoutIsTTY ? 'blocks' : false;
+  const ansiOption =
+    rawOptions.ansi === undefined ? undefined : requiredEnum(rawOptions.ansi, ansiModes, 'ansi');
+  const ansi = ansiOption === undefined ? defaultANSI : ansiOption === 'off' ? false : ansiOption;
+  if (ansi === 'background' && rawOptions.layout !== undefined) {
+    throw new CliError('--layout cannot be combined with --ansi background.');
   }
 
   return {
     input,
     format,
     output,
-    small: rawOptions.small ?? true,
-    ansiColors,
-    onlyAnsiColors,
-    mode: optionalEnum(rawOptions.mode, ɵMODES, 'mode'),
+    layout:
+      rawOptions.layout === undefined
+        ? 'compact'
+        : requiredEnum(rawOptions.layout, layouts, 'layout'),
+    ansi,
+    mode: optionalEnum(rawOptions.mode, modes, 'mode'),
     errorCorrectionLevel: optionalErrorCorrectionLevel(rawOptions.errorCorrection),
     version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as
       QRCodeVersion | undefined,
     mask: optionalIntegerInRange(rawOptions.mask, 'mask', 0, 7) as QRCodeMask | undefined,
     eci: rawOptions.eci ?? false,
-    styling,
-    alt: rawOptions.alt,
+    style,
     ariaLabel: rawOptions.ariaLabel,
     title: rawOptions.title,
   };
@@ -331,23 +316,12 @@ function promptString(value: string | symbol, prompt: PromptAdapter): string {
   return value;
 }
 
-function resolveStyling(rawOptions: RawCliOptions): QRCodeStylingOptions {
-  const size = optionalPositiveInteger(rawOptions.size, 'size') ?? 1;
-  const margin = optionalNonNegativeInteger(rawOptions.margin, 'margin') ?? 2;
-  const colorDark = optionalHexColor(rawOptions.colorDark, 'color-dark');
-  const colorLight = optionalHexColor(rawOptions.colorLight, 'color-light');
-  const colors =
-    colorDark === undefined && colorLight === undefined
-      ? undefined
-      : {
-          colorDark,
-          colorLight,
-        };
-
+function resolveStyle(rawOptions: RawCliOptions): QRCodeVisualStyle {
   return {
-    size,
-    margin,
-    colors,
+    moduleSize: optionalPositiveInteger(rawOptions.moduleSize, 'module-size') ?? 1,
+    quietZone: optionalNonNegativeInteger(rawOptions.quietZone, 'quiet-zone') ?? 2,
+    foreground: optionalHexColor(rawOptions.foreground, 'foreground'),
+    background: optionalHexColor(rawOptions.background, 'background'),
   };
 }
 
@@ -366,16 +340,33 @@ async function render(
   });
 
   if (options.format === 'text') {
-    stdout.write(
-      `${builder.render(
-        QRCodeTextRenderer({
-          ...options.styling,
-          small: options.small,
-          ansiColors: options.ansiColors,
-          onlyAnsiColors: options.onlyAnsiColors,
-        }),
-      )}\n`,
-    );
+    const textStyle = {
+      moduleSize: options.style.moduleSize,
+      quietZone: options.style.quietZone,
+    };
+    const textRenderer =
+      options.ansi === 'background'
+        ? QRCodeTextRenderer({
+            style: textStyle,
+            ansi: {
+              mode: 'background',
+              foreground: options.style.foreground,
+              background: options.style.background,
+            },
+          })
+        : QRCodeTextRenderer({
+            style: textStyle,
+            layout: options.layout,
+            ansi:
+              options.ansi === false
+                ? false
+                : {
+                    mode: 'blocks',
+                    foreground: options.style.foreground,
+                    background: options.style.background,
+                  },
+          });
+    stdout.write(`${builder.render(textRenderer)}\n`);
     return;
   }
 
@@ -384,10 +375,8 @@ async function render(
   if (options.format === 'svg') {
     const svg = builder.render(
       QRCodeSVGRenderer({
-        ...options.styling,
-        alt: options.alt,
-        ariaLabel: options.ariaLabel,
-        title: options.title,
+        style: options.style,
+        accessibility: {ariaLabel: options.ariaLabel, title: options.title},
       }),
     );
 
@@ -396,7 +385,7 @@ async function render(
     return;
   }
 
-  const png = builder.render(QRCodePNGRenderer(options.styling));
+  const png = builder.render(QRCodePNGRenderer({style: options.style}));
   await writeFile(requiredOutput(options), png);
   stderr.write(`${styleText('green', 'Wrote')} ${requiredOutput(options)}\n`);
 }
@@ -450,13 +439,13 @@ function optionalErrorCorrectionLevel(
   value: string | undefined,
 ): QRCodeErrorCorrectionLevel | undefined {
   if (value === undefined) return undefined;
-  return requiredEnum(value.toUpperCase(), ɵECC_LEVELS, 'error-correction');
+  return requiredEnum(value.toUpperCase(), errorCorrectionLevels, 'error-correction');
 }
 
 function optionalPositiveInteger(value: string | undefined, name: string): number | undefined {
   const parsed = optionalInteger(value, name);
   if (parsed === undefined) return undefined;
-  if (!ɵisValidQRCodeSize(parsed)) {
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
     throw new CliError(`Invalid ${name}. Expected a positive integer.`);
   }
   return parsed;
@@ -465,7 +454,7 @@ function optionalPositiveInteger(value: string | undefined, name: string): numbe
 function optionalNonNegativeInteger(value: string | undefined, name: string): number | undefined {
   const parsed = optionalInteger(value, name);
   if (parsed === undefined) return undefined;
-  if (!ɵisValidQRCodeMargin(parsed)) {
+  if (!Number.isSafeInteger(parsed) || parsed < 0) {
     throw new CliError(`Invalid ${name}. Expected a non-negative integer.`);
   }
   return parsed;
@@ -495,11 +484,11 @@ function optionalInteger(value: string | undefined, name: string): number | unde
 
 function optionalHexColor(value: string | undefined, name: string): `#${string}` | undefined {
   if (value === undefined) return undefined;
-  if (!ɵisQRCodeColorHex(value)) {
-    throw new CliError(`Invalid ${name}. Expected a six-digit hex color like #111111.`);
+  if (!/^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i.test(value)) {
+    throw new CliError(`Invalid ${name}. Expected an RGB or RGBA hex color like #111111.`);
   }
 
-  return value;
+  return value as `#${string}`;
 }
 
 const defaultPromptAdapter: PromptAdapter = {

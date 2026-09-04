@@ -1,27 +1,20 @@
 import {
   type QRCodeErrorCorrectionLevel,
+  type QRCodeMask,
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
   type QRCodeMode,
-  type QRCodeStylingOptions,
+  type QRCodeTextStyle,
   type QRCodeVersion,
-  ɵECC_LEVELS,
-  ɵECC_LEVELS_MAP,
-  ɵMODES,
-  ɵMODES_MAP,
-  type ɵQRCodeResolvedMatrixOptions,
-  ɵassembleQRCodeMatrixWithDetails,
-  ɵcreateQRCodeCodewords,
-  ɵparseQRCodeStylingOptions,
-  ɵresolveQRCodeMatrixOptions,
+  createQRCodeStyler,
+  qrcode,
 } from '@qrcodesdk/core';
 
 type QRCodeModule = QRCodeMatrix[number][number];
 
 export type QRCodeExplainRole = 'functional' | 'encoded' | 'remainder';
 
-export interface QRCodeExplainConfig
-  extends QRCodeMatrixOptions, Pick<QRCodeStylingOptions, 'size' | 'margin'> {
+export interface QRCodeExplainConfig extends QRCodeMatrixOptions, QRCodeTextStyle {
   data: string;
 }
 
@@ -53,16 +46,11 @@ export interface QRCodeExplanation {
   readonly version: QRCodeVersion;
   readonly mode: QRCodeMode | 'mixed';
   readonly errorCorrectionLevel: QRCodeErrorCorrectionLevel;
-  readonly mask: NonNullable<QRCodeMatrixOptions['mask']>;
-  readonly size: number;
-  readonly margin: number;
+  readonly mask: QRCodeMask;
+  readonly moduleSize: number;
+  readonly quietZone: number;
   readonly viewSize: number;
 }
-
-type QRCodePlacement = {
-  readonly placementBitIndex: number;
-  readonly sourceValue: QRCodeModule;
-};
 
 export const QR_CODE_EXPLAIN_ROLE_ORDER = [
   'functional',
@@ -87,55 +75,72 @@ export const QR_CODE_EXPLAIN_ROLE_DETAILS = {
   },
 } as const satisfies Record<QRCodeExplainRole, {label: string; description: string}>;
 
+const MASKS = [
+  (row: number, column: number) => (row + column) % 2 === 0,
+  (row: number) => row % 2 === 0,
+  (_row: number, column: number) => column % 3 === 0,
+  (row: number, column: number) => (row + column) % 3 === 0,
+  (row: number, column: number) => (Math.floor(row / 2) + Math.floor(column / 3)) % 2 === 0,
+  (row: number, column: number) => ((row * column) % 2) + ((row * column) % 3) === 0,
+  (row: number, column: number) => (((row * column) % 2) + ((row * column) % 3)) % 2 === 0,
+  (row: number, column: number) => (((row + column) % 2) + ((row * column) % 3)) % 2 === 0,
+] as const;
+
 export function explainQRCode(config: QRCodeExplainConfig): QRCodeExplanation {
-  const styling = ɵparseQRCodeStylingOptions({size: config.size, margin: config.margin});
-  const resolved = ɵresolveQRCodeMatrixOptions(config.data, {
+  const matrixOptions: QRCodeMatrixOptions = {
     mode: config.mode,
     version: config.version,
     errorCorrectionLevel: config.errorCorrectionLevel,
     mask: config.mask,
     eci: config.eci,
-  });
-  const codewords = ɵcreateQRCodeCodewords(resolved);
-  const matrixSize = resolved.version * 4 + 17;
-  const placementGrid = Array.from({length: matrixSize}, () =>
-    Array.from<QRCodePlacement | undefined>({length: matrixSize}),
+  };
+  const matrix = qrcode(config.data).config(matrixOptions).matrix();
+  const version = ((matrix.length - 17) / 4) as QRCodeVersion;
+  const mask = config.mask ?? resolveMask(config.data, matrixOptions, matrix, version);
+  const drawing = createQRCodeStyler({
+    moduleSize: config.moduleSize,
+    quietZone: config.quietZone,
+  }).draw(matrix);
+  const reserved = createReservedGrid(version);
+  const placements = createPlacements(reserved);
+  const codewordBitCount = Math.floor(placements.length / 8) * 8;
+  const placementByPosition = new Map(
+    placements.map(([row, column], placementBitIndex) => [
+      row * matrix.length + column,
+      placementBitIndex,
+    ]),
   );
-  const generated = ɵassembleQRCodeMatrixWithDetails(
-    resolved.version,
-    resolved.errorCorrectionLevel,
-    codewords,
-    resolved.mask,
-    (row, column, placementBitIndex, sourceValue) => {
-      placementGrid[row]![column] = {placementBitIndex, sourceValue};
-    },
-  );
-  const moduleGrid = generated.matrix.map((row, rowIndex) =>
-    row.map((value, columnIndex) =>
-      createModule(
-        rowIndex,
-        columnIndex,
-        value,
-        generated.reserved[rowIndex]![columnIndex] === 1,
-        placementGrid[rowIndex]![columnIndex],
-        codewords.length * 8,
-      ),
-    ),
+  const moduleGrid = matrix.map((row, rowIndex) =>
+    row.map((value, columnIndex) => {
+      const placementBitIndex = placementByPosition.get(rowIndex * matrix.length + columnIndex);
+      if (placementBitIndex === undefined) {
+        return createModule(rowIndex, columnIndex, value, 'functional');
+      }
+      if (placementBitIndex >= codewordBitCount) {
+        return createModule(rowIndex, columnIndex, value, 'remainder');
+      }
+      const sourceValue = (value ^ +MASKS[mask](rowIndex, columnIndex)) as QRCodeModule;
+      return {
+        ...createModule(rowIndex, columnIndex, value, 'encoded'),
+        sourceValue,
+        placementBitIndex,
+        codewordIndex: Math.floor(placementBitIndex / 8),
+      };
+    }),
   );
   const modules = moduleGrid.flat();
-
   return {
-    matrix: generated.matrix,
+    matrix,
     modules,
     moduleGrid,
     groups: createGroups(modules),
-    version: resolved.version,
-    mode: resolveModeName(resolved),
-    errorCorrectionLevel: resolveErrorCorrectionLevelName(resolved),
-    mask: generated.mask,
-    size: styling.size,
-    margin: styling.margin,
-    viewSize: generated.matrix.length + styling.margin * 2,
+    version,
+    mode: resolveMode(config),
+    errorCorrectionLevel: config.errorCorrectionLevel ?? 'M',
+    mask,
+    moduleSize: drawing.moduleSize,
+    quietZone: drawing.quietZone,
+    viewSize: drawing.viewSize,
   };
 }
 
@@ -143,55 +148,97 @@ function createModule(
   row: number,
   column: number,
   value: QRCodeModule,
-  reserved: boolean,
-  placement: QRCodePlacement | undefined,
-  codewordBitCount: number,
+  role: QRCodeExplainRole,
 ): QRCodeExplainModule {
-  if (reserved) {
-    if (placement !== undefined) throwInvalidPlacement(row, column);
-    return {key: `${row}:${column}`, row, column, value, role: 'functional', groupId: 'functional'};
+  return {key: `${row}:${column}`, row, column, value, role, groupId: role};
+}
+
+function createReservedGrid(version: QRCodeVersion): boolean[][] {
+  const size = version * 4 + 17;
+  const grid = Array.from({length: size}, () => Array<boolean>(size).fill(false));
+  mark(grid, 0, 0, 9, 9);
+  mark(grid, size - 8, 0, 8, 9);
+  mark(grid, 0, size - 8, 9, 8);
+  for (let index = 9; index < size - 8; index++) {
+    grid[6]![index] = true;
+    grid[index]![6] = true;
   }
-  if (placement === undefined) throwInvalidPlacement(row, column);
-
-  if (placement.placementBitIndex >= codewordBitCount) {
-    return {key: `${row}:${column}`, row, column, value, role: 'remainder', groupId: 'remainder'};
+  const alignments = alignmentPositions(version);
+  for (let rowIndex = 0; rowIndex < alignments.length; rowIndex++) {
+    const minimumColumn = rowIndex === 0 || rowIndex === alignments.length - 1 ? 1 : 0;
+    const maximumColumn = rowIndex === 0 ? alignments.length - 1 : alignments.length;
+    for (let columnIndex = minimumColumn; columnIndex < maximumColumn; columnIndex++) {
+      mark(grid, alignments[columnIndex]!, alignments[rowIndex]!, 5, 5);
+    }
   }
-
-  return {
-    key: `${row}:${column}`,
-    row,
-    column,
-    value,
-    sourceValue: placement.sourceValue,
-    role: 'encoded',
-    groupId: 'encoded',
-    placementBitIndex: placement.placementBitIndex,
-    codewordIndex: Math.floor(placement.placementBitIndex / 8),
-  };
+  if (version >= 7) {
+    mark(grid, size - 11, 0, 3, 6);
+    mark(grid, 0, size - 11, 6, 3);
+  }
+  return grid;
 }
 
-function throwInvalidPlacement(row: number, column: number): never {
-  throw new Error(
-    `QRCode explain: Matrix placement mismatch at (${String(column)}, ${String(row)})`,
-  );
+function mark(grid: boolean[][], x: number, y: number, width: number, height: number): void {
+  for (let row = y; row < y + height; row++) {
+    for (let column = x; column < x + width; column++) grid[row]![column] = true;
+  }
 }
 
-function resolveModeName(resolved: ɵQRCodeResolvedMatrixOptions): QRCodeMode | 'mixed' {
-  const names = new Set(
-    resolved.segments.map(({mode}) => ɵMODES.find((candidate) => ɵMODES_MAP[candidate] === mode)),
-  );
-  if (names.has(undefined)) throw new Error('QRCode explain: Unable to resolve encoded mode');
-  return names.size > 1 ? 'mixed' : names.values().next().value!;
+function alignmentPositions(version: QRCodeVersion): number[] {
+  if (version === 1) return [];
+  const count = Math.floor(version / 7) + 2;
+  const step = Math.floor((version * 8 + count * 3 + 5) / (count * 4 - 4)) * 2;
+  const positions = [4];
+  for (let position = version * 4 + 8; positions.length < count; position -= step) {
+    positions.splice(1, 0, position);
+  }
+  return positions;
 }
 
-function resolveErrorCorrectionLevelName(
-  resolved: ɵQRCodeResolvedMatrixOptions,
-): QRCodeErrorCorrectionLevel {
-  const name = ɵECC_LEVELS.find(
-    (candidate) => ɵECC_LEVELS_MAP[candidate] === resolved.errorCorrectionLevel,
-  );
-  if (name === undefined) throw new Error('QRCode explain: Unable to resolve error correction');
-  return name;
+function createPlacements(reserved: readonly (readonly boolean[])[]): [number, number][] {
+  const placements: [number, number][] = [];
+  const size = reserved.length;
+  let direction = -1;
+  for (let right = size - 1; right >= 0; right -= 2) {
+    if (right === 6) right--;
+    let row = direction < 0 ? size - 1 : 0;
+    for (let step = 0; step < size; step++) {
+      for (let column = right; column > right - 2; column--) {
+        if (!reserved[row]![column]) placements.push([row, column]);
+      }
+      row += direction;
+    }
+    direction = -direction;
+  }
+  return placements;
+}
+
+function resolveMask(
+  data: string,
+  options: QRCodeMatrixOptions,
+  matrix: QRCodeMatrix,
+  version: QRCodeVersion,
+): QRCodeMask {
+  for (let mask = 0; mask < 8; mask++) {
+    const candidate = qrcode(data)
+      .config({...options, version, mask: mask as QRCodeMask})
+      .matrix();
+    if (
+      candidate.every((row, index) =>
+        row.every((value, column) => value === matrix[index]?.[column]),
+      )
+    ) {
+      return mask as QRCodeMask;
+    }
+  }
+  throw new Error('QRCode explain: Unable to resolve mask');
+}
+
+function resolveMode(config: QRCodeExplainConfig): QRCodeMode | 'mixed' {
+  if (config.mode) return config.mode;
+  if (/^\d+$/.test(config.data)) return 'numeric';
+  if (/^[0-9A-Z $%*+\-./:]+$/.test(config.data)) return 'alphanumeric';
+  return /[0-9A-Z]{4,}/.test(config.data) ? 'mixed' : 'octet';
 }
 
 function createGroups(
@@ -201,10 +248,9 @@ function createGroups(
   for (const role of QR_CODE_EXPLAIN_ROLE_ORDER) {
     const details = QR_CODE_EXPLAIN_ROLE_DETAILS[role];
     groups.set(role, {
+      ...details,
       id: role,
       role,
-      label: details.label,
-      description: details.description,
       modules: modules.filter((module) => module.role === role),
     });
   }

@@ -1,4 +1,4 @@
-import {QR_CODE_STYLING_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
+import {QR_CODE_STYLING_ROUNDTRIP_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
@@ -21,8 +21,7 @@ describe('QRCodeCanvasRenderer', () => {
           .errorCorrection('H')
           .render(
             QRCodeCanvasRenderer({
-              size: 4,
-              margin: 4,
+              style: {moduleSize: 4, quietZone: 4},
               image: {source: logo, size: 0.16, padding: 0.25},
             }),
           ),
@@ -30,7 +29,7 @@ describe('QRCodeCanvasRenderer', () => {
     ).toBe('prepared browser image');
   });
 
-  const defaultRenderer = QRCodeCanvasRenderer({size: 4, margin: 4});
+  const defaultRenderer = QRCodeCanvasRenderer({style: {moduleSize: 4, quietZone: 4}});
 
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name canvas output', (fixture) => {
     expect(
@@ -44,13 +43,16 @@ describe('QRCodeCanvasRenderer', () => {
     );
   });
 
-  test.each(QR_CODE_STYLING_FIXTURES)('decodes $name canvas styling fixture', (fixture) => {
-    expect(
-      decodeCanvasQRCode(
-        qrcode(fixture.data)
-          .config(fixture.matrixOptions)
-          .render(QRCodeCanvasRenderer(fixture.styling)),
-      ),
-    ).toBe(fixture.data);
-  });
+  test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES)(
+    'decodes $name canvas styling fixture',
+    (fixture) => {
+      expect(
+        decodeCanvasQRCode(
+          qrcode(fixture.data)
+            .config(fixture.matrixOptions)
+            .render(QRCodeCanvasRenderer({style: fixture.styling})),
+        ),
+      ).toBe(fixture.data);
+    },
+  );
 });

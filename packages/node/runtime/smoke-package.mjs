@@ -14,7 +14,7 @@ const png = qrcode('Runtime ✅ 你好')
   .mode('octet')
   .errorCorrection('H')
   .mask(3)
-  .render(QRCodePNGRenderer({size: 1, margin: 1}));
+  .render(QRCodePNGRenderer({style: {moduleSize: 1, quietZone: 1}}));
 
 assert.equal(Buffer.isBuffer(png), true);
 logSuccess('PNG renderer returns a Node.js Buffer');

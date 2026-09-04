@@ -183,25 +183,25 @@ qrc "https://qrcodesdk.dev"
 Use full-height, double-width `██` modules when preferred:
 
 ```sh
-qrc "https://qrcodesdk.dev" --no-small
+qrc "https://qrcodesdk.dev" --layout full
 ```
 
 ANSI styling is disabled automatically when standard output is redirected or `NO_COLOR` is present.
 You can also disable it explicitly:
 
 ```sh
-qrc "https://qrcodesdk.dev" --no-ansi-colors
+qrc "https://qrcodesdk.dev" --ansi off
 ```
 
 Render modules entirely as ANSI-colored spaces, without UTF-8 block glyphs:
 
 ```sh
-qrc "https://qrcodesdk.dev" --only-ansi-colors
+qrc "https://qrcodesdk.dev" --ansi background
 ```
 
-The equivalent explicit boolean forms are `--small false` and `--ansi-colors false`. Both options also accept `true`. Layout and ANSI styling are independent and affect text output only. Compact and full block layouts require UTF-8; ANSI-background-only output contains spaces and escape sequences instead. Explicit ANSI flags take precedence over `NO_COLOR` and TTY detection.
-
-`--only-ansi-colors` ignores the `small` setting and implies ANSI output. It cannot be combined with `--no-ansi-colors` or `--ansi-colors false`.
+Use `--layout compact` or `--layout full` with block output. `--ansi background` has fixed full-cell
+geometry and cannot be combined with `--layout`. An explicit ANSI mode takes precedence over
+`NO_COLOR` and TTY detection.
 
 ## Write SVG files
 
@@ -239,10 +239,10 @@ SVG and PNG output require `--output`. If the extension is not `.svg` or `.png`,
 qrc "https://qrcodesdk.dev" \
   --output qrcode.svg \
   --error-correction H \
-  --size 2 \
-  --margin 3 \
-  --color-dark '#111827' \
-  --color-light '#ffffff' \
+  --module-size 2 \
+  --quiet-zone 3 \
+  --foreground '#111827' \
+  --background '#ffffff' \
   --aria-label 'Scan to open qrcodesdk.dev'
 ```
 
@@ -282,22 +282,18 @@ see [Customize output](https://qrcodesdk.dev/guides/customize/).
 | `--version <1-40>`                      | Pin a QR code version.                                      | `Auto`      |
 | `--mask <0-7>`                          | Pin a QR code mask.                                         | `Auto`      |
 | `--eci [true\|false]`                   | Emit UTF-8 ECI assignment 26 for octet segments.            | `false`     |
-| `--size <number>`                       | Module size as a positive integer.                          | `1`         |
-| `--margin <number>`                     | Margin as a non-negative integer.                           | `2`         |
-| `--small <true\|false>`                 | Pack two QR rows into each terminal line.                   | `true`      |
-| `--no-small`                            | Alias for `--small false`.                                  | -           |
-| `--ansi-colors <true\|false>`           | Override environment-aware ANSI color detection.            | `Auto`      |
-| `--no-ansi-colors`                      | Alias for `--ansi-colors false`.                            | -           |
-| `--only-ansi-colors`                    | Use ANSI background cells without UTF-8 block glyphs.       | `false`     |
-| `--color-dark <#rrggbb>`                | Dark module color.                                          | `#000000`   |
-| `--color-light <#rrggbb>`               | Light module color.                                         | `#ffffff`   |
-| `--alt <text>`                          | Fallback SVG accessible name.                               | `undefined` |
+| `--module-size <number>`                | Module size as a positive integer.                          | `1`         |
+| `--quiet-zone <number>`                 | Quiet zone as a non-negative integer.                       | `2`         |
+| `--layout <compact\|full>`              | Text block layout.                                          | `compact`   |
+| `--ansi <off\|blocks\|background>`      | Explicit ANSI output mode.                                  | Environment |
+| `--foreground <#rrggbb[aa]>`            | Dark module color.                                          | `#000000`   |
+| `--background <#rrggbb[aa]>`            | Light module color.                                         | `#ffffff`   |
 | `--aria-label <text>`                   | SVG `aria-label` accessible name.                           | `undefined` |
 | `--title <text>`                        | SVG child `<title>` text.                                   | `undefined` |
 
-Colors must be six-digit hex values. `--size` must be positive and `--margin` must be non-negative.
+Colors must be RGB or RGBA hex values. `--module-size` must be positive and `--quiet-zone` must be non-negative.
 For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI
-background. With `--only-ansi-colors`, both become module background colors.
+background. With `--ansi background`, both become module background colors.
 
 ## Interactive and automated use
 

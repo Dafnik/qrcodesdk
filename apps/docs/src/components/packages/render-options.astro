@@ -9,29 +9,29 @@ interface Props {
 const {accessibility = true, compressionLevel = false} = Astro.props;
 
 const options = [
-  ['`size`', 'All', '`number`', '`5`', 'Pixel size of each QR module.'],
-  ['`margin`', 'All', '`number`', '`4`', 'Quiet-zone width in modules.'],
-  ['`colors.colorDark`', 'All', '`string`', "`'#000000'`", 'Dark module color.'],
-  ['`colors.colorLight`', 'All', '`string`', "`'#ffffff'`", 'Background color.'],
+  ['`style.moduleSize`', 'All', '`number`', '`5`', 'Pixel size of each QR module.'],
+  ['`style.quietZone`', 'All', '`number`', '`4`', 'Quiet-zone width in modules.'],
+  ['`style.foreground`', 'All', '`QRCodeColor`', "`'#000000'`", 'Default dark color.'],
+  ['`style.background`', 'All', '`QRCodeColor`', "`'#ffffff'`", 'Background color.'],
   [
-    '`dotsOptions`',
+    '`style.modules`',
     'All',
-    '`QRCodeDotsOptions`',
-    "`{type: 'square'}`",
+    '`{shape?: QRCodeModuleShape; color?: QRCodeColor}`',
+    "`{shape: 'square'}`",
     'Ordinary module shape and optional color.',
   ],
   [
-    '`cornersSquareOptions`',
+    '`style.finder.outer`',
     'All',
-    '`QRCodeCornersSquareOptions`',
-    "`{type: 'square'}`",
+    '`{shape?: QRCodeFinderShape; color?: QRCodeColor}`',
+    "`{shape: 'square'}`",
     'Finder-ring shape and optional color.',
   ],
   [
-    '`cornersDotOptions`',
+    '`style.finder.center`',
     'All',
-    '`QRCodeCornersDotOptions`',
-    "`{type: 'square'}`",
+    '`{shape?: QRCodeFinderShape; color?: QRCodeColor}`',
+    "`{shape: 'square'}`",
     'Finder-center shape and optional color.',
   ],
   [
@@ -46,15 +46,21 @@ const options = [
   ['`image.clearBackground`', 'All', '`boolean`', '`true`', 'Clears modules behind the image.'],
   ...(accessibility
     ? [
-        ['`alt`', 'SVG, Image', '`string`', '`undefined`', 'Image `alt` attribute.'],
-        ['`ariaLabel`', 'SVG, Image', '`string`', '`undefined`', 'Image `aria-label`.'],
-        ['`title`', 'SVG, Image', '`string`', '`undefined`', 'Image `title` attribute.'],
+        ['`accessibility.alt`', 'Image', '`string`', "`''`", 'Image `alt` property.'],
+        [
+          '`accessibility.ariaLabel`',
+          'SVG, Canvas, Image',
+          '`string`',
+          '`undefined`',
+          'Accessible name.',
+        ],
+        ['`accessibility.title`', 'SVG, Canvas, Image', '`string`', '`undefined`', 'Output title.'],
       ]
     : []),
   ...(compressionLevel
     ? [
         [
-          '`compressionLevel`',
+          '`compression.level`',
           '',
           '`number`',
           '`9`',
@@ -64,19 +70,16 @@ const options = [
     : []),
 ];
 
-const optionTypes = `export type QRCodeDotsOptions = {
-  color?: QRCodeColorHex;
-  type?: QRCodeDotType;
-};
-
-export type QRCodeCornersSquareOptions = {
-  color?: QRCodeColorHex;
-  type?: QRCodeCornerSquareType;
-};
-
-export type QRCodeCornersDotOptions = {
-  color?: QRCodeColorHex;
-  type?: QRCodeCornerDotType;
+const optionTypes = `export interface QRCodeVisualStyle {
+  moduleSize?: number;
+  quietZone?: number;
+  foreground?: QRCodeColor;
+  background?: QRCodeColor;
+  modules?: {shape?: QRCodeModuleShape; color?: QRCodeColor};
+  finder?: {
+    outer?: {shape?: QRCodeFinderShape; color?: QRCodeColor};
+    center?: {shape?: QRCodeFinderShape; color?: QRCodeColor};
+  };
 };`;
 ---
 
@@ -117,21 +120,20 @@ export type QRCodeCornersDotOptions = {
 
 <ul>
   <li>
-    Color options use hash-prefixed values such as <code>#111827</code>.
+    Colors must be exactly <code>#RRGGBB</code> or <code>#RRGGBBAA</code>.
   </li>
   <li>
-    <code>size</code> requires a positive safe integer (<code>&gt;0</code>) and
-    <code>margin</code> a non-negative safe integer (<code>&gt;=0</code>).
+    <code>moduleSize</code> requires a positive safe integer (<code>&gt;0</code>) and
+    <code>quietZone</code> a non-negative safe integer (<code>&gt;=0</code>).
   </li>
   <li>
     Module, finder-ring, and finder-center options pass through to every component. Their optional
-    colors independently inherit
-    <code>colors.colorDark</code>.
+    colors independently inherit <code>style.foreground</code>.
   </li>
   <li>
-    Data-module types are <code>square</code>, <code>rounded</code>,
-    <code>dots</code>, <code>classy</code>, <code>classy-rounded</code>, and
-    <code>extra-rounded</code>. Finder rings and centers additionally support
-    <code>dot</code>.
+    Module shapes are <code>square</code>, <code>circle</code>, <code>rounded</code>,
+    <code>extra-rounded</code>, <code>diagonal</code>, and <code>diagonal-rounded</code>. Finder
+    shapes are <code>square</code>, <code>rounded</code>, <code>extra-rounded</code>, and
+    <code>circle</code>.
   </li>
 </ul>

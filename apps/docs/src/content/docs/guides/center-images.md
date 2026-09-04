@@ -142,7 +142,7 @@ export function QRCodeWithLogo() {
   return source ? (
     <QRCodeImage
       data="https://qrcodesdk.dev"
-      options={{errorCorrectionLevel: 'H', image: {source, size: 0.3}}}
+      options={{matrix: {errorCorrectionLevel: 'H'}, image: {source, size: 0.3}}}
     />
   ) : (
     <button type="button" onClick={() => void loadLogo('/logo.png')}>
@@ -163,7 +163,9 @@ import {QRCodeImage} from '@qrcodesdk/vue';
 
 const source = shallowRef<HTMLImageElement>();
 const options = computed<QRCodeImageOptions | undefined>(() =>
-  source.value ? {errorCorrectionLevel: 'H', image: {source: source.value, size: 0.3}} : undefined,
+  source.value
+    ? {matrix: {errorCorrectionLevel: 'H'}, image: {source: source.value, size: 0.3}}
+    : undefined,
 );
 
 async function loadLogo(url: string) {
@@ -189,7 +191,7 @@ async function loadLogo(url: string) {
 
   let source = $state<HTMLImageElement>();
   const options: QRCodeImageOptions | undefined = $derived(
-    source ? {errorCorrectionLevel: 'H', image: {source, size: 0.3}} : undefined,
+    source ? {matrix: {errorCorrectionLevel: 'H'}, image: {source, size: 0.3}} : undefined,
   );
 
   async function loadLogo(url: string) {
@@ -220,7 +222,7 @@ import {QRCodeImage} from '@qrcodesdk/angular';
   template: `
     @if (source(); as image) {
       <qrcode-image
-        [options]="{errorCorrectionLevel: 'H', image: {source: image, size: 0.3}}"
+        [options]="{matrix: {errorCorrectionLevel: 'H'}, image: {source: image, size: 0.3}}"
         data="https://qrcodesdk.dev" />
     }
   `,

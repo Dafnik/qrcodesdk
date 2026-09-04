@@ -3,12 +3,17 @@ qrcode
 eccs
 ecclevel
 rrggbb
+rrggbbaa
+rgba
 Grüße
 describedby
+evenodd
 fesm
 importmap
+lifecycles
 networkidle
 nopass
+popcount
 FGHIJ
 roundtrips
 Streamable

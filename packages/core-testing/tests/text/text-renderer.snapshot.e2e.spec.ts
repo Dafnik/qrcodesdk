@@ -9,8 +9,8 @@ import {expectTextToMatchFileSnapshot} from './text-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/text', import.meta.url));
 const RENDERER_VARIANTS = [
-  {name: 'compact', small: true, snapshotSuffix: ''},
-  {name: 'full', small: false, snapshotSuffix: '-full'},
+  {name: 'compact', layout: 'compact', snapshotSuffix: ''},
+  {name: 'full', layout: 'full', snapshotSuffix: '-full'},
 ] as const;
 
 describe('QRCodeTextRenderer snapshots', () => {
@@ -19,7 +19,12 @@ describe('QRCodeTextRenderer snapshots', () => {
       expectTextToMatchFileSnapshot(
         qrcode(fixture.data)
           .config(fixture)
-          .render(QRCodeTextRenderer({size: 2, margin: 4, small: variant.small})),
+          .render(
+            QRCodeTextRenderer({
+              style: {moduleSize: 2, quietZone: 4},
+              layout: variant.layout,
+            }),
+          ),
         join(SNAPSHOT_DIR, `${fixture.name}${variant.snapshotSuffix}.txt`),
       );
     });

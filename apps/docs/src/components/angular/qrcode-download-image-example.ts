@@ -10,7 +10,7 @@ import {QRCodeImage} from '@qrcodesdk/angular';
       <qrcode-image
         #qrcode
         [options]="{
-          alt: 'QR code for qrcodesdk.dev',
+          accessibility: {alt: 'QR code for qrcodesdk.dev'},
         }"
         data="https://qrcodesdk.dev" />
       <button class="btn-primary" (click)="qrcode.download('qrcodesdk')" type="button">

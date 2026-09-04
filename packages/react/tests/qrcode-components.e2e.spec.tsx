@@ -8,15 +8,12 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '../src';
 
-const svgOptions: QRCodeSVGOptions = {size: 2, margin: 1};
+const svgOptions: QRCodeSVGOptions = {style: {moduleSize: 2, quietZone: 1}};
 const imageOptions: QRCodeImageOptions = {
-  size: 2,
-  margin: 1,
-  alt: 'QR alt',
-  ariaLabel: 'QR aria',
-  title: 'QR title',
+  style: {moduleSize: 2, quietZone: 1},
+  accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
 };
-const canvasOptions: QRCodeCanvasOptions = {size: 2, margin: 1};
+const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}};
 
 describe('React QR code components', () => {
   beforeEach(() => {
@@ -108,7 +105,7 @@ describe('React QR code components', () => {
     const {container} = render(
       <>
         <QRCodeSVG data="DECORATIVE" />
-        <QRCodeCanvas data="LABELED" options={{title: 'Scan this code'}} />
+        <QRCodeCanvas data="LABELED" options={{accessibility: {title: 'Scan this code'}}} />
       </>,
     );
 
@@ -155,11 +152,15 @@ describe('React QR code components', () => {
 
   test('passes styled options through SVG, image, and canvas components', async () => {
     const styledOptions = {
-      size: 2,
-      margin: 1,
-      dotsOptions: {color: '#112233' as const, type: 'classy-rounded' as const},
-      cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
-      cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
+      style: {
+        moduleSize: 2,
+        quietZone: 1,
+        modules: {color: '#112233' as const, shape: 'diagonal-rounded' as const},
+        finder: {
+          outer: {color: '#445566' as const, shape: 'extra-rounded' as const},
+          center: {color: '#778899' as const, shape: 'circle' as const},
+        },
+      },
     };
     const {container} = render(
       <>
@@ -271,7 +272,7 @@ describe('React QR code components', () => {
     const wrapper = renderedElement<HTMLDivElement>(container, 'div');
     const firstImage = renderedElement<HTMLImageElement>(container, 'img');
 
-    rerender(<QRCodeImage data="HELLO" options={{size: 3, margin: 1}} />);
+    rerender(<QRCodeImage data="HELLO" options={{style: {moduleSize: 3, quietZone: 1}}} />);
 
     await waitFor(() =>
       expect(renderedElement<HTMLImageElement>(container, 'img')).not.toBe(firstImage),

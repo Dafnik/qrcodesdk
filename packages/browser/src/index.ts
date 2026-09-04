@@ -1,5 +1,6 @@
 export {
   type QRCodeCanvasImageOptions,
+  type QRCodeCanvasAccessibilityOptions,
   type QRCodeCanvasOptions,
   QRCodeCanvasRenderer,
   type QRCodeCanvasRendererOptions,
@@ -7,6 +8,7 @@ export {
 export {
   QRCodeDownloadImageRenderer,
   type QRCodeDownloadImageRendererOptions,
+  type QRCodeImageAccessibilityOptions,
   type QRCodeImageOptions,
   QRCodeImageRenderer,
   type QRCodeImageRendererOptions,

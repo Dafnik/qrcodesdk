@@ -6,8 +6,10 @@ import {QRCodeSVG} from '@qrcodesdk/react';
 export default function QRCodeSVGExample() {
   const options = useMemo<QRCodeSVGOptions>(
     () => ({
-      title: 'QR code for qrcodesdk.dev',
-      ariaLabel: 'Scan to open qrcodesdk.dev',
+      accessibility: {
+        title: 'QR code for qrcodesdk.dev',
+        ariaLabel: 'Scan to open qrcodesdk.dev',
+      },
     }),
     [],
   );

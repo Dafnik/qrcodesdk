@@ -43,9 +43,9 @@ describe('playground prepared image options', () => {
     assert.equal(svgOptions.image?.source, preparedImage.dataUrl);
     assert.equal(imageOptions.image?.source, preparedImage.element);
     assert.equal(canvasOptions.image?.source, preparedImage.element);
-    assert.equal(svgOptions.eci, false);
-    assert.equal(imageOptions.eci, false);
-    assert.equal(canvasOptions.eci, false);
+    assert.equal(svgOptions.matrix?.eci, false);
+    assert.equal(imageOptions.matrix?.eci, false);
+    assert.equal(canvasOptions.matrix?.eci, false);
     assert.deepEqual(svgOptions.image, {
       source: preparedImage.dataUrl,
       size: 0.3,
@@ -57,9 +57,9 @@ describe('playground prepared image options', () => {
   test('forwards enabled ECI through every renderer and error-checking path', () => {
     const config = {...defaultPlaygroundConfig, eci: true};
 
-    assert.equal(createPlaygroundSVGOptions(config, preparedImage).eci, true);
-    assert.equal(createPlaygroundImageOptions(config, preparedImage).eci, true);
-    assert.equal(createPlaygroundCanvasOptions(config, preparedImage).eci, true);
+    assert.equal(createPlaygroundSVGOptions(config, preparedImage).matrix?.eci, true);
+    assert.equal(createPlaygroundImageOptions(config, preparedImage).matrix?.eci, true);
+    assert.equal(createPlaygroundCanvasOptions(config, preparedImage).matrix?.eci, true);
     assert.equal(hasQRCodeError(config, undefined), undefined);
     assert.match(
       String(hasQRCodeError({...config, eci: 'true' as never}, undefined)),

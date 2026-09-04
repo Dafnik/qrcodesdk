@@ -1,16 +1,16 @@
-import {calculateQRCodeRenderedSize} from './styling';
+import {calculateQRCodeOutputSize} from './styling';
 import type {
-  QRCodeDotType,
   QRCodeMatrix,
-  ɵQRCodeModuleShape,
-  ɵQRCodeModuleStylePrimitive,
-  ɵQRCodeParsedStylingOptions,
-  ɵQRCodeStyleLayer,
-  ɵQRCodeStylePlan,
-  ɵQRCodeStylePrimitive,
-  ɵQRCodeStyleRectangle,
-  ɵQRCodeStyleRole,
-  ɵQRCodeStyleRotation,
+  QRCodeModuleShape,
+  QRCodeModuleStylePrimitive,
+  QRCodePaintShape,
+  QRCodeResolvedVisualStyle,
+  QRCodeStyleLayer,
+  QRCodeStylePlan,
+  QRCodeStylePrimitive,
+  QRCodeStyleRectangle,
+  QRCodeStyleRole,
+  QRCodeStyleRotation,
 } from './types';
 
 const FINDER_SIZE = 7;
@@ -20,21 +20,21 @@ const FINDER_CENTER_SIZE = 3;
 type Finder = {
   x: number;
   y: number;
-  rotation: ɵQRCodeStyleRotation;
+  rotation: QRCodeStyleRotation;
 };
 
-type ResolvedModuleShape = {shape: ɵQRCodeModuleShape; rotation: ɵQRCodeStyleRotation};
+type ResolvedModuleShape = {shape: QRCodePaintShape; rotation: QRCodeStyleRotation};
 
-const RESOLVED_MODULE_SHAPE_CACHE = new Map<QRCodeDotType, ResolvedModuleShape[]>();
+const RESOLVED_MODULE_SHAPE_CACHE = new Map<QRCodeModuleShape, ResolvedModuleShape[]>();
 
 export function createQRCodeStylePlan(
   matrix: QRCodeMatrix,
-  styling: ɵQRCodeParsedStylingOptions,
-): ɵQRCodeStylePlan {
+  styling: QRCodeResolvedVisualStyle,
+): QRCodeStylePlan {
   if (
-    styling.dotsOptions.type === 'square' &&
-    styling.cornersSquareOptions.type === 'square' &&
-    styling.cornersDotOptions.type === 'square'
+    styling.modules.shape === 'square' &&
+    styling.finder.outer.shape === 'square' &&
+    styling.finder.center.shape === 'square'
   ) {
     return createSquareQRCodeStylePlan(matrix, styling);
   }
@@ -44,20 +44,20 @@ export function createQRCodeStylePlan(
 
 function createSquareQRCodeStylePlan(
   matrix: QRCodeMatrix,
-  styling: ɵQRCodeParsedStylingOptions,
-): ɵQRCodeStylePlan {
+  styling: QRCodeResolvedVisualStyle,
+): QRCodeStylePlan {
   const moduleCount = matrix.length;
-  const viewSize = moduleCount + 2 * styling.margin;
+  const viewSize = moduleCount + 2 * styling.quietZone;
   const gridWidth = Math.max(
     viewSize,
-    styling.margin + matrix.reduce((maximum, row) => Math.max(maximum, row.length), 0),
+    styling.quietZone + matrix.reduce((maximum, row) => Math.max(maximum, row.length), 0),
   );
   const finders = findFinderPatterns(matrix);
   const finderDarkCells = createFinderDarkCellMap(finders, moduleCount);
-  const layersByColor = new Map<ɵQRCodeStylePrimitive['color'], MutableStyleLayer>();
+  const layersByColor = new Map<QRCodeStylePrimitive['color'], MutableStyleLayer>();
   const mutableLayers: MutableStyleLayer[] = [];
 
-  const addCell = (color: ɵQRCodeStylePrimitive['color'], x: number, y: number): void => {
+  const addCell = (color: QRCodeStylePrimitive['color'], x: number, y: number): void => {
     const layer = getMutableStyleLayer(color, gridWidth, viewSize, layersByColor, mutableLayers);
     layer.squareCells[y * gridWidth + x] = 1;
   };
@@ -67,7 +67,7 @@ function createSquareQRCodeStylePlan(
     const rowOffset = row * moduleCount;
     for (let column = 0; column < matrixRow.length; column++) {
       if (!matrixRow[column] || finderDarkCells[rowOffset + column] === 1) continue;
-      addCell(styling.dotsOptions.color, styling.margin + column, styling.margin + row);
+      addCell(styling.modules.color, styling.quietZone + column, styling.quietZone + row);
     }
   }
 
@@ -75,9 +75,9 @@ function createSquareQRCodeStylePlan(
     const finder = finders[index]!;
     forEachFinderRingCell((row, column) => {
       addCell(
-        styling.cornersSquareOptions.color,
-        styling.margin + finder.x + column,
-        styling.margin + finder.y + row,
+        styling.finder.outer.color,
+        styling.quietZone + finder.x + column,
+        styling.quietZone + finder.y + row,
       );
     });
   }
@@ -87,9 +87,9 @@ function createSquareQRCodeStylePlan(
     for (let row = 0; row < FINDER_CENTER_SIZE; row++) {
       for (let column = 0; column < FINDER_CENTER_SIZE; column++) {
         addCell(
-          styling.cornersDotOptions.color,
-          styling.margin + finder.x + FINDER_CENTER_OFFSET + column,
-          styling.margin + finder.y + FINDER_CENTER_OFFSET + row,
+          styling.finder.center.color,
+          styling.quietZone + finder.x + FINDER_CENTER_OFFSET + column,
+          styling.quietZone + finder.y + FINDER_CENTER_OFFSET + row,
         );
       }
     }
@@ -98,8 +98,8 @@ function createSquareQRCodeStylePlan(
   return {
     moduleCount,
     viewSize,
-    renderedSize: calculateQRCodeRenderedSize(matrix, styling),
-    backgroundColor: styling.colors.colorLight,
+    outputSize: calculateQRCodeOutputSize(matrix, styling),
+    backgroundColor: styling.background,
     hasCurves: false,
     layers: finishMutableStyleLayers(mutableLayers, gridWidth, viewSize),
   };
@@ -107,21 +107,21 @@ function createSquareQRCodeStylePlan(
 
 function createStyledQRCodeStylePlan(
   matrix: QRCodeMatrix,
-  styling: ɵQRCodeParsedStylingOptions,
-): ɵQRCodeStylePlan {
+  styling: QRCodeResolvedVisualStyle,
+): QRCodeStylePlan {
   const moduleCount = matrix.length;
-  const viewSize = moduleCount + 2 * styling.margin;
+  const viewSize = moduleCount + 2 * styling.quietZone;
   const gridWidth = Math.max(
     viewSize,
-    styling.margin + matrix.reduce((maximum, row) => Math.max(maximum, row.length), 0),
+    styling.quietZone + matrix.reduce((maximum, row) => Math.max(maximum, row.length), 0),
   );
   const finders = findFinderPatterns(matrix);
   const finderDarkCells = createFinderDarkCellMap(finders, moduleCount);
-  const layersByColor = new Map<ɵQRCodeStylePrimitive['color'], MutableStyleLayer>();
+  const layersByColor = new Map<QRCodeStylePrimitive['color'], MutableStyleLayer>();
   const mutableLayers: MutableStyleLayer[] = [];
   let hasCurves = false;
 
-  const addPrimitive = (primitive: ɵQRCodeStylePrimitive): void => {
+  const addPrimitive = (primitive: QRCodeStylePrimitive): void => {
     const layer = getMutableStyleLayer(
       primitive.color,
       gridWidth,
@@ -142,18 +142,26 @@ function createStyledQRCodeStylePlan(
     return !!matrix[row]?.[column] && finderDarkCells[row * moduleCount + column] !== 1;
   };
 
-  const dotsType = styling.dotsOptions.type;
-  const dotsColor = styling.dotsOptions.color;
+  const dotsType = styling.modules.shape;
+  const dotsColor = styling.modules.color;
 
-  if (dotsType === 'square' || dotsType === 'dots') {
-    const shape: ɵQRCodeModuleShape = dotsType === 'square' ? 'square' : 'dot';
+  if (dotsType === 'square' || dotsType === 'circle') {
+    const shape: QRCodePaintShape = dotsType === 'square' ? 'square' : 'circle';
     for (let row = 0; row < moduleCount; row++) {
       const matrixRow = matrix[row]!;
       const rowOffset = row * moduleCount;
       for (let column = 0; column < matrixRow.length; column++) {
         if (!matrixRow[column] || finderDarkCells[rowOffset + column] === 1) continue;
         addPrimitive(
-          createResolvedModulePrimitive(column, row, styling.margin, 'dots', dotsColor, shape, 0),
+          createResolvedModulePrimitive(
+            column,
+            row,
+            styling.quietZone,
+            'modules',
+            dotsColor,
+            shape,
+            0,
+          ),
         );
       }
     }
@@ -166,8 +174,8 @@ function createStyledQRCodeStylePlan(
         const primitive = createModulePrimitive(
           column,
           row,
-          styling.margin,
-          'dots',
+          styling.quietZone,
+          'modules',
           dotsColor,
           dotsType,
           isOrdinaryDark(row, column - 1),
@@ -182,15 +190,15 @@ function createStyledQRCodeStylePlan(
 
   for (let index = 0; index < finders.length; index++) {
     const finder = finders[index]!;
-    const type = styling.cornersSquareOptions.type;
-    if (type === 'dot' || type === 'square' || type === 'extra-rounded') {
-      const primitive: ɵQRCodeStylePrimitive = {
+    const type = styling.finder.outer.shape;
+    if (type === 'circle' || type === 'square' || type === 'rounded' || type === 'extra-rounded') {
+      const primitive: QRCodeStylePrimitive = {
         kind: 'finder-ring',
-        role: 'cornersSquare',
-        color: styling.cornersSquareOptions.color,
+        role: 'finderOuter',
+        color: styling.finder.outer.color,
         shape: type,
-        x: styling.margin + finder.x,
-        y: styling.margin + finder.y,
+        x: styling.quietZone + finder.x,
+        y: styling.quietZone + finder.y,
         size: FINDER_SIZE,
         rotation: finder.rotation,
       };
@@ -200,9 +208,9 @@ function createStyledQRCodeStylePlan(
         const primitive = createModulePrimitive(
           finder.x + column,
           finder.y + row,
-          styling.margin,
-          'cornersSquare',
-          styling.cornersSquareOptions.color,
+          styling.quietZone,
+          'finderOuter',
+          styling.finder.outer.color,
           type,
           isFinderRingCell(row, column - 1),
           isFinderRingCell(row, column + 1),
@@ -216,15 +224,15 @@ function createStyledQRCodeStylePlan(
 
   for (let index = 0; index < finders.length; index++) {
     const finder = finders[index]!;
-    const type = styling.cornersDotOptions.type;
-    if (type === 'dot' || type === 'square') {
-      const primitive: ɵQRCodeStylePrimitive = {
+    const type = styling.finder.center.shape;
+    if (type === 'circle' || type === 'square' || type === 'rounded' || type === 'extra-rounded') {
+      const primitive: QRCodeStylePrimitive = {
         kind: 'finder-center',
-        role: 'cornersDot',
-        color: styling.cornersDotOptions.color,
+        role: 'finderCenter',
+        color: styling.finder.center.color,
         shape: type,
-        x: styling.margin + finder.x + FINDER_CENTER_OFFSET,
-        y: styling.margin + finder.y + FINDER_CENTER_OFFSET,
+        x: styling.quietZone + finder.x + FINDER_CENTER_OFFSET,
+        y: styling.quietZone + finder.y + FINDER_CENTER_OFFSET,
         size: FINDER_CENTER_SIZE,
         rotation: finder.rotation,
       };
@@ -235,9 +243,9 @@ function createStyledQRCodeStylePlan(
           const primitive = createModulePrimitive(
             finder.x + FINDER_CENTER_OFFSET + column,
             finder.y + FINDER_CENTER_OFFSET + row,
-            styling.margin,
-            'cornersDot',
-            styling.cornersDotOptions.color,
+            styling.quietZone,
+            'finderCenter',
+            styling.finder.center.color,
             type,
             isFinderCenterModuleCell(row, column - 1),
             isFinderCenterModuleCell(row, column + 1),
@@ -253,24 +261,24 @@ function createStyledQRCodeStylePlan(
   return {
     moduleCount,
     viewSize,
-    renderedSize: calculateQRCodeRenderedSize(matrix, styling),
-    backgroundColor: styling.colors.colorLight,
+    outputSize: calculateQRCodeOutputSize(matrix, styling),
+    backgroundColor: styling.background,
     hasCurves,
     layers: finishMutableStyleLayers(mutableLayers, gridWidth, viewSize),
   };
 }
 
 type MutableStyleLayer = {
-  color: ɵQRCodeStylePrimitive['color'];
+  color: QRCodeStylePrimitive['color'];
   squareCells: Uint8Array;
-  curvedPrimitives: ɵQRCodeStylePrimitive[];
+  curvedPrimitives: QRCodeStylePrimitive[];
 };
 
 function getMutableStyleLayer(
-  color: ɵQRCodeStylePrimitive['color'],
+  color: QRCodeStylePrimitive['color'],
   gridWidth: number,
   gridHeight: number,
-  layersByColor: Map<ɵQRCodeStylePrimitive['color'], MutableStyleLayer>,
+  layersByColor: Map<QRCodeStylePrimitive['color'], MutableStyleLayer>,
   mutableLayers: MutableStyleLayer[],
 ): MutableStyleLayer {
   const existing = layersByColor.get(color);
@@ -290,7 +298,7 @@ function finishMutableStyleLayers(
   mutableLayers: readonly MutableStyleLayer[],
   gridWidth: number,
   gridHeight: number,
-): ɵQRCodeStyleLayer[] {
+): QRCodeStyleLayer[] {
   return mutableLayers.map(({color, squareCells, curvedPrimitives}) => ({
     color,
     rectangles: compactSquareCells(squareCells, gridWidth, gridHeight),
@@ -301,7 +309,7 @@ function finishMutableStyleLayers(
 function addSquarePrimitiveCells(
   cells: Uint8Array,
   gridWidth: number,
-  primitive: ɵQRCodeStylePrimitive,
+  primitive: QRCodeStylePrimitive,
 ): void {
   const {x, y} = primitive;
   if (primitive.kind === 'module') {
@@ -332,8 +340,8 @@ function compactSquareCells(
   cells: Uint8Array,
   width: number,
   height: number,
-): ɵQRCodeStyleRectangle[] {
-  const rectangles: ɵQRCodeStyleRectangle[] = [];
+): QRCodeStyleRectangle[] {
+  const rectangles: QRCodeStyleRectangle[] = [];
   let previousWidths = new Uint16Array(width);
   let previousRectangleIndexes = new Int32Array(width);
   let currentWidths = new Uint16Array(width);
@@ -378,14 +386,14 @@ function createModulePrimitive(
   column: number,
   row: number,
   margin: number,
-  role: ɵQRCodeStyleRole,
-  color: ɵQRCodeModuleStylePrimitive['color'],
-  type: QRCodeDotType,
+  role: QRCodeStyleRole,
+  color: QRCodeModuleStylePrimitive['color'],
+  type: QRCodeModuleShape,
   left: boolean,
   right: boolean,
   top: boolean,
   bottom: boolean,
-): ɵQRCodeModuleStylePrimitive {
+): QRCodeModuleStylePrimitive {
   const {shape, rotation} = resolveModuleShape(type, left, right, top, bottom);
 
   return createResolvedModulePrimitive(column, row, margin, role, color, shape, rotation);
@@ -395,11 +403,11 @@ function createResolvedModulePrimitive(
   column: number,
   row: number,
   margin: number,
-  role: ɵQRCodeStyleRole,
-  color: ɵQRCodeModuleStylePrimitive['color'],
-  shape: ɵQRCodeModuleShape,
-  rotation: ɵQRCodeStyleRotation,
-): ɵQRCodeModuleStylePrimitive {
+  role: QRCodeStyleRole,
+  color: QRCodeModuleStylePrimitive['color'],
+  shape: QRCodePaintShape,
+  rotation: QRCodeStyleRotation,
+): QRCodeModuleStylePrimitive {
   return {
     kind: 'module',
     role,
@@ -413,7 +421,7 @@ function createResolvedModulePrimitive(
 }
 
 function resolveModuleShape(
-  type: QRCodeDotType,
+  type: QRCodeModuleShape,
   left: boolean,
   right: boolean,
   top: boolean,
@@ -434,37 +442,37 @@ function resolveModuleShape(
 }
 
 function resolveUncachedModuleShape(
-  type: QRCodeDotType,
+  type: QRCodeModuleShape,
   left: boolean,
   right: boolean,
   top: boolean,
   bottom: boolean,
 ): ResolvedModuleShape {
   if (type === 'square') return {shape: 'square', rotation: 0};
-  if (type === 'dots') return {shape: 'dot', rotation: 0};
+  if (type === 'circle') return {shape: 'circle', rotation: 0};
 
   const neighborsCount = +left + +right + +top + +bottom;
 
-  if (type === 'classy' || type === 'classy-rounded') {
+  if (type === 'diagonal' || type === 'diagonal-rounded') {
     if (neighborsCount === 0) {
       return {shape: 'opposite-corners-rounded', rotation: 90};
     }
     if (!left && !top) {
       return {
-        shape: type === 'classy' ? 'corner-rounded' : 'corner-extra-rounded',
+        shape: type === 'diagonal' ? 'corner-rounded' : 'corner-extra-rounded',
         rotation: 270,
       };
     }
     if (!right && !bottom) {
       return {
-        shape: type === 'classy' ? 'corner-rounded' : 'corner-extra-rounded',
+        shape: type === 'diagonal' ? 'corner-rounded' : 'corner-extra-rounded',
         rotation: 90,
       };
     }
     return {shape: 'square', rotation: 0};
   }
 
-  if (neighborsCount === 0) return {shape: 'dot', rotation: 0};
+  if (neighborsCount === 0) return {shape: 'circle', rotation: 0};
   if (neighborsCount > 2 || (left && right) || (top && bottom)) {
     return {shape: 'square', rotation: 0};
   }
@@ -486,7 +494,7 @@ function cornerRotation(
   right: boolean,
   top: boolean,
   bottom: boolean,
-): ɵQRCodeStyleRotation {
+): QRCodeStyleRotation {
   if (left && top) return 90;
   if (top && right) return 180;
   if (right && bottom) return 270;
@@ -498,7 +506,7 @@ function sideRotation(
   right: boolean,
   top: boolean,
   bottom: boolean,
-): ɵQRCodeStyleRotation {
+): QRCodeStyleRotation {
   if (top) return 90;
   if (right) return 180;
   if (bottom) return 270;

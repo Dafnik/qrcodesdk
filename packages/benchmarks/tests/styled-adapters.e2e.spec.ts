@@ -18,9 +18,7 @@ describe('styled SVG benchmark adapters', {timeout: 15_000}, () => {
   );
 
   test('maps fixture dimensions, matrix options, and global colors', () => {
-    const fixture = QR_CODE_STYLING_FIXTURES.find(({name}) =>
-      name.endsWith('palette-global-navy'),
-    )!;
+    const fixture = QR_CODE_STYLING_FIXTURES.find(({name}) => name.endsWith('palette-navy'))!;
 
     expect(createQRCodeStylingLibraryOptions(fixture)).toMatchObject({
       type: 'svg',
@@ -42,7 +40,7 @@ describe('styled SVG benchmark adapters', {timeout: 15_000}, () => {
 
   test('keeps per-part colors and every fixture shape type', () => {
     const featureFixture = QR_CODE_STYLING_FIXTURES.find(({name}) =>
-      name.endsWith('palette-feature-jewel'),
+      name.endsWith('palette-jewel'),
     )!;
     expect(createQRCodeStylingLibraryOptions(featureFixture)).toMatchObject({
       dotsOptions: {color: '#112233'},
@@ -55,10 +53,10 @@ describe('styled SVG benchmark adapters', {timeout: 15_000}, () => {
       new Set(['rounded', 'dots', 'classy', 'classy-rounded', 'square', 'extra-rounded']),
     );
     expect(new Set(mapped.map(({cornersSquareOptions}) => cornersSquareOptions?.type))).toEqual(
-      new Set(['dot', 'square', 'extra-rounded', 'rounded', 'dots', 'classy', 'classy-rounded']),
+      new Set(['dot', 'square', 'extra-rounded']),
     );
     expect(new Set(mapped.map(({cornersDotOptions}) => cornersDotOptions?.type))).toEqual(
-      new Set(['dot', 'square', 'rounded', 'dots', 'classy', 'classy-rounded', 'extra-rounded']),
+      new Set(['dot', 'square', 'extra-rounded']),
     );
   });
 });

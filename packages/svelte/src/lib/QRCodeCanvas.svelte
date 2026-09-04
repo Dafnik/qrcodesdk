@@ -3,16 +3,18 @@
   import {qrcode} from '@qrcodesdk/core';
 
   import type {QRCodeCanvasProps} from './types.js';
+  import {splitOptions} from './split-options.js';
 
   let {data, options, ...attributes}: QRCodeCanvasProps = $props();
   let container = $state<HTMLDivElement>();
 
-  const canvasRenderer = $derived(QRCodeCanvasRenderer(options));
+  const resolvedOptions = $derived(splitOptions(options));
+  const canvasRenderer = $derived(QRCodeCanvasRenderer(resolvedOptions[1]));
 
   $effect(() => {
     if (!container) return;
 
-    container.replaceChildren(qrcode(data).config(options).render(canvasRenderer));
+    container.replaceChildren(qrcode(data).config(resolvedOptions[0]).render(canvasRenderer));
   });
 </script>
 

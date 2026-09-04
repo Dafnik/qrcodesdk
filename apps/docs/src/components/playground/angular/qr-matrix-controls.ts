@@ -139,7 +139,7 @@ import {playgroundConfig, updateQrConfig} from '../playground-config.ts';
           <input
             id="size"
             [ngModel]="currentConfig().size"
-            (ngModelChange)="updateQrConfig({size: $event})"
+            (ngModelChange)="updateQrConfig({moduleSize: $event})"
             hlmInput
             type="number"
             min="1"
@@ -151,7 +151,7 @@ import {playgroundConfig, updateQrConfig} from '../playground-config.ts';
           <input
             id="margin"
             [ngModel]="currentConfig().margin"
-            (ngModelChange)="updateQrConfig({margin: $event})"
+            (ngModelChange)="updateQrConfig({quietZone: $event})"
             hlmInput
             type="number"
             min="0"

@@ -2,21 +2,28 @@ import {atom} from 'nanostores';
 
 import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
 import type {
-  QRCodeAccessibilityOptions,
   QRCodeDataImageURL,
   QRCodeMatrixOptions,
   QRCodeSVGOptions,
-  QRCodeStylingOptions,
+  QRCodeVisualStyle,
 } from '@qrcodesdk/core';
 
 export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue';
 export type PlaygroundOutput = 'svg' | 'image' | 'canvas';
 
-export interface PlaygroundConfig
-  extends QRCodeMatrixOptions, QRCodeStylingOptions, QRCodeAccessibilityOptions {
+export interface PlaygroundConfig extends QRCodeMatrixOptions {
   data: string;
   packageName: PlaygroundPackage;
   output: PlaygroundOutput;
+  moduleSize?: number;
+  quietZone?: number;
+  foreground?: QRCodeVisualStyle['foreground'];
+  background?: QRCodeVisualStyle['background'];
+  modules?: QRCodeVisualStyle['modules'];
+  finder?: QRCodeVisualStyle['finder'];
+  alt?: string;
+  ariaLabel?: string;
+  title?: string;
 }
 
 export interface PlaygroundPreparedImage {
@@ -39,8 +46,8 @@ export const defaultPlaygroundConfig: PlaygroundConfig = {
   packageName: 'react',
   output: 'svg',
   eci: false,
-  size: 8,
-  margin: 4,
+  moduleSize: 8,
+  quietZone: 4,
 };
 
 export const playgroundConfig = atom<PlaygroundConfig>(defaultPlaygroundConfig);
@@ -78,25 +85,8 @@ export function mergeQrConfig(
     ...current,
     ...patch,
 
-    colors: mergeOptionalObject(current.colors, patch.colors, Object.hasOwn(patch, 'colors')),
-
-    dotsOptions: mergeOptionalObject(
-      current.dotsOptions,
-      patch.dotsOptions,
-      Object.hasOwn(patch, 'dotsOptions'),
-    ),
-
-    cornersSquareOptions: mergeOptionalObject(
-      current.cornersSquareOptions,
-      patch.cornersSquareOptions,
-      Object.hasOwn(patch, 'cornersSquareOptions'),
-    ),
-
-    cornersDotOptions: mergeOptionalObject(
-      current.cornersDotOptions,
-      patch.cornersDotOptions,
-      Object.hasOwn(patch, 'cornersDotOptions'),
-    ),
+    modules: mergeOptionalObject(current.modules, patch.modules, Object.hasOwn(patch, 'modules')),
+    finder: mergeFinder(current.finder, patch.finder, Object.hasOwn(patch, 'finder')),
   };
 }
 
@@ -185,7 +175,7 @@ export function createPlaygroundSVGOptions(
   config: PlaygroundConfig,
   preparedImage = playgroundPreparedImage.get(),
 ): QRCodeSVGOptions {
-  const options = rendererOptions(config);
+  const options = svgOptions(config);
   return preparedImage
     ? {
         ...options,
@@ -203,7 +193,7 @@ export function createPlaygroundImageOptions(
   config: PlaygroundConfig,
   preparedImage = playgroundPreparedImage.get(),
 ): QRCodeImageOptions {
-  const options = rendererOptions(config);
+  const options = imageOptions(config);
   return preparedImage
     ? {
         ...options,
@@ -221,7 +211,7 @@ export function createPlaygroundCanvasOptions(
   config: PlaygroundConfig,
   preparedImage = playgroundPreparedImage.get(),
 ): QRCodeCanvasOptions {
-  const options = rendererOptions(config);
+  const options = canvasOptions(config);
   return preparedImage
     ? {
         ...options,
@@ -235,22 +225,66 @@ export function createPlaygroundCanvasOptions(
     : options;
 }
 
-function rendererOptions(config: PlaygroundConfig) {
+function baseOptions(config: PlaygroundConfig) {
   return {
-    version: config.version,
-    mode: config.mode,
-    errorCorrectionLevel: config.errorCorrectionLevel,
-    mask: config.mask,
-    eci: config.eci,
-    size: config.size,
-    margin: config.margin,
-    colors: config.colors,
-    dotsOptions: config.dotsOptions,
-    cornersSquareOptions: config.cornersSquareOptions,
-    cornersDotOptions: config.cornersDotOptions,
-    alt: config.alt,
-    ariaLabel: config.ariaLabel,
-    title: config.title,
+    matrix: {
+      version: config.version,
+      mode: config.mode,
+      errorCorrectionLevel: config.errorCorrectionLevel,
+      mask: config.mask,
+      eci: config.eci,
+    },
+    style: {
+      moduleSize: config.moduleSize,
+      quietZone: config.quietZone,
+      foreground: config.foreground,
+      background: config.background,
+      modules: config.modules,
+      finder: config.finder,
+    },
+  };
+}
+
+function svgOptions(config: PlaygroundConfig): QRCodeSVGOptions {
+  return {
+    ...baseOptions(config),
+    accessibility: {ariaLabel: config.ariaLabel, title: config.title},
+  };
+}
+
+function imageOptions(config: PlaygroundConfig): QRCodeImageOptions {
+  return {
+    ...baseOptions(config),
+    accessibility: {alt: config.alt, ariaLabel: config.ariaLabel, title: config.title},
+  };
+}
+
+function canvasOptions(config: PlaygroundConfig): QRCodeCanvasOptions {
+  return {
+    ...baseOptions(config),
+    accessibility: {ariaLabel: config.ariaLabel, title: config.title},
+  };
+}
+
+function mergeFinder(
+  current: QRCodeVisualStyle['finder'],
+  patch: QRCodeVisualStyle['finder'],
+  isPresent: boolean,
+): QRCodeVisualStyle['finder'] {
+  const finder = mergeOptionalObject(current, patch, isPresent);
+  if (!finder) return finder;
+  return {
+    ...finder,
+    outer: mergeOptionalObject(
+      current?.outer,
+      patch?.outer,
+      Boolean(patch && Object.hasOwn(patch, 'outer')),
+    ),
+    center: mergeOptionalObject(
+      current?.center,
+      patch?.center,
+      Boolean(patch && Object.hasOwn(patch, 'center')),
+    ),
   };
 }
 

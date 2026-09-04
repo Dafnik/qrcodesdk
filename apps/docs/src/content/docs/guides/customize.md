@@ -1,6 +1,6 @@
 ---
 title: Customize appearance
-description: Style QR code size, quiet zone, colors, modules, finder patterns, and accessible labels without compromising scan reliability.
+description: Style QR code dimensions, colors, modules, and finder patterns with the shared visual style contract.
 docType: guide
 
 related:
@@ -12,116 +12,90 @@ related:
   - ./center-images.md
 ---
 
-Built-in visual renderers share the same styling options, defaults, and validation rules. This guide
-uses SVG, but the size, quiet-zone, color, module, and finder settings also apply to Canvas,
-PNG-backed Image, and Node.js PNG output.
-
-## Prerequisite
-
-Start with a working renderer. For the recommended default, install `@qrcodesdk/core` and confirm
-that the [minimal SVG example](/reference/renderers/svg/#minimal-example) produces output.
+SVG, Canvas, browser Image, and Node.js PNG renderers consume the same `QRCodeVisualStyle`.
+Styling is renderer-owned, so matrix generation remains independent of presentation.
 
 ## Apply a visual theme
 
 ```ts
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, type QRCodeVisualStyle, qrcode} from '@qrcodesdk/core';
+
+const style: QRCodeVisualStyle = {
+  moduleSize: 8,
+  quietZone: 4,
+  foreground: '#111827',
+  background: '#ffffff',
+  modules: {shape: 'rounded'},
+  finder: {
+    outer: {shape: 'extra-rounded', color: '#7c3aed'},
+    center: {shape: 'circle', color: '#2563eb'},
+  },
+};
 
 const svg = qrcode('https://qrcodesdk.dev').render(
   QRCodeSVGRenderer({
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
+    style,
+    accessibility: {
+      title: 'QRCodeSDK website',
+      ariaLabel: 'Scan to open qrcodesdk.dev',
     },
-    dotsOptions: {type: 'rounded'},
-    cornersSquareOptions: {type: 'extra-rounded', color: '#7c3aed'},
-    cornersDotOptions: {type: 'dot', color: '#2563eb'},
-    title: 'QRCodeSDK website',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
   }),
 );
 ```
 
-## Shared visual options
+Renderer factories validate and copy the complete option tree immediately. Unknown properties and
+invalid values throw when the factory is called. Later mutations to `style` do not change the
+renderer.
 
-| Option                       | Default            | Validation and meaning                                     |
-| ---------------------------- | ------------------ | ---------------------------------------------------------- |
-| `size`                       | `5`                | Positive safe integer; pixels per module for visual output |
-| `margin`                     | `4`                | Non-negative safe integer; quiet zone in modules           |
-| `colors.colorDark`           | `'#000000'`        | Hash-prefixed, six-digit hexadecimal color                 |
-| `colors.colorLight`          | `'#ffffff'`        | Hash-prefixed, six-digit hexadecimal color                 |
-| `dotsOptions.type`           | `'square'`         | Shape of ordinary dark modules                             |
-| `dotsOptions.color`          | `colors.colorDark` | Ordinary-module color override                             |
-| `cornersSquareOptions.type`  | `'square'`         | Shape of finder outer rings                                |
-| `cornersSquareOptions.color` | `colors.colorDark` | Finder-ring color override                                 |
-| `cornersDotOptions.type`     | `'square'`         | Shape of finder centers                                    |
-| `cornersDotOptions.color`    | `colors.colorDark` | Finder-center color override                               |
+## Shared visual style
 
-The rendered width and height are `size × (matrix width + 2 × margin)`. For terminal text, `size` is
-an integer scale rather than a pixel measurement; see the [Terminal text reference](/reference/renderers/text/).
+| Property              | Default      | Validation and meaning                             |
+| --------------------- | ------------ | -------------------------------------------------- |
+| `moduleSize`          | `5`          | Positive safe integer; pixels per module           |
+| `quietZone`           | `4`          | Non-negative safe integer; border width in modules |
+| `foreground`          | `'#000000'`  | RGB or RGBA hexadecimal color                      |
+| `background`          | `'#ffffff'`  | RGB or RGBA hexadecimal color                      |
+| `modules.shape`       | `'square'`   | Shape of ordinary dark modules                     |
+| `modules.color`       | `foreground` | Ordinary-module color override                     |
+| `finder.outer.shape`  | `'square'`   | Shape of finder outer rings                        |
+| `finder.outer.color`  | `foreground` | Finder-ring color override                         |
+| `finder.center.shape` | `'square'`   | Shape of finder centers                            |
+| `finder.center.color` | `foreground` | Finder-center color override                       |
 
-### Module and finder types
+Colors must be exactly `#RRGGBB` or `#RRGGBBAA`, with case-insensitive hexadecimal digits. Alpha is
+preserved by all graphical renderers.
 
-| Feature            | Option                      | Supported types                                                          |
-| ------------------ | --------------------------- | ------------------------------------------------------------------------ |
-| Ordinary modules   | `dotsOptions.type`          | `square`, `rounded`, `dots`, `classy`, `classy-rounded`, `extra-rounded` |
-| Finder outer rings | `cornersSquareOptions.type` | all ordinary-module types plus `dot`                                     |
-| Finder centers     | `cornersDotOptions.type`    | all ordinary-module types plus `dot`                                     |
+Ordinary modules support `square`, `circle`, `rounded`, `extra-rounded`, `diagonal`, and
+`diagonal-rounded`. Finder outer rings and centers support `square`, `rounded`, `extra-rounded`, and
+`circle`. Finder shapes do not inherit the ordinary module shape.
 
-Color overrides are independent. Omitting one keeps that feature on `colors.colorDark`. Curved shapes
-are neighbor-aware and raster renderers antialias their edges. Shape options do not change terminal
-text geometry.
+The output width and height are `moduleSize × (matrix width + 2 × quietZone)`.
 
-## Keep the quiet zone clear
+## Text styling
 
-`margin` is the light quiet zone surrounding the encoded matrix. Keep the default four-module
-margin unless the destination format adds an equivalent clear border. Do not place text, borders,
-background art, or adjacent UI inside it.
-
-When reducing the margin for a constrained layout, scan-test the final composition—not only the raw
-renderer output—at its smallest displayed size.
-
-## Add accessible labels
-
-SVG and PNG-backed Image output support `title` and `ariaLabel`; Image output also supports `alt`.
-Describe the destination or action rather than the visual grid.
+Terminal text deliberately exposes a smaller `QRCodeTextStyle` with only `moduleSize` and
+`quietZone`. ANSI colors and compact/full layout belong to `QRCodeTextRenderer` itself because they
+cannot be represented by graphical renderers.
 
 ```ts
-QRCodeSVGRenderer({
-  title: 'Event registration',
-  ariaLabel: 'Scan to open event registration',
+QRCodeTextRenderer({
+  style: {moduleSize: 1, quietZone: 2},
+  layout: 'compact',
+  ansi: {mode: 'blocks', foreground: '#111827', background: '#ffffff'},
 });
 ```
 
-For a decorative QR code that repeats a nearby link, follow the accessibility semantics of the
-element or component where you render it. The renderer reference lists the attributes emitted by
-each output.
+## Accessibility and center images
 
-## Add a center image
+Accessibility is output-specific and lives under `accessibility`. SVG accepts `ariaLabel` and
+`title`; Canvas accepts `ariaLabel` and `title`; Image accepts `alt`, `ariaLabel`, and `title`. SVG
+does not accept `alt`.
 
-SVG, Canvas, PNG-backed Image, Node.js PNG, React, Vue, Svelte, and Angular accept prepared
-center-image sources, but their source types and loading behavior differ. Follow
-[Add a center image](/guides/center-images/) for preparation, sizing, padding, and framework-specific
-examples.
+Center images also remain renderer options because their source types differ by runtime. See
+[Add a center image](/guides/center-images/) for preparation and sizing.
 
-## Protect scan reliability
+## Scan reliability
 
-- Keep every dark feature in strong contrast with `colors.colorLight`; do not rely on hue difference
-  alone.
-- Preserve a clear quiet zone and render modules large enough to survive the final display or print
-  process.
-- Prefer conservative shapes when the QR code will be small, compressed, printed, or viewed by older
-  scanners.
-- Use `.errorCorrection('H')` when a center image intentionally covers modules, while remembering
-  that higher redundancy cannot guarantee recovery from an oversized overlay.
-- Test the final artifact with the devices, apps, lighting, scale, and compression used in production.
-
-Error correction changes matrix capacity rather than appearance. Its complete definition and the
-version/mask controls are in [Builder and matrix](/reference/builder/#matrix-options).
-
-## Result and next step
-
-The output now uses one shared visual theme without changing its payload. Look up output-specific
-options in [Renderer outputs](/reference/renderers/), or add a prepared logo with
-[Add a center image](/guides/center-images/).
+The API accepts transparent colors, low contrast, a zero quiet zone, all supported shapes, and the
+full image-size range. Those values are structurally valid, but not necessarily easy to scan. Test
+the final displayed or printed artifact on the devices and at the sizes used in production.

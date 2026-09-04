@@ -354,77 +354,77 @@ function formatOptions(
   image?: {source: string; preparedImage: PlaygroundPreparedImage},
 ): string {
   const entries: string[] = [];
+  const styleEntries: string[] = [];
 
-  if (config.size !== undefined) {
-    entries.push(`size: ${config.size}`);
+  if (config.moduleSize !== undefined) {
+    styleEntries.push(`moduleSize: ${config.moduleSize}`);
   }
 
-  if (config.margin !== undefined) {
-    entries.push(`margin: ${config.margin}`);
+  if (config.quietZone !== undefined) {
+    styleEntries.push(`quietZone: ${config.quietZone}`);
   }
 
-  if (config.colors !== undefined) {
-    const colorEntries: string[] = [];
-
-    if (config.colors.colorDark !== undefined) {
-      colorEntries.push(`colorDark: ${quote(config.colors.colorDark)}`);
-    }
-
-    if (config.colors.colorLight !== undefined) {
-      colorEntries.push(`colorLight: ${quote(config.colors.colorLight)}`);
-    }
-
-    if (colorEntries.length > 0) {
-      entries.push(`colors: ${formatObject(colorEntries, depth + 1)}`);
-    }
+  if (config.foreground !== undefined) {
+    styleEntries.push(`foreground: ${quote(config.foreground)}`);
+  }
+  if (config.background !== undefined) {
+    styleEntries.push(`background: ${quote(config.background)}`);
+  }
+  if (shouldIncludeShapeOptions(config.modules, 'square')) {
+    styleEntries.push(`modules: ${formatShapeOptions(config.modules, depth + 2)}`);
+  }
+  const finderEntries: string[] = [];
+  if (shouldIncludeShapeOptions(config.finder?.outer, 'square')) {
+    finderEntries.push(`outer: ${formatShapeOptions(config.finder?.outer, depth + 3)}`);
+  }
+  if (shouldIncludeShapeOptions(config.finder?.center, 'square')) {
+    finderEntries.push(`center: ${formatShapeOptions(config.finder?.center, depth + 3)}`);
+  }
+  if (finderEntries.length > 0) {
+    styleEntries.push(`finder: ${formatObject(finderEntries, depth + 2)}`);
+  }
+  if (styleEntries.length > 0) {
+    entries.push(`style: ${formatObject(styleEntries, depth + 1)}`);
   }
 
-  if (shouldIncludeStyleOptions(config.dotsOptions, 'square')) {
-    entries.push(`dotsOptions: ${formatStyleOptions(config.dotsOptions, depth + 1)}`);
-  }
-
-  if (shouldIncludeStyleOptions(config.cornersSquareOptions, 'square')) {
-    entries.push(
-      `cornersSquareOptions: ${formatStyleOptions(config.cornersSquareOptions, depth + 1)}`,
-    );
-  }
-
-  if (shouldIncludeStyleOptions(config.cornersDotOptions, 'square')) {
-    entries.push(`cornersDotOptions: ${formatStyleOptions(config.cornersDotOptions, depth + 1)}`);
-  }
-
+  const matrixEntries: string[] = [];
   if (config.version !== undefined) {
-    entries.push(`version: ${config.version}`);
+    matrixEntries.push(`version: ${config.version}`);
   }
 
   if (config.mode !== undefined) {
-    entries.push(`mode: ${quote(config.mode)}`);
+    matrixEntries.push(`mode: ${quote(config.mode)}`);
   }
 
   if (config.errorCorrectionLevel !== undefined) {
-    entries.push(`errorCorrectionLevel: ${quote(config.errorCorrectionLevel)}`);
+    matrixEntries.push(`errorCorrectionLevel: ${quote(config.errorCorrectionLevel)}`);
   }
 
   if (config.mask !== undefined) {
-    entries.push(`mask: ${config.mask}`);
+    matrixEntries.push(`mask: ${config.mask}`);
   }
 
   if (config.eci === true) {
-    entries.push('eci: true');
+    matrixEntries.push('eci: true');
+  }
+  if (matrixEntries.length > 0) entries.push(`matrix: ${formatObject(matrixEntries, depth + 1)}`);
+
+  const accessibilityEntries: string[] = [];
+  if (config.output === 'image') {
+    if (config.alt) {
+      accessibilityEntries.push(`alt: ${quote(config.alt)}`);
+    }
   }
 
-  if (config.output !== 'canvas') {
-    if (config.alt) {
-      entries.push(`alt: ${quote(config.alt)}`);
-    }
+  if (config.ariaLabel) {
+    accessibilityEntries.push(`ariaLabel: ${quote(config.ariaLabel)}`);
+  }
 
-    if (config.ariaLabel) {
-      entries.push(`ariaLabel: ${quote(config.ariaLabel)}`);
-    }
-
-    if (config.title) {
-      entries.push(`title: ${quote(config.title)}`);
-    }
+  if (config.title) {
+    accessibilityEntries.push(`title: ${quote(config.title)}`);
+  }
+  if (accessibilityEntries.length > 0) {
+    entries.push(`accessibility: ${formatObject(accessibilityEntries, depth + 1)}`);
   }
 
   if (image) {
@@ -553,10 +553,10 @@ function indent(value: string, depth: number): string {
     .join('\n');
 }
 
-function shouldIncludeStyleOptions(
+function shouldIncludeShapeOptions(
   options:
     | {
-        type?: string;
+        readonly shape?: string;
         color?: string;
       }
     | undefined,
@@ -567,14 +567,14 @@ function shouldIncludeStyleOptions(
   }
 
   return (
-    options.color !== undefined || (options.type !== undefined && options.type !== defaultType)
+    options.color !== undefined || (options.shape !== undefined && options.shape !== defaultType)
   );
 }
 
-function formatStyleOptions(
+function formatShapeOptions(
   options:
     | {
-        type?: string;
+        readonly shape?: string;
         color?: string;
       }
     | undefined,
@@ -582,8 +582,8 @@ function formatStyleOptions(
 ): string {
   const entries: string[] = [];
 
-  if (options?.type !== undefined) {
-    entries.push(`type: ${quote(options.type)}`);
+  if (options?.shape !== undefined) {
+    entries.push(`shape: ${quote(options.shape)}`);
   }
 
   if (options?.color !== undefined) {

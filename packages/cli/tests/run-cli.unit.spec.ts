@@ -106,9 +106,9 @@ describe('runCli', () => {
   });
 
   test.each([
-    {args: ['--ansi-colors', 'true'], stdoutIsTTY: false, environment: {}},
-    {args: ['--ansi-colors', 'true'], stdoutIsTTY: true, environment: {NO_COLOR: '1'}},
-    {args: ['--only-ansi-colors'], stdoutIsTTY: false, environment: {NO_COLOR: '1'}},
+    {args: ['--ansi', 'blocks'], stdoutIsTTY: false, environment: {}},
+    {args: ['--ansi', 'blocks'], stdoutIsTTY: true, environment: {NO_COLOR: '1'}},
+    {args: ['--ansi', 'background'], stdoutIsTTY: false, environment: {NO_COLOR: '1'}},
   ])('lets explicit ANSI flags override the output environment', async (configuration) => {
     const runtime = {...createRuntime(), ...configuration};
 
@@ -118,7 +118,7 @@ describe('runCli', () => {
   });
 
   test.each([
-    {name: 'text', args: ['--no-ansi-colors']},
+    {name: 'text', args: ['--ansi', 'off']},
     {name: 'SVG', args: ['--output', 'code.svg']},
     {name: 'PNG', args: ['--output', 'code.png']},
   ])('defaults $name output to no ECI and supports explicit opt-in', async ({args}) => {
@@ -146,94 +146,35 @@ describe('runCli', () => {
   });
 
   test.each([
-    {name: 'default options', args: [], small: true, ansiColors: true},
+    {name: 'default options', args: [], compact: true, ansi: true},
+    {name: 'full layout', args: ['--layout', 'full'], compact: false, ansi: true},
+    {name: 'ANSI off', args: ['--ansi', 'off'], compact: true, ansi: false},
     {
-      name: '--small true and --ansi-colors true',
-      args: ['--small', 'true', '--ansi-colors', 'true'],
-      small: true,
-      ansiColors: true,
+      name: 'full layout with ANSI off',
+      args: ['--layout', 'full', '--ansi', 'off'],
+      compact: false,
+      ansi: false,
     },
-    {name: '--small false', args: ['--small', 'false'], small: false, ansiColors: true},
-    {
-      name: '--ansi-colors false',
-      args: ['--ansi-colors', 'false'],
-      small: true,
-      ansiColors: false,
-    },
-    {
-      name: '--small false and --ansi-colors false',
-      args: ['--small', 'false', '--ansi-colors', 'false'],
-      small: false,
-      ansiColors: false,
-    },
-  ])('supports text renderer booleans with $name', async ({args, small, ansiColors}) => {
+  ])('supports text renderer options with $name', async ({args, compact, ansi}) => {
     const runtime = createRuntime();
 
     await expect(
-      runCli(['HELLO WORLD', '--size', '1', '--margin', '0', ...args], runtime),
+      runCli(['HELLO WORLD', '--module-size', '1', '--quiet-zone', '0', ...args], runtime),
     ).resolves.toBe(0);
 
     const output = runtime.stdoutText();
     const visibleLines = output.replaceAll(ANSI_PATTERN, '').split('\n').slice(0, -1);
 
-    expect(output.includes('\u001b[')).toBe(ansiColors);
-    expect(visibleLines).toHaveLength(small ? 11 : 21);
-    expect(Array.from(visibleLines[0]!)).toHaveLength(small ? 21 : 42);
-  });
-
-  test('supports negated aliases for false renderer booleans', async () => {
-    const explicit = createRuntime();
-    const equalsSyntax = createRuntime();
-    const negated = createRuntime();
-
-    await expect(
-      runCli(['HELLO WORLD', '--small', 'false', '--ansi-colors', 'false'], explicit),
-    ).resolves.toBe(0);
-    await expect(
-      runCli(['HELLO WORLD', '--small=false', '--ansi-colors=false'], equalsSyntax),
-    ).resolves.toBe(0);
-    await expect(runCli(['HELLO WORLD', '--no-small', '--no-ansi-colors'], negated)).resolves.toBe(
-      0,
-    );
-
-    expect(equalsSyntax.stdoutText()).toBe(explicit.stdoutText());
-    expect(negated.stdoutText()).toBe(explicit.stdoutText());
-  });
-
-  test('uses the last repeated renderer boolean option', async () => {
-    const falseLast = createRuntime();
-    const trueLast = createRuntime();
-    const ansiFalseLast = createRuntime();
-    const ansiTrueLast = createRuntime();
-    const expectedFalse = createRuntime();
-    const expectedTrue = createRuntime();
-
-    await expect(runCli(['HELLO WORLD', '--small', 'true', '--no-small'], falseLast)).resolves.toBe(
-      0,
-    );
-    await expect(runCli(['HELLO WORLD', '--no-small', '--small', 'true'], trueLast)).resolves.toBe(
-      0,
-    );
-    await expect(runCli(['HELLO WORLD', '--small', 'false'], expectedFalse)).resolves.toBe(0);
-    await expect(runCli(['HELLO WORLD', '--small', 'true'], expectedTrue)).resolves.toBe(0);
-    await expect(
-      runCli(['HELLO WORLD', '--ansi-colors', 'true', '--no-ansi-colors'], ansiFalseLast),
-    ).resolves.toBe(0);
-    await expect(
-      runCli(['HELLO WORLD', '--no-ansi-colors', '--ansi-colors', 'true'], ansiTrueLast),
-    ).resolves.toBe(0);
-
-    expect(falseLast.stdoutText()).toBe(expectedFalse.stdoutText());
-    expect(trueLast.stdoutText()).toBe(expectedTrue.stdoutText());
-    expect(ansiFalseLast.stdoutText()).not.toContain('\u001b[');
-    expect(ansiTrueLast.stdoutText()).toContain('\u001b[');
+    expect(output.includes('\u001b[')).toBe(ansi);
+    expect(visibleLines).toHaveLength(compact ? 11 : 21);
+    expect(Array.from(visibleLines[0]!)).toHaveLength(compact ? 21 : 42);
   });
 
   test('uses custom colors for ANSI terminal output', async () => {
     const runtime = createRuntime();
 
     await expect(
-      runCli(['HELLO WORLD', '--color-dark', '#1a2b3c', '--color-light', '#ddeeff'], runtime),
+      runCli(['HELLO WORLD', '--foreground', '#1a2b3c', '--background', '#ddeeff'], runtime),
     ).resolves.toBe(0);
 
     expect(runtime.stdoutText()).toContain('\u001b[38;2;26;43;60m');
@@ -247,14 +188,15 @@ describe('runCli', () => {
       runCli(
         [
           'HELLO WORLD',
-          '--only-ansi-colors',
-          '--size',
+          '--ansi',
+          'background',
+          '--module-size',
           '1',
-          '--margin',
+          '--quiet-zone',
           '0',
-          '--color-dark',
+          '--foreground',
           '#1a2b3c',
-          '--color-light',
+          '--background',
           '#ddeeff',
         ],
         runtime,
@@ -272,28 +214,25 @@ describe('runCli', () => {
     expect(Array.from(visibleLines[0]!)).toHaveLength(42);
   });
 
-  test.each([
-    {name: '--no-ansi-colors', args: ['--no-ansi-colors']},
-    {name: '--ansi-colors false', args: ['--ansi-colors', 'false']},
-  ])('rejects $name with ANSI-background-only output', async ({args}) => {
+  test('rejects a layout with ANSI-background output', async () => {
     const runtime = createRuntime();
 
-    await expect(runCli(['HELLO WORLD', '--only-ansi-colors', ...args], runtime)).resolves.toBe(1);
+    await expect(
+      runCli(['HELLO WORLD', '--ansi', 'background', '--layout', 'full'], runtime),
+    ).resolves.toBe(1);
 
-    expect(runtime.stderrText()).toContain(
-      'Cannot combine --only-ansi-colors with --no-ansi-colors.',
-    );
+    expect(runtime.stderrText()).toContain('layout');
   });
 
-  test('rejects invalid and missing renderer boolean values', async () => {
+  test('rejects invalid and missing ANSI modes', async () => {
     const invalid = createRuntime();
     const missing = createRuntime();
 
-    await expect(runCli(['HELLO WORLD', '--small', 'yes'], invalid)).resolves.toBe(1);
-    await expect(runCli(['HELLO WORLD', '--ansi-colors'], missing)).resolves.toBe(1);
+    await expect(runCli(['HELLO WORLD', '--ansi', 'yes'], invalid)).resolves.toBe(1);
+    await expect(runCli(['HELLO WORLD', '--ansi'], missing)).resolves.toBe(1);
 
-    expect(invalid.stderrText()).toContain('Expected true or false');
-    expect(missing.stderrText()).toContain("option '--ansi-colors <boolean>' argument missing");
+    expect(invalid.stderrText()).toContain('Expected one of: off, blocks, background');
+    expect(missing.stderrText()).toContain("option '--ansi <mode>' argument missing");
   });
 
   test('rejects conflicting positional and option input', async () => {
@@ -338,15 +277,15 @@ describe('runCli', () => {
   });
 
   test.each([
-    {args: ['--size', '0'], message: 'Invalid size. Expected a positive integer.'},
-    {args: ['--margin', '-1'], message: 'Invalid margin. Expected a non-negative integer.'},
+    {args: ['--module-size', '0'], message: 'Invalid module-size. Expected a positive integer.'},
+    {args: ['--quiet-zone', '-1'], message: 'Invalid quiet-zone. Expected a non-negative integer.'},
     {
-      args: ['--color-dark', '#fff'],
-      message: 'Invalid color-dark. Expected a six-digit hex color like #111111.',
+      args: ['--foreground', '#fff'],
+      message: 'Invalid foreground. Expected an RGB or RGBA hex color like #111111.',
     },
     {
-      args: ['--color-light', '#gggggg'],
-      message: 'Invalid color-light. Expected a six-digit hex color like #111111.',
+      args: ['--background', '#gggggg'],
+      message: 'Invalid background. Expected an RGB or RGBA hex color like #111111.',
     },
   ])('rejects invalid styling options: $args', async ({args, message}) => {
     const runtime = createRuntime();

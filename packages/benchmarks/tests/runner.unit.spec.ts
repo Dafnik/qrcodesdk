@@ -21,7 +21,7 @@ const stylingFixture: QRCodeStylingFixture = {
   name: 'styled-fixture',
   data: '1',
   matrixOptions: {version: 1, mode: 'numeric'},
-  styling: {size: 5, margin: 4},
+  styling: {moduleSize: 5, quietZone: 4},
 };
 
 function adapter(

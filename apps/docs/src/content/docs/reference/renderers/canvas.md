@@ -27,21 +27,22 @@ const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
 ## Return value
 
 The renderer synchronously returns a new `HTMLCanvasElement`. Its pixel width and height are both
-`size × (matrix width + 2 × margin)`. The backing context is opaque and filled with
-`colors.colorLight`.
+`style.moduleSize × (matrix width + 2 × style.quietZone)`. RGBA colors retain their alpha.
 
 ## Renderer-specific options
 
 `QRCodeCanvasRendererOptions` accepts the
-[shared visual options](/guides/customize/#shared-visual-options) and a prepared overlay:
+[shared visual style](/guides/customize/#shared-visual-style) and a prepared overlay:
 
-| Option                  | Type                | Default               | Effect                                      |
-| ----------------------- | ------------------- | --------------------- | ------------------------------------------- |
-| `ariaLabel`             | `string`            | `undefined`           | Sets an `aria-label` attribute              |
-| `image.source`          | `CanvasImageSource` | required with `image` | Draws an already-ready browser image source |
-| `image.size`            | `number`            | `0.4`                 | Image box as a fraction of matrix width     |
-| `image.padding`         | `number`            | `1`                   | Clear padding measured in modules           |
-| `image.clearBackground` | `boolean`           | `true`                | Clears modules behind the image and padding |
+| Option                    | Type                | Default               | Effect                                           |
+| ------------------------- | ------------------- | --------------------- | ------------------------------------------------ |
+| `style`                   | `QRCodeVisualStyle` | shared defaults       | Applies graphical dimensions, colors, and shapes |
+| `accessibility.ariaLabel` | `string`            | `undefined`           | Sets an `aria-label` attribute                   |
+| `accessibility.title`     | `string`            | `undefined`           | Sets a `title` attribute                         |
+| `image.source`            | `CanvasImageSource` | required with `image` | Draws an already-ready browser image source      |
+| `image.size`              | `number`            | `0.4`                 | Image box as a fraction of matrix width          |
+| `image.padding`           | `number`            | `1`                   | Clear padding measured in modules                |
+| `image.clearBackground`   | `boolean`           | `true`                | Clears modules behind the image and padding      |
 
 ## Renderer-specific constraints
 
@@ -58,6 +59,8 @@ renderer.
 - A non-empty `ariaLabel` sets `role="img"` and `aria-label` on the Canvas element. Without it, the
   Canvas remains unlabelled. For more accessibility controls, use the
   [PNG-backed Image renderer](/reference/renderers/image/) for native image attributes.
+- Options are validated and copied when `QRCodeCanvasRenderer()` is called. The prepared image
+  source is retained by identity and checked when rendering.
 
 ## Related guides
 

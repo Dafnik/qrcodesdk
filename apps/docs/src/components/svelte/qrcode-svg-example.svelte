@@ -3,9 +3,8 @@
   import {QRCodeSVG} from '@qrcodesdk/svelte';
 
   const options: QRCodeSVGOptions = {
-    size: 8,
-    margin: 2,
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    style: {moduleSize: 8, quietZone: 2},
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
   };
 </script>
 

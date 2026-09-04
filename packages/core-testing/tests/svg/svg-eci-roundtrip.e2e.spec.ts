@@ -14,7 +14,7 @@ const JSQR_ROUNDTRIP_ECI_ENABLED_COMBINATIONS = [...getAllQRCodeECICombinations(
 );
 
 describe('SVG QR eci roundtrips', () => {
-  const testSVGRenderer = QRCodeSVGRenderer({size: 4, margin: 4});
+  const testSVGRenderer = QRCodeSVGRenderer({style: {moduleSize: 4, quietZone: 4}});
 
   test.each(JSQR_ROUNDTRIP_ECI_ENABLED_COMBINATIONS)(
     'decodes eci $name SVG output',

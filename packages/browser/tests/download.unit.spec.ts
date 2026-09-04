@@ -12,7 +12,7 @@ describe('download QR code renderers', () => {
     const downloads = captureDownloads(vi);
 
     QRCodeDownloadImageRenderer({
-      renderer: QRCodeImageRenderer({size: 1, margin: 0}),
+      renderer: QRCodeImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
       filename: 'ticket',
     })([[1]]);
 
@@ -28,7 +28,7 @@ describe('download QR code renderers', () => {
     const downloads = captureDownloads(vi);
 
     QRCodeDownloadImageRenderer({
-      renderer: QRCodeImageRenderer({size: 1, margin: 0}),
+      renderer: QRCodeImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
       filename: 'ticket.png',
     })([[1]]);
 

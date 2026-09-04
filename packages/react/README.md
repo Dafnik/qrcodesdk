@@ -105,8 +105,10 @@ import {QRCodeSVG} from '@qrcodesdk/react';
 export default function QRCodeSVGExample() {
   const options = useMemo<QRCodeSVGOptions>(
     () => ({
-      title: 'QR code for qrcodesdk.dev',
-      ariaLabel: 'Scan to open qrcodesdk.dev',
+      accessibility: {
+        title: 'QR code for qrcodesdk.dev',
+        ariaLabel: 'Scan to open qrcodesdk.dev',
+      },
     }),
     [],
   );
@@ -126,10 +128,11 @@ import {QRCodeImage} from '@qrcodesdk/react';
 export default function QRCodeImageExample() {
   const options = useMemo<QRCodeImageOptions>(
     () => ({
-      size: 8,
-      margin: 4,
-      alt: 'QR code for qrcodesdk.dev',
-      ariaLabel: 'Scan to open qrcodesdk.dev',
+      style: {moduleSize: 8, quietZone: 4},
+      accessibility: {
+        alt: 'QR code for qrcodesdk.dev',
+        ariaLabel: 'Scan to open qrcodesdk.dev',
+      },
     }),
     [],
   );
@@ -149,11 +152,11 @@ import {QRCodeCanvas} from '@qrcodesdk/react';
 export default function QRCodeCanvasExample() {
   const options = useMemo<QRCodeCanvasOptions>(
     () => ({
-      size: 8,
-      margin: 4,
-      colors: {
-        colorDark: '#111827',
-        colorLight: '#ffffff',
+      style: {
+        moduleSize: 8,
+        quietZone: 4,
+        foreground: '#111827',
+        background: '#ffffff',
       },
     }),
     [],
@@ -173,7 +176,10 @@ import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/react';
 
 export default function QRCodeDownloadImageExample() {
   const qrcode = useRef<QRCodeDownloadHandle>(null);
-  const options = useMemo<QRCodeImageOptions>(() => ({alt: 'QR code for qrcodesdk.dev'}), []);
+  const options = useMemo<QRCodeImageOptions>(
+    () => ({accessibility: {alt: 'QR code for qrcodesdk.dev'}}),
+    [],
+  );
 
   return (
     <div className="flex flex-col items-center gap-2">

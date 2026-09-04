@@ -109,8 +109,10 @@ import {QRCodeSVG} from '@qrcodesdk/angular';
   template: `
     <qrcode-svg
       [options]="{
-        title: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
+        accessibility: {
+          title: 'QR code for qrcodesdk.dev',
+          ariaLabel: 'Scan to open qrcodesdk.dev',
+        },
       }"
       data="https://qrcodesdk.dev" />
   `,
@@ -135,10 +137,11 @@ import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 })
 export class QRCodeImageExample {
   protected readonly options: QRCodeImageOptions = {
-    size: 8,
-    margin: 4,
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {
+      alt: 'QR code for qrcodesdk.dev',
+      ariaLabel: 'Scan to open qrcodesdk.dev',
+    },
   };
 }
 ```
@@ -160,11 +163,11 @@ import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
 })
 export class QRCodeCanvasExample {
   protected readonly options: QRCodeCanvasOptions = {
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
+    style: {
+      moduleSize: 8,
+      quietZone: 4,
+      foreground: '#111827',
+      background: '#ffffff',
     },
   };
 }
@@ -185,7 +188,7 @@ import {QRCodeImage} from '@qrcodesdk/angular';
       <qrcode-image
         #qrcode
         [options]="{
-          alt: 'QR code for qrcodesdk.dev',
+          accessibility: {alt: 'QR code for qrcodesdk.dev'},
         }"
         data="https://qrcodesdk.dev" />
       <button class="btn-primary" (click)="qrcode.download('qrcodesdk')" type="button">

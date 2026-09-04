@@ -89,10 +89,11 @@ try {
       'Expected square QR code matrix rows',
     );
 
-    const svg = builder.render(core.QRCodeSVGRenderer({size: 2, margin: 1}));
+    const style = {moduleSize: 2, quietZone: 1};
+    const svg = builder.render(core.QRCodeSVGRenderer({style}));
     check(svg.includes('width="62"'), 'Expected installed Core to render SVG output');
 
-    const canvas = builder.render(browserPackage.QRCodeCanvasRenderer({size: 2, margin: 1}));
+    const canvas = builder.render(browserPackage.QRCodeCanvasRenderer({style}));
     check(canvas instanceof globalThis.HTMLCanvasElement, 'Expected a browser canvas element');
     check(canvas.width === 62 && canvas.height === 62, 'Expected a 62×62 browser canvas');
 
@@ -108,7 +109,10 @@ try {
     check(hasDarkPixel && hasLightPixel, 'Expected rendered dark and light canvas pixels');
 
     const image = builder.render(
-      browserPackage.QRCodeImageRenderer({size: 2, margin: 1, alt: 'Runtime QR code'}),
+      browserPackage.QRCodeImageRenderer({
+        style,
+        accessibility: {alt: 'Runtime QR code'},
+      }),
     );
     globalThis.document.body.append(image);
     await image.decode();

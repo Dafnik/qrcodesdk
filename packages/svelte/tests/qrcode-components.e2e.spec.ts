@@ -7,15 +7,12 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '../src/lib/index.js';
 
-const svgOptions: QRCodeSVGOptions = {size: 2, margin: 1};
+const svgOptions: QRCodeSVGOptions = {style: {moduleSize: 2, quietZone: 1}};
 const imageOptions: QRCodeImageOptions = {
-  size: 2,
-  margin: 1,
-  alt: 'QR alt',
-  ariaLabel: 'QR aria',
-  title: 'QR title',
+  style: {moduleSize: 2, quietZone: 1},
+  accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
 };
-const canvasOptions: QRCodeCanvasOptions = {size: 2, margin: 1};
+const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}};
 
 describe('Svelte QR code components', () => {
   beforeEach(() => {
@@ -90,7 +87,7 @@ describe('Svelte QR code components', () => {
     const svg = renderComponent(QRCodeSVG, {data: 'DECORATIVE'});
     const canvas = renderComponent(QRCodeCanvas, {
       data: 'LABELED',
-      options: {title: 'Scan this code'},
+      options: {accessibility: {title: 'Scan this code'}},
     });
 
     await waitFor(() => expect(canvas.container.querySelector('canvas')).not.toBeNull());
@@ -105,11 +102,15 @@ describe('Svelte QR code components', () => {
 
   test('passes styled options through SVG, image, and canvas components', async () => {
     const styledOptions = {
-      size: 2,
-      margin: 1,
-      dotsOptions: {color: '#112233' as const, type: 'classy-rounded' as const},
-      cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
-      cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
+      style: {
+        moduleSize: 2,
+        quietZone: 1,
+        modules: {color: '#112233' as const, shape: 'diagonal-rounded' as const},
+        finder: {
+          outer: {color: '#445566' as const, shape: 'extra-rounded' as const},
+          center: {color: '#778899' as const, shape: 'circle' as const},
+        },
+      },
     };
     const svg = renderComponent(QRCodeSVG, {data: 'STYLED', options: styledOptions});
     const image = renderComponent(QRCodeImage, {data: 'STYLED', options: styledOptions});
@@ -170,7 +171,7 @@ describe('Svelte QR code components', () => {
     const firstImage = renderedElement<HTMLImageElement>(image.container, 'img');
     const firstCanvas = renderedElement<HTMLCanvasElement>(canvas.container, 'canvas');
 
-    await image.rerender({options: {size: 3, margin: 1}});
+    await image.rerender({options: {style: {moduleSize: 3, quietZone: 1}}});
     await canvas.rerender({data: 'WORLD'});
 
     expect(imageWrapper.children).toHaveLength(1);

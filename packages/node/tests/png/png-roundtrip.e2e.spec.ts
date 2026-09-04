@@ -1,4 +1,4 @@
-import {QR_CODE_STYLING_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
+import {QR_CODE_STYLING_ROUNDTRIP_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {PNG} from 'pngjs';
 import {describe, expect, test} from 'vitest';
 
@@ -23,8 +23,7 @@ describe('PNG QR roundtrips', () => {
           .errorCorrection('H')
           .render(
             QRCodePNGRenderer({
-              size: 4,
-              margin: 4,
+              style: {moduleSize: 4, quietZone: 4},
               image: {
                 source: PNG.sync.write(logo),
                 size: 0.16,
@@ -36,7 +35,7 @@ describe('PNG QR roundtrips', () => {
     ).toBe('prepared Node image');
   });
 
-  const defaultRenderer = QRCodePNGRenderer({size: 4, margin: 4});
+  const defaultRenderer = QRCodePNGRenderer({style: {moduleSize: 4, quietZone: 4}});
 
   test.each(
     ['Grüße aus Wien', '東京 ✅🚀'].flatMap((data) => [
@@ -53,12 +52,12 @@ describe('PNG QR roundtrips', () => {
     );
   });
 
-  test.each(QR_CODE_STYLING_FIXTURES)('decodes $name PNG styling fixture', (fixture) => {
+  test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES)('decodes $name PNG styling fixture', (fixture) => {
     expect(
       decodePngQRCode(
         qrcode(fixture.data)
           .config(fixture.matrixOptions)
-          .render(QRCodePNGRenderer(fixture.styling)),
+          .render(QRCodePNGRenderer({style: fixture.styling})),
       ),
     ).toBe(fixture.data);
   });

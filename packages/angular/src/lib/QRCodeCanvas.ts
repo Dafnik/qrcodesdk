@@ -14,6 +14,7 @@ import {type QRCodeCanvasOptions, QRCodeCanvasRenderer} from '@qrcodesdk/browser
 import {type QRCodeInputData, qrcode} from '@qrcodesdk/core';
 
 import {replaceElementChildren} from './render-element';
+import {splitOptions} from './split-options';
 
 @Component({
   selector: 'qrcode-canvas',
@@ -28,10 +29,11 @@ export class QRCodeCanvas {
 
   options = input<QRCodeCanvasOptions>();
 
-  readonly canvasRenderer = computed(() => QRCodeCanvasRenderer(this.options()));
+  readonly resolvedOptions = computed(() => splitOptions(this.options()));
+  readonly canvasRenderer = computed(() => QRCodeCanvasRenderer(this.resolvedOptions()[1]));
 
   readonly qrcodeBuilder = computed(() =>
-    qrcode(this.data()).config(this.options()).renderer(this.canvasRenderer()),
+    qrcode(this.data()).config(this.resolvedOptions()[0]).renderer(this.canvasRenderer()),
   );
 
   constructor() {
