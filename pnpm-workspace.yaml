@@ -28,8 +28,8 @@ catalog:
   '@types/node': 25.9.5
   '@types/react': 19.2.18
   '@types/react-dom': 19.2.5
-  eslint: 9.39.5
-  jsdom: 29.1.1
+  eslint: 10.9.1
+  jsdom: 30.0.1
   jsqr: 1.4.0
   prettier: 3.9.6
   qrcode: 1.5.4
@@ -47,9 +47,9 @@ catalog:
 
 catalogs:
   angular-typescript:
-    typescript: 6.0.3
+    typescript: 7.0.2
   svelte-typescript:
-    typescript: 5.9.3
+    typescript: 7.0.2
 
 packageExtensions:
   '@analogjs/vite-plugin-angular@>=3.0.0-alpha.64 <3.0.0':
@@ -66,4 +66,4 @@ patchedDependencies:
   qrcode-generator@2.0.4: patches/qrcode-generator@2.0.4.patch
 
 overrides:
-  '@phenomnomnominal/tsquery@6.2.0>typescript': 'npm:typescript@6.0.3'
+  '@phenomnomnominal/tsquery@6.2.0>typescript': 'npm:typescript@7.0.2'
