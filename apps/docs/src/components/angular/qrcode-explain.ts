@@ -201,27 +201,27 @@ export class QRCodeExplainControls {
             aria-label="Interactive QR code anatomy. Use the pointer or arrow keys to inspect modules.">
             <rect [attr.height]="qr.viewSize" [attr.width]="qr.viewSize" fill="var(--background)" />
 
-            @if (qr.margin > 0) {
+            @if (qr.quietZone > 0) {
               <g data-group="margin" data-role="margin" aria-label="Quiet zone">
                 <rect
-                  [attr.height]="qr.margin"
+                  [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
                   fill="var(--background)" />
                 <rect
-                  [attr.height]="qr.margin"
+                  [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
-                  [attr.y]="qr.margin + qr.matrix.length"
+                  [attr.y]="qr.quietZone + qr.matrix.length"
                   fill="var(--background)" />
                 <rect
                   [attr.height]="qr.matrix.length"
-                  [attr.width]="qr.margin"
-                  [attr.y]="qr.margin"
+                  [attr.width]="qr.quietZone"
+                  [attr.y]="qr.quietZone"
                   fill="var(--background)" />
                 <rect
                   [attr.height]="qr.matrix.length"
-                  [attr.width]="qr.margin"
-                  [attr.x]="qr.margin + qr.matrix.length"
-                  [attr.y]="qr.margin"
+                  [attr.width]="qr.quietZone"
+                  [attr.x]="qr.quietZone + qr.matrix.length"
+                  [attr.y]="qr.quietZone"
                   fill="var(--background)" />
               </g>
             }
@@ -238,27 +238,27 @@ export class QRCodeExplainControls {
                   [attr.data-value]="module.value"
                   [attr.height]="1"
                   [attr.width]="1"
-                  [attr.x]="module.column + qr.margin"
-                  [attr.y]="module.row + qr.margin" />
+                  [attr.x]="module.column + qr.quietZone"
+                  [attr.y]="module.row + qr.quietZone" />
               }
             </g>
 
-            @if (isMarginSelection() && qr.margin > 0) {
+            @if (isMarginSelection() && qr.quietZone > 0) {
               <g class="selection-margin" pointer-events="none">
-                <rect [attr.height]="qr.margin" [attr.width]="qr.viewSize" />
+                <rect [attr.height]="qr.quietZone" [attr.width]="qr.viewSize" />
                 <rect
-                  [attr.height]="qr.margin"
+                  [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
-                  [attr.y]="qr.margin + qr.matrix.length" />
+                  [attr.y]="qr.quietZone + qr.matrix.length" />
                 <rect
                   [attr.height]="qr.matrix.length"
-                  [attr.width]="qr.margin"
-                  [attr.y]="qr.margin" />
+                  [attr.width]="qr.quietZone"
+                  [attr.y]="qr.quietZone" />
                 <rect
                   [attr.height]="qr.matrix.length"
-                  [attr.width]="qr.margin"
-                  [attr.x]="qr.margin + qr.matrix.length"
-                  [attr.y]="qr.margin" />
+                  [attr.width]="qr.quietZone"
+                  [attr.x]="qr.quietZone + qr.matrix.length"
+                  [attr.y]="qr.quietZone" />
               </g>
             } @else {
               <g pointer-events="none">
@@ -267,8 +267,8 @@ export class QRCodeExplainControls {
                     class="selection-module"
                     [attr.height]="1"
                     [attr.width]="1"
-                    [attr.x]="module.column + qr.margin"
-                    [attr.y]="module.row + qr.margin" />
+                    [attr.x]="module.column + qr.quietZone"
+                    [attr.y]="module.row + qr.quietZone" />
                 }
               </g>
             }
@@ -278,8 +278,8 @@ export class QRCodeExplainControls {
                 class="selection-cursor"
                 [attr.height]="1"
                 [attr.width]="1"
-                [attr.x]="module.column + qr.margin"
-                [attr.y]="module.row + qr.margin"
+                [attr.x]="module.column + qr.quietZone"
+                [attr.y]="module.row + qr.quietZone"
                 pointer-events="none" />
             }
           </svg>

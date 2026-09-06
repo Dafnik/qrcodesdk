@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {describe, test} from 'node:test';
 
 import {type QRCodeMask, qrcode} from '@qrcodesdk/core';
@@ -81,6 +82,14 @@ describe('explainQRCode', () => {
     assert.throws(() => explainQRCode({data: '1', moduleSize: 0}), /moduleSize/);
     assert.throws(() => explainQRCode({data: '1', quietZone: -1}), /quietZone/);
   });
+});
+
+test('the Angular explainer offsets modules with the resolved quiet zone', () => {
+  const component = readFileSync(new URL('../angular/qrcode-explain.ts', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(component, /qr\.margin\b/);
+  assert.match(component, /module\.column \+ qr\.quietZone/);
+  assert.match(component, /module\.row \+ qr\.quietZone/);
 });
 
 function byPlacement(
