@@ -1,5 +1,6 @@
 import * as core from '@qrcodesdk/core';
 import * as drawing from '@qrcodesdk/core/drawing';
+import * as payload from '@qrcodesdk/core/payload';
 
 const EXPECTED_MATRIX_SIZE = 29;
 const EXPECTED_MATRIX_CHECKSUM = 321386907;
@@ -50,17 +51,32 @@ function assertMatrix(matrix) {
 globalThis.console.log('Testing the installed @qrcodesdk/core package');
 
 assert(
-  [...Object.keys(core), ...Object.keys(drawing)].every(
+  [...Object.keys(core), ...Object.keys(drawing), ...Object.keys(payload)].every(
     (name) => !name.startsWith(String.fromCodePoint(0x275)),
   ),
   'Expected package entry points to contain no internal exports',
 );
-logSuccess('root and drawing subpath resolve without internal runtime exports');
+logSuccess('root, drawing, and payload entry points resolve without internal runtime exports');
 
 for (const exportName of ['qrcode', 'QRCodeSVGRenderer', 'QRCodeTextRenderer']) {
   assert(typeof core[exportName] === 'function', `Expected Core export ${exportName}`);
 }
 logSuccess('package exposes the qrcode builder and bundled renderers');
+
+for (const exportName of [
+  'emailPayload',
+  'geoPayload',
+  'phonePayload',
+  'smsPayload',
+  'wifiPayload',
+]) {
+  assert(typeof payload[exportName] === 'function', `Expected payload export ${exportName}`);
+  assert(
+    !(exportName in core),
+    `Expected ${exportName} to be exported only from the payload subpath`,
+  );
+}
+logSuccess('payload subpath exposes the payload serializers');
 
 const builder = core.qrcode('Runtime ✅ 你好').mode('octet').errorCorrection('H').mask(3);
 const matrix = builder.matrix();

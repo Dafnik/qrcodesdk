@@ -36,16 +36,3 @@ export {
 } from './svg';
 export {createQRCodeStyler} from './drawing/styler';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';
-export {
-  emailPayload,
-  geoPayload,
-  phonePayload,
-  smsPayload,
-  wifiPayload,
-  type QRCodeEmailPayload,
-  type QRCodeGeoPayload,
-  type QRCodePhonePayload,
-  type QRCodeSMSPayload,
-  type QRCodeWiFiEncryption,
-  type QRCodeWiFiPayload,
-} from './payload';

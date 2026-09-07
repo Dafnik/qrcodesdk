@@ -7,7 +7,8 @@ Core exports small serializers for payload formats that scanners commonly unders
 returns the string passed to `qrcode()`.
 
 ```ts
-import {qrcode, wifiPayload} from '@qrcodesdk/core';
+import {qrcode} from '@qrcodesdk/core';
+import {wifiPayload} from '@qrcodesdk/core/payload';
 
 const matrix = qrcode(
   wifiPayload({
@@ -32,7 +33,7 @@ Wi-Fi delimiter characters in the SSID and password.
 | `wifiPayload`  | `QRCodeWiFiPayload`  | Wi-Fi QR payload  |
 
 ```ts
-import {emailPayload, geoPayload, phonePayload, smsPayload} from '@qrcodesdk/core';
+import {emailPayload, geoPayload, phonePayload, smsPayload} from '@qrcodesdk/core/payload';
 
 emailPayload({
   to: 'hello@example.com',

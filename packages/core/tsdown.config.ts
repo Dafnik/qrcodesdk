@@ -1,7 +1,7 @@
 import {defineConfig} from 'tsdown';
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/drawing/index.ts'],
+  entry: ['src/index.ts', 'src/drawing/index.ts', 'src/payload.ts'],
   dts: {
     tsgo: true,
   },

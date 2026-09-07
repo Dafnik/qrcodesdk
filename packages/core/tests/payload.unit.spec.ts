@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeError, emailPayload, geoPayload, phonePayload, smsPayload, wifiPayload} from '../src';
+import {QRCodeError} from '../src';
+import {emailPayload, geoPayload, phonePayload, smsPayload, wifiPayload} from '../src/payload';
 
 describe('payload serializers', () => {
   test('serializes RFC 6068 email payloads', () => {

@@ -54,6 +54,7 @@
   "exports": {
     ".": "./dist/index.mjs",
     "./drawing": "./dist/drawing/index.mjs",
+    "./payload": "./dist/payload.mjs",
     "./package.json": "./package.json"
   },
   "files": [

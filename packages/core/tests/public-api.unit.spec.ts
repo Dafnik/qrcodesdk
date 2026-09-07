@@ -18,6 +18,15 @@ import type {
 } from '../src';
 import * as drawing from '../src/drawing';
 import type {QRCodeDrawing, QRCodeDrawingTarget, QRCodeStyler} from '../src/drawing';
+import * as payload from '../src/payload';
+import type {
+  QRCodeEmailPayload,
+  QRCodeGeoPayload,
+  QRCodePhonePayload,
+  QRCodeSMSPayload,
+  QRCodeWiFiEncryption,
+  QRCodeWiFiPayload,
+} from '../src/payload';
 
 describe('public API', () => {
   test('exports the stable runtime surface without internal utility exports', () => {
@@ -28,12 +37,7 @@ describe('public API', () => {
       'QRCodeTextRenderer',
       'QR_CODE_ERROR_CODES',
       'createQRCodeStyler',
-      'emailPayload',
-      'geoPayload',
-      'phonePayload',
       'qrcode',
-      'smsPayload',
-      'wifiPayload',
     ]);
     expect(qrcode).toBeTypeOf('function');
     expect(createQRCodeStyler).toBeTypeOf('function');
@@ -42,7 +46,7 @@ describe('public API', () => {
     expect(QRCodeSVGRenderer).toBeTypeOf('function');
     expect(QRCodeTextRenderer).toBeTypeOf('function');
     const internalPrefix = String.fromCodePoint(0x275);
-    expect([...Object.keys(core), ...Object.keys(drawing)]).not.toEqual(
+    expect([...Object.keys(core), ...Object.keys(drawing), ...Object.keys(payload)]).not.toEqual(
       expect.arrayContaining([expect.stringMatching(new RegExp(`^${internalPrefix}`, 'u'))]),
     );
   });
@@ -63,5 +67,21 @@ describe('public API', () => {
     expectTypeOf(createQRCodeStyler).returns.toEqualTypeOf<QRCodeStyler>();
     expectTypeOf<QRCodeStyler['draw']>().returns.toEqualTypeOf<QRCodeDrawing>();
     expectTypeOf<QRCodeDrawing['paint']>().parameter(0).toEqualTypeOf<QRCodeDrawingTarget>();
+  });
+
+  test('exposes payload utilities and types from the payload subpath', () => {
+    expect(Object.keys(payload).sort()).toEqual([
+      'emailPayload',
+      'geoPayload',
+      'phonePayload',
+      'smsPayload',
+      'wifiPayload',
+    ]);
+    expectTypeOf<QRCodeEmailPayload>().toHaveProperty('to');
+    expectTypeOf<QRCodePhonePayload>().toHaveProperty('number');
+    expectTypeOf<QRCodeSMSPayload>().toHaveProperty('recipients');
+    expectTypeOf<QRCodeGeoPayload>().toHaveProperty('latitude');
+    expectTypeOf<QRCodeWiFiEncryption>().toEqualTypeOf<'WPA' | 'WEP' | 'nopass'>();
+    expectTypeOf<QRCodeWiFiPayload>().toHaveProperty('ssid');
   });
 });

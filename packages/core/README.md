@@ -110,12 +110,10 @@ import {
   QRCodeBuilder,
   type QRCodeColor,
   type QRCodeDataImageURL,
-  type QRCodeEmailPayload,
   QRCodeError,
   type QRCodeErrorCode,
   type QRCodeErrorCorrectionLevel,
   type QRCodeFinderShape,
-  type QRCodeGeoPayload,
   type QRCodeImageOverlayOptions,
   type QRCodeInputData,
   type QRCodeMask,
@@ -123,9 +121,7 @@ import {
   type QRCodeMatrixOptions,
   type QRCodeMode,
   type QRCodeModuleShape,
-  type QRCodePhonePayload,
   type QRCodeRenderer,
-  type QRCodeSMSPayload,
   type QRCodeSVGAccessibilityOptions,
   type QRCodeSVGImageOptions,
   type QRCodeSVGOptions,
@@ -138,20 +134,27 @@ import {
   type QRCodeTextStyle,
   type QRCodeVersion,
   type QRCodeVisualStyle,
-  type QRCodeWiFiPayload,
   createQRCodeStyler,
+  qrcode,
+} from '@qrcodesdk/core';
+import type {QRCodeDrawing, QRCodeDrawingTarget, QRCodeStyler} from '@qrcodesdk/core/drawing';
+import {
+  type QRCodeEmailPayload,
+  type QRCodeGeoPayload,
+  type QRCodePhonePayload,
+  type QRCodeSMSPayload,
+  type QRCodeWiFiEncryption,
+  type QRCodeWiFiPayload,
   emailPayload,
   geoPayload,
   phonePayload,
-  qrcode,
   smsPayload,
   wifiPayload,
-} from '@qrcodesdk/core';
+} from '@qrcodesdk/core/payload';
 ```
 
-Custom graphical renderers can import `QRCodeStyler`, `QRCodeDrawing`, and
-`QRCodeDrawingTarget` from the stable `@qrcodesdk/core/drawing` subpath. Those low-level types are
-deliberately not re-exported from the package root.
+Drawing types and payload helpers are deliberately not re-exported from the package root. Import
+them from the stable subpath entry points shown above.
 
 ## Generated output stability
 
