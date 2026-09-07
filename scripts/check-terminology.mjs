@@ -7,6 +7,8 @@ const skippedDirectories = new Set([
   '.astro-cache',
   '.git',
   '.nx',
+  '.svelte-kit',
+  '.angular',
   '.turbo',
   'coverage',
   'dist',

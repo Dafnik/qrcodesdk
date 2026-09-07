@@ -27,10 +27,6 @@ const moduleDirectories = [
     directory: path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'browser', 'dist'),
   },
 ];
-const [coreSource, browserSource] = await Promise.all([
-  readFile(path.join(moduleDirectories[0].directory, 'index.mjs'), 'utf8'),
-  readFile(path.join(moduleDirectories[1].directory, 'index.mjs'), 'utf8'),
-]);
 logSuccess('installed Core and Browser ESM bundles are readable');
 
 const browser = await browserType.launch({headless: true});
