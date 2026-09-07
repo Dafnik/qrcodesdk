@@ -46,8 +46,6 @@ jobs:
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.12
-        with:
-          use-relative-cache-path: true
 
       - name: Check formatting
         run: pnpm turbo run format:check
@@ -80,8 +78,6 @@ jobs:
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.12
-        with:
-          use-relative-cache-path: true
 
       - name: Build everything
         run: pnpm turbo run build
@@ -106,8 +102,6 @@ jobs:
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.12
-        with:
-          use-relative-cache-path: true
 
       - name: Test
         run: pnpm turbo run test
@@ -129,8 +123,6 @@ jobs:
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.12
-        with:
-          use-relative-cache-path: true
 
       - name: Restore build outputs
         run: pnpm turbo run build
@@ -176,8 +168,6 @@ jobs:
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.12
-        with:
-          use-relative-cache-path: true
 
       - name: Test roundtrips
         run: pnpm turbo run test:roundtrips --filter=@repo/core-testing --filter=@qrcodesdk/browser --filter=@qrcodesdk/node
