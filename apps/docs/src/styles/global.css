@@ -158,4 +158,9 @@
   .mermaid .bar-plot-0 > text {
     font-size: 16px !important;
   }
+
+  table th,
+  table td {
+    white-space: nowrap;
+  }
 }
