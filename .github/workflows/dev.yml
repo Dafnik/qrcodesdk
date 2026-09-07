@@ -30,7 +30,65 @@ jobs:
         uses: dafnik/commitlint@v1
 
   verify:
-    name: Verify and build
+    name: Verify
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node and pnpm
+        uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.12
+        with:
+          use-relative-cache-path: true
+
+      - name: Check formatting
+        run: pnpm turbo run format:check
+
+      - name: Lint
+        run: pnpm turbo run lint
+
+      - name: Check spellings
+        run: pnpm turbo run cspell
+
+      - name: Check terminology
+        run: pnpm turbo run terminology
+
+      - name: Check types
+        run: pnpm turbo run check-types
+
+  build:
+    name: Build monorepo packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node and pnpm
+        uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.12
+        with:
+          use-relative-cache-path: true
+
+      - name: Build everything
+        run: pnpm turbo run build
+
+  test:
+    name: Test
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -46,8 +104,36 @@ jobs:
       - name: Setup Playwright
         uses: ./.github/actions/setup-playwright
 
-      - name: Check repository
-        run: pnpm turbo run check
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.12
+        with:
+          use-relative-cache-path: true
+
+      - name: Test
+        run: pnpm turbo run test
+
+  package:
+    name: Package
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node and pnpm
+        uses: dafnik/setup-node-pnpm@v5
+        with:
+          install-ignore-scripts: true
+
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.12
+        with:
+          use-relative-cache-path: true
+
+      - name: Restore build outputs
+        run: pnpm turbo run build
 
       - name: Pack runtime packages
         shell: bash
@@ -73,6 +159,7 @@ jobs:
 
   roundtrips:
     name: Roundtrip tests
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -87,12 +174,17 @@ jobs:
       - name: Setup Playwright
         uses: ./.github/actions/setup-playwright
 
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.12
+        with:
+          use-relative-cache-path: true
+
       - name: Test roundtrips
-        run: pnpm test:roundtrips
+        run: pnpm turbo run test:roundtrips --filter=@repo/core-testing --filter=@qrcodesdk/browser --filter=@qrcodesdk/node
 
   runtime:
     name: ${{ matrix.package }} on ${{ matrix.runtime }} ${{ matrix.version }}
-    needs: verify
+    needs: package
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -227,7 +319,7 @@ jobs:
 
   browser-runtime:
     name: Browser package on ${{ matrix.browser }}
-    needs: verify
+    needs: package
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -275,7 +367,7 @@ jobs:
 
   framework-runtime:
     name: ${{ matrix.framework }} ${{ matrix.version }} consumer
-    needs: verify
+    needs: package
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -336,7 +428,10 @@ jobs:
     name: required
     if: always()
     needs:
+      - build
       - verify
+      - test
+      - package
       - roundtrips
       - runtime
       - browser-runtime
@@ -345,7 +440,10 @@ jobs:
     steps:
       - name: Require every development job
         if: >-
+          needs.build.result != 'success' ||
           needs.verify.result != 'success' ||
+          needs.test.result != 'success' ||
+          needs.package.result != 'success' ||
           needs.roundtrips.result != 'success' ||
           needs.runtime.result != 'success' ||
           needs['browser-runtime'].result != 'success' ||
