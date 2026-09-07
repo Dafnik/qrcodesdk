@@ -21,7 +21,7 @@ declare const __QRCODESDK_CLI_VERSION__: string;
 type OutputFormat = 'text' | 'svg' | 'png';
 
 type RawCliOptions = {
-  readonly input?: string;
+  readonly payload?: string;
   readonly format?: string;
   readonly output?: string;
   readonly mode?: string;
@@ -43,7 +43,7 @@ type ResolvedCliOptions = Readonly<
   QRCodeMatrixOptions & {
     readonly ariaLabel?: string;
     readonly title?: string;
-    readonly input: string;
+    readonly payload: string;
     readonly format: OutputFormat;
     readonly output?: string;
     readonly layout: 'compact' | 'full';
@@ -117,17 +117,17 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       .name('qrc')
       .showSuggestionAfterError(true)
       .showHelpAfterError(true)
-      .usage('[data] [options]')
+      .usage('[payload] [options]')
       .summary('generate QR codes from a terminal.')
       .description(
         '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG and PNG files.',
       )
       .version(__QRCODESDK_CLI_VERSION__, '-V', 'Print the installed CLI package version')
-      .argument('[data]', 'Positional QR code input data')
-      .option('--input <value>', 'QR code input data, equivalent to positional [data]')
+      .argument('[payload]', 'Positional QR code payload')
+      .option('--payload <value>', 'QR code payload, equivalent to positional [payload]')
       .option('--format <format>', 'Output format. Inferred from `.svg` or `.png` output paths')
       .option('-o, --output <path>', 'Required output path for SVG and PNG')
-      .option('--mode <mode>', 'QR code data mode: numeric, alphanumeric, or octet')
+      .option('--mode <mode>', 'QR code mode: numeric, alphanumeric, or octet')
       .option('--error-correction <level>', 'Error correction level: L, M, Q, or H')
       .option('--version <version>', 'Pin a QR code version from 1 to 40')
       .option('--mask <mask>', 'Pin a QR code mask from 0 to 7')
@@ -152,8 +152,8 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
         writeOut: (chunk) => stdout.write(chunk),
       })
       .exitOverride()
-      .action(async (positionalInput: string | undefined, rawOptions: RawCliOptions) => {
-        const options = await resolveCliOptions(positionalInput, rawOptions, runtime);
+      .action(async (positionalPayload: string | undefined, rawOptions: RawCliOptions) => {
+        const options = await resolveCliOptions(positionalPayload, rawOptions, runtime);
         await render(options, runtime, stdout, stderr);
       });
 
@@ -162,13 +162,13 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
 }
 
 async function resolveCliOptions(
-  positionalInput: string | undefined,
+  positionalPayload: string | undefined,
   rawOptions: RawCliOptions,
   runtime: CliRuntime,
 ): Promise<ResolvedCliOptions> {
   const prompt = runtime.prompts ?? defaultPromptAdapter;
   const interactive = runtime.interactive ?? Boolean(process.stdin.isTTY && process.stdout.isTTY);
-  const input = await resolveInput(positionalInput, rawOptions.input, interactive, prompt);
+  const payload = await resolvePayload(positionalPayload, rawOptions.payload, interactive, prompt);
   const format = await resolveFormat(rawOptions.format, rawOptions.output, interactive, prompt);
   const output = await resolveOutput(format, rawOptions.output, interactive, prompt);
   const style = resolveStyle(rawOptions);
@@ -183,7 +183,7 @@ async function resolveCliOptions(
   }
 
   return {
-    input,
+    payload,
     format,
     output,
     layout:
@@ -203,34 +203,34 @@ async function resolveCliOptions(
   };
 }
 
-async function resolveInput(
-  positionalInput: string | undefined,
-  optionInput: string | undefined,
+async function resolvePayload(
+  positionalPayload: string | undefined,
+  optionPayload: string | undefined,
   interactive: boolean,
   prompt: PromptAdapter,
 ): Promise<string> {
   if (
-    positionalInput !== undefined &&
-    optionInput !== undefined &&
-    positionalInput !== optionInput
+    positionalPayload !== undefined &&
+    optionPayload !== undefined &&
+    positionalPayload !== optionPayload
   ) {
     throw new CliError(
-      'Pass QR input either as [data] or --input, not both with different values.',
+      'Pass QR payload either as [payload] or --payload, not both with different values.',
     );
   }
 
-  const input = optionInput ?? positionalInput;
-  if (input !== undefined) return input;
+  const payload = optionPayload ?? positionalPayload;
+  if (payload !== undefined) return payload;
 
   if (!interactive) {
-    throw new CliError('Missing QR input. Pass [data] or --input.');
+    throw new CliError('Missing QR payload. Pass [payload] or --payload.');
   }
 
   const value = await prompt.text({
-    message: 'QR input',
+    message: 'QR payload',
     placeholder: 'https://qrcodesdk.dev',
   });
-  return requiredPromptText(value, prompt, 'Missing QR input. Pass [data] or --input.');
+  return requiredPromptText(value, prompt, 'Missing QR payload. Pass [payload] or --payload.');
 }
 
 async function resolveFormat(
@@ -331,7 +331,7 @@ async function render(
   stdout: WritableTarget,
   stderr: WritableTarget,
 ): Promise<void> {
-  const builder = qrcode(options.input).config({
+  const builder = qrcode(options.payload).options({
     mode: options.mode,
     errorCorrectionLevel: options.errorCorrectionLevel,
     version: options.version,

@@ -2,19 +2,19 @@ import {QRCodeError} from './error';
 import {generateQRCodeMatrix} from './matrix/generate-qrcode-matrix';
 import type {
   QRCodeErrorCorrectionLevel,
-  QRCodeInputData,
   QRCodeMask,
   QRCodeMatrix,
   QRCodeMatrixOptions,
   QRCodeMode,
+  QRCodePayload,
   QRCodeRenderer,
   QRCodeVersion,
 } from './types';
 
-type NoData = {readonly hasData: false; readonly _data: undefined};
-type HasData = {readonly hasData: true; readonly _data: QRCodeInputData};
+type NoPayload = {readonly hasPayload: false; readonly _payload: undefined};
+type HasPayload = {readonly hasPayload: true; readonly _payload: QRCodePayload};
 
-type BuilderData<D> = D extends HasData ? QRCodeInputData : undefined;
+type BuilderPayload<P> = P extends HasPayload ? QRCodePayload : undefined;
 type BuilderRenderer<R> =
   R extends HasRenderer<infer TOutput> ? QRCodeRenderer<TOutput> : undefined;
 
@@ -25,76 +25,76 @@ type HasRenderer<TOutput> = {
 };
 
 export class QRCodeBuilder<
-  D extends NoData | HasData,
+  P extends NoPayload | HasPayload,
   R extends NoRenderer | HasRenderer<unknown>,
 > {
   private cachedMatrix: QRCodeMatrix | undefined;
 
   private constructor(
-    private readonly _data: BuilderData<D>,
-    private readonly _config: QRCodeMatrixOptions,
+    private readonly _payload: BuilderPayload<P>,
+    private readonly _options: QRCodeMatrixOptions,
     private readonly currentRenderer: BuilderRenderer<R>,
   ) {}
 
-  static create(): QRCodeBuilder<NoData, NoRenderer>;
+  static create(): QRCodeBuilder<NoPayload, NoRenderer>;
   static create(
-    data: QRCodeInputData,
-    config?: QRCodeMatrixOptions,
-  ): QRCodeBuilder<HasData, NoRenderer>;
+    payload: QRCodePayload,
+    options?: QRCodeMatrixOptions,
+  ): QRCodeBuilder<HasPayload, NoRenderer>;
   static create(
-    data?: QRCodeInputData,
-    config?: QRCodeMatrixOptions,
-  ): QRCodeBuilder<NoData, NoRenderer> | QRCodeBuilder<HasData, NoRenderer> {
+    payload?: QRCodePayload,
+    options?: QRCodeMatrixOptions,
+  ): QRCodeBuilder<NoPayload, NoRenderer> | QRCodeBuilder<HasPayload, NoRenderer> {
     return new QRCodeBuilder(
-      data,
+      payload,
       {
         errorCorrectionLevel: 'M',
-        ...config,
+        ...options,
       },
       undefined,
     );
   }
 
-  data(value: QRCodeInputData): QRCodeBuilder<HasData, R> {
-    return new QRCodeBuilder(value, this._config, this.currentRenderer);
+  payload(payload: QRCodePayload): QRCodeBuilder<HasPayload, R> {
+    return new QRCodeBuilder(payload, this._options, this.currentRenderer);
   }
 
-  mode(mode?: QRCodeMode): QRCodeBuilder<D, R> {
-    return this.withConfig({mode});
+  mode(mode?: QRCodeMode): QRCodeBuilder<P, R> {
+    return this.withOptions({mode});
   }
 
-  config(config?: QRCodeMatrixOptions): QRCodeBuilder<D, R> {
-    return this.withConfig(config);
+  options(options?: QRCodeMatrixOptions): QRCodeBuilder<P, R> {
+    return this.withOptions(options);
   }
 
-  errorCorrection(level?: QRCodeErrorCorrectionLevel): QRCodeBuilder<D, R> {
-    return this.withConfig({errorCorrectionLevel: level});
+  errorCorrection(level?: QRCodeErrorCorrectionLevel): QRCodeBuilder<P, R> {
+    return this.withOptions({errorCorrectionLevel: level});
   }
 
-  version(version?: QRCodeVersion): QRCodeBuilder<D, R> {
-    return this.withConfig({version});
+  version(version?: QRCodeVersion): QRCodeBuilder<P, R> {
+    return this.withOptions({version});
   }
 
-  mask(mask?: QRCodeMask): QRCodeBuilder<D, R> {
-    return this.withConfig({mask});
+  mask(mask?: QRCodeMask): QRCodeBuilder<P, R> {
+    return this.withOptions({mask});
   }
 
-  eci(enabled?: boolean): QRCodeBuilder<D, R> {
-    return this.withConfig({eci: enabled});
+  eci(enabled?: boolean): QRCodeBuilder<P, R> {
+    return this.withOptions({eci: enabled});
   }
 
-  renderer<TOutput>(renderer: QRCodeRenderer<TOutput>): QRCodeBuilder<D, HasRenderer<TOutput>> {
-    return new QRCodeBuilder(this._data, this._config, renderer);
+  renderer<TOutput>(renderer: QRCodeRenderer<TOutput>): QRCodeBuilder<P, HasRenderer<TOutput>> {
+    return new QRCodeBuilder(this._payload, this._options, renderer);
   }
 
-  matrix(this: QRCodeBuilder<HasData, R>): QRCodeMatrix {
-    return (this.cachedMatrix ??= generateQRCodeMatrix(this._data, this._config));
+  matrix(this: QRCodeBuilder<HasPayload, R>): QRCodeMatrix {
+    return (this.cachedMatrix ??= generateQRCodeMatrix(this._payload, this._options));
   }
 
-  render<TOutput>(this: QRCodeBuilder<HasData, R>, renderer: QRCodeRenderer<TOutput>): TOutput;
-  render<TOutput>(this: QRCodeBuilder<HasData, HasRenderer<TOutput>>): TOutput;
+  render<TOutput>(this: QRCodeBuilder<HasPayload, R>, renderer: QRCodeRenderer<TOutput>): TOutput;
+  render<TOutput>(this: QRCodeBuilder<HasPayload, HasRenderer<TOutput>>): TOutput;
   render<TOutput>(
-    this: QRCodeBuilder<HasData, R | HasRenderer<TOutput>>,
+    this: QRCodeBuilder<HasPayload, R | HasRenderer<TOutput>>,
     renderer?: QRCodeRenderer<TOutput>,
   ): TOutput {
     const selectedRenderer = renderer ?? this.currentRenderer;
@@ -106,20 +106,20 @@ export class QRCodeBuilder<
     return selectedRenderer(this.matrix()) as TOutput;
   }
 
-  private withConfig(config: QRCodeMatrixOptions = {}): QRCodeBuilder<D, R> {
+  private withOptions(options: QRCodeMatrixOptions = {}): QRCodeBuilder<P, R> {
     return new QRCodeBuilder(
-      this._data,
+      this._payload,
       {
-        ...this._config,
-        ...config,
+        ...this._options,
+        ...options,
       },
       this.currentRenderer,
     );
   }
 }
 
-export function qrcode(): QRCodeBuilder<NoData, NoRenderer>;
-export function qrcode(data: QRCodeInputData): QRCodeBuilder<HasData, NoRenderer>;
-export function qrcode(data?: QRCodeInputData) {
-  return data === undefined ? QRCodeBuilder.create() : QRCodeBuilder.create(data);
+export function qrcode(): QRCodeBuilder<NoPayload, NoRenderer>;
+export function qrcode(payload: QRCodePayload): QRCodeBuilder<HasPayload, NoRenderer>;
+export function qrcode(payload?: QRCodePayload) {
+  return payload === undefined ? QRCodeBuilder.create() : QRCodeBuilder.create(payload);
 }

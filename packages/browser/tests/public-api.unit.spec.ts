@@ -1,9 +1,9 @@
 import {describe, expectTypeOf, test} from 'vitest';
 
-import type {QRCodeImageOverlayOptions, QRCodeMatrixOptions} from '@qrcodesdk/core';
+import type {QRCodeCenterImageOptions, QRCodeMatrixOptions} from '@qrcodesdk/core';
 
 import type {
-  QRCodeCanvasImageOptions,
+  QRCodeCanvasCenterImageOptions,
   QRCodeCanvasOptions,
   QRCodeCanvasRendererOptions,
   QRCodeImageOptions,
@@ -15,8 +15,8 @@ describe('public API types', () => {
     expectTypeOf<QRCodeCanvasOptions>().toEqualTypeOf<
       QRCodeCanvasRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
     >();
-    expectTypeOf<QRCodeCanvasImageOptions>().toEqualTypeOf<
-      QRCodeImageOverlayOptions<CanvasImageSource>
+    expectTypeOf<QRCodeCanvasCenterImageOptions>().toEqualTypeOf<
+      QRCodeCenterImageOptions<CanvasImageSource>
     >();
     expectTypeOf<QRCodeImageOptions>().toEqualTypeOf<
       QRCodeImageRendererOptions & {readonly matrix?: QRCodeMatrixOptions}

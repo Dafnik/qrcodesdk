@@ -105,7 +105,7 @@ For server rendering, defer them until hydration or use the runtime-neutral SVG 
 
 ```ts
 import {
-  type QRCodeCanvasImageOptions,
+  type QRCodeCanvasCenterImageOptions,
   type QRCodeCanvasOptions,
   QRCodeCanvasRenderer,
   type QRCodeCanvasRendererOptions,

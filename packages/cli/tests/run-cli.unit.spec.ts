@@ -81,10 +81,10 @@ describe('runCli', () => {
     expect(runtime.stderrText()).toBe('');
   });
 
-  test('accepts --input as an alternative to positional input', async () => {
+  test('accepts --payload as an alternative to positional payload', async () => {
     const runtime = createRuntime();
 
-    await expect(runCli(['--input', 'HELLO WORLD'], runtime)).resolves.toBe(0);
+    await expect(runCli(['--payload', 'HELLO WORLD'], runtime)).resolves.toBe(0);
 
     expect(runtime.stdoutText()).toContain('\u001b[38;2;0;0;0m');
   });
@@ -109,10 +109,10 @@ describe('runCli', () => {
     {args: ['--ansi', 'blocks'], stdoutIsTTY: false, environment: {}},
     {args: ['--ansi', 'blocks'], stdoutIsTTY: true, environment: {NO_COLOR: '1'}},
     {args: ['--ansi', 'background'], stdoutIsTTY: false, environment: {NO_COLOR: '1'}},
-  ])('lets explicit ANSI flags override the output environment', async (configuration) => {
-    const runtime = {...createRuntime(), ...configuration};
+  ])('lets explicit ANSI flags override the output environment', async (scenario) => {
+    const runtime = {...createRuntime(), ...scenario};
 
-    await expect(runCli(['HELLO WORLD', ...configuration.args], runtime)).resolves.toBe(0);
+    await expect(runCli(['HELLO WORLD', ...scenario.args], runtime)).resolves.toBe(0);
 
     expect(runtime.stdoutText()).toContain('\u001b[');
   });
@@ -235,12 +235,12 @@ describe('runCli', () => {
     expect(missing.stderrText()).toContain("option '--ansi <mode>' argument missing");
   });
 
-  test('rejects conflicting positional and option input', async () => {
+  test('rejects conflicting positional and option payload', async () => {
     const runtime = createRuntime();
 
-    await expect(runCli(['HELLO', '--input', 'WORLD'], runtime)).resolves.toBe(1);
+    await expect(runCli(['HELLO', '--payload', 'WORLD'], runtime)).resolves.toBe(1);
 
-    expect(runtime.stderrText()).toContain('Pass QR input either as [data] or --input');
+    expect(runtime.stderrText()).toContain('Pass QR payload either as [payload] or --payload');
   });
 
   test('infers SVG output from the output extension', async () => {
@@ -300,7 +300,7 @@ describe('runCli', () => {
 
     await expect(runCli([], runtime)).resolves.toBe(1);
 
-    expect(runtime.stderrText()).toContain('Missing QR input');
+    expect(runtime.stderrText()).toContain('Missing QR payload');
   });
 
   test('requires an explicit format when an output extension is ambiguous', async () => {
@@ -311,7 +311,7 @@ describe('runCli', () => {
     expect(runtime.stderrText()).toContain('Unable to infer output format');
   });
 
-  test('prompts for missing input in interactive mode', async () => {
+  test('prompts for missing payload in interactive mode', async () => {
     const runtime = {
       ...createRuntime(),
       interactive: true,

@@ -7,7 +7,7 @@
 </script>
 
 <div class="flex flex-col items-center gap-2">
-  <QRCodeImage bind:this={qrcode} data="https://qrcodesdk.dev" {options} />
+  <QRCodeImage bind:this={qrcode} payload="https://qrcodesdk.dev" {options} />
   <button class="btn-primary" type="button" onclick={() => qrcode?.download('qrcodesdk')}>
     Download PNG
   </button>

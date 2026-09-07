@@ -3,13 +3,13 @@ import type {QRCodeMatrixOptions} from '@qrcodesdk/core';
 export type QRCodeTestFixture = Readonly<
   QRCodeMatrixOptions & {
     readonly name: string;
-    readonly data: string;
+    readonly payload: string;
   }
 >;
 
 export const QR_CODE_ECI_TEST_FIXTURE = {
   name: 'bytes-utf8-eci',
-  data: 'Grüße ✅',
+  payload: 'Grüße ✅',
   mode: 'octet',
   eci: true,
   version: 2,
@@ -19,91 +19,91 @@ export const QR_CODE_ECI_TEST_FIXTURE = {
 export const QR_CODE_TEST_FIXTURES = [
   {
     name: 'numeric',
-    data: '1234567890',
+    payload: '1234567890',
     mode: 'numeric',
     version: 1,
     mask: 1,
   },
   {
     name: 'numeric-long',
-    data: '867530912345678901234567890',
+    payload: '867530912345678901234567890',
     mode: 'numeric',
     version: 2,
     mask: 4,
   },
   {
     name: 'numeric-leading-zeroes',
-    data: '000012340000',
+    payload: '000012340000',
     mode: 'numeric',
     version: 1,
     mask: 6,
   },
   {
     name: 'alphanumeric',
-    data: 'HELLO WORLD',
+    payload: 'HELLO WORLD',
     mode: 'alphanumeric',
     version: 1,
     mask: 2,
   },
   {
     name: 'alphanumeric-symbols',
-    data: 'A1 B2-C3.D4/E5:F6',
+    payload: 'A1 B2-C3.D4/E5:F6',
     mode: 'alphanumeric',
     version: 2,
     mask: 0,
   },
   {
     name: 'bytes',
-    data: 'hello, 世界',
+    payload: 'hello, 世界',
     mode: 'octet',
     version: 2,
     mask: 3,
   },
   {
     name: 'bytes-emoji',
-    data: 'QR ✅🚀',
+    payload: 'QR ✅🚀',
     mode: 'octet',
     version: 3,
     mask: 7,
   },
   {
     name: 'bytes-newline',
-    data: 'line one\nline two\nline three',
+    payload: 'line one\nline two\nline three',
     mode: 'octet',
     version: 3,
     mask: 1,
   },
   {
     name: 'bytes-json',
-    data: '{"type":"qr","ok":true,"count":42}',
+    payload: '{"type":"qr","ok":true,"count":42}',
     mode: 'octet',
     version: 3,
     mask: 2,
   },
   {
     name: 'bytes-empty-string',
-    data: '',
+    payload: '',
     mode: 'octet',
     version: 1,
     mask: 0,
   },
   {
     name: 'numeric-version-5',
-    data: '3141592653589793238462643383279',
+    payload: '3141592653589793238462643383279',
     mode: 'numeric',
     version: 5,
     mask: 7,
   },
   {
     name: 'alphanumeric-version-4',
-    data: 'THE QUICK BROWN FOX 123',
+    payload: 'THE QUICK BROWN FOX 123',
     mode: 'alphanumeric',
     version: 4,
     mask: 3,
   },
   {
     name: 'bytes-version-6-unicode',
-    data: 'Café Münchner Kindl — 東京',
+    payload: 'Café Münchner Kindl — 東京',
     mode: 'octet',
     version: 6,
     mask: 4,
@@ -111,7 +111,7 @@ export const QR_CODE_TEST_FIXTURES = [
   QR_CODE_ECI_TEST_FIXTURE,
   {
     name: 'numeric-max-capacity',
-    data: '1'.repeat(7_089),
+    payload: '1'.repeat(7_089),
     mode: 'numeric',
     version: 40,
     mask: 0,
@@ -119,7 +119,7 @@ export const QR_CODE_TEST_FIXTURES = [
   },
   {
     name: 'alphanumeric-max-capacity',
-    data: 'A'.repeat(4_296),
+    payload: 'A'.repeat(4_296),
     mode: 'alphanumeric',
     version: 40,
     mask: 1,
@@ -127,7 +127,7 @@ export const QR_CODE_TEST_FIXTURES = [
   },
   {
     name: 'bytes-max-capacity',
-    data: 'A'.repeat(2_953),
+    payload: 'A'.repeat(2_953),
     mode: 'octet',
     version: 40,
     mask: 2,

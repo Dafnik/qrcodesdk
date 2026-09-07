@@ -1,9 +1,9 @@
-import type {QRCodeDrawingTarget} from './drawing';
+import type {QRCodeStyledDrawingTarget} from './drawing';
 import {createQRCodeStyler} from './drawing/styler';
 import {QRCodeError} from './error';
 import {assertKnownKeys} from './styling';
 import type {
-  QRCodeImageOverlayOptions,
+  QRCodeCenterImageOptions,
   QRCodeMatrix,
   QRCodeMatrixOptions,
   QRCodeRenderer,
@@ -11,7 +11,7 @@ import type {
 } from './types';
 
 export type QRCodeDataImageURL = `data:image/${string}`;
-export type QRCodeSVGImageOptions = QRCodeImageOverlayOptions<QRCodeDataImageURL>;
+export type QRCodeSVGCenterImageOptions = QRCodeCenterImageOptions<QRCodeDataImageURL>;
 export type QRCodeSVGAccessibilityOptions = {
   readonly ariaLabel?: string;
   readonly title?: string;
@@ -19,37 +19,42 @@ export type QRCodeSVGAccessibilityOptions = {
 export type QRCodeSVGRendererOptions = {
   readonly style?: QRCodeVisualStyle;
   readonly accessibility?: QRCodeSVGAccessibilityOptions;
-  readonly image?: QRCodeSVGImageOptions;
+  readonly centerImage?: QRCodeSVGCenterImageOptions;
 };
 export type QRCodeSVGOptions = QRCodeSVGRendererOptions & {
   readonly matrix?: QRCodeMatrixOptions;
 };
 
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
-  assertKnownKeys(options, 'options', ['style', 'accessibility', 'image']);
+  assertKnownKeys(options, 'options', ['style', 'accessibility', 'centerImage']);
   assertKnownKeys(options?.accessibility, 'accessibility', ['ariaLabel', 'title']);
-  assertKnownKeys(options?.image, 'image', ['source', 'size', 'padding', 'clearBackground']);
+  assertKnownKeys(options?.centerImage, 'centerImage', [
+    'source',
+    'size',
+    'padding',
+    'clearBackground',
+  ]);
   assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
   assertOptionalString(options?.accessibility?.title, 'accessibility.title');
   const styler = createQRCodeStyler(options?.style);
   const accessibility = options?.accessibility ? {...options.accessibility} : undefined;
-  const imageOptions = options?.image ? {...options.image} : undefined;
-  const imageLayout = imageOptions
+  const centerImageOptions = options?.centerImage ? {...options.centerImage} : undefined;
+  const centerImageLayout = centerImageOptions
     ? {
-        size: imageOptions.size,
-        padding: imageOptions.padding,
-        clearBackground: imageOptions.clearBackground,
+        size: centerImageOptions.size,
+        padding: centerImageOptions.padding,
+        clearBackground: centerImageOptions.clearBackground,
       }
     : undefined;
-  if (imageOptions && !isQRCodeDataImageURL(imageOptions.source)) {
+  if (centerImageOptions && !isQRCodeDataImageURL(centerImageOptions.source)) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
       'QR code SVG image source must be an embedded data:image URL',
-      {details: {source: imageOptions.source}},
+      {details: {source: centerImageOptions.source}},
     );
   }
-  if (imageOptions) {
-    styler.draw([[1]]).placeImage(imageLayout);
+  if (centerImageOptions) {
+    styler.draw([[1]]).placeCenterImage(centerImageLayout);
   }
 
   return (matrix: QRCodeMatrix) => {
@@ -65,7 +70,7 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     if (title) svg += `<title>${escapeTextContent(title)}</title>`;
     svg += target.backgroundString();
 
-    const placement = imageOptions ? drawing.placeImage(imageLayout) : undefined;
+    const placement = centerImageOptions ? drawing.placeCenterImage(centerImageLayout) : undefined;
     if (placement?.clear) {
       const maskId =
         `qrcodesdk-clear-${drawing.viewSize}-${formatNumber(placement.clear.x)}-${formatNumber(placement.clear.size)}`.replace(
@@ -77,14 +82,14 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
       svg += target.layersString();
     }
 
-    if (imageOptions && placement) {
-      svg += `<image href="${escapeAttributeValue(imageOptions.source)}" x="${formatNumber(placement.image.x)}" y="${formatNumber(placement.image.y)}" width="${formatNumber(placement.image.size)}" height="${formatNumber(placement.image.size)}" preserveAspectRatio="xMidYMid meet"/>`;
+    if (centerImageOptions && placement) {
+      svg += `<image href="${escapeAttributeValue(centerImageOptions.source)}" x="${formatNumber(placement.centerImage.x)}" y="${formatNumber(placement.centerImage.y)}" width="${formatNumber(placement.centerImage.size)}" height="${formatNumber(placement.centerImage.size)}" preserveAspectRatio="xMidYMid meet"/>`;
     }
     return `${svg}</svg>`;
   };
 }
 
-class SVGDrawingTarget implements QRCodeDrawingTarget {
+class SVGDrawingTarget implements QRCodeStyledDrawingTarget {
   hasCurves = false;
   backgroundFill = '#000000';
   backgroundOpacity = '';

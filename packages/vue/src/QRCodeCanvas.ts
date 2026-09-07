@@ -10,7 +10,7 @@ import {
 } from 'vue';
 
 import {type QRCodeCanvasOptions, QRCodeCanvasRenderer} from '@qrcodesdk/browser';
-import {type QRCodeInputData, qrcode} from '@qrcodesdk/core';
+import {type QRCodePayload, qrcode} from '@qrcodesdk/core';
 
 import {splitOptions} from './split-options';
 import type {QRCodeBaseProps} from './types';
@@ -20,8 +20,8 @@ export type QRCodeCanvasProps = QRCodeBaseProps<QRCodeCanvasOptions>;
 export const QRCodeCanvas = defineComponent({
   name: 'QRCodeCanvas',
   props: {
-    data: {
-      type: [String, Number] as PropType<QRCodeInputData>,
+    payload: {
+      type: [String, Number] as PropType<QRCodePayload>,
       required: true,
     },
     options: Object as PropType<QRCodeCanvasOptions>,
@@ -32,14 +32,16 @@ export const QRCodeCanvas = defineComponent({
 
     onMounted(() => {
       stopRendering = watch(
-        [() => props.data, () => props.options],
+        [() => props.payload, () => props.options],
         () => {
           const host = container.value;
           if (!host) return;
 
           const [matrixOptions, rendererOptions] = splitOptions(props.options);
           host.replaceChildren(
-            qrcode(props.data).config(matrixOptions).render(QRCodeCanvasRenderer(rendererOptions)),
+            qrcode(props.payload)
+              .options(matrixOptions)
+              .render(QRCodeCanvasRenderer(rendererOptions)),
           );
         },
         {deep: true, immediate: true},

@@ -25,7 +25,7 @@ describe('styled SVG benchmark adapters', {timeout: 15_000}, () => {
       width: 540,
       height: 540,
       margin: 48,
-      data: fixture.data,
+      data: fixture.payload,
       qrOptions: {
         typeNumber: 5,
         mode: 'Byte',

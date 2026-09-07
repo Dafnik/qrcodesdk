@@ -1,7 +1,7 @@
 # Use renderer-owned styling and a public drawing protocol
 
 Styling belongs to renderer factories, while `QRCodeBuilder` remains responsible only for payload
-and matrix configuration. SVG, Canvas, browser Image, and Node PNG consume the complete
+and matrix options. SVG, Canvas, browser Image, and Node PNG consume the complete
 `QRCodeVisualStyle`; Text consumes the smaller `QRCodeTextStyle`. Unsupported and unknown renderer
 options fail rather than being ignored.
 

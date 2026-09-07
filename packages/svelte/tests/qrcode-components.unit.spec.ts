@@ -15,9 +15,9 @@ describe('Svelte QR code component API', () => {
   });
 
   test('exposes download handles only for SVG and image components', () => {
-    const svg = render(svelteApi.QRCodeSVG, {data: 'HELLO'});
-    const image = render(svelteApi.QRCodeImage, {data: 'HELLO'});
-    const canvas = render(svelteApi.QRCodeCanvas, {data: 'HELLO'});
+    const svg = render(svelteApi.QRCodeSVG, {payload: 'HELLO'});
+    const image = render(svelteApi.QRCodeImage, {payload: 'HELLO'});
+    const canvas = render(svelteApi.QRCodeCanvas, {payload: 'HELLO'});
 
     expect(svg.component.download).toBeTypeOf('function');
     expect(image.component.download).toBeTypeOf('function');

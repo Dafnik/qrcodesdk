@@ -7,7 +7,7 @@ import type {
 
 export type QRCodeStylingFixture = {
   readonly name: string;
-  readonly data: string;
+  readonly payload: string;
   readonly matrixOptions: QRCodeMatrixOptions;
   readonly styling: QRCodeVisualStyle;
 };
@@ -43,7 +43,7 @@ for (let index = 0; index < 60; index++) {
   const palette = PALETTES[index % PALETTES.length]!;
   fixtures.push({
     name: `modules-${moduleShape}_outer-${outerShape}_center-${centerShape}_palette-${palette.name}`,
-    data: 'The quick brown fox jumps over the lazy dog',
+    payload: 'The quick brown fox jumps over the lazy dog',
     matrixOptions: {version: 5, mode: 'octet', errorCorrectionLevel: 'H', mask: 3},
     styling: {
       moduleSize: 12,

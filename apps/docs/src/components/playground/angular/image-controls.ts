@@ -18,7 +18,7 @@ import {
   preparePlaygroundImage,
   preparePlaygroundLogo,
   updatePlaygroundImage,
-} from '../playground-config.ts';
+} from '../playground-options.ts';
 
 @Component({
   selector: 'playground-image-controls',

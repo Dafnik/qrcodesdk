@@ -1,20 +1,22 @@
 import type {QRCodeMatrix} from '../types';
 
 export interface QRCodeStyler {
-  draw(matrix: QRCodeMatrix): QRCodeDrawing;
+  draw(matrix: QRCodeMatrix): QRCodeStyledDrawing;
 }
 
-export interface QRCodeDrawing {
+export interface QRCodeStyledDrawing {
   readonly moduleCount: number;
   readonly moduleSize: number;
   readonly quietZone: number;
   readonly viewSize: number;
   readonly outputSize: number;
-  paint(target: QRCodeDrawingTarget): void;
-  placeImage(options?: QRCodeDrawingImageOptions): QRCodeDrawingImagePlacement;
+  paint(target: QRCodeStyledDrawingTarget): void;
+  placeCenterImage(
+    options?: QRCodeStyledDrawingCenterImageOptions,
+  ): QRCodeStyledDrawingCenterImagePlacement;
 }
 
-export interface QRCodeDrawingTarget {
+export interface QRCodeStyledDrawingTarget {
   drawBackground(red: number, green: number, blue: number, alpha: number): void;
   beginLayer(red: number, green: number, blue: number, alpha: number): void;
   drawRectangle(x: number, y: number, width: number, height: number): void;
@@ -42,13 +44,13 @@ export interface QRCodeDrawingTarget {
   endLayer(): void;
 }
 
-interface QRCodeDrawingImageOptions {
+interface QRCodeStyledDrawingCenterImageOptions {
   readonly size?: number;
   readonly padding?: number;
   readonly clearBackground?: boolean;
 }
 
-interface QRCodeDrawingImagePlacement {
-  readonly image: {readonly x: number; readonly y: number; readonly size: number};
+interface QRCodeStyledDrawingCenterImagePlacement {
+  readonly centerImage: {readonly x: number; readonly y: number; readonly size: number};
   readonly clear: {readonly x: number; readonly y: number; readonly size: number} | undefined;
 }

@@ -1,9 +1,9 @@
 import {describe, expect, test, vi} from 'vitest';
 
 import {createQRCodeStyler, qrcode} from '../src';
-import type {QRCodeDrawingTarget} from '../src/drawing';
+import type {QRCodeStyledDrawingTarget} from '../src/drawing';
 
-function target(): QRCodeDrawingTarget {
+function target(): QRCodeStyledDrawingTarget {
   return {
     drawBackground: vi.fn(),
     beginLayer: vi.fn(),
@@ -53,11 +53,11 @@ describe('createQRCodeStyler', () => {
 
   test('centralizes image placement', () => {
     const drawing = createQRCodeStyler({quietZone: 4}).draw(qrcode('image').matrix());
-    const placement = drawing.placeImage({size: 0.4, padding: 1});
-    expect(placement.image).toEqual({x: 10.3, y: 10.3, size: 8.4});
+    const placement = drawing.placeCenterImage({size: 0.4, padding: 1});
+    expect(placement.centerImage).toEqual({x: 10.3, y: 10.3, size: 8.4});
     expect(placement.clear?.x).toBe(9.3);
     expect(placement.clear?.y).toBe(9.3);
     expect(placement.clear?.size).toBeCloseTo(10.4);
-    expect(drawing.placeImage({clearBackground: false}).clear).toBeUndefined();
+    expect(drawing.placeCenterImage({clearBackground: false}).clear).toBeUndefined();
   });
 });

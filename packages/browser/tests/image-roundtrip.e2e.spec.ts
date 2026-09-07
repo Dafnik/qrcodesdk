@@ -15,24 +15,24 @@ describe('QRCodeImageRenderer', () => {
 
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name image output', async (fixture) => {
     await expect(
-      decodeImageQRCode(qrcode().data(fixture.data).config(fixture).render(defaultRenderer)),
-    ).resolves.toBe(fixture.data);
+      decodeImageQRCode(qrcode().payload(fixture.payload).options(fixture).render(defaultRenderer)),
+    ).resolves.toBe(fixture.payload);
   });
 
   test.each(JSQR_ROUNDTRIP_COMBINATIONS_TWO)('decodes $name image output', async (fixture) => {
     await expect(
-      decodeImageQRCode(qrcode(fixture.data).config(fixture).render(defaultRenderer)),
-    ).resolves.toBe(fixture.data);
+      decodeImageQRCode(qrcode(fixture.payload).options(fixture).render(defaultRenderer)),
+    ).resolves.toBe(fixture.payload);
   });
 
   test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES)(
     'decodes $name image styling fixture',
     async (fixture) => {
-      const image = qrcode(fixture.data)
-        .config(fixture.matrixOptions)
+      const image = qrcode(fixture.payload)
+        .options(fixture.matrixOptions)
         .render(QRCodeImageRenderer({style: fixture.styling}));
 
-      await expect(decodeImageQRCode(image)).resolves.toBe(fixture.data);
+      await expect(decodeImageQRCode(image)).resolves.toBe(fixture.payload);
     },
   );
 });

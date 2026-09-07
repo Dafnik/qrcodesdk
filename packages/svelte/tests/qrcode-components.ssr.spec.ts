@@ -13,9 +13,9 @@ const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}
 
 describe('Svelte QR code server rendering', () => {
   test('renders SVG but no browser elements during SSR', () => {
-    const svg = render(QRCodeSVG, {props: {data: 'HELLO', options: svgOptions, id: 'ssr'}});
-    const image = render(QRCodeImage, {props: {data: 'HELLO', options: imageOptions}});
-    const canvas = render(QRCodeCanvas, {props: {data: 'HELLO', options: canvasOptions}});
+    const svg = render(QRCodeSVG, {props: {payload: 'HELLO', options: svgOptions, id: 'ssr'}});
+    const image = render(QRCodeImage, {props: {payload: 'HELLO', options: imageOptions}});
+    const canvas = render(QRCodeCanvas, {props: {payload: 'HELLO', options: canvasOptions}});
 
     expect(svg.body).toContain('<svg');
     expect(svg.body).toContain('id="ssr"');

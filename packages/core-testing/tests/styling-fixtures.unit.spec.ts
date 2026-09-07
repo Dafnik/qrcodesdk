@@ -9,7 +9,7 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
     expect(QR_CODE_STYLING_FIXTURES).toHaveLength(60);
     expect(new Set(QR_CODE_STYLING_FIXTURES.map(({name}) => name)).size).toBe(60);
     for (const fixture of QR_CODE_STYLING_FIXTURES) {
-      const matrix = qrcode(fixture.data).config(fixture.matrixOptions).matrix();
+      const matrix = qrcode(fixture.payload).options(fixture.matrixOptions).matrix();
       const drawing = createQRCodeStyler(fixture.styling).draw(matrix);
       expect(drawing.moduleSize).toBe(12);
       expect(drawing.quietZone).toBe(4);

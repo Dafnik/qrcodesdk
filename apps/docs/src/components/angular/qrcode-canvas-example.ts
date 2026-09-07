@@ -7,7 +7,7 @@ import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
   selector: 'qrcode-angular-canvas-example',
   imports: [QRCodeCanvas],
   template: `
-    <qrcode-canvas [options]="options" data="https://qrcodesdk.dev" />
+    <qrcode-canvas [options]="options" payload="https://qrcodesdk.dev" />
   `,
 })
 export class QRCodeCanvasExample {

@@ -1,4 +1,4 @@
-export type QRCodeInputData = string | number;
+export type QRCodePayload = string | number;
 
 export type QRCodeModule = 0 | 1;
 export type QRCodeMatrix = readonly (readonly QRCodeModule[])[];
@@ -8,11 +8,11 @@ export type QRCodeReservedMatrix = QRCodeModule[][];
 export type QRCodeCodeword = number;
 export type QRCodeCodewords = QRCodeCodeword[];
 export type QRCodePolynomial = QRCodeCodeword[];
-export type QRCodeEncodedData = string | QRCodeCodewords;
+export type QRCodeEncodedPayload = string | QRCodeCodewords;
 
 export type QRCodeEncodedSegment = {
   readonly mode: QRCodeSupportedModeIndicator;
-  readonly data: QRCodeEncodedData;
+  readonly payload: QRCodeEncodedPayload;
 };
 
 export type QRCodeSupportedModeIndicator = 1 | 2 | 4;
@@ -107,7 +107,7 @@ export type QRCodeMatrixOptions = {
   eci?: boolean;
 };
 
-export type QRCodeImageOverlayOptions<TSource> = {
+export type QRCodeCenterImageOptions<TSource> = {
   readonly source: TSource;
   readonly size?: number;
   readonly padding?: number;
@@ -178,7 +178,7 @@ export type QRCodeStyleLayer = {
   curvedPrimitives: readonly QRCodeStylePrimitive[];
 };
 
-export type QRCodeStylePlan = {
+export type QRCodeStyledDrawingData = {
   moduleCount: number;
   viewSize: number;
   outputSize: number;

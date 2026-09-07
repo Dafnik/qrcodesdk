@@ -214,9 +214,9 @@ import {qrcode} from '@qrcodesdk/core';
 
 const container = document.querySelector('#qrcode');
 
-export function updateQRCode(data: string) {
-  const image = qrcode(data).render(
-    QRCodeImageRenderer({accessibility: {alt: '', ariaLabel: `Scan to open ${data}`}}),
+export function updateQRCode(payload: string) {
+  const image = qrcode(payload).render(
+    QRCodeImageRenderer({accessibility: {alt: '', ariaLabel: `Scan to open ${payload}`}}),
   );
 
   container?.replaceChildren(image);

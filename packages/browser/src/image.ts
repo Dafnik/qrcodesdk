@@ -22,7 +22,7 @@ export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<H
 export function QRCodeImageRenderer(
   options?: QRCodeImageRendererOptions,
 ): QRCodeRenderer<HTMLImageElement> {
-  assertKnownKeys(options, 'options', ['style', 'accessibility', 'image']);
+  assertKnownKeys(options, 'options', ['style', 'accessibility', 'centerImage']);
   assertKnownKeys(options?.accessibility, 'accessibility', ['alt', 'ariaLabel', 'title']);
   assertOptionalString(options?.accessibility?.alt, 'accessibility.alt');
   assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
@@ -34,7 +34,7 @@ export function QRCodeImageRenderer(
   };
   const canvasRenderer = QRCodeCanvasRenderer({
     style: options?.style,
-    image: options?.image,
+    centerImage: options?.centerImage,
     accessibility: {
       ariaLabel: accessibility.ariaLabel,
       title: accessibility.title,

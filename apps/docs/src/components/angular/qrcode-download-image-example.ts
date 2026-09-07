@@ -12,7 +12,7 @@ import {QRCodeImage} from '@qrcodesdk/angular';
         [options]="{
           accessibility: {alt: 'QR code for qrcodesdk.dev'},
         }"
-        data="https://qrcodesdk.dev" />
+        payload="https://qrcodesdk.dev" />
       <button class="btn-primary" (click)="qrcode.download('qrcodesdk')" type="button">
         Download PNG
       </button>

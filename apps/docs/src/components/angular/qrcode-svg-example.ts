@@ -13,7 +13,7 @@ import {QRCodeSVG} from '@qrcodesdk/angular';
           ariaLabel: 'Scan to open qrcodesdk.dev',
         },
       }"
-      data="https://qrcodesdk.dev" />
+      payload="https://qrcodesdk.dev" />
   `,
 })
 export class QRCodeSVGExample {}

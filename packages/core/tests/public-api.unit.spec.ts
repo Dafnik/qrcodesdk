@@ -17,7 +17,7 @@ import type {
   QRCodeVisualStyle,
 } from '../src';
 import * as drawing from '../src/drawing';
-import type {QRCodeDrawing, QRCodeDrawingTarget, QRCodeStyler} from '../src/drawing';
+import type {QRCodeStyledDrawing, QRCodeStyledDrawingTarget, QRCodeStyler} from '../src/drawing';
 import * as payload from '../src/payload';
 import type {
   QRCodeEmailPayload,
@@ -65,8 +65,10 @@ describe('public API', () => {
 
   test('exposes drawing types from the drawing subpath', () => {
     expectTypeOf(createQRCodeStyler).returns.toEqualTypeOf<QRCodeStyler>();
-    expectTypeOf<QRCodeStyler['draw']>().returns.toEqualTypeOf<QRCodeDrawing>();
-    expectTypeOf<QRCodeDrawing['paint']>().parameter(0).toEqualTypeOf<QRCodeDrawingTarget>();
+    expectTypeOf<QRCodeStyler['draw']>().returns.toEqualTypeOf<QRCodeStyledDrawing>();
+    expectTypeOf<QRCodeStyledDrawing['paint']>()
+      .parameter(0)
+      .toEqualTypeOf<QRCodeStyledDrawingTarget>();
   });
 
   test('exposes payload utilities and types from the payload subpath', () => {

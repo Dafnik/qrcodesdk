@@ -22,6 +22,9 @@
     "//#format:check": {
       "cache": false
     },
+    "//#terminology": {
+      "cache": false
+    },
     "benchmark": {
       "cache": false,
       "dependsOn": ["build"]
@@ -40,7 +43,15 @@
       "outputs": ["dist/**", "!.turbo/**", "!.astro-cache/**"]
     },
     "check": {
-      "dependsOn": ["//#format:check", "//#cspell", "build", "test", "lint", "check-types"]
+      "dependsOn": [
+        "//#format:check",
+        "//#cspell",
+        "//#terminology",
+        "build",
+        "test",
+        "lint",
+        "check-types"
+      ]
     },
     "check-performance": {
       "cache": false

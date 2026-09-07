@@ -28,7 +28,7 @@ The matrix is a two-dimensional array. `1` means a dark module and `0` means a l
 ## Styled renderer
 
 `createQRCodeStyler()` validates and snapshots a `QRCodeVisualStyle` immediately. Its `draw()`
-method caches immutable drawings by matrix identity. Implement `QRCodeDrawingTarget` to translate
+method caches immutable drawings by matrix identity. Implement `QRCodeStyledDrawingTarget` to translate
 the callback stream into your output format.
 
 ```ts
@@ -38,9 +38,9 @@ import {
   createQRCodeStyler,
   qrcode,
 } from '@qrcodesdk/core';
-import type {QRCodeDrawingTarget} from '@qrcodesdk/core/drawing';
+import type {QRCodeStyledDrawingTarget} from '@qrcodesdk/core/drawing';
 
-class CommandTarget implements QRCodeDrawingTarget {
+class CommandTarget implements QRCodeStyledDrawingTarget {
   readonly commands: string[] = [];
 
   drawBackground(r: number, g: number, b: number, a: number) {
@@ -113,7 +113,7 @@ with one background callback, then emits balanced, non-nested layer and path lif
 exceptions propagate unchanged. Callback counts, batching, command order within those lifecycle
 rules, and exact path segmentation are implementation details.
 
-For a renderer-specific center image, call `drawing.placeImage({size, padding,
+For a renderer-specific center image, call `drawing.placeCenterImage({size, padding,
 clearBackground})`. It returns the image box and optional clear box in the same module coordinate
 system. Loading, decoding, clearing, and compositing the actual source remain the renderer's job.
 

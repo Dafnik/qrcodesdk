@@ -7,7 +7,7 @@ import type {QRCodeImageOptions} from '@qrcodesdk/browser';
   selector: 'qrcode-angular-image-example',
   imports: [QRCodeImage],
   template: `
-    <qrcode-image [options]="options" data="https://qrcodesdk.dev" />
+    <qrcode-image [options]="options" payload="https://qrcodesdk.dev" />
   `,
 })
 export class QRCodeImageExample {

@@ -1,9 +1,9 @@
 import {QRCodeError} from '../error';
 import type {
   QRCodeErrorCorrectionLevelValue,
-  QRCodeInputData,
   QRCodeMask,
   QRCodeMatrixOptions,
+  QRCodePayload,
   QRCodeResolvedMatrixOptions,
   QRCodeVersion,
 } from '../types';
@@ -14,25 +14,25 @@ import {resolveMode} from './mode';
 import {createSingleSegment, getSegmentsBitLength, optimizeSegments} from './segments';
 
 export function resolveQRCodeMatrixOptions(
-  data: QRCodeInputData,
+  payload: QRCodePayload,
   options: QRCodeMatrixOptions = {},
 ): QRCodeResolvedMatrixOptions {
-  validateInputData(data);
+  validatePayload(payload);
   const eci = resolveECI(options.eci);
 
-  const forcedMode = options.mode === undefined ? undefined : resolveMode(data, options.mode);
+  const forcedMode = options.mode === undefined ? undefined : resolveMode(payload, options.mode);
   const forcedSegment =
-    forcedMode === undefined ? undefined : createSingleSegment(forcedMode, data);
+    forcedMode === undefined ? undefined : createSingleSegment(forcedMode, payload);
   if (forcedMode !== undefined && forcedSegment === undefined) {
-    throw new QRCodeError('INVALID_INPUT', 'QRCode: Invalid data format', {
-      details: {data, mode: options.mode},
+    throw new QRCodeError('INVALID_PAYLOAD', 'QRCode: Invalid payload format', {
+      details: {payload, mode: options.mode},
     });
   }
 
   const errorCorrectionLevel = resolveErrorCorrectionLevel(options.errorCorrectionLevel);
   const {version, segments} = resolveVersionAndSegments(
     options.version,
-    data,
+    payload,
     forcedSegment === undefined ? undefined : [forcedSegment],
     errorCorrectionLevel,
     eci,
@@ -42,10 +42,10 @@ export function resolveQRCodeMatrixOptions(
   return {segments, errorCorrectionLevel, version, mask, eci};
 }
 
-function validateInputData(data: QRCodeInputData): void {
-  if (typeof data === 'number' && (!Number.isSafeInteger(data) || data < 0)) {
-    throw new QRCodeError('INVALID_INPUT', 'QRCode: Invalid data format', {
-      details: {data},
+function validatePayload(payload: QRCodePayload): void {
+  if (typeof payload === 'number' && (!Number.isSafeInteger(payload) || payload < 0)) {
+    throw new QRCodeError('INVALID_PAYLOAD', 'QRCode: Invalid payload format', {
+      details: {payload},
     });
   }
 }
@@ -64,16 +64,16 @@ function resolveErrorCorrectionLevel(
 
 function resolveVersionAndSegments(
   requestedVersion: QRCodeMatrixOptions['version'],
-  data: QRCodeInputData,
+  payload: QRCodePayload,
   forcedSegments: QRCodeResolvedMatrixOptions['segments'] | undefined,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
   eci: boolean,
 ): Pick<QRCodeResolvedMatrixOptions, 'segments' | 'version'> {
   if (requestedVersion !== undefined) {
     validateVersion(requestedVersion);
-    const segments = forcedSegments ?? optimizeSegments(data, requestedVersion, eci);
+    const segments = forcedSegments ?? optimizeSegments(payload, requestedVersion, eci);
     if (!segmentsFitVersion(segments, requestedVersion, errorCorrectionLevel, eci)) {
-      throw new QRCodeError('DATA_TOO_LARGE', 'QRCode: Data too large', {
+      throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large', {
         details: {version: requestedVersion},
       });
     }
@@ -85,7 +85,7 @@ function resolveVersionAndSegments(
     [10, 26],
     [27, 40],
   ] as const) {
-    const segments = forcedSegments ?? optimizeSegments(data, start, eci);
+    const segments = forcedSegments ?? optimizeSegments(payload, start, eci);
     for (let version = start; version <= end; version++) {
       const qrVersion = version as QRCodeVersion;
       if (segmentsFitVersion(segments, qrVersion, errorCorrectionLevel, eci)) {
@@ -94,7 +94,7 @@ function resolveVersionAndSegments(
     }
   }
 
-  throw new QRCodeError('DATA_TOO_LARGE', 'QRCode: Data too large');
+  throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large');
 }
 
 function validateVersion(version: number): asserts version is QRCodeVersion {

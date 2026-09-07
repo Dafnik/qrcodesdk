@@ -20,8 +20,8 @@ describe('SVG QR eci roundtrips', () => {
     'decodes eci $name SVG output',
     async (fixture) => {
       await expect(
-        decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),
-      ).resolves.toBe(fixture.data);
+        decodeSvgQRCode(qrcode(fixture.payload).options(fixture).render(testSVGRenderer)),
+      ).resolves.toBe(fixture.payload);
     },
   );
 });

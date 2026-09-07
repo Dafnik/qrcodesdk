@@ -16,12 +16,12 @@
 <main>
   <p data-testid="framework-version">Svelte {VERSION}</p>
   <section data-testid="qrcode-svg">
-    <QRCodeSVG data="HELLO" {options} />
+    <QRCodeSVG payload="HELLO" {options} />
   </section>
   <section data-testid="qrcode-image">
-    <QRCodeImage data="HELLO" options={imageOptions} />
+    <QRCodeImage payload="HELLO" options={imageOptions} />
   </section>
   <section data-testid="qrcode-canvas">
-    <QRCodeCanvas data="HELLO" {options} />
+    <QRCodeCanvas payload="HELLO" {options} />
   </section>
 </main>

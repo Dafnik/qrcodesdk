@@ -7,12 +7,12 @@ import type {
 } from '@qrcodesdk/core';
 
 import {
-  type PlaygroundConfig,
+  type PlaygroundOptions,
   type PlaygroundOutput,
   type PlaygroundPackage,
-  defaultPlaygroundConfig,
-  playgroundConfig,
-} from './playground-config.ts';
+  defaultPlaygroundOptions,
+  playgroundOptions,
+} from './playground-options.ts';
 
 const PLAYGROUND_PACKAGES = [
   'angular',
@@ -45,180 +45,196 @@ const FINDER_SHAPES = [
 
 interface QueryFieldCodec {
   readonly key: string;
-  read(params: URLSearchParams, fallback: PlaygroundConfig, config: PlaygroundConfig): void;
+  read(
+    params: URLSearchParams,
+    fallback: PlaygroundOptions,
+    currentOptions: PlaygroundOptions,
+  ): void;
   write(
     params: URLSearchParams,
-    config: PlaygroundConfig,
-    defaults: PlaygroundConfig | undefined,
+    currentOptions: PlaygroundOptions,
+    defaults: PlaygroundOptions | undefined,
   ): void;
 }
 
 const QUERY_FIELD_CODECS = [
   defineQueryField(
-    'data',
-    (config) => config.data,
-    (config, data) => {
-      config.data = data;
+    'payload',
+    (options) => options.payload,
+    (options, payload) => {
+      options.payload = payload;
     },
     parseRequiredString,
     serializeString,
   ),
   defineQueryField(
     'package',
-    (config) => config.packageName,
-    (config, packageName) => {
-      config.packageName = packageName;
+    (currentOptions) => currentOptions.packageName,
+    (currentOptions, packageName) => {
+      currentOptions.packageName = packageName;
     },
     (value, fallback) => parseStringUnion(value, PLAYGROUND_PACKAGES, fallback),
     serializeString,
   ),
   defineQueryField(
     'output',
-    (config) => config.output,
-    (config, output) => {
-      config.output = output;
+    (currentOptions) => currentOptions.output,
+    (currentOptions, output) => {
+      currentOptions.output = output;
     },
     (value, fallback) => parseStringUnion(value, PLAYGROUND_OUTPUTS, fallback),
     serializeString,
   ),
   defineQueryField(
     'version',
-    (config) => config.version,
-    (config, version) => setOptionalProperty(config, 'version', version),
+    (currentOptions) => currentOptions.version,
+    (currentOptions, version) => setOptionalProperty(currentOptions, 'version', version),
     (value, fallback) => parseOptionalNumber(value, isQRCodeVersion, fallback),
     serializeNumber,
   ),
   defineQueryField(
     'mode',
-    (config) => config.mode,
-    (config, mode) => setOptionalProperty(config, 'mode', mode),
+    (currentOptions) => currentOptions.mode,
+    (currentOptions, mode) => setOptionalProperty(currentOptions, 'mode', mode),
     (value, fallback) => parseOptionalStringUnion(value, MODES, fallback),
     serializeString,
   ),
   defineQueryField(
     'level',
-    (config) => config.errorCorrectionLevel,
-    (config, errorCorrectionLevel) =>
-      setOptionalProperty(config, 'errorCorrectionLevel', errorCorrectionLevel),
+    (currentOptions) => currentOptions.errorCorrectionLevel,
+    (currentOptions, errorCorrectionLevel) =>
+      setOptionalProperty(currentOptions, 'errorCorrectionLevel', errorCorrectionLevel),
     (value, fallback) => parseOptionalStringUnion(value, ERROR_CORRECTION_LEVELS, fallback),
     serializeString,
   ),
   defineQueryField(
     'mask',
-    (config) => config.mask,
-    (config, mask) => setOptionalProperty(config, 'mask', mask),
+    (currentOptions) => currentOptions.mask,
+    (currentOptions, mask) => setOptionalProperty(currentOptions, 'mask', mask),
     (value, fallback) => parseOptionalNumber(value, isQRCodeMask, fallback),
     serializeNumber,
   ),
   defineQueryField(
     'eci',
-    (config) => config.eci ?? false,
-    (config, eci) => {
-      config.eci = eci;
+    (currentOptions) => currentOptions.eci ?? false,
+    (currentOptions, eci) => {
+      currentOptions.eci = eci;
     },
     parseBoolean,
     serializeBoolean,
   ),
   defineQueryField(
     'module-size',
-    (config) => config.moduleSize,
-    (config, moduleSize) => setOptionalProperty(config, 'moduleSize', moduleSize),
+    (currentOptions) => currentOptions.moduleSize,
+    (currentOptions, moduleSize) => setOptionalProperty(currentOptions, 'moduleSize', moduleSize),
     (value, fallback) => parseOptionalNumber(value, isPositiveInteger, fallback),
     serializeNumber,
   ),
   defineQueryField(
     'quiet-zone',
-    (config) => config.quietZone,
-    (config, quietZone) => setOptionalProperty(config, 'quietZone', quietZone),
+    (currentOptions) => currentOptions.quietZone,
+    (currentOptions, quietZone) => setOptionalProperty(currentOptions, 'quietZone', quietZone),
     (value, fallback) => parseOptionalNumber(value, isNonNegativeInteger, fallback),
     serializeNumber,
   ),
   defineQueryField(
     'background',
-    (config) => config.background,
-    (config, background) => setOptionalProperty(config, 'background', background),
+    (currentOptions) => currentOptions.background,
+    (currentOptions, background) => setOptionalProperty(currentOptions, 'background', background),
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
     'foreground',
-    (config) => config.foreground,
-    (config, foreground) => setOptionalProperty(config, 'foreground', foreground),
+    (currentOptions) => currentOptions.foreground,
+    (currentOptions, foreground) => setOptionalProperty(currentOptions, 'foreground', foreground),
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
     'modules-color',
-    (config) => config.modules?.color,
-    (config, color) => {
-      config.modules = compactObject({...config.modules, color});
+    (currentOptions) => currentOptions.modules?.color,
+    (currentOptions, color) => {
+      currentOptions.modules = compactObject({...currentOptions.modules, color});
     },
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
     'modules-shape',
-    (config) => config.modules?.shape,
-    (config, shape) => {
-      config.modules = compactObject({...config.modules, shape});
+    (currentOptions) => currentOptions.modules?.shape,
+    (currentOptions, shape) => {
+      currentOptions.modules = compactObject({...currentOptions.modules, shape});
     },
     (value, fallback) => parseOptionalStringUnion(value, MODULE_SHAPES, fallback),
     serializeString,
   ),
   defineQueryField(
     'finder-outer-color',
-    (config) => config.finder?.outer?.color,
-    (config, color) => {
-      config.finder = {...config.finder, outer: compactObject({...config.finder?.outer, color})};
+    (currentOptions) => currentOptions.finder?.outer?.color,
+    (currentOptions, color) => {
+      currentOptions.finder = {
+        ...currentOptions.finder,
+        outer: compactObject({...currentOptions.finder?.outer, color}),
+      };
     },
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
     'finder-outer-shape',
-    (config) => config.finder?.outer?.shape,
-    (config, shape) => {
-      config.finder = {...config.finder, outer: compactObject({...config.finder?.outer, shape})};
+    (currentOptions) => currentOptions.finder?.outer?.shape,
+    (currentOptions, shape) => {
+      currentOptions.finder = {
+        ...currentOptions.finder,
+        outer: compactObject({...currentOptions.finder?.outer, shape}),
+      };
     },
     (value, fallback) => parseOptionalStringUnion(value, FINDER_SHAPES, fallback),
     serializeString,
   ),
   defineQueryField(
     'finder-center-color',
-    (config) => config.finder?.center?.color,
-    (config, color) => {
-      config.finder = {...config.finder, center: compactObject({...config.finder?.center, color})};
+    (currentOptions) => currentOptions.finder?.center?.color,
+    (currentOptions, color) => {
+      currentOptions.finder = {
+        ...currentOptions.finder,
+        center: compactObject({...currentOptions.finder?.center, color}),
+      };
     },
     parseOptionalColor,
     serializeColor,
   ),
   defineQueryField(
     'finder-center-shape',
-    (config) => config.finder?.center?.shape,
-    (config, shape) => {
-      config.finder = {...config.finder, center: compactObject({...config.finder?.center, shape})};
+    (currentOptions) => currentOptions.finder?.center?.shape,
+    (currentOptions, shape) => {
+      currentOptions.finder = {
+        ...currentOptions.finder,
+        center: compactObject({...currentOptions.finder?.center, shape}),
+      };
     },
     (value, fallback) => parseOptionalStringUnion(value, FINDER_SHAPES, fallback),
     serializeString,
   ),
   defineQueryField(
     'alt',
-    (config) => config.alt,
-    (config, alt) => setOptionalProperty(config, 'alt', alt),
+    (currentOptions) => currentOptions.alt,
+    (currentOptions, alt) => setOptionalProperty(currentOptions, 'alt', alt),
     parseOptionalString,
     serializeString,
   ),
   defineQueryField(
     'aria-label',
-    (config) => config.ariaLabel,
-    (config, ariaLabel) => setOptionalProperty(config, 'ariaLabel', ariaLabel),
+    (currentOptions) => currentOptions.ariaLabel,
+    (currentOptions, ariaLabel) => setOptionalProperty(currentOptions, 'ariaLabel', ariaLabel),
     parseOptionalString,
     serializeString,
   ),
   defineQueryField(
     'title',
-    (config) => config.title,
-    (config, title) => setOptionalProperty(config, 'title', title),
+    (currentOptions) => currentOptions.title,
+    (currentOptions, title) => setOptionalProperty(currentOptions, 'title', title),
     parseOptionalString,
     serializeString,
   ),
@@ -231,19 +247,19 @@ export interface QrQuerySyncOptions {
   debounceMs?: number;
 
   /**
-   * Remove values that equal `defaultQrConfig`.
+   * Remove values that equal `defaultPlaygroundOptions`.
    */
   omitDefaults?: boolean;
 }
 
-export interface WriteQrConfigToUrlOptions {
+export interface WriteQrOptionsToUrlOptions {
   omitDefaults?: boolean;
 }
 
 let activeCleanup: (() => void) | undefined;
 
 /**
- * Starts two-way synchronization between `qrConfig` and the current URL.
+ * Starts two-way synchronization between `qrOptions` and the current URL.
  *
  * Initial URL values overwrite the store. Subsequent store changes update
  * the URL with `replaceState`. Browser Back and Forward navigation updates
@@ -263,11 +279,11 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   let applyingUrlState = true;
   let updateTimer: ReturnType<typeof setTimeout> | undefined;
 
-  playgroundConfig.set(readQrConfigFromUrl());
+  playgroundOptions.set(readQrOptionsFromUrl());
 
   applyingUrlState = false;
 
-  const unsubscribe = playgroundConfig.subscribe((config) => {
+  const unsubscribe = playgroundOptions.subscribe((currentOptions) => {
     if (applyingUrlState) {
       return;
     }
@@ -275,7 +291,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
     clearTimeout(updateTimer);
 
     updateTimer = setTimeout(() => {
-      writeQrConfigToUrl(config, {
+      writeQrOptionsToUrl(currentOptions, {
         omitDefaults,
       });
     }, debounceMs);
@@ -286,7 +302,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
     applyingUrlState = true;
 
     try {
-      playgroundConfig.set(readQrConfigFromUrl());
+      playgroundOptions.set(readQrOptionsFromUrl());
     } finally {
       applyingUrlState = false;
     }
@@ -305,42 +321,42 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
 }
 
 /**
- * Reads the current browser URL into a validated playground configuration.
+ * Reads the current browser URL into a validated playground options.
  */
-export function readQrConfigFromUrl(
-  fallback: PlaygroundConfig = defaultPlaygroundConfig,
-): PlaygroundConfig {
+export function readQrOptionsFromUrl(
+  fallback: PlaygroundOptions = defaultPlaygroundOptions,
+): PlaygroundOptions {
   if (typeof window === 'undefined') {
-    return clonePlaygroundConfig(fallback);
+    return clonePlaygroundOptions(fallback);
   }
 
-  return readQrConfigFromSearchParams(new URLSearchParams(window.location.search), fallback);
+  return readQrOptionsFromSearchParams(new URLSearchParams(window.location.search), fallback);
 }
 
 /**
- * Parses a URLSearchParams instance into a validated playground configuration.
+ * Parses a URLSearchParams instance into a validated playground options.
  */
-export function readQrConfigFromSearchParams(
+export function readQrOptionsFromSearchParams(
   params: URLSearchParams,
-  fallback: PlaygroundConfig = defaultPlaygroundConfig,
-): PlaygroundConfig {
-  const config = clonePlaygroundConfig(fallback);
+  fallback: PlaygroundOptions = defaultPlaygroundOptions,
+): PlaygroundOptions {
+  const currentOptions = clonePlaygroundOptions(fallback);
 
   for (const codec of QUERY_FIELD_CODECS) {
-    codec.read(params, fallback, config);
+    codec.read(params, fallback, currentOptions);
   }
 
-  return config;
+  return currentOptions;
 }
 
 /**
- * Writes a playground configuration to the current browser URL.
+ * Writes a playground options to the current browser URL.
  *
  * Query parameters not owned by the playground are preserved.
  */
-export function writeQrConfigToUrl(
-  config: PlaygroundConfig,
-  options: WriteQrConfigToUrlOptions = {},
+export function writeQrOptionsToUrl(
+  currentOptions: PlaygroundOptions,
+  options: WriteQrOptionsToUrlOptions = {},
 ): void {
   if (typeof window === 'undefined') {
     return;
@@ -350,10 +366,10 @@ export function writeQrConfigToUrl(
 
   const url = new URL(window.location.href);
 
-  writeQrConfigToSearchParams(
+  writeQrOptionsToSearchParams(
     url.searchParams,
-    config,
-    omitDefaults ? defaultPlaygroundConfig : undefined,
+    currentOptions,
+    omitDefaults ? defaultPlaygroundOptions : undefined,
   );
 
   if (url.href === window.location.href) {
@@ -364,17 +380,17 @@ export function writeQrConfigToUrl(
 }
 
 /**
- * Writes the configuration into an existing URLSearchParams instance.
+ * Writes the options into an existing URLSearchParams instance.
  *
  * Only playground-owned parameters are modified. Other parameters remain.
  */
-export function writeQrConfigToSearchParams(
+export function writeQrOptionsToSearchParams(
   params: URLSearchParams,
-  config: PlaygroundConfig,
-  defaults?: PlaygroundConfig,
+  currentOptions: PlaygroundOptions,
+  defaults?: PlaygroundOptions,
 ): URLSearchParams {
   for (const codec of QUERY_FIELD_CODECS) {
-    codec.write(params, config, defaults);
+    codec.write(params, currentOptions, defaults);
   }
 
   return params;
@@ -382,19 +398,19 @@ export function writeQrConfigToSearchParams(
 
 function defineQueryField<T>(
   key: string,
-  getValue: (config: PlaygroundConfig) => T,
-  setValue: (config: PlaygroundConfig, value: T) => void,
+  getValue: (currentOptions: PlaygroundOptions) => T,
+  setValue: (currentOptions: PlaygroundOptions, value: T) => void,
   parse: (value: string | null, fallback: T) => T,
   serialize: (value: T, defaultValue: T | undefined) => string | undefined,
 ): QueryFieldCodec {
   return {
     key,
-    read(params, fallback, config) {
-      setValue(config, parse(params.get(key), getValue(fallback)));
+    read(params, fallback, currentOptions) {
+      setValue(currentOptions, parse(params.get(key), getValue(fallback)));
     },
-    write(params, config, defaults) {
+    write(params, currentOptions, defaults) {
       const defaultValue = defaults === undefined ? undefined : getValue(defaults);
-      const value = serialize(getValue(config), defaultValue);
+      const value = serialize(getValue(currentOptions), defaultValue);
 
       if (value === undefined) {
         params.delete(key);
@@ -537,7 +553,7 @@ function compactObject<T extends object>(value: T): T | undefined {
   return entries.length > 0 ? (Object.fromEntries(entries) as T) : undefined;
 }
 
-type OptionalPlaygroundConfigKey =
+type OptionalPlaygroundOptionsKey =
   | 'version'
   | 'mode'
   | 'errorCorrectionLevel'
@@ -550,26 +566,26 @@ type OptionalPlaygroundConfigKey =
   | 'ariaLabel'
   | 'title';
 
-function setOptionalProperty<K extends OptionalPlaygroundConfigKey>(
-  config: PlaygroundConfig,
+function setOptionalProperty<K extends OptionalPlaygroundOptionsKey>(
+  currentOptions: PlaygroundOptions,
   key: K,
-  value: PlaygroundConfig[K],
+  value: PlaygroundOptions[K],
 ): void {
   if (value === undefined) {
-    delete (config as Partial<PlaygroundConfig>)[key];
+    delete (currentOptions as Partial<PlaygroundOptions>)[key];
   } else {
-    config[key] = value;
+    currentOptions[key] = value;
   }
 }
 
-function clonePlaygroundConfig(config: PlaygroundConfig): PlaygroundConfig {
+function clonePlaygroundOptions(currentOptions: PlaygroundOptions): PlaygroundOptions {
   return {
-    ...config,
-    modules: config.modules ? {...config.modules} : undefined,
-    finder: config.finder
+    ...currentOptions,
+    modules: currentOptions.modules ? {...currentOptions.modules} : undefined,
+    finder: currentOptions.finder
       ? {
-          outer: config.finder.outer ? {...config.finder.outer} : undefined,
-          center: config.finder.center ? {...config.finder.center} : undefined,
+          outer: currentOptions.finder.outer ? {...currentOptions.finder.outer} : undefined,
+          center: currentOptions.finder.center ? {...currentOptions.finder.center} : undefined,
         }
       : undefined,
   };

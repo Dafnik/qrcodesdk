@@ -5,7 +5,7 @@
   import type {QRCodeImageProps} from './types.js';
   import {splitOptions} from './split-options.js';
 
-  let {data, options, ...attributes}: QRCodeImageProps = $props();
+  let {payload, options, ...attributes}: QRCodeImageProps = $props();
   let container = $state<HTMLDivElement>();
 
   const resolvedOptions = $derived(splitOptions(options));
@@ -14,14 +14,14 @@
   $effect(() => {
     if (!container) return;
 
-    container.replaceChildren(qrcode(data).config(resolvedOptions[0]).render(imageRenderer));
+    container.replaceChildren(qrcode(payload).options(resolvedOptions[0]).render(imageRenderer));
   });
 
   export function download(filename = '') {
     if (typeof document === 'undefined') return;
 
-    qrcode(data)
-      .config(resolvedOptions[0])
+    qrcode(payload)
+      .options(resolvedOptions[0])
       .render(
         QRCodeDownloadImageRenderer({renderer: imageRenderer, filename: filename || undefined}),
       );

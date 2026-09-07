@@ -1,7 +1,7 @@
 import {bench, describe} from 'vitest';
 
 import {createQRCodeStyler, qrcode} from '../src';
-import type {QRCodeDrawingTarget} from '../src/drawing';
+import type {QRCodeStyledDrawingTarget} from '../src/drawing';
 import type {QRCodeVersion, QRCodeVisualStyle} from '../src/types';
 
 const VERSIONS = [1, 10, 40] as const satisfies readonly QRCodeVersion[];
@@ -15,7 +15,7 @@ const STYLE = {
   },
 } as const satisfies QRCodeVisualStyle;
 
-const target: QRCodeDrawingTarget = {
+const target: QRCodeStyledDrawingTarget = {
   drawBackground() {},
   beginLayer() {},
   drawRectangle() {},
@@ -31,7 +31,7 @@ const target: QRCodeDrawingTarget = {
 
 describe('styler hot paths', () => {
   for (const version of VERSIONS) {
-    const matrix = qrcode('A').config({mode: 'alphanumeric', version, mask: 0}).matrix();
+    const matrix = qrcode('A').options({mode: 'alphanumeric', version, mask: 0}).matrix();
     const styler = createQRCodeStyler(STYLE);
     const drawing = styler.draw(matrix);
 

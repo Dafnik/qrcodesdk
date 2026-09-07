@@ -46,5 +46,5 @@ smsPayload({recipients: '+12015550123', body: 'Meet at 10?'});
 geoPayload({latitude: 48.2082, longitude: 16.3738});
 ```
 
-Invalid structured values throw `QRCodeError` with code `INVALID_INPUT`. The helpers serialize only;
+Invalid structured values throw `QRCodeError` with code `INVALID_PAYLOAD`. The helpers serialize only;
 they do not add builder methods or change matrix generation.

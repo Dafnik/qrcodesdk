@@ -26,7 +26,7 @@ export function createBenchmarkReport(options: CreateBenchmarkReportOptions): Be
   const cpuList = cpus();
 
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     generatedAt: options.generatedAt ?? new Date().toISOString(),
     environment: {
       node: process.version,
@@ -39,7 +39,7 @@ export function createBenchmarkReport(options: CreateBenchmarkReportOptions): Be
     libraries: Object.fromEntries(
       options.libraries.map((library) => [library.id, library.version]),
     ) as BenchmarkReport['libraries'],
-    configuration: {
+    options: {
       samples: options.samples,
       warmupStaticPasses: options.warmupStaticPasses,
       warmupExhaustivePasses: options.warmupExhaustivePasses,

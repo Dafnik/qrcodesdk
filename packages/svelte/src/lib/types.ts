@@ -1,10 +1,10 @@
 import type {HTMLAttributes} from 'svelte/elements';
 
 import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
-import type {QRCodeInputData, QRCodeSVGOptions} from '@qrcodesdk/core';
+import type {QRCodePayload, QRCodeSVGOptions} from '@qrcodesdk/core';
 
 export type QRCodeBaseProps<TOptions> = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
-  data: QRCodeInputData;
+  payload: QRCodePayload;
   options?: TOptions;
 };
 

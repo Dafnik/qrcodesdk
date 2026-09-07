@@ -5,7 +5,7 @@
   import type {QRCodeCanvasProps} from './types.js';
   import {splitOptions} from './split-options.js';
 
-  let {data, options, ...attributes}: QRCodeCanvasProps = $props();
+  let {payload, options, ...attributes}: QRCodeCanvasProps = $props();
   let container = $state<HTMLDivElement>();
 
   const resolvedOptions = $derived(splitOptions(options));
@@ -14,7 +14,7 @@
   $effect(() => {
     if (!container) return;
 
-    container.replaceChildren(qrcode(data).config(resolvedOptions[0]).render(canvasRenderer));
+    container.replaceChildren(qrcode(payload).options(resolvedOptions[0]).render(canvasRenderer));
   });
 </script>
 

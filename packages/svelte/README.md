@@ -59,9 +59,9 @@ Import the components directly in a Svelte component:
   import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/svelte';
 </script>
 
-<QRCodeSVG data="https://qrcodesdk.dev" />
-<QRCodeImage data="https://qrcodesdk.dev" />
-<QRCodeCanvas data="https://qrcodesdk.dev" />
+<QRCodeSVG payload="https://qrcodesdk.dev" />
+<QRCodeImage payload="https://qrcodesdk.dev" />
+<QRCodeCanvas payload="https://qrcodesdk.dev" />
 ```
 
 ## Version compatibility
@@ -105,7 +105,7 @@ that wrapper.
   };
 </script>
 
-<QRCodeSVG class="mx-auto" data="https://qrcodesdk.dev" {options} />
+<QRCodeSVG class="mx-auto" payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### Image component
@@ -121,7 +121,7 @@ that wrapper.
   };
 </script>
 
-<QRCodeImage class="mx-auto" data="https://qrcodesdk.dev" {options} />
+<QRCodeImage class="mx-auto" payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### Canvas component
@@ -134,7 +134,7 @@ that wrapper.
   const options: QRCodeCanvasOptions = {style: {moduleSize: 8, quietZone: 2}};
 </script>
 
-<QRCodeCanvas class="mx-auto" data="https://qrcodesdk.dev" {options} />
+<QRCodeCanvas class="mx-auto" payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### PNG download
@@ -149,7 +149,7 @@ that wrapper.
 </script>
 
 <div class="flex flex-col items-center gap-2">
-  <QRCodeImage bind:this={qrcode} data="https://qrcodesdk.dev" {options} />
+  <QRCodeImage bind:this={qrcode} payload="https://qrcodesdk.dev" {options} />
   <button class="btn-primary" type="button" onclick={() => qrcode?.download('qrcodesdk')}>
     Download PNG
   </button>
@@ -159,7 +159,7 @@ that wrapper.
 ## Center images
 
 Load and decode a browser image first, store it in rune-mode state, and pass it through
-`options.image.source`. Render the Image or Canvas component only after the source is ready. See
+`options.centerImage.source`. Render the Image or Canvas component only after the source is ready. See
 [Add a center image](https://qrcodesdk.dev/guides/center-images/#svelte) for a complete
 Svelte example.
 
@@ -176,7 +176,7 @@ Svelte example.
 </script>
 
 <button type="button" onclick={() => qrcode?.download('qrcodesdk')}>Download PNG</button>
-<QRCodeImage bind:this={qrcode} data="https://qrcodesdk.dev" />
+<QRCodeImage bind:this={qrcode} payload="https://qrcodesdk.dev" />
 ```
 
 The appropriate `.svg` or `.png` extension is appended when necessary.
@@ -195,9 +195,9 @@ Canvas downloads.
 on the server and populate it after mounting in the browser. Their download methods also skip work
 outside the browser.
 
-## Shared configuration
+## Shared options
 
-The `options` prop combines matrix settings with the selected renderer's settings. Use the
+The `options` prop combines matrix options with the selected renderer's options. Use the
 [builder reference](https://qrcodesdk.dev/reference/builder/) for encoding, version, mask, and error correction;
 [Customize output](https://qrcodesdk.dev/guides/customize/) for shared visual options; and the dedicated
 [renderer references](https://qrcodesdk.dev/reference/renderers/) for output-specific options and constraints.

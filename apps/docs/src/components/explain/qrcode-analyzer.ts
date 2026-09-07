@@ -14,8 +14,8 @@ type QRCodeModule = QRCodeMatrix[number][number];
 
 export type QRCodeExplainRole = 'functional' | 'encoded' | 'remainder';
 
-export interface QRCodeExplainConfig extends QRCodeMatrixOptions, QRCodeTextStyle {
-  data: string;
+export interface QRCodeExplainOptions extends QRCodeMatrixOptions, QRCodeTextStyle {
+  payload: string;
 }
 
 export interface QRCodeExplainModule {
@@ -32,7 +32,7 @@ export interface QRCodeExplainModule {
 
 export interface QRCodeExplainGroup {
   readonly id: string;
-  readonly role: QRCodeExplainRole | 'margin';
+  readonly role: QRCodeExplainRole | 'quiet-zone';
   readonly label: string;
   readonly description: string;
   readonly modules: readonly QRCodeExplainModule[];
@@ -66,8 +66,7 @@ export const QR_CODE_EXPLAIN_ROLE_DETAILS = {
   },
   encoded: {
     label: 'Encoded modules',
-    description:
-      'Placed codeword bits containing headers, payload data, padding, and error correction.',
+    description: 'Placed codeword bits containing headers, payload, padding, and error correction.',
   },
   remainder: {
     label: 'Remainder bits',
@@ -86,20 +85,20 @@ const MASKS = [
   (row: number, column: number) => (((row + column) % 2) + ((row * column) % 3)) % 2 === 0,
 ] as const;
 
-export function explainQRCode(config: QRCodeExplainConfig): QRCodeExplanation {
+export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation {
   const matrixOptions: QRCodeMatrixOptions = {
-    mode: config.mode,
-    version: config.version,
-    errorCorrectionLevel: config.errorCorrectionLevel,
-    mask: config.mask,
-    eci: config.eci,
+    mode: options.mode,
+    version: options.version,
+    errorCorrectionLevel: options.errorCorrectionLevel,
+    mask: options.mask,
+    eci: options.eci,
   };
-  const matrix = qrcode(config.data).config(matrixOptions).matrix();
+  const matrix = qrcode(options.payload).options(matrixOptions).matrix();
   const version = ((matrix.length - 17) / 4) as QRCodeVersion;
-  const mask = config.mask ?? resolveMask(config.data, matrixOptions, matrix, version);
+  const mask = options.mask ?? resolveMask(options.payload, matrixOptions, matrix, version);
   const drawing = createQRCodeStyler({
-    moduleSize: config.moduleSize,
-    quietZone: config.quietZone,
+    moduleSize: options.moduleSize,
+    quietZone: options.quietZone,
   }).draw(matrix);
   const reserved = createReservedGrid(version);
   const placements = createPlacements(reserved);
@@ -138,8 +137,8 @@ export function explainQRCode(config: QRCodeExplainConfig): QRCodeExplanation {
     moduleGrid,
     groups: createGroups(modules),
     version,
-    mode: resolveMode(config),
-    errorCorrectionLevel: config.errorCorrectionLevel ?? 'M',
+    mode: resolveMode(options),
+    errorCorrectionLevel: options.errorCorrectionLevel ?? 'M',
     mask,
     moduleSize: drawing.moduleSize,
     quietZone: drawing.quietZone,
@@ -217,14 +216,14 @@ function createPlacements(reserved: readonly (readonly boolean[])[]): [number, n
 }
 
 function resolveMask(
-  data: string,
+  payload: string,
   options: QRCodeMatrixOptions,
   matrix: QRCodeMatrix,
   version: QRCodeVersion,
 ): QRCodeMask {
   for (let mask = 0; mask < 8; mask++) {
-    const candidate = qrcode(data)
-      .config({...options, version, mask: mask as QRCodeMask})
+    const candidate = qrcode(payload)
+      .options({...options, version, mask: mask as QRCodeMask})
       .matrix();
     if (
       candidate.every((row, index) =>
@@ -237,11 +236,11 @@ function resolveMask(
   throw new Error('QRCode explain: Unable to resolve mask');
 }
 
-function resolveMode(config: QRCodeExplainConfig): QRCodeMode | 'mixed' {
-  if (config.mode) return config.mode;
-  if (/^\d+$/.test(config.data)) return 'numeric';
-  if (/^[0-9A-Z $%*+\-./:]+$/.test(config.data)) return 'alphanumeric';
-  return /[0-9A-Z]{4,}/.test(config.data) ? 'mixed' : 'octet';
+function resolveMode(options: QRCodeExplainOptions): QRCodeMode | 'mixed' {
+  if (options.mode) return options.mode;
+  if (/^\d+$/.test(options.payload)) return 'numeric';
+  if (/^[0-9A-Z $%*+\-./:]+$/.test(options.payload)) return 'alphanumeric';
+  return /[0-9A-Z]{4,}/.test(options.payload) ? 'mixed' : 'octet';
 }
 
 function createGroups(
@@ -257,9 +256,9 @@ function createGroups(
       modules: modules.filter((module) => module.role === role),
     });
   }
-  groups.set('margin', {
-    id: 'margin',
-    role: 'margin',
+  groups.set('quiet-zone', {
+    id: 'quiet-zone',
+    role: 'quiet-zone',
     label: 'Quiet zone',
     description:
       'A clear light border that helps scanners isolate the QR code from its surroundings.',

@@ -127,7 +127,7 @@ qrc "https://qrcodesdk.dev" \
   --aria-label 'Scan to open qrcodesdk.dev'
 ```
 
-The CLI exposes matrix and visual settings as flags. Leave mode, version, and mask on automatic
+The CLI exposes matrix and visual options as flags. Leave mode, version, and mask on automatic
 selection unless you need a compatibility target or deterministic fixture:
 
 ```sh
@@ -146,19 +146,19 @@ qrc "Grüße" --eci true
 ```
 
 Use `--eci false` to disable it explicitly. For the behavior and tradeoffs behind these flags, see
-the [builder reference](/reference/builder/). For colors, size, margins, and scan-safety guidance,
-see [Customize output](/guides/customize/).
+the [builder reference](/reference/builder/). For colors, module size, quiet zones, and scan-reliability guidance,
+see [Customize appearance](/guides/customize/).
 
 ## Options
 
 | Option                                  | Description                                                 | Default     |
 | --------------------------------------- | ----------------------------------------------------------- | :---------- |
-| `[data]`                                | Positional QR code input data.                              | -           |
-| `--input <value>`                       | QR code input data, equivalent to positional `[data]`.      | -           |
+| `[payload]`                             | Positional QR code payload.                                 | -           |
+| `--payload <value>`                     | QR code payload, equivalent to positional `[payload]`.      | -           |
 | `-V`                                    | Print the installed CLI package version.                    | -           |
 | `--format <text\|svg\|png>`             | Output format. Inferred from `.svg` or `.png` output paths. | -           |
 | `-o, --output <path>`                   | Required output path for SVG and PNG.                       | -           |
-| `--mode <numeric\|alphanumeric\|octet>` | QR code data mode.                                          | `Auto`      |
+| `--mode <numeric\|alphanumeric\|octet>` | QR code mode.                                               | `Auto`      |
 | `--error-correction <L\|M\|Q\|H>`       | Error correction level.                                     | `M`         |
 | `--version <1-40>`                      | Pin a QR code version.                                      | `Auto`      |
 | `--mask <0-7>`                          | Pin a QR code mask.                                         | `Auto`      |
@@ -178,13 +178,13 @@ background. With `--ansi background`, both become module background colors.
 
 ## Interactive and automated use
 
-In an interactive terminal, `qrc` prompts only for missing required values such as input, an ambiguous format, or a file output path.
+In an interactive terminal, `qrc` prompts only for missing required values such as payload, an ambiguous format, or a file output path.
 
 In a non-interactive shell or CI job, missing required values fail with a clear error instead of opening a prompt. Pass every required value explicitly:
 
 ```sh
 qrc \
-  --input "https://qrcodesdk.dev" \
+  --payload "https://qrcodesdk.dev" \
   --format png \
   --output artifacts/qrcode.png
 ```

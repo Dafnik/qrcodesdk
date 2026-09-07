@@ -8,7 +8,7 @@ import {NgIcon, provideIcons} from '@ng-icons/core';
 import {lucideCheck, lucideCopy} from '@ng-icons/lucide';
 import {HlmButton} from '@spartan-ng/helm/button';
 
-import {playgroundConfig, playgroundPreparedImage} from '../playground-config.ts';
+import {playgroundOptions, playgroundPreparedImage} from '../playground-options.ts';
 import {createCodeHighlighter} from './code-highlighter.ts';
 import {generatePlaygroundCode} from './playground-code-generator.ts';
 
@@ -20,13 +20,13 @@ import {generatePlaygroundCode} from './playground-code-generator.ts';
     <div class="border-border bg-card text-card-foreground overflow-hidden rounded-md border">
       <div
         class="border-border bg-muted/40 sticky top-0 z-10 flex items-center justify-between gap-3 border-b px-3 py-2">
-        @let packageName = currentConfig().packageName | titlecase;
+        @let packageName = currentOptions().packageName | titlecase;
         <h6 class="text-foreground text-sm font-semibold">
           {{ packageName | titlecase }}
         </h6>
         <button
           [attr.aria-label]="'Copy ' + packageName + ' code'"
-          [attr.data-copied]="copied()"
+          [attr.payload-copied]="copied()"
           [title]="'Copy ' + packageName + ' code'"
           (click)="copyCode()"
           hlmBtn
@@ -51,7 +51,7 @@ export class PlaygroundCode {
 
   private readonly codeHighlighter = createCodeHighlighter();
 
-  protected readonly currentConfig = toSignal(this.nanostores.useStore(playgroundConfig), {
+  protected readonly currentOptions = toSignal(this.nanostores.useStore(playgroundOptions), {
     requireSync: true,
   });
   protected readonly preparedImage = toSignal(this.nanostores.useStore(playgroundPreparedImage), {
@@ -59,7 +59,7 @@ export class PlaygroundCode {
   });
 
   protected readonly preview = computed(() =>
-    generatePlaygroundCode(this.currentConfig(), this.preparedImage()),
+    generatePlaygroundCode(this.currentOptions(), this.preparedImage()),
   );
   protected readonly highlightedCode = computed(() => {
     const preview = this.preview();

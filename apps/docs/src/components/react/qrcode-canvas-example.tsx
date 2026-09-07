@@ -16,5 +16,5 @@ export default function QRCodeCanvasExample() {
     [],
   );
 
-  return <QRCodeCanvas data="https://qrcodesdk.dev" options={options} />;
+  return <QRCodeCanvas payload="https://qrcodesdk.dev" options={options} />;
 }

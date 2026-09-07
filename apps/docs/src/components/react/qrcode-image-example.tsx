@@ -15,5 +15,5 @@ export default function QRCodeImageExample() {
     [],
   );
 
-  return <QRCodeImage data="https://qrcodesdk.dev" options={options} />;
+  return <QRCodeImage payload="https://qrcodesdk.dev" options={options} />;
 }

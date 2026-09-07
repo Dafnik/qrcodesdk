@@ -60,12 +60,12 @@ const AUTOMATIC_MASK_OCTET_DIVERGENCES = new Map<
 function referenceMatrixQRCodePackage(fixture: QRCodeTestFixture): QRCodeMatrix {
   const encodedData =
     fixture.mode === 'numeric'
-      ? [{mode: 'numeric' as const, data: fixture.data}]
+      ? [{mode: 'numeric' as const, data: fixture.payload}]
       : fixture.mode === 'alphanumeric'
-        ? [{mode: 'alphanumeric' as const, data: fixture.data}]
+        ? [{mode: 'alphanumeric' as const, data: fixture.payload}]
         : fixture.mode === 'octet'
-          ? [{mode: 'byte' as const, data: new TextEncoder().encode(fixture.data)}]
-          : fixture.data;
+          ? [{mode: 'byte' as const, data: new TextEncoder().encode(fixture.payload)}]
+          : fixture.payload;
 
   const qr = create(encodedData, {
     errorCorrectionLevel: fixture.errorCorrectionLevel ?? 'M',
@@ -83,7 +83,7 @@ function referenceMatrixQRCodeGeneratorPackage(fixture: QRCodeTestFixture): QRCo
 
   const qr = qrcodeGenerator(fixture.version ?? 0, fixture.errorCorrectionLevel ?? 'M');
   qr.addData(
-    fixture.data,
+    fixture.payload,
     fixture.mode === 'numeric'
       ? 'Numeric'
       : fixture.mode === 'alphanumeric'
@@ -111,8 +111,8 @@ describe('qrcode().matrix()', () => {
     expect(new Set(ALL_QR_CODE_COMBINATIONS.map(({name}) => name)).size).toBe(
       TOTAL_QR_CODE_COMBINATIONS,
     );
-    for (const {data, version} of ALL_QR_CODE_COMBINATIONS) {
-      expect(data).toHaveLength(version);
+    for (const {payload, version} of ALL_QR_CODE_COMBINATIONS) {
+      expect(payload).toHaveLength(version);
     }
   });
 
@@ -129,14 +129,16 @@ describe('qrcode().matrix()', () => {
     for (const fixture of QR_CODE_TEST_FIXTURES.filter(
       (candidate) => !('eci' in candidate) || candidate.eci !== true,
     )) {
-      const matrix = qrcode(fixture.data).config(fixture).matrix();
+      const matrix = qrcode(fixture.payload).options(fixture).matrix();
       expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
       expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
     }
   });
 
   test('intentionally differs from reference generators when UTF-8 ECI is enabled', () => {
-    const matrix = qrcode(QR_CODE_ECI_TEST_FIXTURE.data).config(QR_CODE_ECI_TEST_FIXTURE).matrix();
+    const matrix = qrcode(QR_CODE_ECI_TEST_FIXTURE.payload)
+      .options(QR_CODE_ECI_TEST_FIXTURE)
+      .matrix();
 
     expect(matrix).not.toEqual(referenceMatrixQRCodePackage(QR_CODE_ECI_TEST_FIXTURE));
     expect(matrix).not.toEqual(referenceMatrixQRCodeGeneratorPackage(QR_CODE_ECI_TEST_FIXTURE));
@@ -145,12 +147,12 @@ describe('qrcode().matrix()', () => {
   test('matches the reference generator for automatic mixed-mode encoding without ECI', () => {
     const fixture = {
       name: 'mixed-mode-default-eci',
-      data: 'ABCDE12345678?A1A',
+      payload: 'ABCDE12345678?A1A',
       version: 1 as const,
       mask: 0 as const,
     };
 
-    expect(qrcode(fixture.data).config(fixture).matrix()).toEqual(
+    expect(qrcode(fixture.payload).options(fixture).matrix()).toEqual(
       referenceMatrixQRCodePackage(fixture),
     );
   });
@@ -164,7 +166,7 @@ describe('qrcode().matrix()', () => {
           .matrix();
         const fixture = {
           name: `MASK TEST ${errorCorrectionLevel} ${mask}`,
-          data: 'MASK TEST 123',
+          payload: 'MASK TEST 123',
           mode: 'alphanumeric' as const,
           errorCorrectionLevel,
           mask,
@@ -178,12 +180,12 @@ describe('qrcode().matrix()', () => {
   test('matches reference matrix mask selection when the mask is automatic', () => {
     const fixture = {
       name: 'automatic-mask',
-      data: 'AUTO MASK 123',
+      payload: 'AUTO MASK 123',
       mode: 'alphanumeric' as const,
       version: 2 as const,
       errorCorrectionLevel: 'M' as const,
     };
-    const matrix = qrcode(fixture.data).config(fixture).matrix();
+    const matrix = qrcode(fixture.payload).options(fixture).matrix();
 
     expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
   });
@@ -191,13 +193,13 @@ describe('qrcode().matrix()', () => {
   test('matches the reference automatic mask for the numeric version 1 regression', () => {
     const fixture = {
       name: 'automatic-mask-numeric-version-1',
-      data: '1',
+      payload: '1',
       mode: 'numeric' as const,
       version: 1 as const,
       errorCorrectionLevel: 'M' as const,
     };
 
-    expect(qrcode(fixture.data).config(fixture).matrix()).toEqual(
+    expect(qrcode(fixture.payload).options(fixture).matrix()).toEqual(
       referenceMatrixQRCodePackage(fixture),
     );
   });
@@ -205,7 +207,7 @@ describe('qrcode().matrix()', () => {
   test.each(REFERENCE_QR_CODE_COMBINATIONS)(
     'matches explicit-mask reference matrices for $name',
     (fixture) => {
-      const matrix = qrcode(fixture.data).config(fixture).matrix();
+      const matrix = qrcode(fixture.payload).options(fixture).matrix();
 
       expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
       expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
@@ -215,7 +217,7 @@ describe('qrcode().matrix()', () => {
   test.each(REFERENCE_QR_CODE_AUTO_MASK_COMBINATIONS)(
     'matches automatic-mask reference matrix for $name',
     (fixture) => {
-      const matrix = qrcode(fixture.data).config(fixture).matrix();
+      const matrix = qrcode(fixture.payload).options(fixture).matrix();
       const referenceMatrix = referenceMatrixQRCodePackage(fixture);
       const knownDivergence =
         AUTOMATIC_MASK_N3_DIVERGENCES.get(fixture.name) ??
@@ -228,10 +230,10 @@ describe('qrcode().matrix()', () => {
       }
 
       expect(matrix).toEqual(
-        qrcode(fixture.data).config(fixture).mask(knownDivergence.qrcodeSdk).matrix(),
+        qrcode(fixture.payload).options(fixture).mask(knownDivergence.qrcodeSdk).matrix(),
       );
       expect(referenceMatrix).toEqual(
-        qrcode(fixture.data).config(fixture).mask(knownDivergence.reference).matrix(),
+        qrcode(fixture.payload).options(fixture).mask(knownDivergence.reference).matrix(),
       );
     },
   );

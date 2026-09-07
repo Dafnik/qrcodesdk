@@ -1,17 +1,17 @@
 import {
+  type QRCodeCenterImageOptions,
   QRCodeError,
-  type QRCodeImageOverlayOptions,
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
   type QRCodeRenderer,
   type QRCodeVisualStyle,
   createQRCodeStyler,
 } from '@qrcodesdk/core';
-import type {QRCodeDrawingTarget} from '@qrcodesdk/core/drawing';
+import type {QRCodeStyledDrawingTarget} from '@qrcodesdk/core/drawing';
 
 import {assertKnownKeys, assertOptionalString} from './options';
 
-export type QRCodeCanvasImageOptions = QRCodeImageOverlayOptions<CanvasImageSource>;
+export type QRCodeCanvasCenterImageOptions = QRCodeCenterImageOptions<CanvasImageSource>;
 export type QRCodeCanvasAccessibilityOptions = {
   readonly ariaLabel?: string;
   readonly title?: string;
@@ -19,7 +19,7 @@ export type QRCodeCanvasAccessibilityOptions = {
 export type QRCodeCanvasRendererOptions = {
   readonly style?: QRCodeVisualStyle;
   readonly accessibility?: QRCodeCanvasAccessibilityOptions;
-  readonly image?: QRCodeCanvasImageOptions;
+  readonly centerImage?: QRCodeCanvasCenterImageOptions;
 };
 export type QRCodeCanvasOptions = QRCodeCanvasRendererOptions & {
   readonly matrix?: QRCodeMatrixOptions;
@@ -28,26 +28,31 @@ export type QRCodeCanvasOptions = QRCodeCanvasRendererOptions & {
 export function QRCodeCanvasRenderer(
   options?: QRCodeCanvasRendererOptions,
 ): QRCodeRenderer<HTMLCanvasElement> {
-  assertKnownKeys(options, 'options', ['style', 'accessibility', 'image']);
+  assertKnownKeys(options, 'options', ['style', 'accessibility', 'centerImage']);
   assertKnownKeys(options?.accessibility, 'accessibility', ['ariaLabel', 'title']);
-  assertKnownKeys(options?.image, 'image', ['source', 'size', 'padding', 'clearBackground']);
+  assertKnownKeys(options?.centerImage, 'centerImage', [
+    'source',
+    'size',
+    'padding',
+    'clearBackground',
+  ]);
   assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
   assertOptionalString(options?.accessibility?.title, 'accessibility.title');
   const styler = createQRCodeStyler(options?.style);
   const accessibility = options?.accessibility ? {...options.accessibility} : undefined;
-  const imageOptions = options?.image ? {...options.image} : undefined;
-  const imageLayout = imageOptions
+  const centerImageOptions = options?.centerImage ? {...options.centerImage} : undefined;
+  const centerImageLayout = centerImageOptions
     ? {
-        size: imageOptions.size,
-        padding: imageOptions.padding,
-        clearBackground: imageOptions.clearBackground,
+        size: centerImageOptions.size,
+        padding: centerImageOptions.padding,
+        clearBackground: centerImageOptions.clearBackground,
       }
     : undefined;
-  if (imageOptions) styler.draw([[1]]).placeImage(imageLayout);
+  if (centerImageOptions) styler.draw([[1]]).placeCenterImage(centerImageLayout);
 
   return (matrix: QRCodeMatrix) => {
     const drawing = styler.draw(matrix);
-    const placement = imageOptions ? drawing.placeImage(imageLayout) : undefined;
+    const placement = centerImageOptions ? drawing.placeCenterImage(centerImageLayout) : undefined;
     const canvas = document.createElement('canvas');
     canvas.width = drawing.outputSize;
     canvas.height = drawing.outputSize;
@@ -63,17 +68,17 @@ export function QRCodeCanvasRenderer(
     const target = new CanvasDrawingTarget(context, drawing.moduleSize, drawing.outputSize);
     drawing.paint(target);
 
-    if (imageOptions && placement) {
-      const sourceSize = getCanvasImageSourceSize(imageOptions.source);
+    if (centerImageOptions && placement) {
+      const sourceSize = getCanvasImageSourceSize(centerImageOptions.source);
       if (placement.clear) target.clearImageArea(placement.clear);
-      const boxX = placement.image.x * drawing.moduleSize;
-      const boxY = placement.image.y * drawing.moduleSize;
-      const boxSize = placement.image.size * drawing.moduleSize;
+      const boxX = placement.centerImage.x * drawing.moduleSize;
+      const boxY = placement.centerImage.y * drawing.moduleSize;
+      const boxSize = placement.centerImage.size * drawing.moduleSize;
       const scale = Math.min(boxSize / sourceSize.width, boxSize / sourceSize.height);
       const width = sourceSize.width * scale;
       const height = sourceSize.height * scale;
       context.drawImage(
-        imageOptions.source,
+        centerImageOptions.source,
         boxX + (boxSize - width) / 2,
         boxY + (boxSize - height) / 2,
         width,
@@ -84,7 +89,7 @@ export function QRCodeCanvasRenderer(
   };
 }
 
-class CanvasDrawingTarget implements QRCodeDrawingTarget {
+class CanvasDrawingTarget implements QRCodeStyledDrawingTarget {
   private background = 'rgba(255, 255, 255, 1)';
   private fillRule: CanvasFillRule = 'nonzero';
 

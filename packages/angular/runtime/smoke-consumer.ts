@@ -9,13 +9,13 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
     <main>
       <p data-testid="framework-version">Angular {{ frameworkVersion }}</p>
       <section data-testid="qrcode-svg">
-        <qrcode-svg [options]="options" data="HELLO" />
+        <qrcode-svg [options]="options" payload="HELLO" />
       </section>
       <section data-testid="qrcode-image">
-        <qrcode-image [options]="imageOptions" data="HELLO" />
+        <qrcode-image [options]="imageOptions" payload="HELLO" />
       </section>
       <section data-testid="qrcode-canvas">
-        <qrcode-canvas [options]="options" data="HELLO" />
+        <qrcode-canvas [options]="options" payload="HELLO" />
       </section>
     </main>
   `,

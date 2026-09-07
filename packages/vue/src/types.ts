@@ -1,7 +1,7 @@
-import type {QRCodeInputData} from '@qrcodesdk/core';
+import type {QRCodePayload} from '@qrcodesdk/core';
 
 export type QRCodeBaseProps<TOptions> = {
-  data: QRCodeInputData;
+  payload: QRCodePayload;
   options?: TOptions;
 };
 

@@ -12,7 +12,7 @@ export default function QRCodeDownloadImageExample() {
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <QRCodeImage data="https://qrcodesdk.dev" options={options} ref={qrcode} />
+      <QRCodeImage payload="https://qrcodesdk.dev" options={options} ref={qrcode} />
       <button
         className="btn-primary"
         onClick={() => qrcode.current?.download('qrcodesdk')}

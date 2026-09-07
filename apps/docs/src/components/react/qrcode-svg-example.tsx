@@ -14,5 +14,5 @@ export default function QRCodeSVGExample() {
     [],
   );
 
-  return <QRCodeSVG data="https://qrcodesdk.dev" options={options} />;
+  return <QRCodeSVG payload="https://qrcodesdk.dev" options={options} />;
 }

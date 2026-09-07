@@ -1,8 +1,8 @@
 import {QRCodeError} from '../error';
 import type {
-  QRCodeEncodedData,
-  QRCodeInputData,
+  QRCodeEncodedPayload,
   QRCodeMode,
+  QRCodePayload,
   QRCodeSupportedModeIndicator,
   QRCodeVersion,
 } from '../types';
@@ -29,15 +29,15 @@ const ALPHANUMERIC_REGEXP = /^[A-Z0-9 $%*+\-./:]*$/;
 
 type PackBits = (value: number, bitCount: number) => void;
 type TextEncoderConstructor = new () => {
-  encode(input?: string): Uint8Array;
+  encode(payload?: string): Uint8Array;
 };
 
 export type QRCodeModeDefinition = {
   readonly indicator: QRCodeSupportedModeIndicator;
-  readonly validate: (data: QRCodeInputData) => QRCodeEncodedData | undefined;
+  readonly validate: (payload: QRCodePayload) => QRCodeEncodedPayload | undefined;
   readonly getCharacterCountBits: (version: QRCodeVersion) => number;
   readonly getPayloadBitLength: (dataLength: number) => number;
-  readonly encodePayload: (data: QRCodeEncodedData, pack: PackBits) => void;
+  readonly encodePayload: (payload: QRCodeEncodedPayload, pack: PackBits) => void;
 };
 
 let cachedAlphanumericMap: Record<string, number> | undefined;
@@ -52,54 +52,57 @@ export function getAlphanumericMap(): Record<string, number> {
 const MODE_DEFINITIONS: Record<QRCodeSupportedModeIndicator, QRCodeModeDefinition> = {
   [MODE_NUMERIC]: {
     indicator: MODE_NUMERIC,
-    validate: (data) => {
-      const stringData = String(data);
-      return NUMERIC_REGEXP.test(stringData) ? stringData : undefined;
+    validate: (payload) => {
+      const stringPayload = String(payload);
+      return NUMERIC_REGEXP.test(stringPayload) ? stringPayload : undefined;
     },
     getCharacterCountBits: (version) => (version < 10 ? 10 : version < 27 ? 12 : 14),
     getPayloadBitLength: (dataLength) => ((dataLength / 3) | 0) * 10 + [0, 4, 7][dataLength % 3]!,
-    encodePayload: (data, pack) => {
-      const stringData = data as string;
+    encodePayload: (payload, pack) => {
+      const stringPayload = payload as string;
       let index = 2;
-      for (; index < stringData.length; index += 3) {
-        pack(Number.parseInt(stringData.substring(index - 2, index + 1), 10), 10);
+      for (; index < stringPayload.length; index += 3) {
+        pack(Number.parseInt(stringPayload.substring(index - 2, index + 1), 10), 10);
       }
-      pack(Number.parseInt(stringData.substring(index - 2), 10), [0, 4, 7][stringData.length % 3]!);
+      pack(
+        Number.parseInt(stringPayload.substring(index - 2), 10),
+        [0, 4, 7][stringPayload.length % 3]!,
+      );
     },
   },
   [MODE_ALPHANUMERIC]: {
     indicator: MODE_ALPHANUMERIC,
-    validate: (data) => {
-      const stringData = String(data);
-      return ALPHANUMERIC_REGEXP.test(stringData) ? stringData : undefined;
+    validate: (payload) => {
+      const stringPayload = String(payload);
+      return ALPHANUMERIC_REGEXP.test(stringPayload) ? stringPayload : undefined;
     },
     getCharacterCountBits: (version) => (version < 10 ? 9 : version < 27 ? 11 : 13),
     getPayloadBitLength: (dataLength) => ((dataLength / 2) | 0) * 11 + (dataLength % 2) * 6,
-    encodePayload: (data, pack) => {
+    encodePayload: (payload, pack) => {
       const alphanumericMap = getAlphanumericMap();
-      const stringData = data as string;
+      const stringPayload = payload as string;
       let index = 1;
-      for (; index < stringData.length; index += 2) {
+      for (; index < stringPayload.length; index += 2) {
         pack(
-          alphanumericMap[stringData.charAt(index - 1)]! * 45 +
-            alphanumericMap[stringData.charAt(index)]!,
+          alphanumericMap[stringPayload.charAt(index - 1)]! * 45 +
+            alphanumericMap[stringPayload.charAt(index)]!,
           11,
         );
       }
-      if (stringData.length % 2 === 1) {
-        pack(alphanumericMap[stringData.charAt(index - 1)]!, 6);
+      if (stringPayload.length % 2 === 1) {
+        pack(alphanumericMap[stringPayload.charAt(index - 1)]!, 6);
       }
     },
   },
   [MODE_OCTET]: {
     indicator: MODE_OCTET,
-    validate: (data) => encodeUTF8(String(data)),
+    validate: (payload) => encodeUTF8(String(payload)),
     getCharacterCountBits: (version) => (version < 10 ? 8 : 16),
     getPayloadBitLength: (dataLength) => dataLength * 8,
-    encodePayload: (data, pack) => {
-      const dataArray = data as number[];
-      for (let index = 0; index < dataArray.length; index++) {
-        pack(dataArray[index]!, 8);
+    encodePayload: (payload, pack) => {
+      const payloadBytes = payload as number[];
+      for (let index = 0; index < payloadBytes.length; index++) {
+        pack(payloadBytes[index]!, 8);
       }
     },
   },
@@ -116,39 +119,40 @@ export function getModeDefinition(mode: number | undefined): QRCodeModeDefinitio
 }
 
 export function resolveMode(
-  data: QRCodeInputData,
+  payload: QRCodePayload,
   requestedMode: QRCodeMode | undefined,
 ): QRCodeSupportedModeIndicator {
   if (requestedMode !== undefined) {
     return getModeDefinition(MODES_MAP[requestedMode]).indicator;
   }
 
-  if (typeof data === 'number' || NUMERIC_REGEXP.test(data)) return MODE_NUMERIC;
-  if (ALPHANUMERIC_REGEXP.test(data)) return MODE_ALPHANUMERIC;
+  if (typeof payload === 'number' || NUMERIC_REGEXP.test(payload)) return MODE_NUMERIC;
+  if (ALPHANUMERIC_REGEXP.test(payload)) return MODE_ALPHANUMERIC;
   return MODE_OCTET;
 }
 
-export function validateData(
+export function validatePayload(
   mode: QRCodeSupportedModeIndicator,
-  data: QRCodeInputData,
-): QRCodeEncodedData | undefined {
-  if (typeof data === 'number' && (!Number.isSafeInteger(data) || data < 0)) return undefined;
-  return getModeDefinition(mode).validate(data);
+  payload: QRCodePayload,
+): QRCodeEncodedPayload | undefined {
+  if (typeof payload === 'number' && (!Number.isSafeInteger(payload) || payload < 0))
+    return undefined;
+  return getModeDefinition(mode).validate(payload);
 }
 
-export function isNumericData(data: string): boolean {
-  return NUMERIC_REGEXP.test(data);
+export function isNumericPayload(payload: string): boolean {
+  return NUMERIC_REGEXP.test(payload);
 }
 
-export function isAlphanumericData(data: string): boolean {
-  return ALPHANUMERIC_REGEXP.test(data);
+export function isAlphanumericPayload(payload: string): boolean {
+  return ALPHANUMERIC_REGEXP.test(payload);
 }
 
-export function encodeUTF8(data: string): number[] {
+export function encodeUTF8(payload: string): number[] {
   cachedTextEncoder ??= new (
     globalThis as unknown as {TextEncoder: TextEncoderConstructor}
   ).TextEncoder();
-  return [...cachedTextEncoder.encode(data)];
+  return [...cachedTextEncoder.encode(payload)];
 }
 
 function createAlphanumericMap(): Record<string, number> {

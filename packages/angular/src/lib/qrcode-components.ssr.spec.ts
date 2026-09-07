@@ -12,9 +12,9 @@ import {QRCodeSVG} from './QRCodeSVG';
   selector: 'qrcode-ssr-host',
   imports: [QRCodeCanvas, QRCodeImage, QRCodeSVG],
   template: `
-    <qrcode-svg data="SSR" />
-    <qrcode-image data="SSR" />
-    <qrcode-canvas data="SSR" />
+    <qrcode-svg payload="SSR" />
+    <qrcode-image payload="SSR" />
+    <qrcode-canvas payload="SSR" />
   `,
 })
 class QRCodeSSRHost {}

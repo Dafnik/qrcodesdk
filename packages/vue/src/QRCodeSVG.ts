@@ -2,7 +2,7 @@ import {type PropType, computed, defineComponent, h} from 'vue';
 
 import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
 import {
-  type QRCodeInputData,
+  type QRCodePayload,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   qrcode,
@@ -16,8 +16,8 @@ export type QRCodeSVGProps = QRCodeBaseProps<QRCodeSVGOptions>;
 export const QRCodeSVG = defineComponent({
   name: 'QRCodeSVG',
   props: {
-    data: {
-      type: [String, Number] as PropType<QRCodeInputData>,
+    payload: {
+      type: [String, Number] as PropType<QRCodePayload>,
       required: true,
     },
     options: Object as PropType<QRCodeSVGOptions>,
@@ -26,15 +26,15 @@ export const QRCodeSVG = defineComponent({
     const resolvedOptions = computed(() => splitOptions(props.options));
     const svgRenderer = computed(() => QRCodeSVGRenderer(resolvedOptions.value[1]));
     const svg = computed(() =>
-      qrcode(props.data).config(resolvedOptions.value[0]).render(svgRenderer.value),
+      qrcode(props.payload).options(resolvedOptions.value[0]).render(svgRenderer.value),
     );
 
     const handle: QRCodeDownloadHandle = {
       download(filename?: string) {
         if (typeof document === 'undefined') return;
 
-        qrcode(props.data)
-          .config(resolvedOptions.value[0])
+        qrcode(props.payload)
+          .options(resolvedOptions.value[0])
           .render(
             QRCodeDownloadSVGRenderer({
               renderer: svgRenderer.value,

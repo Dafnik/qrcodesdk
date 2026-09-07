@@ -5,7 +5,7 @@ import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 
 import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
-import type {QRCodeInputData, QRCodeSVGOptions} from '@qrcodesdk/core';
+import type {QRCodePayload, QRCodeSVGOptions} from '@qrcodesdk/core';
 
 import {QRCodeCanvas} from './QRCodeCanvas';
 import {QRCodeImage} from './QRCodeImage';
@@ -14,10 +14,10 @@ import {QRCodeSVG} from './QRCodeSVG';
 @Component({
   selector: 'qrcode-svg-host',
   imports: [QRCodeSVG],
-  template: '<qrcode-svg [data]="data()" [options]="options()" />',
+  template: '<qrcode-svg [payload]="payload()" [options]="options()" />',
 })
 class QRCodeSVGHost {
-  readonly data = input<QRCodeInputData>('HELLO');
+  readonly payload = input<QRCodePayload>('HELLO');
   readonly options = input<QRCodeSVGOptions>({style: {moduleSize: 2, quietZone: 1}});
 
   readonly svgQRCode = viewChild.required(QRCodeSVG);
@@ -26,10 +26,10 @@ class QRCodeSVGHost {
 @Component({
   selector: 'qrcode-image-host',
   imports: [QRCodeImage],
-  template: '<qrcode-image [data]="data()" [options]="options()" />',
+  template: '<qrcode-image [payload]="payload()" [options]="options()" />',
 })
 class QRCodeImageHost {
-  readonly data = input<QRCodeInputData>('HELLO');
+  readonly payload = input<QRCodePayload>('HELLO');
   readonly options = input<QRCodeImageOptions>({
     style: {moduleSize: 2, quietZone: 1},
     accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
@@ -41,10 +41,10 @@ class QRCodeImageHost {
 @Component({
   selector: 'qrcode-canvas-host',
   imports: [QRCodeCanvas],
-  template: '<qrcode-canvas [data]="data()" [options]="options()" />',
+  template: '<qrcode-canvas [payload]="payload()" [options]="options()" />',
 })
 class QRCodeCanvasHost {
-  readonly data = input<QRCodeInputData>('HELLO');
+  readonly payload = input<QRCodePayload>('HELLO');
   readonly options = input<QRCodeCanvasOptions>({style: {moduleSize: 2, quietZone: 1}});
 }
 
@@ -80,10 +80,10 @@ describe('Angular QR code components', () => {
     expect(svg.getAttribute('height')).toBe('46');
   });
 
-  test('renders numeric input data', async () => {
+  test('renders numeric payload', async () => {
     const fixture = TestBed.createComponent(QRCodeSVGHost);
 
-    fixture.componentRef.setInput('data', 12_345);
+    fixture.componentRef.setInput('payload', 12_345);
     await fixture.whenStable();
 
     const svg = getRenderedElement<SVGSVGElement>(fixture, 'svg');
@@ -222,7 +222,7 @@ describe('Angular QR code components', () => {
     expect(canvas.height).toBe(75);
   });
 
-  test('passes prepared image overlays through SVG, image, and canvas components', async () => {
+  test('passes prepared center images through SVG, image, and canvas components', async () => {
     const source = document.createElement('canvas');
     source.width = 4;
     source.height = 2;
@@ -232,15 +232,15 @@ describe('Angular QR code components', () => {
 
     svgFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      image: {source: 'data:image/png;base64,cHJlcGFyZWQ=', size: 0.2},
+      centerImage: {source: 'data:image/png;base64,cHJlcGFyZWQ=', size: 0.2},
     });
     imageFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      image: {source, size: 0.2},
+      centerImage: {source, size: 0.2},
     });
     canvasFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      image: {source, size: 0.2},
+      centerImage: {source, size: 0.2},
     });
     await Promise.all([
       svgFixture.whenStable(),
@@ -257,11 +257,11 @@ describe('Angular QR code components', () => {
 
     imageFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      image: {source, size: 0.3},
+      centerImage: {source, size: 0.3},
     });
     canvasFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      image: {source, size: 0.3},
+      centerImage: {source, size: 0.3},
     });
     await Promise.all([imageFixture.whenStable(), canvasFixture.whenStable()]);
 
@@ -269,32 +269,32 @@ describe('Angular QR code components', () => {
     expect(getRenderedElement<HTMLCanvasElement>(canvasFixture, 'canvas')).not.toBe(firstCanvas);
   });
 
-  test('downloads prepared SVG and PNG image overlays', async () => {
+  test('downloads prepared SVG and PNG center images', async () => {
     const source = document.createElement('canvas');
     source.width = 2;
     source.height = 1;
     const svgFixture = TestBed.createComponent(QRCodeSVGHost);
     const imageFixture = TestBed.createComponent(QRCodeImageHost);
     const downloads = captureDownloads(vi);
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-overlay-svg');
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-center-image-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
     svgFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      image: {source: 'data:image/png;base64,cHJlcGFyZWQ='},
+      centerImage: {source: 'data:image/png;base64,cHJlcGFyZWQ='},
     });
     imageFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      image: {source},
+      centerImage: {source},
     });
     await Promise.all([svgFixture.whenStable(), imageFixture.whenStable()]);
 
-    svgFixture.componentInstance.svgQRCode().download('overlay');
-    imageFixture.componentInstance.imageQRCode().download('overlay');
+    svgFixture.componentInstance.svgQRCode().download('center-image');
+    imageFixture.componentInstance.imageQRCode().download('center-image');
 
     expect(downloads).toEqual([
-      {href: 'blob:qrcode-overlay-svg', filename: 'overlay.svg'},
-      {href: 'data:image/png;base64,qrcode', filename: 'overlay.png'},
+      {href: 'blob:qrcode-center-image-svg', filename: 'center-image.svg'},
+      {href: 'data:image/png;base64,qrcode', filename: 'center-image.png'},
     ]);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -327,7 +327,7 @@ describe('Angular QR code components', () => {
     const wrapper = getRenderedElement<HTMLElement>(fixture, 'qrcode-canvas');
     const firstCanvas = getRenderedElement<HTMLCanvasElement>(fixture, 'canvas');
 
-    fixture.componentRef.setInput('data', 'WORLD');
+    fixture.componentRef.setInput('payload', 'WORLD');
     fixture.detectChanges();
 
     const secondCanvas = getRenderedElement<HTMLCanvasElement>(fixture, 'canvas');

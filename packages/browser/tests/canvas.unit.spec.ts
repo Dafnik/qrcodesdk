@@ -60,8 +60,8 @@ describe('QRCodeCanvasRenderer', () => {
     expect(() => QRCodeCanvasRenderer({accessibility: null} as never)).toThrowError(
       expect.objectContaining({details: expect.objectContaining({field: 'accessibility'})}),
     );
-    expect(() => QRCodeCanvasRenderer({image: []} as never)).toThrowError(
-      expect.objectContaining({details: expect.objectContaining({field: 'image'})}),
+    expect(() => QRCodeCanvasRenderer({centerImage: []} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'centerImage'})}),
     );
   });
 });

@@ -9,7 +9,7 @@ import {QR_CODE_EXPLAIN_ROLE_ORDER, explainQRCode} from './qrcode-analyzer.ts';
 describe('explainQRCode', () => {
   test('classifies every matrix module using QR placement rules', () => {
     const explanation = explainQRCode({
-      data: 'EXPLAIN',
+      payload: 'EXPLAIN',
       version: 5,
       errorCorrectionLevel: 'H',
       mask: 3,
@@ -26,9 +26,9 @@ describe('explainQRCode', () => {
     }
   });
 
-  test('reports public matrix and style settings', () => {
+  test('reports public matrix and style options', () => {
     const explanation = explainQRCode({
-      data: '12345',
+      payload: '12345',
       version: 1,
       mask: 0,
       moduleSize: 8,
@@ -44,8 +44,8 @@ describe('explainQRCode', () => {
   });
 
   test('maps encoded bits to zig-zag coordinates and stable unmasked values', () => {
-    const first = explainQRCode({data: 'MASK CHECK', version: 3, mask: 0});
-    const second = explainQRCode({data: 'MASK CHECK', version: 3, mask: 1});
+    const first = explainQRCode({payload: 'MASK CHECK', version: 3, mask: 0});
+    const second = explainQRCode({payload: 'MASK CHECK', version: 3, mask: 1});
     const encodedFirst = first.modules.filter(({role}) => role === 'encoded').sort(byPlacement);
     const encodedSecond = second.modules.filter(({role}) => role === 'encoded').sort(byPlacement);
     assert.deepEqual(
@@ -66,11 +66,11 @@ describe('explainQRCode', () => {
   test('resolves every forced mask and the automatic mask through the public builder', () => {
     for (let mask = 0; mask < 8; mask++) {
       const typedMask = mask as QRCodeMask;
-      const explanation = explainQRCode({data: 'MASK CHECK', mask: typedMask});
+      const explanation = explainQRCode({payload: 'MASK CHECK', mask: typedMask});
       assert.equal(explanation.mask, typedMask);
       assert.deepEqual(explanation.matrix, qrcode('MASK CHECK').mask(typedMask).matrix());
     }
-    const automatic = explainQRCode({data: 'AUTOMATIC MASK'});
+    const automatic = explainQRCode({payload: 'AUTOMATIC MASK'});
     assert.deepEqual(
       automatic.matrix,
       qrcode('AUTOMATIC MASK').version(automatic.version).mask(automatic.mask).matrix(),
@@ -78,16 +78,16 @@ describe('explainQRCode', () => {
   });
 
   test('validates matrix and styling inputs through public APIs', () => {
-    assert.throws(() => explainQRCode({data: 'ABC', mode: 'numeric'}), /Invalid data format/);
-    assert.throws(() => explainQRCode({data: '1', moduleSize: 0}), /moduleSize/);
-    assert.throws(() => explainQRCode({data: '1', quietZone: -1}), /quietZone/);
+    assert.throws(() => explainQRCode({payload: 'ABC', mode: 'numeric'}), /Invalid payload format/);
+    assert.throws(() => explainQRCode({payload: '1', moduleSize: 0}), /moduleSize/);
+    assert.throws(() => explainQRCode({payload: '1', quietZone: -1}), /quietZone/);
   });
 });
 
 test('the Angular explainer offsets modules with the resolved quiet zone', () => {
   const component = readFileSync(new URL('../angular/qrcode-explain.ts', import.meta.url), 'utf8');
 
-  assert.doesNotMatch(component, /qr\.margin\b/);
+  assert.match(component, /qr\.quietZone\b/);
   assert.match(component, /module\.column \+ qr\.quietZone/);
   assert.match(component, /module\.row \+ qr\.quietZone/);
 });

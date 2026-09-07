@@ -36,7 +36,7 @@ from an intermediate Canvas element, and its width and height match that Canvas 
 ## Renderer-specific options
 
 The renderer accepts the [shared visual style](/guides/customize/#shared-visual-style), the same
-prepared `image` overlay and `ariaLabel` as the
+prepared `centerImage` and `ariaLabel` as the
 [Canvas renderer](/reference/renderers/canvas/#renderer-specific-options), and these DOM attributes:
 
 | Option                    | Type     | Default     | Effect                                           |
@@ -62,7 +62,7 @@ For server output, choose SVG or the Node.js PNG renderer.
 
 ## Related guides
 
-- [Customize appearance](/guides/customize/) for shared styling, labels, and scan safety.
+- [Customize appearance](/guides/customize/) for shared styling, labels, and scan reliability.
 - [Add a center image](/guides/center-images/) for preparing a `CanvasImageSource`.
 - [Browser Usage](/guides/browser-usage/) for rendering in the browser.
 - [Download or save](/guides/download-or-save/) for PNG downloads.

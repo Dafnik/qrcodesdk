@@ -17,8 +17,8 @@ describe('QRCodeTextRenderer snapshots', () => {
   describe.each(RENDERER_VARIANTS)('$name rendering', (variant) => {
     test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR text snapshot', (fixture) => {
       expectTextToMatchFileSnapshot(
-        qrcode(fixture.data)
-          .config(fixture)
+        qrcode(fixture.payload)
+          .options(fixture)
           .render(
             QRCodeTextRenderer({
               style: {moduleSize: 2, quietZone: 4},

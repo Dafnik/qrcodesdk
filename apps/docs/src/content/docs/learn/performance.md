@@ -10,7 +10,7 @@ The matrix, automatic matrix, and SVG benchmarks compare QRCodeSDK with **qrcode
 
 The matrix and SVG fixtures supply explicit versions and masks. The **qrcode-generator** rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them.
 
-Styled SVG generation uses all 60 shared styling fixtures at 1, 10, 50 repetitions. Both libraries select the mask automatically because **qr-code-styling** has no public mask option. Fixture module size and margin determine the matching pixel dimensions passed to **qr-code-styling**, which renders SVG through a shared JSDOM environment initialized before measurement.
+Styled SVG generation uses all 60 shared styling fixtures at 1, 10, 50 repetitions. Both libraries select the mask automatically because **qr-code-styling** has no public mask option. Fixture module size and quiet zone determine the matching pixel dimensions and margin passed to **qr-code-styling**, which renders SVG through a shared JSDOM environment initialized before measurement.
 
 ## Benchmark environment
 

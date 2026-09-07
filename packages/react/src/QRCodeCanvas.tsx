@@ -7,7 +7,7 @@ import {splitOptions} from './split-options';
 
 export type QRCodeCanvasProps = QRCodeBaseProps<QRCodeCanvasOptions>;
 
-export function QRCodeCanvas({data, options, ...wrapperProps}: QRCodeCanvasProps) {
+export function QRCodeCanvas({payload, options, ...wrapperProps}: QRCodeCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [matrixOptions, rendererOptions] = useMemo(() => splitOptions(options), [options]);
   const canvasRenderer = useMemo(() => QRCodeCanvasRenderer(rendererOptions), [rendererOptions]);
@@ -16,8 +16,8 @@ export function QRCodeCanvas({data, options, ...wrapperProps}: QRCodeCanvasProps
     const container = containerRef.current;
     if (!container) return;
 
-    container.replaceChildren(qrcode(data).config(matrixOptions).render(canvasRenderer));
-  }, [canvasRenderer, data, matrixOptions]);
+    container.replaceChildren(qrcode(payload).options(matrixOptions).render(canvasRenderer));
+  }, [canvasRenderer, payload, matrixOptions]);
 
   return <div {...wrapperProps} ref={containerRef} />;
 }

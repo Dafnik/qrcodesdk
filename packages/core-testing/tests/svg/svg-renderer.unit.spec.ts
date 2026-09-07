@@ -45,7 +45,7 @@ describe('QRCodeSVGRenderer', () => {
 
   test('validates embedded image sources at construction', () => {
     expect(() =>
-      QRCodeSVGRenderer({image: {source: 'https://example.com/logo.png' as never}}),
+      QRCodeSVGRenderer({centerImage: {source: 'https://example.com/logo.png' as never}}),
     ).toThrowError(expect.objectContaining<Partial<QRCodeError>>({code: 'INVALID_IMAGE_SOURCE'}));
   });
 });

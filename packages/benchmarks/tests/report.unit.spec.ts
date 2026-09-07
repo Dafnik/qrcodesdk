@@ -30,7 +30,7 @@ const result: BenchmarkResult = {
 };
 
 describe('benchmark report', () => {
-  test('serializes stable metadata, configuration, samples, and checksum fields', () => {
+  test('serializes stable metadata, options, samples, and checksum fields', () => {
     const report = createBenchmarkReport({
       workspaceRoot: process.cwd(),
       libraries,
@@ -52,7 +52,7 @@ describe('benchmark report', () => {
     const parsed = JSON.parse(serialized) as typeof report;
 
     expect(parsed).toMatchObject({
-      schemaVersion: 5,
+      schemaVersion: 6,
       generatedAt: '2026-07-17T00:00:00.000Z',
       libraries: {
         qrcodesdk: '1.0.0',
@@ -60,7 +60,7 @@ describe('benchmark report', () => {
         'qrcode-generator': '1.0.0',
         'qr-code-styling': '1.0.0',
       },
-      configuration: {
+      options: {
         samples: 3,
         warmupStaticPasses: 5,
         warmupExhaustivePasses: 1,

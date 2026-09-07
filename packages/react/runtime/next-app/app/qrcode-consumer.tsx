@@ -18,13 +18,13 @@ export function QRCodeConsumer() {
     <main>
       <p data-testid="framework-version">React {version}</p>
       <section data-testid="qrcode-svg">
-        <QRCodeSVG data="HELLO" options={options} />
+        <QRCodeSVG payload="HELLO" options={options} />
       </section>
       <section data-testid="qrcode-image">
-        <QRCodeImage data="HELLO" options={imageOptions} />
+        <QRCodeImage payload="HELLO" options={imageOptions} />
       </section>
       <section data-testid="qrcode-canvas">
-        <QRCodeCanvas data="HELLO" options={options} />
+        <QRCodeCanvas payload="HELLO" options={options} />
       </section>
     </main>
   );

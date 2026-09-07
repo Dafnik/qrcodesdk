@@ -21,7 +21,6 @@
     "esm",
     "modules",
     "module",
-    "runtime-agnostic",
     "node",
     "browser",
     "deno",

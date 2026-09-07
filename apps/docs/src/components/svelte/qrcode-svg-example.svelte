@@ -8,4 +8,4 @@
   };
 </script>
 
-<QRCodeSVG class="mx-auto" data="https://qrcodesdk.dev" {options} />
+<QRCodeSVG class="mx-auto" payload="https://qrcodesdk.dev" {options} />

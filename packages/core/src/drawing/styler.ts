@@ -1,8 +1,8 @@
 import {QRCodeError} from '../error';
-import {createQRCodeStylePlan} from '../style-plan';
+import {createQRCodeStyledDrawingData} from '../styled-drawing';
 import {assertKnownKeys, parseQRCodeColor, resolveQRCodeVisualStyle} from '../styling';
 import type {QRCodeMatrix, QRCodeStylePrimitive, QRCodeVisualStyle} from '../types';
-import type {QRCodeDrawing, QRCodeDrawingTarget, QRCodeStyler} from './index';
+import type {QRCodeStyledDrawing, QRCodeStyledDrawingTarget, QRCodeStyler} from './index';
 
 const TWO_PI = Math.PI * 2;
 
@@ -18,25 +18,25 @@ export function createQRCodeStyler(style?: QRCodeVisualStyle): QRCodeStyler {
   ]) {
     if (!colors.has(color)) colors.set(color, parseQRCodeColor(color));
   }
-  const drawings = new WeakMap<QRCodeMatrix, QRCodeDrawing>();
+  const drawings = new WeakMap<QRCodeMatrix, QRCodeStyledDrawing>();
 
   return Object.freeze({
     draw(matrix: QRCodeMatrix) {
       const cached = drawings.get(matrix);
       if (cached) return cached;
-      const plan = createQRCodeStylePlan(matrix, resolved);
-      const background = colors.get(plan.backgroundColor)!;
-      const layerColors = plan.layers.map((layer) => colors.get(layer.color)!);
-      const drawing: QRCodeDrawing = Object.freeze({
-        moduleCount: plan.moduleCount,
+      const styledDrawingData = createQRCodeStyledDrawingData(matrix, resolved);
+      const background = colors.get(styledDrawingData.backgroundColor)!;
+      const layerColors = styledDrawingData.layers.map((layer) => colors.get(layer.color)!);
+      const drawing: QRCodeStyledDrawing = Object.freeze({
+        moduleCount: styledDrawingData.moduleCount,
         moduleSize: resolved.moduleSize,
         quietZone: resolved.quietZone,
-        viewSize: plan.viewSize,
-        outputSize: plan.outputSize,
-        paint(target: QRCodeDrawingTarget) {
+        viewSize: styledDrawingData.viewSize,
+        outputSize: styledDrawingData.outputSize,
+        paint(target: QRCodeStyledDrawingTarget) {
           target.drawBackground(...background);
-          for (let layerIndex = 0; layerIndex < plan.layers.length; layerIndex++) {
-            const layer = plan.layers[layerIndex]!;
+          for (let layerIndex = 0; layerIndex < styledDrawingData.layers.length; layerIndex++) {
+            const layer = styledDrawingData.layers[layerIndex]!;
             target.beginLayer(...layerColors[layerIndex]!);
             for (let index = 0; index < layer.rectangles.length; index++) {
               const rectangle = layer.rectangles[index]!;
@@ -52,8 +52,12 @@ export function createQRCodeStyler(style?: QRCodeVisualStyle): QRCodeStyler {
             target.endLayer();
           }
         },
-        placeImage(options: Parameters<QRCodeDrawing['placeImage']>[0]) {
-          return resolveImagePlacement(plan.moduleCount, resolved.quietZone, options);
+        placeCenterImage(options: Parameters<QRCodeStyledDrawing['placeCenterImage']>[0]) {
+          return resolveCenterImagePlacement(
+            styledDrawingData.moduleCount,
+            resolved.quietZone,
+            options,
+          );
         },
       });
       drawings.set(matrix, drawing);
@@ -62,39 +66,39 @@ export function createQRCodeStyler(style?: QRCodeVisualStyle): QRCodeStyler {
   });
 }
 
-function resolveImagePlacement(
+function resolveCenterImagePlacement(
   moduleCount: number,
   quietZone: number,
-  options?: Parameters<QRCodeDrawing['placeImage']>[0],
-): ReturnType<QRCodeDrawing['placeImage']> {
-  assertKnownKeys(options, 'image', ['size', 'padding', 'clearBackground']);
+  options?: Parameters<QRCodeStyledDrawing['placeCenterImage']>[0],
+): ReturnType<QRCodeStyledDrawing['placeCenterImage']> {
+  assertKnownKeys(options, 'centerImage', ['size', 'padding', 'clearBackground']);
   const size = options?.size ?? 0.4;
   const padding = options?.padding ?? 1;
   const clearBackground = options?.clearBackground ?? true;
   if (!Number.isFinite(size) || size <= 0 || size > 1) {
-    throwInvalid('image.size', 'greater than 0 and at most 1', size);
+    throwInvalid('centerImage.size', 'greater than 0 and at most 1', size);
   }
   if (!Number.isFinite(padding) || padding < 0) {
-    throwInvalid('image.padding', 'a non-negative finite number', padding);
+    throwInvalid('centerImage.padding', 'a non-negative finite number', padding);
   }
   if (typeof clearBackground !== 'boolean') {
-    throwInvalid('image.clearBackground', 'a boolean', clearBackground);
+    throwInvalid('centerImage.clearBackground', 'a boolean', clearBackground);
   }
 
-  const imageSize = moduleCount * size;
-  const position = quietZone + (moduleCount - imageSize) / 2;
+  const centerImageSize = moduleCount * size;
+  const position = quietZone + (moduleCount - centerImageSize) / 2;
   const matrixEnd = quietZone + moduleCount;
   const clearStart = Math.max(quietZone, position - padding);
-  const clearEnd = Math.min(matrixEnd, position + imageSize + padding);
+  const clearEnd = Math.min(matrixEnd, position + centerImageSize + padding);
   return {
-    image: {x: position, y: position, size: imageSize},
+    centerImage: {x: position, y: position, size: centerImageSize},
     clear: clearBackground
       ? {x: clearStart, y: clearStart, size: clearEnd - clearStart}
       : undefined,
   };
 }
 
-function paintPrimitive(target: QRCodeDrawingTarget, primitive: QRCodeStylePrimitive): void {
+function paintPrimitive(target: QRCodeStyledDrawingTarget, primitive: QRCodeStylePrimitive): void {
   if (primitive.kind === 'finder-ring') {
     if (primitive.shape === 'circle') {
       circle(target, primitive.x, primitive.y, primitive.size);
@@ -166,7 +170,7 @@ function finderRadius(shape: 'square' | 'rounded' | 'extra-rounded', size: numbe
   return shape === 'rounded' ? Math.min(1, size / 2) : size / 2;
 }
 
-function circle(target: QRCodeDrawingTarget, x: number, y: number, size: number): void {
+function circle(target: QRCodeStyledDrawingTarget, x: number, y: number, size: number): void {
   const radius = size / 2;
   const centerX = x + radius;
   const centerY = y + radius;
@@ -176,7 +180,7 @@ function circle(target: QRCodeDrawingTarget, x: number, y: number, size: number)
 }
 
 function roundedSquare(
-  target: QRCodeDrawingTarget,
+  target: QRCodeStyledDrawingTarget,
   x: number,
   y: number,
   size: number,
@@ -195,7 +199,7 @@ function roundedSquare(
 }
 
 function moveLocal(
-  target: QRCodeDrawingTarget,
+  target: QRCodeStyledDrawingTarget,
   primitive: QRCodeStylePrimitive,
   x: number,
   y: number,
@@ -204,7 +208,7 @@ function moveLocal(
 }
 
 function lineLocal(
-  target: QRCodeDrawingTarget,
+  target: QRCodeStyledDrawingTarget,
   primitive: QRCodeStylePrimitive,
   x: number,
   y: number,
@@ -213,7 +217,7 @@ function lineLocal(
 }
 
 function arcLocal(
-  target: QRCodeDrawingTarget,
+  target: QRCodeStyledDrawingTarget,
   primitive: QRCodeStylePrimitive,
   centerX: number,
   centerY: number,

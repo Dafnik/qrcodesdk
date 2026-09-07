@@ -1,37 +1,37 @@
 import {PNG} from 'pngjs';
 
 import {
+  type QRCodeCenterImageOptions,
   QRCodeError,
-  type QRCodeImageOverlayOptions,
   type QRCodeMatrix,
   type QRCodeRenderer,
   type QRCodeVisualStyle,
   createQRCodeStyler,
 } from '@qrcodesdk/core';
-import type {QRCodeDrawingTarget} from '@qrcodesdk/core/drawing';
+import type {QRCodeStyledDrawingTarget} from '@qrcodesdk/core/drawing';
 
-export type QRCodePNGImageOptions = QRCodeImageOverlayOptions<Buffer>;
+export type QRCodePNGCenterImageOptions = QRCodeCenterImageOptions<Buffer>;
 export type QRCodePNGRendererOptions = {
   readonly style?: QRCodeVisualStyle;
-  readonly image?: QRCodePNGImageOptions;
+  readonly centerImage?: QRCodePNGCenterImageOptions;
   readonly compression?: {readonly level?: number};
 };
 
 export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
-  assertKeys(options, 'options', ['style', 'image', 'compression']);
-  assertKeys(options?.image, 'image', ['source', 'size', 'padding', 'clearBackground']);
+  assertKeys(options, 'options', ['style', 'centerImage', 'compression']);
+  assertKeys(options?.centerImage, 'centerImage', ['source', 'size', 'padding', 'clearBackground']);
   assertKeys(options?.compression, 'compression', ['level']);
   const styler = createQRCodeStyler(options?.style);
-  const imageOptions = options?.image ? {...options.image} : undefined;
-  const imageLayout = imageOptions
+  const centerImageOptions = options?.centerImage ? {...options.centerImage} : undefined;
+  const centerImageLayout = centerImageOptions
     ? {
-        size: imageOptions.size,
-        padding: imageOptions.padding,
-        clearBackground: imageOptions.clearBackground,
+        size: centerImageOptions.size,
+        padding: centerImageOptions.padding,
+        clearBackground: centerImageOptions.clearBackground,
       }
     : undefined;
   const compressionLevel = resolveCompressionLevel(options?.compression?.level);
-  if (imageOptions) styler.draw([[1]]).placeImage(imageLayout);
+  if (centerImageOptions) styler.draw([[1]]).placeCenterImage(centerImageLayout);
 
   return (matrix: QRCodeMatrix) => {
     const drawing = styler.draw(matrix);
@@ -39,16 +39,16 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
     const target = new PNGDrawingTarget(png, drawing.moduleSize);
     drawing.paint(target);
 
-    if (imageOptions) {
-      const source = decodeImageSource(imageOptions.source);
-      const placement = drawing.placeImage(imageLayout);
+    if (centerImageOptions) {
+      const source = decodeImageSource(centerImageOptions.source);
+      const placement = drawing.placeCenterImage(centerImageLayout);
       if (placement.clear) target.clearImageArea(placement.clear);
       compositeImage(
         png,
         source,
-        placement.image.x * drawing.moduleSize,
-        placement.image.y * drawing.moduleSize,
-        placement.image.size * drawing.moduleSize,
+        placement.centerImage.x * drawing.moduleSize,
+        placement.centerImage.y * drawing.moduleSize,
+        placement.centerImage.size * drawing.moduleSize,
       );
     }
     return PNG.sync.write(png, {deflateLevel: compressionLevel});
@@ -57,7 +57,7 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
 
 type Color = {red: number; green: number; blue: number; alpha: number};
 
-class PNGDrawingTarget implements QRCodeDrawingTarget {
+class PNGDrawingTarget implements QRCodeStyledDrawingTarget {
   private background: Color = {red: 255, green: 255, blue: 255, alpha: 255};
   private color: Color = {red: 0, green: 0, blue: 0, alpha: 255};
   private coverage: Uint16Array | undefined;

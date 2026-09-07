@@ -31,7 +31,7 @@ const text = qrcode('HELLO WORLD').render(
 | `style.moduleSize` | `5`         | Positive integer module scale                                           |
 | `style.quietZone`  | `4`         | Non-negative integer border in modules                                  |
 | `layout`           | `'compact'` | `'compact'` packs two rows per line; `'full'` uses two cells per module |
-| `ansi`             | `false`     | `true`, `false`, or an ANSI configuration object                        |
+| `ansi`             | `false`     | `true`, `false`, or an ANSI options object                              |
 | `ansi.mode`        | `'blocks'`  | `'blocks'` uses glyphs; `'background'` uses colored spaces              |
 | `ansi.foreground`  | `'#000000'` | RGB or RGBA hexadecimal dark color                                      |
 | `ansi.background`  | `'#ffffff'` | RGB or RGBA hexadecimal light color                                     |

@@ -8,4 +8,4 @@
   };
 </script>
 
-<QRCodeImage class="mx-auto" data="https://qrcodesdk.dev" {options} />
+<QRCodeImage class="mx-auto" payload="https://qrcodesdk.dev" {options} />

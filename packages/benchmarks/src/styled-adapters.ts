@@ -49,17 +49,17 @@ export function createQRCodeStylingLibraryOptions(
   }
 
   const size = fixture.styling.moduleSize ?? 5;
-  const margin = fixture.styling.quietZone ?? 4;
+  const quietZone = fixture.styling.quietZone ?? 4;
   const moduleCount = 17 + 4 * version;
-  const renderedSize = (moduleCount + 2 * margin) * size;
+  const renderedSize = (moduleCount + 2 * quietZone) * size;
   const colorDark = fixture.styling.foreground ?? '#000000';
 
   return {
     type: 'svg',
     width: renderedSize,
     height: renderedSize,
-    margin: margin * size,
-    data: fixture.data,
+    margin: quietZone * size,
+    data: fixture.payload,
     jsdom: sharedJSDOMConstructor,
     qrOptions: {
       typeNumber: version,
@@ -89,8 +89,8 @@ const qrcodeSDKStyledSVGAdapter: StyledSVGAdapter = {
   label: 'QRCodeSDK',
   version: qrcodeSDKPackage.version,
   styledSvg: (fixture) =>
-    createQRCodeSDK(fixture.data)
-      .config(automaticMatrixOptions(fixture))
+    createQRCodeSDK(fixture.payload)
+      .options(automaticMatrixOptions(fixture))
       .render(QRCodeSVGRenderer({style: fixture.styling})).length,
 };
 

@@ -9,16 +9,16 @@ import {
   createPlaygroundCanvasOptions,
   createPlaygroundImageOptions,
   createPlaygroundSVGOptions,
-  defaultPlaygroundConfig,
-  playgroundConfig,
+  defaultPlaygroundOptions,
   playgroundImageStatus,
+  playgroundOptions,
   playgroundPreparedImage,
   preparePlaygroundImage,
   preparePlaygroundLogo,
-  resetQrConfig,
+  resetQrOptions,
   updatePlaygroundImage,
-  updateQrConfig,
-} from './playground-config.ts';
+  updateQrOptions,
+} from './playground-options.ts';
 import {hasQRCodeError} from './qrcode-error-checker.ts';
 
 const preparedImage: PlaygroundPreparedImage = {
@@ -36,17 +36,17 @@ describe('playground prepared image options', () => {
   });
 
   test('maps the embedded URL to SVG and the loaded element to browser renderers', () => {
-    const svgOptions = createPlaygroundSVGOptions(defaultPlaygroundConfig, preparedImage);
-    const imageOptions = createPlaygroundImageOptions(defaultPlaygroundConfig, preparedImage);
-    const canvasOptions = createPlaygroundCanvasOptions(defaultPlaygroundConfig, preparedImage);
+    const svgOptions = createPlaygroundSVGOptions(defaultPlaygroundOptions, preparedImage);
+    const imageOptions = createPlaygroundImageOptions(defaultPlaygroundOptions, preparedImage);
+    const canvasOptions = createPlaygroundCanvasOptions(defaultPlaygroundOptions, preparedImage);
 
-    assert.equal(svgOptions.image?.source, preparedImage.dataUrl);
-    assert.equal(imageOptions.image?.source, preparedImage.element);
-    assert.equal(canvasOptions.image?.source, preparedImage.element);
+    assert.equal(svgOptions.centerImage?.source, preparedImage.dataUrl);
+    assert.equal(imageOptions.centerImage?.source, preparedImage.element);
+    assert.equal(canvasOptions.centerImage?.source, preparedImage.element);
     assert.equal(svgOptions.matrix?.eci, false);
     assert.equal(imageOptions.matrix?.eci, false);
     assert.equal(canvasOptions.matrix?.eci, false);
-    assert.deepEqual(svgOptions.image, {
+    assert.deepEqual(svgOptions.centerImage, {
       source: preparedImage.dataUrl,
       size: 0.3,
       padding: 0.5,
@@ -55,19 +55,19 @@ describe('playground prepared image options', () => {
   });
 
   test('forwards enabled ECI through every renderer and error-checking path', () => {
-    const config = {...defaultPlaygroundConfig, eci: true};
+    const options = {...defaultPlaygroundOptions, eci: true};
 
-    assert.equal(createPlaygroundSVGOptions(config, preparedImage).matrix?.eci, true);
-    assert.equal(createPlaygroundImageOptions(config, preparedImage).matrix?.eci, true);
-    assert.equal(createPlaygroundCanvasOptions(config, preparedImage).matrix?.eci, true);
-    assert.equal(hasQRCodeError(config, undefined), undefined);
+    assert.equal(createPlaygroundSVGOptions(options, preparedImage).matrix?.eci, true);
+    assert.equal(createPlaygroundImageOptions(options, preparedImage).matrix?.eci, true);
+    assert.equal(createPlaygroundCanvasOptions(options, preparedImage).matrix?.eci, true);
+    assert.equal(hasQRCodeError(options, undefined), undefined);
     assert.match(
-      String(hasQRCodeError({...config, eci: 'true' as never}, undefined)),
+      String(hasQRCodeError({...options, eci: 'true' as never}, undefined)),
       /Invalid ECI setting/,
     );
   });
 
-  test('updates settings without replacing prepared sources', () => {
+  test('updates options without replacing prepared sources', () => {
     playgroundPreparedImage.set(preparedImage);
 
     updatePlaygroundImage({size: 0.6, padding: 2, clearBackground: true});
@@ -83,13 +83,13 @@ describe('playground prepared image options', () => {
   test('reset removes session-only image and status state', () => {
     playgroundPreparedImage.set(preparedImage);
     playgroundImageStatus.set({state: 'ready'});
-    updateQrConfig({eci: true});
+    updateQrOptions({eci: true});
 
-    resetQrConfig();
+    resetQrOptions();
 
     assert.equal(playgroundPreparedImage.get(), undefined);
     assert.deepEqual(playgroundImageStatus.get(), {state: 'idle'});
-    assert.equal(playgroundConfig.get().eci, false);
+    assert.equal(playgroundOptions.get().eci, false);
   });
 
   test('reports image preparation failures and removes a previous image', async () => {

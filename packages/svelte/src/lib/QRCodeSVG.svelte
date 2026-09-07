@@ -5,17 +5,17 @@
   import type {QRCodeSVGProps} from './types.js';
   import {splitOptions} from './split-options.js';
 
-  let {data, options, ...attributes}: QRCodeSVGProps = $props();
+  let {payload, options, ...attributes}: QRCodeSVGProps = $props();
 
   const resolvedOptions = $derived(splitOptions(options));
   const svgRenderer = $derived(QRCodeSVGRenderer(resolvedOptions[1]));
-  const svg = $derived(qrcode(data).config(resolvedOptions[0]).render(svgRenderer));
+  const svg = $derived(qrcode(payload).options(resolvedOptions[0]).render(svgRenderer));
 
   export function download(filename = '') {
     if (typeof document === 'undefined') return;
 
-    qrcode(data)
-      .config(resolvedOptions[0])
+    qrcode(payload)
+      .options(resolvedOptions[0])
       .render(QRCodeDownloadSVGRenderer({renderer: svgRenderer, filename: filename || undefined}));
   }
 </script>

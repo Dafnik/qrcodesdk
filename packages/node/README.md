@@ -63,7 +63,7 @@ colors are preserved, including transparent backgrounds.
 
 ## Work with PNG output
 
-See the [PNG Buffer renderer](https://qrcodesdk.dev/reference/renderers/png/) for compression, prepared PNG overlays,
+See the [PNG Buffer renderer](https://qrcodesdk.dev/reference/renderers/png/) for compression, prepared PNG center images,
 and exact constraints. Follow [Download or save](https://qrcodesdk.dev/guides/download-or-save/) to write the Buffer to
 disk or [Serve a QR code](https://qrcodesdk.dev/guides/server-output/) to return it as `image/png`.
 
@@ -74,7 +74,7 @@ their Node.js compatibility layers.
 
 The public TypeScript API uses Node's global `Buffer` type. TypeScript consumers must include
 `@types/node` in their development dependencies and make Node types available in their TypeScript
-configuration.
+options.
 
 ## Package boundary
 
@@ -84,7 +84,7 @@ configuration.
 
 ```ts
 import {
-  type QRCodePNGImageOptions,
+  type QRCodePNGCenterImageOptions,
   QRCodePNGRenderer,
   type QRCodePNGRendererOptions,
 } from '@qrcodesdk/node';

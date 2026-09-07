@@ -59,9 +59,9 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/react';
 export function App() {
   return (
     <>
-      <QRCodeSVG data="https://qrcodesdk.dev" />
-      <QRCodeImage data="https://qrcodesdk.dev" />
-      <QRCodeCanvas data="https://qrcodesdk.dev" />
+      <QRCodeSVG payload="https://qrcodesdk.dev" />
+      <QRCodeImage payload="https://qrcodesdk.dev" />
+      <QRCodeCanvas payload="https://qrcodesdk.dev" />
     </>
   );
 }
@@ -113,7 +113,7 @@ export default function QRCodeSVGExample() {
     [],
   );
 
-  return <QRCodeSVG data="https://qrcodesdk.dev" options={options} />;
+  return <QRCodeSVG payload="https://qrcodesdk.dev" options={options} />;
 }
 ```
 
@@ -137,7 +137,7 @@ export default function QRCodeImageExample() {
     [],
   );
 
-  return <QRCodeImage data="https://qrcodesdk.dev" options={options} />;
+  return <QRCodeImage payload="https://qrcodesdk.dev" options={options} />;
 }
 ```
 
@@ -162,7 +162,7 @@ export default function QRCodeCanvasExample() {
     [],
   );
 
-  return <QRCodeCanvas data="https://qrcodesdk.dev" options={options} />;
+  return <QRCodeCanvas payload="https://qrcodesdk.dev" options={options} />;
 }
 ```
 
@@ -183,7 +183,7 @@ export default function QRCodeDownloadImageExample() {
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <QRCodeImage data="https://qrcodesdk.dev" options={options} ref={qrcode} />
+      <QRCodeImage payload="https://qrcodesdk.dev" options={options} ref={qrcode} />
       <button
         className="btn-primary"
         onClick={() => qrcode.current?.download('qrcodesdk')}
@@ -198,7 +198,7 @@ export default function QRCodeDownloadImageExample() {
 ## Center images
 
 Load and decode a browser image first, store the resulting `HTMLImageElement` in state, and pass
-it through `options.image.source`. Updating that state rerenders the component with the prepared
+it through `options.centerImage.source`. Updating that state rerenders the component with the prepared
 source. See
 [Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete
 React lifecycle.
@@ -221,7 +221,7 @@ export function QRCodeDownload() {
       <button type="button" onClick={() => qrcode.current?.download('qrcodesdk')}>
         Download PNG
       </button>
-      <QRCodeImage ref={qrcode} data="https://qrcodesdk.dev" />
+      <QRCodeImage ref={qrcode} payload="https://qrcodesdk.dev" />
     </>
   );
 }
@@ -240,9 +240,9 @@ Canvas downloads.
 
 `QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
 
-## Shared configuration
+## Shared options
 
-The `options` prop combines matrix settings with the selected renderer's settings. Use the
+The `options` prop combines matrix options with the selected renderer's options. Use the
 [builder reference](https://qrcodesdk.dev/reference/builder/) for encoding, version, mask, and error correction;
 [Customize output](https://qrcodesdk.dev/guides/customize/) for shared visual options; and the dedicated
 [renderer references](https://qrcodesdk.dev/reference/renderers/) for output-specific options and constraints.

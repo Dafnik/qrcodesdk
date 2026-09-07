@@ -9,7 +9,7 @@
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
 `@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK.
-It turns data into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
+It turns a payload into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
 
 ## Install
 
@@ -63,14 +63,14 @@ options and constraints.
 
 ## What Core adds
 
-| Capability                    | API                     | Return type    |
-| ----------------------------- | ----------------------- | -------------- |
-| Generate a QR matrix          | `qrcode(data).matrix()` | `QRCodeMatrix` |
-| Render scalable vector output | `QRCodeSVGRenderer`     | SVG `string`   |
-| Render terminal output        | `QRCodeTextRenderer`    | text `string`  |
+| Capability                    | API                        | Return type    |
+| ----------------------------- | -------------------------- | -------------- |
+| Generate a QR matrix          | `qrcode(payload).matrix()` | `QRCodeMatrix` |
+| Render scalable vector output | `QRCodeSVGRenderer`        | SVG `string`   |
+| Render terminal output        | `QRCodeTextRenderer`       | text `string`  |
 
-The complete input, matrix-option, builder-method, and matrix-output contracts live in
-[Builder and matrix](https://qrcodesdk.dev/reference/builder/). Shared visual options and scan-safety guidance live in
+The complete payload, matrix-option, builder-method, and matrix-output contracts live in
+[Builder and matrix](https://qrcodesdk.dev/reference/builder/). Shared visual options and scan-reliability guidance live in
 [Customize appearance](https://qrcodesdk.dev/guides/customize/).
 
 Typed helpers serialize common application values before generation. See
@@ -108,22 +108,22 @@ Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/refere
 ```ts
 import {
   QRCodeBuilder,
+  type QRCodeCenterImageOptions,
   type QRCodeColor,
   type QRCodeDataImageURL,
   QRCodeError,
   type QRCodeErrorCode,
   type QRCodeErrorCorrectionLevel,
   type QRCodeFinderShape,
-  type QRCodeImageOverlayOptions,
-  type QRCodeInputData,
   type QRCodeMask,
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
   type QRCodeMode,
   type QRCodeModuleShape,
+  type QRCodePayload,
   type QRCodeRenderer,
   type QRCodeSVGAccessibilityOptions,
-  type QRCodeSVGImageOptions,
+  type QRCodeSVGCenterImageOptions,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
@@ -137,7 +137,11 @@ import {
   createQRCodeStyler,
   qrcode,
 } from '@qrcodesdk/core';
-import type {QRCodeDrawing, QRCodeDrawingTarget, QRCodeStyler} from '@qrcodesdk/core/drawing';
+import type {
+  QRCodeStyledDrawing,
+  QRCodeStyledDrawingTarget,
+  QRCodeStyler,
+} from '@qrcodesdk/core/drawing';
 import {
   type QRCodeEmailPayload,
   type QRCodeGeoPayload,
@@ -158,7 +162,7 @@ them from the stable subpath entry points shown above.
 
 ## Generated output stability
 
-Output is deterministic for one installed implementation, but matrix cells, SVG markup, and PNG
+Output is deterministic for one installed implementation, but matrix modules, SVG markup, and PNG
 bytes may change between QRCodeSDK releases. Pin exact package versions and keep fixtures when exact
 artifacts matter. See the [version and output policy](https://qrcodesdk.dev/project/release-policy/).
 

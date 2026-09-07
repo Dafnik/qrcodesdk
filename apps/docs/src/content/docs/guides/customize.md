@@ -49,18 +49,18 @@ renderer.
 
 ## Shared visual style
 
-| Property              | Default      | Validation and meaning                             |
-| --------------------- | ------------ | -------------------------------------------------- |
-| `moduleSize`          | `5`          | Positive safe integer; pixels per module           |
-| `quietZone`           | `4`          | Non-negative safe integer; border width in modules |
-| `foreground`          | `'#000000'`  | RGB or RGBA hexadecimal color                      |
-| `background`          | `'#ffffff'`  | RGB or RGBA hexadecimal color                      |
-| `modules.shape`       | `'square'`   | Shape of ordinary dark modules                     |
-| `modules.color`       | `foreground` | Ordinary-module color override                     |
-| `finder.outer.shape`  | `'square'`   | Shape of finder outer rings                        |
-| `finder.outer.color`  | `foreground` | Finder-ring color override                         |
-| `finder.center.shape` | `'square'`   | Shape of finder centers                            |
-| `finder.center.color` | `foreground` | Finder-center color override                       |
+| Property              | Default      | Validation and meaning                                 |
+| --------------------- | ------------ | ------------------------------------------------------ |
+| `moduleSize`          | `5`          | Positive safe integer; pixels per module               |
+| `quietZone`           | `4`          | Non-negative safe integer; quiet-zone width in modules |
+| `foreground`          | `'#000000'`  | RGB or RGBA hexadecimal color                          |
+| `background`          | `'#ffffff'`  | RGB or RGBA hexadecimal color                          |
+| `modules.shape`       | `'square'`   | Shape of ordinary dark modules                         |
+| `modules.color`       | `foreground` | Ordinary-module color override                         |
+| `finder.outer.shape`  | `'square'`   | Shape of finder outer rings                            |
+| `finder.outer.color`  | `foreground` | Finder-ring color override                             |
+| `finder.center.shape` | `'square'`   | Shape of finder centers                                |
+| `finder.center.color` | `foreground` | Finder-center color override                           |
 
 Colors must be exactly `#RRGGBB` or `#RRGGBBAA`, with case-insensitive hexadecimal digits. Alpha is
 preserved by all graphical renderers.

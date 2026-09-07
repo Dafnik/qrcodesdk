@@ -5,10 +5,10 @@ import type {QRCodeDataImageURL} from '@qrcodesdk/core';
 
 import {generatePlaygroundCode} from './angular/playground-code-generator.ts';
 import {
-  type PlaygroundConfig,
+  type PlaygroundOptions,
   type PlaygroundPreparedImage,
-  defaultPlaygroundConfig,
-} from './playground-config.ts';
+  defaultPlaygroundOptions,
+} from './playground-options.ts';
 
 const preparedImage: PlaygroundPreparedImage = {
   dataUrl: 'data:image/png;base64,cHJlcGFyZWQ=' as QRCodeDataImageURL,
@@ -19,12 +19,12 @@ const preparedImage: PlaygroundPreparedImage = {
   clearBackground: true,
 };
 
-function config(
-  packageName: PlaygroundConfig['packageName'],
-  output: PlaygroundConfig['output'],
-): PlaygroundConfig {
+function createOptions(
+  packageName: PlaygroundOptions['packageName'],
+  output: PlaygroundOptions['output'],
+): PlaygroundOptions {
   return {
-    ...defaultPlaygroundConfig,
+    ...defaultPlaygroundOptions,
     packageName,
     output,
     errorCorrectionLevel: 'H',
@@ -34,7 +34,7 @@ function config(
 describe('generated playground image snippets', () => {
   for (const packageName of ['react', 'vue', 'svelte', 'angular'] as const) {
     test(`${packageName} SVG reads and decodes the file before conditional rendering`, () => {
-      const {code} = generatePlaygroundCode(config(packageName, 'svg'), preparedImage);
+      const {code} = generatePlaygroundCode(createOptions(packageName, 'svg'), preparedImage);
 
       assert.match(code, /new FileReader\(\)/);
       assert.match(code, /await image\.decode\(\)/);
@@ -50,7 +50,7 @@ describe('generated playground image snippets', () => {
 
     for (const output of ['image', 'canvas'] as const) {
       test(`${packageName} ${output} passes a decoded image element after preparation`, () => {
-        const {code} = generatePlaygroundCode(config(packageName, output), preparedImage);
+        const {code} = generatePlaygroundCode(createOptions(packageName, output), preparedImage);
 
         assert.match(code, /new FileReader\(\)/);
         assert.match(code, /const image = new Image\(\)/);
@@ -64,8 +64,11 @@ describe('generated playground image snippets', () => {
 describe('generated playground ECI options', () => {
   for (const packageName of ['react', 'vue', 'svelte', 'angular'] as const) {
     test(`${packageName} includes ECI only when enabled`, () => {
-      const disabled = generatePlaygroundCode(config(packageName, 'svg')).code;
-      const enabled = generatePlaygroundCode({...config(packageName, 'svg'), eci: true}).code;
+      const disabled = generatePlaygroundCode(createOptions(packageName, 'svg')).code;
+      const enabled = generatePlaygroundCode({
+        ...createOptions(packageName, 'svg'),
+        eci: true,
+      }).code;
 
       assert.doesNotMatch(disabled, /eci:/);
       assert.match(enabled, /eci: true/);
@@ -75,20 +78,20 @@ describe('generated playground ECI options', () => {
 
 describe('generated playground languages', () => {
   test('generates an idiomatic Vue single-file component', () => {
-    const preview = generatePlaygroundCode(config('vue', 'image'));
+    const preview = generatePlaygroundCode(createOptions('vue', 'image'));
 
     assert.equal(preview.lang, 'vue');
     assert.match(preview.code, /<script setup lang="ts">/);
     assert.match(preview.code, /from '@qrcodesdk\/vue'/);
     assert.match(preview.code, /ref="qrcode"/);
-    assert.match(preview.code, /:data="data"/);
+    assert.match(preview.code, /:payload="payload"/);
     assert.match(preview.code, /:options="options"/);
     assert.doesNotMatch(preview.code, /:data(?:\s|\/|>)/);
     assert.doesNotMatch(preview.code, /:options(?:\s|\/|>)/);
   });
 
   test('generates an idiomatic Svelte component', () => {
-    const preview = generatePlaygroundCode(config('svelte', 'image'));
+    const preview = generatePlaygroundCode(createOptions('svelte', 'image'));
 
     assert.equal(preview.lang, 'svelte');
     assert.match(preview.code, /<script lang="ts">/);

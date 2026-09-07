@@ -47,8 +47,8 @@ describe('QRCodePNGRenderer', () => {
     expect(() => QRCodePNGRenderer({compression: null} as never)).toThrowError(
       expect.objectContaining({details: expect.objectContaining({field: 'compression'})}),
     );
-    expect(() => QRCodePNGRenderer({image: []} as never)).toThrowError(
-      expect.objectContaining({details: expect.objectContaining({field: 'image'})}),
+    expect(() => QRCodePNGRenderer({centerImage: []} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'centerImage'})}),
     );
   });
 });

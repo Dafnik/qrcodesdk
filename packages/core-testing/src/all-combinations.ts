@@ -17,7 +17,7 @@ const ERROR_CORRECTION_LEVELS = [
 const MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const satisfies readonly QRCodeMask[];
 const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
 
-const DATA_BY_MODE = {
+const PAYLOAD_BY_MODE = {
   numeric: '1',
   alphanumeric: 'A',
   octet: 'A',
@@ -50,7 +50,7 @@ function* getAllQRCodeCombinationsWithECI(eci: boolean): Generator<Required<QRCo
               `mask-${mask}`,
               `mode-${mode}`,
             ].join('_'),
-            data: DATA_BY_MODE[mode].repeat(version),
+            payload: PAYLOAD_BY_MODE[mode].repeat(version),
             mode,
             version: version as QRCodeVersion,
             mask,
@@ -74,7 +74,7 @@ export function* getAllQRCodeAutoMaskCombinations(): Generator<QRCodeAutoMaskCom
             'mask-auto',
             `mode-${mode}`,
           ].join('_'),
-          data: DATA_BY_MODE[mode].repeat(version),
+          payload: PAYLOAD_BY_MODE[mode].repeat(version),
           mode,
           version: version as QRCodeVersion,
           errorCorrectionLevel,
