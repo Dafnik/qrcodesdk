@@ -1,12 +1,9 @@
 import type {ComponentPropsWithoutRef} from 'react';
 
-import type {QRCodeInputData} from '@qrcodesdk/core';
+import type {QRCodePayload} from '@qrcodesdk/core';
 
-export type QRCodeBaseProps<TOptions> = Omit<
-  ComponentPropsWithoutRef<'div'>,
-  'children' | 'data'
-> & {
-  data: QRCodeInputData;
+export type QRCodeBaseProps<TOptions> = Omit<ComponentPropsWithoutRef<'div'>, 'children'> & {
+  payload: QRCodePayload;
   options?: TOptions;
 };
 

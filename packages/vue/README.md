@@ -59,9 +59,9 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/vue';
 </script>
 
 <template>
-  <QRCodeSVG data="https://qrcodesdk.dev" />
-  <QRCodeImage data="https://qrcodesdk.dev" />
-  <QRCodeCanvas data="https://qrcodesdk.dev" />
+  <QRCodeSVG payload="https://qrcodesdk.dev" />
+  <QRCodeImage payload="https://qrcodesdk.dev" />
+  <QRCodeCanvas payload="https://qrcodesdk.dev" />
 </template>
 ```
 
@@ -101,13 +101,15 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {QRCodeSVG} from '@qrcodesdk/vue';
 
 const options: QRCodeSVGOptions = {
-  title: 'QR code for qrcodesdk.dev',
-  ariaLabel: 'Scan to open qrcodesdk.dev',
+  accessibility: {
+    title: 'QR code for qrcodesdk.dev',
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+  },
 };
 </script>
 
 <template>
-  <QRCodeSVG data="https://qrcodesdk.dev" :options="options" />
+  <QRCodeSVG payload="https://qrcodesdk.dev" :options="options" />
 </template>
 ```
 
@@ -119,15 +121,16 @@ import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 import {QRCodeImage} from '@qrcodesdk/vue';
 
 const options: QRCodeImageOptions = {
-  size: 8,
-  margin: 4,
-  alt: 'QR code for qrcodesdk.dev',
-  ariaLabel: 'Scan to open qrcodesdk.dev',
+  style: {moduleSize: 8, quietZone: 4},
+  accessibility: {
+    alt: 'QR code for qrcodesdk.dev',
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+  },
 };
 </script>
 
 <template>
-  <QRCodeImage data="https://qrcodesdk.dev" :options="options" />
+  <QRCodeImage payload="https://qrcodesdk.dev" :options="options" />
 </template>
 ```
 
@@ -139,17 +142,17 @@ import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
 import {QRCodeCanvas} from '@qrcodesdk/vue';
 
 const options: QRCodeCanvasOptions = {
-  size: 8,
-  margin: 4,
-  colors: {
-    colorDark: '#111827',
-    colorLight: '#ffffff',
+  style: {
+    moduleSize: 8,
+    quietZone: 4,
+    foreground: '#111827',
+    background: '#ffffff',
   },
 };
 </script>
 
 <template>
-  <QRCodeCanvas data="https://qrcodesdk.dev" :options="options" />
+  <QRCodeCanvas payload="https://qrcodesdk.dev" :options="options" />
 </template>
 ```
 
@@ -163,12 +166,12 @@ import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 import {type QRCodeDownloadHandle, QRCodeImage} from '@qrcodesdk/vue';
 
 const qrcode = ref<QRCodeDownloadHandle | null>(null);
-const options: QRCodeImageOptions = {alt: 'QR code for qrcodesdk.dev'};
+const options: QRCodeImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};
 </script>
 
 <template>
   <div class="flex flex-col items-center gap-2">
-    <QRCodeImage ref="qrcode" data="https://qrcodesdk.dev" :options="options" />
+    <QRCodeImage ref="qrcode" payload="https://qrcodesdk.dev" :options="options" />
     <button class="btn-primary" type="button" @click="qrcode?.download('qrcodesdk')">
       Download PNG
     </button>
@@ -179,7 +182,7 @@ const options: QRCodeImageOptions = {alt: 'QR code for qrcodesdk.dev'};
 ## Center images
 
 Load and decode a browser image first, store it in a `shallowRef`, and pass it through
-`options.image.source`. Render the Image or Canvas component only after the source is ready. See
+`options.centerImage.source`. Render the Image or Canvas component only after the source is ready. See
 [Add a center image](https://qrcodesdk.dev/guides/center-images/#vue) for a complete
 Vue example.
 
@@ -199,7 +202,7 @@ const qrcode = ref<QRCodeDownloadHandle | null>(null);
 
 <template>
   <button type="button" @click="qrcode?.download('qrcodesdk')">Download PNG</button>
-  <QRCodeImage ref="qrcode" data="https://qrcodesdk.dev" />
+  <QRCodeImage ref="qrcode" payload="https://qrcodesdk.dev" />
 </template>
 ```
 
@@ -219,9 +222,9 @@ downloads.
 on the server and populate it after mounting in the browser. Their download methods also skip work
 outside the browser.
 
-## Shared configuration
+## Shared options
 
-The `options` prop combines matrix settings with the selected renderer's settings. Use the
+The `options` prop combines matrix options with the selected renderer's options. Use the
 [builder reference](https://qrcodesdk.dev/reference/builder/) for encoding, version, mask, and error correction;
 [Customize output](https://qrcodesdk.dev/guides/customize/) for shared visual options; and the dedicated
 [renderer references](https://qrcodesdk.dev/reference/renderers/) for output-specific options and constraints.

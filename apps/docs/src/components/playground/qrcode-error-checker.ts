@@ -2,30 +2,35 @@ import {QRCodeCanvasRenderer, QRCodeImageRenderer} from '@qrcodesdk/browser';
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 import {
-  type PlaygroundConfig,
+  type PlaygroundOptions,
   type PlaygroundPreparedImage,
   createPlaygroundCanvasOptions,
   createPlaygroundImageOptions,
   createPlaygroundSVGOptions,
   playgroundPreparedImage,
-} from './playground-config.ts';
+} from './playground-options.ts';
 
 export function hasQRCodeError(
-  config: PlaygroundConfig,
+  options: PlaygroundOptions,
   preparedImage: PlaygroundPreparedImage | undefined = playgroundPreparedImage.get(),
 ) {
   try {
-    const builder = qrcode(config.data).config(config);
-    switch (config.output) {
-      case 'canvas':
-        builder.render(QRCodeCanvasRenderer(createPlaygroundCanvasOptions(config, preparedImage)));
+    switch (options.output) {
+      case 'canvas': {
+        const {matrix, ...rendererOptions} = createPlaygroundCanvasOptions(options, preparedImage);
+        qrcode(options.payload).options(matrix).render(QRCodeCanvasRenderer(rendererOptions));
         break;
-      case 'image':
-        builder.render(QRCodeImageRenderer(createPlaygroundImageOptions(config, preparedImage)));
+      }
+      case 'image': {
+        const {matrix, ...rendererOptions} = createPlaygroundImageOptions(options, preparedImage);
+        qrcode(options.payload).options(matrix).render(QRCodeImageRenderer(rendererOptions));
         break;
-      case 'svg':
-        builder.render(QRCodeSVGRenderer(createPlaygroundSVGOptions(config, preparedImage)));
+      }
+      case 'svg': {
+        const {matrix, ...rendererOptions} = createPlaygroundSVGOptions(options, preparedImage);
+        qrcode(options.payload).options(matrix).render(QRCodeSVGRenderer(rendererOptions));
         break;
+      }
     }
 
     return undefined;

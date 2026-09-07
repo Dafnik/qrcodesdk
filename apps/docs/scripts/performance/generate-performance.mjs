@@ -63,7 +63,7 @@ function requireFiniteNumber(value, label) {
 export function validateBenchmarkReport(report) {
   const parsedReport = requireObject(report, 'Benchmark report');
 
-  if (parsedReport.schemaVersion !== 5) {
+  if (parsedReport.schemaVersion !== 6) {
     throw new Error(`Unsupported benchmark schema version: ${parsedReport.schemaVersion}.`);
   }
 
@@ -80,26 +80,26 @@ export function validateBenchmarkReport(report) {
     requireString(version, `libraries.${library}`);
   }
 
-  const configuration = requireObject(parsedReport.configuration, 'configuration');
-  requireFiniteNumber(configuration.samples, 'configuration.samples');
-  requireFiniteNumber(configuration.warmupStaticPasses, 'configuration.warmupStaticPasses');
-  requireFiniteNumber(configuration.warmupExhaustivePasses, 'configuration.warmupExhaustivePasses');
-  const svgConfiguration = requireObject(configuration.svg, 'configuration.svg');
-  requireFiniteNumber(svgConfiguration.pixelsPerModule, 'configuration.svg.pixelsPerModule');
-  requireFiniteNumber(svgConfiguration.quietZoneModules, 'configuration.svg.quietZoneModules');
-  const styledSvgConfiguration = requireObject(configuration.styledSvg, 'configuration.styledSvg');
-  requireFiniteNumber(styledSvgConfiguration.fixtureCount, 'configuration.styledSvg.fixtureCount');
-  if (!Array.isArray(styledSvgConfiguration.multipliers)) {
-    throw new Error('configuration.styledSvg.multipliers must be an array.');
+  const options = requireObject(parsedReport.options, 'options');
+  requireFiniteNumber(options.samples, 'options.samples');
+  requireFiniteNumber(options.warmupStaticPasses, 'options.warmupStaticPasses');
+  requireFiniteNumber(options.warmupExhaustivePasses, 'options.warmupExhaustivePasses');
+  const svgOptions = requireObject(options.svg, 'options.svg');
+  requireFiniteNumber(svgOptions.pixelsPerModule, 'options.svg.pixelsPerModule');
+  requireFiniteNumber(svgOptions.quietZoneModules, 'options.svg.quietZoneModules');
+  const styledSvgOptions = requireObject(options.styledSvg, 'options.styledSvg');
+  requireFiniteNumber(styledSvgOptions.fixtureCount, 'options.styledSvg.fixtureCount');
+  if (!Array.isArray(styledSvgOptions.multipliers)) {
+    throw new Error('options.styledSvg.multipliers must be an array.');
   }
-  for (const [index, multiplier] of styledSvgConfiguration.multipliers.entries()) {
-    requireFiniteNumber(multiplier, `configuration.styledSvg.multipliers[${index}]`);
+  for (const [index, multiplier] of styledSvgOptions.multipliers.entries()) {
+    requireFiniteNumber(multiplier, `options.styledSvg.multipliers[${index}]`);
   }
-  if (styledSvgConfiguration.dimensionsFromFixtures !== true) {
-    throw new Error('configuration.styledSvg.dimensionsFromFixtures must be true.');
+  if (styledSvgOptions.dimensionsFromFixtures !== true) {
+    throw new Error('options.styledSvg.dimensionsFromFixtures must be true.');
   }
-  if (styledSvgConfiguration.automaticMaskSelection !== true) {
-    throw new Error('configuration.styledSvg.automaticMaskSelection must be true.');
+  if (styledSvgOptions.automaticMaskSelection !== true) {
+    throw new Error('options.styledSvg.automaticMaskSelection must be true.');
   }
 
   if (!Array.isArray(parsedReport.results) || parsedReport.results.length === 0) {
@@ -219,7 +219,7 @@ export async function generatePerformancePage(report, options = {}) {
   const outputPath = options.outputPath ?? DEFAULT_OUTPUT_PATH;
   const workspaceRoot = options.workspaceRoot ?? WORKSPACE_ROOT;
   const environment = parsedReport.environment;
-  const configuration = parsedReport.configuration;
+  const reportOptions = parsedReport.options;
   const libraryVersions = Object.entries(parsedReport.libraries)
     .map(([library, version]) => `\`${library}@${version}\``)
     .join(', ');
@@ -261,7 +261,7 @@ The matrix, automatic matrix, and SVG benchmarks compare QRCodeSDK with **qrcode
 
 The matrix and SVG fixtures supply explicit versions and masks. The **qrcode-generator** rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them.
 
-Styled SVG generation uses all ${configuration.styledSvg.fixtureCount} shared styling fixtures at ${configuration.styledSvg.multipliers.join(', ')} repetitions. Both libraries select the mask automatically because **qr-code-styling** has no public mask option. Fixture module size and margin determine the matching pixel dimensions passed to **qr-code-styling**, which renders SVG through a shared JSDOM environment initialized before measurement.
+Styled SVG generation uses all ${reportOptions.styledSvg.fixtureCount} shared styling fixtures at ${reportOptions.styledSvg.multipliers.join(', ')} repetitions. Both libraries select the mask automatically because **qr-code-styling** has no public mask option. Fixture module size and margin determine the matching pixel dimensions passed to **qr-code-styling**, which renders SVG through a shared JSDOM environment initialized before measurement.
 
 ## Benchmark environment
 
@@ -269,9 +269,9 @@ Styled SVG generation uses all ${configuration.styledSvg.fixtureCount} shared st
 - Runtime: \`${environment.node}\` on \`${environment.platform} ${environment.architecture}\`
 - CPU: \`${environment.cpuModel}\` (${environment.cpuCount} logical cores)
 - Libraries: ${libraryVersions}
-- Samples: ${configuration.samples} timed samples after ${configuration.warmupStaticPasses} static warm-up passes and ${configuration.warmupExhaustivePasses} exhaustive warm-up pass${configuration.warmupExhaustivePasses === 1 ? '' : 'es'}
-- SVG output: ${configuration.svg.pixelsPerModule} px/module with a ${configuration.svg.quietZoneModules}-module quiet zone
-- Styled SVG fixtures: ${configuration.styledSvg.fixtureCount}, with fixture-derived dimensions and automatic mask selection
+- Samples: ${reportOptions.samples} timed samples after ${reportOptions.warmupStaticPasses} static warm-up passes and ${reportOptions.warmupExhaustivePasses} exhaustive warm-up pass${reportOptions.warmupExhaustivePasses === 1 ? '' : 'es'}
+- SVG output: ${reportOptions.svg.pixelsPerModule} px/module with a ${reportOptions.svg.quietZoneModules}-module quiet zone
+- Styled SVG fixtures: ${reportOptions.styledSvg.fixtureCount}, with fixture-derived dimensions and automatic mask selection
 
 The charts show throughput calculated from the median time. Higher is better, and each chart lists the fastest library first. Expand the exact benchmark data beneath each section for median time, min–max range, and throughput.
 

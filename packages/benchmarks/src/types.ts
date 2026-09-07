@@ -48,7 +48,7 @@ export interface BenchmarkResult extends BenchmarkSummary {
 }
 
 export interface BenchmarkReport {
-  readonly schemaVersion: 5;
+  readonly schemaVersion: 6;
   readonly generatedAt: string;
   readonly environment: {
     readonly node: string;
@@ -59,7 +59,7 @@ export interface BenchmarkReport {
     readonly cpuCount: number;
   };
   readonly libraries: Readonly<Record<BenchmarkLibraryId, string>>;
-  readonly configuration: {
+  readonly options: {
     readonly samples: number;
     readonly warmupStaticPasses: number;
     readonly warmupExhaustivePasses: number;

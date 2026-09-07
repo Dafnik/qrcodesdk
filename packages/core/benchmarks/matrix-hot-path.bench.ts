@@ -35,11 +35,11 @@ describe('matrix hot paths', () => {
     });
 
     bench(`automatic mask version ${String(version)}`, () => {
-      qrcode('A').config({mode: 'alphanumeric', version}).matrix();
+      qrcode('A').options({mode: 'alphanumeric', version}).matrix();
     });
 
     bench(`explicit mask version ${String(version)}`, () => {
-      qrcode('A').config({mask: 0, mode: 'alphanumeric', version}).matrix();
+      qrcode('A').options({mask: 0, mode: 'alphanumeric', version}).matrix();
     });
   }
 });
@@ -47,7 +47,7 @@ describe('matrix hot paths', () => {
 describe('explicit mask variants', () => {
   for (const mask of MASKS) {
     bench(`explicit mask ${String(mask)} version 20`, () => {
-      qrcode('A').config({mask, mode: 'alphanumeric', version: 20}).matrix();
+      qrcode('A').options({mask, mode: 'alphanumeric', version: 20}).matrix();
     });
   }
 });

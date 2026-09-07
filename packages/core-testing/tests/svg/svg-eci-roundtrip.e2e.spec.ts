@@ -14,14 +14,14 @@ const JSQR_ROUNDTRIP_ECI_ENABLED_COMBINATIONS = [...getAllQRCodeECICombinations(
 );
 
 describe('SVG QR eci roundtrips', () => {
-  const testSVGRenderer = QRCodeSVGRenderer({size: 4, margin: 4});
+  const testSVGRenderer = QRCodeSVGRenderer({style: {moduleSize: 4, quietZone: 4}});
 
   test.each(JSQR_ROUNDTRIP_ECI_ENABLED_COMBINATIONS)(
     'decodes eci $name SVG output',
     async (fixture) => {
       await expect(
-        decodeSvgQRCode(qrcode(fixture.data).config(fixture).render(testSVGRenderer)),
-      ).resolves.toBe(fixture.data);
+        decodeSvgQRCode(qrcode(fixture.payload).options(fixture).render(testSVGRenderer)),
+      ).resolves.toBe(fixture.payload);
     },
   );
 });

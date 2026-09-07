@@ -9,7 +9,7 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());`;
 const reactExample = `import {QRCodeSVG} from '@qrcodesdk/react';
 
 export function App() {
-  return <QRCodeSVG data="https://qrcodesdk.dev" />;
+  return <QRCodeSVG payload="https://qrcodesdk.dev" />;
 }`;
 
 const vueExample = `<script setup lang="ts">
@@ -17,14 +17,14 @@ import {QRCodeSVG} from '@qrcodesdk/vue';
 </script>
 
 <template>
-  <QRCodeSVG data="https://qrcodesdk.dev" />
+  <QRCodeSVG payload="https://qrcodesdk.dev" />
 </template>`;
 
 const svelteExample = `<script lang="ts">
   import {QRCodeSVG} from '@qrcodesdk/svelte';
 </script>
 
-<QRCodeSVG data="https://qrcodesdk.dev" />`;
+<QRCodeSVG payload="https://qrcodesdk.dev" />`;
 
 const angularExample = `import {Component} from '@angular/core';
 import {QRCodeSVG} from '@qrcodesdk/angular';
@@ -32,7 +32,7 @@ import {QRCodeSVG} from '@qrcodesdk/angular';
 @Component({
   selector: 'app-root',
   imports: [QRCodeSVG],
-  template: '<qrcode-svg data="https://qrcodesdk.dev" />',
+  template: '<qrcode-svg payload="https://qrcodesdk.dev" />',
 })
 export class App {}`;
 ---

@@ -8,10 +8,12 @@ import {QRCodeSVG} from '@qrcodesdk/angular';
   template: `
     <qrcode-svg
       [options]="{
-        title: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
+        accessibility: {
+          title: 'QR code for qrcodesdk.dev',
+          ariaLabel: 'Scan to open qrcodesdk.dev',
+        },
       }"
-      data="https://qrcodesdk.dev" />
+      payload="https://qrcodesdk.dev" />
   `,
 })
 export class QRCodeSVGExample {}

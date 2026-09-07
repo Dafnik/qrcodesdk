@@ -9,14 +9,14 @@ import {
 } from './mode';
 
 /**
- * Returns the code words (sans ECC bits) for given data and configurations.
- * Requires data to be preprocessed by `validateData`. No length check is
+ * Returns the code words (sans ECC bits) for given payload segments and options.
+ * Requires the payload to be preprocessed by `validatePayload`. No length check is
  * performed, and everything has to be checked before calling this function.
  *
  * @param {QRCodeVersion} version - The version number of the QR code.
- * @param {readonly QRCodeEncodedSegment[]} segments - The data segments to encode.
+ * @param {readonly QRCodeEncodedSegment[]} segments - The payload segments to encode.
  * @param {number} maxBufferLength - The maximum buffer length.
- * @returns {QRCodeCodewords} The code words for the given data.
+ * @returns {QRCodeCodewords} The code words for the given payload segments.
  */
 export function encode(
   version: QRCodeVersion,
@@ -49,13 +49,13 @@ export function encode(
     }
     const definition = getModeDefinition(segment.mode);
     pack(segment.mode, 4);
-    pack(segment.data.length, definition.getCharacterCountBits(version));
-    definition.encodePayload(segment.data, pack);
+    pack(segment.payload.length, definition.getCharacterCountBits(version));
+    definition.encodePayload(segment.payload, pack);
   }
 
   const encodedDataBitLength = buffer.length * 8 + (8 - remaining);
   if (encodedDataBitLength > capacity) {
-    throw new QRCodeError('DATA_TOO_LARGE', 'QRCode: Data too large', {
+    throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large', {
       details: {encodedDataBitLength, capacity},
     });
   }

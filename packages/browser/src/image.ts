@@ -1,31 +1,47 @@
-import type {
-  QRCodeAccessibilityOptions,
-  QRCodeMatrix,
-  QRCodeOptions,
-  QRCodeRenderer,
-} from '@qrcodesdk/core';
+import {type QRCodeMatrix, type QRCodeMatrixOptions, type QRCodeRenderer} from '@qrcodesdk/core';
 
 import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from './canvas';
 import {downloadQRCode, ensureExtension} from './download-helper';
+import {assertKnownKeys, assertOptionalString} from './options';
 import type {QRCodeDownloadRendererOptions} from './types';
 
-export type QRCodeImageRendererOptions = QRCodeCanvasRendererOptions & QRCodeAccessibilityOptions;
-export type QRCodeImageOptions = QRCodeOptions<QRCodeImageRendererOptions>;
+export type QRCodeImageAccessibilityOptions = {
+  readonly alt?: string;
+  readonly ariaLabel?: string;
+  readonly title?: string;
+};
+export type QRCodeImageRendererOptions = Omit<QRCodeCanvasRendererOptions, 'accessibility'> & {
+  readonly accessibility?: QRCodeImageAccessibilityOptions;
+};
+export type QRCodeImageOptions = QRCodeImageRendererOptions & {
+  readonly matrix?: QRCodeMatrixOptions;
+};
 
 export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<HTMLImageElement>;
 
 export function QRCodeImageRenderer(
   options?: QRCodeImageRendererOptions,
 ): QRCodeRenderer<HTMLImageElement> {
-  const canvasRenderer = QRCodeCanvasRenderer(options);
-  let resolvedAccessibility: Required<QRCodeAccessibilityOptions> | undefined;
+  assertKnownKeys(options, 'options', ['style', 'accessibility', 'centerImage']);
+  assertKnownKeys(options?.accessibility, 'accessibility', ['alt', 'ariaLabel', 'title']);
+  assertOptionalString(options?.accessibility?.alt, 'accessibility.alt');
+  assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
+  assertOptionalString(options?.accessibility?.title, 'accessibility.title');
+  const accessibility: Required<QRCodeImageAccessibilityOptions> = {
+    alt: options?.accessibility?.alt ?? '',
+    ariaLabel: options?.accessibility?.ariaLabel ?? '',
+    title: options?.accessibility?.title ?? '',
+  };
+  const canvasRenderer = QRCodeCanvasRenderer({
+    style: options?.style,
+    centerImage: options?.centerImage,
+    accessibility: {
+      ariaLabel: accessibility.ariaLabel,
+      title: accessibility.title,
+    },
+  });
 
   return (matrix: QRCodeMatrix) => {
-    const accessibility = (resolvedAccessibility ??= {
-      alt: options?.alt ?? '',
-      ariaLabel: options?.ariaLabel ?? '',
-      title: options?.title ?? '',
-    });
     const canvas = canvasRenderer(matrix);
     const image = document.createElement('img');
 
@@ -50,7 +66,7 @@ export function QRCodeDownloadImageRenderer(
 
 function applyAccessibilityAttributes(
   image: HTMLImageElement,
-  options: Required<QRCodeAccessibilityOptions>,
+  options: Required<QRCodeImageAccessibilityOptions>,
 ): void {
   image.alt = options.alt;
   if (options.ariaLabel) image.setAttribute('aria-label', options.ariaLabel);

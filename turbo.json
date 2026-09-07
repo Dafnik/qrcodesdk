@@ -16,7 +16,13 @@
     "//#cspell": {
       "cache": false
     },
+    "//#format": {
+      "cache": false
+    },
     "//#format:check": {
+      "cache": false
+    },
+    "//#terminology": {
       "cache": false
     },
     "benchmark": {
@@ -27,13 +33,25 @@
       "cache": false,
       "dependsOn": ["build"]
     },
+    "benchmark:styler": {
+      "cache": false,
+      "dependsOn": ["build"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", "!.turbo/**", "!.astro-cache/**"]
     },
     "check": {
-      "dependsOn": ["//#format:check", "//#cspell", "build", "test", "lint", "check-types"]
+      "dependsOn": [
+        "//#format:check",
+        "//#cspell",
+        "//#terminology",
+        "build",
+        "test",
+        "lint",
+        "check-types"
+      ]
     },
     "check-performance": {
       "cache": false

@@ -17,9 +17,9 @@ describe('Vue QR code component API', () => {
   });
 
   test('exposes download handles only for SVG and image components', () => {
-    const svg = mount(vueApi.QRCodeSVG, {props: {data: 'HELLO'}});
-    const image = mount(vueApi.QRCodeImage, {props: {data: 'HELLO'}});
-    const canvas = mount(vueApi.QRCodeCanvas, {props: {data: 'HELLO'}});
+    const svg = mount(vueApi.QRCodeSVG, {props: {payload: 'HELLO'}});
+    const image = mount(vueApi.QRCodeImage, {props: {payload: 'HELLO'}});
+    const canvas = mount(vueApi.QRCodeCanvas, {props: {payload: 'HELLO'}});
 
     expect((svg.vm as unknown as QRCodeDownloadHandle).download).toBeTypeOf('function');
     expect((image.vm as unknown as QRCodeDownloadHandle).download).toBeTypeOf('function');

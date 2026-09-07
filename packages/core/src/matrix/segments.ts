@@ -1,6 +1,6 @@
 import type {
   QRCodeEncodedSegment,
-  QRCodeInputData,
+  QRCodePayload,
   QRCodeSupportedModeIndicator,
   QRCodeVersion,
 } from '../types';
@@ -10,9 +10,9 @@ import {
   MODE_NUMERIC,
   MODE_OCTET,
   getModeDefinition,
-  isAlphanumericData,
-  isNumericData,
-  validateData,
+  isAlphanumericPayload,
+  isNumericPayload,
+  validatePayload,
 } from './mode';
 
 type SegmentMode = QRCodeSupportedModeIndicator;
@@ -31,19 +31,19 @@ const MODE_ORDER = [MODE_NUMERIC, MODE_ALPHANUMERIC, MODE_OCTET] as const;
 
 export function createSingleSegment(
   mode: QRCodeSupportedModeIndicator,
-  data: QRCodeInputData,
+  payload: QRCodePayload,
 ): QRCodeEncodedSegment | undefined {
-  const encoded = validateData(mode, data);
-  return encoded === undefined ? undefined : {mode, data: encoded};
+  const encoded = validatePayload(mode, payload);
+  return encoded === undefined ? undefined : {mode, payload: encoded};
 }
 
 export function optimizeSegments(
-  data: QRCodeInputData,
+  payload: QRCodePayload,
   version: QRCodeVersion,
   eci: boolean,
 ): QRCodeEncodedSegment[] {
-  const source = String(data);
-  if (source.length === 0) return [{mode: MODE_NUMERIC, data: ''}];
+  const source = String(payload);
+  if (source.length === 0) return [{mode: MODE_NUMERIC, payload: ''}];
 
   const characters = Array.from(source);
   const histories: ReadonlyMap<string, OptimizerState>[] = [];
@@ -92,14 +92,14 @@ export function getSegmentsBitLength(
     bitLength +=
       4 +
       definition.getCharacterCountBits(version) +
-      definition.getPayloadBitLength(segment.data.length);
+      definition.getPayloadBitLength(segment.payload.length);
   }
   return bitLength;
 }
 
 function canEncodeCharacter(mode: SegmentMode, character: string): boolean {
-  if (mode === MODE_NUMERIC) return isNumericData(character);
-  if (mode === MODE_ALPHANUMERIC) return isAlphanumericData(character);
+  if (mode === MODE_NUMERIC) return isNumericPayload(character);
+  if (mode === MODE_ALPHANUMERIC) return isAlphanumericPayload(character);
   return true;
 }
 

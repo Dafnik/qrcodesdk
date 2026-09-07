@@ -7,29 +7,31 @@ import {qrcode} from '@qrcodesdk/core';
 import {forwardRef, useEffect, useImperativeHandle, useMemo, useRef} from 'react';
 
 import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
+import {splitOptions} from './split-options';
 
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
 
 export const QRCodeImage = forwardRef<QRCodeDownloadHandle, QRCodeImageProps>(function QRCodeImage(
-  {data, options, ...wrapperProps},
+  {payload, options, ...wrapperProps},
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageRenderer = useMemo(() => QRCodeImageRenderer(options), [options]);
+  const [matrixOptions, rendererOptions] = useMemo(() => splitOptions(options), [options]);
+  const imageRenderer = useMemo(() => QRCodeImageRenderer(rendererOptions), [rendererOptions]);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    container.replaceChildren(qrcode(data).config(options).render(imageRenderer));
-  }, [data, imageRenderer, options]);
+    container.replaceChildren(qrcode(payload).options(matrixOptions).render(imageRenderer));
+  }, [payload, imageRenderer, matrixOptions]);
 
   useImperativeHandle(
     ref,
     () => ({
       download(filename?: string) {
-        qrcode(data)
-          .config(options)
+        qrcode(payload)
+          .options(matrixOptions)
           .render(
             QRCodeDownloadImageRenderer({
               renderer: imageRenderer,
@@ -38,7 +40,7 @@ export const QRCodeImage = forwardRef<QRCodeDownloadHandle, QRCodeImageProps>(fu
           );
       },
     }),
-    [data, imageRenderer, options],
+    [payload, imageRenderer, matrixOptions],
   );
 
   return <div {...wrapperProps} ref={containerRef} />;

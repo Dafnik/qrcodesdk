@@ -12,16 +12,16 @@ import type {BenchmarkAdapter, BenchmarkWorkload, StyledSVGAdapter} from '../src
 
 const fixture: QRCodeTestFixture = {
   name: 'fixture',
-  data: '1',
+  payload: '1',
   mode: 'numeric',
   version: 1,
   mask: 0,
 };
 const stylingFixture: QRCodeStylingFixture = {
   name: 'styled-fixture',
-  data: '1',
+  payload: '1',
   matrixOptions: {version: 1, mode: 'numeric'},
-  styling: {size: 5, margin: 4},
+  styling: {moduleSize: 5, quietZone: 4},
 };
 
 function adapter(

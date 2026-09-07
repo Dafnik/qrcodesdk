@@ -1,6 +1,6 @@
-# Export payload helpers from the Core entry point
+# Export payload helpers from a Core subpath
 
-Typed payload helpers are named exports from the main `@qrcodesdk/core` entry point rather than
-subpath exports or a separate package. This makes helpers easier to discover and keeps one import
-style, relying on consumer tree-shaking to remove unused helpers and accepting their inclusion in
-native ESM downloads that do not tree-shake.
+Typed payload helpers and their input types are named exports from the `@qrcodesdk/core/payload`
+subpath rather than the main entry point or a separate package. This keeps the root runtime surface
+focused on QR generation and renderers while allowing consumers to load payload serializers only
+when needed.

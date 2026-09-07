@@ -30,24 +30,23 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 
 ## Return value
 
-The renderer returns a complete SVG `string` with an explicit width, height, and `viewBox`. The root
-element has `role="img"`. Output with only square shapes uses `shape-rendering="crispEdges"`; curved
-styles omit that hint.
+The renderer returns a complete SVG `string` with an explicit width, height, and `viewBox`. A
+non-empty accessible name adds `role="img"`; decorative output has no image role. Output with only
+square shapes uses `shape-rendering="crispEdges"`; curved styles omit that hint.
 
 ## Renderer-specific options
 
-`QRCodeSVGRendererOptions` accepts the [shared visual options](/guides/customize/#shared-visual-options)
-plus these SVG-specific fields:
+`QRCodeSVGRendererOptions` accepts `style`, `accessibility`, and `centerImage`. It rejects every other key.
 
-| Option                  | Type                 | Default               | Effect                                               |
-| ----------------------- | -------------------- | --------------------- | ---------------------------------------------------- |
-| `alt`                   | `string`             | `undefined`           | Fallback accessible name when `ariaLabel` is omitted |
-| `ariaLabel`             | `string`             | `undefined`           | Sets `aria-label` and takes precedence over `alt`    |
-| `title`                 | `string`             | `undefined`           | Adds a child `<title>` element                       |
-| `image.source`          | `QRCodeDataImageURL` | required with `image` | Embeds a prepared `data:image/...` URL               |
-| `image.size`            | `number`             | `0.4`                 | Image box as a fraction of matrix width              |
-| `image.padding`         | `number`             | `1`                   | Clear padding measured in modules                    |
-| `image.clearBackground` | `boolean`            | `true`                | Clears modules behind the image and padding          |
+| Option                        | Type                 | Default                     | Effect                                           |
+| ----------------------------- | -------------------- | --------------------------- | ------------------------------------------------ |
+| `style`                       | `QRCodeVisualStyle`  | shared defaults             | Applies graphical dimensions, colors, and shapes |
+| `accessibility.ariaLabel`     | `string`             | `undefined`                 | Sets `aria-label` and meaningful image semantics |
+| `accessibility.title`         | `string`             | `undefined`                 | Adds a child `<title>` element                   |
+| `centerImage.source`          | `QRCodeDataImageURL` | required with `centerImage` | Embeds a prepared `data:image/...` URL           |
+| `centerImage.size`            | `number`             | `0.4`                       | Image box as a fraction of matrix width          |
+| `centerImage.padding`         | `number`             | `1`                         | Clear padding measured in modules                |
+| `centerImage.clearBackground` | `boolean`            | `true`                      | Clears modules behind the image and padding      |
 
 ## Renderer-specific constraints
 
@@ -56,16 +55,18 @@ Renderer-generated text is escaped, but inserting any HTML string into a documen
 the normal trust decision for that application.
 :::
 
-- `image.source` must be a non-empty embedded image data URL. The renderer does not read paths or
+- `centerImage.source` must be a non-empty embedded image data URL. The renderer does not read paths or
   fetch remote URLs.
+- SVG does not accept `accessibility.alt`; use `ariaLabel` and optionally `title`.
 - Image `size` must be finite, greater than `0`, and at most `1`; padding must be finite and
   non-negative.
+- Options are validated and copied when `QRCodeSVGRenderer()` is called.
 - The renderer is runtime-neutral under the [Core compatibility contract](/packages/core/#runtime-compatibility).
 
 ## Related guides
 
 - [Customize appearance](/guides/customize/) for shared colors, module shapes, quiet zones, labels,
-  and scan safety.
+  and scan reliability.
 - [Add a center image](/guides/center-images/) for preparing an SVG center image source.
 - [Browser Usage](/guides/browser-usage/) for rendering in the browser.
 - [Download or save](/guides/download-or-save/) for files and browser downloads.

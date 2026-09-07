@@ -6,7 +6,7 @@ import {
   MODE_NUMERIC,
   MODE_OCTET,
   encodeUTF8,
-  validateData,
+  validatePayload,
 } from '../../src/matrix/mode';
 import {getSegmentsBitLength, optimizeSegments} from '../../src/matrix/segments';
 import type {QRCodeEncodedSegment, QRCodeVersion} from '../../src/types';
@@ -22,13 +22,13 @@ describe('mixed-mode segmentation', () => {
       expect(segments).toEqual(
         version < 27
           ? [
-              {mode: MODE_ALPHANUMERIC, data: 'ABCDE'},
-              {mode: MODE_NUMERIC, data: '12345678'},
-              {mode: MODE_OCTET, data: [0x3f, 0x41, 0x31, 0x41]},
+              {mode: MODE_ALPHANUMERIC, payload: 'ABCDE'},
+              {mode: MODE_NUMERIC, payload: '12345678'},
+              {mode: MODE_OCTET, payload: [0x3f, 0x41, 0x31, 0x41]},
             ]
           : [
-              {mode: MODE_ALPHANUMERIC, data: 'ABCDE12345678'},
-              {mode: MODE_OCTET, data: [0x3f, 0x41, 0x31, 0x41]},
+              {mode: MODE_ALPHANUMERIC, payload: 'ABCDE12345678'},
+              {mode: MODE_OCTET, payload: [0x3f, 0x41, 0x31, 0x41]},
             ],
       );
     },
@@ -36,29 +36,29 @@ describe('mixed-mode segmentation', () => {
 
   test('does not switch modes when segment headers cost more than they save', () => {
     expect(optimizeSegments('ABCDE12FGHIJ', 1, false)).toEqual([
-      {mode: MODE_ALPHANUMERIC, data: 'ABCDE12FGHIJ'},
+      {mode: MODE_ALPHANUMERIC, payload: 'ABCDE12FGHIJ'},
     ]);
     expect(optimizeSegments('abc12def', 1, false)).toEqual([
-      {mode: MODE_OCTET, data: [0x61, 0x62, 0x63, 0x31, 0x32, 0x64, 0x65, 0x66]},
+      {mode: MODE_OCTET, payload: [0x61, 0x62, 0x63, 0x31, 0x32, 0x64, 0x65, 0x66]},
     ]);
   });
 
   test('preserves pure-mode, number, leading-zero, empty, and Unicode inputs', () => {
-    expect(optimizeSegments(12345, 1, false)).toEqual([{mode: MODE_NUMERIC, data: '12345'}]);
-    expect(optimizeSegments('00123', 1, false)).toEqual([{mode: MODE_NUMERIC, data: '00123'}]);
+    expect(optimizeSegments(12345, 1, false)).toEqual([{mode: MODE_NUMERIC, payload: '12345'}]);
+    expect(optimizeSegments('00123', 1, false)).toEqual([{mode: MODE_NUMERIC, payload: '00123'}]);
     expect(optimizeSegments('HELLO WORLD', 1, false)).toEqual([
-      {mode: MODE_ALPHANUMERIC, data: 'HELLO WORLD'},
+      {mode: MODE_ALPHANUMERIC, payload: 'HELLO WORLD'},
     ]);
     expect(optimizeSegments('hello', 1, false)).toEqual([
-      {mode: MODE_OCTET, data: [0x68, 0x65, 0x6c, 0x6c, 0x6f]},
+      {mode: MODE_OCTET, payload: [0x68, 0x65, 0x6c, 0x6c, 0x6f]},
     ]);
-    expect(optimizeSegments('', 1, false)).toEqual([{mode: MODE_NUMERIC, data: ''}]);
+    expect(optimizeSegments('', 1, false)).toEqual([{mode: MODE_NUMERIC, payload: ''}]);
     expect(optimizeSegments('AB✅🚀1234567890', 1, false)).toEqual([
-      {mode: MODE_OCTET, data: encodeUTF8('AB✅🚀')},
-      {mode: MODE_NUMERIC, data: '1234567890'},
+      {mode: MODE_OCTET, payload: encodeUTF8('AB✅🚀')},
+      {mode: MODE_NUMERIC, payload: '1234567890'},
     ]);
     expect(optimizeSegments('\ud800', 1, false)).toEqual([
-      {mode: MODE_OCTET, data: [0xef, 0xbf, 0xbd]},
+      {mode: MODE_OCTET, payload: [0xef, 0xbf, 0xbd]},
     ]);
   });
 
@@ -94,9 +94,9 @@ function bruteForceMinimumBitLength(input: string, version: QRCodeVersion, eci: 
     for (let end = start + 1; end <= characters.length; end++) {
       const text = characters.slice(start, end).join('');
       for (const mode of MODES) {
-        const encoded = validateData(mode, text);
+        const encoded = validatePayload(mode, text);
         if (encoded === undefined) continue;
-        const segment = {mode, data: encoded} satisfies QRCodeEncodedSegment;
+        const segment = {mode, payload: encoded} satisfies QRCodeEncodedSegment;
         const introducesUTF8ECI = mode === MODE_OCTET && !hasUTF8ECI;
         const segmentBitLength =
           getSegmentsBitLength(version, [segment], eci) -

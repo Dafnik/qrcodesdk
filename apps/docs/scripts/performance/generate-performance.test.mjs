@@ -24,7 +24,7 @@ const RESULT = {
   qrCodesPerSecond: 8500,
 };
 const REPORT = {
-  schemaVersion: 5,
+  schemaVersion: 6,
   generatedAt: '2026-07-17T21:07:54.996Z',
   environment: {
     node: 'v24.18.0',
@@ -40,7 +40,7 @@ const REPORT = {
     'qrcode-generator': '2.0.4',
     'qr-code-styling': '1.9.2',
   },
-  configuration: {
+  options: {
     samples: 3,
     warmupStaticPasses: 5,
     warmupExhaustivePasses: 1,
@@ -162,33 +162,33 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
 
 test('rejects unsupported or incomplete benchmark reports', () => {
   assert.throws(
-    () => validateBenchmarkReport({...REPORT, schemaVersion: 4}),
-    /Unsupported benchmark schema version: 4/,
+    () => validateBenchmarkReport({...REPORT, schemaVersion: 5}),
+    /Unsupported benchmark schema version: 5/,
   );
   assert.throws(() => validateBenchmarkReport({...REPORT, results: []}), /non-empty array/);
   assert.throws(
     () =>
       validateBenchmarkReport({
         ...REPORT,
-        configuration: {...REPORT.configuration, svg: undefined},
+        options: {...REPORT.options, svg: undefined},
       }),
-    /configuration\.svg must be an object/,
+    /options\.svg must be an object/,
   );
   assert.throws(
     () =>
       validateBenchmarkReport({
         ...REPORT,
-        configuration: {...REPORT.configuration, warmupExhaustivePasses: undefined},
+        options: {...REPORT.options, warmupExhaustivePasses: undefined},
       }),
-    /configuration\.warmupExhaustivePasses must be a finite number/,
+    /options\.warmupExhaustivePasses must be a finite number/,
   );
   assert.throws(
     () =>
       validateBenchmarkReport({
         ...REPORT,
-        configuration: {...REPORT.configuration, styledSvg: undefined},
+        options: {...REPORT.options, styledSvg: undefined},
       }),
-    /configuration\.styledSvg must be an object/,
+    /options\.styledSvg must be an object/,
   );
 });
 

@@ -7,30 +7,30 @@ import {
   createPlaygroundCanvasOptions,
   createPlaygroundImageOptions,
   createPlaygroundSVGOptions,
-  playgroundConfig,
+  playgroundOptions,
   playgroundPreparedImage,
-} from './playground-config.ts';
+} from './playground-options.ts';
 import {hasQRCodeError} from './qrcode-error-checker.ts';
 
-const config = useStore(playgroundConfig);
+const options = useStore(playgroundOptions);
 const preparedImage = useStore(playgroundPreparedImage);
 const svgQRCode = ref<QRCodeDownloadHandle | null>(null);
 const imageQRCode = ref<QRCodeDownloadHandle | null>(null);
-const error = computed(() => hasQRCodeError(config.value, preparedImage.value));
-const svgOptions = computed(() => createPlaygroundSVGOptions(config.value, preparedImage.value));
+const error = computed(() => hasQRCodeError(options.value, preparedImage.value));
+const svgOptions = computed(() => createPlaygroundSVGOptions(options.value, preparedImage.value));
 const imageOptions = computed(() =>
-  createPlaygroundImageOptions(config.value, preparedImage.value),
+  createPlaygroundImageOptions(options.value, preparedImage.value),
 );
 const canvasOptions = computed(() =>
-  createPlaygroundCanvasOptions(config.value, preparedImage.value),
+  createPlaygroundCanvasOptions(options.value, preparedImage.value),
 );
 </script>
 
 <template>
-  <div :data-active="config.packageName === 'vue'">
+  <div :data-active="options.packageName === 'vue'">
     <div
       class="flex flex-col items-center justify-center gap-4"
-      v-if="config.packageName === 'vue'">
+      v-if="options.packageName === 'vue'">
       <div
         class="group/alert text-destructive bg-card *:data-[slot=alert-description]:text-destructive/90 relative grid w-full max-w-md gap-0.5 rounded-lg border px-2.5 py-2 text-start text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pe-18"
         v-if="error">
@@ -40,12 +40,12 @@ const canvasOptions = computed(() =>
         </h4>
         <p
           class="text-destructive/90 [&_a]:hover:text-foreground text-sm text-balance md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_p:not(:last-child)]:mb-4">
-          {{ String(error || 'This QR code configuration is invalid.') }}
+          {{ String(error || 'This QR code options is invalid.') }}
         </p>
       </div>
 
-      <template v-else-if="config.output === 'svg'">
-        <QRCodeSVG ref="svgQRCode" :data="config.data" :options="svgOptions" />
+      <template v-else-if="options.output === 'svg'">
+        <QRCodeSVG ref="svgQRCode" :payload="options.payload" :options="svgOptions" />
         <button
           class="btn-primary large min-w-64"
           type="button"
@@ -54,8 +54,8 @@ const canvasOptions = computed(() =>
         </button>
       </template>
 
-      <template v-else-if="config.output === 'image'">
-        <QRCodeImage ref="imageQRCode" :data="config.data" :options="imageOptions" />
+      <template v-else-if="options.output === 'image'">
+        <QRCodeImage ref="imageQRCode" :payload="options.payload" :options="imageOptions" />
         <button
           class="btn-primary large min-w-64"
           type="button"
@@ -64,7 +64,7 @@ const canvasOptions = computed(() =>
         </button>
       </template>
 
-      <QRCodeCanvas v-else :data="config.data" :options="canvasOptions" />
+      <QRCodeCanvas v-else :payload="options.payload" :options="canvasOptions" />
     </div>
   </div>
 </template>

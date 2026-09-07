@@ -9,23 +9,25 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
     <main>
       <p data-testid="framework-version">Angular {{ frameworkVersion }}</p>
       <section data-testid="qrcode-svg">
-        <qrcode-svg [options]="options" data="HELLO" />
+        <qrcode-svg [options]="options" payload="HELLO" />
       </section>
       <section data-testid="qrcode-image">
-        <qrcode-image [options]="imageOptions" data="HELLO" />
+        <qrcode-image [options]="imageOptions" payload="HELLO" />
       </section>
       <section data-testid="qrcode-canvas">
-        <qrcode-canvas [options]="options" data="HELLO" />
+        <qrcode-canvas [options]="options" payload="HELLO" />
       </section>
     </main>
   `,
 })
 export class App {
   protected readonly frameworkVersion = VERSION.full;
-  protected readonly options = {size: 2, margin: 1};
+  protected readonly options = {style: {moduleSize: 2, quietZone: 1}};
   protected readonly imageOptions = {
     ...this.options,
-    alt: 'Framework runtime QR code',
-    ariaLabel: 'Framework runtime QR code',
+    accessibility: {
+      alt: 'Framework runtime QR code',
+      ariaLabel: 'Framework runtime QR code',
+    },
   };
 }

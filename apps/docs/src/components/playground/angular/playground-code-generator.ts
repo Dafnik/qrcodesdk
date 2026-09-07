@@ -1,8 +1,8 @@
 import {
-  type PlaygroundConfig,
+  type PlaygroundOptions,
   type PlaygroundOutput,
   type PlaygroundPreparedImage,
-} from '../playground-config.ts';
+} from '../playground-options.ts';
 
 export type HighlighterLang = 'angular-ts' | 'svelte' | 'tsx' | 'vue';
 
@@ -45,46 +45,46 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
 };
 
 export function generatePlaygroundCode(
-  config: PlaygroundConfig,
+  playgroundOptionsValue: PlaygroundOptions,
   preparedImage?: PlaygroundPreparedImage,
 ): CodePreview {
-  switch (config.packageName) {
+  switch (playgroundOptionsValue.packageName) {
     case 'react':
-      return generateReactCode(config, preparedImage);
+      return generateReactCode(playgroundOptionsValue, preparedImage);
     case 'vue':
-      return generateVueCode(config, preparedImage);
+      return generateVueCode(playgroundOptionsValue, preparedImage);
     case 'svelte':
-      return generateSvelteCode(config, preparedImage);
+      return generateSvelteCode(playgroundOptionsValue, preparedImage);
     case 'angular':
-      return generateAngularCode(config, preparedImage);
+      return generateAngularCode(playgroundOptionsValue, preparedImage);
   }
 }
 
 function generateSvelteCode(
-  config: PlaygroundConfig,
+  playgroundOptionsValue: PlaygroundOptions,
   preparedImage?: PlaygroundPreparedImage,
 ): CodePreview {
-  const meta = META_BY_OUTPUT[config.output];
+  const meta = META_BY_OUTPUT[playgroundOptionsValue.output];
   const hasDownload = meta.downloadLabel !== undefined;
   const hasImage = preparedImage !== undefined;
   const componentImport = hasDownload
     ? `import {${meta.componentName}, type QRCodeDownloadHandle} from '@qrcodesdk/svelte';`
     : `import {${meta.componentName}} from '@qrcodesdk/svelte';`;
   const optionsTypes =
-    hasImage && config.output === 'svg'
+    hasImage && playgroundOptionsValue.output === 'svg'
       ? `QRCodeDataImageURL, ${meta.optionsType}`
       : meta.optionsType;
   const qrcodeRef = hasDownload ? `let qrcode: QRCodeDownloadHandle | undefined;\n` : '';
   const optionsDeclaration = hasImage
     ? `let imageSource = $state<${
-        config.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
+        playgroundOptionsValue.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
       }>();
 const options: ${meta.optionsType} | undefined = $derived(
-  imageSource ? ${formatOptions(config, 1, {source: 'imageSource', preparedImage})} : undefined,
+  imageSource ? ${formatOptions(playgroundOptionsValue, 1, {source: 'imageSource', preparedImage})} : undefined,
 );
 
-${svelteImagePreparation(config.output)}`
-    : `const options: ${meta.optionsType} = ${formatOptions(config, 1)};`;
+${svelteImagePreparation(playgroundOptionsValue.output)}`
+    : `const options: ${meta.optionsType} = ${formatOptions(playgroundOptionsValue, 1)};`;
   const downloadButton = hasDownload
     ? `  <button type="button" onclick={() => qrcode?.download('qrcodesdk')}>
     ${meta.downloadLabel}
@@ -95,7 +95,7 @@ ${svelteImagePreparation(config.output)}`
     ? `<input type="file" accept="image/*" onchange={selectImage} />\n`
     : '';
   const bindProperty = hasDownload ? ' bind:this={qrcode}' : '';
-  const component = `<${meta.componentName}${bindProperty} {data} {options} />`;
+  const component = `<${meta.componentName}${bindProperty} {payload} {options} />`;
   const body = hasImage
     ? `${imageInput}{#if options}
 ${downloadButton}  ${component}
@@ -108,9 +108,9 @@ ${downloadButton}  ${component}
   import type {${optionsTypes}} from '${meta.optionsPackage}';
   ${componentImport}
 
-  const data = ${quote(config.data)};
+  const payload = ${quote(playgroundOptionsValue.payload)};
   ${qrcodeRef}${optionsDeclaration.replaceAll('\n', '\n  ')}
-${hasImage ? `\n${indent(fileReaderHelper(config.output === 'svg'), 1)}` : ''}
+${hasImage ? `\n${indent(fileReaderHelper(playgroundOptionsValue.output === 'svg'), 1)}` : ''}
 </script>
 
 ${body}`,
@@ -118,10 +118,10 @@ ${body}`,
 }
 
 function generateReactCode(
-  config: PlaygroundConfig,
+  playgroundOptionsValue: PlaygroundOptions,
   preparedImage?: PlaygroundPreparedImage,
 ): CodePreview {
-  const meta = META_BY_OUTPUT[config.output];
+  const meta = META_BY_OUTPUT[playgroundOptionsValue.output];
   const hasDownload = meta.downloadLabel !== undefined;
   const hasImage = preparedImage !== undefined;
 
@@ -137,7 +137,7 @@ function generateReactCode(
     : `import {${meta.componentName}} from '@qrcodesdk/react';`;
 
   const optionsTypes =
-    hasImage && config.output === 'svg'
+    hasImage && playgroundOptionsValue.output === 'svg'
       ? `QRCodeDataImageURL, ${meta.optionsType}`
       : meta.optionsType;
   const imports =
@@ -150,8 +150,8 @@ function generateReactCode(
     : '';
   const imageDeclaration = hasImage
     ? `  const [imageSource, setImageSource] = useState<${
-        config.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
-      }>();\n\n${reactImagePreparation(config.output)}
+        playgroundOptionsValue.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
+      }>();\n\n${reactImagePreparation(playgroundOptionsValue.output)}
 
   if (!imageSource) {
     return <input type="file" accept="image/*" onChange={selectImage} />;
@@ -178,10 +178,10 @@ function generateReactCode(
     ? [
         `    <>`,
         downloadButton,
-        `      <${meta.componentName}${refProperty} data={data} options={options} />`,
+        `      <${meta.componentName}${refProperty} payload={payload} options={options} />`,
         `    </>`,
       ].join('\n')
-    : `    <${meta.componentName} data={data} options={options} />`;
+    : `    <${meta.componentName} payload={payload} options={options} />`;
   const imageInput = hasImage
     ? `      <input type="file" accept="image/*" onChange={selectImage} />\n`
     : '';
@@ -192,10 +192,10 @@ function generateReactCode(
     code: `${imports}
 
 export function QRCodeExample() {
-  const data = ${quote(config.data)};
+  const payload = ${quote(playgroundOptionsValue.payload)};
 
 ${refDeclaration}${imageDeclaration}  const options: ${meta.optionsType} = ${formatOptions(
-      config,
+      playgroundOptionsValue,
       2,
       preparedImage ? {source: 'imageSource', preparedImage} : undefined,
     )};
@@ -204,15 +204,15 @@ ${refDeclaration}${imageDeclaration}  const options: ${meta.optionsType} = ${for
 ${hasImage ? `    <>\n${imageInput}${indent(body, 2)}\n    </>` : body}
   );
 }
-${hasImage ? `\n${fileReaderHelper(config.output === 'svg')}` : ''}`,
+${hasImage ? `\n${fileReaderHelper(playgroundOptionsValue.output === 'svg')}` : ''}`,
   };
 }
 
 function generateVueCode(
-  config: PlaygroundConfig,
+  playgroundOptionsValue: PlaygroundOptions,
   preparedImage?: PlaygroundPreparedImage,
 ): CodePreview {
-  const meta = META_BY_OUTPUT[config.output];
+  const meta = META_BY_OUTPUT[playgroundOptionsValue.output];
   const hasDownload = meta.downloadLabel !== undefined;
   const hasImage = preparedImage !== undefined;
   const vueImports = [
@@ -224,23 +224,23 @@ function generateVueCode(
     ? `import {${meta.componentName}, type QRCodeDownloadHandle} from '@qrcodesdk/vue';`
     : `import {${meta.componentName}} from '@qrcodesdk/vue';`;
   const optionsTypes =
-    hasImage && config.output === 'svg'
+    hasImage && playgroundOptionsValue.output === 'svg'
       ? `QRCodeDataImageURL, ${meta.optionsType}`
       : meta.optionsType;
   const qrcodeRef = hasDownload ? `const qrcode = ref<QRCodeDownloadHandle | null>(null);\n` : '';
   const optionsDeclaration = hasImage
     ? `const imageSource = shallowRef<${
-        config.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
+        playgroundOptionsValue.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
       }>();
 const options = computed<${meta.optionsType} | undefined>(() => {
   const source = imageSource.value;
   if (!source) return undefined;
 
-  return ${formatOptions(config, 1, {source: 'source', preparedImage})};
+  return ${formatOptions(playgroundOptionsValue, 1, {source: 'source', preparedImage})};
 });
 
-${vueImagePreparation(config.output)}`
-    : `const options: ${meta.optionsType} = ${formatOptions(config, 1)};`;
+${vueImagePreparation(playgroundOptionsValue.output)}`
+    : `const options: ${meta.optionsType} = ${formatOptions(playgroundOptionsValue, 1)};`;
   const downloadButton = hasDownload
     ? `  <button type="button" @click="qrcode?.download('qrcodesdk')">
     ${meta.downloadLabel}
@@ -260,22 +260,22 @@ import type {${optionsTypes}} from '${meta.optionsPackage}';
 ${componentImport}
 ${vueImport}
 
-const data = ${quote(config.data)};
+const payload = ${quote(playgroundOptionsValue.payload)};
 ${qrcodeRef}${optionsDeclaration}
-${hasImage ? `\n${fileReaderHelper(config.output === 'svg')}` : ''}
+${hasImage ? `\n${fileReaderHelper(playgroundOptionsValue.output === 'svg')}` : ''}
 </script>
 
 <template>
-${imageInput}${downloadButton}  <${meta.componentName}${conditional}${refProperty} :data="data" :options="options" />
+${imageInput}${downloadButton}  <${meta.componentName}${conditional}${refProperty} :payload="payload" :options="options" />
 </template>`,
   };
 }
 
 function generateAngularCode(
-  config: PlaygroundConfig,
+  playgroundOptionsValue: PlaygroundOptions,
   preparedImage?: PlaygroundPreparedImage,
 ): CodePreview {
-  const meta = META_BY_OUTPUT[config.output];
+  const meta = META_BY_OUTPUT[playgroundOptionsValue.output];
   const hasDownload = meta.downloadLabel !== undefined;
   const hasImage = preparedImage !== undefined;
 
@@ -289,11 +289,11 @@ function generateAngularCode(
   const qrcodeTemplate = hasDownload
     ? `${downloadButton}    <${meta.selector}
       #qrcode
-      [data]="data"
+      [payload]="payload"
       [options]="options"
     />`
     : `    <${meta.selector}
-      [data]="data"
+      [payload]="payload"
       [options]="options"
     />`;
   const template = hasImage
@@ -304,25 +304,25 @@ ${indent(qrcodeTemplate, 3)}
     : qrcodeTemplate;
   const angularImports = hasImage ? 'Component, computed, signal' : 'Component';
   const optionsTypes =
-    hasImage && config.output === 'svg'
+    hasImage && playgroundOptionsValue.output === 'svg'
       ? `QRCodeDataImageURL, ${meta.optionsType}`
       : meta.optionsType;
   const imageMembers = hasImage
     ? `
   readonly imageSource = signal<${
-    config.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
+    playgroundOptionsValue.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
   }>();
   readonly options = computed<${meta.optionsType} | undefined>(() => {
     const source = this.imageSource();
     if (!source) return undefined;
 
-    return ${formatOptions(config, 2, {source: 'source', preparedImage})};
+    return ${formatOptions(playgroundOptionsValue, 2, {source: 'source', preparedImage})};
   });
 
-${indent(angularImagePreparation(config.output), 1)}
+${indent(angularImagePreparation(playgroundOptionsValue.output), 1)}
 `
     : `
-  readonly options: ${meta.optionsType} = ${formatOptions(config, 2)};
+  readonly options: ${meta.optionsType} = ${formatOptions(playgroundOptionsValue, 2)};
 `;
 
   return {
@@ -341,95 +341,101 @@ ${template}
   \`,
 })
 export class QRCodeExample {
-  readonly data = ${quote(config.data)};
+  readonly payload = ${quote(playgroundOptionsValue.payload)};
 ${imageMembers}
 }
-${hasImage ? `\n${fileReaderHelper(config.output === 'svg')}` : ''}`,
+${hasImage ? `\n${fileReaderHelper(playgroundOptionsValue.output === 'svg')}` : ''}`,
   };
 }
 
 function formatOptions(
-  config: PlaygroundConfig,
+  playgroundOptionsValue: PlaygroundOptions,
   depth: number,
   image?: {source: string; preparedImage: PlaygroundPreparedImage},
 ): string {
   const entries: string[] = [];
+  const styleEntries: string[] = [];
 
-  if (config.size !== undefined) {
-    entries.push(`size: ${config.size}`);
+  if (playgroundOptionsValue.moduleSize !== undefined) {
+    styleEntries.push(`moduleSize: ${playgroundOptionsValue.moduleSize}`);
   }
 
-  if (config.margin !== undefined) {
-    entries.push(`margin: ${config.margin}`);
+  if (playgroundOptionsValue.quietZone !== undefined) {
+    styleEntries.push(`quietZone: ${playgroundOptionsValue.quietZone}`);
   }
 
-  if (config.colors !== undefined) {
-    const colorEntries: string[] = [];
-
-    if (config.colors.colorDark !== undefined) {
-      colorEntries.push(`colorDark: ${quote(config.colors.colorDark)}`);
-    }
-
-    if (config.colors.colorLight !== undefined) {
-      colorEntries.push(`colorLight: ${quote(config.colors.colorLight)}`);
-    }
-
-    if (colorEntries.length > 0) {
-      entries.push(`colors: ${formatObject(colorEntries, depth + 1)}`);
-    }
+  if (playgroundOptionsValue.foreground !== undefined) {
+    styleEntries.push(`foreground: ${quote(playgroundOptionsValue.foreground)}`);
+  }
+  if (playgroundOptionsValue.background !== undefined) {
+    styleEntries.push(`background: ${quote(playgroundOptionsValue.background)}`);
+  }
+  if (shouldIncludeShapeOptions(playgroundOptionsValue.modules, 'square')) {
+    styleEntries.push(`modules: ${formatShapeOptions(playgroundOptionsValue.modules, depth + 2)}`);
+  }
+  const finderEntries: string[] = [];
+  if (shouldIncludeShapeOptions(playgroundOptionsValue.finder?.outer, 'square')) {
+    finderEntries.push(
+      `outer: ${formatShapeOptions(playgroundOptionsValue.finder?.outer, depth + 3)}`,
+    );
+  }
+  if (shouldIncludeShapeOptions(playgroundOptionsValue.finder?.center, 'square')) {
+    finderEntries.push(
+      `center: ${formatShapeOptions(playgroundOptionsValue.finder?.center, depth + 3)}`,
+    );
+  }
+  if (finderEntries.length > 0) {
+    styleEntries.push(`finder: ${formatObject(finderEntries, depth + 2)}`);
+  }
+  if (styleEntries.length > 0) {
+    entries.push(`style: ${formatObject(styleEntries, depth + 1)}`);
   }
 
-  if (shouldIncludeStyleOptions(config.dotsOptions, 'square')) {
-    entries.push(`dotsOptions: ${formatStyleOptions(config.dotsOptions, depth + 1)}`);
+  const matrixEntries: string[] = [];
+  if (playgroundOptionsValue.version !== undefined) {
+    matrixEntries.push(`version: ${playgroundOptionsValue.version}`);
   }
 
-  if (shouldIncludeStyleOptions(config.cornersSquareOptions, 'square')) {
-    entries.push(
-      `cornersSquareOptions: ${formatStyleOptions(config.cornersSquareOptions, depth + 1)}`,
+  if (playgroundOptionsValue.mode !== undefined) {
+    matrixEntries.push(`mode: ${quote(playgroundOptionsValue.mode)}`);
+  }
+
+  if (playgroundOptionsValue.errorCorrectionLevel !== undefined) {
+    matrixEntries.push(
+      `errorCorrectionLevel: ${quote(playgroundOptionsValue.errorCorrectionLevel)}`,
     );
   }
 
-  if (shouldIncludeStyleOptions(config.cornersDotOptions, 'square')) {
-    entries.push(`cornersDotOptions: ${formatStyleOptions(config.cornersDotOptions, depth + 1)}`);
+  if (playgroundOptionsValue.mask !== undefined) {
+    matrixEntries.push(`mask: ${playgroundOptionsValue.mask}`);
   }
 
-  if (config.version !== undefined) {
-    entries.push(`version: ${config.version}`);
+  if (playgroundOptionsValue.eci === true) {
+    matrixEntries.push('eci: true');
   }
+  if (matrixEntries.length > 0) entries.push(`matrix: ${formatObject(matrixEntries, depth + 1)}`);
 
-  if (config.mode !== undefined) {
-    entries.push(`mode: ${quote(config.mode)}`);
-  }
-
-  if (config.errorCorrectionLevel !== undefined) {
-    entries.push(`errorCorrectionLevel: ${quote(config.errorCorrectionLevel)}`);
-  }
-
-  if (config.mask !== undefined) {
-    entries.push(`mask: ${config.mask}`);
-  }
-
-  if (config.eci === true) {
-    entries.push('eci: true');
-  }
-
-  if (config.output !== 'canvas') {
-    if (config.alt) {
-      entries.push(`alt: ${quote(config.alt)}`);
+  const accessibilityEntries: string[] = [];
+  if (playgroundOptionsValue.output === 'image') {
+    if (playgroundOptionsValue.alt) {
+      accessibilityEntries.push(`alt: ${quote(playgroundOptionsValue.alt)}`);
     }
+  }
 
-    if (config.ariaLabel) {
-      entries.push(`ariaLabel: ${quote(config.ariaLabel)}`);
-    }
+  if (playgroundOptionsValue.ariaLabel) {
+    accessibilityEntries.push(`ariaLabel: ${quote(playgroundOptionsValue.ariaLabel)}`);
+  }
 
-    if (config.title) {
-      entries.push(`title: ${quote(config.title)}`);
-    }
+  if (playgroundOptionsValue.title) {
+    accessibilityEntries.push(`title: ${quote(playgroundOptionsValue.title)}`);
+  }
+  if (accessibilityEntries.length > 0) {
+    entries.push(`accessibility: ${formatObject(accessibilityEntries, depth + 1)}`);
   }
 
   if (image) {
     entries.push(
-      `image: ${formatObject(
+      `centerImage: ${formatObject(
         [
           `source: ${image.source}`,
           `size: ${image.preparedImage.size}`,
@@ -553,10 +559,10 @@ function indent(value: string, depth: number): string {
     .join('\n');
 }
 
-function shouldIncludeStyleOptions(
+function shouldIncludeShapeOptions(
   options:
     | {
-        type?: string;
+        readonly shape?: string;
         color?: string;
       }
     | undefined,
@@ -567,14 +573,14 @@ function shouldIncludeStyleOptions(
   }
 
   return (
-    options.color !== undefined || (options.type !== undefined && options.type !== defaultType)
+    options.color !== undefined || (options.shape !== undefined && options.shape !== defaultType)
   );
 }
 
-function formatStyleOptions(
+function formatShapeOptions(
   options:
     | {
-        type?: string;
+        readonly shape?: string;
         color?: string;
       }
     | undefined,
@@ -582,8 +588,8 @@ function formatStyleOptions(
 ): string {
   const entries: string[] = [];
 
-  if (options?.type !== undefined) {
-    entries.push(`type: ${quote(options.type)}`);
+  if (options?.shape !== undefined) {
+    entries.push(`shape: ${quote(options.shape)}`);
   }
 
   if (options?.color !== undefined) {

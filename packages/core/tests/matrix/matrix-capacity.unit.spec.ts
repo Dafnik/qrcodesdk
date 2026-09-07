@@ -99,7 +99,7 @@ describe('capacity helpers', () => {
     expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!], false)).toBe(20);
     expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!], true)).toBe(32);
     // @ts-expect-error Exercise the runtime fallback for an unsupported mode.
-    expect(() => getSegmentsBitLength(1, [{mode: -1, data: ''}], false)).toThrow(
+    expect(() => getSegmentsBitLength(1, [{mode: -1, payload: ''}], false)).toThrow(
       'QRCode: Invalid mode',
     );
   });

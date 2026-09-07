@@ -30,8 +30,8 @@ describe('React QR code component handles', () => {
 
     render(
       <>
-        <QRCodeSVG data="HELLO" ref={svgQRCode} />
-        <QRCodeImage data="HELLO" ref={imageQRCode} />
+        <QRCodeSVG payload="HELLO" ref={svgQRCode} />
+        <QRCodeImage payload="HELLO" ref={imageQRCode} />
       </>,
     );
 
@@ -40,9 +40,9 @@ describe('React QR code component handles', () => {
   });
 
   test('server-renders complete SVG markup and permanent browser-output wrappers', () => {
-    const svg = renderToString(<QRCodeSVG data="SSR" />);
-    const image = renderToString(<QRCodeImage data="SSR" />);
-    const canvas = renderToString(<QRCodeCanvas data="SSR" />);
+    const svg = renderToString(<QRCodeSVG payload="SSR" />);
+    const image = renderToString(<QRCodeImage payload="SSR" />);
+    const canvas = renderToString(<QRCodeCanvas payload="SSR" />);
 
     expect(svg).toContain('<svg');
     expect(svg).toContain('<path');

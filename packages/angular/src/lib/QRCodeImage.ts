@@ -15,9 +15,10 @@ import {
   type QRCodeImageOptions,
   QRCodeImageRenderer,
 } from '@qrcodesdk/browser';
-import {type QRCodeInputData, qrcode} from '@qrcodesdk/core';
+import {type QRCodePayload, qrcode} from '@qrcodesdk/core';
 
 import {replaceElementChildren} from './render-element';
+import {splitOptions} from './split-options';
 
 @Component({
   selector: 'qrcode-image',
@@ -28,14 +29,15 @@ export class QRCodeImage {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);
 
-  data = input.required<QRCodeInputData>();
+  payload = input.required<QRCodePayload>();
 
   options = input<QRCodeImageOptions>();
 
-  readonly imageRenderer = computed(() => QRCodeImageRenderer(this.options()));
+  readonly resolvedOptions = computed(() => splitOptions(this.options()));
+  readonly imageRenderer = computed(() => QRCodeImageRenderer(this.resolvedOptions()[1]));
 
   readonly qrcodeBuilder = computed(() =>
-    qrcode(this.data()).config(this.options()).renderer(this.imageRenderer()),
+    qrcode(this.payload()).options(this.resolvedOptions()[0]).renderer(this.imageRenderer()),
   );
 
   constructor() {

@@ -6,7 +6,7 @@ import type {Options as QRCodeStylingLibraryOptions} from 'qr-code-styling';
 import qrCodeStylingPackage from 'qr-code-styling/package.json' with {type: 'json'};
 
 import {QRCodeSVGRenderer, qrcode as createQRCodeSDK} from '@qrcodesdk/core';
-import type {QRCodeMatrixOptions} from '@qrcodesdk/core';
+import type {QRCodeFinderShape, QRCodeMatrixOptions, QRCodeModuleShape} from '@qrcodesdk/core';
 import qrcodeSDKPackage from '@qrcodesdk/core/package.json' with {type: 'json'};
 
 import type {StyledSVGAdapter} from './types';
@@ -48,18 +48,18 @@ export function createQRCodeStylingLibraryOptions(
     throw new Error(`Styled benchmark fixture ${fixture.name} must specify a QR code version`);
   }
 
-  const size = fixture.styling.size ?? 5;
-  const margin = fixture.styling.margin ?? 4;
+  const size = fixture.styling.moduleSize ?? 5;
+  const quietZone = fixture.styling.quietZone ?? 4;
   const moduleCount = 17 + 4 * version;
-  const renderedSize = (moduleCount + 2 * margin) * size;
-  const colorDark = fixture.styling.colors?.colorDark ?? '#000000';
+  const renderedSize = (moduleCount + 2 * quietZone) * size;
+  const colorDark = fixture.styling.foreground ?? '#000000';
 
   return {
     type: 'svg',
     width: renderedSize,
     height: renderedSize,
-    margin: margin * size,
-    data: fixture.data,
+    margin: quietZone * size,
+    data: fixture.payload,
     jsdom: sharedJSDOMConstructor,
     qrOptions: {
       typeNumber: version,
@@ -67,19 +67,19 @@ export function createQRCodeStylingLibraryOptions(
       errorCorrectionLevel: fixture.matrixOptions.errorCorrectionLevel ?? 'M',
     },
     backgroundOptions: {
-      color: fixture.styling.colors?.colorLight ?? '#ffffff',
+      color: fixture.styling.background ?? '#ffffff',
     },
     dotsOptions: {
-      color: fixture.styling.dotsOptions?.color ?? colorDark,
-      type: fixture.styling.dotsOptions?.type ?? 'square',
+      color: fixture.styling.modules?.color ?? colorDark,
+      type: mapModuleShape(fixture.styling.modules?.shape),
     },
     cornersSquareOptions: {
-      color: fixture.styling.cornersSquareOptions?.color ?? colorDark,
-      type: fixture.styling.cornersSquareOptions?.type ?? 'square',
+      color: fixture.styling.finder?.outer?.color ?? colorDark,
+      type: mapFinderShape(fixture.styling.finder?.outer?.shape),
     },
     cornersDotOptions: {
-      color: fixture.styling.cornersDotOptions?.color ?? colorDark,
-      type: fixture.styling.cornersDotOptions?.type ?? 'square',
+      color: fixture.styling.finder?.center?.color ?? colorDark,
+      type: mapFinderShape(fixture.styling.finder?.center?.shape),
     },
   };
 }
@@ -89,9 +89,9 @@ const qrcodeSDKStyledSVGAdapter: StyledSVGAdapter = {
   label: 'QRCodeSDK',
   version: qrcodeSDKPackage.version,
   styledSvg: (fixture) =>
-    createQRCodeSDK(fixture.data)
-      .config(automaticMatrixOptions(fixture))
-      .render(QRCodeSVGRenderer(fixture.styling)).length,
+    createQRCodeSDK(fixture.payload)
+      .options(automaticMatrixOptions(fixture))
+      .render(QRCodeSVGRenderer({style: fixture.styling})).length,
 };
 
 const qrCodeStylingAdapter: StyledSVGAdapter = {
@@ -110,3 +110,36 @@ export const STYLED_SVG_BENCHMARK_ADAPTERS = [
   qrcodeSDKStyledSVGAdapter,
   qrCodeStylingAdapter,
 ] as const satisfies readonly StyledSVGAdapter[];
+
+function mapModuleShape(
+  shape: QRCodeModuleShape | undefined,
+): NonNullable<QRCodeStylingLibraryOptions['dotsOptions']>['type'] {
+  switch (shape) {
+    case 'circle':
+      return 'dots';
+    case 'diagonal':
+      return 'classy';
+    case 'diagonal-rounded':
+      return 'classy-rounded';
+    case 'rounded':
+    case 'extra-rounded':
+    case 'square':
+      return shape;
+    default:
+      return 'square';
+  }
+}
+
+function mapFinderShape(
+  shape: QRCodeFinderShape | undefined,
+): NonNullable<QRCodeStylingLibraryOptions['cornersSquareOptions']>['type'] {
+  switch (shape) {
+    case 'circle':
+      return 'dot';
+    case 'rounded':
+    case 'extra-rounded':
+      return 'extra-rounded';
+    default:
+      return 'square';
+  }
+}

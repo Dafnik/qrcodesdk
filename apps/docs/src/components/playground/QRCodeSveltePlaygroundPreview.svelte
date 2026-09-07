@@ -5,27 +5,27 @@
     createPlaygroundCanvasOptions,
     createPlaygroundImageOptions,
     createPlaygroundSVGOptions,
-    playgroundConfig,
+    playgroundOptions,
     playgroundPreparedImage,
-  } from './playground-config.ts';
+  } from './playground-options.ts';
   import {hasQRCodeError} from './qrcode-error-checker.ts';
 
   let svgQRCode: QRCodeDownloadHandle | undefined;
   let imageQRCode: QRCodeDownloadHandle | undefined;
-  const error = $derived(hasQRCodeError($playgroundConfig, $playgroundPreparedImage));
+  const error = $derived(hasQRCodeError($playgroundOptions, $playgroundPreparedImage));
   const svgOptions = $derived(
-    createPlaygroundSVGOptions($playgroundConfig, $playgroundPreparedImage),
+    createPlaygroundSVGOptions($playgroundOptions, $playgroundPreparedImage),
   );
   const imageOptions = $derived(
-    createPlaygroundImageOptions($playgroundConfig, $playgroundPreparedImage),
+    createPlaygroundImageOptions($playgroundOptions, $playgroundPreparedImage),
   );
   const canvasOptions = $derived(
-    createPlaygroundCanvasOptions($playgroundConfig, $playgroundPreparedImage),
+    createPlaygroundCanvasOptions($playgroundOptions, $playgroundPreparedImage),
   );
 </script>
 
-<div data-active={$playgroundConfig.packageName === 'svelte'}>
-  {#if $playgroundConfig.packageName === 'svelte'}
+<div data-active={$playgroundOptions.packageName === 'svelte'}>
+  {#if $playgroundOptions.packageName === 'svelte'}
     <div class="flex flex-col items-center justify-center gap-4">
       {#if error}
         <div
@@ -36,19 +36,25 @@
           </h4>
           <p
             class="text-destructive/90 [&_a]:hover:text-foreground text-sm text-balance md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_p:not(:last-child)]:mb-4">
-            {String(error || 'This QR code configuration is invalid.')}
+            {String(error || 'This QR code options is invalid.')}
           </p>
         </div>
-      {:else if $playgroundConfig.output === 'svg'}
-        <QRCodeSVG bind:this={svgQRCode} data={$playgroundConfig.data} options={svgOptions} />
+      {:else if $playgroundOptions.output === 'svg'}
+        <QRCodeSVG
+          bind:this={svgQRCode}
+          payload={$playgroundOptions.payload}
+          options={svgOptions} />
         <button
           class="btn-primary large min-w-64"
           type="button"
           onclick={() => svgQRCode?.download('qrcodesdk')}>
           Download SVG
         </button>
-      {:else if $playgroundConfig.output === 'image'}
-        <QRCodeImage bind:this={imageQRCode} data={$playgroundConfig.data} options={imageOptions} />
+      {:else if $playgroundOptions.output === 'image'}
+        <QRCodeImage
+          bind:this={imageQRCode}
+          payload={$playgroundOptions.payload}
+          options={imageOptions} />
         <button
           class="btn-primary large min-w-64"
           type="button"
@@ -56,7 +62,7 @@
           Download PNG
         </button>
       {:else}
-        <QRCodeCanvas data={$playgroundConfig.data} options={canvasOptions} />
+        <QRCodeCanvas payload={$playgroundOptions.payload} options={canvasOptions} />
       {/if}
     </div>
   {/if}

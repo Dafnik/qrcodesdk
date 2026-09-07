@@ -1,13 +1,13 @@
-import type {QRCodeInputData, QRCodeMatrix, QRCodeMatrixOptions} from '../types';
+import type {QRCodeMatrix, QRCodeMatrixOptions, QRCodePayload} from '../types';
 import {assembleQRCodeMatrix} from './assemble-matrix';
 import {createQRCodeCodewords} from './create-qrcode-codewords';
 import {resolveQRCodeMatrixOptions} from './resolve-matrix-options';
 
 export function generateQRCodeMatrix(
-  data: QRCodeInputData,
+  payload: QRCodePayload,
   options?: QRCodeMatrixOptions,
 ): QRCodeMatrix {
-  const resolved = resolveQRCodeMatrixOptions(data, options);
+  const resolved = resolveQRCodeMatrixOptions(payload, options);
   const codewords = createQRCodeCodewords(resolved);
   return assembleQRCodeMatrix(
     resolved.version,

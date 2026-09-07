@@ -1,10 +1,9 @@
 import {describe, expectTypeOf, test} from 'vitest';
 
-import type {QRCodeOptions} from '@qrcodesdk/core';
-import type {QRCodeImageOverlayOptions} from '@qrcodesdk/core';
+import type {QRCodeCenterImageOptions, QRCodeMatrixOptions} from '@qrcodesdk/core';
 
 import type {
-  QRCodeCanvasImageOptions,
+  QRCodeCanvasCenterImageOptions,
   QRCodeCanvasOptions,
   QRCodeCanvasRendererOptions,
   QRCodeImageOptions,
@@ -13,10 +12,14 @@ import type {
 
 describe('public API types', () => {
   test('exports canonical browser component option types', () => {
-    expectTypeOf<QRCodeCanvasOptions>().toEqualTypeOf<QRCodeOptions<QRCodeCanvasRendererOptions>>();
-    expectTypeOf<QRCodeCanvasImageOptions>().toEqualTypeOf<
-      QRCodeImageOverlayOptions<CanvasImageSource>
+    expectTypeOf<QRCodeCanvasOptions>().toEqualTypeOf<
+      QRCodeCanvasRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
     >();
-    expectTypeOf<QRCodeImageOptions>().toEqualTypeOf<QRCodeOptions<QRCodeImageRendererOptions>>();
+    expectTypeOf<QRCodeCanvasCenterImageOptions>().toEqualTypeOf<
+      QRCodeCenterImageOptions<CanvasImageSource>
+    >();
+    expectTypeOf<QRCodeImageOptions>().toEqualTypeOf<
+      QRCodeImageRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
+    >();
   });
 });

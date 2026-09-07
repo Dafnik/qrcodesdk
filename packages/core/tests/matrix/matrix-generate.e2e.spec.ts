@@ -1,7 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
 import {
-  ɵMODES as MODES,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMode,
   type QRCodeVersion,
@@ -13,6 +12,8 @@ import {MODES_MAP} from '../../src/matrix/mode';
 import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
 import {createSingleSegment} from '../../src/matrix/segments';
 import {expectSquareBinaryMatrix} from './helpers';
+
+const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
 
 const ERROR_CORRECTION_LEVELS = [
   'L',
@@ -58,40 +59,40 @@ describe('qrcode().matrix()', () => {
   });
 
   test('uses mixed modes automatically while explicit modes remain forced', () => {
-    const data = 'ABCD12345678901234567890abcd';
-    const automatic = qrcode(data).mask(1).matrix();
-    const forcedOctet = qrcode(data).mode('octet').mask(1).matrix();
+    const payload = 'ABCD12345678901234567890abcd';
+    const automatic = qrcode(payload).mask(1).matrix();
+    const forcedOctet = qrcode(payload).mode('octet').mask(1).matrix();
 
     expect(automatic).toHaveLength(25);
     expect(forcedOctet).toHaveLength(29);
-    expect(qrcode(data).version(2).mask(1).matrix()).toEqual(automatic);
-    expect(qrcode(data).mode('octet').mode(undefined).mask(1).matrix()).toEqual(automatic);
-    expect(qrcode(data).config({mode: 'octet'}).config({mode: undefined}).mask(1).matrix()).toEqual(
-      automatic,
-    );
+    expect(qrcode(payload).version(2).mask(1).matrix()).toEqual(automatic);
+    expect(qrcode(payload).mode('octet').mode(undefined).mask(1).matrix()).toEqual(automatic);
+    expect(
+      qrcode(payload).options({mode: 'octet'}).options({mode: undefined}).mask(1).matrix(),
+    ).toEqual(automatic);
     expect(qrcode('ABCDE12345678?A1A').version(1).matrix()).toHaveLength(21);
     expect(qrcode('ABCDE12345678?A1A').eci(true).matrix()).toHaveLength(25);
     expect(() => qrcode('ABCDE12345678?A1A').eci(true).version(1).matrix()).toThrow(
-      'QRCode: Data too large',
+      'QRCode: Payload too large',
     );
   });
 
   test('keeps ECI opt-in, immutable, and resettable', () => {
-    const data = 'Grüße';
-    const optionsMatrix = qrcode(data).config({eci: true}).mask(0).matrix();
-    const methodMatrix = qrcode(data).eci(true).mask(0).matrix();
-    const defaultMatrix = qrcode(data).mask(0).matrix();
+    const payload = 'Grüße';
+    const optionsMatrix = qrcode(payload).options({eci: true}).mask(0).matrix();
+    const methodMatrix = qrcode(payload).eci(true).mask(0).matrix();
+    const defaultMatrix = qrcode(payload).mask(0).matrix();
 
     expect(methodMatrix).toEqual(optionsMatrix);
     expect(methodMatrix).not.toEqual(defaultMatrix);
-    expect(qrcode(data).eci(false).mask(0).matrix()).toEqual(defaultMatrix);
-    expect(qrcode(data).eci(true).eci(undefined).mask(0).matrix()).toEqual(defaultMatrix);
-    expect(qrcode(data).config({eci: undefined}).mask(0).matrix()).toEqual(defaultMatrix);
+    expect(qrcode(payload).eci(false).mask(0).matrix()).toEqual(defaultMatrix);
+    expect(qrcode(payload).eci(true).eci(undefined).mask(0).matrix()).toEqual(defaultMatrix);
+    expect(qrcode(payload).options({eci: undefined}).mask(0).matrix()).toEqual(defaultMatrix);
   });
 
   test('does not change numeric or alphanumeric symbols when ECI is enabled', () => {
-    for (const data of ['1234567890', 'HELLO WORLD']) {
-      expect(qrcode(data).eci(true).mask(0).matrix()).toEqual(qrcode(data).mask(0).matrix());
+    for (const payload of ['1234567890', 'HELLO WORLD']) {
+      expect(qrcode(payload).eci(true).mask(0).matrix()).toEqual(qrcode(payload).mask(0).matrix());
     }
   });
 
@@ -124,15 +125,15 @@ describe('qrcode().matrix()', () => {
     expect(builder.render()).toBe(matrix);
     expect(builder.render()).toBe(matrix);
     expect(renderedMatrices).toEqual([matrix, matrix]);
-    expect(builder.data('new data').matrix()).not.toBe(matrix);
+    expect(builder.payload('new payload').matrix()).not.toBe(matrix);
     expect(builder.errorCorrection('H').matrix()).not.toBe(matrix);
   });
 
-  test('builder configuration is immutable and retains the configured renderer', () => {
+  test('builder options are immutable and retain the selected renderer', () => {
     const original = qrcode('123').renderer((matrix) => matrix.length);
     const configuredBuilders = [
       original.mode('numeric'),
-      original.config({mode: 'numeric'}),
+      original.options({mode: 'numeric'}),
       original.errorCorrection('H'),
       original.version(2),
       original.mask(0),
@@ -168,14 +169,14 @@ describe('qrcode().matrix()', () => {
           .errorCorrection(errorCorrectionLevel)
           .mask(0)
           .matrix(),
-      ).toThrow('QRCode: Data too large');
+      ).toThrow('QRCode: Payload too large');
     },
   );
 
-  test('rejects invalid public options and incompatible data', () => {
-    expect(() => qrcode('ABC').mode('numeric').matrix()).toThrow('QRCode: Invalid data format');
+  test('rejects invalid public options and incompatible payload', () => {
+    expect(() => qrcode('ABC').mode('numeric').matrix()).toThrow('QRCode: Invalid payload format');
     expect(() => qrcode('abc').mode('alphanumeric').matrix()).toThrow(
-      'QRCode: Invalid data format',
+      'QRCode: Invalid payload format',
     );
     expect(() =>
       qrcode('123')
@@ -212,12 +213,12 @@ describe('qrcode().matrix()', () => {
     for (const invalidECI of [0, 1, 'true', null]) {
       expect(() =>
         qrcode('abc')
-          .config({eci: invalidECI as never})
+          .options({eci: invalidECI as never})
           .matrix(),
       ).toThrow('QRCode: Invalid ECI setting');
     }
     expect(() => qrcode('1'.repeat(7_090)).mode('numeric').matrix()).toThrow(
-      'QRCode: Data too large',
+      'QRCode: Payload too large',
     );
     for (const invalidNumber of [
       -1,
@@ -227,11 +228,11 @@ describe('qrcode().matrix()', () => {
       Number.NEGATIVE_INFINITY,
       Number.MAX_SAFE_INTEGER + 1,
     ]) {
-      expect(() => qrcode(invalidNumber).matrix()).toThrow('QRCode: Invalid data format');
+      expect(() => qrcode(invalidNumber).matrix()).toThrow('QRCode: Invalid payload format');
     }
   });
 
-  test('accepts non-negative safe integer input', () => {
+  test('accepts non-negative safe integer payload', () => {
     expect(qrcode(0).matrix()).toHaveLength(21);
     expect(qrcode(12345).matrix()).toHaveLength(21);
     expect(qrcode(Number.MAX_SAFE_INTEGER).matrix()).toHaveLength(21);

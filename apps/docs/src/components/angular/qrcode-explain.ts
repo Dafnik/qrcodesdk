@@ -26,11 +26,11 @@ import {
   explainQRCode,
 } from '../explain/qrcode-analyzer.ts';
 import {QrMatrixControls} from '../playground/angular/qr-matrix-controls.ts';
-import {playgroundConfig, resetQrConfig} from '../playground/playground-config.ts';
+import {playgroundOptions, resetQrOptions} from '../playground/playground-options.ts';
 
 type ExplainSelection = {
   groupId: string;
-  role: QRCodeExplainRole | 'margin';
+  role: QRCodeExplainRole | 'quiet-zone';
   module?: QRCodeExplainModule;
 };
 
@@ -45,7 +45,7 @@ type TooltipPosition = {
 
 type LegendItem = {
   id: string;
-  role: QRCodeExplainRole | 'margin';
+  role: QRCodeExplainRole | 'quiet-zone';
   label: string;
   count: number;
 };
@@ -58,7 +58,7 @@ type LegendItem = {
     <div class="grid gap-4">
       <div class="flex items-center justify-between gap-4">
         <h2 class="text-2xl font-bold">Configure</h2>
-        <button (click)="resetQrConfig()" type="button" hlmBtn>
+        <button (click)="resetQrOptions()" type="button" hlmBtn>
           Reset
           <ng-icon name="lucideRotateCcw" />
         </button>
@@ -69,7 +69,7 @@ type LegendItem = {
   `,
 })
 export class QRCodeExplainControls {
-  protected readonly resetQrConfig = resetQrConfig;
+  protected readonly resetQrOptions = resetQrOptions;
 }
 
 @Component({
@@ -126,7 +126,7 @@ export class QRCodeExplainControls {
       vector-effect: non-scaling-stroke;
     }
 
-    .selection-margin {
+    .selection-quiet-zone {
       fill: var(--explain-accent-soft);
       stroke: var(--explain-accent);
       stroke-width: 0.14;
@@ -158,7 +158,7 @@ export class QRCodeExplainControls {
       </hlm-alert>
     } @else if (explanation(); as qr) {
       <div class="grid gap-5">
-        <div class="flex flex-wrap gap-2" aria-label="Resolved QR code settings">
+        <div class="flex flex-wrap gap-2" aria-label="Resolved QR code options">
           <span
             class="bg-secondary text-secondary-foreground rounded-md px-2.5 py-1 font-mono text-xs">
             V{{ qr.version }}
@@ -201,27 +201,27 @@ export class QRCodeExplainControls {
             aria-label="Interactive QR code anatomy. Use the pointer or arrow keys to inspect modules.">
             <rect [attr.height]="qr.viewSize" [attr.width]="qr.viewSize" fill="var(--background)" />
 
-            @if (qr.margin > 0) {
-              <g data-group="margin" data-role="margin" aria-label="Quiet zone">
+            @if (qr.quietZone > 0) {
+              <g data-group="quiet-zone" data-role="quiet-zone" aria-label="Quiet zone">
                 <rect
-                  [attr.height]="qr.margin"
+                  [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
                   fill="var(--background)" />
                 <rect
-                  [attr.height]="qr.margin"
+                  [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
-                  [attr.y]="qr.margin + qr.matrix.length"
+                  [attr.y]="qr.quietZone + qr.matrix.length"
                   fill="var(--background)" />
                 <rect
                   [attr.height]="qr.matrix.length"
-                  [attr.width]="qr.margin"
-                  [attr.y]="qr.margin"
+                  [attr.width]="qr.quietZone"
+                  [attr.y]="qr.quietZone"
                   fill="var(--background)" />
                 <rect
                   [attr.height]="qr.matrix.length"
-                  [attr.width]="qr.margin"
-                  [attr.x]="qr.margin + qr.matrix.length"
-                  [attr.y]="qr.margin"
+                  [attr.width]="qr.quietZone"
+                  [attr.x]="qr.quietZone + qr.matrix.length"
+                  [attr.y]="qr.quietZone"
                   fill="var(--background)" />
               </g>
             }
@@ -230,35 +230,35 @@ export class QRCodeExplainControls {
               @for (module of qr.modules; track module.key) {
                 <rect
                   class="qr-module"
-                  [attr.data-column]="module.column"
-                  [attr.data-group]="module.groupId"
-                  [attr.data-key]="module.key"
-                  [attr.data-role]="module.role"
-                  [attr.data-row]="module.row"
-                  [attr.data-value]="module.value"
+                  [attr.payload-column]="module.column"
+                  [attr.payload-group]="module.groupId"
+                  [attr.payload-key]="module.key"
+                  [attr.payload-role]="module.role"
+                  [attr.payload-row]="module.row"
+                  [attr.payload-value]="module.value"
                   [attr.height]="1"
                   [attr.width]="1"
-                  [attr.x]="module.column + qr.margin"
-                  [attr.y]="module.row + qr.margin" />
+                  [attr.x]="module.column + qr.quietZone"
+                  [attr.y]="module.row + qr.quietZone" />
               }
             </g>
 
-            @if (isMarginSelection() && qr.margin > 0) {
-              <g class="selection-margin" pointer-events="none">
-                <rect [attr.height]="qr.margin" [attr.width]="qr.viewSize" />
+            @if (isQuietZoneSelection() && qr.quietZone > 0) {
+              <g class="selection-quiet-zone" pointer-events="none">
+                <rect [attr.height]="qr.quietZone" [attr.width]="qr.viewSize" />
                 <rect
-                  [attr.height]="qr.margin"
+                  [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
-                  [attr.y]="qr.margin + qr.matrix.length" />
+                  [attr.y]="qr.quietZone + qr.matrix.length" />
                 <rect
                   [attr.height]="qr.matrix.length"
-                  [attr.width]="qr.margin"
-                  [attr.y]="qr.margin" />
+                  [attr.width]="qr.quietZone"
+                  [attr.y]="qr.quietZone" />
                 <rect
                   [attr.height]="qr.matrix.length"
-                  [attr.width]="qr.margin"
-                  [attr.x]="qr.margin + qr.matrix.length"
-                  [attr.y]="qr.margin" />
+                  [attr.width]="qr.quietZone"
+                  [attr.x]="qr.quietZone + qr.matrix.length"
+                  [attr.y]="qr.quietZone" />
               </g>
             } @else {
               <g pointer-events="none">
@@ -267,8 +267,8 @@ export class QRCodeExplainControls {
                     class="selection-module"
                     [attr.height]="1"
                     [attr.width]="1"
-                    [attr.x]="module.column + qr.margin"
-                    [attr.y]="module.row + qr.margin" />
+                    [attr.x]="module.column + qr.quietZone"
+                    [attr.y]="module.row + qr.quietZone" />
                 }
               </g>
             }
@@ -278,8 +278,8 @@ export class QRCodeExplainControls {
                 class="selection-cursor"
                 [attr.height]="1"
                 [attr.width]="1"
-                [attr.x]="module.column + qr.margin"
-                [attr.y]="module.row + qr.margin"
+                [attr.x]="module.column + qr.quietZone"
+                [attr.y]="module.row + qr.quietZone"
                 pointer-events="none" />
             }
           </svg>
@@ -377,13 +377,13 @@ export class QRCodeExplainControls {
 export class QRCodeExplain {
   private readonly nanostores = inject(NanostoresService);
   private readonly surface = viewChild.required<ElementRef<HTMLDivElement>>('surface');
-  private readonly config = toSignal(this.nanostores.useStore(playgroundConfig), {
+  private readonly options = toSignal(this.nanostores.useStore(playgroundOptions), {
     requireSync: true,
   });
 
   protected readonly state = computed<ExplainState>(() => {
     try {
-      return {explanation: explainQRCode(this.config())};
+      return {explanation: explainQRCode(this.options())};
     } catch (error) {
       return {error: error instanceof Error ? error.message : String(error)};
     }
@@ -407,17 +407,19 @@ export class QRCodeExplain {
     () => this.pinnedSelection() ?? this.previewSelection(),
   );
   protected readonly activeModule = computed(() => this.activeSelection()?.module);
-  protected readonly isMarginSelection = computed(() => this.activeSelection()?.role === 'margin');
+  protected readonly isQuietZoneSelection = computed(
+    () => this.activeSelection()?.role === 'quiet-zone',
+  );
   protected readonly tooltipSelection = signal<ExplainSelection | undefined>(undefined);
   protected readonly tooltipPosition = signal<TooltipPosition>({x: 0, y: 0, below: false});
   protected readonly renderedPixelSize = computed(() => {
     const explanation = this.explanation();
-    return explanation === undefined ? 0 : explanation.viewSize * explanation.size;
+    return explanation === undefined ? 0 : explanation.viewSize * explanation.moduleSize;
   });
   protected readonly activeModules = computed<readonly QRCodeExplainModule[]>(() => {
     const selection = this.activeSelection();
     const explanation = this.explanation();
-    if (selection === undefined || explanation === undefined || selection.role === 'margin')
+    if (selection === undefined || explanation === undefined || selection.role === 'quiet-zone')
       return [];
     return explanation.modules.filter(({role}) => role === selection.role);
   });
@@ -429,11 +431,11 @@ export class QRCodeExplain {
       counts.set(module.role, (counts.get(module.role) ?? 0) + 1);
     }
     const items: LegendItem[] =
-      explanation.margin > 0
+      explanation.quietZone > 0
         ? [
             {
-              id: 'role:margin',
-              role: 'margin',
+              id: 'role:quiet-zone',
+              role: 'quiet-zone',
               label: 'Quiet zone',
               count: explanation.viewSize ** 2 - explanation.matrix.length ** 2,
             },
@@ -570,12 +572,12 @@ export class QRCodeExplain {
   }
 
   protected selectionLabel(selection: ExplainSelection): string {
-    if (selection.role === 'margin') return 'Quiet zone';
+    if (selection.role === 'quiet-zone') return 'Quiet zone';
     return QR_CODE_EXPLAIN_ROLE_DETAILS[selection.role].label;
   }
 
   protected selectionDescription(selection: ExplainSelection): string {
-    if (selection.role === 'margin') {
+    if (selection.role === 'quiet-zone') {
       return 'A clear light border that helps scanners isolate the QR code from its surroundings.';
     }
     return QR_CODE_EXPLAIN_ROLE_DETAILS[selection.role].description;
@@ -602,7 +604,7 @@ export class QRCodeExplain {
 
   private selectionFromElement(element: SVGElement): ExplainSelection | undefined {
     const groupId = element.dataset['group'];
-    const role = element.dataset['role'] as QRCodeExplainRole | 'margin' | undefined;
+    const role = element.dataset['role'] as QRCodeExplainRole | 'quiet-zone' | undefined;
     if (groupId === undefined || role === undefined) return undefined;
     const row = Number(element.dataset['row']);
     const column = Number(element.dataset['column']);

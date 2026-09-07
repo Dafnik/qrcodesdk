@@ -62,9 +62,9 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
   selector: 'app-root',
   imports: [QRCodeSVG, QRCodeImage, QRCodeCanvas],
   template: `
-    <qrcode-svg data="https://qrcodesdk.dev" />
-    <qrcode-image data="https://qrcodesdk.dev" />
-    <qrcode-canvas data="https://qrcodesdk.dev" />
+    <qrcode-svg payload="https://qrcodesdk.dev" />
+    <qrcode-image payload="https://qrcodesdk.dev" />
+    <qrcode-canvas payload="https://qrcodesdk.dev" />
   `,
 })
 export class App {}
@@ -92,7 +92,7 @@ export class App {}
 | `options` | `Component-specific options` | Optional matrix and renderer configuration. |
 
 All three components are standalone. Add the components you use to the host component's
-`imports` array, then bind `data` and `options` with normal Angular template syntax.
+`imports` array, then bind `payload` and `options` with normal Angular template syntax.
 
 ## Live examples
 
@@ -109,10 +109,12 @@ import {QRCodeSVG} from '@qrcodesdk/angular';
   template: `
     <qrcode-svg
       [options]="{
-        title: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
+        accessibility: {
+          title: 'QR code for qrcodesdk.dev',
+          ariaLabel: 'Scan to open qrcodesdk.dev',
+        },
       }"
-      data="https://qrcodesdk.dev" />
+      payload="https://qrcodesdk.dev" />
   `,
 })
 export class QRCodeSVGExample {}
@@ -130,15 +132,16 @@ import type {QRCodeImageOptions} from '@qrcodesdk/browser';
   selector: 'qrcode-angular-image-example',
   imports: [QRCodeImage],
   template: `
-    <qrcode-image [options]="options" data="https://qrcodesdk.dev" />
+    <qrcode-image [options]="options" payload="https://qrcodesdk.dev" />
   `,
 })
 export class QRCodeImageExample {
   protected readonly options: QRCodeImageOptions = {
-    size: 8,
-    margin: 4,
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {
+      alt: 'QR code for qrcodesdk.dev',
+      ariaLabel: 'Scan to open qrcodesdk.dev',
+    },
   };
 }
 ```
@@ -155,16 +158,16 @@ import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
   selector: 'qrcode-angular-canvas-example',
   imports: [QRCodeCanvas],
   template: `
-    <qrcode-canvas [options]="options" data="https://qrcodesdk.dev" />
+    <qrcode-canvas [options]="options" payload="https://qrcodesdk.dev" />
   `,
 })
 export class QRCodeCanvasExample {
   protected readonly options: QRCodeCanvasOptions = {
-    size: 8,
-    margin: 4,
-    colors: {
-      colorDark: '#111827',
-      colorLight: '#ffffff',
+    style: {
+      moduleSize: 8,
+      quietZone: 4,
+      foreground: '#111827',
+      background: '#ffffff',
     },
   };
 }
@@ -185,9 +188,9 @@ import {QRCodeImage} from '@qrcodesdk/angular';
       <qrcode-image
         #qrcode
         [options]="{
-          alt: 'QR code for qrcodesdk.dev',
+          accessibility: {alt: 'QR code for qrcodesdk.dev'},
         }"
-        data="https://qrcodesdk.dev" />
+        payload="https://qrcodesdk.dev" />
       <button class="btn-primary" (click)="qrcode.download('qrcodesdk')" type="button">
         Download PNG
       </button>
@@ -216,10 +219,10 @@ component and template.
 - `QRCodeImage` exposes `download(filename?)` and writes a PNG file.
 
 ```angular-html
-<qrcode-svg #qrcodeSvg data="https://qrcodesdk.dev" />
+<qrcode-svg #qrcodeSvg payload="https://qrcodesdk.dev" />
 <button (click)="qrcodeSvg.download('qrcodesdk')" type="button">Download SVG</button>
 
-<qrcode-image #qrcodeImage data="https://qrcodesdk.dev" />
+<qrcode-image #qrcodeImage payload="https://qrcodesdk.dev" />
 <button (click)="qrcodeImage.download('qrcodesdk')" type="button">Download PNG</button>
 ```
 
@@ -236,9 +239,9 @@ downloads and manual Canvas export.
 
 `QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
 
-## Shared configuration
+## Shared options
 
-The `options` input combines matrix settings with the selected renderer's settings. Use the
+The `options` input combines matrix options with the selected renderer's options. Use the
 [builder reference](https://qrcodesdk.dev/reference/builder/) for encoding, version, mask, and error correction;
 [Customize output](https://qrcodesdk.dev/guides/customize/) for shared visual options; and the dedicated
 [renderer references](https://qrcodesdk.dev/reference/renderers/) for output-specific options and constraints.

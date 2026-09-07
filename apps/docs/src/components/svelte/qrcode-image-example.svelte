@@ -3,10 +3,9 @@
   import {QRCodeImage} from '@qrcodesdk/svelte';
 
   const options: QRCodeImageOptions = {
-    size: 8,
-    margin: 2,
-    alt: 'QR code for qrcodesdk.dev',
+    style: {moduleSize: 8, quietZone: 2},
+    accessibility: {alt: 'QR code for qrcodesdk.dev'},
   };
 </script>
 
-<QRCodeImage class="mx-auto" data="https://qrcodesdk.dev" {options} />
+<QRCodeImage class="mx-auto" payload="https://qrcodesdk.dev" {options} />

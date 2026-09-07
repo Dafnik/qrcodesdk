@@ -12,11 +12,13 @@ import {
 
 import {QRCodeDownloadSVGRenderer} from '@qrcodesdk/browser';
 import {
-  type QRCodeInputData,
+  type QRCodePayload,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   qrcode,
 } from '@qrcodesdk/core';
+
+import {splitOptions} from './split-options';
 
 @Component({
   selector: 'qrcode-svg',
@@ -27,14 +29,15 @@ export class QRCodeSVG {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);
 
-  data = input.required<QRCodeInputData>();
+  payload = input.required<QRCodePayload>();
 
   options = input<QRCodeSVGOptions>();
 
-  readonly svgRenderer = computed(() => QRCodeSVGRenderer(this.options()));
+  readonly resolvedOptions = computed(() => splitOptions(this.options()));
+  readonly svgRenderer = computed(() => QRCodeSVGRenderer(this.resolvedOptions()[1]));
 
   readonly qrcodeBuilder = computed(() =>
-    qrcode(this.data()).config(this.options()).renderer(this.svgRenderer()),
+    qrcode(this.payload()).options(this.resolvedOptions()[0]).renderer(this.svgRenderer()),
   );
 
   constructor() {

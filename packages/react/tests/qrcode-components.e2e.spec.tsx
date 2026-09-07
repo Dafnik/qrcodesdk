@@ -8,15 +8,12 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 
 import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '../src';
 
-const svgOptions: QRCodeSVGOptions = {size: 2, margin: 1};
+const svgOptions: QRCodeSVGOptions = {style: {moduleSize: 2, quietZone: 1}};
 const imageOptions: QRCodeImageOptions = {
-  size: 2,
-  margin: 1,
-  alt: 'QR alt',
-  ariaLabel: 'QR aria',
-  title: 'QR title',
+  style: {moduleSize: 2, quietZone: 1},
+  accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
 };
-const canvasOptions: QRCodeCanvasOptions = {size: 2, margin: 1};
+const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}};
 
 describe('React QR code components', () => {
   beforeEach(() => {
@@ -29,7 +26,7 @@ describe('React QR code components', () => {
   });
 
   test('renders SVG QR code output', () => {
-    const {container} = render(<QRCodeSVG data="HELLO" options={svgOptions} />);
+    const {container} = render(<QRCodeSVG payload="HELLO" options={svgOptions} />);
     const svg = renderedElement<SVGSVGElement>(container, 'svg');
 
     expect(svg.tagName.toLowerCase()).toBe('svg');
@@ -37,15 +34,15 @@ describe('React QR code components', () => {
     expect(svg.getAttribute('height')).toBe('46');
   });
 
-  test('renders numeric input data', () => {
-    const {container} = render(<QRCodeSVG data={12_345} options={svgOptions} />);
+  test('renders numeric payload', () => {
+    const {container} = render(<QRCodeSVG payload={12_345} options={svgOptions} />);
     const svg = renderedElement<SVGSVGElement>(container, 'svg');
 
     expect(svg.querySelectorAll('path')).toHaveLength(2);
   });
 
   test('renders image QR code output with PNG data and accessibility attributes', async () => {
-    const {container} = render(<QRCodeImage data="HELLO" options={imageOptions} />);
+    const {container} = render(<QRCodeImage payload="HELLO" options={imageOptions} />);
 
     await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
 
@@ -63,7 +60,7 @@ describe('React QR code components', () => {
     const imageQRCode = createRef<QRCodeDownloadHandle>();
     const downloads = captureDownloads(vi);
 
-    render(<QRCodeImage data="HELLO" options={imageOptions} ref={imageQRCode} />);
+    render(<QRCodeImage payload="HELLO" options={imageOptions} ref={imageQRCode} />);
     imageQRCode.current?.download('qrcodesdk');
 
     expect(downloads).toEqual([
@@ -80,7 +77,7 @@ describe('React QR code components', () => {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
-    render(<QRCodeSVG data="HELLO" options={svgOptions} ref={svgQRCode} />);
+    render(<QRCodeSVG payload="HELLO" options={svgOptions} ref={svgQRCode} />);
     svgQRCode.current?.download('qrcodesdk');
 
     expect(downloads).toEqual([
@@ -94,7 +91,7 @@ describe('React QR code components', () => {
   });
 
   test('renders canvas QR code output', async () => {
-    const {container} = render(<QRCodeCanvas data="HELLO" options={canvasOptions} />);
+    const {container} = render(<QRCodeCanvas payload="HELLO" options={canvasOptions} />);
 
     await waitFor(() => expect(container.querySelector('canvas')).not.toBeNull());
 
@@ -107,8 +104,8 @@ describe('React QR code components', () => {
   test('renders decorative defaults and labeled Canvas output', async () => {
     const {container} = render(
       <>
-        <QRCodeSVG data="DECORATIVE" />
-        <QRCodeCanvas data="LABELED" options={{title: 'Scan this code'}} />
+        <QRCodeSVG payload="DECORATIVE" />
+        <QRCodeCanvas payload="LABELED" options={{accessibility: {title: 'Scan this code'}}} />
       </>,
     );
 
@@ -130,7 +127,7 @@ describe('React QR code components', () => {
     const onClick = vi.fn();
     const {container} = render(
       <Component
-        data="PROPS"
+        payload="PROPS"
         id="qrcode-wrapper"
         className="custom-class"
         style={{color: 'red'}}
@@ -155,17 +152,21 @@ describe('React QR code components', () => {
 
   test('passes styled options through SVG, image, and canvas components', async () => {
     const styledOptions = {
-      size: 2,
-      margin: 1,
-      dotsOptions: {color: '#112233' as const, type: 'classy-rounded' as const},
-      cornersSquareOptions: {color: '#445566' as const, type: 'extra-rounded' as const},
-      cornersDotOptions: {color: '#778899' as const, type: 'dot' as const},
+      style: {
+        moduleSize: 2,
+        quietZone: 1,
+        modules: {color: '#112233' as const, shape: 'diagonal-rounded' as const},
+        finder: {
+          outer: {color: '#445566' as const, shape: 'extra-rounded' as const},
+          center: {color: '#778899' as const, shape: 'circle' as const},
+        },
+      },
     };
     const {container} = render(
       <>
-        <QRCodeSVG data="STYLED" options={styledOptions} />
-        <QRCodeImage data="STYLED" options={styledOptions} />
-        <QRCodeCanvas data="STYLED" options={styledOptions} />
+        <QRCodeSVG payload="STYLED" options={styledOptions} />
+        <QRCodeImage payload="STYLED" options={styledOptions} />
+        <QRCodeCanvas payload="STYLED" options={styledOptions} />
       </>,
     );
 
@@ -179,7 +180,7 @@ describe('React QR code components', () => {
     ).toEqual(['#ffffff', '#112233', '#445566', '#778899']);
   });
 
-  test('passes prepared image overlays through SVG, image, and canvas components', async () => {
+  test('passes prepared center images through SVG, image, and canvas components', async () => {
     const source = document.createElement('canvas');
     source.width = 4;
     source.height = 2;
@@ -187,11 +188,17 @@ describe('React QR code components', () => {
     const {container, rerender} = render(
       <>
         <QRCodeSVG
-          data="OVERLAY"
-          options={{...svgOptions, image: {source: svgSource, size: 0.2}}}
+          payload="CENTER IMAGE"
+          options={{...svgOptions, centerImage: {source: svgSource, size: 0.2}}}
         />
-        <QRCodeImage data="OVERLAY" options={{...imageOptions, image: {source, size: 0.2}}} />
-        <QRCodeCanvas data="OVERLAY" options={{...canvasOptions, image: {source, size: 0.2}}} />
+        <QRCodeImage
+          payload="CENTER IMAGE"
+          options={{...imageOptions, centerImage: {source, size: 0.2}}}
+        />
+        <QRCodeCanvas
+          payload="CENTER IMAGE"
+          options={{...canvasOptions, centerImage: {source, size: 0.2}}}
+        />
       </>,
     );
 
@@ -210,11 +217,17 @@ describe('React QR code components', () => {
     rerender(
       <>
         <QRCodeSVG
-          data="OVERLAY"
-          options={{...svgOptions, image: {source: svgSource, size: 0.3}}}
+          payload="CENTER IMAGE"
+          options={{...svgOptions, centerImage: {source: svgSource, size: 0.3}}}
         />
-        <QRCodeImage data="OVERLAY" options={{...imageOptions, image: {source, size: 0.3}}} />
-        <QRCodeCanvas data="OVERLAY" options={{...canvasOptions, image: {source, size: 0.3}}} />
+        <QRCodeImage
+          payload="CENTER IMAGE"
+          options={{...imageOptions, centerImage: {source, size: 0.3}}}
+        />
+        <QRCodeCanvas
+          payload="CENTER IMAGE"
+          options={{...canvasOptions, centerImage: {source, size: 0.3}}}
+        />
       </>,
     );
 
@@ -224,54 +237,54 @@ describe('React QR code components', () => {
     });
   });
 
-  test('downloads prepared SVG and PNG image overlays', async () => {
+  test('downloads prepared SVG and PNG center images', async () => {
     const source = document.createElement('canvas');
     source.width = 2;
     source.height = 1;
     const svgQRCode = createRef<QRCodeDownloadHandle>();
     const imageQRCode = createRef<QRCodeDownloadHandle>();
     const downloads = captureDownloads(vi);
-    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-overlay-svg');
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-center-image-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
     render(
       <>
         <QRCodeSVG
           ref={svgQRCode}
-          data="OVERLAY"
+          payload="CENTER IMAGE"
           options={{
             ...svgOptions,
-            image: {source: 'data:image/png;base64,cHJlcGFyZWQ='},
+            centerImage: {source: 'data:image/png;base64,cHJlcGFyZWQ='},
           }}
         />
         <QRCodeImage
           ref={imageQRCode}
-          data="OVERLAY"
-          options={{...imageOptions, image: {source}}}
+          payload="CENTER IMAGE"
+          options={{...imageOptions, centerImage: {source}}}
         />
       </>,
     );
 
-    svgQRCode.current?.download('overlay');
-    imageQRCode.current?.download('overlay');
+    svgQRCode.current?.download('center-image');
+    imageQRCode.current?.download('center-image');
 
     expect(downloads).toEqual([
-      {href: 'blob:qrcode-overlay-svg', filename: 'overlay.svg'},
-      {href: 'data:image/png;base64,qrcode', filename: 'overlay.png'},
+      {href: 'blob:qrcode-center-image-svg', filename: 'center-image.svg'},
+      {href: 'data:image/png;base64,qrcode', filename: 'center-image.png'},
     ]);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
   test('replaces existing rendered image when props change', async () => {
-    const {container, rerender} = render(<QRCodeImage data="HELLO" options={imageOptions} />);
+    const {container, rerender} = render(<QRCodeImage payload="HELLO" options={imageOptions} />);
 
     await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
 
     const wrapper = renderedElement<HTMLDivElement>(container, 'div');
     const firstImage = renderedElement<HTMLImageElement>(container, 'img');
 
-    rerender(<QRCodeImage data="HELLO" options={{size: 3, margin: 1}} />);
+    rerender(<QRCodeImage payload="HELLO" options={{style: {moduleSize: 3, quietZone: 1}}} />);
 
     await waitFor(() =>
       expect(renderedElement<HTMLImageElement>(container, 'img')).not.toBe(firstImage),
@@ -285,14 +298,14 @@ describe('React QR code components', () => {
   });
 
   test('replaces existing rendered canvas when props change', async () => {
-    const {container, rerender} = render(<QRCodeCanvas data="HELLO" options={canvasOptions} />);
+    const {container, rerender} = render(<QRCodeCanvas payload="HELLO" options={canvasOptions} />);
 
     await waitFor(() => expect(container.querySelector('canvas')).not.toBeNull());
 
     const wrapper = renderedElement<HTMLDivElement>(container, 'div');
     const firstCanvas = renderedElement<HTMLCanvasElement>(container, 'canvas');
 
-    rerender(<QRCodeCanvas data="WORLD" options={canvasOptions} />);
+    rerender(<QRCodeCanvas payload="WORLD" options={canvasOptions} />);
 
     await waitFor(() =>
       expect(renderedElement<HTMLCanvasElement>(container, 'canvas')).not.toBe(firstCanvas),

@@ -17,16 +17,16 @@ assert.ok(consumerDirectory, 'QRCODESDK_CONSUMER must point to the installed pac
 
 globalThis.console.log(`Testing the installed @qrcodesdk/browser package in ${browserName}`);
 
-const [coreSource, browserSource] = await Promise.all([
-  readFile(
-    path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'core', 'dist', 'index.mjs'),
-    'utf8',
-  ),
-  readFile(
-    path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'browser', 'dist', 'index.mjs'),
-    'utf8',
-  ),
-]);
+const moduleDirectories = [
+  {
+    pathnamePrefix: '/core/',
+    directory: path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'core', 'dist'),
+  },
+  {
+    pathnamePrefix: '/browser/',
+    directory: path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'browser', 'dist'),
+  },
+];
 logSuccess('installed Core and Browser ESM bundles are readable');
 
 const browser = await browserType.launch({headless: true});
@@ -46,8 +46,8 @@ try {
               <script type="importmap">
                 {
                   "imports": {
-                    "@qrcodesdk/core": "/core.mjs",
-                    "@qrcodesdk/browser": "/browser.mjs"
+                    "@qrcodesdk/core": "/core/index.mjs",
+                    "@qrcodesdk/browser": "/browser/index.mjs"
                   }
                 }
               </script>
@@ -58,14 +58,28 @@ try {
       return;
     }
 
-    if (pathname === '/core.mjs') {
-      await route.fulfill({contentType: 'text/javascript', body: coreSource});
-      return;
-    }
+    for (const {pathnamePrefix, directory} of moduleDirectories) {
+      if (!pathname.startsWith(pathnamePrefix)) continue;
 
-    if (pathname === '/browser.mjs') {
-      await route.fulfill({contentType: 'text/javascript', body: browserSource});
-      return;
+      const modulePath = path.resolve(directory, pathname.slice(pathnamePrefix.length));
+      const relativeModulePath = path.relative(directory, modulePath);
+      if (
+        !relativeModulePath.endsWith('.mjs') ||
+        relativeModulePath.startsWith('..') ||
+        path.isAbsolute(relativeModulePath)
+      ) {
+        break;
+      }
+
+      try {
+        await route.fulfill({
+          contentType: 'text/javascript',
+          body: await readFile(modulePath, 'utf8'),
+        });
+        return;
+      } catch {
+        break;
+      }
     }
 
     await route.fulfill({status: 404, body: 'Not found'});
@@ -89,10 +103,11 @@ try {
       'Expected square QR code matrix rows',
     );
 
-    const svg = builder.render(core.QRCodeSVGRenderer({size: 2, margin: 1}));
+    const style = {moduleSize: 2, quietZone: 1};
+    const svg = builder.render(core.QRCodeSVGRenderer({style}));
     check(svg.includes('width="62"'), 'Expected installed Core to render SVG output');
 
-    const canvas = builder.render(browserPackage.QRCodeCanvasRenderer({size: 2, margin: 1}));
+    const canvas = builder.render(browserPackage.QRCodeCanvasRenderer({style}));
     check(canvas instanceof globalThis.HTMLCanvasElement, 'Expected a browser canvas element');
     check(canvas.width === 62 && canvas.height === 62, 'Expected a 62×62 browser canvas');
 
@@ -108,7 +123,10 @@ try {
     check(hasDarkPixel && hasLightPixel, 'Expected rendered dark and light canvas pixels');
 
     const image = builder.render(
-      browserPackage.QRCodeImageRenderer({size: 2, margin: 1, alt: 'Runtime QR code'}),
+      browserPackage.QRCodeImageRenderer({
+        style,
+        accessibility: {alt: 'Runtime QR code'},
+      }),
     );
     globalThis.document.body.append(image);
     await image.decode();

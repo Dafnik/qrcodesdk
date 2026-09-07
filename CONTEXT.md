@@ -5,18 +5,18 @@ QRCodeSDK generates QR code symbols and turns them into outputs for JavaScript a
 ## Language
 
 **Unified QR API**:
-The shared typed model for payloads, matrix configuration, output selection, styling, and framework
+The shared typed model for payloads, matrix options, output selection, styling, and framework
 components. This is QRCodeSDK's primary product promise.
 _Avoid_: Collection of QR libraries, identical import path
 
 **Runtime-neutral**:
 Usable without Node.js, DOM, filesystem, or framework APIs. Runtime-neutral does not mean every
 JavaScript environment is tested or supported.
-_Avoid_: Runtime-agnostic, universal
+_Avoid_: Universal
 
 **Payload**:
-The data encoded by a QR code before symbol generation. A payload may be opaque text or text that
-follows a recognized payload format.
+A string or safe integer encoded by a QR code before symbol generation. A payload may be opaque text
+or text that follows a recognized payload format.
 
 **Common application payload**:
 Text or a safe integer intended for one QR code symbol, including URLs and supported payload-format
@@ -41,10 +41,10 @@ roles of modules.
 **QR code matrix**:
 An immutable square grid of light and dark modules produced by symbol generation. Renderers read the
 matrix but do not transform it in place.
-_Avoid_: Pixel grid, mutable matrix
+_Avoid_: Mutable matrix
 
 **QR code builder**:
-An immutable payload and matrix-configuration value that lazily generates one QR code matrix. It
+An immutable payload and matrix-options value that lazily generates one QR code matrix. It
 reuses that matrix for every output requested from the same builder.
 _Avoid_: Mutable generator, one-shot builder
 
@@ -58,15 +58,21 @@ A hosted URL whose destination or analytics can change without regenerating the 
 redirects, accounts, and scan analytics are outside QRCodeSDK's scope.
 _Avoid_: Dynamic QR code
 
-**Render size**:
-The integer scale of each QR code module in rendered output. It is not a requested final width, so
+**Module size**:
+The positive integer size of each QR code module in rendered output. It is not a requested final width, so
 the total dimensions vary with symbol version and quiet zone.
-_Avoid_: Output width, fixed size
 
 **Shared visual styling**:
 Appearance options with equivalent geometry and color behavior across SVG, Canvas, browser Image,
-and Node PNG output. Output-specific CSS features are outside the shared styling model.
+and Node PNG output. Text styling is a smaller separate contract, while download renderers and
+output-specific options such as accessibility, center images, compression, and ANSI behavior are
+outside shared visual styling.
 _Avoid_: Renderer-specific styling
+
+**Styled drawing**:
+An immutable, renderer-neutral description of a QR code matrix with shared visual styling applied.
+Graphical renderers paint the same styled drawing into their output formats.
+_Avoid_: Renderer-specific geometry
 
 **Prepared image source**:
 Image content that the developer has already loaded or decoded into the source type required by a
@@ -103,15 +109,10 @@ A rendered QR code intentionally excluded from the accessibility tree because ne
 already provides its meaning or action. Unlabeled visual output is decorative by default.
 _Avoid_: Unnamed image
 
-**Sibling integration contract**:
-An export prefixed with `ɵ` that QRCodeSDK packages use to integrate with each other. It is not a
-public consumer API, but it remains compatible within its declared Core patch line.
-_Avoid_: Public API, unrestricted private implementation
-
 **Scan reliability**:
 The likelihood that a rendered QR code can be decoded in its final medium and conditions. Valid
 customization does not guarantee scan reliability; the developer must test the final artifact.
-_Avoid_: Scan safety, decoding guarantee
+_Avoid_: Decoding guarantee
 
 **Published package size**:
 The compressed and unpacked byte size of every file shipped in one registry package. It includes

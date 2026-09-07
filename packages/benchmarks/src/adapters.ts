@@ -53,9 +53,9 @@ function referenceModes(mode: QRCodeTestFixture['mode']): ReferenceModes {
 
 function qrcodeInput(fixture: QRCodeTestFixture): QRCodeSegment[] {
   const mode = referenceModes(fixture.mode).qrcode;
-  if (mode === 'numeric') return [{data: fixture.data, mode}];
-  if (mode === 'alphanumeric') return [{data: fixture.data, mode}];
-  return [{data: new TextEncoder().encode(fixture.data), mode}];
+  if (mode === 'numeric') return [{data: fixture.payload, mode}];
+  if (mode === 'alphanumeric') return [{data: fixture.payload, mode}];
+  return [{data: new TextEncoder().encode(fixture.payload), mode}];
 }
 
 function qrcodeSVGOptions(fixture: QRCodeTestFixture): QRCodeToStringOptions {
@@ -75,7 +75,7 @@ function qrcodeSVGOptions(fixture: QRCodeTestFixture): QRCodeToStringOptions {
 
 function createGeneratorQRCode(fixture: QRCodeTestFixture) {
   const qr = qrcodeGenerator(fixture.version ?? 0, fixture.errorCorrectionLevel ?? 'M');
-  qr.addData(fixture.data, referenceModes(fixture.mode).qrcodeGenerator);
+  qr.addData(fixture.payload, referenceModes(fixture.mode).qrcodeGenerator);
   if (fixture.mask === undefined) qr.make();
   else qr.make(fixture.mask);
   return qr;
@@ -86,14 +86,16 @@ const qrcodeSDKAdapter: BenchmarkAdapter = {
   label: 'QRCodeSDK',
   version: qrcodeSDKPackage.version,
   matrix: (fixture) =>
-    createQRCodeSDK(fixture.data).config(qrcodeSDKOptions(fixture)).matrix().length,
+    createQRCodeSDK(fixture.payload).options(qrcodeSDKOptions(fixture)).matrix().length,
   svg: (fixture) =>
-    createQRCodeSDK(fixture.data)
-      .config(qrcodeSDKOptions(fixture))
+    createQRCodeSDK(fixture.payload)
+      .options(qrcodeSDKOptions(fixture))
       .render(
         QRCodeSVGRenderer({
-          margin: SVG_QUIET_ZONE_MODULES,
-          size: SVG_PIXELS_PER_MODULE,
+          style: {
+            moduleSize: SVG_PIXELS_PER_MODULE,
+            quietZone: SVG_QUIET_ZONE_MODULES,
+          },
         }),
       ).length,
 };

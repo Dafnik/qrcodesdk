@@ -7,30 +7,30 @@ import {
   createPlaygroundCanvasOptions,
   createPlaygroundImageOptions,
   createPlaygroundSVGOptions,
-  playgroundConfig,
+  playgroundOptions,
   playgroundPreparedImage,
-} from './playground-config.ts';
+} from './playground-options.ts';
 import {hasQRCodeError} from './qrcode-error-checker.ts';
 
 export default function QRCodeReactPlaygroundPreview() {
-  const config = useStore(playgroundConfig);
+  const options = useStore(playgroundOptions);
   const preparedImage = useStore(playgroundPreparedImage);
 
   const svgRef = useRef<QRCodeDownloadHandle>(null);
   const imageRef = useRef<QRCodeDownloadHandle>(null);
 
   const content = useMemo(() => {
-    if (config.packageName !== 'react') return null;
-    const hasError = hasQRCodeError(config, preparedImage);
+    if (options.packageName !== 'react') return null;
+    const hasError = hasQRCodeError(options, preparedImage);
     if (hasError) return <PreviewError message={hasError} />;
 
-    if (config.output === 'svg') {
+    if (options.output === 'svg') {
       return (
         <div className="flex flex-col items-center justify-center gap-4">
           <QRCodeSVG
             ref={svgRef}
-            data={config.data}
-            options={createPlaygroundSVGOptions(config, preparedImage)}
+            payload={options.payload}
+            options={createPlaygroundSVGOptions(options, preparedImage)}
           />
           <DownloadButton
             label="Download SVG"
@@ -40,13 +40,13 @@ export default function QRCodeReactPlaygroundPreview() {
       );
     }
 
-    if (config.output === 'image') {
+    if (options.output === 'image') {
       return (
         <div className="flex flex-col items-center justify-center gap-4">
           <QRCodeImage
             ref={imageRef}
-            data={config.data}
-            options={createPlaygroundImageOptions(config, preparedImage)}
+            payload={options.payload}
+            options={createPlaygroundImageOptions(options, preparedImage)}
           />
           <DownloadButton
             label="Download PNG"
@@ -58,13 +58,13 @@ export default function QRCodeReactPlaygroundPreview() {
 
     return (
       <QRCodeCanvas
-        data={config.data}
-        options={createPlaygroundCanvasOptions(config, preparedImage)}
+        payload={options.payload}
+        options={createPlaygroundCanvasOptions(options, preparedImage)}
       />
     );
-  }, [config, preparedImage]);
+  }, [options, preparedImage]);
 
-  return <div data-active={config.packageName === 'react'}>{content}</div>;
+  return <div data-active={options.packageName === 'react'}>{content}</div>;
 }
 
 function DownloadButton({label, onClick}: {label: string; onClick(): void}) {
@@ -82,7 +82,7 @@ function PreviewError({message}: {message?: unknown}) {
         QR code generation failed
       </h4>
       <p className="text-destructive/90 [&_a]:hover:text-foreground text-sm text-balance md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_p:not(:last-child)]:mb-4">
-        {message ? String(message) : 'This QR code configuration is invalid.'}
+        {message ? String(message) : 'This QR code options is invalid.'}
       </p>
     </div>
   );

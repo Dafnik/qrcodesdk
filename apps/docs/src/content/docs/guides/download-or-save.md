@@ -63,7 +63,7 @@ export function DownloadQRCode() {
       <button type="button" onClick={() => qrcode.current?.download('qrcodesdk')}>
         Download PNG
       </button>
-      <QRCodeImage ref={qrcode} data="https://qrcodesdk.dev" />
+      <QRCodeImage ref={qrcode} payload="https://qrcodesdk.dev" />
     </>
   );
 }
@@ -87,7 +87,7 @@ const qrcode = ref<QRCodeDownloadHandle | null>(null);
 
 <template>
   <button type="button" @click="qrcode?.download('qrcodesdk')">Download PNG</button>
-  <QRCodeImage ref="qrcode" data="https://qrcodesdk.dev" />
+  <QRCodeImage ref="qrcode" payload="https://qrcodesdk.dev" />
 </template>
 ```
 
@@ -105,7 +105,7 @@ Call `download(filename?)` through an SVG or Image component bound with `bind:th
 </script>
 
 <button type="button" onclick={() => qrcode?.download('qrcodesdk')}>Download PNG</button>
-<QRCodeImage bind:this={qrcode} data="https://qrcodesdk.dev" />
+<QRCodeImage bind:this={qrcode} payload="https://qrcodesdk.dev" />
 ```
 
 Svelte's Canvas component also has no download method.
@@ -115,10 +115,10 @@ Svelte's Canvas component also has no download method.
 Call `download(filename?)` on an SVG or Image component template reference:
 
 ```angular-html
-<qrcode-svg #qrcodeSvg data="https://qrcodesdk.dev" />
+<qrcode-svg #qrcodeSvg payload="https://qrcodesdk.dev" />
 <button (click)="qrcodeSvg.download('qrcodesdk')" type="button">Download SVG</button>
 
-<qrcode-image #qrcodeImage data="https://qrcodesdk.dev" />
+<qrcode-image #qrcodeImage payload="https://qrcodesdk.dev" />
 <button (click)="qrcodeImage.download('qrcodesdk')" type="button">Download PNG</button>
 ```
 

@@ -1,6 +1,6 @@
 ---
 title: Builder and matrix
-description: Reference for QRCodeSDK input data, modes, ECI, matrix options, builder methods, and matrix output.
+description: Reference for QRCodeSDK payload, modes, ECI, matrix options, builder methods, and matrix output.
 docType: reference
 
 related:
@@ -9,10 +9,10 @@ related:
   - ./custom-renderers.md
 ---
 
-`qrcode()` creates an immutable builder from `@qrcodesdk/core`. Each configuration method returns a
+`qrcode()` creates an immutable builder from `@qrcodesdk/core`. Each options method returns a
 new builder; the original builder remains unchanged.
 
-## Input data
+## Payload
 
 The builder accepts a `string` or a non-negative safe integer. Use a string for values with leading
 zeroes or values outside JavaScript's safe-integer range.
@@ -22,20 +22,20 @@ import {qrcode} from '@qrcodesdk/core';
 
 qrcode('https://qrcodesdk.dev');
 qrcode(1234567890);
-qrcode().data('data supplied later');
+qrcode().payload('payload supplied later');
 ```
 
-QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, and UTF-8 octet data,
+QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, and UTF-8 octet payloads,
 including automatic mixed-mode segmentation.
 
 ## Encoding modes
 
-| Mode           | Accepted data                 | Use it for                                     |
+| Mode           | Accepted payload              | Use it for                                     |
 | -------------- | ----------------------------- | ---------------------------------------------- |
 | `numeric`      | Digits only                   | Numeric identifiers and digit-only payloads    |
 | `alphanumeric` | QR alphanumeric character set | Uppercase text such as `HELLO WORLD`           |
 | `octet`        | UTF-8 bytes                   | URLs, JSON, emoji, lowercase, and general text |
-| omitted        | Any supported input           | Automatic shortest-bit segmentation; default   |
+| omitted        | Any supported payload         | Automatic shortest-bit segmentation; default   |
 
 Setting a mode forces the complete payload into that mode. When mode is omitted, the builder splits
 the payload into the shortest-bit combination of numeric, alphanumeric, and octet segments. Manual
@@ -58,7 +58,7 @@ Set options individually or together:
 ```ts
 const builder = qrcode('Grüße ✅').mode('octet').eci(true).errorCorrection('H').version(4).mask(2);
 
-const equivalent = qrcode('Grüße ✅').config({
+const equivalent = qrcode('Grüße ✅').options({
   mode: 'octet',
   eci: true,
   errorCorrectionLevel: 'H',
@@ -80,8 +80,8 @@ alphanumeric-only symbols are identical with either setting.
 
 The levels `L`, `M`, `Q`, and `H` add increasing amounts of redundant data. The default is `M`.
 Higher levels can tolerate more damaged or obscured modules, but reduce capacity and may select a
-larger version. For visual overlays, see the reliability guidance in
-[Customize appearance](/guides/customize/#protect-scan-reliability).
+larger version. For center images, see the reliability guidance in
+[Customize appearance](/guides/customize/#scan-reliability).
 
 ### Version and mask
 
@@ -90,7 +90,7 @@ Most applications should leave both values automatic. Pin them for fixtures, com
 or exact visual comparisons.
 :::
 
-When a pinned version cannot contain the payload, generation throws `QRCode: Data too large`.
+When a pinned version cannot contain the payload, generation throws `QRCode: Payload too large`.
 Removing the override helps only if a larger version can fit the payload. If automatic selection also
 fails, shorten or change the payload.
 
@@ -98,18 +98,18 @@ fails, shorten or change the payload.
 
 | Method                     | Returns                   | Effect                                                         |
 | -------------------------- | ------------------------- | -------------------------------------------------------------- |
-| `.data(value)`             | a builder with data       | Sets or replaces the input                                     |
-| `.config(options?)`        | a configured builder      | Merges all supplied matrix options                             |
+| `.payload(value)`          | a builder with a payload  | Sets or replaces the payload                                   |
+| `.options(options?)`       | a configured builder      | Merges all supplied matrix options                             |
 | `.mode(mode?)`             | a configured builder      | Forces or clears the encoding mode                             |
 | `.eci(enabled?)`           | a configured builder      | Enables or clears the UTF-8 ECI declaration                    |
 | `.errorCorrection(level?)` | a configured builder      | Sets or clears the error correction level                      |
 | `.version(version?)`       | a configured builder      | Pins or clears the version                                     |
 | `.mask(mask?)`             | a configured builder      | Pins or clears the mask                                        |
-| `.matrix()`                | `QRCodeMatrix`            | Generates the matrix; requires data                            |
+| `.matrix()`                | `QRCodeMatrix`            | Generates the matrix; requires a payload                       |
 | `.renderer(renderer)`      | a builder with a renderer | Stores a renderer for a later call                             |
 | `.render(renderer?)`       | renderer output           | Generates the matrix and invokes a supplied or stored renderer |
 
-The builder's types prevent `.matrix()` or `.render()` before data is set, and prevent `.render()`
+The builder's types prevent `.matrix()` or `.render()` before a payload is set, and prevent `.render()`
 without either a stored or directly supplied renderer.
 
 ## Matrix output and renderer contract

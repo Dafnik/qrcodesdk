@@ -51,6 +51,8 @@ export function mockCanvasRendering(mockApi: MockApi): void {
     return {
       arc: mockApi.fn(),
       beginPath: mockApi.fn(),
+      bezierCurveTo: mockApi.fn(),
+      clearRect: mockApi.fn(),
       closePath: mockApi.fn(),
       drawImage: mockApi.fn(),
       fill: mockApi.fn(),

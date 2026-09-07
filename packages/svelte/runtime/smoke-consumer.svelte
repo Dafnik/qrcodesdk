@@ -3,23 +3,25 @@
 
   import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/svelte';
 
-  const options = {size: 2, margin: 1};
+  const options = {style: {moduleSize: 2, quietZone: 1}};
   const imageOptions = {
     ...options,
-    alt: 'Framework runtime QR code',
-    ariaLabel: 'Framework runtime QR code',
+    accessibility: {
+      alt: 'Framework runtime QR code',
+      ariaLabel: 'Framework runtime QR code',
+    },
   };
 </script>
 
 <main>
   <p data-testid="framework-version">Svelte {VERSION}</p>
   <section data-testid="qrcode-svg">
-    <QRCodeSVG data="HELLO" {options} />
+    <QRCodeSVG payload="HELLO" {options} />
   </section>
   <section data-testid="qrcode-image">
-    <QRCodeImage data="HELLO" options={imageOptions} />
+    <QRCodeImage payload="HELLO" options={imageOptions} />
   </section>
   <section data-testid="qrcode-canvas">
-    <QRCodeCanvas data="HELLO" {options} />
+    <QRCodeCanvas payload="HELLO" {options} />
   </section>
 </main>

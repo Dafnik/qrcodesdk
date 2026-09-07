@@ -12,7 +12,7 @@ Every hand-written page declares exactly one `docType` in front matter:
 ## Topic ownership
 
 Give each topic one canonical page. Setup selection belongs to **Choose your setup**; matrix options to
-**Builder and matrix**; shared styling and scan safety to **Customize appearance**; output selection
+**Builder and matrix**; shared styling and scan reliability to **Customize appearance**; output selection
 to **Renderer outputs**; center-image preparation to **Add a center image**; downloading and saving
 to **Download or save**; and HTTP response patterns to **Serve a QR code**.
 

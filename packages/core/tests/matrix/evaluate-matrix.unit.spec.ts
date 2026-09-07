@@ -25,7 +25,7 @@ describe('evaluateMatrix', () => {
       for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
         for (const mask of MASKS) {
           const matrix = qrcode('A')
-            .config({errorCorrectionLevel, mask, mode: 'alphanumeric', version})
+            .options({errorCorrectionLevel, mask, mode: 'alphanumeric', version})
             .matrix();
 
           expect(evaluateMatrix(matrix)).toBe(evaluateMatrixLegacy(matrix));

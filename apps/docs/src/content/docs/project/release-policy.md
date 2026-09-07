@@ -5,8 +5,8 @@ description: Framework support windows and generated-artifact compatibility guar
 
 ## Generated artifacts
 
-Identical input and options produce deterministic output within one installed QRCodeSDK
-implementation. Matrix cells, SVG markup, and PNG bytes may change between releases as encoding,
+Identical payload and options produce deterministic output within one installed QRCodeSDK
+implementation. Matrix modules, SVG markup, and PNG bytes may change between releases as encoding,
 mask selection, markup, or rasterization changes.
 
 If exact artifacts matter, pin every QRCodeSDK package to an exact version and retain your own matrix,

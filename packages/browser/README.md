@@ -66,8 +66,10 @@ import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
   QRCodeImageRenderer({
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    accessibility: {
+      alt: 'QR code for qrcodesdk.dev',
+      ariaLabel: 'Scan to open qrcodesdk.dev',
+    },
   }),
 );
 
@@ -103,7 +105,7 @@ For server rendering, defer them until hydration or use the runtime-neutral SVG 
 
 ```ts
 import {
-  type QRCodeCanvasImageOptions,
+  type QRCodeCanvasCenterImageOptions,
   type QRCodeCanvasOptions,
   QRCodeCanvasRenderer,
   type QRCodeCanvasRendererOptions,

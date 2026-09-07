@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeError, emailPayload, geoPayload, phonePayload, smsPayload, wifiPayload} from '../src';
+import {QRCodeError} from '../src';
+import {emailPayload, geoPayload, phonePayload, smsPayload, wifiPayload} from '../src/payload';
 
 describe('payload serializers', () => {
   test('serializes RFC 6068 email payloads', () => {
@@ -55,7 +56,7 @@ describe('payload serializers', () => {
     try {
       serialize();
     } catch (error) {
-      expect(error).toMatchObject({code: 'INVALID_INPUT', details: {field: expect.any(String)}});
+      expect(error).toMatchObject({code: 'INVALID_PAYLOAD', details: {field: expect.any(String)}});
     }
   });
 
@@ -66,7 +67,7 @@ describe('payload serializers', () => {
       wifiPayload({ssid: 'Open', encryption: 'nopass', password: 'secret'});
     } catch (error) {
       expect(error).toMatchObject({
-        code: 'INVALID_INPUT',
+        code: 'INVALID_PAYLOAD',
         details: {field: 'password', value: '[REDACTED]'},
       });
       expect(JSON.stringify(error)).not.toContain('secret');
@@ -80,7 +81,7 @@ describe('payload serializers', () => {
       geoPayload({latitude: 91, longitude: 0});
     } catch (error) {
       expect(error).toMatchObject({
-        code: 'INVALID_INPUT',
+        code: 'INVALID_PAYLOAD',
         details: {field: 'latitude', value: 91},
       });
     }
