@@ -1,16 +1,8 @@
-import {
-  QRCodeError,
-  type QRCodeMatrix,
-  type QRCodeMatrixOptions,
-  type QRCodeRenderer,
-} from '@qrcodesdk/core';
+import {type QRCodeMatrix, type QRCodeMatrixOptions, type QRCodeRenderer} from '@qrcodesdk/core';
 
-import {
-  QRCodeCanvasRenderer,
-  type QRCodeCanvasRendererOptions,
-  assertOptionalString,
-} from './canvas';
+import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from './canvas';
 import {downloadQRCode, ensureExtension} from './download-helper';
+import {assertKnownKeys, assertOptionalString} from './options';
 import type {QRCodeDownloadRendererOptions} from './types';
 
 export type QRCodeImageAccessibilityOptions = {
@@ -30,8 +22,8 @@ export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<H
 export function QRCodeImageRenderer(
   options?: QRCodeImageRendererOptions,
 ): QRCodeRenderer<HTMLImageElement> {
-  assertKeys(options, 'options', ['style', 'accessibility', 'image']);
-  assertKeys(options?.accessibility, 'accessibility', ['alt', 'ariaLabel', 'title']);
+  assertKnownKeys(options, 'options', ['style', 'accessibility', 'image']);
+  assertKnownKeys(options?.accessibility, 'accessibility', ['alt', 'ariaLabel', 'title']);
   assertOptionalString(options?.accessibility?.alt, 'accessibility.alt');
   assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
   assertOptionalString(options?.accessibility?.title, 'accessibility.title');
@@ -79,16 +71,4 @@ function applyAccessibilityAttributes(
   image.alt = options.alt;
   if (options.ariaLabel) image.setAttribute('aria-label', options.ariaLabel);
   if (options.title) image.title = options.title;
-}
-
-function assertKeys(value: object | undefined, path: string, keys: readonly string[]): void {
-  if (!value) return;
-  const known = new Set(keys);
-  const unknown = Object.keys(value).find((key) => !known.has(key));
-  if (unknown !== undefined) {
-    const field = `${path}.${unknown}`;
-    throw new QRCodeError('INVALID_OPTIONS', `Unknown QR code option ${field}`, {
-      details: {field, value: (value as Record<string, unknown>)[unknown]},
-    });
-  }
 }

@@ -57,5 +57,11 @@ describe('QRCodeCanvasRenderer', () => {
         details: expect.objectContaining({field: 'accessibility.ariaLabel'}),
       }),
     );
+    expect(() => QRCodeCanvasRenderer({accessibility: null} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'accessibility'})}),
+    );
+    expect(() => QRCodeCanvasRenderer({image: []} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'image'})}),
+    );
   });
 });

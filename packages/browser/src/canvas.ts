@@ -9,6 +9,8 @@ import {
 } from '@qrcodesdk/core';
 import type {QRCodeDrawingTarget} from '@qrcodesdk/core/drawing';
 
+import {assertKnownKeys, assertOptionalString} from './options';
+
 export type QRCodeCanvasImageOptions = QRCodeImageOverlayOptions<CanvasImageSource>;
 export type QRCodeCanvasAccessibilityOptions = {
   readonly ariaLabel?: string;
@@ -26,9 +28,9 @@ export type QRCodeCanvasOptions = QRCodeCanvasRendererOptions & {
 export function QRCodeCanvasRenderer(
   options?: QRCodeCanvasRendererOptions,
 ): QRCodeRenderer<HTMLCanvasElement> {
-  assertKeys(options, 'options', ['style', 'accessibility', 'image']);
-  assertKeys(options?.accessibility, 'accessibility', ['ariaLabel', 'title']);
-  assertKeys(options?.image, 'image', ['source', 'size', 'padding', 'clearBackground']);
+  assertKnownKeys(options, 'options', ['style', 'accessibility', 'image']);
+  assertKnownKeys(options?.accessibility, 'accessibility', ['ariaLabel', 'title']);
+  assertKnownKeys(options?.image, 'image', ['source', 'size', 'padding', 'clearBackground']);
   assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
   assertOptionalString(options?.accessibility?.title, 'accessibility.title');
   const styler = createQRCodeStyler(options?.style);
@@ -249,27 +251,4 @@ function throwInvalidImageDimensions(): never {
 
 function rgba(red: number, green: number, blue: number, alpha: number): string {
   return `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
-}
-
-function assertKeys(value: object | undefined, path: string, keys: readonly string[]): void {
-  if (!value) return;
-  const known = new Set(keys);
-  const unknown = Object.keys(value).find((key) => !known.has(key));
-  if (unknown !== undefined) {
-    const field = `${path}.${unknown}`;
-    throw new QRCodeError('INVALID_OPTIONS', `Unknown QR code option ${field}`, {
-      details: {field, value: (value as Record<string, unknown>)[unknown]},
-    });
-  }
-}
-
-export function assertOptionalString(
-  value: unknown,
-  field: string,
-): asserts value is string | undefined {
-  if (value !== undefined && typeof value !== 'string') {
-    throw new QRCodeError('INVALID_OPTIONS', `QR code ${field} must be a string`, {
-      details: {field, value},
-    });
-  }
 }

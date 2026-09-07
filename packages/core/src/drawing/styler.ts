@@ -8,6 +8,16 @@ const TWO_PI = Math.PI * 2;
 
 export function createQRCodeStyler(style?: QRCodeVisualStyle): QRCodeStyler {
   const resolved = resolveQRCodeVisualStyle(style);
+  const colors = new Map<string, ReturnType<typeof parseQRCodeColor>>();
+  for (const color of [
+    resolved.background,
+    resolved.foreground,
+    resolved.modules.color,
+    resolved.finder.outer.color,
+    resolved.finder.center.color,
+  ]) {
+    if (!colors.has(color)) colors.set(color, parseQRCodeColor(color));
+  }
   const drawings = new WeakMap<QRCodeMatrix, QRCodeDrawing>();
 
   return Object.freeze({
@@ -15,8 +25,8 @@ export function createQRCodeStyler(style?: QRCodeVisualStyle): QRCodeStyler {
       const cached = drawings.get(matrix);
       if (cached) return cached;
       const plan = createQRCodeStylePlan(matrix, resolved);
-      const background = parseQRCodeColor(plan.backgroundColor);
-      const layerColors = plan.layers.map((layer) => parseQRCodeColor(layer.color));
+      const background = colors.get(plan.backgroundColor)!;
+      const layerColors = plan.layers.map((layer) => colors.get(layer.color)!);
       const drawing: QRCodeDrawing = Object.freeze({
         moduleCount: plan.moduleCount,
         moduleSize: resolved.moduleSize,

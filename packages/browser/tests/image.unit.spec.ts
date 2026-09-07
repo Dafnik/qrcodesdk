@@ -28,5 +28,8 @@ describe('QRCodeImageRenderer', () => {
     expect(() => QRCodeImageRenderer({accessibility: {alt: 1 as never}})).toThrowError(
       expect.objectContaining({details: expect.objectContaining({field: 'accessibility.alt'})}),
     );
+    expect(() => QRCodeImageRenderer({accessibility: null} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'accessibility'})}),
+    );
   });
 });

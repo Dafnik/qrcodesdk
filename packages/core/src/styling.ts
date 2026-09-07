@@ -107,12 +107,11 @@ export function parseQRCodeColor(color: QRCodeColor): QRCodeRGBA {
   ];
 }
 
-export function assertKnownKeys(
-  value: object | undefined,
-  path: string,
-  knownKeys: readonly string[],
-): void {
-  if (!value) return;
+export function assertKnownKeys(value: unknown, path: string, knownKeys: readonly string[]): void {
+  if (value === undefined) return;
+  if (!isPlainObject(value)) {
+    throwInvalid(path, 'a plain object', value);
+  }
   const known = new Set(knownKeys);
   const unknown = Object.keys(value).find((key) => !known.has(key));
   if (unknown !== undefined) {
@@ -121,6 +120,12 @@ export function assertKnownKeys(
       details: {field, value: (value as Record<string, unknown>)[unknown]},
     });
   }
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== 'object' || value === null) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }
 
 function validatePositiveInteger(field: string, value: unknown): asserts value is number {

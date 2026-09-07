@@ -385,8 +385,13 @@ function resolveCompressionLevel(value: number | undefined): number {
   return level;
 }
 
-function assertKeys(value: object | undefined, path: string, keys: readonly string[]): void {
-  if (!value) return;
+function assertKeys(value: unknown, path: string, keys: readonly string[]): void {
+  if (value === undefined) return;
+  if (!isPlainObject(value)) {
+    throw new QRCodeError('INVALID_OPTIONS', `QR code ${path} must be a plain object`, {
+      details: {field: path, value},
+    });
+  }
   const known = new Set(keys);
   const unknown = Object.keys(value).find((key) => !known.has(key));
   if (unknown !== undefined) {
@@ -395,4 +400,10 @@ function assertKeys(value: object | undefined, path: string, keys: readonly stri
       details: {field, value: (value as Record<string, unknown>)[unknown]},
     });
   }
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== 'object' || value === null) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }

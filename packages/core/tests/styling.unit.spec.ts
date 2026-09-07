@@ -27,6 +27,17 @@ describe('styling validation', () => {
     ).not.toThrow();
   });
 
+  test.each([
+    [null, 'style'],
+    [[], 'style'],
+    [{modules: null}, 'style.modules'],
+    [{finder: {outer: []}}, 'style.finder.outer'],
+  ])('rejects malformed visual style groups %#', (style, field) => {
+    expect(() => createQRCodeStyler(style as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field})}),
+    );
+  });
+
   test('validates renderer options when the factory is called', () => {
     expect(() => QRCodeSVGRenderer({style: {moduleSize: 0}})).toThrowError(QRCodeError);
     expect(() => QRCodeTextRenderer({style: {quietZone: -1}})).toThrowError(QRCodeError);
@@ -37,6 +48,18 @@ describe('styling validation', () => {
       expect.objectContaining({
         details: expect.objectContaining({field: 'accessibility.title'}),
       }),
+    );
+    expect(() => QRCodeSVGRenderer({accessibility: null} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'accessibility'})}),
+    );
+    expect(() => QRCodeSVGRenderer({image: []} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'image'})}),
+    );
+    expect(() => QRCodeTextRenderer({style: null} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'style'})}),
+    );
+    expect(() => QRCodeTextRenderer({ansi: []} as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'ansi'})}),
     );
   });
 
