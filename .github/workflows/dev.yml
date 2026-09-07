@@ -266,12 +266,17 @@ jobs:
           case "$PACKAGE" in
             core)
               tarballs=("$RUNNER_TEMP/runtime-packages/qrcodesdk-core-"*.tgz)
+              package_specs=("@qrcodesdk/core=${tarballs[0]}")
               cp packages/core/runtime/smoke-package.mjs "$consumer"
               ;;
             node)
               tarballs=(
                 "$RUNNER_TEMP/runtime-packages/qrcodesdk-core-"*.tgz
                 "$RUNNER_TEMP/runtime-packages/qrcodesdk-node-"*.tgz
+              )
+              package_specs=(
+                "@qrcodesdk/core=${tarballs[0]}"
+                "@qrcodesdk/node=${tarballs[1]}"
               )
               cp packages/node/runtime/smoke-package.mjs "$consumer"
               ;;
@@ -281,13 +286,32 @@ jobs:
                 "$RUNNER_TEMP/runtime-packages/qrcodesdk-node-"*.tgz
                 "$RUNNER_TEMP/runtime-packages/qrcodesdk-cli-"*.tgz
               )
+              package_specs=(
+                "@qrcodesdk/core=${tarballs[0]}"
+                "@qrcodesdk/node=${tarballs[1]}"
+                "@qrcodesdk/cli=${tarballs[2]}"
+              )
               cp packages/cli/runtime/smoke-package.mjs "$consumer"
               ;;
           esac
 
           cd "$consumer"
           if [ "$RUNTIME" = 'bun' ]; then
-            bun add "${tarballs[@]}"
+            bun -e '
+              const dependencies = Object.fromEntries(
+                process.argv
+                  .filter((argument) => argument.startsWith("@qrcodesdk/"))
+                  .map((spec) => {
+                    const separator = spec.indexOf("=");
+                    return [spec.slice(0, separator), `file:${spec.slice(separator + 1)}`];
+                  }),
+              );
+              await Bun.write(
+                "package.json",
+                JSON.stringify({private: true, type: "module", dependencies, overrides: dependencies}),
+              );
+            ' -- "${package_specs[@]}"
+            bun install --ignore-scripts --no-save
           else
             if [ "$RUNTIME" = 'node' ]; then
               npm config set engine-strict true --location=project

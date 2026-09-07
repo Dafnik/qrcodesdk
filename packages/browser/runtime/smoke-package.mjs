@@ -17,15 +17,19 @@ assert.ok(consumerDirectory, 'QRCODESDK_CONSUMER must point to the installed pac
 
 globalThis.console.log(`Testing the installed @qrcodesdk/browser package in ${browserName}`);
 
+const moduleDirectories = [
+  {
+    pathnamePrefix: '/core/',
+    directory: path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'core', 'dist'),
+  },
+  {
+    pathnamePrefix: '/browser/',
+    directory: path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'browser', 'dist'),
+  },
+];
 const [coreSource, browserSource] = await Promise.all([
-  readFile(
-    path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'core', 'dist', 'index.mjs'),
-    'utf8',
-  ),
-  readFile(
-    path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'browser', 'dist', 'index.mjs'),
-    'utf8',
-  ),
+  readFile(path.join(moduleDirectories[0].directory, 'index.mjs'), 'utf8'),
+  readFile(path.join(moduleDirectories[1].directory, 'index.mjs'), 'utf8'),
 ]);
 logSuccess('installed Core and Browser ESM bundles are readable');
 
@@ -46,8 +50,8 @@ try {
               <script type="importmap">
                 {
                   "imports": {
-                    "@qrcodesdk/core": "/core.mjs",
-                    "@qrcodesdk/browser": "/browser.mjs"
+                    "@qrcodesdk/core": "/core/index.mjs",
+                    "@qrcodesdk/browser": "/browser/index.mjs"
                   }
                 }
               </script>
@@ -58,14 +62,28 @@ try {
       return;
     }
 
-    if (pathname === '/core.mjs') {
-      await route.fulfill({contentType: 'text/javascript', body: coreSource});
-      return;
-    }
+    for (const {pathnamePrefix, directory} of moduleDirectories) {
+      if (!pathname.startsWith(pathnamePrefix)) continue;
 
-    if (pathname === '/browser.mjs') {
-      await route.fulfill({contentType: 'text/javascript', body: browserSource});
-      return;
+      const modulePath = path.resolve(directory, pathname.slice(pathnamePrefix.length));
+      const relativeModulePath = path.relative(directory, modulePath);
+      if (
+        !relativeModulePath.endsWith('.mjs') ||
+        relativeModulePath.startsWith('..') ||
+        path.isAbsolute(relativeModulePath)
+      ) {
+        break;
+      }
+
+      try {
+        await route.fulfill({
+          contentType: 'text/javascript',
+          body: await readFile(modulePath, 'utf8'),
+        });
+        return;
+      } catch {
+        break;
+      }
     }
 
     await route.fulfill({status: 404, body: 'Not found'});
