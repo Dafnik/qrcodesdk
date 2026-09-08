@@ -90,12 +90,12 @@ test('the Angular explainer exposes modules for pointer inspection', () => {
   assert.match(component, /qr\.quietZone\b/);
   assert.match(component, /module\.column \+ qr\.quietZone/);
   assert.match(component, /module\.row \+ qr\.quietZone/);
-  assert.match(component, /\[attr\.payload-group\]="module\.groupId"/);
-  assert.match(component, /\[attr\.payload-role\]="module\.role"/);
-  assert.match(component, /\[attr\.payload-row\]="module\.row"/);
-  assert.match(component, /\[attr\.payload-column\]="module\.column"/);
-  assert.match(component, /closest<SVGElement>\('\[payload-group\]'\)/);
-  assert.match(component, /element\.dataset\['payloadGroup'\]/);
+  assert.match(component, /\[attr\.data-group\]="module\.groupId"/);
+  assert.match(component, /\[attr\.data-role\]="module\.role"/);
+  assert.match(component, /\[attr\.data-row\]="module\.row"/);
+  assert.match(component, /\[attr\.data-column\]="module\.column"/);
+  assert.match(component, /closest<SVGElement>\('\[data-group\]'\)/);
+  assert.match(component, /element\.dataset\['group'\]/);
 });
 
 function byPlacement(

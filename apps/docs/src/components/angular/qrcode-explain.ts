@@ -202,7 +202,7 @@ export class QRCodeExplainControls {
             <rect [attr.height]="qr.viewSize" [attr.width]="qr.viewSize" fill="var(--background)" />
 
             @if (qr.quietZone > 0) {
-              <g payload-group="quiet-zone" payload-role="quiet-zone" aria-label="Quiet zone">
+              <g data-group="quiet-zone" data-role="quiet-zone" aria-label="Quiet zone">
                 <rect
                   [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
@@ -230,12 +230,12 @@ export class QRCodeExplainControls {
               @for (module of qr.modules; track module.key) {
                 <rect
                   class="qr-module"
-                  [attr.payload-column]="module.column"
-                  [attr.payload-group]="module.groupId"
-                  [attr.payload-key]="module.key"
-                  [attr.payload-role]="module.role"
-                  [attr.payload-row]="module.row"
-                  [attr.payload-value]="module.value"
+                  [attr.data-column]="module.column"
+                  [attr.data-group]="module.groupId"
+                  [attr.data-key]="module.key"
+                  [attr.data-role]="module.role"
+                  [attr.data-row]="module.row"
+                  [attr.data-value]="module.value"
                   [attr.height]="1"
                   [attr.width]="1"
                   [attr.x]="module.column + qr.quietZone"
@@ -458,7 +458,7 @@ export class QRCodeExplain {
   protected onPointerMove(event: PointerEvent): void {
     const target = event.target;
     if (!(target instanceof SVGElement)) return;
-    const interactive = target.closest<SVGElement>('[payload-group]');
+    const interactive = target.closest<SVGElement>('[data-group]');
     if (interactive === null) return;
 
     const selection = this.selectionFromElement(interactive);
@@ -598,11 +598,11 @@ export class QRCodeExplain {
   }
 
   private selectionFromElement(element: SVGElement): ExplainSelection | undefined {
-    const groupId = element.dataset['payloadGroup'];
-    const role = element.dataset['payloadRole'] as QRCodeExplainRole | 'quiet-zone' | undefined;
+    const groupId = element.dataset['group'];
+    const role = element.dataset['role'] as QRCodeExplainRole | 'quiet-zone' | undefined;
     if (groupId === undefined || role === undefined) return undefined;
-    const row = Number(element.dataset['payloadRow']);
-    const column = Number(element.dataset['payloadColumn']);
+    const row = Number(element.dataset['row']);
+    const column = Number(element.dataset['column']);
     const module =
       Number.isInteger(row) && Number.isInteger(column)
         ? this.explanation()?.moduleGrid[row]?.[column]
