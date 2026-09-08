@@ -79,7 +79,7 @@ export default defineConfig({
     shikiConfig: {
       themes: {
         light: 'github-light',
-        dark: 'github-dark',
+        dark: 'poimandres',
       },
     },
   },
@@ -135,7 +135,7 @@ export default defineConfig({
       description:
         'Build QR codes with a single TypeScript-first API, then render them in the format your app needs.',
       expressiveCode: {
-        themes: ['github-light', 'github-dark'],
+        themes: ['github-light', 'poimandres'],
       },
       routeMiddleware: './src/routeData.ts',
       plugins: [
