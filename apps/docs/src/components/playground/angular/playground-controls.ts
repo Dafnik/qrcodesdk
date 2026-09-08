@@ -178,12 +178,7 @@ export class PlaygroundColorInput {
                   for="override-modules"
                   hlmLabel>
                   <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                      <span class="text-sm leading-4">Modules</span>
-                      <span class="text-muted-foreground text-xs leading-[inherit] font-normal">
-                        (Ordinary modules)
-                      </span>
-                    </div>
+                    <span class="text-sm leading-4">Modules</span>
                     <hlm-switch [(checked)]="overrideModules" inputId="override-modules" />
                   </div>
 
@@ -232,12 +227,7 @@ export class PlaygroundColorInput {
                   for="override-finder-outer"
                   hlmLabel>
                   <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                      <span class="text-sm leading-4">Finder outer ring</span>
-                      <span class="text-muted-foreground text-xs leading-[inherit] font-normal">
-                        (Finder outer rings)
-                      </span>
-                    </div>
+                    <span class="text-sm leading-4">Finder outer ring</span>
                     <hlm-switch [(checked)]="overrideFinderOuter" inputId="override-finder-outer" />
                   </div>
 
@@ -286,12 +276,7 @@ export class PlaygroundColorInput {
                   for="override-finder-center"
                   hlmLabel>
                   <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                      <span class="text-sm leading-4">Finder center</span>
-                      <span class="text-muted-foreground text-xs leading-[inherit] font-normal">
-                        (Finder centers)
-                      </span>
-                    </div>
+                    <span class="text-sm leading-4">Finder center</span>
                     <hlm-switch
                       [(checked)]="overrideFinderCenter"
                       inputId="override-finder-center" />
