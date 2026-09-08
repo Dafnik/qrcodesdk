@@ -183,7 +183,11 @@ const statusSymbol = {
 } as const;
 ---
 
-<div class="table-frame" role="region" aria-label="QR code library comparison" tabindex="0">
+<div
+  class="table-frame not-content"
+  role="region"
+  aria-label="QR code library comparison. Scroll horizontally to compare all libraries."
+  tabindex="0">
   <table>
     <caption>
       <span>Version snapshot: August 2026</span>
@@ -237,15 +241,24 @@ const statusSymbol = {
 </div>
 
 <style>
+  table th,
+  table td {
+    white-space: wrap !important;
+  }
+
   .table-frame {
     --line: color-mix(in srgb, var(--sl-color-gray-5), transparent 12%);
     --paper: color-mix(in srgb, var(--sl-color-bg-nav), var(--sl-color-bg) 30%);
     --highlight: color-mix(in srgb, var(--sl-color-accent-high), transparent 92%);
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
+    box-sizing: border-box;
+    inline-size: 100%;
+    contain: inline-size paint;
+    min-inline-size: 0;
+    max-inline-size: 100%;
     margin-top: 2rem;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: none;
     border: 1px solid var(--line);
     border-radius: 0.45rem;
     background: var(--paper);
@@ -258,6 +271,8 @@ const statusSymbol = {
   }
 
   table {
+    display: table;
+    table-layout: fixed;
     width: 100%;
     min-width: 66rem;
     margin: 0;
@@ -288,7 +303,6 @@ const statusSymbol = {
     gap: 1rem;
   }
 
-  caption,
   .legend,
   .legend > span,
   .cell-title {
@@ -296,7 +310,9 @@ const statusSymbol = {
   }
 
   .legend {
-    justify-content: flex-end;
+    margin-top: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     letter-spacing: 0.04em;
   }
 
@@ -308,7 +324,7 @@ const statusSymbol = {
 
   th,
   td {
-    min-width: 11rem;
+    overflow-wrap: anywhere;
     padding: 1rem;
     border: 0;
     border-right: 1px solid var(--line);
@@ -359,7 +375,6 @@ const statusSymbol = {
     position: sticky;
     z-index: 1;
     left: 0;
-    min-width: 10rem;
     color: var(--sl-color-white);
     background: var(--sl-color-bg-nav);
     font-size: 0.78rem;
@@ -436,15 +451,23 @@ const statusSymbol = {
     color: var(--sl-color-gray-3);
   }
 
-  @media (max-width: 34rem) {
-    caption {
-      align-items: flex-start;
-      flex-direction: column;
+  @media (max-width: 48rem) {
+    table {
+      min-width: 48rem;
+      table-layout: fixed;
     }
 
-    .legend {
-      flex-wrap: wrap;
-      justify-content: flex-start;
+    th,
+    td {
+      min-width: 0;
+      padding: 0.75rem;
+      overflow-wrap: anywhere;
+    }
+
+    thead th:first-child,
+    tbody th {
+      width: 7rem;
+      min-width: 0;
     }
   }
 </style>
