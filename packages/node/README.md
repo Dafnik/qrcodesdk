@@ -4,7 +4,7 @@
 
 # @qrcodesdk/node
 
-[![Open @qrcodesdk/node on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/node?color=7469B6&style=shieldsio)](https://npmx.dev/@qrcodesdk/node) ![@qrcodesdk/node version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/node?color=7469B6&label=version&style=shieldsio) ![@qrcodesdk/node install size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/node?color=7469B6&label=install%20size&style=shieldsio) ![@qrcodesdk/node download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/node?color=7469B6&label=download%2Fmo&style=shieldsio) [![@qrcodesdk/node source code](https://npmx.dev/api/registry/badge/name/@qrcodesdk/node?color=7469B6&label=source%20code&value=GitHub%20%E2%86%97&style=shieldsio)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/node)
+[![Open @qrcodesdk/node on npmx.dev](https://npmx.dev/api/registry/badge/name/@qrcodesdk/node?color=24272c&style=shieldsio)](https://npmx.dev/@qrcodesdk/node) ![@qrcodesdk/node version](https://npmx.dev/api/registry/badge/version/@qrcodesdk/node?color=24272c&label=version&style=shieldsio) ![@qrcodesdk/node install size](https://npmx.dev/api/registry/badge/size/@qrcodesdk/node?color=24272c&label=install%20size&style=shieldsio) ![@qrcodesdk/node download/mo](https://npmx.dev/api/registry/badge/downloads-month/@qrcodesdk/node?color=24272c&label=download%2Fmo&style=shieldsio) [![@qrcodesdk/node source code](https://npmx.dev/api/registry/badge/name/@qrcodesdk/node?color=24272c&label=source%20code&value=GitHub%20%E2%86%97&style=shieldsio)](https://github.com/Dafnik/qrcodesdk/tree/main/packages/node)
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
