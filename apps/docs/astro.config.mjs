@@ -162,7 +162,7 @@ export default defineConfig({
       social: [
         {
           icon: 'npmx',
-          label: 'npmx Organisation',
+          label: 'npmx organisation',
           href: 'https://npmx.dev/org/qrcodesdk',
         },
         {
