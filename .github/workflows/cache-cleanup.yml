@@ -1,0 +1,54 @@
+name: Clean old GitHub Actions caches
+
+on:
+  schedule:
+    # Run every day at 03:00 UTC
+    - cron: '0 3 * * *'
+
+  # Allow manual runs from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    name: Delete caches unused for 3 days
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete caches not accessed in the last 3 days
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cutoff=$(date -u -d "3 days ago" +%s)
+
+          echo "Deleting caches last accessed before:"
+          date -u -d "@$cutoff"
+
+          gh cache list \
+            --limit 10000 \
+            --json id,key,lastAccessedAt \
+            --jq '.[] | [.id, .key, .lastAccessedAt] | @tsv' |
+          while IFS=$'\t' read -r id key last_accessed; do
+            # Skip entries without a last-accessed timestamp
+            if [ -z "$last_accessed" ] || [ "$last_accessed" = "null" ]; then
+              continue
+            fi
+
+            accessed=$(date -u -d "$last_accessed" +%s)
+
+            if [ "$accessed" -lt "$cutoff" ]; then
+              echo "Deleting cache:"
+              echo "  ID:            $id"
+              echo "  Key:           $key"
+              echo "  Last accessed: $last_accessed"
+
+              gh cache delete "$id"
+            fi
+          done
