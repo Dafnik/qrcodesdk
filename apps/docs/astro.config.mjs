@@ -161,6 +161,11 @@ export default defineConfig({
       },
       social: [
         {
+          icon: 'npmx',
+          label: 'npmx Organisation',
+          href: 'https://npmx.dev/org/qrcodesdk',
+        },
+        {
           icon: 'github',
           label: 'GitHub',
           href: 'https://github.com/Dafnik/qrcodesdk',

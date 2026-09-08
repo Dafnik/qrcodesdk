@@ -1,4 +1,4 @@
-const BADGE_COLOR = '7469B6';
+const BADGE_COLOR = '24272c';
 const BUNDLE_EXTERNALS =
   '%22rxjs%22,%22@angular/core%22,%22@angular/common%22,%22pngjs%22,%22react%22,%22react-dom%22,%22svelte%22,%22vue%22';
 
