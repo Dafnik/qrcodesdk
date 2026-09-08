@@ -202,7 +202,7 @@ export class QRCodeExplainControls {
             <rect [attr.height]="qr.viewSize" [attr.width]="qr.viewSize" fill="var(--background)" />
 
             @if (qr.quietZone > 0) {
-              <g data-group="quiet-zone" data-role="quiet-zone" aria-label="Quiet zone">
+              <g payload-group="quiet-zone" payload-role="quiet-zone" aria-label="Quiet zone">
                 <rect
                   [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
@@ -301,12 +301,7 @@ export class QRCodeExplainControls {
 
         <div class="grid gap-3">
           <div class="flex items-end justify-between gap-4">
-            <div>
-              <p class="text-muted-foreground font-mono text-xs tracking-[0.18em] uppercase">
-                Signal map
-              </p>
-              <h3 class="text-base font-semibold">QR anatomy</h3>
-            </div>
+            <h3 class="text-base font-semibold">QR anatomy</h3>
             <p class="text-muted-foreground text-right text-xs">Hover to preview · click to pin</p>
           </div>
 
@@ -463,7 +458,7 @@ export class QRCodeExplain {
   protected onPointerMove(event: PointerEvent): void {
     const target = event.target;
     if (!(target instanceof SVGElement)) return;
-    const interactive = target.closest<SVGElement>('[data-group]');
+    const interactive = target.closest<SVGElement>('[payload-group]');
     if (interactive === null) return;
 
     const selection = this.selectionFromElement(interactive);
@@ -603,11 +598,11 @@ export class QRCodeExplain {
   }
 
   private selectionFromElement(element: SVGElement): ExplainSelection | undefined {
-    const groupId = element.dataset['group'];
-    const role = element.dataset['role'] as QRCodeExplainRole | 'quiet-zone' | undefined;
+    const groupId = element.dataset['payloadGroup'];
+    const role = element.dataset['payloadRole'] as QRCodeExplainRole | 'quiet-zone' | undefined;
     if (groupId === undefined || role === undefined) return undefined;
-    const row = Number(element.dataset['row']);
-    const column = Number(element.dataset['column']);
+    const row = Number(element.dataset['payloadRow']);
+    const column = Number(element.dataset['payloadColumn']);
     const module =
       Number.isInteger(row) && Number.isInteger(column)
         ? this.explanation()?.moduleGrid[row]?.[column]

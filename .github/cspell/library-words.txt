@@ -26,4 +26,4 @@ bundlejs
 haspopup
 googlechrome
 JSDOM
-poimandres
+vitesse

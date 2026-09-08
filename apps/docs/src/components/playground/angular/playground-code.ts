@@ -67,8 +67,8 @@ export class PlaygroundCode {
     const highlighted = this.codeHighlighter.codeToHtml(preview.code, {
       lang: preview.lang,
       themes: {
-        light: 'github-light',
-        dark: 'poimandres',
+        light: 'vitesse-light',
+        dark: 'vitesse-black',
       },
     });
 

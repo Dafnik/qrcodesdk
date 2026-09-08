@@ -41,9 +41,10 @@ const badges = packageName ? createPackageBadges(packageName, {bundledSize: size
       )}
 
       {worksWith?.length && (
-        <div class="inline-flex overflow-hidden rounded-[3px] font-mono text-[11px] leading-5 font-normal text-white shadow-sm">
+        <div class="inline-flex overflow-hidden rounded-[5px] font-mono text-[12px] leading-5 font-medium text-white shadow-sm">
           <span class="bg-[#555] px-1">works with</span>
-          <div class="flex items-center gap-1 bg-gray-800 px-1">
+
+          <div class="flex items-center gap-1 bg-[#292c32] px-2">
             {worksWith.map((env) => (
               <div class="relative h-4" style="aspect-ratio: 256 / 292">
                 <img

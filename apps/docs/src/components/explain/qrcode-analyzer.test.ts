@@ -84,12 +84,18 @@ describe('explainQRCode', () => {
   });
 });
 
-test('the Angular explainer offsets modules with the resolved quiet zone', () => {
+test('the Angular explainer exposes modules for pointer inspection', () => {
   const component = readFileSync(new URL('../angular/qrcode-explain.ts', import.meta.url), 'utf8');
 
   assert.match(component, /qr\.quietZone\b/);
   assert.match(component, /module\.column \+ qr\.quietZone/);
   assert.match(component, /module\.row \+ qr\.quietZone/);
+  assert.match(component, /\[attr\.payload-group\]="module\.groupId"/);
+  assert.match(component, /\[attr\.payload-role\]="module\.role"/);
+  assert.match(component, /\[attr\.payload-row\]="module\.row"/);
+  assert.match(component, /\[attr\.payload-column\]="module\.column"/);
+  assert.match(component, /closest<SVGElement>\('\[payload-group\]'\)/);
+  assert.match(component, /element\.dataset\['payloadGroup'\]/);
 });
 
 function byPlacement(
