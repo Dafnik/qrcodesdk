@@ -13,11 +13,11 @@ React components for rendering QR codes as inline SVG, PNG-backed Image elements
 ## Install
 
 ```sh
-npm install @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
+npm install @qrcodesdk/react
 ```
 
 ```sh
-pnpm add @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
+pnpm add @qrcodesdk/react
 ```
 
 <details>
@@ -26,25 +26,25 @@ pnpm add @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
 **vp**
 
 ```sh
-vp add @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
+vp add @qrcodesdk/react
 ```
 
 **deno**
 
 ```sh
-deno add @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
+deno add @qrcodesdk/react
 ```
 
 **bun**
 
 ```sh
-bun add @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
+bun add @qrcodesdk/react
 ```
 
 **yarn**
 
 ```sh
-yarn add @qrcodesdk/react @qrcodesdk/core @qrcodesdk/browser
+yarn add @qrcodesdk/react
 ```
 
 </details>

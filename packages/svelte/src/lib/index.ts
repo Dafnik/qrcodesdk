@@ -8,3 +8,5 @@ export type {
   QRCodeImageProps,
   QRCodeSVGProps,
 } from './types.js';
+export type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+export type {QRCodeSVGOptions} from '@qrcodesdk/core';

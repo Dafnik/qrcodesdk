@@ -13,11 +13,11 @@ Vue components for rendering QR codes as inline SVG, PNG-backed Image elements, 
 ## Install
 
 ```sh
-npm install @qrcodesdk/vue @qrcodesdk/core @qrcodesdk/browser
+npm install @qrcodesdk/vue
 ```
 
 ```sh
-pnpm add @qrcodesdk/vue @qrcodesdk/core @qrcodesdk/browser
+pnpm add @qrcodesdk/vue
 ```
 
 <details>
@@ -26,25 +26,25 @@ pnpm add @qrcodesdk/vue @qrcodesdk/core @qrcodesdk/browser
 **vp**
 
 ```sh
-vp add @qrcodesdk/vue @qrcodesdk/core @qrcodesdk/browser
+vp add @qrcodesdk/vue
 ```
 
 **deno**
 
 ```sh
-deno add @qrcodesdk/vue @qrcodesdk/core @qrcodesdk/browser
+deno add @qrcodesdk/vue
 ```
 
 **bun**
 
 ```sh
-bun add @qrcodesdk/vue @qrcodesdk/core @qrcodesdk/browser
+bun add @qrcodesdk/vue
 ```
 
 **yarn**
 
 ```sh
-yarn add @qrcodesdk/vue @qrcodesdk/core @qrcodesdk/browser
+yarn add @qrcodesdk/vue
 ```
 
 </details>

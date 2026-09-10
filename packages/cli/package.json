@@ -72,8 +72,8 @@
   },
   "dependencies": {
     "@clack/prompts": "1.7.0",
-    "@qrcodesdk/core": "workspace:~",
-    "@qrcodesdk/node": "workspace:*",
+    "@qrcodesdk/core": "workspace:0.0.1",
+    "@qrcodesdk/node": "workspace:0.0.1",
     "commander": "15.0.0"
   },
   "devDependencies": {

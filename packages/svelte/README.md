@@ -14,11 +14,11 @@ elements.
 ## Install
 
 ```sh
-npm install @qrcodesdk/svelte @qrcodesdk/core @qrcodesdk/browser
+npm install @qrcodesdk/svelte
 ```
 
 ```sh
-pnpm add @qrcodesdk/svelte @qrcodesdk/core @qrcodesdk/browser
+pnpm add @qrcodesdk/svelte
 ```
 
 <details>
@@ -27,25 +27,25 @@ pnpm add @qrcodesdk/svelte @qrcodesdk/core @qrcodesdk/browser
 **vp**
 
 ```sh
-vp add @qrcodesdk/svelte @qrcodesdk/core @qrcodesdk/browser
+vp add @qrcodesdk/svelte
 ```
 
 **deno**
 
 ```sh
-deno add @qrcodesdk/svelte @qrcodesdk/core @qrcodesdk/browser
+deno add @qrcodesdk/svelte
 ```
 
 **bun**
 
 ```sh
-bun add @qrcodesdk/svelte @qrcodesdk/core @qrcodesdk/browser
+bun add @qrcodesdk/svelte
 ```
 
 **yarn**
 
 ```sh
-yarn add @qrcodesdk/svelte @qrcodesdk/core @qrcodesdk/browser
+yarn add @qrcodesdk/svelte
 ```
 
 </details>
