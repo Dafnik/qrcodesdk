@@ -96,8 +96,7 @@ that wrapper.
 
 ```svelte
 <script lang="ts">
-  import type {QRCodeSVGOptions} from '@qrcodesdk/core';
-  import {QRCodeSVG} from '@qrcodesdk/svelte';
+  import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeSVGOptions = {
     style: {moduleSize: 8, quietZone: 2},
@@ -112,8 +111,7 @@ that wrapper.
 
 ```svelte
 <script lang="ts">
-  import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-  import {QRCodeImage} from '@qrcodesdk/svelte';
+  import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeImageOptions = {
     style: {moduleSize: 8, quietZone: 2},
@@ -128,8 +126,7 @@ that wrapper.
 
 ```svelte
 <script lang="ts">
-  import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
-  import {QRCodeCanvas} from '@qrcodesdk/svelte';
+  import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeCanvasOptions = {style: {moduleSize: 8, quietZone: 2}};
 </script>
@@ -141,8 +138,7 @@ that wrapper.
 
 ```svelte
 <script lang="ts">
-  import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-  import {type QRCodeDownloadHandle, QRCodeImage} from '@qrcodesdk/svelte';
+  import {type QRCodeDownloadHandle, QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/svelte';
 
   let qrcode: QRCodeDownloadHandle | undefined;
   const options: QRCodeImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};

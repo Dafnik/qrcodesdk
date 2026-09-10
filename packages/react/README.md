@@ -97,10 +97,9 @@ Use a React ref when you need a download handle; the rendered SVG, Image, or Can
 ### SVG component
 
 ```tsx
-import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {useMemo} from 'react';
 
-import {QRCodeSVG} from '@qrcodesdk/react';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/react';
 
 export default function QRCodeSVGExample() {
   const options = useMemo<QRCodeSVGOptions>(
@@ -120,10 +119,9 @@ export default function QRCodeSVGExample() {
 ### Image component
 
 ```tsx
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 import {useMemo} from 'react';
 
-import {QRCodeImage} from '@qrcodesdk/react';
+import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/react';
 
 export default function QRCodeImageExample() {
   const options = useMemo<QRCodeImageOptions>(
@@ -144,10 +142,9 @@ export default function QRCodeImageExample() {
 ### Canvas component
 
 ```tsx
-import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
 import {useMemo} from 'react';
 
-import {QRCodeCanvas} from '@qrcodesdk/react';
+import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/react';
 
 export default function QRCodeCanvasExample() {
   const options = useMemo<QRCodeCanvasOptions>(
@@ -169,10 +166,9 @@ export default function QRCodeCanvasExample() {
 ### PNG download
 
 ```tsx
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 import {useMemo, useRef} from 'react';
 
-import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/react';
+import {QRCodeImage, type QRCodeDownloadHandle, type QRCodeImageOptions} from '@qrcodesdk/react';
 
 export default function QRCodeDownloadImageExample() {
   const qrcode = useRef<QRCodeDownloadHandle>(null);

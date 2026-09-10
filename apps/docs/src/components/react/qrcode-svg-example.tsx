@@ -1,7 +1,6 @@
-import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {useMemo} from 'react';
 
-import {QRCodeSVG} from '@qrcodesdk/react';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/react';
 
 export default function QRCodeSVGExample() {
   const options = useMemo<QRCodeSVGOptions>(

@@ -1,7 +1,6 @@
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
 import {useMemo, useRef} from 'react';
 
-import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/react';
+import {QRCodeImage, type QRCodeDownloadHandle, type QRCodeImageOptions} from '@qrcodesdk/react';
 
 export default function QRCodeDownloadImageExample() {
   const qrcode = useRef<QRCodeDownloadHandle>(null);

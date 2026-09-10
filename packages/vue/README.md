@@ -97,8 +97,7 @@ inside that wrapper.
 
 ```vue
 <script setup lang="ts">
-import type {QRCodeSVGOptions} from '@qrcodesdk/core';
-import {QRCodeSVG} from '@qrcodesdk/vue';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/vue';
 
 const options: QRCodeSVGOptions = {
   accessibility: {
@@ -117,8 +116,7 @@ const options: QRCodeSVGOptions = {
 
 ```vue
 <script setup lang="ts">
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-import {QRCodeImage} from '@qrcodesdk/vue';
+import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/vue';
 
 const options: QRCodeImageOptions = {
   style: {moduleSize: 8, quietZone: 4},
@@ -138,8 +136,7 @@ const options: QRCodeImageOptions = {
 
 ```vue
 <script setup lang="ts">
-import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
-import {QRCodeCanvas} from '@qrcodesdk/vue';
+import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/vue';
 
 const options: QRCodeCanvasOptions = {
   style: {
@@ -162,8 +159,7 @@ const options: QRCodeCanvasOptions = {
 <script setup lang="ts">
 import {ref} from 'vue';
 
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-import {type QRCodeDownloadHandle, QRCodeImage} from '@qrcodesdk/vue';
+import {type QRCodeDownloadHandle, QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/vue';
 
 const qrcode = ref<QRCodeDownloadHandle | null>(null);
 const options: QRCodeImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};

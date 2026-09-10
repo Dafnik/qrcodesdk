@@ -6,6 +6,18 @@ const coreExample = `import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());`;
 
+const browserExample = `import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {qrcode} from '@qrcodesdk/core';
+
+const image = qrcode('https://qrcodesdk.dev').render(QRCodeImageRenderer());
+
+document.body.append(image);`;
+
+const nodeExample = `import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());`;
+
 const reactExample = `import {QRCodeSVG} from '@qrcodesdk/react';
 
 export function App() {
@@ -50,35 +62,33 @@ export class App {}`;
       </a> when you need its options or exact return contract.
     </p>
   </TabItem>
+  <TabItem label="Browser">
+    <PackageManagerTabs mode="add" packages={['@qrcodesdk/core', '@qrcodesdk/browser']} />
+    <p>Render a PNG-backed image element in the browser:</p>
+    <Code code={browserExample} lang="ts" />
+  </TabItem>
+  <TabItem label="Node.js">
+    <PackageManagerTabs mode="add" packages={['@qrcodesdk/core', '@qrcodesdk/node']} />
+    <p>Render PNG bytes on the server:</p>
+    <Code code={nodeExample} lang="ts" />
+  </TabItem>
   <TabItem label="React">
-    <PackageManagerTabs
-      mode="add"
-      packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/react']}
-    />
+    <PackageManagerTabs mode="add" packages={['@qrcodesdk/react']} />
     <p>Render an SVG component in React or Next.js:</p>
     <Code code={reactExample} lang="tsx" />
   </TabItem>
   <TabItem label="Vue">
-    <PackageManagerTabs
-      mode="add"
-      packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/vue']}
-    />
+    <PackageManagerTabs mode="add" packages={['@qrcodesdk/vue']} />
     <p>Render an SVG component in Vue:</p>
     <Code code={vueExample} lang="vue" />
   </TabItem>
   <TabItem label="Svelte">
-    <PackageManagerTabs
-      mode="add"
-      packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/svelte']}
-    />
+    <PackageManagerTabs mode="add" packages={['@qrcodesdk/svelte']} />
     <p>Render an SVG component in Svelte:</p>
     <Code code={svelteExample} lang="svelte" />
   </TabItem>
   <TabItem label="Angular">
-    <PackageManagerTabs
-      mode="add"
-      packages={['@qrcodesdk/core', '@qrcodesdk/browser', '@qrcodesdk/angular']}
-    />
+    <PackageManagerTabs mode="add" packages={['@qrcodesdk/angular']} />
     <p>Render a standalone SVG component in Angular:</p>
     <Code code={angularExample} lang="ts" />
   </TabItem>

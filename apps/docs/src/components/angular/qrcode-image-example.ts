@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 
-import {QRCodeImage} from '@qrcodesdk/angular';
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
+import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/angular';
 
 @Component({
   selector: 'qrcode-angular-image-example',

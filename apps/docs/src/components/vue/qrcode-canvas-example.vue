@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
-import {QRCodeCanvas} from '@qrcodesdk/vue';
+import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/vue';
 
 const options: QRCodeCanvasOptions = {
   style: {

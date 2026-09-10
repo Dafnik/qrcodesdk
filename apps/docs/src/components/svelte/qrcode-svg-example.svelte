@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type {QRCodeSVGOptions} from '@qrcodesdk/core';
-  import {QRCodeSVG} from '@qrcodesdk/svelte';
+  import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeSVGOptions = {
     style: {moduleSize: 8, quietZone: 2},

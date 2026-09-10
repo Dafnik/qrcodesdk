@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-  import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/svelte';
+  import {QRCodeImage, type QRCodeDownloadHandle, type QRCodeImageOptions} from '@qrcodesdk/svelte';
 
   let qrcode: QRCodeDownloadHandle | undefined;
   const options: QRCodeImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};

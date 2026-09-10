@@ -77,6 +77,23 @@ describe('generated playground ECI options', () => {
 });
 
 describe('generated playground languages', () => {
+  for (const packageName of ['react', 'vue', 'svelte', 'angular'] as const) {
+    for (const output of ['svg', 'image', 'canvas'] as const) {
+      test(`${packageName} ${output} imports its option type from the adapter`, () => {
+        const {code} = generatePlaygroundCode(createOptions(packageName, output));
+        const type =
+          output === 'svg'
+            ? 'QRCodeSVGOptions'
+            : output === 'image'
+              ? 'QRCodeImageOptions'
+              : 'QRCodeCanvasOptions';
+
+        assert.match(code, new RegExp(`type ${type}.*@qrcodesdk/${packageName}`));
+        assert.doesNotMatch(code, /@qrcodesdk\/(?:browser|core)/);
+      });
+    }
+  }
+
   test('generates an idiomatic Vue single-file component', () => {
     const preview = generatePlaygroundCode(createOptions('vue', 'image'));
 

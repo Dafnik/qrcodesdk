@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type {QRCodeSVGOptions} from '@qrcodesdk/core';
-import {QRCodeSVG} from '@qrcodesdk/vue';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/vue';
 
 const options: QRCodeSVGOptions = {
   accessibility: {
