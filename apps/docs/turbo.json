@@ -6,9 +6,6 @@
     },
     "start": {
       "dependsOn": ["^build"]
-    },
-    "test": {
-      "dependsOn": []
     }
   }
 }
