@@ -1,6 +1,6 @@
 {
   "name": "@qrcodesdk/angular",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "@qrcodesdk/angular provides standalone Angular components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.",
   "sideEffects": false,
   "private": false,
@@ -62,8 +62,8 @@
     "rxjs": "^7.0.0"
   },
   "dependencies": {
-    "@qrcodesdk/browser": "workspace:0.0.1",
-    "@qrcodesdk/core": "workspace:0.0.1",
+    "@qrcodesdk/browser": "workspace:0.0.2",
+    "@qrcodesdk/core": "workspace:0.0.2",
     "tslib": "^2.8.1"
   },
   "devDependencies": {

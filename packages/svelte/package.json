@@ -1,7 +1,7 @@
 {
   "name": "@qrcodesdk/svelte",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "@qrcodesdk/svelte provides Svelte components for rendering QR codes as SVG, PNG-backed image elements, and canvas elements.",
   "sideEffects": false,
   "private": false,
@@ -76,8 +76,8 @@
     "svelte": "^5.0.0"
   },
   "dependencies": {
-    "@qrcodesdk/browser": "workspace:0.0.1",
-    "@qrcodesdk/core": "workspace:0.0.1"
+    "@qrcodesdk/browser": "workspace:0.0.2",
+    "@qrcodesdk/core": "workspace:0.0.2"
   },
   "devDependencies": {
     "@qrcodesdk/browser": "workspace:*",

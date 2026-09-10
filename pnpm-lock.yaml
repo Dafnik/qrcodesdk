@@ -383,10 +383,10 @@ importers:
   packages/angular:
     dependencies:
       '@qrcodesdk/browser':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../browser
       '@qrcodesdk/core':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../core
       tslib:
         specifier: ^2.8.1
@@ -530,10 +530,10 @@ importers:
         specifier: 1.7.0
         version: 1.7.0
       '@qrcodesdk/core':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../core
       '@qrcodesdk/node':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../node
       commander:
         specifier: 15.0.0
@@ -689,10 +689,10 @@ importers:
   packages/react:
     dependencies:
       '@qrcodesdk/browser':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../browser
       '@qrcodesdk/core':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../core
     devDependencies:
       '@repo/core-testing':
@@ -738,10 +738,10 @@ importers:
   packages/svelte:
     dependencies:
       '@qrcodesdk/browser':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../browser
       '@qrcodesdk/core':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../core
     devDependencies:
       '@repo/core-testing':
@@ -792,10 +792,10 @@ importers:
   packages/vue:
     dependencies:
       '@qrcodesdk/browser':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../browser
       '@qrcodesdk/core':
-        specifier: workspace:0.0.1
+        specifier: workspace:0.0.2
         version: link:../core
     devDependencies:
       '@repo/core-testing':
@@ -14770,8 +14770,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.68.0(supports-color@10.2.2)(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.68.0(typescript@5.9.3)
-      '@typescript-eslint/types': 8.68.0
+      '@typescript-eslint/tsconfig-utils': 8.69.0(typescript@5.9.3)
+      '@typescript-eslint/types': 8.69.0
       debug: 4.4.3(supports-color@10.2.2)
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -14779,8 +14779,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.68.0(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.68.0(typescript@6.0.3)
-      '@typescript-eslint/types': 8.68.0
+      '@typescript-eslint/tsconfig-utils': 8.69.0(typescript@6.0.3)
+      '@typescript-eslint/types': 8.69.0
       debug: 4.4.3(supports-color@10.2.2)
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -14821,6 +14821,10 @@ snapshots:
   '@typescript-eslint/tsconfig-utils@8.68.0(typescript@6.0.3)':
     dependencies:
       typescript: 6.0.3
+
+  '@typescript-eslint/tsconfig-utils@8.69.0(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
 
   '@typescript-eslint/tsconfig-utils@8.69.0(typescript@6.0.3)':
     dependencies:

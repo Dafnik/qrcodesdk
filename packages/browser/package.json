@@ -1,7 +1,7 @@
 {
   "name": "@qrcodesdk/browser",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "@qrcodesdk/browser adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.",
   "sideEffects": false,
   "private": false,
@@ -69,7 +69,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "@qrcodesdk/core": "workspace:0.0.1"
+    "@qrcodesdk/core": "workspace:0.0.2"
   },
   "devDependencies": {
     "@qrcodesdk/core": "workspace:*",
