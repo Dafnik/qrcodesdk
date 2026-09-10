@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
-  import {QRCodeCanvas} from '@qrcodesdk/svelte';
+  import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeCanvasOptions = {style: {moduleSize: 8, quietZone: 2}};
 </script>

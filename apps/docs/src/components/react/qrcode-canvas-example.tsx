@@ -1,7 +1,6 @@
-import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
 import {useMemo} from 'react';
 
-import {QRCodeCanvas} from '@qrcodesdk/react';
+import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/react';
 
 export default function QRCodeCanvasExample() {
   const options = useMemo<QRCodeCanvasOptions>(

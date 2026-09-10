@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-import {QRCodeImage, type QRCodeDownloadHandle} from '@qrcodesdk/vue';
+import {QRCodeImage, type QRCodeDownloadHandle, type QRCodeImageOptions} from '@qrcodesdk/vue';
 import {ref} from 'vue';
 
 const qrcode = ref<QRCodeDownloadHandle | null>(null);

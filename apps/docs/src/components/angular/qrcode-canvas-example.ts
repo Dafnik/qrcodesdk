@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 
-import {QRCodeCanvas} from '@qrcodesdk/angular';
-import type {QRCodeCanvasOptions} from '@qrcodesdk/browser';
+import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/angular';
 
 @Component({
   selector: 'qrcode-angular-canvas-example',

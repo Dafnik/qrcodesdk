@@ -13,7 +13,6 @@ export type CodePreview = {
 
 type ComponentMeta = {
   componentName: string;
-  optionsPackage: '@qrcodesdk/browser' | '@qrcodesdk/core';
   optionsType: string;
   selector: string;
   downloadLabel?: string;
@@ -22,7 +21,6 @@ type ComponentMeta = {
 const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
   svg: {
     componentName: 'QRCodeSVG',
-    optionsPackage: '@qrcodesdk/core',
     optionsType: 'QRCodeSVGOptions',
     selector: 'qrcode-svg',
     downloadLabel: 'Download SVG',
@@ -30,7 +28,6 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
 
   image: {
     componentName: 'QRCodeImage',
-    optionsPackage: '@qrcodesdk/browser',
     optionsType: 'QRCodeImageOptions',
     selector: 'qrcode-image',
     downloadLabel: 'Download PNG',
@@ -38,7 +35,6 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
 
   canvas: {
     componentName: 'QRCodeCanvas',
-    optionsPackage: '@qrcodesdk/browser',
     optionsType: 'QRCodeCanvasOptions',
     selector: 'qrcode-canvas',
   },
@@ -67,13 +63,10 @@ function generateSvelteCode(
   const meta = META_BY_OUTPUT[playgroundOptionsValue.output];
   const hasDownload = meta.downloadLabel !== undefined;
   const hasImage = preparedImage !== undefined;
-  const componentImport = hasDownload
-    ? `import {${meta.componentName}, type QRCodeDownloadHandle} from '@qrcodesdk/svelte';`
-    : `import {${meta.componentName}} from '@qrcodesdk/svelte';`;
-  const optionsTypes =
-    hasImage && playgroundOptionsValue.output === 'svg'
-      ? `QRCodeDataImageURL, ${meta.optionsType}`
-      : meta.optionsType;
+  const componentImport = `import {${meta.componentName}, type ${[
+    meta.optionsType,
+    ...(hasDownload ? ['QRCodeDownloadHandle'] : []),
+  ].join(', type ')}} from '@qrcodesdk/svelte';`;
   const qrcodeRef = hasDownload ? `let qrcode: QRCodeDownloadHandle | undefined;\n` : '';
   const optionsDeclaration = hasImage
     ? `let imageSource = $state<${
@@ -105,8 +98,7 @@ ${downloadButton}  ${component}
   return {
     lang: 'svelte',
     code: `<script lang="ts">
-  import type {${optionsTypes}} from '${meta.optionsPackage}';
-  ${componentImport}
+  ${hasImage && playgroundOptionsValue.output === 'svg' ? "import type {QRCodeDataImageURL} from '@qrcodesdk/core';\n  " : ''}${componentImport}
 
   const payload = ${quote(playgroundOptionsValue.payload)};
   ${qrcodeRef}${optionsDeclaration.replaceAll('\n', '\n  ')}
@@ -132,17 +124,16 @@ function generateReactCode(
   const reactImport =
     reactImports.length > 0 ? `import {${reactImports.join(', ')}} from 'react';\n\n` : '';
 
-  const componentImport = hasDownload
-    ? `import {${meta.componentName}, type QRCodeDownloadHandle} from '@qrcodesdk/react';`
-    : `import {${meta.componentName}} from '@qrcodesdk/react';`;
+  const componentImport = `import {${meta.componentName}, type ${[
+    meta.optionsType,
+    ...(hasDownload ? ['QRCodeDownloadHandle'] : []),
+  ].join(', type ')}} from '@qrcodesdk/react';`;
 
-  const optionsTypes =
-    hasImage && playgroundOptionsValue.output === 'svg'
-      ? `QRCodeDataImageURL, ${meta.optionsType}`
-      : meta.optionsType;
   const imports =
     `${reactImport}` +
-    `import type {${optionsTypes}} from '${meta.optionsPackage}';\n` +
+    (hasImage && playgroundOptionsValue.output === 'svg'
+      ? "import type {QRCodeDataImageURL} from '@qrcodesdk/core';\n"
+      : '') +
     componentImport;
 
   const refDeclaration = hasDownload
@@ -220,13 +211,10 @@ function generateVueCode(
     ...(hasDownload ? ['ref'] : []),
   ];
   const vueImport = vueImports.length > 0 ? `import {${vueImports.join(', ')}} from 'vue';\n` : '';
-  const componentImport = hasDownload
-    ? `import {${meta.componentName}, type QRCodeDownloadHandle} from '@qrcodesdk/vue';`
-    : `import {${meta.componentName}} from '@qrcodesdk/vue';`;
-  const optionsTypes =
-    hasImage && playgroundOptionsValue.output === 'svg'
-      ? `QRCodeDataImageURL, ${meta.optionsType}`
-      : meta.optionsType;
+  const componentImport = `import {${meta.componentName}, type ${[
+    meta.optionsType,
+    ...(hasDownload ? ['QRCodeDownloadHandle'] : []),
+  ].join(', type ')}} from '@qrcodesdk/vue';`;
   const qrcodeRef = hasDownload ? `const qrcode = ref<QRCodeDownloadHandle | null>(null);\n` : '';
   const optionsDeclaration = hasImage
     ? `const imageSource = shallowRef<${
@@ -256,8 +244,7 @@ ${vueImagePreparation(playgroundOptionsValue.output)}`
   return {
     lang: 'vue',
     code: `<script setup lang="ts">
-import type {${optionsTypes}} from '${meta.optionsPackage}';
-${componentImport}
+${hasImage && playgroundOptionsValue.output === 'svg' ? "import type {QRCodeDataImageURL} from '@qrcodesdk/core';\n" : ''}${componentImport}
 ${vueImport}
 
 const payload = ${quote(playgroundOptionsValue.payload)};
@@ -303,10 +290,6 @@ ${indent(qrcodeTemplate, 3)}
     }`
     : qrcodeTemplate;
   const angularImports = hasImage ? 'Component, computed, signal' : 'Component';
-  const optionsTypes =
-    hasImage && playgroundOptionsValue.output === 'svg'
-      ? `QRCodeDataImageURL, ${meta.optionsType}`
-      : meta.optionsType;
   const imageMembers = hasImage
     ? `
   readonly imageSource = signal<${
@@ -330,8 +313,8 @@ ${indent(angularImagePreparation(playgroundOptionsValue.output), 1)}
 
     code: `import {${angularImports}} from '@angular/core';
 
-import {${meta.componentName}} from '@qrcodesdk/angular';
-import type {${optionsTypes}} from '${meta.optionsPackage}';
+import {${meta.componentName}, type ${meta.optionsType}} from '@qrcodesdk/angular';
+${hasImage && playgroundOptionsValue.output === 'svg' ? "import type {QRCodeDataImageURL} from '@qrcodesdk/core';\n" : ''}
 
 @Component({
   selector: 'qrcode-app-example',

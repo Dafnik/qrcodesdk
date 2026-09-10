@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-import {QRCodeImage} from '@qrcodesdk/vue';
+import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/vue';
 
 const options: QRCodeImageOptions = {
   style: {moduleSize: 8, quietZone: 4},

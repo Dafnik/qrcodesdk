@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-  import {QRCodeImage} from '@qrcodesdk/svelte';
+  import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeImageOptions = {
     style: {moduleSize: 8, quietZone: 2},
