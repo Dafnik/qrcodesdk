@@ -68,9 +68,11 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "@qrcodesdk/browser": "workspace:^",
-    "@qrcodesdk/core": "workspace:^",
     "vue": "^3.3.0"
+  },
+  "dependencies": {
+    "@qrcodesdk/browser": "workspace:0.0.1",
+    "@qrcodesdk/core": "workspace:0.0.1"
   },
   "devDependencies": {
     "@qrcodesdk/browser": "workspace:*",

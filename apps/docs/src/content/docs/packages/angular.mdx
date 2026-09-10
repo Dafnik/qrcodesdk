@@ -30,10 +30,7 @@ Angular components for rendering QR codes as inline SVG, PNG-backed Image elemen
 
 ## Install
 
-<PackageManagerTabs
-  packages={['@qrcodesdk/angular', '@qrcodesdk/core', '@qrcodesdk/browser']}
-  mode="add"
-/>
+<PackageManagerTabs packages={['@qrcodesdk/angular']} mode="add" />
 
 ## Quick start
 
@@ -130,7 +127,12 @@ The `options` input combines matrix options with the selected renderer's options
 ## Public API
 
 ```ts
-import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
-import type {QRCodeSVGOptions} from '@qrcodesdk/core';
+import {
+  QRCodeCanvas,
+  type QRCodeCanvasOptions,
+  QRCodeImage,
+  type QRCodeImageOptions,
+  QRCodeSVG,
+  type QRCodeSVGOptions,
+} from '@qrcodesdk/angular';
 ```

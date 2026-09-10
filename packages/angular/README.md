@@ -13,11 +13,11 @@ Angular components for rendering QR codes as inline SVG, PNG-backed Image elemen
 ## Install
 
 ```sh
-npm install @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+npm install @qrcodesdk/angular
 ```
 
 ```sh
-pnpm add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+pnpm add @qrcodesdk/angular
 ```
 
 <details>
@@ -26,25 +26,25 @@ pnpm add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
 **vp**
 
 ```sh
-vp add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+vp add @qrcodesdk/angular
 ```
 
 **deno**
 
 ```sh
-deno add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+deno add @qrcodesdk/angular
 ```
 
 **bun**
 
 ```sh
-bun add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+bun add @qrcodesdk/angular
 ```
 
 **yarn**
 
 ```sh
-yarn add @qrcodesdk/angular @qrcodesdk/core @qrcodesdk/browser
+yarn add @qrcodesdk/angular
 ```
 
 </details>
@@ -249,9 +249,14 @@ The `options` input combines matrix options with the selected renderer's options
 ## Public API
 
 ```ts
-import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
-import type {QRCodeSVGOptions} from '@qrcodesdk/core';
+import {
+  QRCodeCanvas,
+  type QRCodeCanvasOptions,
+  QRCodeImage,
+  type QRCodeImageOptions,
+  QRCodeSVG,
+  type QRCodeSVGOptions,
+} from '@qrcodesdk/angular';
 ```
 
 ## Documentation
