@@ -27,39 +27,37 @@ if (bundleJsUrl) {
 const badges = packageName ? createPackageBadges(packageName, {bundledSize: size}) : [];
 ---
 
-{
-  packageName && (
-    <div class="not-content flex flex-wrap items-center gap-1.5">
-      {badges.map(({alt, imageUrl, href}) =>
-        href ? (
-          <a href={href} target="_blank" rel="noopener noreferrer">
-            <img src={imageUrl} alt={alt} loading="lazy" />
-          </a>
-        ) : (
+{packageName && (
+  <div class="not-content flex flex-wrap items-center gap-1.5">
+    {badges.map(({alt, imageUrl, href}) =>
+      href ? (
+        <a href={href} target="_blank" rel="noopener noreferrer">
           <img src={imageUrl} alt={alt} loading="lazy" />
-        ),
-      )}
+        </a>
+      ) : (
+        <img src={imageUrl} alt={alt} loading="lazy" />
+      ),
+    )}
 
-      {worksWith?.length && (
-        <div class="inline-flex overflow-hidden rounded-[5px] font-mono text-[12px] leading-5 font-medium text-white shadow-sm">
-          <span class="bg-[#555] px-1">works with</span>
+    {worksWith?.length && (
+      <div class="inline-flex overflow-hidden rounded-[5px] font-mono text-[12px] leading-5 font-medium text-white shadow-sm">
+        <span class="bg-[#555] px-1">works with</span>
 
-          <div class="flex items-center gap-1 bg-[#292c32] px-2">
-            {worksWith.map((env) => (
-              <div class="relative h-4" style="aspect-ratio: 256 / 292">
-                <img
-                  src={'/logos/' + env.toLowerCase() + '.svg'}
-                  width="256"
-                  height="292"
-                  alt={'This package works with ' + env}
-                  title={'This package works with ' + env}
-                  class="h-4 brightness-0 invert select-none"
-                />
-              </div>
-            ))}
-          </div>
+        <div class="flex items-center gap-1 bg-[#292c32] px-2">
+          {worksWith.map((env) => (
+            <div class="relative h-4" style="aspect-ratio: 256 / 292">
+              <img
+                src={'/logos/' + env.toLowerCase() + '.svg'}
+                width="256"
+                height="292"
+                alt={'This package works with ' + env}
+                title={'This package works with ' + env}
+                class="h-4 brightness-0 invert select-none"
+              />
+            </div>
+          ))}
         </div>
-      )}
-    </div>
-  )
-}
+      </div>
+    )}
+  </div>
+)}

@@ -192,50 +192,51 @@ const statusSymbol = {
     <caption>
       <span>Version snapshot: August 2026</span>
       <span class="legend" aria-label="Status legend">
-        <span><i class="status yes">+</i> built in</span>
-        <span><i class="status partial">~</i> conditional</span>
-        <span><i class="status no">−</i> absent</span>
+        <span>
+          <i class="status yes">+</i>built in
+        </span>
+        <span>
+          <i class="status partial">~</i>conditional
+        </span>
+        <span>
+          <i class="status no">−</i>absent
+        </span>
       </span>
     </caption>
     <thead>
       <tr>
         <th scope="col">Capability</th>
-        {
-          libraries.map((library) => (
-            <th scope="col" class:list={{recommended: library.recommended}}>
-              <a href={library.href}>{library.name}</a>
-              <small>v{library.version}</small>
-            </th>
-          ))
-        }
+        {libraries.map((library) => (
+          <th scope="col" class:list={{recommended: library.recommended}}>
+            <a href={library.href}>{library.name}</a>
+            <small>v{library.version}</small>
+          </th>
+        ))}
       </tr>
     </thead>
     <tbody>
-      {
-        rows.map((row, rowIndex) => (
-          <tr
-            class:list={{'group-start': rowIndex === 0 || rows[rowIndex - 1]?.group !== row.group}}>
-            <th scope="row">
-              {(rowIndex === 0 || rows[rowIndex - 1]?.group !== row.group) && (
-                <span>{row.group}</span>
-              )}
-              {row.feature}
-            </th>
-            {row.values.map((value, valueIndex) => (
-              <td class:list={{recommended: valueIndex === 0}}>
-                <div class="cell-title">
-                  <span class="sr-only">{value.status}</span>
-                  <span class:list={['status', value.status]} aria-hidden="true">
-                    {statusSymbol[value.status]}
-                  </span>
-                  <strong>{value.title}</strong>
-                </div>
-                <small>{value.detail}</small>
-              </td>
-            ))}
-          </tr>
-        ))
-      }
+      {rows.map((row, rowIndex) => (
+        <tr class:list={{'group-start': rowIndex === 0 || rows[rowIndex - 1]?.group !== row.group}}>
+          <th scope="row">
+            {(rowIndex === 0 || rows[rowIndex - 1]?.group !== row.group) && (
+              <span>{row.group}</span>
+            )}
+            {row.feature}
+          </th>
+          {row.values.map((value, valueIndex) => (
+            <td class:list={{recommended: valueIndex === 0}}>
+              <div class="cell-title">
+                <span class="sr-only">{value.status}</span>
+                <span class:list={['status', value.status]} aria-hidden="true">
+                  {statusSymbol[value.status]}
+                </span>
+                <strong>{value.title}</strong>
+              </div>
+              <small>{value.detail}</small>
+            </td>
+          ))}
+        </tr>
+      ))}
     </tbody>
   </table>
 </div>

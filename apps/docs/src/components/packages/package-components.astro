@@ -51,24 +51,22 @@ const props = [
   </thead>
 
   <tbody>
-    {
-      components.map((item) => (
-        <tr>
+    {components.map((item) => (
+      <tr>
+        <td>
+          <code>{item.component}</code>
+        </td>
+        {selector && (
           <td>
-            <code>{item.component}</code>
+            <code>{item.selector}</code>
           </td>
-          {selector && (
-            <td>
-              <code>{item.selector}</code>
-            </td>
-          )}
-          <td>
-            <code>{item.output}</code>
-          </td>
-          <td>{item.downloadSupport}</td>
-        </tr>
-      ))
-    }
+        )}
+        <td>
+          <code>{item.output}</code>
+        </td>
+        <td>{item.downloadSupport}</td>
+      </tr>
+    ))}
   </tbody>
 </table>
 
@@ -84,18 +82,16 @@ const props = [
   </thead>
 
   <tbody>
-    {
-      props.map((item) => (
-        <tr>
-          <td>
-            <code>{item.prop}</code>
-          </td>
-          <td>
-            <code>{item.type}</code>
-          </td>
-          <td>{item.description}</td>
-        </tr>
-      ))
-    }
+    {props.map((item) => (
+      <tr>
+        <td>
+          <code>{item.prop}</code>
+        </td>
+        <td>
+          <code>{item.type}</code>
+        </td>
+        <td>{item.description}</td>
+      </tr>
+    ))}
   </tbody>
 </table>
