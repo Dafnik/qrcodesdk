@@ -1,4 +1,4 @@
-import {bench, describe} from 'vitest';
+import {describe, test} from 'vitest';
 
 import {createQRCodeStyler, qrcode} from '../src';
 import type {QRCodeStyledDrawingTarget} from '../src/drawing';
@@ -31,24 +31,25 @@ const target: QRCodeStyledDrawingTarget = {
 
 describe('styler hot paths', () => {
   for (const version of VERSIONS) {
-    const matrix = qrcode('A').options({mode: 'alphanumeric', version, mask: 0}).matrix();
-    const styler = createQRCodeStyler(STYLE);
-    const drawing = styler.draw(matrix);
+    test(`version ${String(version)}`, async ({bench}) => {
+      const matrix = qrcode('A').options({mode: 'alphanumeric', version, mask: 0}).matrix();
+      const styler = createQRCodeStyler(STYLE);
+      const drawing = styler.draw(matrix);
 
-    bench(`compile style version ${String(version)}`, () => {
-      createQRCodeStyler(STYLE);
-    });
-
-    bench(`first draw version ${String(version)}`, () => {
-      createQRCodeStyler(STYLE).draw(matrix);
-    });
-
-    bench(`cached draw version ${String(version)}`, () => {
-      styler.draw(matrix);
-    });
-
-    bench(`cached repaint version ${String(version)}`, () => {
-      drawing.paint(target);
+      await bench.compare(
+        bench('compile style', () => {
+          createQRCodeStyler(STYLE);
+        }),
+        bench('first draw', () => {
+          createQRCodeStyler(STYLE).draw(matrix);
+        }),
+        bench('cached draw', () => {
+          styler.draw(matrix);
+        }),
+        bench('cached repaint', () => {
+          drawing.paint(target);
+        }),
+      );
     });
   }
 });

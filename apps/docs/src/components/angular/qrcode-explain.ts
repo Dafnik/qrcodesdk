@@ -513,6 +513,7 @@ export class QRCodeExplain {
     const explanation = this.explanation();
     if (explanation === undefined) return;
     const current = this.keyboardPosition();
+    // eslint-disable-next-line no-useless-assignment
     let next = current;
 
     switch (event.key) {

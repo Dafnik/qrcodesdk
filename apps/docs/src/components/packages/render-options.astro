@@ -93,22 +93,20 @@ const optionTypes = `export interface QRCodeVisualStyle {
   </thead>
 
   <tbody>
-    {
-      options.map(([option, components, type, defaultValue, description]) => (
-        <tr>
-          <td>
-            <code>{option.replaceAll('`', '')}</code>
-            {components !== 'All' && components ? ` (${components})` : ''}
-          </td>
-          <td>
-            {type.startsWith('`') ? <code>{type.replaceAll('`', '')}</code> : type}
-            <br />
-            Default: <code>{defaultValue.replaceAll('`', '')}</code>
-          </td>
-          <td>{description}</td>
-        </tr>
-      ))
-    }
+    {options.map(([option, components, type, defaultValue, description]) => (
+      <tr>
+        <td>
+          <code>{option.replaceAll('`', '')}</code>
+          {components !== 'All' && components ? ` (${components})` : ''}
+        </td>
+        <td>
+          {type.startsWith('`') ? <code>{type.replaceAll('`', '')}</code> : type}
+          <br />
+          Default: <code>{defaultValue.replaceAll('`', '')}</code>
+        </td>
+        <td>{description}</td>
+      </tr>
+    ))}
   </tbody>
 </table>
 
@@ -120,20 +118,20 @@ const optionTypes = `export interface QRCodeVisualStyle {
 
 <ul>
   <li>
-    Colors must be exactly <code>#RRGGBB</code> or <code>#RRGGBBAA</code>.
+    Colors must be exactly<code>#RRGGBB</code>or<code>#RRGGBBAA</code>.
   </li>
   <li>
-    <code>moduleSize</code> requires a positive safe integer (<code>&gt;0</code>) and
-    <code>quietZone</code> a non-negative safe integer (<code>&gt;=0</code>).
+    <code>moduleSize</code>requires a positive safe integer (<code>&gt;0</code>) and
+    <code>quietZone</code>a non-negative safe integer (<code>&gt;=0</code>).
   </li>
   <li>
     Module, finder-ring, and finder-center options pass through to every component. Their optional
-    colors independently inherit <code>style.foreground</code>.
+    colors independently inherit<code>style.foreground</code>.
   </li>
   <li>
-    Module shapes are <code>square</code>, <code>circle</code>, <code>rounded</code>,
-    <code>extra-rounded</code>, <code>diagonal</code>, and <code>diagonal-rounded</code>. Finder
-    shapes are <code>square</code>, <code>rounded</code>, <code>extra-rounded</code>, and
+    Module shapes are<code>square</code>,<code>circle</code>,<code>rounded</code>,
+    <code>extra-rounded</code>,<code>diagonal</code>, and<code>diagonal-rounded</code>. Finder
+    shapes are<code>square</code>,<code>rounded</code>,<code>extra-rounded</code>, and
     <code>circle</code>.
   </li>
 </ul>

@@ -1,4 +1,4 @@
-import {bench, describe} from 'vitest';
+import {describe, test} from 'vitest';
 
 import {qrcode} from '../src';
 import {applyMaskToMatrix} from '../src/matrix/apply-mask-to-matrix';
@@ -28,63 +28,67 @@ function createDeterministicMatrix(version: QRCodeVersion): QRCodeMatrix {
 
 describe('matrix hot paths', () => {
   for (const version of VERSIONS) {
-    const matrix = createDeterministicMatrix(version);
+    test(`version ${String(version)}`, async ({bench}) => {
+      const matrix = createDeterministicMatrix(version);
 
-    bench(`evaluateMatrix version ${String(version)}`, () => {
-      evaluateMatrix(matrix);
-    });
-
-    bench(`automatic mask version ${String(version)}`, () => {
-      qrcode('A').options({mode: 'alphanumeric', version}).matrix();
-    });
-
-    bench(`explicit mask version ${String(version)}`, () => {
-      qrcode('A').options({mask: 0, mode: 'alphanumeric', version}).matrix();
+      await bench.compare(
+        bench('evaluate matrix', () => {
+          evaluateMatrix(matrix);
+        }),
+        bench('automatic mask', () => {
+          qrcode('A').options({mode: 'alphanumeric', version}).matrix();
+        }),
+        bench('explicit mask', () => {
+          qrcode('A').options({mask: 0, mode: 'alphanumeric', version}).matrix();
+        }),
+      );
     });
   }
 });
 
 describe('explicit mask variants', () => {
-  for (const mask of MASKS) {
-    bench(`explicit mask ${String(mask)} version 20`, () => {
-      qrcode('A').options({mask, mode: 'alphanumeric', version: 20}).matrix();
-    });
-  }
+  test('version 20', async ({bench}) => {
+    await bench.compare(
+      ...MASKS.map((mask) =>
+        bench(`mask ${String(mask)}`, () => {
+          qrcode('A').options({mask, mode: 'alphanumeric', version: 20}).matrix();
+        }),
+      ),
+    );
+  });
 });
 
 describe('explicit mask stages', () => {
   for (const version of VERSIONS) {
-    const options = {mask: 0 as const, mode: 'alphanumeric' as const, version};
-    const resolved = resolveQRCodeMatrixOptions('A', options);
-    const codewords = createQRCodeCodewords(resolved);
-    const {matrix, reserved} = createBaseMatrix(version);
+    test(`version ${String(version)}`, async ({bench}) => {
+      const options = {mask: 0 as const, mode: 'alphanumeric' as const, version};
+      const resolved = resolveQRCodeMatrixOptions('A', options);
+      const codewords = createQRCodeCodewords(resolved);
+      const {matrix, reserved} = createBaseMatrix(version);
 
-    bench(`resolve options version ${String(version)}`, () => {
-      resolveQRCodeMatrixOptions('A', options);
-    });
-
-    bench(`create codewords version ${String(version)}`, () => {
-      createQRCodeCodewords(resolved);
-    });
-
-    bench(`create base matrix version ${String(version)}`, () => {
-      createBaseMatrix(version);
-    });
-
-    bench(`fill data version ${String(version)}`, () => {
-      fillDataInMatrix(matrix, reserved, codewords);
-    });
-
-    bench(`apply mask version ${String(version)}`, () => {
-      applyMaskToMatrix(matrix, reserved, 0);
-    });
-
-    bench(`fill format version ${String(version)}`, () => {
-      fillFormatInformationInMatrix(matrix, resolved.errorCorrectionLevel, 0);
-    });
-
-    bench(`assemble matrix version ${String(version)}`, () => {
-      assembleQRCodeMatrix(version, resolved.errorCorrectionLevel, codewords, 0);
+      await bench.compare(
+        bench('resolve options', () => {
+          resolveQRCodeMatrixOptions('A', options);
+        }),
+        bench('create codewords', () => {
+          createQRCodeCodewords(resolved);
+        }),
+        bench('create base matrix', () => {
+          createBaseMatrix(version);
+        }),
+        bench('fill data', () => {
+          fillDataInMatrix(matrix, reserved, codewords);
+        }),
+        bench('apply mask', () => {
+          applyMaskToMatrix(matrix, reserved, 0);
+        }),
+        bench('fill format', () => {
+          fillFormatInformationInMatrix(matrix, resolved.errorCorrectionLevel, 0);
+        }),
+        bench('assemble matrix', () => {
+          assembleQRCodeMatrix(version, resolved.errorCorrectionLevel, codewords, 0);
+        }),
+      );
     });
   }
 });
