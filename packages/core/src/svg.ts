@@ -34,8 +34,8 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     'padding',
     'clearBackground',
   ]);
-  assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
-  assertOptionalString(options?.accessibility?.title, 'accessibility.title');
+  assertOptionalXMLString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
+  assertOptionalXMLString(options?.accessibility?.title, 'accessibility.title');
   const styler = createQRCodeStyler(options?.style);
   const accessibility = options?.accessibility ? {...options.accessibility} : undefined;
   const centerImageOptions = options?.centerImage ? {...options.centerImage} : undefined;
@@ -46,7 +46,10 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
         clearBackground: centerImageOptions.clearBackground,
       }
     : undefined;
-  if (centerImageOptions && !isQRCodeDataImageURL(centerImageOptions.source)) {
+  if (
+    centerImageOptions &&
+    (!isQRCodeDataImageURL(centerImageOptions.source) || !isXMLString(centerImageOptions.source))
+  ) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
       'QR code SVG image source must be an embedded data:image URL',
@@ -206,12 +209,39 @@ function isQRCodeDataImageURL(value: unknown): value is QRCodeDataImageURL {
   return /^image\/[a-z0-9.+-]+$/i.test(value.slice(5, commaIndex).split(';', 1)[0] ?? '');
 }
 
-function assertOptionalString(value: unknown, field: string): asserts value is string | undefined {
+function assertOptionalXMLString(
+  value: unknown,
+  field: string,
+): asserts value is string | undefined {
   if (value !== undefined && typeof value !== 'string') {
     throw new QRCodeError('INVALID_OPTIONS', `QR code ${field} must be a string`, {
       details: {field, value},
     });
   }
+  if (typeof value === 'string' && !isXMLString(value)) {
+    throw new QRCodeError('INVALID_OPTIONS', `QR code ${field} must contain valid XML characters`, {
+      details: {field, value},
+    });
+  }
+}
+
+function isXMLString(value: string): boolean {
+  for (const character of value) {
+    const codePoint = character.codePointAt(0)!;
+    if (
+      codePoint !== 9 &&
+      codePoint !== 10 &&
+      codePoint !== 13 &&
+      !(
+        (codePoint >= 0x20 && codePoint <= 0xd7ff) ||
+        (codePoint >= 0xe000 && codePoint <= 0xfffd) ||
+        (codePoint >= 0x10000 && codePoint <= 0x10ffff)
+      )
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function rgbHex(red: number, green: number, blue: number): string {

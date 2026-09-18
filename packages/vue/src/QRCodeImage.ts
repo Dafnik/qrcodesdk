@@ -17,12 +17,17 @@ import {
 import {type QRCodePayload, qrcode} from '@qrcodesdk/core';
 
 import {splitOptions} from './split-options';
-import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
+import {
+  type QRCodeBaseProps,
+  type QRCodeDownloadHandle,
+  withoutManagedContentAttributes,
+} from './types';
 
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
 
 export const QRCodeImage = defineComponent({
   name: 'QRCodeImage',
+  inheritAttrs: false,
   props: {
     payload: {
       type: [String, Number] as PropType<QRCodePayload>,
@@ -30,7 +35,7 @@ export const QRCodeImage = defineComponent({
     },
     options: Object as PropType<QRCodeImageOptions>,
   },
-  setup(props, {expose}) {
+  setup(props, {attrs, expose}) {
     const container = ref<HTMLDivElement>();
     let stopRendering: WatchStopHandle | undefined;
 
@@ -68,6 +73,6 @@ export const QRCodeImage = defineComponent({
 
     expose(handle);
 
-    return () => h('div', {ref: container});
+    return () => h('div', {...withoutManagedContentAttributes(attrs), ref: container});
   },
 });

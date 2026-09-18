@@ -213,6 +213,12 @@ const DIMENSION_PAIRS = [
 ] as const;
 
 function getCanvasImageSourceSize(source: CanvasImageSource): CanvasImageSourceDimensions {
+  if (source === null || source === undefined) {
+    throw new QRCodeError(
+      'INVALID_IMAGE_SOURCE',
+      'QR code canvas image source is required when centerImage is configured',
+    );
+  }
   const candidate = source as unknown as Record<string, unknown>;
   if (candidate['complete'] === false) {
     throw new QRCodeError(

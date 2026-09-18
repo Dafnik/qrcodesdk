@@ -52,6 +52,12 @@ describe('styling validation', () => {
     expect(() => QRCodeSVGRenderer({accessibility: null} as never)).toThrowError(
       expect.objectContaining({details: expect.objectContaining({field: 'accessibility'})}),
     );
+    expect(() => QRCodeSVGRenderer({accessibility: {title: '\0'}})).toThrowError(
+      expect.objectContaining({code: 'INVALID_OPTIONS'}),
+    );
+    expect(() =>
+      QRCodeSVGRenderer({centerImage: {source: 'data:image/png;base64,a\0' as never}}),
+    ).toThrowError(expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}));
     expect(() => QRCodeSVGRenderer({centerImage: []} as never)).toThrowError(
       expect.objectContaining({details: expect.objectContaining({field: 'centerImage'})}),
     );

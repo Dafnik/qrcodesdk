@@ -1,4 +1,9 @@
-import {type QRCodeMatrix, type QRCodeMatrixOptions, type QRCodeRenderer} from '@qrcodesdk/core';
+import {
+  QRCodeError,
+  type QRCodeMatrix,
+  type QRCodeMatrixOptions,
+  type QRCodeRenderer,
+} from '@qrcodesdk/core';
 
 import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from './canvas';
 import {downloadQRCode, ensureExtension} from './download-helper';
@@ -45,7 +50,15 @@ export function QRCodeImageRenderer(
     const canvas = canvasRenderer(matrix);
     const image = document.createElement('img');
 
-    image.src = canvas.toDataURL('image/png');
+    try {
+      image.src = canvas.toDataURL('image/png');
+    } catch (error) {
+      throw new QRCodeError(
+        'RENDER_FAILED',
+        'QR code image rendering requires an origin-clean canvas. Use same-origin or CORS-enabled center images.',
+        {cause: error},
+      );
+    }
     image.width = canvas.width;
     image.height = canvas.height;
     applyAccessibilityAttributes(image, accessibility);

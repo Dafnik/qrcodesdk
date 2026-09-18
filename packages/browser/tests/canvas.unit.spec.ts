@@ -48,20 +48,26 @@ describe('QRCodeCanvasRenderer', () => {
   });
 
   test('validates options at construction', () => {
-    expect(() => QRCodeCanvasRenderer({style: {moduleSize: 0}})).toThrowError(QRCodeError);
-    expect(() => QRCodeCanvasRenderer({size: 2} as never)).toThrowError(
+    expect(() => QRCodeCanvasRenderer({style: {moduleSize: 0}})).toThrow(QRCodeError);
+    expect(() => QRCodeCanvasRenderer({size: 2} as never)).toThrow(
       expect.objectContaining({details: expect.objectContaining({field: 'options.size'})}),
     );
-    expect(() => QRCodeCanvasRenderer({accessibility: {ariaLabel: 1 as never}})).toThrowError(
+    expect(() => QRCodeCanvasRenderer({accessibility: {ariaLabel: 1 as never}})).toThrow(
       expect.objectContaining({
         details: expect.objectContaining({field: 'accessibility.ariaLabel'}),
       }),
     );
-    expect(() => QRCodeCanvasRenderer({accessibility: null} as never)).toThrowError(
+    expect(() => QRCodeCanvasRenderer({accessibility: null} as never)).toThrow(
       expect.objectContaining({details: expect.objectContaining({field: 'accessibility'})}),
     );
-    expect(() => QRCodeCanvasRenderer({centerImage: []} as never)).toThrowError(
+    expect(() => QRCodeCanvasRenderer({centerImage: []} as never)).toThrow(
       expect.objectContaining({details: expect.objectContaining({field: 'centerImage'})}),
     );
+  });
+
+  test('reports a missing unchecked center image source through QRCodeError', () => {
+    const render = QRCodeCanvasRenderer({centerImage: {} as never});
+
+    expect(() => render([[1]])).toThrow(expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}));
   });
 });

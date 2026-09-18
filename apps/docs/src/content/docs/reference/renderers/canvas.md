@@ -56,8 +56,8 @@ renderer.
   dimensions before rendering; unloaded or zero-sized sources throw.
 - `centerImage.source` may be any ready `CanvasImageSource`, such as an `HTMLImageElement`, another canvas,
   or an `ImageBitmap`.
-- A non-empty `ariaLabel` sets `role="img"` and `aria-label` on the Canvas element. Without it, the
-  Canvas remains unlabelled. For more accessibility controls, use the
+- A non-empty `ariaLabel`, or a non-empty `title` when `ariaLabel` is blank, sets `role="img"` and
+  `aria-label` on the Canvas element. The Canvas is decorative only when both are blank. For more accessibility controls, use the
   [PNG-backed Image renderer](/reference/renderers/image/) for native image attributes.
 - Options are validated and copied when `QRCodeCanvasRenderer()` is called. The prepared image
   source is retained by identity and checked when rendering.

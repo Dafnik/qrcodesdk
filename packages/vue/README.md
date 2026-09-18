@@ -83,7 +83,7 @@ import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/vue';
 
 | Prop      | Type                         | Description                                             |
 | --------- | ---------------------------- | ------------------------------------------------------- |
-| `data`    | `string \| number`           | Required QR code payload.                               |
+| `payload` | `string \| number`           | Required QR code payload.                               |
 | `options` | `Component-specific options` | Optional matrix and renderer configuration.             |
 | `class`   | `string \| object \| array`  | Vue class binding applied to the component wrapper div. |
 

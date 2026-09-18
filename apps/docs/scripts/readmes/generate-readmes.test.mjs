@@ -50,6 +50,8 @@ Example package documentation.
   assert.ok(content.includes('`QRCodeSVG`'));
   assert.ok(content.includes('`qrcode-svg`'));
   assert.ok(content.includes('`className`'));
+  assert.ok(content.includes('`payload`'));
+  assert.ok(!content.includes('`data` | `string \\| number`'));
   assert.ok(content.includes('`string \\| number`'));
   await assert.rejects(assertReadmeCurrent(content, output, docsRoot), {
     message: `README.md is stale. Run \`${GENERATE_COMMAND}\`.`,

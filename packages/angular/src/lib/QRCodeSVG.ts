@@ -29,14 +29,14 @@ export class QRCodeSVG {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);
 
-  payload = input.required<QRCodePayload>();
+  readonly payload = input.required<QRCodePayload>();
 
-  options = input<QRCodeSVGOptions>();
+  readonly options = input<QRCodeSVGOptions>();
 
-  readonly resolvedOptions = computed(() => splitOptions(this.options()));
-  readonly svgRenderer = computed(() => QRCodeSVGRenderer(this.resolvedOptions()[1]));
+  private readonly resolvedOptions = computed(() => splitOptions(this.options()));
+  private readonly svgRenderer = computed(() => QRCodeSVGRenderer(this.resolvedOptions()[1]));
 
-  readonly qrcodeBuilder = computed(() =>
+  private readonly qrcodeBuilder = computed(() =>
     qrcode(this.payload()).options(this.resolvedOptions()[0]).renderer(this.svgRenderer()),
   );
 
