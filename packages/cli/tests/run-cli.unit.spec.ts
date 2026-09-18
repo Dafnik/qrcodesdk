@@ -125,24 +125,27 @@ describe('runCli', () => {
     const defaultRuntime = createRuntime();
     const explicitFalseRuntime = createRuntime();
     const enabledRuntime = createRuntime();
-    const explicitTrueRuntime = createRuntime();
 
     await expect(runCli(['Grüße', '--mask', '0', ...args], defaultRuntime)).resolves.toBe(0);
     await expect(
-      runCli(['Grüße', '--mask', '0', '--eci', 'false', ...args], explicitFalseRuntime),
+      runCli(['Grüße', '--mask', '0', '--no-eci', ...args], explicitFalseRuntime),
     ).resolves.toBe(0);
     await expect(runCli(['Grüße', '--mask', '0', '--eci', ...args], enabledRuntime)).resolves.toBe(
       0,
     );
-    await expect(
-      runCli(['Grüße', '--mask', '0', '--eci', 'true', ...args], explicitTrueRuntime),
-    ).resolves.toBe(0);
 
     const output = (runtime: ReturnType<typeof createRuntime>) =>
       runtime.files[0]?.data ?? runtime.stdoutText();
     expect(output(explicitFalseRuntime)).toEqual(output(defaultRuntime));
     expect(output(enabledRuntime)).not.toEqual(output(defaultRuntime));
-    expect(output(explicitTrueRuntime)).toEqual(output(enabledRuntime));
+  });
+
+  test('accepts a payload after the ECI flag', async () => {
+    const runtime = createRuntime();
+
+    await expect(runCli(['--eci', 'Grüße', '--ansi', 'off'], runtime)).resolves.toBe(0);
+
+    expect(runtime.stdoutText()).not.toBe('');
   });
 
   test.each([

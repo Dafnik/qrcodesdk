@@ -51,4 +51,19 @@ describe('QRCodePNGRenderer', () => {
       expect.objectContaining({details: expect.objectContaining({field: 'centerImage'})}),
     );
   });
+
+  test('rejects center-image PNG headers above the pixel budget before decoding', () => {
+    const source = Buffer.alloc(24);
+    source.write('89504e470d0a1a0a', 'hex');
+    source.writeUInt32BE(13, 8);
+    source.write('IHDR', 12, 'ascii');
+    source.writeUInt32BE(10_000, 16);
+    source.writeUInt32BE(10_000, 20);
+
+    const render = QRCodePNGRenderer({centerImage: {source}});
+
+    expect(() => render([[1]])).toThrowError(
+      expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}),
+    );
+  });
 });

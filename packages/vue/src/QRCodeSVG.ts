@@ -9,12 +9,17 @@ import {
 } from '@qrcodesdk/core';
 
 import {splitOptions} from './split-options';
-import type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
+import {
+  type QRCodeBaseProps,
+  type QRCodeDownloadHandle,
+  withoutManagedContentAttributes,
+} from './types';
 
 export type QRCodeSVGProps = QRCodeBaseProps<QRCodeSVGOptions>;
 
 export const QRCodeSVG = defineComponent({
   name: 'QRCodeSVG',
+  inheritAttrs: false,
   props: {
     payload: {
       type: [String, Number] as PropType<QRCodePayload>,
@@ -22,7 +27,7 @@ export const QRCodeSVG = defineComponent({
     },
     options: Object as PropType<QRCodeSVGOptions>,
   },
-  setup(props, {expose}) {
+  setup(props, {attrs, expose}) {
     const resolvedOptions = computed(() => splitOptions(props.options));
     const svgRenderer = computed(() => QRCodeSVGRenderer(resolvedOptions.value[1]));
     const svg = computed(() =>
@@ -46,6 +51,6 @@ export const QRCodeSVG = defineComponent({
 
     expose(handle);
 
-    return () => h('div', {innerHTML: svg.value});
+    return () => h('div', {...withoutManagedContentAttributes(attrs), innerHTML: svg.value});
   },
 });

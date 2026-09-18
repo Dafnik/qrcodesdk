@@ -85,7 +85,7 @@ export function App() {
 
 | Prop        | Type                         | Description                                     |
 | ----------- | ---------------------------- | ----------------------------------------------- |
-| `data`      | `string \| number`           | Required QR code payload.                       |
+| `payload`   | `string \| number`           | Required QR code payload.                       |
 | `options`   | `Component-specific options` | Optional matrix and renderer configuration.     |
 | `className` | `string`                     | CSS class applied to the component wrapper div. |
 

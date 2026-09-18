@@ -124,6 +124,11 @@ describe('qrcode().matrix()', () => {
     expect(builder.matrix()).toBe(matrix);
     expect(builder.render()).toBe(matrix);
     expect(builder.render()).toBe(matrix);
+    expect(Object.isFrozen(matrix)).toBe(true);
+    expect(Object.isFrozen(matrix[0])).toBe(true);
+    expect(() => {
+      (matrix as never as number[][])[0]![0] = 0;
+    }).toThrow(TypeError);
     expect(renderedMatrices).toEqual([matrix, matrix]);
     expect(builder.payload('new payload').matrix()).not.toBe(matrix);
     expect(builder.errorCorrection('H').matrix()).not.toBe(matrix);
@@ -236,6 +241,11 @@ describe('qrcode().matrix()', () => {
     expect(qrcode(0).matrix()).toHaveLength(21);
     expect(qrcode(12345).matrix()).toHaveLength(21);
     expect(qrcode(Number.MAX_SAFE_INTEGER).matrix()).toHaveLength(21);
+    for (const payload of [null, true, {}, []]) {
+      expect(() => qrcode(payload as never).matrix()).toThrow(
+        expect.objectContaining({code: 'INVALID_PAYLOAD'}),
+      );
+    }
   });
 
   test('throws Error instances for invalid runtime usage', () => {

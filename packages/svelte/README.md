@@ -82,7 +82,7 @@ Import the components directly in a Svelte component:
 
 | Prop      | Type                         | Description                                     |
 | --------- | ---------------------------- | ----------------------------------------------- |
-| `data`    | `string \| number`           | Required QR code payload.                       |
+| `payload` | `string \| number`           | Required QR code payload.                       |
 | `options` | `Component-specific options` | Optional matrix and renderer configuration.     |
 | `class`   | `string`                     | CSS class applied to the component wrapper div. |
 

@@ -11,6 +11,7 @@ import {gunzipSync} from 'node:zlib';
 const execFile = promisify(execFileCallback);
 const packageDirectory = process.cwd();
 const sdkDependencyPolicy = {
+  '@qrcodesdk/core': {},
   '@qrcodesdk/angular': {
     dependencies: ['@qrcodesdk/browser', '@qrcodesdk/core'],
   },
@@ -116,6 +117,23 @@ test('packed package contains every declared entrypoint', async () => {
       await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
     );
 
+    if (packageJson.bin === undefined) {
+      const exportTargets = collectStringTargets(packageJson.exports);
+      assert.ok(
+        exportTargets.length > 0,
+        `${packageJson.name} must declare at least one export target`,
+      );
+      assert.ok(
+        typeof packageJson.types === 'string' || typeof packageJson.typings === 'string',
+        `${packageJson.name} must declare a type declaration target`,
+      );
+    } else {
+      assert.ok(
+        collectStringTargets(packageJson.bin).length > 0,
+        `${packageJson.name} must declare at least one bin target`,
+      );
+    }
+
     for (const field of ['exports', 'module', 'types', 'typings']) {
       for (const target of collectStringTargets(packageJson[field])) {
         assertTargetExists(entries, packageJson.name, field, target);
@@ -132,17 +150,16 @@ test('packed package contains every declared entrypoint', async () => {
     }
 
     const expectedPolicy = sdkDependencyPolicy[packageJson.name];
-    if (expectedPolicy) {
-      for (const field of ['dependencies', 'peerDependencies']) {
-        const expectedDependencies = expectedPolicy[field] ?? [];
-        assert.deepEqual(
-          Object.keys(collectQRCodeSdkDependencies(packageJson, field)).sort(),
-          expectedDependencies,
-          `${packageJson.name} must publish its SDK ${field}`,
-        );
-        for (const name of expectedDependencies) {
-          assertExactSdkDependency(packageJson, sourcePackageJson, field, name);
-        }
+    assert.ok(expectedPolicy, `${packageJson.name} must declare an SDK dependency policy`);
+    for (const field of ['dependencies', 'peerDependencies']) {
+      const expectedDependencies = expectedPolicy[field] ?? [];
+      assert.deepEqual(
+        Object.keys(collectQRCodeSdkDependencies(packageJson, field)).sort(),
+        expectedDependencies,
+        `${packageJson.name} must publish its SDK ${field}`,
+      );
+      for (const name of expectedDependencies) {
+        assertExactSdkDependency(packageJson, sourcePackageJson, field, name);
       }
     }
   } finally {

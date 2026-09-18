@@ -1,5 +1,5 @@
 import {cancel, isCancel, select, text} from '@clack/prompts';
-import {Command, CommanderError, Option} from 'commander';
+import {Command, CommanderError} from 'commander';
 import {writeFile as writeFileDefault} from 'node:fs/promises';
 import process from 'node:process';
 import {styleText} from 'node:util';
@@ -131,14 +131,8 @@ export async function runCli(argv: readonly string[], runtime: CliRuntime = {}):
       .option('--error-correction <level>', 'Error correction level: L, M, Q, or H')
       .option('--version <version>', 'Pin a QR code version from 1 to 40')
       .option('--mask <mask>', 'Pin a QR code mask from 0 to 7')
-      .addOption(
-        booleanOption(
-          '--eci [boolean]',
-          'Emit UTF-8 ECI assignment 26 for octet segments',
-          'eci',
-          false,
-        ),
-      )
+      .option('--eci', 'Emit UTF-8 ECI assignment 26 for octet segments')
+      .option('--no-eci', 'Do not emit UTF-8 ECI assignment 26')
       .option('--module-size <size>', 'Module size as a positive integer')
       .option('--quiet-zone <size>', 'Quiet zone as a non-negative integer')
       .option('--layout <layout>', 'Text layout: compact or full')
@@ -410,23 +404,6 @@ function optionalEnum<T extends string>(
 ): T | undefined {
   if (value === undefined) return undefined;
   return requiredEnum(value, allowed, name);
-}
-
-function booleanOption(
-  flags: string,
-  description: string,
-  name: string,
-  defaultValue?: boolean,
-): Option {
-  const option = new Option(flags, description).argParser((value) => requiredBoolean(value, name));
-  return defaultValue === undefined ? option : option.default(defaultValue);
-}
-
-function requiredBoolean(value: string, name: string): boolean {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-
-  throw new CliError(`Invalid ${name}. Expected true or false.`);
 }
 
 function requiredEnum<T extends string>(value: string, allowed: readonly T[], name: string): T {

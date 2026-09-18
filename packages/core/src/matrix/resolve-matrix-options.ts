@@ -43,7 +43,10 @@ export function resolveQRCodeMatrixOptions(
 }
 
 function validatePayload(payload: QRCodePayload): void {
-  if (typeof payload === 'number' && (!Number.isSafeInteger(payload) || payload < 0)) {
+  if (
+    (typeof payload !== 'string' && typeof payload !== 'number') ||
+    (typeof payload === 'number' && (!Number.isSafeInteger(payload) || payload < 0))
+  ) {
     throw new QRCodeError('INVALID_PAYLOAD', 'QRCode: Invalid payload format', {
       details: {payload},
     });

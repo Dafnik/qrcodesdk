@@ -2,11 +2,12 @@ import {cleanup, render} from '@testing-library/react';
 import {mockCanvasRendering} from '@repo/core-testing';
 import {createRef} from 'react';
 import {renderToString} from 'react-dom/server';
-import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, expectTypeOf, test, vi} from 'vitest';
 
 import * as reactApi from '../src';
 
 type QRCodeDownloadHandle = import('../src').QRCodeDownloadHandle;
+type QRCodeSVGProps = import('../src/QRCodeSVG').QRCodeSVGProps;
 
 const {QRCodeCanvas, QRCodeImage, QRCodeSVG} = reactApi;
 
@@ -22,6 +23,12 @@ describe('React QR code component handles', () => {
 
   test('exports only the documented runtime components', () => {
     expect(Object.keys(reactApi).sort()).toEqual(['QRCodeCanvas', 'QRCodeImage', 'QRCodeSVG']);
+  });
+
+  test('does not accept managed HTML content props', () => {
+    expectTypeOf<
+      'dangerouslySetInnerHTML' extends keyof QRCodeSVGProps ? true : false
+    >().toEqualTypeOf<false>();
   });
 
   test('exposes download handles only for SVG and image components', () => {

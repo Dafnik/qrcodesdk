@@ -30,6 +30,38 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
     );
   });
 
+  test('covers every shape and palette pair', () => {
+    const palettes = new Set(['default', 'navy', 'jewel', 'slate', 'mono', 'mixed']);
+    const pairs = [
+      [
+        'modules',
+        (styling: (typeof QR_CODE_STYLING_FIXTURES)[number]['styling']) => styling.modules?.shape,
+      ],
+      [
+        'outer',
+        (styling: (typeof QR_CODE_STYLING_FIXTURES)[number]['styling']) =>
+          styling.finder?.outer?.shape,
+      ],
+      [
+        'center',
+        (styling: (typeof QR_CODE_STYLING_FIXTURES)[number]['styling']) =>
+          styling.finder?.center?.shape,
+      ],
+    ] as const;
+
+    for (const [, getShape] of pairs) {
+      const shapes = new Set(QR_CODE_STYLING_FIXTURES.map(({styling}) => getShape(styling)));
+      for (const shape of shapes) {
+        const coveredPalettes = new Set(
+          QR_CODE_STYLING_FIXTURES.filter(({styling}) => getShape(styling) === shape).map(
+            ({name}) => name.match(/palette-(.+)$/u)?.[1],
+          ),
+        );
+        expect(coveredPalettes).toEqual(palettes);
+      }
+    }
+  });
+
   test('keeps scanner-sensitive combinations out of the roundtrip contract', () => {
     expect(QR_CODE_STYLING_ROUNDTRIP_FIXTURES).toHaveLength(57);
     expect(

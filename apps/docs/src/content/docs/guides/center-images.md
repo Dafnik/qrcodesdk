@@ -99,7 +99,10 @@ const canvas = qrcode('https://qrcodesdk.dev')
   .render(QRCodeCanvasRenderer({centerImage: {source, size: 0.3}}));
 ```
 
-Unloaded or zero-sized sources throw synchronously.
+Unloaded or zero-sized sources throw synchronously. When you render an Image element, export a
+Canvas, or create a PNG data URL, the browser must also keep the Canvas origin-clean. Use a
+same-origin image or a cross-origin image served with CORS permission and loaded with the matching
+`crossOrigin` setting.
 
 ### PNG Buffer for Node.js
 

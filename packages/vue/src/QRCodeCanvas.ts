@@ -13,12 +13,13 @@ import {type QRCodeCanvasOptions, QRCodeCanvasRenderer} from '@qrcodesdk/browser
 import {type QRCodePayload, qrcode} from '@qrcodesdk/core';
 
 import {splitOptions} from './split-options';
-import type {QRCodeBaseProps} from './types';
+import {type QRCodeBaseProps, withoutManagedContentAttributes} from './types';
 
 export type QRCodeCanvasProps = QRCodeBaseProps<QRCodeCanvasOptions>;
 
 export const QRCodeCanvas = defineComponent({
   name: 'QRCodeCanvas',
+  inheritAttrs: false,
   props: {
     payload: {
       type: [String, Number] as PropType<QRCodePayload>,
@@ -26,7 +27,7 @@ export const QRCodeCanvas = defineComponent({
     },
     options: Object as PropType<QRCodeCanvasOptions>,
   },
-  setup(props) {
+  setup(props, {attrs}) {
     const container = ref<HTMLDivElement>();
     let stopRendering: WatchStopHandle | undefined;
 
@@ -50,6 +51,6 @@ export const QRCodeCanvas = defineComponent({
 
     onUnmounted(() => stopRendering?.());
 
-    return () => h('div', {ref: container});
+    return () => h('div', {...withoutManagedContentAttributes(attrs), ref: container});
   },
 });

@@ -528,7 +528,7 @@ function createPackageComponentNodes(attributes, packageName) {
 
 | Prop | Type | Description |
 | --- | --- | --- |
-| \`data\` | \`string \\| number\` | Required QR code payload. |
+| \`payload\` | \`string \\| number\` | Required QR code payload. |
 | \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${frameworkPropRow}
 `;
 

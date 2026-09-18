@@ -17,6 +17,9 @@ export type QRCodePNGRendererOptions = {
   readonly compression?: {readonly level?: number};
 };
 
+const MAX_CENTER_IMAGE_BYTES = 16 * 1024 * 1024;
+const MAX_CENTER_IMAGE_PIXELS = 16_777_216;
+
 export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
   assertKeys(options, 'options', ['style', 'centerImage', 'compression']);
   assertKeys(options?.centerImage, 'centerImage', ['source', 'size', 'padding', 'clearBackground']);
@@ -326,13 +329,49 @@ function decodeImageSource(source: Buffer): PNG {
       'QR code PNG image source must be a Buffer containing PNG bytes',
     );
   }
+  if (source.length > MAX_CENTER_IMAGE_BYTES) {
+    throw new QRCodeError(
+      'INVALID_IMAGE_SOURCE',
+      `QR code PNG image source must not exceed ${MAX_CENTER_IMAGE_BYTES} bytes`,
+    );
+  }
+  assertPngDimensions(source);
   try {
-    return PNG.sync.read(source);
+    const image = PNG.sync.read(source);
+    assertImageDimensions(image.width, image.height);
+    return image;
   } catch (error) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
       'QR code PNG image source must contain valid PNG bytes',
       {cause: error},
+    );
+  }
+}
+
+function assertPngDimensions(source: Buffer): void {
+  if (
+    source.length < 24 ||
+    source.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a' ||
+    source.readUInt32BE(8) !== 13 ||
+    source.subarray(12, 16).toString('ascii') !== 'IHDR'
+  ) {
+    return;
+  }
+  assertImageDimensions(source.readUInt32BE(16), source.readUInt32BE(20));
+}
+
+function assertImageDimensions(width: number, height: number): void {
+  if (
+    !Number.isSafeInteger(width) ||
+    !Number.isSafeInteger(height) ||
+    width <= 0 ||
+    height <= 0 ||
+    width * height > MAX_CENTER_IMAGE_PIXELS
+  ) {
+    throw new QRCodeError(
+      'INVALID_IMAGE_SOURCE',
+      `QR code PNG image source must not exceed ${MAX_CENTER_IMAGE_PIXELS} pixels`,
     );
   }
 }

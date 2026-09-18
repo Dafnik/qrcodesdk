@@ -40,7 +40,10 @@ for (let index = 0; index < 60; index++) {
   const moduleShape = MODULE_SHAPES[index % MODULE_SHAPES.length]!;
   const outerShape = FINDER_SHAPES[Math.floor(index / 6) % FINDER_SHAPES.length]!;
   const centerShape = FINDER_SHAPES[Math.floor(index / 15) % FINDER_SHAPES.length]!;
-  const palette = PALETTES[index % PALETTES.length]!;
+  const palette =
+    PALETTES[
+      (index + Math.floor(index / MODULE_SHAPES.length) + Math.floor(index / 15)) % PALETTES.length
+    ]!;
   fixtures.push({
     name: `modules-${moduleShape}_outer-${outerShape}_center-${centerShape}_palette-${palette.name}`,
     payload: 'The quick brown fox jumps over the lazy dog',
@@ -61,9 +64,9 @@ for (let index = 0; index < 60; index++) {
 export const QR_CODE_STYLING_FIXTURES: readonly QRCodeStylingFixture[] = fixtures;
 
 const SCANNER_SENSITIVE_FIXTURES = new Set([
-  'modules-square_outer-extra-rounded_center-square_palette-default',
-  'modules-circle_outer-extra-rounded_center-square_palette-navy',
-  'modules-circle_outer-square_center-circle_palette-navy',
+  'modules-square_outer-extra-rounded_center-square_palette-jewel',
+  'modules-circle_outer-extra-rounded_center-square_palette-slate',
+  'modules-circle_outer-square_center-circle_palette-default',
 ]);
 
 export const QR_CODE_STYLING_ROUNDTRIP_FIXTURES: readonly QRCodeStylingFixture[] =

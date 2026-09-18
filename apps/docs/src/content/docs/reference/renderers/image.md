@@ -54,6 +54,8 @@ For server output, choose SVG or the Node.js PNG renderer.
 
 - Rendering is synchronous; center-image sources must already be loaded and have positive intrinsic
   dimensions.
+- Center images must be same-origin or CORS-enabled to encode the Canvas as a PNG data URL. Otherwise
+  rendering throws `QRCodeError` with code `RENDER_FAILED`.
 - Options are validated and copied when `QRCodeImageRenderer()` is called. The prepared image
   source is retained by identity and checked when rendering.
 - The PNG is encoded into the element's data URL. Use the

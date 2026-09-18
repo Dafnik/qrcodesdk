@@ -88,7 +88,7 @@ export class App {}
 
 | Prop      | Type                         | Description                                 |
 | --------- | ---------------------------- | ------------------------------------------- |
-| `data`    | `string \| number`           | Required QR code payload.                   |
+| `payload` | `string \| number`           | Required QR code payload.                   |
 | `options` | `Component-specific options` | Optional matrix and renderer configuration. |
 
 All three components are standalone. Add the components you use to the host component's

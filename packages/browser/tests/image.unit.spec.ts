@@ -22,14 +22,29 @@ describe('QRCodeImageRenderer', () => {
   });
 
   test('rejects unsupported fields instead of ignoring them', () => {
-    expect(() => QRCodeImageRenderer({alt: 'legacy' as never} as never)).toThrowError(
+    expect(() => QRCodeImageRenderer({alt: 'legacy' as never} as never)).toThrow(
       expect.objectContaining({details: expect.objectContaining({field: 'options.alt'})}),
     );
-    expect(() => QRCodeImageRenderer({accessibility: {alt: 1 as never}})).toThrowError(
+    expect(() => QRCodeImageRenderer({accessibility: {alt: 1 as never}})).toThrow(
       expect.objectContaining({details: expect.objectContaining({field: 'accessibility.alt'})}),
     );
-    expect(() => QRCodeImageRenderer({accessibility: null} as never)).toThrowError(
+    expect(() => QRCodeImageRenderer({accessibility: null} as never)).toThrow(
       expect.objectContaining({details: expect.objectContaining({field: 'accessibility'})}),
     );
+  });
+
+  test('wraps canvas encoding failures in QRCodeError', () => {
+    const toDataURL = HTMLCanvasElement.prototype.toDataURL;
+    HTMLCanvasElement.prototype.toDataURL = () => {
+      throw new DOMException('The canvas is not origin-clean', 'SecurityError');
+    };
+
+    try {
+      expect(() => QRCodeImageRenderer()([[1]])).toThrow(
+        expect.objectContaining({code: 'RENDER_FAILED'}),
+      );
+    } finally {
+      HTMLCanvasElement.prototype.toDataURL = toDataURL;
+    }
   });
 });
