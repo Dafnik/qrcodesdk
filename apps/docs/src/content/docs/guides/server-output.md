@@ -175,10 +175,3 @@ repeatable public output.
 Use `Content-Disposition: attachment; filename="qrcode.svg"` only when the response should download
 instead of display inline. When a framework calculates `Content-Length`, let it do so from the final
 string or Buffer; otherwise use the UTF-8 byte length for SVG and `png.length` for PNG.
-
-## Result and next step
-
-The endpoint now returns image output with a matching media type. Use the
-[SVG string reference](/reference/renderers/svg/) or [PNG Buffer reference](/reference/renderers/png/)
-to tune renderer-specific options, and [Customize appearance](/guides/customize/) for shared visual
-settings.

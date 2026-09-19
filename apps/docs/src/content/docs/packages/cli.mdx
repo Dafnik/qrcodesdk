@@ -23,9 +23,7 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 ## Runtime requirements
 
-When executed with Node.js, `@qrcodesdk/cli` requires Node 22.12.0 or newer. Packed consumers are
-verified in CI on Node 22.12.0 and the latest Node 24.x release. The Deno and Bun commands below
-use those runtimes' Node compatibility layers and are not covered by the Node compatibility job.
+`@qrcodesdk/cli` requires Node 22.12.0 or newer.
 
 ## Install
 
@@ -138,14 +136,13 @@ qrc "HELLO WORLD" \
   --output hello.svg
 ```
 
-Enable the UTF-8 ECI declaration with a presence flag or an explicit boolean:
+Enable the UTF-8 ECI declaration:
 
 ```sh
 qrc "Grüße" --eci
-qrc "Grüße" --eci true
 ```
 
-Use `--eci false` to disable it explicitly. For the behavior and tradeoffs behind these flags, see
+The CLI does not emit ECI by default. Use `--no-eci` to disable it explicitly. For the behavior and tradeoffs behind these flags, see
 the [builder reference](/reference/builder/). For colors, module size, quiet zones, and scan-reliability guidance,
 see [Customize appearance](/guides/customize/).
 
@@ -162,7 +159,8 @@ see [Customize appearance](/guides/customize/).
 | `--error-correction <L\|M\|Q\|H>`       | Error correction level.                                     | `M`         |
 | `--version <1-40>`                      | Pin a QR code version.                                      | `Auto`      |
 | `--mask <0-7>`                          | Pin a QR code mask.                                         | `Auto`      |
-| `--eci [true\|false]`                   | Emit UTF-8 ECI assignment 26 for octet segments.            | `false`     |
+| `--eci`                                 | Emit UTF-8 ECI assignment 26 for octet segments.            | `false`     |
+| `--no-eci`                              | Do not emit UTF-8 ECI assignment 26.                        | `false`     |
 | `--module-size <number>`                | Module size as a positive integer.                          | `1`         |
 | `--quiet-zone <number>`                 | Quiet zone as a non-negative integer.                       | `2`         |
 | `--layout <compact\|full>`              | Text block layout.                                          | `compact`   |

@@ -235,10 +235,3 @@ their normal component lifecycle.
   rendered pixel dimensions. Increase `style.moduleSize` when more raster resolution is needed.
 - Scan-test the final page at its smallest supported viewport and after any CSS transforms, browser
   zoom, screenshots, or image compression.
-
-## Result and next step
-
-The QR code now uses the browser output that matches its next operation and is mounted with normal
-DOM APIs. Follow [Customize appearance](/guides/customize/) for shared visual options,
-[Add a center image](/guides/center-images/) for prepared image sources, or
-[Download or save](/guides/download-or-save/) to turn the output into a file.
