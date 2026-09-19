@@ -21,8 +21,3 @@ decoded payload and documented options behave the same.
 | React     | Selected widely used stable majors            | 18 and 19              |
 | Vue       | The current major from a tested minimum minor | 3.3 and newer          |
 | Svelte    | The current major                             | 5                      |
-
-The compatibility suite tests the minimum and current versions named by these ranges. Angular ranges
-are reviewed when Angular adds or retires a supported major. React ranges require a manual review when
-a stable major ships because React has no Angular-style support schedule. Vue's tested minimum minor
-and the active Svelte major are reviewed with their upstream releases.

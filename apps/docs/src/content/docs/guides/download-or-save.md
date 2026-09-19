@@ -69,9 +69,6 @@ export function DownloadQRCode() {
 }
 ```
 
-`QRCodeCanvas` has no download handle; export its Canvas output manually or render `QRCodeImage` for
-built-in PNG downloads.
-
 ## Download from Vue
 
 Call `download(filename?)` through an SVG or Image component template ref:
@@ -91,8 +88,6 @@ const qrcode = ref<QRCodeDownloadHandle | null>(null);
 </template>
 ```
 
-Vue's Canvas component also has no download method.
-
 ## Download from Svelte
 
 Call `download(filename?)` through an SVG or Image component bound with `bind:this`:
@@ -108,8 +103,6 @@ Call `download(filename?)` through an SVG or Image component bound with `bind:th
 <QRCodeImage bind:this={qrcode} payload="https://qrcodesdk.dev" />
 ```
 
-Svelte's Canvas component also has no download method.
-
 ## Download from Angular
 
 Call `download(filename?)` on an SVG or Image component template reference:
@@ -121,8 +114,6 @@ Call `download(filename?)` on an SVG or Image component template reference:
 <qrcode-image #qrcodeImage payload="https://qrcodesdk.dev" />
 <button (click)="qrcodeImage.download('qrcodesdk')" type="button">Download PNG</button>
 ```
-
-Angular's Canvas component also has no download method.
 
 ## Export a Canvas manually
 
