@@ -88,8 +88,7 @@ QRCodeTextRenderer({
 ## Accessibility and center images
 
 Accessibility is output-specific and lives under `accessibility`. SVG accepts `ariaLabel` and
-`title`; Canvas accepts `ariaLabel` and `title`; Image accepts `alt`, `ariaLabel`, and `title`. SVG
-does not accept `alt`.
+`title`; Canvas accepts `ariaLabel` and `title`; Image accepts `alt`, `ariaLabel`, and `title`.
 
 Center images also remain renderer options because their source types differ by runtime. See
 [Add a center image](/guides/center-images/) for preparation and sizing.

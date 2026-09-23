@@ -51,14 +51,8 @@ the result will scan. Start around `0.2`–`0.3`, preserve padding, and increase
 | Core SVG                           | `QRCodeDataImageURL`                                       | Convert bytes or a Blob to an embedded `data:image/...` URL          |
 | Browser Canvas or PNG-backed Image | loaded `CanvasImageSource`                                 | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
 | Node.js PNG                        | PNG `Buffer`                                               | Read or download valid PNG bytes before rendering                    |
-| React SVG                          | `QRCodeDataImageURL` in `options.centerImage.source`       | Prepare outside render; memoize options when useful                  |
-| React Image or Canvas              | loaded `CanvasImageSource` in `options.centerImage.source` | Store the decoded source in state before mounting output             |
-| Vue SVG                            | `QRCodeDataImageURL` in `options.centerImage.source`       | Prepare before updating a ref or computed options                    |
-| Vue Image or Canvas                | loaded `CanvasImageSource` in `options.centerImage.source` | Store the decoded source in a `shallowRef` before mounting output    |
-| Svelte SVG                         | `QRCodeDataImageURL` in `options.centerImage.source`       | Prepare before updating rune-mode state                              |
-| Svelte Image or Canvas             | loaded `CanvasImageSource` in `options.centerImage.source` | Store the decoded source in `$state` before mounting output          |
-| Angular SVG                        | `QRCodeDataImageURL` in `[options]`                        | Prepare before updating the input                                    |
-| Angular Image or Canvas            | loaded `CanvasImageSource` in `[options]`                  | Store the decoded source in a signal before rendering output         |
+| Framework Adapter SVG's            | `QRCodeDataImageURL` in `options.centerImage.source`       | Prepare outside render; memoize options when useful                  |
+| Framework Adapter Image or Canvas  | loaded `CanvasImageSource` in `options.centerImage.source` | Store the decoded source in state before mounting output             |
 
 QRCodeSDK never reads an image path or fetches a URL on your behalf.
 
