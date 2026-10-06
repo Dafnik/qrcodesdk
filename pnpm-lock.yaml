@@ -502,8 +502,8 @@ importers:
         specifier: 7.2.9
         version: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@types/node@25.9.5)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass@1.101.0)(yaml@2.9.0)
       nx:
-        specifier: 23.1.2
-        version: 23.1.2
+        specifier: 23.2.1
+        version: 23.2.1
       prettier:
         specifier: 'catalog:'
         version: 3.9.6
@@ -3539,19 +3539,9 @@ packages:
       verdaccio:
         optional: true
 
-  '@nx/nx-darwin-arm64@23.1.2':
-    resolution: {integrity: sha512-g4Y5okERFcTiFlFS8vkSv65p81XleajClGROLA0CqtIjkwJTInH/pEMfKx9VlnFYIJxk7FIOeFbEpvdqL1VPGg==}
-    cpu: [arm64]
-    os: [darwin]
-
   '@nx/nx-darwin-arm64@23.2.1':
     resolution: {integrity: sha512-majzvZlhlWL8MSDEKbQoGv3qM1u7v8Pk7X86srWsySbGDnCJ5BpMFyqMeroQ3AY4lxRjLYWACX5YXVPy2ttRtQ==}
     cpu: [arm64]
-    os: [darwin]
-
-  '@nx/nx-darwin-x64@23.1.2':
-    resolution: {integrity: sha512-33i1eMuUyXJ2723aQA8mZhuEYoObjVWB8lz56ofXCGDsmiOnKf+s3gPIZi5admD6otLBO+fhnwfPLstHSiqOXw==}
-    cpu: [x64]
     os: [darwin]
 
   '@nx/nx-darwin-x64@23.2.1':
@@ -3559,31 +3549,15 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@nx/nx-freebsd-x64@23.1.2':
-    resolution: {integrity: sha512-7l36xPKFBvcYKbHrafCbJ5ueJfm9Mu0XjjOonPlSc6ys95bum9fUiwar4kqsXGsqgj4iyDMoyQYjTU1wg7TmVA==}
-    cpu: [x64]
-    os: [freebsd]
-
   '@nx/nx-freebsd-x64@23.2.1':
     resolution: {integrity: sha512-GxxMtUlZWy74b15iyHVw+c4a0V2pSHR6RKbvmaSJQ3BXJrJarIqaWys/JrvcV2I/AjtrN7Tq7cFxCEaxkwCsEA==}
     cpu: [x64]
     os: [freebsd]
 
-  '@nx/nx-linux-arm-gnueabihf@23.1.2':
-    resolution: {integrity: sha512-zMgO2U/MxJEt04ShfqQuTX5k5uNl3pAYTOrRv9wDvfh+iqZb5SkIJdHLDRUKaoI3TFCECg6fIzo60akc5WEdcw==}
-    cpu: [arm]
-    os: [linux]
-
   '@nx/nx-linux-arm-gnueabihf@23.2.1':
     resolution: {integrity: sha512-Wr/VLZkPhEsDN7GGx0wOmvZ6v7yMrMf9WpLfrcTVe10NPUB/y6xYaoTDo8teKOBNLsPJ73C40bj2ZBmWtGPg7Q==}
     cpu: [arm]
     os: [linux]
-
-  '@nx/nx-linux-arm64-gnu@23.1.2':
-    resolution: {integrity: sha512-XN92hnz3cZwx7+ePicGPHshP3h5rloeh57p4A+xHIo3nym500Hsx8iS+jnUmnMWl8xOG8Jj/hlJwRUvKxMCukQ==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
 
   '@nx/nx-linux-arm64-gnu@23.2.1':
     resolution: {integrity: sha512-lGPhJYkJbIlTWj38FrHZ3qnaGkAfafPrK+6KjGdt+ubDOt9fp0lyUbEhfdg9JuIL++hOgcTHvz0FOA6S+7k3nA==}
@@ -3591,23 +3565,11 @@ packages:
     os: [linux]
     libc: [glibc]
 
-  '@nx/nx-linux-arm64-musl@23.1.2':
-    resolution: {integrity: sha512-ntuKRyPrm/aEOusGsp0eQ3cP+OicBF7/w9G18puFRu0lEwQ2aqBXwXC3GkVUsLjYsOr7SnVmY+MJnVH5NWMQDw==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
   '@nx/nx-linux-arm64-musl@23.2.1':
     resolution: {integrity: sha512-HrHBmBjh++NBE1p0DBjnc53Ech86/4gy4V1bAUJRViG1/FSJAopKE8qQqanYfShOUsHXk6ohPIhf6nlC8LsFFQ==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
-
-  '@nx/nx-linux-x64-gnu@23.1.2':
-    resolution: {integrity: sha512-e+sLHpmzrvh1qauc9PauV01h2fJlQoJUuaokTZMKTFWaHKwC7sDPYc3X6lEVcO1TZ7lGpIjiiofdu0Fu2PufDw==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
 
   '@nx/nx-linux-x64-gnu@23.2.1':
     resolution: {integrity: sha512-D1mSU/kdC1N8aeo7RpmuXWOl77GR4QIbam4dpUmezAwdNkIHlIq7hwqec+4HDWum9nlNmQX/dZn0nZaBem0rRA==}
@@ -3615,31 +3577,15 @@ packages:
     os: [linux]
     libc: [glibc]
 
-  '@nx/nx-linux-x64-musl@23.1.2':
-    resolution: {integrity: sha512-9a0SbUhK6/q9ficxtZ40ywqd5u/iggGicmxeMIgW30v7zu+WozrfQK0b+jJa2etCgJCJSwR2eeGQ4vGAIoLclw==}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
   '@nx/nx-linux-x64-musl@23.2.1':
     resolution: {integrity: sha512-p8Lc4RLu7cj4iP7NCnivLv4Qw+RorrLRO6s2J0LNIMH4nI1PAu5p5IztsCb3lsRo0f/ERCQ8DGwBn2BM1J8Blg==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@nx/nx-win32-arm64-msvc@23.1.2':
-    resolution: {integrity: sha512-zpDIRceGxkE6ZD12nz6NaMvG54SBSPb7v+SnKuaS6YP8uKtMuR0MsHMrTIYThmmrvtzrZNUmn6EGAlffulr8pg==}
-    cpu: [arm64]
-    os: [win32]
-
   '@nx/nx-win32-arm64-msvc@23.2.1':
     resolution: {integrity: sha512-XWYG+6P368xOZXU1z3QH4jXlaajQDxlXVGzYXogp+i09twEAhE7LV6fmv8gQptBta67EZy610KcKu38IVn6x7Q==}
     cpu: [arm64]
-    os: [win32]
-
-  '@nx/nx-win32-x64-msvc@23.1.2':
-    resolution: {integrity: sha512-7fAteEO6NSWLzrzy+QQoG6n78vKAcbOMgM/f7P1kIXzUWNzPNgCg4Svz2OuxkWEnZs8KGDcqw0YILggdQlqd8g==}
-    cpu: [x64]
     os: [win32]
 
   '@nx/nx-win32-x64-msvc@23.2.1':
@@ -8707,18 +8653,6 @@ packages:
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
 
-  nx@23.1.2:
-    resolution: {integrity: sha512-Qn0D3QOjBqEVH2abVCjkrs15m3OmsU7gOz7PYMhSbmJECAO1PHSKDyMJTaxIaP10E7R3JEdgehkqIBMPVOIYiw==}
-    hasBin: true
-    peerDependencies:
-      '@swc-node/register': ^1.11.1
-      '@swc/core': ^1.15.8
-    peerDependenciesMeta:
-      '@swc-node/register':
-        optional: true
-      '@swc/core':
-        optional: true
-
   nx@23.2.1:
     resolution: {integrity: sha512-QOgM7EcJ6gvLKZ3Azno7wdoXXhRhZHbRDN79gCmGXsBxH9WBXCeSy3DyGdee/d5Fa6GnxVOgwKTCx8l0eA+vHw==}
     hasBin: true
@@ -13594,8 +13528,8 @@ snapshots:
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:
-      '@emnapi/core': 1.4.5
-      '@emnapi/runtime': 1.4.5
+      '@emnapi/core': 1.11.3
+      '@emnapi/runtime': 1.11.3
       '@tybys/wasm-util': 0.9.0
 
   '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
@@ -13644,14 +13578,14 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.3
 
-  '@nx/angular@23.2.1(@angular-devkit/core@22.2.1(chokidar@5.0.0))(@angular-devkit/schematics@22.2.1(chokidar@5.0.0))(@angular/build@22.1.6(62b5254dc059e8ec28e74bc4e2f027ea))(@babel/traverse@7.29.8(supports-color@10.2.2))(@schematics/angular@21.2.14(chokidar@5.0.0))(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(ng-packagr@22.1.1(@angular/compiler-cli@22.1.4(@angular/compiler@22.1.4)(typescript@6.0.3))(supports-color@10.2.2)(tailwindcss@4.3.3)(tslib@2.8.1)(typescript@6.0.3))(nx@23.1.2)(rxjs@7.8.2)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@nx/angular@23.2.1(@angular-devkit/core@22.2.1(chokidar@5.0.0))(@angular-devkit/schematics@22.2.1(chokidar@5.0.0))(@angular/build@22.1.6(62b5254dc059e8ec28e74bc4e2f027ea))(@babel/traverse@7.29.8(supports-color@10.2.2))(@schematics/angular@21.2.14(chokidar@5.0.0))(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(ng-packagr@22.1.1(@angular/compiler-cli@22.1.4(@angular/compiler@22.1.4)(typescript@6.0.3))(supports-color@10.2.2)(tailwindcss@4.3.3)(tslib@2.8.1)(typescript@6.0.3))(nx@23.2.1)(rxjs@7.8.2)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@angular-devkit/core': 22.2.1(chokidar@5.0.0)
       '@angular-devkit/schematics': 22.2.1(chokidar@5.0.0)
-      '@nx/devkit': 23.2.1(nx@23.1.2)
-      '@nx/eslint': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)
-      '@nx/js': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)
-      '@nx/web': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@nx/eslint@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2))(debug@4.4.3(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)
+      '@nx/devkit': 23.2.1(nx@23.2.1)
+      '@nx/eslint': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)
+      '@nx/js': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)
+      '@nx/web': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@nx/eslint@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2))(debug@4.4.3(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)
       '@phenomnomnominal/tsquery': 6.2.0(typescript@6.0.3)
       '@schematics/angular': 21.2.14(chokidar@5.0.0)
       '@typescript-eslint/type-utils': 8.71.0(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
@@ -13680,15 +13614,6 @@ snapshots:
       - typescript
       - verdaccio
 
-  '@nx/devkit@23.2.1(nx@23.1.2)':
-    dependencies:
-      ejs: 5.0.1
-      minimatch: 10.2.5
-      nx: 23.1.2
-      semver: 7.8.5
-      tslib: 2.8.1
-      yargs-parser: 21.1.1
-
   '@nx/devkit@23.2.1(nx@23.2.1)':
     dependencies:
       ejs: 5.0.1
@@ -13698,10 +13623,10 @@ snapshots:
       tslib: 2.8.1
       yargs-parser: 21.1.1
 
-  '@nx/eslint@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)':
+  '@nx/eslint@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)':
     dependencies:
-      '@nx/devkit': 23.2.1(nx@23.1.2)
-      '@nx/js': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)
+      '@nx/devkit': 23.2.1(nx@23.2.1)
+      '@nx/js': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)
       eslint: 9.39.5(jiti@2.7.0)(supports-color@10.2.2)
       semver: 7.8.5
       tslib: 2.8.1
@@ -13717,7 +13642,7 @@ snapshots:
       - supports-color
       - verdaccio
 
-  '@nx/js@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)':
+  '@nx/js@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)':
     dependencies:
       '@babel/core': 7.29.7(supports-color@10.2.2)
       '@babel/plugin-proposal-decorators': 7.29.7(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2)
@@ -13729,7 +13654,7 @@ snapshots:
       '@babel/preset-env': 7.29.7(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2)
       '@babel/preset-typescript': 7.29.7(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2)
       '@babel/runtime': 7.29.7
-      '@nx/devkit': 23.2.1(nx@23.1.2)
+      '@nx/devkit': 23.2.1(nx@23.2.1)
       '@nx/workspace': 23.2.1
       '@zkochan/js-yaml': 0.0.7
       babel-plugin-const-enum: 1.2.0(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2)
@@ -13755,76 +13680,46 @@ snapshots:
       - nx
       - supports-color
 
-  '@nx/nx-darwin-arm64@23.1.2':
-    optional: true
-
   '@nx/nx-darwin-arm64@23.2.1':
-    optional: true
-
-  '@nx/nx-darwin-x64@23.1.2':
     optional: true
 
   '@nx/nx-darwin-x64@23.2.1':
     optional: true
 
-  '@nx/nx-freebsd-x64@23.1.2':
-    optional: true
-
   '@nx/nx-freebsd-x64@23.2.1':
-    optional: true
-
-  '@nx/nx-linux-arm-gnueabihf@23.1.2':
     optional: true
 
   '@nx/nx-linux-arm-gnueabihf@23.2.1':
     optional: true
 
-  '@nx/nx-linux-arm64-gnu@23.1.2':
-    optional: true
-
   '@nx/nx-linux-arm64-gnu@23.2.1':
-    optional: true
-
-  '@nx/nx-linux-arm64-musl@23.1.2':
     optional: true
 
   '@nx/nx-linux-arm64-musl@23.2.1':
     optional: true
 
-  '@nx/nx-linux-x64-gnu@23.1.2':
-    optional: true
-
   '@nx/nx-linux-x64-gnu@23.2.1':
-    optional: true
-
-  '@nx/nx-linux-x64-musl@23.1.2':
     optional: true
 
   '@nx/nx-linux-x64-musl@23.2.1':
     optional: true
 
-  '@nx/nx-win32-arm64-msvc@23.1.2':
-    optional: true
-
   '@nx/nx-win32-arm64-msvc@23.2.1':
-    optional: true
-
-  '@nx/nx-win32-x64-msvc@23.1.2':
     optional: true
 
   '@nx/nx-win32-x64-msvc@23.2.1':
     optional: true
 
-  '@nx/web@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@nx/eslint@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2))(debug@4.4.3(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)':
+  '@nx/web@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@nx/eslint@23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2))(debug@4.4.3(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)':
     dependencies:
-      '@nx/devkit': 23.2.1(nx@23.1.2)
-      '@nx/js': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)
+      '@nx/devkit': 23.2.1(nx@23.2.1)
+      '@nx/js': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)
       detect-port: 2.1.0
       http-server: 14.1.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       picocolors: 1.1.1
       tslib: 2.8.1
     optionalDependencies:
-      '@nx/eslint': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)
+      '@nx/eslint': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)
     transitivePeerDependencies:
       - '@babel/traverse'
       - '@swc-node/register'
@@ -14464,16 +14359,16 @@ snapshots:
   '@spartan-ng/cli@1.3.4(@angular-devkit/core@22.2.1(chokidar@5.0.0))(@angular-devkit/schematics@22.2.1(chokidar@5.0.0))(@angular/build@22.1.6(62b5254dc059e8ec28e74bc4e2f027ea))(@angular/compiler@22.1.4)(@babel/traverse@7.29.8(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(chokidar@5.0.0)(debug@4.4.3(supports-color@10.2.2))(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(ng-packagr@22.1.1(@angular/compiler-cli@22.1.4(@angular/compiler@22.1.4)(typescript@6.0.3))(supports-color@10.2.2)(tailwindcss@4.3.3)(tslib@2.8.1)(typescript@6.0.3))(rxjs@7.8.2)(supports-color@10.2.2)(tslib@2.8.1)':
     dependencies:
       '@angular/core': 22.1.4(@angular/compiler@22.1.4)(rxjs@7.8.2)
-      '@nx/angular': 23.2.1(@angular-devkit/core@22.2.1(chokidar@5.0.0))(@angular-devkit/schematics@22.2.1(chokidar@5.0.0))(@angular/build@22.1.6(62b5254dc059e8ec28e74bc4e2f027ea))(@babel/traverse@7.29.8(supports-color@10.2.2))(@schematics/angular@21.2.14(chokidar@5.0.0))(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(ng-packagr@22.1.1(@angular/compiler-cli@22.1.4(@angular/compiler@22.1.4)(typescript@6.0.3))(supports-color@10.2.2)(tailwindcss@4.3.3)(tslib@2.8.1)(typescript@6.0.3))(nx@23.1.2)(rxjs@7.8.2)(supports-color@10.2.2)(typescript@6.0.3)
-      '@nx/devkit': 23.2.1(nx@23.1.2)
-      '@nx/js': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.1.2)(supports-color@10.2.2)
+      '@nx/angular': 23.2.1(@angular-devkit/core@22.2.1(chokidar@5.0.0))(@angular-devkit/schematics@22.2.1(chokidar@5.0.0))(@angular/build@22.1.6(62b5254dc059e8ec28e74bc4e2f027ea))(@babel/traverse@7.29.8(supports-color@10.2.2))(@schematics/angular@21.2.14(chokidar@5.0.0))(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(ng-packagr@22.1.1(@angular/compiler-cli@22.1.4(@angular/compiler@22.1.4)(typescript@6.0.3))(supports-color@10.2.2)(tailwindcss@4.3.3)(tslib@2.8.1)(typescript@6.0.3))(nx@23.2.1)(rxjs@7.8.2)(supports-color@10.2.2)(typescript@6.0.3)
+      '@nx/devkit': 23.2.1(nx@23.2.1)
+      '@nx/js': 23.2.1(@babel/traverse@7.29.8(supports-color@10.2.2))(nx@23.2.1)(supports-color@10.2.2)
       '@nx/workspace': 23.2.1
       '@phenomnomnominal/tsquery': 6.2.0(typescript@6.0.3)
       '@schematics/angular': 21.2.14(chokidar@5.0.0)
       enquirer: 2.3.6
       jsonc-eslint-parser: 2.4.2
       node-html-parser: 7.1.0
-      nx: 23.1.2
+      nx: 23.2.1
       picocolors: 1.1.1
       postcss: 8.5.28
       postcss-selector-parser: 7.1.6
@@ -15994,7 +15889,7 @@ snapshots:
 
   axios@1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@7.2.0):
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3(supports-color@10.2.2))
+      follow-redirects: 1.16.1(debug@4.4.3(supports-color@10.2.2))
       form-data: 4.0.6
       https-proxy-agent: 5.0.1(supports-color@7.2.0)
       proxy-from-env: 2.1.0
@@ -16141,7 +16036,7 @@ snapshots:
 
   brace-expansion@5.0.9:
     dependencies:
-      balanced-match: 4.0.3
+      balanced-match: 4.0.4
 
   braces@3.0.3:
     dependencies:
@@ -16164,7 +16059,7 @@ snapshots:
 
   bundle-name@4.1.0:
     dependencies:
-      run-applescript: 7.0.0
+      run-applescript: 7.1.0
 
   bundle-name@4.1.1:
     dependencies:
@@ -16806,8 +16701,8 @@ snapshots:
 
   default-browser@5.2.1:
     dependencies:
-      bundle-name: 4.1.0
-      default-browser-id: 5.0.0
+      bundle-name: 4.1.1
+      default-browser-id: 5.0.1
 
   default-browser@5.5.1:
     dependencies:
@@ -17599,7 +17494,7 @@ snapshots:
       call-bind-apply-helpers: 1.0.2
       es-define-property: 1.0.1
       es-errors: 1.3.0
-      es-object-atoms: 1.1.1
+      es-object-atoms: 1.1.2
       function-bind: 1.1.2
       get-proto: 1.0.1
       gopd: 1.2.0
@@ -17612,7 +17507,7 @@ snapshots:
   get-proto@1.0.1:
     dependencies:
       dunder-proto: 1.0.1
-      es-object-atoms: 1.1.1
+      es-object-atoms: 1.1.2
 
   get-symbol-description@1.1.0:
     dependencies:
@@ -19214,7 +19109,7 @@ snapshots:
 
   minimatch@10.2.5:
     dependencies:
-      brace-expansion: 5.0.9
+      brace-expansion: 5.0.12
 
   minimatch@10.2.6:
     dependencies:
@@ -19377,140 +19272,6 @@ snapshots:
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
-
-  nx@23.1.2:
-    dependencies:
-      '@emnapi/core': 1.4.5
-      '@emnapi/runtime': 1.4.5
-      '@emnapi/wasi-threads': 1.0.4
-      '@jest/diff-sequences': 30.0.1
-      '@napi-rs/wasm-runtime': 0.2.4
-      '@tybys/wasm-util': 0.9.0
-      '@yarnpkg/lockfile': 1.1.0
-      '@zkochan/js-yaml': 0.0.7
-      agent-base: 6.0.2(supports-color@7.2.0)
-      ansi-colors: 4.1.3
-      ansi-regex: 5.0.1
-      ansi-styles: 4.3.0
-      argparse: 2.0.1
-      asynckit: 0.4.0
-      axios: 1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@7.2.0)
-      balanced-match: 4.0.3
-      base64-js: 1.5.1
-      bl: 4.1.0
-      brace-expansion: 5.0.9
-      buffer: 5.7.1
-      bundle-name: 4.1.0
-      call-bind-apply-helpers: 1.0.2
-      chalk: 4.1.2
-      cli-cursor: 3.1.0
-      cli-spinners: 2.6.1
-      cliui: 8.0.1
-      clone: 1.0.4
-      color-convert: 2.0.1
-      color-name: 1.1.4
-      combined-stream: 1.0.8
-      debug: 4.4.3(supports-color@7.2.0)
-      default-browser: 5.2.1
-      default-browser-id: 5.0.0
-      defaults: 1.0.4
-      define-lazy-prop: 3.0.0
-      delayed-stream: 1.0.0
-      dotenv: 16.4.7
-      dotenv-expand: 12.0.3
-      dunder-proto: 1.0.1
-      ejs: 5.0.1
-      emoji-regex: 8.0.0
-      end-of-stream: 1.4.5
-      enquirer: 2.3.6
-      es-define-property: 1.0.1
-      es-errors: 1.3.0
-      es-object-atoms: 1.1.1
-      es-set-tostringtag: 2.1.0
-      escalade: 3.2.0
-      escape-string-regexp: 1.0.5
-      figures: 3.2.0
-      flat: 5.0.2
-      follow-redirects: 1.16.0(debug@4.4.3(supports-color@10.2.2))
-      form-data: 4.0.6
-      fs-constants: 1.0.0
-      function-bind: 1.1.2
-      get-caller-file: 2.0.5
-      get-intrinsic: 1.3.0
-      get-proto: 1.0.1
-      gopd: 1.2.0
-      has-flag: 4.0.0
-      has-symbols: 1.1.0
-      has-tostringtag: 1.0.2
-      hasown: 2.0.4
-      https-proxy-agent: 5.0.1(supports-color@7.2.0)
-      ieee754: 1.2.1
-      ignore: 7.0.5
-      inherits: 2.0.4
-      is-docker: 3.0.0
-      is-fullwidth-code-point: 3.0.0
-      is-inside-container: 1.0.0
-      is-interactive: 1.0.0
-      is-unicode-supported: 0.1.0
-      is-wsl: 3.1.0
-      isexe: 2.0.0
-      json5: 2.2.3
-      jsonc-parser: 3.3.1
-      lines-and-columns: 2.0.3
-      log-symbols: 4.1.0
-      math-intrinsics: 1.1.0
-      mime-db: 1.52.0
-      mime-types: 2.1.35
-      mimic-fn: 2.1.0
-      minimatch: 10.2.5
-      minimist: 1.2.8
-      ms: 2.1.3
-      npm-run-path: 4.0.1
-      once: 1.4.0
-      onetime: 5.1.2
-      open: 10.1.0
-      ora: 5.4.1
-      path-key: 3.1.1
-      picocolors: 1.1.1
-      proxy-from-env: 2.1.0
-      readable-stream: 3.6.2
-      require-directory: 2.1.1
-      resolve.exports: 2.0.3
-      restore-cursor: 3.1.0
-      run-applescript: 7.0.0
-      safe-buffer: 5.2.1
-      semver: 7.8.4
-      signal-exit: 3.0.7
-      smol-toml: 1.6.1
-      string-width: 4.2.3
-      string_decoder: 1.3.0
-      strip-ansi: 6.0.1
-      strip-bom: 3.0.0
-      supports-color: 7.2.0
-      tar-stream: 2.2.0
-      tmp: 0.2.7
-      tsconfig-paths: 4.2.0
-      tslib: 2.8.1
-      util-deprecate: 1.0.2
-      wcwidth: 1.0.1
-      which: 3.0.1
-      wrap-ansi: 7.0.0
-      wrappy: 1.0.2
-      y18n: 5.0.8
-      yaml: 2.9.0
-      yargs: 17.7.2
-      yargs-parser: 21.1.1
-    optionalDependencies:
-      '@nx/nx-darwin-arm64': 23.1.2
-      '@nx/nx-darwin-x64': 23.1.2
-      '@nx/nx-freebsd-x64': 23.1.2
-      '@nx/nx-linux-arm-gnueabihf': 23.1.2
-      '@nx/nx-linux-arm64-gnu': 23.1.2
-      '@nx/nx-linux-arm64-musl': 23.1.2
-      '@nx/nx-linux-x64-gnu': 23.1.2
-      '@nx/nx-linux-x64-musl': 23.1.2
-      '@nx/nx-win32-arm64-msvc': 23.1.2
-      '@nx/nx-win32-x64-msvc': 23.1.2
 
   nx@23.2.1:
     dependencies:
@@ -19754,10 +19515,10 @@ snapshots:
 
   open@10.1.0:
     dependencies:
-      default-browser: 5.2.1
+      default-browser: 5.5.1
       define-lazy-prop: 3.0.0
       is-inside-container: 1.0.0
-      is-wsl: 3.1.0
+      is-wsl: 3.1.1
 
   open@11.0.4:
     dependencies:
