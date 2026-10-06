@@ -78,7 +78,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "astro": "7.2.9",
-    "nx": "23.1.2",
+    "nx": "23.2.1",
     "prettier": "catalog:",
     "remark-gfm": "4.0.1",
     "remark-mdx": "3.1.1",
