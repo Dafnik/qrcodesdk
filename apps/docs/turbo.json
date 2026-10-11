@@ -6,6 +6,9 @@
     },
     "start": {
       "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["$TURBO_EXTENDS$", "@qrcodesdk/cli#build"]
     }
   }
 }

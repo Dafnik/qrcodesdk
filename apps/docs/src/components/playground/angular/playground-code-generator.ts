@@ -4,7 +4,7 @@ import {
   type PlaygroundPreparedImage,
 } from '../playground-options.ts';
 
-export type HighlighterLang = 'angular-ts' | 'svelte' | 'tsx' | 'vue';
+export type HighlighterLang = 'angular-ts' | 'svelte' | 'tsx' | 'vue' | 'sh';
 
 export type CodePreview = {
   code: string;
@@ -45,6 +45,8 @@ export function generatePlaygroundCode(
   preparedImage?: PlaygroundPreparedImage,
 ): CodePreview {
   switch (playgroundOptionsValue.packageName) {
+    case 'cli':
+      throw new Error('CLI commands use the CLI command generator.');
     case 'react':
       return generateReactCode(playgroundOptionsValue, preparedImage);
     case 'vue':

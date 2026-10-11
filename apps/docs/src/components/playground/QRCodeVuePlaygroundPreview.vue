@@ -16,7 +16,11 @@ const options = useStore(playgroundOptions);
 const preparedImage = useStore(playgroundPreparedImage);
 const svgQRCode = ref<QRCodeDownloadHandle | null>(null);
 const imageQRCode = ref<QRCodeDownloadHandle | null>(null);
-const error = computed(() => hasQRCodeError(options.value, preparedImage.value));
+const error = computed(() =>
+  options.value.packageName === 'vue'
+    ? hasQRCodeError(options.value, preparedImage.value)
+    : undefined,
+);
 const svgOptions = computed(() => createPlaygroundSVGOptions(options.value, preparedImage.value));
 const imageOptions = computed(() =>
   createPlaygroundImageOptions(options.value, preparedImage.value),

@@ -1,5 +1,5 @@
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 
@@ -10,7 +10,7 @@ import {HlmSelectImports} from '@spartan-ng/helm/select';
 import {HlmSwitchImports} from '@spartan-ng/helm/switch';
 import {HlmTextareaImports} from '@spartan-ng/helm/textarea';
 
-import {playgroundOptions, updateQrOptions} from '../playground-options.ts';
+import {type PlaygroundOptions, playgroundOptions, updateQrOptions} from '../playground-options.ts';
 
 @Component({
   selector: 'qr-matrix-controls',
@@ -27,10 +27,10 @@ import {playgroundOptions, updateQrOptions} from '../playground-options.ts';
   template: `
     <div class="grid gap-4">
       <div hlmField>
-        <label hlmFieldLabel for="payload">Payload</label>
+        <label [for]="idPrefix() + 'payload'" hlmFieldLabel>Payload</label>
         <textarea
-          id="payload"
           #autosize="cdkTextareaAutosize"
+          [id]="idPrefix() + 'payload'"
           [ngModel]="currentOptions().payload"
           (ngModelChange)="updateQrOptions({payload: $event})"
           hlmTextarea
@@ -40,25 +40,25 @@ import {playgroundOptions, updateQrOptions} from '../playground-options.ts';
       <div class="border-input rounded-md border p-4" hlmField>
         <div class="flex items-center justify-between gap-4">
           <div class="grid gap-1">
-            <label hlmFieldLabel for="eci">UTF-8 ECI</label>
+            <label [for]="idPrefix() + 'eci'" hlmFieldLabel>UTF-8 ECI</label>
             <p hlmFieldDescription>
               Emit assignment 26 before the first octet segment to explicitly declare UTF-8.
             </p>
           </div>
           <hlm-switch
             [checked]="currentOptions().eci ?? false"
-            (checkedChange)="updateQrOptions({eci: $event})"
-            inputId="eci" />
+            [inputId]="idPrefix() + 'eci'"
+            (checkedChange)="updateQrOptions({eci: $event})" />
         </div>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div hlmField>
-          <label hlmFieldLabel for="mode">Mode</label>
+          <label [for]="idPrefix() + 'mode'" hlmFieldLabel>Mode</label>
           <hlm-select
             [ngModel]="currentOptions().mode"
             (ngModelChange)="updateQrOptions({mode: $event})">
-            <hlm-select-trigger class="w-full" buttonId="mode">
+            <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'mode'">
               <hlm-select-value placeholder="Auto" />
             </hlm-select-trigger>
             <hlm-select-content *hlmSelectPortal>
@@ -74,11 +74,11 @@ import {playgroundOptions, updateQrOptions} from '../playground-options.ts';
         </div>
 
         <div hlmField>
-          <label hlmFieldLabel for="version">Version</label>
+          <label [for]="idPrefix() + 'version'" hlmFieldLabel>Version</label>
           <hlm-select
             [ngModel]="currentOptions().version"
             (ngModelChange)="updateQrOptions({version: $event})">
-            <hlm-select-trigger class="w-full" buttonId="version">
+            <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'version'">
               <hlm-select-value placeholder="Auto" />
             </hlm-select-trigger>
             <hlm-select-content *hlmSelectPortal>
@@ -94,11 +94,11 @@ import {playgroundOptions, updateQrOptions} from '../playground-options.ts';
         </div>
 
         <div hlmField>
-          <label hlmFieldLabel for="errorCorrection">Error Correction</label>
+          <label [for]="idPrefix() + 'errorCorrection'" hlmFieldLabel>Error Correction</label>
           <hlm-select
             [ngModel]="currentOptions().errorCorrectionLevel"
             (ngModelChange)="updateQrOptions({errorCorrectionLevel: $event})">
-            <hlm-select-trigger class="w-full" buttonId="errorCorrection">
+            <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'errorCorrection'">
               <hlm-select-value placeholder="Auto" />
             </hlm-select-trigger>
             <hlm-select-content *hlmSelectPortal>
@@ -115,11 +115,11 @@ import {playgroundOptions, updateQrOptions} from '../playground-options.ts';
         </div>
 
         <div hlmField>
-          <label hlmFieldLabel for="mask">Mask</label>
+          <label [for]="idPrefix() + 'mask'" hlmFieldLabel>Mask</label>
           <hlm-select
             [ngModel]="currentOptions().mask"
             (ngModelChange)="updateQrOptions({mask: $event})">
-            <hlm-select-trigger class="w-full" buttonId="mask">
+            <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'mask'">
               <hlm-select-value placeholder="Auto" />
             </hlm-select-trigger>
             <hlm-select-content *hlmSelectPortal>
@@ -135,39 +135,46 @@ import {playgroundOptions, updateQrOptions} from '../playground-options.ts';
         </div>
 
         <div hlmField>
-          <label hlmFieldLabel for="size">Size</label>
+          <label [for]="idPrefix() + 'size'" hlmFieldLabel>Size</label>
           <input
-            id="size"
+            [id]="idPrefix() + 'size'"
             [ngModel]="currentOptions().moduleSize"
+            [placeholder]="defaultModuleSize()"
             (ngModelChange)="updateQrOptions({moduleSize: $event})"
             hlmInput
             type="number"
-            min="1"
-            placeholder="8" />
+            min="1" />
         </div>
 
         <div hlmField>
-          <label hlmFieldLabel for="quiet-zone">Quiet zone</label>
+          <label [for]="idPrefix() + 'quiet-zone'" hlmFieldLabel>Quiet zone</label>
           <input
-            id="quiet-zone"
+            [id]="idPrefix() + 'quiet-zone'"
             [ngModel]="currentOptions().quietZone"
+            [placeholder]="defaultQuietZone()"
             (ngModelChange)="updateQrOptions({quietZone: $event})"
             hlmInput
             type="number"
-            min="0"
-            placeholder="4" />
+            min="0" />
         </div>
       </div>
     </div>
   `,
 })
 export class QrMatrixControls {
-  protected readonly updateQrOptions = updateQrOptions;
+  readonly options = input<PlaygroundOptions>();
+  readonly update = input<(patch: Partial<PlaygroundOptions>) => void>(updateQrOptions);
+  readonly idPrefix = input('');
+  readonly defaultModuleSize = input(8);
+  readonly defaultQuietZone = input(4);
+  protected readonly updateQrOptions = (patch: Partial<PlaygroundOptions>) => this.update()(patch);
 
   private readonly nanostores = inject(NanostoresService);
-  protected readonly currentOptions = toSignal(this.nanostores.useStore(playgroundOptions), {
+  private readonly storedOptions = toSignal(this.nanostores.useStore(playgroundOptions), {
     requireSync: true,
   });
+
+  protected readonly currentOptions = computed(() => this.options() ?? this.storedOptions());
 
   protected readonly VERSION_OPTIONS = Array.from({length: 40}, (_, index) => index + 1);
   protected readonly MASK_OPTIONS = Array.from({length: 8}, (_, index) => index);
