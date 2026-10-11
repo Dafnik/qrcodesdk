@@ -38,7 +38,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
             <option hlmNativeSelectOption value="installed">qrc (installed)</option>
             <option hlmNativeSelectOption value="npm">npx</option>
             <option hlmNativeSelectOption value="pnpm">pnpm dlx</option>
-            <option hlmNativeSelectOption value="viteplus">vpx</option>
+            <option hlmNativeSelectOption value="viteplus">vp dlx</option>
             <option hlmNativeSelectOption value="bun">bunx</option>
             <option hlmNativeSelectOption value="yarn">yarn dlx</option>
           </hlm-native-select>

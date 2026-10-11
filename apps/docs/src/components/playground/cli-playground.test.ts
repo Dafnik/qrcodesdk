@@ -34,6 +34,7 @@ import {readQrOptionsFromSearchParams} from './query-sync.ts';
 const cliBinary = fileURLToPath(
   new URL('../../../../../packages/cli/dist/bin.mjs', import.meta.url),
 );
+/** Execute the copied command through the built CLI with controlled terminal color detection. */
 function runCommand(options: CliPlaygroundOptions, {tty = true, noColor = false} = {}): string {
   return execFileSync(
     '/bin/sh',

@@ -117,6 +117,7 @@ export class PlaygroundCode {
     });
   }
 
+  /** Copy the current snippet and show success only after the clipboard write completes. */
   protected async copyCode(): Promise<void> {
     const preview = this.preview();
     if (!preview) return;

@@ -40,6 +40,7 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
   },
 };
 
+/** Generate a framework component example; CLI commands use their separate generator. */
 export function generatePlaygroundCode(
   playgroundOptionsValue: PlaygroundOptions,
   preparedImage?: PlaygroundPreparedImage,

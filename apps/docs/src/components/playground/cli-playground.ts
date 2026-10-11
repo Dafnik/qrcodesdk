@@ -41,9 +41,11 @@ export const defaultCliOptions: CliPlaygroundOptions = {
   eci: false,
 };
 export const cliPlaygroundOptions = atom<CliPlaygroundOptions>({...defaultCliOptions});
+/** Merge edited CLI settings without changing the framework configuration. */
 export function updateCliOptions(patch: Partial<CliPlaygroundOptions>): void {
   cliPlaygroundOptions.set({...cliPlaygroundOptions.get(), ...patch});
 }
+/** Restore CLI defaults while leaving the selected package and framework settings intact. */
 export function resetCliOptions(): void {
   cliPlaygroundOptions.set({...defaultCliOptions});
 }
@@ -104,11 +106,13 @@ export function parseTerminalRuns(text: string): TerminalRun[] {
   return runs;
 }
 
+/** Quote one literal POSIX shell argument, rejecting NUL characters that shells cannot pass. */
 export function quoteShellArgument(value: string): string {
   if (value.includes('\0')) throw new Error('Command values cannot contain NUL characters.');
   return "'" + value.replaceAll("'", "'\"'\"'") + "'";
 }
 
+/** Map CLI settings to SVG renderer options without framework styling or center images. */
 export function createCliSVGOptions(options: CliPlaygroundOptions): QRCodeSVGOptions {
   return {
     matrix: {
@@ -128,6 +132,7 @@ export function createCliSVGOptions(options: CliPlaygroundOptions): QRCodeSVGOpt
   };
 }
 
+/** Resolve terminal styling, omitting layout for ANSI background mode and colors for ANSI off. */
 export function createCliTextOptions(options: CliPlaygroundOptions): QRCodeTextRendererOptions {
   const style = {moduleSize: options.moduleSize, quietZone: options.quietZone};
   if (options.ansi === 'background') {
@@ -150,6 +155,10 @@ export function createCliTextOptions(options: CliPlaygroundOptions): QRCodeTextR
   };
 }
 
+/**
+ * Build a POSIX command with required and non-default arguments for the selected launcher.
+ * Omitted ANSI blocks follow the CLI's TTY and NO_COLOR detection when run locally.
+ */
 export function generateCliCommand(options: CliPlaygroundOptions): string {
   const args = ['--payload', quoteShellArgument(options.payload)];
   if (options.format === 'svg')
@@ -207,6 +216,7 @@ export type CliPreview =
     }
   | {state: 'error'; message: string};
 
+/** Validate and render a bounded browser preview, returning an error instead of stale output. */
 export function createCliPreview(options: CliPlaygroundOptions): CliPreview {
   try {
     if (!['text', 'svg'].includes(options.format)) throw new Error('Choose text or SVG output.');

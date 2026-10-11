@@ -347,6 +347,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
 })
 export class PlaygroundControls {
   protected readonly updateQrOptions = updateQrOptions;
+  /** Reset the selected package's settings without discarding the other configuration. */
   protected resetOptions(): void {
     if (this.currentOptions().packageName === 'cli') resetCliOptions();
     else resetQrOptions();

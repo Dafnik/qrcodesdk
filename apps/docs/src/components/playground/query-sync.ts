@@ -262,7 +262,7 @@ export interface WriteQrOptionsToUrlOptions {
 let activeCleanup: (() => void) | undefined;
 
 /**
- * Starts two-way synchronization between `qrOptions` and the current URL.
+ * Starts two-way synchronization between framework and CLI stores and the current URL.
  *
  * Initial URL values overwrite the store. Subsequent store changes update
  * the URL with `replaceState`. Browser Back and Forward navigation updates

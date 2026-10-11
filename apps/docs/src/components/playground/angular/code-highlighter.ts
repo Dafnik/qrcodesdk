@@ -8,6 +8,7 @@ import vitesseLight from '@shikijs/themes/vitesse-light';
 import {createHighlighterCoreSync} from 'shiki/core';
 import {createJavaScriptRegexEngine} from 'shiki/engine/javascript';
 
+/** Load the playground's framework and shell grammars with matching light and dark themes. */
 export function createCodeHighlighter() {
   return createHighlighterCoreSync({
     langs: [angularTs, shell, svelte, tsx, vue],

@@ -29,6 +29,7 @@ const enums = {
   errorCorrectionLevel: ['L', 'M', 'Q', 'H'],
 } as const;
 
+/** Restore CLI settings from cli-* parameters, falling back to defaults for invalid values. */
 export function readCliOptionsFromSearchParams(params: URLSearchParams): CliPlaygroundOptions {
   const options = {...defaultCliOptions};
   for (const [queryKey, field] of Object.entries(fields)) {
@@ -59,6 +60,7 @@ export function readCliOptionsFromSearchParams(params: URLSearchParams): CliPlay
   return options;
 }
 
+/** Update only cli-* parameters, preserving unrelated parameters and optionally omitting defaults. */
 export function writeCliOptionsToSearchParams(
   params: URLSearchParams,
   options: CliPlaygroundOptions,
