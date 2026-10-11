@@ -45,7 +45,7 @@ jobs:
           install-ignore-scripts: true
 
       - name: Cache for Turbo
-        uses: rharkor/caching-for-turbo@v2.3.12
+        uses: rharkor/caching-for-turbo@v2.5.1
 
       - name: Check formatting
         run: pnpm turbo run format:check
@@ -77,7 +77,7 @@ jobs:
           install-ignore-scripts: true
 
       - name: Cache for Turbo
-        uses: rharkor/caching-for-turbo@v2.3.12
+        uses: rharkor/caching-for-turbo@v2.5.1
 
       - name: Build everything
         run: pnpm turbo run build
@@ -101,7 +101,7 @@ jobs:
         uses: ./.github/actions/setup-playwright
 
       - name: Cache for Turbo
-        uses: rharkor/caching-for-turbo@v2.3.12
+        uses: rharkor/caching-for-turbo@v2.5.1
 
       - name: Test
         run: pnpm turbo run test
@@ -122,7 +122,7 @@ jobs:
           install-ignore-scripts: true
 
       - name: Cache for Turbo
-        uses: rharkor/caching-for-turbo@v2.3.12
+        uses: rharkor/caching-for-turbo@v2.5.1
 
       - name: Restore build outputs
         run: pnpm turbo run build
@@ -167,7 +167,7 @@ jobs:
         uses: ./.github/actions/setup-playwright
 
       - name: Cache for Turbo
-        uses: rharkor/caching-for-turbo@v2.3.12
+        uses: rharkor/caching-for-turbo@v2.5.1
 
       - name: Test roundtrips
         run: pnpm turbo run test:roundtrips --filter=@repo/core-testing --filter=@qrcodesdk/browser --filter=@qrcodesdk/node
