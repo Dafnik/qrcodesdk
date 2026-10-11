@@ -4,7 +4,7 @@ import {
   type PlaygroundPreparedImage,
 } from '../playground-options.ts';
 
-export type HighlighterLang = 'angular-ts' | 'svelte' | 'tsx' | 'vue';
+export type HighlighterLang = 'angular-ts' | 'svelte' | 'tsx' | 'vue' | 'sh';
 
 export type CodePreview = {
   code: string;
@@ -40,11 +40,14 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
   },
 };
 
+/** Generate a framework component example; CLI commands use their separate generator. */
 export function generatePlaygroundCode(
   playgroundOptionsValue: PlaygroundOptions,
   preparedImage?: PlaygroundPreparedImage,
 ): CodePreview {
   switch (playgroundOptionsValue.packageName) {
+    case 'cli':
+      throw new Error('CLI commands use the CLI command generator.');
     case 'react':
       return generateReactCode(playgroundOptionsValue, preparedImage);
     case 'vue':

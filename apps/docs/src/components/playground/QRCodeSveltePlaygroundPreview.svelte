@@ -12,7 +12,11 @@
 
   let svgQRCode: QRCodeDownloadHandle | undefined;
   let imageQRCode: QRCodeDownloadHandle | undefined;
-  const error = $derived(hasQRCodeError($playgroundOptions, $playgroundPreparedImage));
+  const error = $derived(
+    $playgroundOptions.packageName === 'svelte'
+      ? hasQRCodeError($playgroundOptions, $playgroundPreparedImage)
+      : undefined,
+  );
   const svgOptions = $derived(
     createPlaygroundSVGOptions($playgroundOptions, $playgroundPreparedImage),
   );

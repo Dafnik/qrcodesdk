@@ -3,6 +3,7 @@ import {Card} from '@astrojs/starlight/components';
 import {AngularPlaygroundPreview} from '../playground/angular/angular-playground-preview.ts';
 import {PlaygroundControls} from '../playground/angular/playground-controls.ts';
 import {PlaygroundCode} from '../playground/angular/playground-code.ts';
+import {CliPlaygroundPreview} from '../playground/angular/cli-playground-preview.ts';
 import QRCodeReactPlaygroundPreview from '../playground/QRCodeReactPlaygroundPreview';
 import QRCodeSveltePlaygroundPreview from '../playground/QRCodeSveltePlaygroundPreview.svelte';
 import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview.vue';
@@ -23,14 +24,13 @@ import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview
     </Card>
     <div class="xl:sticky xl:top-20">
       <div class="grid gap-8">
-        <Card title="">
-          <div class="playground-preview-output grid min-h-96 content-center">
-            <QRCodeReactPlaygroundPreview client:only="react" />
-            <QRCodeSveltePlaygroundPreview client:only="svelte" />
-            <QRCodeVuePlaygroundPreview client:only="vue" />
-            <AngularPlaygroundPreview client:load />
-          </div>
-        </Card>
+        <div class="playground-preview-output grid min-h-96 content-center">
+          <QRCodeReactPlaygroundPreview client:only="react" />
+          <QRCodeSveltePlaygroundPreview client:only="svelte" />
+          <QRCodeVuePlaygroundPreview client:only="vue" />
+          <AngularPlaygroundPreview client:load />
+          <CliPlaygroundPreview client:load />
+        </div>
 
         <PlaygroundCode client:load />
       </div>

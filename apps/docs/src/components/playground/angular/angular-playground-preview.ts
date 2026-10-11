@@ -77,6 +77,8 @@ export class AngularPlaygroundPreview {
     createPlaygroundCanvasOptions(this.options(), this.preparedImage()),
   );
   protected readonly hasError = computed(() =>
-    hasQRCodeError(this.options(), this.preparedImage()),
+    this.options().packageName === 'angular'
+      ? hasQRCodeError(this.options(), this.preparedImage())
+      : undefined,
   );
 }

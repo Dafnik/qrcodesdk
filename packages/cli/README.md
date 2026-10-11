@@ -10,6 +10,8 @@
 
 `@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG and PNG files.
 
+Build a command and preview SVG or terminal text in the [CLI playground](https://qrcodesdk.dev/playground/?package=cli).
+
 ## Runtime requirements
 
 `@qrcodesdk/cli` requires Node 22.12.0 or newer.

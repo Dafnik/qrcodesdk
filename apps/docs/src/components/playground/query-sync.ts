@@ -6,6 +6,8 @@ import type {
   QRCodeVersion,
 } from '@qrcodesdk/core';
 
+import {cliPlaygroundOptions} from './cli-playground.ts';
+import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
 import {
   type PlaygroundOptions,
   type PlaygroundOutput,
@@ -19,6 +21,7 @@ const PLAYGROUND_PACKAGES = [
   'react',
   'svelte',
   'vue',
+  'cli',
 ] as const satisfies readonly PlaygroundPackage[];
 
 const PLAYGROUND_OUTPUTS = [
@@ -259,7 +262,7 @@ export interface WriteQrOptionsToUrlOptions {
 let activeCleanup: (() => void) | undefined;
 
 /**
- * Starts two-way synchronization between `qrOptions` and the current URL.
+ * Starts two-way synchronization between framework and CLI stores and the current URL.
  *
  * Initial URL values overwrite the store. Subsequent store changes update
  * the URL with `replaceState`. Browser Back and Forward navigation updates
@@ -280,10 +283,13 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   let updateTimer: ReturnType<typeof setTimeout> | undefined;
 
   playgroundOptions.set(readQrOptionsFromUrl());
+  cliPlaygroundOptions.set(
+    readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)),
+  );
 
   applyingUrlState = false;
 
-  const unsubscribe = playgroundOptions.subscribe((currentOptions) => {
+  const scheduleWrite = () => {
     if (applyingUrlState) {
       return;
     }
@@ -291,11 +297,13 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
     clearTimeout(updateTimer);
 
     updateTimer = setTimeout(() => {
-      writeQrOptionsToUrl(currentOptions, {
+      writeQrOptionsToUrl(playgroundOptions.get(), {
         omitDefaults,
       });
     }, debounceMs);
-  });
+  };
+  const unsubscribe = playgroundOptions.subscribe(scheduleWrite);
+  const unsubscribeCli = cliPlaygroundOptions.subscribe(scheduleWrite);
 
   const handlePopState = (): void => {
     clearTimeout(updateTimer);
@@ -303,6 +311,9 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
 
     try {
       playgroundOptions.set(readQrOptionsFromUrl());
+      cliPlaygroundOptions.set(
+        readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)),
+      );
     } finally {
       applyingUrlState = false;
     }
@@ -313,6 +324,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   activeCleanup = () => {
     clearTimeout(updateTimer);
     unsubscribe();
+    unsubscribeCli();
     window.removeEventListener('popstate', handlePopState);
     activeCleanup = undefined;
   };
@@ -371,6 +383,7 @@ export function writeQrOptionsToUrl(
     currentOptions,
     omitDefaults ? defaultPlaygroundOptions : undefined,
   );
+  writeCliOptionsToSearchParams(url.searchParams, cliPlaygroundOptions.get(), omitDefaults);
 
   if (url.href === window.location.href) {
     return;

@@ -3,7 +3,9 @@ import {describe, test} from 'node:test';
 
 import type {QRCodeDataImageURL} from '@qrcodesdk/core';
 
+import {createCodeHighlighter} from './angular/code-highlighter.ts';
 import {generatePlaygroundCode} from './angular/playground-code-generator.ts';
+import {defaultCliOptions, generateCliCommand} from './cli-playground.ts';
 import {
   type PlaygroundOptions,
   type PlaygroundPreparedImage,
@@ -77,6 +79,16 @@ describe('generated playground ECI options', () => {
 });
 
 describe('generated playground languages', () => {
+  test('the shared highlighter supports CLI commands and escapes payload markup', () => {
+    const command = generateCliCommand({
+      ...defaultCliOptions,
+      payload: '<img src=x onerror=alert(1)>',
+    });
+    const html = createCodeHighlighter().codeToHtml(command, {lang: 'sh', theme: 'vitesse-light'});
+    assert.match(html, /npx/);
+    assert.match(html, /&(?:lt|#x0*3c|#0*60);img/i);
+    assert.doesNotMatch(html, /<img/);
+  });
   for (const packageName of ['react', 'vue', 'svelte', 'angular'] as const) {
     for (const output of ['svg', 'image', 'canvas'] as const) {
       test(`${packageName} ${output} imports its option type from the adapter`, () => {

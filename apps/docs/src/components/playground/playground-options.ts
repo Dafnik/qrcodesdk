@@ -8,7 +8,7 @@ import type {
   QRCodeVisualStyle,
 } from '@qrcodesdk/core';
 
-export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue';
+export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue' | 'cli';
 export type PlaygroundOutput = 'svg' | 'image' | 'canvas';
 
 export interface PlaygroundOptions extends QRCodeMatrixOptions {
