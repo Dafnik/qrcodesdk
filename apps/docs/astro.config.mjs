@@ -180,19 +180,16 @@ export default defineConfig({
     vue(),
     angular({
       useAngularHydration: false,
+      transformFilter: (_code, id) => {
+        return (
+          id.includes('src/components/angular') ||
+          id.includes('src/components/playground/angular') ||
+          id.includes('src/libs/ui') ||
+          id.includes('src/libs/sim')
+        ); // <- only transform Angular TypeScript files
+      },
       vite: {
-        tailwindCss: {
-          rootStylesheet: 'src/styles/global.css',
-        },
         fastCompile: true,
-        transformFilter: (_code, id) => {
-          return (
-            id.includes('src/components/angular') ||
-            id.includes('src/components/playground/angular') ||
-            id.includes('src/libs/ui') ||
-            id.includes('src/libs/sim')
-          ); // <- only transform Angular TypeScript files
-        },
       },
     }),
     useProductionJsx(),
