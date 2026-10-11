@@ -93,8 +93,8 @@
     "svelte": "catalog:",
     "svelte-check": "4.7.6",
     "typescript": "catalog:svelte-typescript",
-    "typescript-eslint": "8.71.1",
-    "vite": "8.3.4",
+    "typescript-eslint": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }
