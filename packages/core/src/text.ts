@@ -54,8 +54,8 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
   }
   const foregroundColor = ansiOptions.foreground ?? '#000000';
   const backgroundColor = ansiOptions.background ?? '#ffffff';
-  validateColor('style.foreground', foregroundColor);
-  validateColor('style.background', backgroundColor);
+  validateColor('ansi.foreground', foregroundColor);
+  validateColor('ansi.background', backgroundColor);
   const background = compositeANSIColor(parseQRCodeColor(backgroundColor), [255, 255, 255]);
   const foreground = compositeANSIColor(parseQRCodeColor(foregroundColor), background);
   const backgroundOnly = ansi !== false && mode === 'background';

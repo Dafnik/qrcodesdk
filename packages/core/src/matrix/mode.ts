@@ -80,7 +80,7 @@ export function resolveMode(
     const mode = MODES_MAP[requestedMode];
     if (typeof mode !== 'number') {
       throw new QRCodeError('INVALID_OPTIONS', 'QRCode: Invalid mode', {
-        details: {field: 'mode', value: mode},
+        details: {field: 'mode', value: requestedMode},
       });
     }
     return mode;
