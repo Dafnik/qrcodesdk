@@ -1,7 +1,6 @@
-import type {QRCodeStyledDrawingTarget} from './drawing';
 import {createQRCodeStyler} from './drawing/styler';
 import {QRCodeError} from './error';
-import {assertKnownKeys} from './styling';
+import {assertKnownKeys, assertOptionalString} from './options';
 import type {
   QRCodeCenterImageOptions,
   QRCodeMatrix,
@@ -34,172 +33,101 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     'padding',
     'clearBackground',
   ]);
-  assertOptionalXMLString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
-  assertOptionalXMLString(options?.accessibility?.title, 'accessibility.title');
+  const {ariaLabel, title} = options?.accessibility ?? {};
+  assertOptionalXMLString(ariaLabel, 'accessibility.ariaLabel');
+  assertOptionalXMLString(title, 'accessibility.title');
   const styler = createQRCodeStyler(options?.style);
-  const accessibility = options?.accessibility ? {...options.accessibility} : undefined;
-  const centerImageOptions = options?.centerImage ? {...options.centerImage} : undefined;
-  const centerImageLayout = centerImageOptions
-    ? {
-        size: centerImageOptions.size,
-        padding: centerImageOptions.padding,
-        clearBackground: centerImageOptions.clearBackground,
-      }
-    : undefined;
-  if (
-    centerImageOptions &&
-    (!isQRCodeDataImageURL(centerImageOptions.source) || !isXMLString(centerImageOptions.source))
-  ) {
-    throw new QRCodeError(
-      'INVALID_IMAGE_SOURCE',
-      'QR code SVG image source must be an embedded data:image URL',
-      {details: {source: centerImageOptions.source}},
-    );
-  }
-  if (centerImageOptions) {
+  const centerImage = options?.centerImage;
+  const {source, ...centerImageLayout} = centerImage ?? {};
+  if (centerImage) {
+    if (!isQRCodeDataImageURL(source) || !isXMLString(source)) {
+      throw new QRCodeError(
+        'INVALID_IMAGE_SOURCE',
+        'QR code SVG image source must be an embedded data:image URL',
+        {details: {source}},
+      );
+    }
     styler.draw([[1]]).placeCenterImage(centerImageLayout);
   }
+  const accessibleName = ariaLabel?.trim();
 
   return (matrix: QRCodeMatrix) => {
-    const drawing = styler.draw(matrix);
-    const target = new SVGDrawingTarget(drawing.viewSize);
-    drawing.paint(target);
-    const accessibleName = accessibility?.ariaLabel?.trim();
-    const title = accessibility?.title;
-    const isLabeled = Boolean(accessibleName || title?.trim());
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${drawing.outputSize}" height="${drawing.outputSize}" viewBox="0 0 ${drawing.viewSize} ${drawing.viewSize}"${isLabeled ? ' role="img"' : ' aria-hidden="true"'}${target.hasCurves ? '' : ' shape-rendering="crispEdges"'}`;
-    if (accessibleName) svg += ` aria-label="${escapeAttributeValue(accessibleName)}"`;
-    svg += '>';
-    if (title) svg += `<title>${escapeTextContent(title)}</title>`;
-    svg += target.backgroundString();
+    const {viewSize, outputSize, paint, placeCenterImage} = styler.draw(matrix);
+    let background = '';
+    let layers = '';
+    let layer = '';
+    let path = '';
+    let hasCurves = false;
+    paint({
+      drawBackground(red, green, blue, alpha) {
+        background = `<path fill="${rgbHex(red, green, blue)}"${opacityAttribute(alpha)} d="M0 0h${viewSize}v${viewSize}H0z"/>`;
+      },
+      beginLayer(red, green, blue, alpha) {
+        layer = `<path fill="${rgbHex(red, green, blue)}"${opacityAttribute(alpha)} fill-rule="evenodd" d="`;
+        path = '';
+      },
+      drawRectangle(x, y, width, height) {
+        path += `M${point(x, y)}h${formatNumber(width)}v${formatNumber(height)}h-${formatNumber(width)}Z`;
+      },
+      beginPath() {
+        hasCurves = true;
+      },
+      moveTo(x, y) {
+        path += `M${point(x, y)}`;
+      },
+      lineTo(x, y) {
+        path += `L${point(x, y)}`;
+      },
+      arc(centerX, centerY, radius, startAngle, endAngle, counterclockwise) {
+        let delta = endAngle - startAngle;
+        if (counterclockwise) {
+          while (delta >= 0) delta -= Math.PI * 2;
+        } else {
+          while (delta <= 0) delta += Math.PI * 2;
+        }
+        if (Math.abs(delta) >= Math.PI * 2 - 1e-10) {
+          path += arcTo(centerX, centerY, radius, startAngle + delta / 2, counterclockwise, true);
+          path += arcTo(centerX, centerY, radius, endAngle, counterclockwise, true);
+        } else {
+          path += arcTo(
+            centerX,
+            centerY,
+            radius,
+            endAngle,
+            counterclockwise,
+            Math.abs(delta) > Math.PI,
+          );
+        }
+      },
+      closePath() {
+        path += 'Z';
+      },
+      endPath() {},
+      endLayer() {
+        if (path) layers += `${layer}${path}"/>`;
+      },
+    });
 
-    const placement = centerImageOptions ? drawing.placeCenterImage(centerImageLayout) : undefined;
-    if (placement?.clear) {
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${outputSize}" height="${outputSize}" viewBox="0 0 ${viewSize} ${viewSize}"${accessibleName || title?.trim() ? ' role="img"' : ' aria-hidden="true"'}${hasCurves ? '' : ' shape-rendering="crispEdges"'}`;
+    if (accessibleName) svg += ` aria-label="${escapeXML(accessibleName, true)}"`;
+    svg += '>';
+    if (title) svg += `<title>${escapeXML(title)}</title>`;
+    svg += background;
+
+    if (!centerImage) return `${svg}${layers}</svg>`;
+    const {centerImage: image, clear} = placeCenterImage(centerImageLayout);
+    if (clear) {
       const maskId =
-        `qrcodesdk-clear-${drawing.viewSize}-${formatNumber(placement.clear.x)}-${formatNumber(placement.clear.size)}`.replace(
+        `qrcodesdk-clear-${viewSize}-${formatNumber(clear.x)}-${formatNumber(clear.size)}`.replace(
           /\./g,
           '-',
         );
-      svg += `<defs><mask id="${maskId}"><rect width="${drawing.viewSize}" height="${drawing.viewSize}" fill="#fff"/><rect x="${formatNumber(placement.clear.x)}" y="${formatNumber(placement.clear.y)}" width="${formatNumber(placement.clear.size)}" height="${formatNumber(placement.clear.size)}" fill="#000"/></mask></defs><g mask="url(#${maskId})">${target.layersString()}</g>`;
+      svg += `<defs><mask id="${maskId}"><rect width="${viewSize}" height="${viewSize}" fill="#fff"/><rect x="${formatNumber(clear.x)}" y="${formatNumber(clear.y)}" width="${formatNumber(clear.size)}" height="${formatNumber(clear.size)}" fill="#000"/></mask></defs><g mask="url(#${maskId})">${layers}</g>`;
     } else {
-      svg += target.layersString();
+      svg += layers;
     }
-
-    if (centerImageOptions && placement) {
-      svg += `<image href="${escapeAttributeValue(centerImageOptions.source)}" x="${formatNumber(placement.centerImage.x)}" y="${formatNumber(placement.centerImage.y)}" width="${formatNumber(placement.centerImage.size)}" height="${formatNumber(placement.centerImage.size)}" preserveAspectRatio="xMidYMid meet"/>`;
-    }
-    return `${svg}</svg>`;
+    return `${svg}<image href="${escapeXML(source!, true)}" x="${formatNumber(image.x)}" y="${formatNumber(image.y)}" width="${formatNumber(image.size)}" height="${formatNumber(image.size)}" preserveAspectRatio="xMidYMid meet"/></svg>`;
   };
-}
-
-class SVGDrawingTarget implements QRCodeStyledDrawingTarget {
-  hasCurves = false;
-  backgroundFill = '#000000';
-  backgroundOpacity = '';
-  private backgroundMarkup = '';
-  private layerMarkup = '';
-  private path = '';
-  private fill = '#000000';
-  private opacity = '';
-  private fillRule: 'nonzero' | 'evenodd' = 'evenodd';
-
-  constructor(private readonly viewSize: number) {}
-
-  drawBackground(red: number, green: number, blue: number, alpha: number): void {
-    this.backgroundFill = rgbHex(red, green, blue);
-    this.backgroundOpacity = opacityAttribute(alpha);
-    this.backgroundMarkup = `<path fill="${this.backgroundFill}"${this.backgroundOpacity} d="M0 0h${this.viewSize}v${this.viewSize}H0z"/>`;
-  }
-
-  beginLayer(red: number, green: number, blue: number, alpha: number): void {
-    this.fill = rgbHex(red, green, blue);
-    this.opacity = opacityAttribute(alpha);
-    this.path = '';
-  }
-
-  drawRectangle(x: number, y: number, width: number, height: number): void {
-    this.path += `M${point(x, y)}h${formatNumber(width)}v${formatNumber(height)}h-${formatNumber(width)}Z`;
-  }
-
-  beginPath(fillRule: 'nonzero' | 'evenodd'): void {
-    this.fillRule = fillRule;
-    this.hasCurves = true;
-  }
-
-  moveTo(x: number, y: number): void {
-    this.path += `M${point(x, y)}`;
-  }
-
-  lineTo(x: number, y: number): void {
-    this.path += `L${point(x, y)}`;
-  }
-
-  arc(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    startAngle: number,
-    endAngle: number,
-    counterclockwise: boolean,
-  ): void {
-    let delta = endAngle - startAngle;
-    if (counterclockwise) {
-      while (delta >= 0) delta -= Math.PI * 2;
-    } else {
-      while (delta <= 0) delta += Math.PI * 2;
-    }
-    if (Math.abs(delta) >= Math.PI * 2 - 1e-10) {
-      const middle = startAngle + delta / 2;
-      this.appendArc(centerX, centerY, radius, middle, counterclockwise, true);
-      this.appendArc(centerX, centerY, radius, endAngle, counterclockwise, true);
-      return;
-    }
-    this.appendArc(centerX, centerY, radius, endAngle, counterclockwise, Math.abs(delta) > Math.PI);
-  }
-
-  cubicTo(
-    control1X: number,
-    control1Y: number,
-    control2X: number,
-    control2Y: number,
-    x: number,
-    y: number,
-  ): void {
-    this.path += `C${point(control1X, control1Y)} ${point(control2X, control2Y)} ${point(x, y)}`;
-  }
-
-  closePath(): void {
-    this.path += 'Z';
-  }
-
-  endPath(): void {}
-
-  endLayer(): void {
-    if (this.path) {
-      this.layerMarkup += `<path fill="${this.fill}"${this.opacity} fill-rule="${this.fillRule}" d="${this.path}"/>`;
-    }
-  }
-
-  backgroundString(): string {
-    return this.backgroundMarkup;
-  }
-
-  layersString(): string {
-    return this.layerMarkup;
-  }
-
-  private appendArc(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    endAngle: number,
-    counterclockwise: boolean,
-    largeArc: boolean,
-  ): void {
-    const x = centerX + Math.cos(endAngle) * radius;
-    const y = centerY + Math.sin(endAngle) * radius;
-    this.path += `A${formatNumber(radius)} ${formatNumber(radius)} 0 ${largeArc ? 1 : 0} ${counterclockwise ? 0 : 1} ${point(x, y)}`;
-  }
 }
 
 function isQRCodeDataImageURL(value: unknown): value is QRCodeDataImageURL {
@@ -213,11 +141,7 @@ function assertOptionalXMLString(
   value: unknown,
   field: string,
 ): asserts value is string | undefined {
-  if (value !== undefined && typeof value !== 'string') {
-    throw new QRCodeError('INVALID_OPTIONS', `QR code ${field} must be a string`, {
-      details: {field, value},
-    });
-  }
+  assertOptionalString(value, field);
   if (typeof value === 'string' && !isXMLString(value)) {
     throw new QRCodeError('INVALID_OPTIONS', `QR code ${field} must contain valid XML characters`, {
       details: {field, value},
@@ -226,26 +150,22 @@ function assertOptionalXMLString(
 }
 
 function isXMLString(value: string): boolean {
-  for (const character of value) {
-    const codePoint = character.codePointAt(0)!;
-    if (
-      codePoint !== 9 &&
-      codePoint !== 10 &&
-      codePoint !== 13 &&
-      !(
-        (codePoint >= 0x20 && codePoint <= 0xd7ff) ||
-        (codePoint >= 0xe000 && codePoint <= 0xfffd) ||
-        (codePoint >= 0x10000 && codePoint <= 0x10ffff)
-      )
-    ) {
-      return false;
-    }
-  }
-  return true;
+  return /^[\t\n\r\u0020-\ud7ff\ue000-\ufffd\u{10000}-\u{10ffff}]*$/u.test(value);
+}
+
+function arcTo(
+  centerX: number,
+  centerY: number,
+  radius: number,
+  angle: number,
+  counterclockwise: boolean,
+  largeArc: boolean,
+): string {
+  return `A${formatNumber(radius)} ${formatNumber(radius)} 0 ${largeArc ? 1 : 0} ${counterclockwise ? 0 : 1} ${point(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius)}`;
 }
 
 function rgbHex(red: number, green: number, blue: number): string {
-  return `#${red.toString(16).padStart(2, '0')}${green.toString(16).padStart(2, '0')}${blue.toString(16).padStart(2, '0')}`;
+  return `#${((1 << 24) | (red << 16) | (green << 8) | blue).toString(16).slice(1)}`;
 }
 
 function opacityAttribute(alpha: number): string {
@@ -260,8 +180,8 @@ function formatNumber(value: number): string {
   return String(Math.round(value * 1_000_000) / 1_000_000);
 }
 
-function escapeAttributeValue(value: string): string {
-  return value.replace(/[&"<>]/g, (character) =>
+function escapeXML(value: string, attribute?: boolean): string {
+  return value.replace(attribute ? /[&"<>]/g : /[&<>]/g, (character) =>
     character === '&'
       ? '&amp;'
       : character === '"'
@@ -269,11 +189,5 @@ function escapeAttributeValue(value: string): string {
         : character === '<'
           ? '&lt;'
           : '&gt;',
-  );
-}
-
-function escapeTextContent(value: string): string {
-  return value.replace(/[&<>]/g, (character) =>
-    character === '&' ? '&amp;' : character === '<' ? '&lt;' : '&gt;',
   );
 }

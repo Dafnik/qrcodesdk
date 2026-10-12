@@ -18,59 +18,48 @@ export const ECC_LEVELS_MAP: Record<QRCodeErrorCorrectionLevel, QRCodeErrorCorre
   H: ECC_LEVEL_H,
 };
 
-export const ECC_LEVELS = [
-  'L',
-  'M',
-  'Q',
-  'H',
-] as const satisfies readonly QRCodeErrorCorrectionLevel[];
-
 type GF256LookupTables = {
   exponents: QRCodeCodewords;
   logarithms: QRCodeCodewords;
 };
 
 let cachedGF256LookupTables: GF256LookupTables | undefined;
-let cachedGF256GeneratorPolynomials: QRCodePolynomial[] | undefined;
+const generatorPolynomials: QRCodePolynomial[] = [[]];
 
 // GF(2^8)-to-integer mapping with a reducing polynomial x^8+x^4+x^3+x^2+1
 // invariant: exponents[logarithms[i]] == i for all i in [1,256]
 export function getGF256LookupTables(): GF256LookupTables {
-  cachedGF256LookupTables ??= createGF256LookupTables();
+  if (!cachedGF256LookupTables) {
+    const exponents: QRCodeCodewords = [];
+    const logarithms: QRCodeCodewords = [-1];
+    for (let i = 0, value = 1; i < 255; i++) {
+      exponents.push(value);
+      logarithms[value] = i;
+      value = (value * 2) ^ (value >= 128 ? 0x11d : 0);
+    }
+    cachedGF256LookupTables = {exponents, logarithms};
+  }
   return cachedGF256LookupTables;
 }
 
-// Generator polynomials up to degree 30 (JIS X 0510:2004 Appendix A).
-export function getGF256GeneratorPolynomials(): QRCodePolynomial[] {
-  cachedGF256GeneratorPolynomials ??= createGF256GeneratorPolynomials(getGF256LookupTables());
-  return cachedGF256GeneratorPolynomials;
-}
-
-function createGF256LookupTables(): GF256LookupTables {
-  const exponents: QRCodeCodewords = [];
-  const logarithms: QRCodeCodewords = [-1];
-  for (let i = 0, value = 1; i < 255; i++) {
-    exponents.push(value);
-    logarithms[value] = i;
-    value = (value * 2) ^ (value >= 128 ? 0x11d : 0);
-  }
-  return {exponents, logarithms};
-}
-
-function createGF256GeneratorPolynomials({
-  exponents,
-  logarithms,
-}: GF256LookupTables): QRCodePolynomial[] {
-  const polynomials: QRCodePolynomial[] = [[]];
-  for (let i = 0; i < 30; i++) {
-    const previousPolynomial = polynomials[i]!;
+// Generator polynomial of the given degree (JIS X 0510:2004 Appendix A), as logarithms.
+export function getGF256GeneratorPolynomial(degree: number): QRCodePolynomial {
+  const {exponents, logarithms} = getGF256LookupTables();
+  for (let i = generatorPolynomials.length - 1; i < degree; i++) {
+    const previousPolynomial = generatorPolynomials[i]!;
     const polynomial: QRCodePolynomial = [];
     for (let j = 0; j <= i; j++) {
       const a = j < i ? exponents[previousPolynomial[j]!]! : 0;
       const b = exponents[(i + (previousPolynomial[j - 1] || 0)) % 255]!;
       polynomial.push(logarithms[a ^ b]!);
     }
-    polynomials.push(polynomial);
+    generatorPolynomials.push(polynomial);
   }
-  return polynomials;
+  return generatorPolynomials[degree]!;
+}
+
+// Generator polynomials up to degree 30.
+export function getGF256GeneratorPolynomials(): QRCodePolynomial[] {
+  getGF256GeneratorPolynomial(30);
+  return generatorPolynomials;
 }

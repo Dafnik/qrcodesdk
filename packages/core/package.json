@@ -53,7 +53,12 @@
   "exports": {
     ".": "./dist/index.mjs",
     "./drawing": "./dist/drawing/index.mjs",
+    "./error": "./dist/error.mjs",
+    "./internal": "./dist/internal.mjs",
+    "./matrix": "./dist/matrix.mjs",
     "./payload": "./dist/payload.mjs",
+    "./svg": "./dist/svg.mjs",
+    "./text": "./dist/text.mjs",
     "./package.json": "./package.json"
   },
   "files": [

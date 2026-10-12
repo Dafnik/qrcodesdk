@@ -23,7 +23,6 @@ const target: QRCodeStyledDrawingTarget = {
   moveTo() {},
   lineTo() {},
   arc() {},
-  cubicTo() {},
   closePath() {},
   endPath() {},
   endLayer() {},

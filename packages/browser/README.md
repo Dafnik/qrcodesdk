@@ -49,6 +49,10 @@ yarn add @qrcodesdk/core @qrcodesdk/browser
 
 </details>
 
+The renderers are also available from `@qrcodesdk/browser/canvas`,
+`@qrcodesdk/browser/image`, and `@qrcodesdk/browser/svg`. Use these entrypoints to
+load only the required output code when importing directly without an application bundler.
+
 ## Choose an output
 
 | Need                            | Renderer                      | Return value        |

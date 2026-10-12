@@ -1,20 +1,14 @@
-import {cancel, isCancel, select, text} from '@clack/prompts';
-import {Command, CommanderError} from 'commander';
 import {writeFile as writeFileDefault} from 'node:fs/promises';
 import process from 'node:process';
-import {styleText} from 'node:util';
+import {parseArgs, styleText} from 'node:util';
 
-import {
-  type QRCodeErrorCorrectionLevel,
-  type QRCodeMask,
-  type QRCodeMatrixOptions,
-  QRCodeSVGRenderer,
-  QRCodeTextRenderer,
-  type QRCodeVersion,
-  type QRCodeVisualStyle,
-  qrcode,
+import type {
+  QRCodeErrorCorrectionLevel,
+  QRCodeMask,
+  QRCodeMatrixOptions,
+  QRCodeVersion,
+  QRCodeVisualStyle,
 } from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 declare const __QRCODESDK_CLI_VERSION__: string;
 
@@ -87,72 +81,116 @@ const errorCorrectionLevels = ['L', 'M', 'Q', 'H'] as const;
 const layouts = ['compact', 'full'] as const;
 const ansiModes = ['off', 'blocks', 'background'] as const;
 
+const stringOptions = [
+  ['payload', 'value', 'QR code payload, equivalent to positional [payload]'],
+  ['format', 'format', 'Output format. Inferred from `.svg` or `.png` output paths'],
+  ['output', 'path', 'Required output path for SVG and PNG'],
+  ['mode', 'mode', 'QR code mode: numeric, alphanumeric, or octet'],
+  ['error-correction', 'level', 'Error correction level: L, M, Q, or H'],
+  ['version', 'version', 'Pin a QR code version from 1 to 40'],
+  ['mask', 'mask', 'Pin a QR code mask from 0 to 7'],
+  ['module-size', 'size', 'Module size as a positive integer'],
+  ['quiet-zone', 'size', 'Quiet zone as a non-negative integer'],
+  ['layout', 'layout', 'Text layout: compact or full'],
+  ['ansi', 'mode', 'ANSI mode: off, blocks, or background'],
+  ['foreground', 'hex', 'Foreground color as #rrggbb or #rrggbbaa'],
+  ['background', 'hex', 'Background color as #rrggbb or #rrggbbaa'],
+  ['aria-label', 'text', 'SVG aria-label'],
+  ['title', 'text', 'SVG title'],
+] as const;
+
 export async function runCli(argv: readonly string[], runtime: CliRuntime = {}): Promise<number> {
   const stdout = runtime.stdout ?? process.stdout;
   const stderr = runtime.stderr ?? process.stderr;
-  const command = createCommand();
-
   try {
-    await command.parseAsync(['node', 'qrc', ...argv], {from: 'node'});
+    const {values, positionals, printVersion} = parseCommandLine(argv);
+    if (values['help']) {
+      stdout.write(helpText());
+      return 0;
+    }
+    if (printVersion) {
+      stdout.write(`${__QRCODESDK_CLI_VERSION__}\n`);
+      return 0;
+    }
+    if (positionals.length > 1) throw new CliError('Expected at most one payload argument.');
+    const rawOptions = Object.fromEntries(
+      Object.entries(values).map(([name, value]) => [
+        name.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase()),
+        value,
+      ]),
+    ) as RawCliOptions;
+    const options = await resolveCliOptions(positionals[0], rawOptions, runtime);
+    await render(options, runtime, stdout, stderr);
     return 0;
   } catch (error) {
-    if (error instanceof CliError) {
-      stderr.write(`${styleText('red', 'Error:')} ${error.message}\n`);
-      return 1;
-    }
-
-    if (error instanceof CommanderError) {
-      return error.exitCode;
-    }
-
     const message = error instanceof Error ? error.message : String(error);
     stderr.write(`${styleText('red', 'Error:')} ${message}\n`);
     return 1;
   }
+}
 
-  function createCommand(): Command {
-    const program = new Command();
-
-    program
-      .name('qrc')
-      .showSuggestionAfterError(true)
-      .showHelpAfterError(true)
-      .usage('[payload] [options]')
-      .summary('generate QR codes from a terminal.')
-      .description(
-        '@qrcodesdk/cli generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG and PNG files.',
-      )
-      .version(__QRCODESDK_CLI_VERSION__, '-V', 'Print the installed CLI package version')
-      .argument('[payload]', 'Positional QR code payload')
-      .option('--payload <value>', 'QR code payload, equivalent to positional [payload]')
-      .option('--format <format>', 'Output format. Inferred from `.svg` or `.png` output paths')
-      .option('-o, --output <path>', 'Required output path for SVG and PNG')
-      .option('--mode <mode>', 'QR code mode: numeric, alphanumeric, or octet')
-      .option('--error-correction <level>', 'Error correction level: L, M, Q, or H')
-      .option('--version <version>', 'Pin a QR code version from 1 to 40')
-      .option('--mask <mask>', 'Pin a QR code mask from 0 to 7')
-      .option('--eci', 'Emit UTF-8 ECI assignment 26 for octet segments')
-      .option('--no-eci', 'Do not emit UTF-8 ECI assignment 26')
-      .option('--module-size <size>', 'Module size as a positive integer')
-      .option('--quiet-zone <size>', 'Quiet zone as a non-negative integer')
-      .option('--layout <layout>', 'Text layout: compact or full')
-      .option('--ansi <mode>', 'ANSI mode: off, blocks, or background')
-      .option('--foreground <hex>', 'Foreground color as #rrggbb or #rrggbbaa')
-      .option('--background <hex>', 'Background color as #rrggbb or #rrggbbaa')
-      .option('--aria-label <text>', 'SVG aria-label')
-      .option('--title <text>', 'SVG title')
-      .configureOutput({
-        writeErr: (chunk) => stderr.write(chunk),
-        writeOut: (chunk) => stdout.write(chunk),
-      })
-      .exitOverride()
-      .action(async (positionalPayload: string | undefined, rawOptions: RawCliOptions) => {
-        const options = await resolveCliOptions(positionalPayload, rawOptions, runtime);
-        await render(options, runtime, stdout, stderr);
-      });
-
-    return program;
+function parseCommandLine(argv: readonly string[]) {
+  // parseArgs requires option-like string values to use the --option=value form.
+  // Preserve dash-prefixed values accepted by the CLI, including payloads and negative numbers.
+  const args: string[] = [];
+  let printVersion = false;
+  for (let index = 0; index < argv.length; index++) {
+    const flag = argv[index]!;
+    if (flag === '--') {
+      args.push(...argv.slice(index));
+      break;
+    }
+    // -V has no long form because --version pins the QR code version.
+    if (flag === '-V') {
+      printVersion = true;
+      continue;
+    }
+    const value = argv[index + 1];
+    if (
+      (flag === '-o' || stringOptions.some(([name]) => flag === `--${name}`)) &&
+      value !== undefined &&
+      value.startsWith('-')
+    ) {
+      args.push(`${flag === '-o' ? '--output' : flag}=${value}`);
+      index++;
+    } else {
+      args.push(flag);
+    }
   }
+  try {
+    const parsed = parseArgs({
+      args,
+      allowPositionals: true,
+      allowNegative: true,
+      options: {
+        ...Object.fromEntries(stringOptions.map(([name]) => [name, {type: 'string' as const}])),
+        output: {type: 'string', short: 'o'},
+        eci: {type: 'boolean'},
+        help: {type: 'boolean', short: 'h'},
+      },
+    });
+    return {...parsed, printVersion};
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('argument missing')) {
+      const option = stringOptions.find(([name]) => error.message.includes(`--${name}`));
+      if (option) throw new CliError(`option '--${option[0]} <${option[1]}>' argument missing`);
+    }
+    throw error;
+  }
+}
+
+function helpText(): string {
+  const options = stringOptions.map(([name, argument, description]) => [
+    `${name === 'output' ? '-o, ' : '    '}--${name} <${argument}>`,
+    description,
+  ]);
+  options.push(
+    ['    --eci', 'Emit UTF-8 ECI assignment 26 for octet segments'],
+    ['    --no-eci', 'Do not emit UTF-8 ECI assignment 26'],
+    ['-V', 'Print the installed CLI package version'],
+    ['-h, --help', 'Show this help'],
+  );
+  return `Usage: qrc [payload] [options]\n\nGenerate QR codes as terminal text, SVG files, or PNG files.\n\nOptions:\n${options.map(([flag, description]) => `  ${flag!.padEnd(30)} ${description}`).join('\n')}\n`;
 }
 
 async function resolveCliOptions(
@@ -160,7 +198,7 @@ async function resolveCliOptions(
   rawOptions: RawCliOptions,
   runtime: CliRuntime,
 ): Promise<ResolvedCliOptions> {
-  const prompt = runtime.prompts ?? defaultPromptAdapter;
+  const prompt = runtime.prompts;
   const interactive = runtime.interactive ?? Boolean(process.stdin.isTTY && process.stdout.isTTY);
   const payload = await resolvePayload(positionalPayload, rawOptions.payload, interactive, prompt);
   const format = await resolveFormat(rawOptions.format, rawOptions.output, interactive, prompt);
@@ -201,7 +239,7 @@ async function resolvePayload(
   positionalPayload: string | undefined,
   optionPayload: string | undefined,
   interactive: boolean,
-  prompt: PromptAdapter,
+  prompt: PromptAdapter | undefined,
 ): Promise<string> {
   if (
     positionalPayload !== undefined &&
@@ -220,18 +258,19 @@ async function resolvePayload(
     throw new CliError('Missing QR payload. Pass [payload] or --payload.');
   }
 
-  const value = await prompt.text({
+  const adapter = prompt ?? (await import('./prompts'));
+  const value = await adapter.text({
     message: 'QR payload',
     placeholder: 'https://qrcodesdk.dev',
   });
-  return requiredPromptText(value, prompt, 'Missing QR payload. Pass [payload] or --payload.');
+  return requiredPromptText(value, adapter, 'Missing QR payload. Pass [payload] or --payload.');
 }
 
 async function resolveFormat(
   optionFormat: string | undefined,
   output: string | undefined,
   interactive: boolean,
-  prompt: PromptAdapter,
+  prompt: PromptAdapter | undefined,
 ): Promise<OutputFormat> {
   if (optionFormat !== undefined) return requiredEnum(optionFormat, outputFormats, 'format');
   if (output === undefined) return 'text';
@@ -245,7 +284,8 @@ async function resolveFormat(
     );
   }
 
-  const value = await prompt.select({
+  const adapter = prompt ?? (await import('./prompts'));
+  const value = await adapter.select({
     message: 'Output format',
     options: [
       {value: 'svg', label: 'SVG file'},
@@ -253,14 +293,14 @@ async function resolveFormat(
     ],
   });
 
-  return requiredEnum(promptString(value, prompt), fileOutputFormats, 'format');
+  return requiredEnum(promptString(value, adapter), fileOutputFormats, 'format');
 }
 
 async function resolveOutput(
   format: OutputFormat,
   output: string | undefined,
   interactive: boolean,
-  prompt: PromptAdapter,
+  prompt: PromptAdapter | undefined,
 ): Promise<string | undefined> {
   if (format === 'text') {
     if (output !== undefined) {
@@ -276,12 +316,13 @@ async function resolveOutput(
     throw new CliError(`Missing --output for ${format} output.`);
   }
 
-  const value = await prompt.text({
+  const adapter = prompt ?? (await import('./prompts'));
+  const value = await adapter.text({
     message: `${format.toUpperCase()} output path`,
     placeholder: `qrcode.${format}`,
   });
 
-  return requiredPromptText(value, prompt, `Missing --output for ${format} output.`);
+  return requiredPromptText(value, adapter, `Missing --output for ${format} output.`);
 }
 
 function requiredPromptText(
@@ -325,6 +366,7 @@ async function render(
   stdout: WritableTarget,
   stderr: WritableTarget,
 ): Promise<void> {
+  const {qrcode} = await import('@qrcodesdk/core/matrix');
   const builder = qrcode(options.payload).options({
     mode: options.mode,
     errorCorrectionLevel: options.errorCorrectionLevel,
@@ -334,6 +376,7 @@ async function render(
   });
 
   if (options.format === 'text') {
+    const {QRCodeTextRenderer} = await import('@qrcodesdk/core/text');
     const textStyle = {
       moduleSize: options.style.moduleSize,
       quietZone: options.style.quietZone,
@@ -367,6 +410,7 @@ async function render(
   const writeFile = runtime.writeFile ?? writeFileDefault;
 
   if (options.format === 'svg') {
+    const {QRCodeSVGRenderer} = await import('@qrcodesdk/core/svg');
     const svg = builder.render(
       QRCodeSVGRenderer({
         style: options.style,
@@ -379,6 +423,7 @@ async function render(
     return;
   }
 
+  const {QRCodePNGRenderer} = await import('@qrcodesdk/node');
   const png = builder.render(QRCodePNGRenderer({style: options.style}));
   await writeFile(requiredOutput(options), png);
   stderr.write(`${styleText('green', 'Wrote')} ${requiredOutput(options)}\n`);
@@ -467,10 +512,3 @@ function optionalHexColor(value: string | undefined, name: string): `#${string}`
 
   return value as `#${string}`;
 }
-
-const defaultPromptAdapter: PromptAdapter = {
-  text,
-  select,
-  isCancel,
-  cancel,
-};

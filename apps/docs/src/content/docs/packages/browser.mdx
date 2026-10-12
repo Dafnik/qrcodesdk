@@ -25,6 +25,10 @@ import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
 <PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/browser']} mode="add" />
 
+The renderers are also available from `@qrcodesdk/browser/canvas`,
+`@qrcodesdk/browser/image`, and `@qrcodesdk/browser/svg`. Use these entrypoints to
+load only the required output code when importing directly without an application bundler.
+
 ## Choose an output
 
 | Need                            | Renderer                      | Return value        |

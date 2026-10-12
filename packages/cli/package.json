@@ -6,7 +6,9 @@
     "node": ">=22.12.0"
   },
   "description": "@qrcodesdk/cli provides the qrc command for generating QR codes as terminal text, SVG files, or PNG files.",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/bin.mjs"
+  ],
   "private": false,
   "license": "MIT",
   "author": {
@@ -71,10 +73,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@clack/prompts": "1.8.1",
     "@qrcodesdk/core": "workspace:0.0.2",
-    "@qrcodesdk/node": "workspace:0.0.2",
-    "commander": "15.0.0"
+    "@qrcodesdk/node": "workspace:0.0.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

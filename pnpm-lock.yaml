@@ -690,18 +690,12 @@ importers:
 
   packages/cli:
     dependencies:
-      '@clack/prompts':
-        specifier: 1.8.1
-        version: 1.8.1
       '@qrcodesdk/core':
         specifier: workspace:0.0.2
         version: link:../core
       '@qrcodesdk/node':
         specifier: workspace:0.0.2
         version: link:../node
-      commander:
-        specifier: 15.0.0
-        version: 15.0.0
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -814,10 +808,6 @@ importers:
         version: 8.71.1(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
 
   packages/node:
-    dependencies:
-      pngjs:
-        specifier: 7.0.0
-        version: 7.0.0
     devDependencies:
       '@qrcodesdk/core':
         specifier: workspace:*
@@ -834,12 +824,12 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 25.9.5
-      '@types/pngjs':
-        specifier: 6.0.5
-        version: 6.0.5
       jsqr:
         specifier: 'catalog:'
         version: 1.4.0
+      sharp:
+        specifier: 'catalog:'
+        version: 0.35.5(@types/node@25.9.5)
       tsdown:
         specifier: 'catalog:'
         version: 0.23.0(@volar/typescript@2.4.28(typescript@7.0.2))(oxc-resolver@11.24.2)(typescript@7.0.2)
@@ -5171,9 +5161,6 @@ packages:
 
   '@types/picomatch@4.0.3':
     resolution: {integrity: sha512-iG0T6+nYJ9FAPmx9SsUlnwcq1ZVRuCXcVEvWnntoPlrOpwtSTKNDC9uVAxTsC3PUvJ+99n4RpAcNgBbHX3JSnQ==}
-
-  '@types/pngjs@6.0.5':
-    resolution: {integrity: sha512-0k5eKfrA83JOZPppLtS2C7OUtyNAl2wKNxfyYl9Q5g9lPkgBl/9hNyAu6HuEH2J4XmIv2znEpkDd0SaZVxW6iQ==}
 
   '@types/qrcode@1.5.6':
     resolution: {integrity: sha512-te7NQcV2BOvdj2b1hCAHzAoMNuj65kNBMz0KBaxM6c3VGBOhU0dURQKOtH8CFNI/dsKkwlv32p26qYQTWoB5bw==}
@@ -15087,10 +15074,6 @@ snapshots:
   '@types/parse-json@4.0.2': {}
 
   '@types/picomatch@4.0.3': {}
-
-  '@types/pngjs@6.0.5':
-    dependencies:
-      '@types/node': 25.9.5
 
   '@types/qrcode@1.5.6':
     dependencies:

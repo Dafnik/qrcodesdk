@@ -1,9 +1,8 @@
 import {QRCodeError} from './error';
+import {assertKnownKeys, throwInvalid} from './options';
 import type {
   QRCodeColor,
-  QRCodeFinderShape,
   QRCodeMatrix,
-  QRCodeModuleShape,
   QRCodeResolvedVisualStyle,
   QRCodeTextStyle,
   QRCodeVisualStyle,
@@ -17,13 +16,9 @@ const MODULE_SHAPES = [
   'extra-rounded',
   'diagonal',
   'diagonal-rounded',
-] as const satisfies readonly QRCodeModuleShape[];
-const FINDER_SHAPES = [
-  'square',
-  'rounded',
-  'extra-rounded',
-  'circle',
-] as const satisfies readonly QRCodeFinderShape[];
+] as const;
+const FINDER_SHAPES = ['square', 'rounded', 'extra-rounded', 'circle'] as const;
+const SHAPE_KEYS = ['shape', 'color'];
 
 export type QRCodeRGBA = readonly [red: number, green: number, blue: number, alpha: number];
 
@@ -36,55 +31,69 @@ export function resolveQRCodeVisualStyle(style?: QRCodeVisualStyle): QRCodeResol
     'modules',
     'finder',
   ]);
-  assertKnownKeys(style?.modules, 'style.modules', ['shape', 'color']);
-  assertKnownKeys(style?.finder, 'style.finder', ['outer', 'center']);
-  assertKnownKeys(style?.finder?.outer, 'style.finder.outer', ['shape', 'color']);
-  assertKnownKeys(style?.finder?.center, 'style.finder.center', ['shape', 'color']);
+  const finder = style?.finder;
+  assertKnownKeys(style?.modules, 'style.modules', SHAPE_KEYS);
+  assertKnownKeys(finder, 'style.finder', ['outer', 'center']);
+  assertKnownKeys(finder?.outer, 'style.finder.outer', SHAPE_KEYS);
+  assertKnownKeys(finder?.center, 'style.finder.center', SHAPE_KEYS);
 
-  const moduleSize = style?.moduleSize ?? 5;
-  const quietZone = style?.quietZone ?? 4;
+  const {moduleSize, quietZone} = resolveQRCodeTextStyle(style, false);
   const foreground = style?.foreground ?? '#000000';
   const background = style?.background ?? '#ffffff';
-  const moduleShape = style?.modules?.shape ?? 'square';
-  const finderOuterShape = style?.finder?.outer?.shape ?? 'square';
-  const finderCenterShape = style?.finder?.center?.shape ?? 'square';
-
-  validatePositiveInteger('style.moduleSize', moduleSize);
-  validateNonNegativeInteger('style.quietZone', quietZone);
   validateColor('style.foreground', foreground);
   validateColor('style.background', background);
-  validateColor('style.modules.color', style?.modules?.color ?? foreground);
-  validateColor('style.finder.outer.color', style?.finder?.outer?.color ?? foreground);
-  validateColor('style.finder.center.color', style?.finder?.center?.color ?? foreground);
-  validateEnum('style.modules.shape', moduleShape, MODULE_SHAPES);
-  validateEnum('style.finder.outer.shape', finderOuterShape, FINDER_SHAPES);
-  validateEnum('style.finder.center.shape', finderCenterShape, FINDER_SHAPES);
+
+  const parts = (
+    [
+      ['modules', style?.modules, MODULE_SHAPES],
+      ['finder.outer', finder?.outer, FINDER_SHAPES],
+      ['finder.center', finder?.center, FINDER_SHAPES],
+    ] as const
+  ).map(([path, part, shapes]) => {
+    const color = part?.color ?? foreground;
+    validateColor(`style.${path}.color`, color);
+    return {path, shape: part?.shape ?? 'square', color, shapes};
+  });
+  for (const {path, shape, shapes} of parts) {
+    if (!(shapes as readonly unknown[]).includes(shape)) {
+      throw new QRCodeError(
+        'INVALID_OPTIONS',
+        `QR code style.${path}.shape must be one of ${shapes.join(', ')}, received ${String(shape)}`,
+        {details: {field: `style.${path}.shape`, value: shape, supportedValues: shapes}},
+      );
+    }
+  }
+  const [modules, outer, center] = parts.map(({shape, color}) => ({shape, color}));
 
   return {
     moduleSize,
     quietZone,
     foreground,
     background,
-    modules: {shape: moduleShape, color: style?.modules?.color ?? foreground},
-    finder: {
-      outer: {shape: finderOuterShape, color: style?.finder?.outer?.color ?? foreground},
-      center: {shape: finderCenterShape, color: style?.finder?.center?.color ?? foreground},
-    },
-  };
+    modules,
+    finder: {outer, center},
+  } as QRCodeResolvedVisualStyle;
 }
 
-export function resolveQRCodeTextStyle(style?: QRCodeTextStyle): Required<QRCodeTextStyle> {
-  assertKnownKeys(style, 'style', ['moduleSize', 'quietZone']);
+export function resolveQRCodeTextStyle(
+  style?: QRCodeTextStyle,
+  validateKeys = true,
+): Required<QRCodeTextStyle> {
+  if (validateKeys) assertKnownKeys(style, 'style', ['moduleSize', 'quietZone']);
   const moduleSize = style?.moduleSize ?? 5;
   const quietZone = style?.quietZone ?? 4;
-  validatePositiveInteger('style.moduleSize', moduleSize);
-  validateNonNegativeInteger('style.quietZone', quietZone);
+  if (typeof moduleSize !== 'number' || !Number.isSafeInteger(moduleSize) || moduleSize <= 0) {
+    throwInvalid('style.moduleSize', 'a positive safe integer', moduleSize);
+  }
+  if (typeof quietZone !== 'number' || !Number.isSafeInteger(quietZone) || quietZone < 0) {
+    throwInvalid('style.quietZone', 'a non-negative safe integer', quietZone);
+  }
   return {moduleSize, quietZone};
 }
 
 export function calculateQRCodeOutputSize(
   matrix: QRCodeMatrix,
-  style: Pick<Required<QRCodeTextStyle>, 'moduleSize' | 'quietZone'>,
+  style: Required<QRCodeTextStyle>,
 ): number {
   const outputSize = style.moduleSize * (matrix.length + 2 * style.quietZone);
   if (!Number.isSafeInteger(outputSize) || outputSize <= 0) {
@@ -98,72 +107,12 @@ export function calculateQRCodeOutputSize(
 }
 
 export function parseQRCodeColor(color: QRCodeColor): QRCodeRGBA {
-  const hexadecimal = color.slice(1);
-  return [
-    Number.parseInt(hexadecimal.slice(0, 2), 16),
-    Number.parseInt(hexadecimal.slice(2, 4), 16),
-    Number.parseInt(hexadecimal.slice(4, 6), 16),
-    hexadecimal.length === 8 ? Number.parseInt(hexadecimal.slice(6, 8), 16) : 255,
-  ];
+  const value = (index: number) => Number.parseInt(color.slice(index, index + 2), 16);
+  return [value(1), value(3), value(5), color.length === 9 ? value(7) : 255];
 }
 
-export function assertKnownKeys(value: unknown, path: string, knownKeys: readonly string[]): void {
-  if (value === undefined) return;
-  if (!isPlainObject(value)) {
-    throwInvalid(path, 'a plain object', value);
-  }
-  const known = new Set(knownKeys);
-  const unknown = Object.keys(value).find((key) => !known.has(key));
-  if (unknown !== undefined) {
-    const field = `${path}.${unknown}`;
-    throw new QRCodeError('INVALID_OPTIONS', `Unknown QR code option ${field}`, {
-      details: {field, value: (value as Record<string, unknown>)[unknown]},
-    });
-  }
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  if (typeof value !== 'object' || value === null) return false;
-  const prototype = Object.getPrototypeOf(value);
-  return prototype === Object.prototype || prototype === null;
-}
-
-function validatePositiveInteger(field: string, value: unknown): asserts value is number {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) {
-    throwInvalid(field, 'a positive safe integer', value);
-  }
-}
-
-function validateNonNegativeInteger(field: string, value: unknown): asserts value is number {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) {
-    throwInvalid(field, 'a non-negative safe integer', value);
-  }
-}
-
-function validateColor(field: string, value: unknown): asserts value is QRCodeColor {
+export function validateColor(field: string, value: unknown): asserts value is QRCodeColor {
   if (typeof value !== 'string' || !COLOR_PATTERN.test(value)) {
     throwInvalid(field, 'an RGB or RGBA hex color', value);
   }
-}
-
-function validateEnum<T extends string>(
-  field: string,
-  value: unknown,
-  values: readonly T[],
-): asserts value is T {
-  if (!values.some((candidate) => candidate === value)) {
-    throw new QRCodeError(
-      'INVALID_OPTIONS',
-      `QR code ${field} must be one of ${values.join(', ')}, received ${String(value)}`,
-      {details: {field, value, supportedValues: values}},
-    );
-  }
-}
-
-function throwInvalid(field: string, expected: string, value: unknown): never {
-  throw new QRCodeError(
-    'INVALID_OPTIONS',
-    `QR code ${field} must be ${expected}, received ${String(value)}`,
-    {details: {field, value}},
-  );
 }

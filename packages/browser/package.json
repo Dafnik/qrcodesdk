@@ -49,6 +49,9 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
+    "./canvas": "./dist/canvas.mjs",
+    "./image": "./dist/image.mjs",
+    "./svg": "./dist/svg.mjs",
     "./package.json": "./package.json"
   },
   "files": [

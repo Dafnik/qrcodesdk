@@ -19,3 +19,11 @@ roundtrips
 Streamable
 organisation
 IHDR
+ɵassertKnownKeys
+ɵassertOptionalString
+IDAT
+IEND
+PLTE
+truecolor
+libvips
+Colourspace

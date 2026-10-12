@@ -51,7 +51,6 @@ export function mockCanvasRendering(mockApi: MockApi): void {
     return {
       arc: mockApi.fn(),
       beginPath: mockApi.fn(),
-      bezierCurveTo: mockApi.fn(),
       clearRect: mockApi.fn(),
       closePath: mockApi.fn(),
       drawImage: mockApi.fn(),
@@ -60,11 +59,7 @@ export function mockCanvasRendering(mockApi: MockApi): void {
       fillRect: mockApi.fn(),
       lineTo: mockApi.fn(),
       moveTo: mockApi.fn(),
-      quadraticCurveTo: mockApi.fn(),
-      restore: mockApi.fn(),
-      rotate: mockApi.fn(),
-      save: mockApi.fn(),
-      translate: mockApi.fn(),
+      setTransform: mockApi.fn(),
     } as unknown as CanvasRenderingContext2D;
   }) as HTMLCanvasElement['getContext']);
   mockApi

@@ -63,7 +63,8 @@ describe('public API', () => {
     expectTypeOf<QRCodeTextStyle>().toHaveProperty('moduleSize');
   });
 
-  test('exposes drawing types from the drawing subpath', () => {
+  test('exposes the styler and drawing types from the drawing subpath', () => {
+    expect(drawing.createQRCodeStyler).toBe(createQRCodeStyler);
     expectTypeOf(createQRCodeStyler).returns.toEqualTypeOf<QRCodeStyler>();
     expectTypeOf<QRCodeStyler['draw']>().returns.toEqualTypeOf<QRCodeStyledDrawing>();
     expectTypeOf<QRCodeStyledDrawing['paint']>()

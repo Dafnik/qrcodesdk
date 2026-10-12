@@ -9,21 +9,21 @@ import {
   MODE_ALPHANUMERIC,
   MODE_NUMERIC,
   MODE_OCTET,
-  getModeDefinition,
+  getCharacterCountBits,
+  getPayloadBitLength,
   isAlphanumericPayload,
   isNumericPayload,
   validatePayload,
 } from './mode';
 
-type SegmentMode = QRCodeSupportedModeIndicator;
-
 type OptimizerState = {
-  readonly mode: SegmentMode;
+  readonly mode: QRCodeSupportedModeIndicator;
+  // Characters in the current numeric (mod 3) or alphanumeric (mod 2) group.
   readonly remainder: number;
   readonly bitLength: number;
   readonly segmentCount: number;
   readonly hasUTF8ECI: boolean;
-  readonly previousKey: string | undefined;
+  readonly previousKey: number | undefined;
   readonly startsSegment: boolean;
 };
 
@@ -37,48 +37,89 @@ export function createSingleSegment(
   return encoded === undefined ? undefined : {mode, payload: encoded};
 }
 
+/**
+ * Finds the shortest mixed-mode segmentation with a dynamic program over
+ * (mode, partial character group, UTF-8 ECI emitted) states.
+ */
 export function optimizeSegments(
   payload: QRCodePayload,
   version: QRCodeVersion,
   eci: boolean,
 ): QRCodeEncodedSegment[] {
-  const source = String(payload);
-  if (source.length === 0) return [{mode: MODE_NUMERIC, payload: ''}];
+  const characters = Array.from(String(payload));
+  if (characters.length === 0) return [{mode: MODE_NUMERIC, payload: ''}];
 
-  const characters = Array.from(source);
-  const histories: ReadonlyMap<string, OptimizerState>[] = [];
-  let previousStates: ReadonlyMap<string, OptimizerState> | undefined;
+  const histories: Map<number, OptimizerState>[] = [];
+  let previousStates: Map<number | undefined, OptimizerState | undefined> = new Map([
+    [undefined, undefined],
+  ]);
 
-  for (let index = 0; index < characters.length; index++) {
-    const character = characters[index]!;
-    const nextStates = new Map<string, OptimizerState>();
-
+  for (const character of characters) {
+    const states = new Map<number, OptimizerState>();
     for (const mode of MODE_ORDER) {
-      if (!canEncodeCharacter(mode, character)) continue;
-
-      if (previousStates === undefined) {
-        offerState(
-          nextStates,
-          createStartedState(mode, character, version, eci, undefined, undefined),
-        );
+      if (
+        mode === MODE_NUMERIC
+          ? !isNumericPayload(character)
+          : mode === MODE_ALPHANUMERIC && !isAlphanumericPayload(character)
+      ) {
         continue;
       }
 
       for (const [previousKey, previous] of previousStates) {
-        const candidate =
-          previous.mode === mode
-            ? appendToState(previous, previousKey, character)
-            : createStartedState(mode, character, version, eci, previous, previousKey);
-        offerState(nextStates, candidate);
+        const appending = previous?.mode === mode;
+        const remainder =
+          mode === MODE_OCTET ? 0 : appending ? (previous.remainder + 1) % (4 - mode) : 1;
+        const hasUTF8ECI = !!previous?.hasUTF8ECI || mode === MODE_OCTET;
+        const characterBits =
+          mode === MODE_OCTET
+            ? getUTF8ByteLength(character) * 8
+            : (mode === MODE_NUMERIC ? 4 : 6) - (appending && previous.remainder ? 1 : 0);
+        const candidate: OptimizerState = {
+          mode,
+          remainder,
+          bitLength:
+            (previous?.bitLength ?? 0) +
+            characterBits +
+            (appending
+              ? 0
+              : 4 +
+                getCharacterCountBits(mode, version) +
+                (eci && mode === MODE_OCTET && !previous?.hasUTF8ECI ? ECI_UTF8_BIT_LENGTH : 0)),
+          segmentCount: (previous?.segmentCount ?? 0) + (appending ? 0 : 1),
+          hasUTF8ECI,
+          previousKey,
+          startsSegment: !appending,
+        };
+        const key = mode * 6 + remainder * 2 + +hasUTF8ECI;
+        const current = states.get(key);
+        if (!current || isBetter(candidate, current)) states.set(key, candidate);
       }
     }
-
-    histories.push(nextStates);
-    previousStates = nextStates;
+    histories.push(states);
+    previousStates = states;
   }
 
-  const finalState = bestState(previousStates!);
-  return reconstructSegments(characters, histories, stateKey(finalState));
+  let key: number | undefined;
+  let best: OptimizerState | undefined;
+  for (const [stateKey, state] of previousStates as Map<number, OptimizerState>) {
+    if (!best || isBetter(state, best)) {
+      best = state;
+      key = stateKey;
+    }
+  }
+
+  const result: QRCodeEncodedSegment[] = [];
+  for (let index = characters.length - 1, segmentEnd = characters.length; index >= 0; index--) {
+    const state = histories[index]!.get(key!)!;
+    if (state.startsSegment) {
+      result.unshift(
+        createSingleSegment(state.mode, characters.slice(index, segmentEnd).join(''))!,
+      );
+      segmentEnd = index;
+    }
+    key = state.previousKey;
+  }
+  return result;
 }
 
 export function getSegmentsBitLength(
@@ -87,147 +128,21 @@ export function getSegmentsBitLength(
   eci: boolean,
 ): number {
   let bitLength = eci && segments.some(({mode}) => mode === MODE_OCTET) ? ECI_UTF8_BIT_LENGTH : 0;
-  for (const segment of segments) {
-    const definition = getModeDefinition(segment.mode);
+  for (const {mode, payload} of segments) {
     bitLength +=
-      4 +
-      definition.getCharacterCountBits(version) +
-      definition.getPayloadBitLength(segment.payload.length);
+      4 + getCharacterCountBits(mode, version) + getPayloadBitLength(mode, payload.length);
   }
   return bitLength;
 }
 
-function canEncodeCharacter(mode: SegmentMode, character: string): boolean {
-  if (mode === MODE_NUMERIC) return isNumericPayload(character);
-  if (mode === MODE_ALPHANUMERIC) return isAlphanumericPayload(character);
-  return true;
-}
-
-function createStartedState(
-  mode: SegmentMode,
-  character: string,
-  version: QRCodeVersion,
-  eci: boolean,
-  previous: OptimizerState | undefined,
-  previousKey: string | undefined,
-): OptimizerState {
-  const definition = getModeDefinition(mode);
-  return {
-    mode,
-    remainder: initialRemainder(mode),
-    bitLength:
-      (previous?.bitLength ?? 0) +
-      (eci && mode === MODE_OCTET && previous?.hasUTF8ECI !== true ? ECI_UTF8_BIT_LENGTH : 0) +
-      4 +
-      definition.getCharacterCountBits(version) +
-      getFirstCharacterBitLength(mode, character),
-    segmentCount: (previous?.segmentCount ?? 0) + 1,
-    hasUTF8ECI: previous?.hasUTF8ECI === true || mode === MODE_OCTET,
-    previousKey,
-    startsSegment: true,
-  };
-}
-
-function appendToState(
-  previous: OptimizerState,
-  previousKey: string,
-  character: string,
-): OptimizerState {
-  return {
-    mode: previous.mode,
-    remainder: nextRemainder(previous.mode, previous.remainder),
-    bitLength:
-      previous.bitLength +
-      getAppendedCharacterBitLength(previous.mode, previous.remainder, character),
-    segmentCount: previous.segmentCount,
-    hasUTF8ECI: previous.hasUTF8ECI,
-    previousKey,
-    startsSegment: false,
-  };
-}
-
-function offerState(states: Map<string, OptimizerState>, candidate: OptimizerState): void {
-  const key = stateKey(candidate);
-  const current = states.get(key);
-  if (
-    current === undefined ||
+function isBetter(candidate: OptimizerState, current: OptimizerState): boolean {
+  return (
     candidate.bitLength < current.bitLength ||
     (candidate.bitLength === current.bitLength && candidate.segmentCount < current.segmentCount)
-  ) {
-    states.set(key, candidate);
-  }
-}
-
-function bestState(states: ReadonlyMap<string, OptimizerState>): OptimizerState {
-  let result: OptimizerState | undefined;
-  for (const state of states.values()) {
-    if (
-      result === undefined ||
-      state.bitLength < result.bitLength ||
-      (state.bitLength === result.bitLength && state.segmentCount < result.segmentCount)
-    ) {
-      result = state;
-    }
-  }
-  return result!;
-}
-
-function reconstructSegments(
-  characters: readonly string[],
-  histories: readonly ReadonlyMap<string, OptimizerState>[],
-  finalKey: string,
-): QRCodeEncodedSegment[] {
-  const result: QRCodeEncodedSegment[] = [];
-  let key: string | undefined = finalKey;
-  let segmentEnd = characters.length;
-
-  for (let index = characters.length - 1; index >= 0; index--) {
-    const state: OptimizerState = histories[index]!.get(key!)!;
-    if (state.startsSegment) {
-      const text = characters.slice(index, segmentEnd).join('');
-      result.push(createSingleSegment(state.mode, text)!);
-      segmentEnd = index;
-    }
-    key = state.previousKey;
-  }
-
-  return result.reverse();
-}
-
-function stateKey(state: Pick<OptimizerState, 'mode' | 'remainder' | 'hasUTF8ECI'>): string {
-  return `${state.mode}:${state.remainder}:${Number(state.hasUTF8ECI)}`;
-}
-
-function initialRemainder(mode: SegmentMode): number {
-  return mode === MODE_OCTET ? 0 : 1;
-}
-
-function nextRemainder(mode: SegmentMode, remainder: number): number {
-  if (mode === MODE_NUMERIC) return (remainder + 1) % 3;
-  if (mode === MODE_ALPHANUMERIC) return (remainder + 1) % 2;
-  return 0;
-}
-
-function getFirstCharacterBitLength(mode: SegmentMode, character: string): number {
-  if (mode === MODE_NUMERIC) return 4;
-  if (mode === MODE_ALPHANUMERIC) return 6;
-  return getUTF8ByteLength(character) * 8;
-}
-
-function getAppendedCharacterBitLength(
-  mode: SegmentMode,
-  remainder: number,
-  character: string,
-): number {
-  if (mode === MODE_NUMERIC) return remainder === 0 ? 4 : 3;
-  if (mode === MODE_ALPHANUMERIC) return remainder === 0 ? 6 : 5;
-  return getUTF8ByteLength(character) * 8;
+  );
 }
 
 function getUTF8ByteLength(value: string): number {
   const codePoint = value.codePointAt(0)!;
-  if (codePoint <= 0x7f) return 1;
-  if (codePoint <= 0x7ff) return 2;
-  if (codePoint <= 0xffff) return 3;
-  return 4;
+  return codePoint < 0x80 ? 1 : codePoint < 0x800 ? 2 : codePoint < 0x10000 ? 3 : 4;
 }

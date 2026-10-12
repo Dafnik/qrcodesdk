@@ -1,5 +1,5 @@
 import {QR_CODE_STYLING_ROUNDTRIP_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
-import {PNG} from 'pngjs';
+import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
@@ -8,16 +8,14 @@ import {QRCodePNGRenderer} from '../../src';
 import {decodePngQRCode} from './png-helpers';
 
 describe('PNG QR roundtrips', () => {
-  test('decodes output with a small prepared PNG center image', () => {
-    const logo = new PNG({width: 8, height: 4});
-    for (let index = 0; index < logo.data.length; index += 4) {
-      logo.data[index] = 220;
-      logo.data[index + 1] = 38;
-      logo.data[index + 2] = 38;
-      logo.data[index + 3] = 255;
-    }
+  test('decodes output with a small prepared PNG center image', async () => {
+    const logo = await sharp({
+      create: {width: 8, height: 4, channels: 4, background: {r: 220, g: 38, b: 38, alpha: 1}},
+    })
+      .png()
+      .toBuffer();
 
-    expect(
+    await expect(
       decodePngQRCode(
         qrcode('prepared Node image')
           .errorCorrection('H')
@@ -25,14 +23,14 @@ describe('PNG QR roundtrips', () => {
             QRCodePNGRenderer({
               style: {moduleSize: 4, quietZone: 4},
               centerImage: {
-                source: PNG.sync.write(logo),
+                source: logo,
                 size: 0.16,
                 padding: 0.25,
               },
             }),
           ),
       ),
-    ).toBe('prepared Node image');
+    ).resolves.toBe('prepared Node image');
   });
 
   const defaultRenderer = QRCodePNGRenderer({style: {moduleSize: 4, quietZone: 4}});
@@ -42,25 +40,28 @@ describe('PNG QR roundtrips', () => {
       {payload, eci: false},
       {payload, eci: true},
     ]),
-  )('decodes UTF-8 PNG output for $payload with ECI $eci', ({payload, eci}) => {
-    expect(decodePngQRCode(qrcode(payload).mode('octet').eci(eci).render(defaultRenderer))).toBe(
-      payload,
-    );
+  )('decodes UTF-8 PNG output for $payload with ECI $eci', async ({payload, eci}) => {
+    await expect(
+      decodePngQRCode(qrcode(payload).mode('octet').eci(eci).render(defaultRenderer)),
+    ).resolves.toBe(payload);
   });
 
-  test.each(QR_CODE_TEST_FIXTURES)('decodes $name PNG output', (fixture) => {
-    expect(decodePngQRCode(qrcode(fixture.payload).options(fixture).render(defaultRenderer))).toBe(
-      fixture.payload,
-    );
+  test.each(QR_CODE_TEST_FIXTURES)('decodes $name PNG output', async (fixture) => {
+    await expect(
+      decodePngQRCode(qrcode(fixture.payload).options(fixture).render(defaultRenderer)),
+    ).resolves.toBe(fixture.payload);
   });
 
-  test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES)('decodes $name PNG styling fixture', (fixture) => {
-    expect(
-      decodePngQRCode(
-        qrcode(fixture.payload)
-          .options(fixture.matrixOptions)
-          .render(QRCodePNGRenderer({style: fixture.styling})),
-      ),
-    ).toBe(fixture.payload);
-  });
+  test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES)(
+    'decodes $name PNG styling fixture',
+    async (fixture) => {
+      await expect(
+        decodePngQRCode(
+          qrcode(fixture.payload)
+            .options(fixture.matrixOptions)
+            .render(QRCodePNGRenderer({style: fixture.styling})),
+        ),
+      ).resolves.toBe(fixture.payload);
+    },
+  );
 });

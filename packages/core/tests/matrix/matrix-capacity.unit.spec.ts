@@ -13,7 +13,7 @@ import {
   MODE_ALPHANUMERIC,
   MODE_NUMERIC,
   MODE_OCTET,
-  getModeDefinition,
+  getCharacterCountBits,
 } from '../../src/matrix/mode';
 import {needsVersionInfo} from '../../src/matrix/needs-version-info';
 import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
@@ -29,15 +29,14 @@ describe('capacity helpers', () => {
   });
 
   test('returns character count bit widths by mode and version group', () => {
-    expect(getModeDefinition(MODE_NUMERIC).getCharacterCountBits(1)).toBe(10);
-    expect(getModeDefinition(MODE_NUMERIC).getCharacterCountBits(10)).toBe(12);
-    expect(getModeDefinition(MODE_NUMERIC).getCharacterCountBits(27)).toBe(14);
-    expect(getModeDefinition(MODE_ALPHANUMERIC).getCharacterCountBits(1)).toBe(9);
-    expect(getModeDefinition(MODE_ALPHANUMERIC).getCharacterCountBits(10)).toBe(11);
-    expect(getModeDefinition(MODE_ALPHANUMERIC).getCharacterCountBits(27)).toBe(13);
-    expect(getModeDefinition(MODE_OCTET).getCharacterCountBits(1)).toBe(8);
-    expect(getModeDefinition(MODE_OCTET).getCharacterCountBits(10)).toBe(16);
-    expect(() => getModeDefinition(-1)).toThrow('QRCode: Invalid mode');
+    expect(getCharacterCountBits(MODE_NUMERIC, 1)).toBe(10);
+    expect(getCharacterCountBits(MODE_NUMERIC, 10)).toBe(12);
+    expect(getCharacterCountBits(MODE_NUMERIC, 27)).toBe(14);
+    expect(getCharacterCountBits(MODE_ALPHANUMERIC, 1)).toBe(9);
+    expect(getCharacterCountBits(MODE_ALPHANUMERIC, 10)).toBe(11);
+    expect(getCharacterCountBits(MODE_ALPHANUMERIC, 27)).toBe(13);
+    expect(getCharacterCountBits(MODE_OCTET, 1)).toBe(8);
+    expect(getCharacterCountBits(MODE_OCTET, 10)).toBe(16);
   });
 
   test('calculates available codeword and data bits', () => {
@@ -98,10 +97,6 @@ describe('capacity helpers', () => {
     ).toBe(false);
     expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!], false)).toBe(20);
     expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!], true)).toBe(32);
-    // @ts-expect-error Exercise the runtime fallback for an unsupported mode.
-    expect(() => getSegmentsBitLength(1, [{mode: -1, payload: ''}], false)).toThrow(
-      'QRCode: Invalid mode',
-    );
   });
 
   test('charges the ECI header only for enabled octet segments', () => {

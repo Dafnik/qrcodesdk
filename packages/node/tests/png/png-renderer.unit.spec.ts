@@ -1,12 +1,12 @@
-import {PNG} from 'pngjs';
 import {describe, expect, test} from 'vitest';
 
 import {QRCodeError} from '@qrcodesdk/core';
 
 import {QRCodePNGRenderer} from '../../src';
+import {readPng} from './png-helpers';
 
 describe('QRCodePNGRenderer', () => {
-  test('renders production dimensions and RGBA colors', () => {
+  test('renders production dimensions and RGBA colors', async () => {
     const bytes = QRCodePNGRenderer({
       style: {
         moduleSize: 4,
@@ -15,14 +15,14 @@ describe('QRCodePNGRenderer', () => {
         background: '#ffffff80',
       },
     })([[1]]);
-    const png = PNG.sync.read(bytes);
+    const png = await readPng(bytes);
     expect(png.width).toBe(12);
     expect(png.height).toBe(12);
     expect([...png.data.subarray(0, 4)]).toEqual([255, 255, 255, 128]);
   });
 
-  test('renders curved finder and module shapes through the drawing protocol', () => {
-    const png = PNG.sync.read(
+  test('renders curved finder and module shapes through the drawing protocol', async () => {
+    const png = await readPng(
       QRCodePNGRenderer({
         style: {
           moduleSize: 8,

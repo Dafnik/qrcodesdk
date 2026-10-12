@@ -12,7 +12,6 @@ function target(): QRCodeStyledDrawingTarget {
     moveTo: vi.fn(),
     lineTo: vi.fn(),
     arc: vi.fn(),
-    cubicTo: vi.fn(),
     closePath: vi.fn(),
     endPath: vi.fn(),
     endLayer: vi.fn(),

@@ -69,6 +69,89 @@ describe('runCli', () => {
     expect(runtime.stderrText()).toBe('');
   });
 
+  test('has no long form of the CLI version flag', async () => {
+    const runtime = createRuntime();
+
+    await expect(runCli(['--cli-version'], runtime)).resolves.toBe(1);
+
+    expect(runtime.stdoutText()).toBe('');
+    expect(runtime.stderrText()).toContain('--cli-version');
+  });
+
+  test('treats -V after the argument delimiter as the payload', async () => {
+    const runtime = createRuntime();
+    const explicit = createRuntime();
+
+    await expect(runCli(['--', '-V'], runtime)).resolves.toBe(0);
+    await expect(runCli(['--payload=-V'], explicit)).resolves.toBe(0);
+
+    expect(runtime.stdoutText()).toBe(explicit.stdoutText());
+  });
+
+  test.each(['-h', '--help'])('prints help with %s', async (flag) => {
+    const runtime = createRuntime();
+    await expect(runCli([flag], runtime)).resolves.toBe(0);
+    expect(runtime.stdoutText()).toContain('Usage: qrc [payload] [options]');
+    expect(runtime.stdoutText()).toContain('--no-eci');
+    expect(runtime.stdoutText()).toContain('--version <version>');
+    expect(runtime.stderrText()).toBe('');
+    expect(runtime.files).toEqual([]);
+  });
+
+  test.each(['-ocode.svg', '-o'])(
+    'supports equals syntax and output alias %s',
+    async (outputFlag) => {
+      const runtime = createRuntime();
+      const outputArgs = outputFlag === '-o' ? ['-o', 'code.svg'] : [outputFlag];
+      await expect(
+        runCli(['--payload=HELLO', '--format=svg', ...outputArgs], runtime),
+      ).resolves.toBe(0);
+      expect(runtime.files[0]).toMatchObject({path: 'code.svg'});
+      expect(String(runtime.files[0]!.data)).toContain('<svg ');
+    },
+  );
+
+  test('accepts option-like payloads after the argument delimiter', async () => {
+    const runtime = createRuntime();
+    const explicit = createRuntime();
+    await expect(runCli(['--', '--eci'], runtime)).resolves.toBe(0);
+    await expect(runCli(['--payload=--eci'], explicit)).resolves.toBe(0);
+    expect(runtime.stdoutText()).toBe(explicit.stdoutText());
+  });
+
+  test.each(['-hello', '--eci', '--'])(
+    'accepts a separately supplied dash-prefixed payload %s',
+    async (payload) => {
+      const runtime = createRuntime();
+      const explicit = createRuntime();
+      await expect(runCli(['--payload', payload], runtime)).resolves.toBe(0);
+      await expect(runCli([`--payload=${payload}`], explicit)).resolves.toBe(0);
+      expect(runtime.stdoutText()).toBe(explicit.stdoutText());
+    },
+  );
+
+  test.each([
+    ['HELLO', '--unknown'],
+    ['HELLO', 'WORLD'],
+    ['--', '--version', '-1'],
+    ['HELLO', '--eci=true'],
+  ])('rejects invalid argument combinations %j', async (...argv) => {
+    const runtime = createRuntime();
+    await expect(runCli(argv, runtime)).resolves.toBe(1);
+    expect(runtime.stdoutText()).toBe('');
+    expect(runtime.stderrText()).not.toBe('');
+    expect(runtime.files).toEqual([]);
+  });
+
+  test.each([true, false])('uses the last ECI switch when enabled=%s', async (enabled) => {
+    const runtime = createRuntime();
+    const explicit = createRuntime();
+    const switches = enabled ? ['--no-eci', '--eci'] : ['--eci', '--no-eci'];
+    await expect(runCli(['Grüße', ...switches], runtime)).resolves.toBe(0);
+    await expect(runCli(['Grüße', enabled ? '--eci' : '--no-eci'], explicit)).resolves.toBe(0);
+    expect(runtime.stdoutText()).toBe(explicit.stdoutText());
+  });
+
   test('prints terminal text to stdout by default', async () => {
     const runtime = createRuntime();
 

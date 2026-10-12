@@ -17,7 +17,7 @@ import {type QRCodeBaseProps, withoutManagedContentAttributes} from './types';
 
 export type QRCodeCanvasProps = QRCodeBaseProps<QRCodeCanvasOptions>;
 
-export const QRCodeCanvas = defineComponent({
+export const QRCodeCanvas = /* @__PURE__ */ defineComponent({
   name: 'QRCodeCanvas',
   inheritAttrs: false,
   props: {

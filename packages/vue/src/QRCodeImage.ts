@@ -25,7 +25,7 @@ import {
 
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
 
-export const QRCodeImage = defineComponent({
+export const QRCodeImage = /* @__PURE__ */ defineComponent({
   name: 'QRCodeImage',
   inheritAttrs: false,
   props: {
