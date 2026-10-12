@@ -19,14 +19,27 @@ globalThis.console.log(`Testing the installed @qrcodesdk/browser package in ${br
 
 const moduleDirectories = [
   {
+    packageName: '@qrcodesdk/core',
     pathnamePrefix: '/core/',
     directory: path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'core', 'dist'),
   },
   {
+    packageName: '@qrcodesdk/browser',
     pathnamePrefix: '/browser/',
     directory: path.join(consumerDirectory, 'node_modules', '@qrcodesdk', 'browser', 'dist'),
   },
 ];
+const imports = {};
+for (const {packageName, pathnamePrefix, directory} of moduleDirectories) {
+  const packageJson = JSON.parse(
+    await readFile(path.join(directory, '..', 'package.json'), 'utf8'),
+  );
+  for (const [subpath, target] of Object.entries(packageJson.exports)) {
+    if (!target.startsWith('./dist/') || !target.endsWith('.mjs')) continue;
+    const specifier = packageName + (subpath === '.' ? '' : subpath.slice(1));
+    imports[specifier] = pathnamePrefix + target.slice('./dist/'.length);
+  }
+}
 logSuccess('installed Core and Browser ESM bundles are readable');
 
 const browser = await browserType.launch({headless: true});
@@ -44,12 +57,7 @@ try {
           <html>
             <head>
               <script type="importmap">
-                {
-                  "imports": {
-                    "@qrcodesdk/core": "/core/index.mjs",
-                    "@qrcodesdk/browser": "/browser/index.mjs"
-                  }
-                }
+                ${JSON.stringify({imports})}
               </script>
             </head>
             <body></body>
