@@ -11,37 +11,36 @@ import {splitOptions} from './split-options';
 
 export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
 
-export const QRCodeImage = forwardRef<QRCodeDownloadHandle, QRCodeImageProps>(function QRCodeImage(
-  {payload, options, ...wrapperProps},
-  ref,
-) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [matrixOptions, rendererOptions] = useMemo(() => splitOptions(options), [options]);
-  const imageRenderer = useMemo(() => QRCodeImageRenderer(rendererOptions), [rendererOptions]);
+export const QRCodeImage = /* @__PURE__ */ forwardRef<QRCodeDownloadHandle, QRCodeImageProps>(
+  function QRCodeImage({payload, options, ...wrapperProps}, ref) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [matrixOptions, rendererOptions] = useMemo(() => splitOptions(options), [options]);
+    const imageRenderer = useMemo(() => QRCodeImageRenderer(rendererOptions), [rendererOptions]);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    useEffect(() => {
+      const container = containerRef.current;
+      if (!container) return;
 
-    container.replaceChildren(qrcode(payload).options(matrixOptions).render(imageRenderer));
-  }, [payload, imageRenderer, matrixOptions]);
+      container.replaceChildren(qrcode(payload).options(matrixOptions).render(imageRenderer));
+    }, [payload, imageRenderer, matrixOptions]);
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      download(filename?: string) {
-        qrcode(payload)
-          .options(matrixOptions)
-          .render(
-            QRCodeDownloadImageRenderer({
-              renderer: imageRenderer,
-              filename,
-            }),
-          );
-      },
-    }),
-    [payload, imageRenderer, matrixOptions],
-  );
+    useImperativeHandle(
+      ref,
+      () => ({
+        download(filename?: string) {
+          qrcode(payload)
+            .options(matrixOptions)
+            .render(
+              QRCodeDownloadImageRenderer({
+                renderer: imageRenderer,
+                filename,
+              }),
+            );
+        },
+      }),
+      [payload, imageRenderer, matrixOptions],
+    );
 
-  return <div {...wrapperProps} ref={containerRef} />;
-});
+    return <div {...wrapperProps} ref={containerRef} />;
+  },
+);

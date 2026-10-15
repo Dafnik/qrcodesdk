@@ -1,14 +1,14 @@
-import {PNG} from 'pngjs';
-
-import {
-  type QRCodeCenterImageOptions,
-  QRCodeError,
-  type QRCodeMatrix,
-  type QRCodeRenderer,
-  type QRCodeVisualStyle,
-  createQRCodeStyler,
+import type {
+  QRCodeCenterImageOptions,
+  QRCodeMatrix,
+  QRCodeRenderer,
+  QRCodeVisualStyle,
 } from '@qrcodesdk/core';
-import type {QRCodeStyledDrawingTarget} from '@qrcodesdk/core/drawing';
+import {type QRCodeStyledDrawingTarget, createQRCodeStyler} from '@qrcodesdk/core/drawing';
+import {QRCodeError} from '@qrcodesdk/core/error';
+import {ɵassertKnownKeys as assertKeys} from '@qrcodesdk/core/internal';
+
+import {type PNGImage, decodePNG, encodePNG} from './png-codec';
 
 export type QRCodePNGCenterImageOptions = QRCodeCenterImageOptions<Buffer>;
 export type QRCodePNGRendererOptions = {
@@ -25,36 +25,34 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
   assertKeys(options?.centerImage, 'centerImage', ['source', 'size', 'padding', 'clearBackground']);
   assertKeys(options?.compression, 'compression', ['level']);
   const styler = createQRCodeStyler(options?.style);
-  const centerImageOptions = options?.centerImage ? {...options.centerImage} : undefined;
-  const centerImageLayout = centerImageOptions
-    ? {
-        size: centerImageOptions.size,
-        padding: centerImageOptions.padding,
-        clearBackground: centerImageOptions.clearBackground,
-      }
-    : undefined;
+  const hasCenterImage = !!options?.centerImage;
+  const {source, ...centerImageLayout} = options?.centerImage ?? {};
   const compressionLevel = resolveCompressionLevel(options?.compression?.level);
-  if (centerImageOptions) styler.draw([[1]]).placeCenterImage(centerImageLayout);
+  if (hasCenterImage) styler.draw([[1]]).placeCenterImage(centerImageLayout);
 
   return (matrix: QRCodeMatrix) => {
     const drawing = styler.draw(matrix);
-    const png = new PNG({width: drawing.outputSize, height: drawing.outputSize});
+    const png: PNGImage = {
+      width: drawing.outputSize,
+      height: drawing.outputSize,
+      data: Buffer.alloc(4 * drawing.outputSize * drawing.outputSize),
+    };
     const target = new PNGDrawingTarget(png, drawing.moduleSize);
     drawing.paint(target);
 
-    if (centerImageOptions) {
-      const source = decodeImageSource(centerImageOptions.source);
-      const placement = drawing.placeCenterImage(centerImageLayout);
-      if (placement.clear) target.clearImageArea(placement.clear);
+    if (hasCenterImage) {
+      const image = decodeImageSource(source!);
+      const {centerImage, clear} = drawing.placeCenterImage(centerImageLayout);
+      if (clear) target.clearImageArea(clear);
       compositeImage(
         png,
-        source,
-        placement.centerImage.x * drawing.moduleSize,
-        placement.centerImage.y * drawing.moduleSize,
-        placement.centerImage.size * drawing.moduleSize,
+        image,
+        centerImage.x * drawing.moduleSize,
+        centerImage.y * drawing.moduleSize,
+        centerImage.size * drawing.moduleSize,
       );
     }
-    return PNG.sync.write(png, {deflateLevel: compressionLevel});
+    return encodePNG(png, compressionLevel);
   };
 }
 
@@ -64,7 +62,6 @@ class PNGDrawingTarget implements QRCodeStyledDrawingTarget {
   private background: Color = {red: 255, green: 255, blue: 255, alpha: 255};
   private color: Color = {red: 0, green: 0, blue: 0, alpha: 255};
   private coverage: Uint16Array | undefined;
-  private fillRule: 'nonzero' | 'evenodd' = 'nonzero';
   private points: number[] = [];
   private startX = 0;
   private startY = 0;
@@ -72,7 +69,7 @@ class PNGDrawingTarget implements QRCodeStyledDrawingTarget {
   private currentY = 0;
 
   constructor(
-    private readonly png: PNG,
+    private readonly png: PNGImage,
     private readonly scale: number,
   ) {}
 
@@ -96,8 +93,7 @@ class PNGDrawingTarget implements QRCodeStyledDrawingTarget {
     );
   }
 
-  beginPath(fillRule: 'nonzero' | 'evenodd'): void {
-    this.fillRule = fillRule;
+  beginPath(): void {
     this.coverage = new Uint16Array(this.png.width * this.png.height);
   }
 
@@ -135,40 +131,6 @@ class PNGDrawingTarget implements QRCodeStyledDrawingTarget {
       this.currentY = (centerY + Math.sin(angle) * radius) * this.scale;
       this.points.push(this.currentX, this.currentY);
     }
-  }
-
-  cubicTo(
-    control1X: number,
-    control1Y: number,
-    control2X: number,
-    control2Y: number,
-    x: number,
-    y: number,
-  ): void {
-    const fromX = this.currentX;
-    const fromY = this.currentY;
-    const c1x = control1X * this.scale;
-    const c1y = control1Y * this.scale;
-    const c2x = control2X * this.scale;
-    const c2y = control2Y * this.scale;
-    const endX = x * this.scale;
-    const endY = y * this.scale;
-    for (let index = 1; index <= 12; index++) {
-      const t = index / 12;
-      const inverse = 1 - t;
-      this.points.push(
-        inverse ** 3 * fromX +
-          3 * inverse ** 2 * t * c1x +
-          3 * inverse * t ** 2 * c2x +
-          t ** 3 * endX,
-        inverse ** 3 * fromY +
-          3 * inverse ** 2 * t * c1y +
-          3 * inverse * t ** 2 * c2y +
-          t ** 3 * endY,
-      );
-    }
-    this.currentX = endX;
-    this.currentY = endY;
   }
 
   closePath(): void {
@@ -241,10 +203,7 @@ class PNGDrawingTarget implements QRCodeStyledDrawingTarget {
           }
         }
         const coverageIndex = y * this.png.width + x;
-        coverage[coverageIndex] =
-          this.fillRule === 'evenodd'
-            ? coverage[coverageIndex]! ^ sampleMask
-            : coverage[coverageIndex]! | sampleMask;
+        coverage[coverageIndex] = coverage[coverageIndex]! ^ sampleMask;
       }
     }
     this.points.length = 0;
@@ -272,7 +231,7 @@ function popcount(value: number): number {
 }
 
 function fillRect(
-  png: PNG,
+  png: PNGImage,
   x: number,
   y: number,
   width: number,
@@ -290,7 +249,7 @@ function fillRect(
   }
 }
 
-function clearRect(png: PNG, x: number, y: number, width: number, height: number): void {
+function clearRect(png: PNGImage, x: number, y: number, width: number, height: number): void {
   const startX = Math.max(0, Math.floor(x));
   const startY = Math.max(0, Math.floor(y));
   const endX = Math.min(png.width, Math.ceil(x + width));
@@ -300,7 +259,7 @@ function clearRect(png: PNG, x: number, y: number, width: number, height: number
   }
 }
 
-function blendPixel(png: PNG, pixelIndex: number, color: Color, coverage: number): void {
+function blendPixel(png: PNGImage, pixelIndex: number, color: Color, coverage: number): void {
   const index = pixelIndex * 4;
   const sourceAlpha = (color.alpha / 255) * coverage;
   const destinationAlpha = png.data[index + 3]! / 255;
@@ -322,7 +281,7 @@ function blendPixel(png: PNG, pixelIndex: number, color: Color, coverage: number
   png.data[index + 3] = Math.round(outputAlpha * 255);
 }
 
-function decodeImageSource(source: Buffer): PNG {
+function decodeImageSource(source: Buffer): PNGImage {
   if (!Buffer.isBuffer(source)) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
@@ -337,7 +296,7 @@ function decodeImageSource(source: Buffer): PNG {
   }
   assertPngDimensions(source);
   try {
-    const image = PNG.sync.read(source);
+    const image = decodePNG(source);
     assertImageDimensions(image.width, image.height);
     return image;
   } catch (error) {
@@ -377,8 +336,8 @@ function assertImageDimensions(width: number, height: number): void {
 }
 
 function compositeImage(
-  target: PNG,
-  source: PNG,
+  target: PNGImage,
+  source: PNGImage,
   boxX: number,
   boxY: number,
   boxSize: number,
@@ -422,27 +381,4 @@ function resolveCompressionLevel(value: number | undefined): number {
     );
   }
   return level;
-}
-
-function assertKeys(value: unknown, path: string, keys: readonly string[]): void {
-  if (value === undefined) return;
-  if (!isPlainObject(value)) {
-    throw new QRCodeError('INVALID_OPTIONS', `QR code ${path} must be a plain object`, {
-      details: {field: path, value},
-    });
-  }
-  const known = new Set(keys);
-  const unknown = Object.keys(value).find((key) => !known.has(key));
-  if (unknown !== undefined) {
-    const field = `${path}.${unknown}`;
-    throw new QRCodeError('INVALID_OPTIONS', `Unknown QR code option ${field}`, {
-      details: {field, value: (value as Record<string, unknown>)[unknown]},
-    });
-  }
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  if (typeof value !== 'object' || value === null) return false;
-  const prototype = Object.getPrototypeOf(value);
-  return prototype === Object.prototype || prototype === null;
 }

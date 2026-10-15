@@ -2,11 +2,23 @@ import type {RGBAPixel} from '@repo/core-testing';
 import jsQR from 'jsqr';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname} from 'node:path';
-import {PNG} from 'pngjs';
+import sharp from 'sharp';
 import {expect} from 'vitest';
 
-export function decodePngQRCode(input: Buffer | PNG): string {
-  const png = Buffer.isBuffer(input) ? PNG.sync.read(input) : input;
+export type DecodedPng = {width: number; height: number; data: Buffer};
+
+// Decodes with libvips so renderer output is verified independently of the package's codec.
+export async function readPng(input: Buffer): Promise<DecodedPng> {
+  const {data, info} = await sharp(input)
+    .toColourspace('srgb')
+    .ensureAlpha()
+    .raw()
+    .toBuffer({resolveWithObject: true});
+  return {width: info.width, height: info.height, data};
+}
+
+export async function decodePngQRCode(input: Buffer): Promise<string> {
+  const png = await readPng(input);
   const imageData = new Uint8ClampedArray(png.data.buffer, png.data.byteOffset, png.data.length);
   const result = jsQR(imageData, png.width, png.height, {inversionAttempts: 'dontInvert'});
 
@@ -32,7 +44,7 @@ export function expectPngToMatchFileSnapshot(png: Buffer, snapshotPath: string):
   expect(png).toEqual(readFileSync(snapshotPath));
 }
 
-export function getPngPixel(png: PNG, x: number, y: number): RGBAPixel {
+export function getPngPixel(png: DecodedPng, x: number, y: number): RGBAPixel {
   const index = (png.width * y + x) << 2;
 
   return {

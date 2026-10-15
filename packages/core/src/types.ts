@@ -126,67 +126,6 @@ export type QRCodeResolvedVisualStyle = {
   };
 };
 
-export type QRCodeStyleRole = 'modules' | 'finderOuter' | 'finderCenter';
-export type QRCodeStyleRotation = 0 | 90 | 180 | 270;
-export type QRCodePaintShape =
-  | 'square'
-  | 'circle'
-  | 'side-rounded'
-  | 'corner-rounded'
-  | 'corner-extra-rounded'
-  | 'opposite-corners-rounded';
-
-type QRCodeStylePrimitiveBase = {
-  role: QRCodeStyleRole;
-  color: QRCodeColor;
-  x: number;
-  y: number;
-  size: number;
-  rotation: QRCodeStyleRotation;
-};
-
-export type QRCodeModuleStylePrimitive = QRCodeStylePrimitiveBase & {
-  kind: 'module';
-  shape: QRCodePaintShape;
-};
-
-export type QRCodeFinderRingStylePrimitive = QRCodeStylePrimitiveBase & {
-  kind: 'finder-ring';
-  role: 'finderOuter';
-  shape: QRCodeFinderShape;
-};
-
-export type QRCodeFinderCenterStylePrimitive = QRCodeStylePrimitiveBase & {
-  kind: 'finder-center';
-  role: 'finderCenter';
-  shape: QRCodeFinderShape;
-};
-
-export type QRCodeStylePrimitive =
-  QRCodeModuleStylePrimitive | QRCodeFinderRingStylePrimitive | QRCodeFinderCenterStylePrimitive;
-
-export type QRCodeStyleRectangle = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-export type QRCodeStyleLayer = {
-  color: QRCodeColor;
-  rectangles: readonly QRCodeStyleRectangle[];
-  curvedPrimitives: readonly QRCodeStylePrimitive[];
-};
-
-export type QRCodeStyledDrawingData = {
-  moduleCount: number;
-  viewSize: number;
-  outputSize: number;
-  backgroundColor: QRCodeColor;
-  hasCurves: boolean;
-  layers: readonly QRCodeStyleLayer[];
-};
-
 export type QRCodeResolvedMatrixOptions = {
   segments: readonly QRCodeEncodedSegment[];
   version: QRCodeVersion;

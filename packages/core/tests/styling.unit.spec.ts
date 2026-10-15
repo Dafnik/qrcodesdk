@@ -75,6 +75,20 @@ describe('styling validation', () => {
     ).toThrowError(expect.objectContaining({details: expect.objectContaining({field: 'layout'})}));
   });
 
+  test.each(['foreground', 'background'] as const)(
+    'reports the ANSI option path for invalid %s colors',
+    (color) => {
+      const field = `ansi.${color}`;
+      expect(() => QRCodeTextRenderer({ansi: {[color]: 'red'}} as never)).toThrowError(
+        expect.objectContaining({
+          code: 'INVALID_OPTIONS',
+          message: expect.stringContaining(`QR code ${field} must be`),
+          details: {field, value: 'red'},
+        }),
+      );
+    },
+  );
+
   test('composites ANSI RGBA colors instead of dropping alpha', () => {
     const output = QRCodeTextRenderer({
       style: {moduleSize: 1, quietZone: 0},

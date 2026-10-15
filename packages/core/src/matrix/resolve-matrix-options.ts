@@ -9,7 +9,6 @@ import type {
 } from '../types';
 import {ECC_LEVELS_MAP} from './error-correction';
 import {getNumberOfAvailableBitsForData} from './get-number-of-available-bits-for-data';
-import {QR_CODE_MASKS} from './mask';
 import {resolveMode} from './mode';
 import {createSingleSegment, getSegmentsBitLength, optimizeSegments} from './segments';
 
@@ -17,95 +16,73 @@ export function resolveQRCodeMatrixOptions(
   payload: QRCodePayload,
   options: QRCodeMatrixOptions = {},
 ): QRCodeResolvedMatrixOptions {
-  validatePayload(payload);
-  const eci = resolveECI(options.eci);
-
-  const forcedMode = options.mode === undefined ? undefined : resolveMode(payload, options.mode);
-  const forcedSegment =
-    forcedMode === undefined ? undefined : createSingleSegment(forcedMode, payload);
-  if (forcedMode !== undefined && forcedSegment === undefined) {
-    throw new QRCodeError('INVALID_PAYLOAD', 'QRCode: Invalid payload format', {
-      details: {payload, mode: options.mode},
-    });
-  }
-
-  const errorCorrectionLevel = resolveErrorCorrectionLevel(options.errorCorrectionLevel);
-  const {version, segments} = resolveVersionAndSegments(
-    options.version,
-    payload,
-    forcedSegment === undefined ? undefined : [forcedSegment],
-    errorCorrectionLevel,
-    eci,
-  );
-  const mask = resolveMask(options.mask);
-
-  return {segments, errorCorrectionLevel, version, mask, eci};
-}
-
-function validatePayload(payload: QRCodePayload): void {
   if (
     (typeof payload !== 'string' && typeof payload !== 'number') ||
     (typeof payload === 'number' && (!Number.isSafeInteger(payload) || payload < 0))
   ) {
-    throw new QRCodeError('INVALID_PAYLOAD', 'QRCode: Invalid payload format', {
-      details: {payload},
-    });
+    throw invalidPayload({payload});
   }
-}
+  const {eci = false, mask, version: requestedVersion} = options;
+  if (typeof eci !== 'boolean') throw invalidOption('eci', eci, 'ECI setting');
 
-function resolveErrorCorrectionLevel(
-  errorCorrectionLevel: QRCodeMatrixOptions['errorCorrectionLevel'],
-): QRCodeErrorCorrectionLevelValue {
-  const eccLevel = ECC_LEVELS_MAP[(errorCorrectionLevel ?? 'M') as keyof typeof ECC_LEVELS_MAP];
-  if (!Number.isInteger(eccLevel) || eccLevel < 0 || eccLevel > 3) {
-    throw new QRCodeError('INVALID_OPTIONS', 'QRCode: Invalid ECC level', {
-      details: {field: 'errorCorrectionLevel', value: errorCorrectionLevel},
-    });
+  let forcedSegments: QRCodeResolvedMatrixOptions['segments'] | undefined;
+  if (options.mode !== undefined) {
+    const segment = createSingleSegment(resolveMode(payload, options.mode), payload);
+    if (!segment) throw invalidPayload({payload, mode: options.mode});
+    forcedSegments = [segment];
   }
-  return eccLevel;
-}
 
-function resolveVersionAndSegments(
-  requestedVersion: QRCodeMatrixOptions['version'],
-  payload: QRCodePayload,
-  forcedSegments: QRCodeResolvedMatrixOptions['segments'] | undefined,
-  errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
-  eci: boolean,
-): Pick<QRCodeResolvedMatrixOptions, 'segments' | 'version'> {
+  const errorCorrectionLevel =
+    ECC_LEVELS_MAP[(options.errorCorrectionLevel ?? 'M') as keyof typeof ECC_LEVELS_MAP];
+  if (typeof errorCorrectionLevel !== 'number') {
+    throw invalidOption('errorCorrectionLevel', options.errorCorrectionLevel, 'ECC level');
+  }
+
+  let resolved: Pick<QRCodeResolvedMatrixOptions, 'segments' | 'version'> | undefined;
   if (requestedVersion !== undefined) {
-    validateVersion(requestedVersion);
+    if (!Number.isInteger(requestedVersion) || requestedVersion < 1 || requestedVersion > 40) {
+      throw invalidOption('version', requestedVersion, 'version');
+    }
     const segments = forcedSegments ?? optimizeSegments(payload, requestedVersion, eci);
     if (!segmentsFitVersion(segments, requestedVersion, errorCorrectionLevel, eci)) {
       throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large', {
         details: {version: requestedVersion},
       });
     }
-    return {segments, version: requestedVersion};
-  }
-
-  for (const [start, end] of [
-    [1, 9],
-    [10, 26],
-    [27, 40],
-  ] as const) {
-    const segments = forcedSegments ?? optimizeSegments(payload, start, eci);
-    for (let version = start; version <= end; version++) {
-      const qrVersion = version as QRCodeVersion;
-      if (segmentsFitVersion(segments, qrVersion, errorCorrectionLevel, eci)) {
-        return {segments, version: qrVersion};
+    resolved = {segments, version: requestedVersion};
+  } else {
+    // Character count indicator widths change at versions 10 and 27.
+    search: for (const [start, end] of [
+      [1, 9],
+      [10, 26],
+      [27, 40],
+    ] as const) {
+      const segments = forcedSegments ?? optimizeSegments(payload, start, eci);
+      for (let version = start; version <= end; version++) {
+        if (segmentsFitVersion(segments, version as QRCodeVersion, errorCorrectionLevel, eci)) {
+          resolved = {segments, version: version as QRCodeVersion};
+          break search;
+        }
       }
     }
+    if (!resolved) throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large');
   }
 
-  throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large');
+  if (mask !== undefined && !(Number.isInteger(mask) && mask >= 0 && mask < 8)) {
+    throw invalidOption('mask', mask, 'mask');
+  }
+
+  return {...resolved, errorCorrectionLevel, mask: mask as QRCodeMask | undefined, eci};
 }
 
-function validateVersion(version: number): asserts version is QRCodeVersion {
-  if (!Number.isInteger(version) || version < 1 || version > 40) {
-    throw new QRCodeError('INVALID_OPTIONS', 'QRCode: Invalid version', {
-      details: {field: 'version', value: version},
-    });
-  }
+function invalidPayload(details: Record<string, unknown>): QRCodeError {
+  return new QRCodeError('INVALID_PAYLOAD', 'QRCode: Invalid payload format', {details});
+}
+
+function invalidOption(field: string, value: unknown, label: string): QRCodeError {
+  return new QRCodeError('INVALID_OPTIONS', `QRCode: Invalid ${label}`, {
+    details: {field, value},
+  });
 }
 
 export function segmentsFitVersion(
@@ -118,24 +95,4 @@ export function segmentsFitVersion(
     getSegmentsBitLength(version, segments, eci) <=
     getNumberOfAvailableBitsForData(version, errorCorrectionLevel)
   );
-}
-
-function resolveECI(eci: QRCodeMatrixOptions['eci']): boolean {
-  if (eci === undefined) return false;
-  if (typeof eci !== 'boolean') {
-    throw new QRCodeError('INVALID_OPTIONS', 'QRCode: Invalid ECI setting', {
-      details: {field: 'eci', value: eci},
-    });
-  }
-  return eci;
-}
-
-function resolveMask(mask: QRCodeMatrixOptions['mask']): QRCodeMask | undefined {
-  if (mask === undefined) return undefined;
-  if (!QR_CODE_MASKS.includes(mask)) {
-    throw new QRCodeError('INVALID_OPTIONS', 'QRCode: Invalid mask', {
-      details: {field: 'mask', value: mask},
-    });
-  }
-  return mask;
 }

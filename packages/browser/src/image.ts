@@ -1,9 +1,5 @@
-import {
-  QRCodeError,
-  type QRCodeMatrix,
-  type QRCodeMatrixOptions,
-  type QRCodeRenderer,
-} from '@qrcodesdk/core';
+import type {QRCodeMatrix, QRCodeMatrixOptions, QRCodeRenderer} from '@qrcodesdk/core';
+import {QRCodeError} from '@qrcodesdk/core/error';
 
 import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from './canvas';
 import {downloadQRCode, ensureExtension} from './download-helper';

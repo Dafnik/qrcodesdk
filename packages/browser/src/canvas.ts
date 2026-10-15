@@ -1,13 +1,12 @@
-import {
-  type QRCodeCenterImageOptions,
-  QRCodeError,
-  type QRCodeMatrix,
-  type QRCodeMatrixOptions,
-  type QRCodeRenderer,
-  type QRCodeVisualStyle,
-  createQRCodeStyler,
+import type {
+  QRCodeCenterImageOptions,
+  QRCodeMatrix,
+  QRCodeMatrixOptions,
+  QRCodeRenderer,
+  QRCodeVisualStyle,
 } from '@qrcodesdk/core';
-import type {QRCodeStyledDrawingTarget} from '@qrcodesdk/core/drawing';
+import {createQRCodeStyler} from '@qrcodesdk/core/drawing';
+import {QRCodeError} from '@qrcodesdk/core/error';
 
 import {assertKnownKeys, assertOptionalString} from './options';
 
@@ -40,22 +39,15 @@ export function QRCodeCanvasRenderer(
   assertOptionalString(options?.accessibility?.title, 'accessibility.title');
   const styler = createQRCodeStyler(options?.style);
   const accessibility = options?.accessibility ? {...options.accessibility} : undefined;
-  const centerImageOptions = options?.centerImage ? {...options.centerImage} : undefined;
-  const centerImageLayout = centerImageOptions
-    ? {
-        size: centerImageOptions.size,
-        padding: centerImageOptions.padding,
-        clearBackground: centerImageOptions.clearBackground,
-      }
-    : undefined;
-  if (centerImageOptions) styler.draw([[1]]).placeCenterImage(centerImageLayout);
+  const hasCenterImage = !!options?.centerImage;
+  const {source, ...centerImageLayout} = options?.centerImage ?? {};
+  if (hasCenterImage) styler.draw([[1]]).placeCenterImage(centerImageLayout);
 
   return (matrix: QRCodeMatrix) => {
     const drawing = styler.draw(matrix);
-    const placement = centerImageOptions ? drawing.placeCenterImage(centerImageLayout) : undefined;
+    const {moduleSize, viewSize} = drawing;
     const canvas = document.createElement('canvas');
-    canvas.width = drawing.outputSize;
-    canvas.height = drawing.outputSize;
+    canvas.width = canvas.height = drawing.outputSize;
     applyAccessibility(canvas, accessibility);
 
     const context = canvas.getContext('2d');
@@ -65,20 +57,45 @@ export function QRCodeCanvasRenderer(
         'Canvas QR code renderer requires a 2D canvas context',
       );
     }
-    const target = new CanvasDrawingTarget(context, drawing.moduleSize, drawing.outputSize);
-    drawing.paint(target);
+    let background = '';
+    const fillBackground = (x: number, y: number, width: number, height: number) => {
+      context.clearRect(x, y, width, height);
+      context.fillStyle = background;
+      context.fillRect(x, y, width, height);
+    };
+    // Draw in module units.
+    context.setTransform(moduleSize, 0, 0, moduleSize, 0, 0);
+    drawing.paint({
+      drawBackground(red, green, blue, alpha) {
+        background = rgba(red, green, blue, alpha);
+        fillBackground(0, 0, viewSize, viewSize);
+      },
+      beginLayer(red, green, blue, alpha) {
+        context.fillStyle = rgba(red, green, blue, alpha);
+      },
+      drawRectangle: context.fillRect.bind(context),
+      beginPath: () => context.beginPath(),
+      moveTo: context.moveTo.bind(context),
+      lineTo: context.lineTo.bind(context),
+      arc: context.arc.bind(context),
+      closePath: context.closePath.bind(context),
+      endPath: () => context.fill('evenodd'),
+      endLayer() {},
+    });
 
-    if (centerImageOptions && placement) {
-      const sourceSize = getCanvasImageSourceSize(centerImageOptions.source);
-      if (placement.clear) target.clearImageArea(placement.clear);
-      const boxX = placement.centerImage.x * drawing.moduleSize;
-      const boxY = placement.centerImage.y * drawing.moduleSize;
-      const boxSize = placement.centerImage.size * drawing.moduleSize;
+    if (hasCenterImage) {
+      const {centerImage, clear} = drawing.placeCenterImage(centerImageLayout);
+      const sourceSize = getCanvasImageSourceSize(source!);
+      if (clear) fillBackground(clear.x, clear.y, clear.size, clear.size);
+      const boxX = centerImage.x * moduleSize;
+      const boxY = centerImage.y * moduleSize;
+      const boxSize = centerImage.size * moduleSize;
       const scale = Math.min(boxSize / sourceSize.width, boxSize / sourceSize.height);
       const width = sourceSize.width * scale;
       const height = sourceSize.height * scale;
+      context.setTransform(1, 0, 0, 1, 0, 0);
       context.drawImage(
-        centerImageOptions.source,
+        source!,
         boxX + (boxSize - width) / 2,
         boxY + (boxSize - height) / 2,
         width,
@@ -87,107 +104,6 @@ export function QRCodeCanvasRenderer(
     }
     return canvas;
   };
-}
-
-class CanvasDrawingTarget implements QRCodeStyledDrawingTarget {
-  private background = 'rgba(255, 255, 255, 1)';
-  private fillRule: CanvasFillRule = 'nonzero';
-
-  constructor(
-    private readonly context: CanvasRenderingContext2D,
-    private readonly scale: number,
-    private readonly outputSize: number,
-  ) {}
-
-  drawBackground(red: number, green: number, blue: number, alpha: number): void {
-    this.background = rgba(red, green, blue, alpha);
-    this.context.clearRect(0, 0, this.outputSize, this.outputSize);
-    this.context.fillStyle = this.background;
-    this.context.fillRect(0, 0, this.outputSize, this.outputSize);
-  }
-
-  beginLayer(red: number, green: number, blue: number, alpha: number): void {
-    this.context.fillStyle = rgba(red, green, blue, alpha);
-  }
-
-  drawRectangle(x: number, y: number, width: number, height: number): void {
-    this.context.fillRect(x * this.scale, y * this.scale, width * this.scale, height * this.scale);
-  }
-
-  beginPath(fillRule: 'nonzero' | 'evenodd'): void {
-    this.fillRule = fillRule;
-    this.context.beginPath();
-  }
-
-  moveTo(x: number, y: number): void {
-    this.context.moveTo(x * this.scale, y * this.scale);
-  }
-
-  lineTo(x: number, y: number): void {
-    this.context.lineTo(x * this.scale, y * this.scale);
-  }
-
-  arc(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    startAngle: number,
-    endAngle: number,
-    counterclockwise: boolean,
-  ): void {
-    this.context.arc(
-      centerX * this.scale,
-      centerY * this.scale,
-      radius * this.scale,
-      startAngle,
-      endAngle,
-      counterclockwise,
-    );
-  }
-
-  cubicTo(
-    control1X: number,
-    control1Y: number,
-    control2X: number,
-    control2Y: number,
-    x: number,
-    y: number,
-  ): void {
-    this.context.bezierCurveTo(
-      control1X * this.scale,
-      control1Y * this.scale,
-      control2X * this.scale,
-      control2Y * this.scale,
-      x * this.scale,
-      y * this.scale,
-    );
-  }
-
-  closePath(): void {
-    this.context.closePath();
-  }
-
-  endPath(): void {
-    this.context.fill(this.fillRule);
-  }
-
-  endLayer(): void {}
-
-  clearImageArea(area: {x: number; y: number; size: number}): void {
-    this.context.clearRect(
-      area.x * this.scale,
-      area.y * this.scale,
-      area.size * this.scale,
-      area.size * this.scale,
-    );
-    this.context.fillStyle = this.background;
-    this.context.fillRect(
-      area.x * this.scale,
-      area.y * this.scale,
-      area.size * this.scale,
-      area.size * this.scale,
-    );
-  }
 }
 
 function applyAccessibility(

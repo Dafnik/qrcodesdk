@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import {test} from 'node:test';
+import {pathToFileURL} from 'node:url';
 import {promisify} from 'node:util';
 import {gunzipSync} from 'node:zlib';
 
@@ -34,6 +35,38 @@ const sdkDependencyPolicy = {
     dependencies: ['@qrcodesdk/browser', '@qrcodesdk/core'],
   },
 };
+
+test('runtime subpaths share the root exports', async () => {
+  const packageJson = JSON.parse(
+    await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
+  );
+  const exportsBySubpath =
+    packageJson.name === '@qrcodesdk/core'
+      ? {
+          './matrix': ['qrcode', 'QRCodeBuilder'],
+          './svg': ['QRCodeSVGRenderer'],
+          './text': ['QRCodeTextRenderer'],
+          './error': ['QRCodeError', 'QR_CODE_ERROR_CODES'],
+          './drawing': ['createQRCodeStyler'],
+        }
+      : packageJson.name === '@qrcodesdk/browser'
+        ? {
+            './canvas': ['QRCodeCanvasRenderer'],
+            './image': ['QRCodeImageRenderer', 'QRCodeDownloadImageRenderer'],
+            './svg': ['QRCodeDownloadSVGRenderer'],
+          }
+        : {};
+  if (Object.keys(exportsBySubpath).length === 0) return;
+  const importTarget = (target) => import(pathToFileURL(path.join(packageDirectory, target)).href);
+  const root = await importTarget(packageJson.exports['.']);
+  for (const [subpath, names] of Object.entries(exportsBySubpath)) {
+    const module = await importTarget(packageJson.exports[subpath]);
+    for (const name of names) {
+      assert.ok(root[name], `${packageJson.name} must export ${name}`);
+      assert.equal(module[name], root[name], `${packageJson.name}${subpath} must share ${name}`);
+    }
+  }
+});
 
 function readTarEntries(gzippedTarball) {
   const tarball = gunzipSync(gzippedTarball);

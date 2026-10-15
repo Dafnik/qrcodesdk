@@ -1,5 +1,7 @@
 import type {QRCodeMatrix} from '../types';
 
+export {createQRCodeStyler} from './styler';
+
 export interface QRCodeStyler {
   draw(matrix: QRCodeMatrix): QRCodeStyledDrawing;
 }
@@ -30,14 +32,6 @@ export interface QRCodeStyledDrawingTarget {
     startAngle: number,
     endAngle: number,
     counterclockwise: boolean,
-  ): void;
-  cubicTo(
-    control1X: number,
-    control1Y: number,
-    control2X: number,
-    control2Y: number,
-    x: number,
-    y: number,
   ): void;
   closePath(): void;
   endPath(): void;

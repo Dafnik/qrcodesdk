@@ -17,7 +17,7 @@ import {
 
 export type QRCodeSVGProps = QRCodeBaseProps<QRCodeSVGOptions>;
 
-export const QRCodeSVG = defineComponent({
+export const QRCodeSVG = /* @__PURE__ */ defineComponent({
   name: 'QRCodeSVG',
   inheritAttrs: false,
   props: {

@@ -5,7 +5,6 @@ import type {
   QRCodeMutableMatrix,
 } from '../types';
 import {augmentBCH} from './augment-bch';
-import {getQRCodeFormatInformationCoordinates} from './format-information';
 
 /**
  * Puts the format information into the matrix.
@@ -23,12 +22,11 @@ export function fillFormatInformationInMatrix(
   const n: number = matrix.length,
     code: number = augmentBCH((ecclevel << 3) | mask, 5, 0x537, 10) ^ 0x5412;
 
-  const coordinates = getQRCodeFormatInformationCoordinates(n);
-  for (let i = 0; i < coordinates.length; i++) {
-    const [[firstRow, firstColumn], [secondRow, secondColumn]] = coordinates[i]!;
-    matrix[firstRow]![firstColumn] = matrix[secondRow]![secondColumn] = ((code >> i) &
-      1) as QRCodeModule;
+  for (let i = 0; i < 15; i++) {
     // we don't have to mark those bits reserved; always done in createBaseMatrix above.
+    matrix[i < 6 ? i : i < 8 ? i + 1 : n - 15 + i]![8] = matrix[8]![
+      i < 8 ? n - 1 - i : i === 8 ? 7 : 14 - i
+    ] = ((code >> i) & 1) as QRCodeModule;
   }
   return matrix;
 }

@@ -74,17 +74,14 @@
   "peerDependencies": {
     "@qrcodesdk/core": "workspace:0.0.2"
   },
-  "dependencies": {
-    "pngjs": "7.0.0"
-  },
   "devDependencies": {
     "@qrcodesdk/core": "workspace:*",
     "@repo/core-testing": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
-    "@types/pngjs": "6.0.5",
     "jsqr": "catalog:",
+    "sharp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

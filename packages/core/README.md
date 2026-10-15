@@ -61,6 +61,13 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 The result is an SVG `string`. See the [SVG renderer reference](https://qrcodesdk.dev/reference/renderers/svg/) for its
 options and constraints.
 
+For direct runtime imports, use `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`,
+`@qrcodesdk/core/text`, or `@qrcodesdk/core/error`. The drawing subpath exports
+`createQRCodeStyler` and its drawing types. When running ESM directly without a bundler, these
+entrypoints avoid loading unrelated renderers through the root entrypoint. The root continues
+to export the same APIs and supports tree shaking in application bundles, so subpath imports
+are optional for bundled applications.
+
 ## What Core adds
 
 | Capability                    | API                        | Return type    |

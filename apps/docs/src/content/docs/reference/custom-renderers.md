@@ -73,16 +73,6 @@ class CommandTarget implements QRCodeStyledDrawingTarget {
       `arc ${centerX} ${centerY} ${radius} ${startAngle} ${endAngle} ${counterclockwise}`,
     );
   }
-  cubicTo(
-    control1X: number,
-    control1Y: number,
-    control2X: number,
-    control2Y: number,
-    x: number,
-    y: number,
-  ) {
-    this.commands.push(`cubic ${control1X} ${control1Y} ${control2X} ${control2Y} ${x} ${y}`);
-  }
   closePath() {
     this.commands.push('close');
   }

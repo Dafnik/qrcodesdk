@@ -298,6 +298,7 @@ background. With `--ansi background`, both become module background colors.
 ## Interactive and automated use
 
 In an interactive terminal, `qrc` prompts only for missing required values such as payload, an ambiguous format, or a file output path.
+Choose the output format with the arrow keys, `j`/`k`, or a number key, then press Enter. Press Escape or Ctrl+C to cancel a prompt.
 
 In a non-interactive shell or CI job, missing required values fail with a clear error instead of opening a prompt. Pass every required value explicitly:
 

@@ -4,8 +4,8 @@ import {
   ECI_UTF8_ASSIGNMENT,
   MODE_ECI,
   MODE_OCTET,
-  MODE_TERMINATOR,
-  getModeDefinition,
+  encodePayload,
+  getCharacterCountBits,
 } from './mode';
 
 /**
@@ -47,10 +47,9 @@ export function encode(
       pack(ECI_UTF8_ASSIGNMENT, 8);
       hasWrittenUTF8ECI = true;
     }
-    const definition = getModeDefinition(segment.mode);
     pack(segment.mode, 4);
-    pack(segment.payload.length, definition.getCharacterCountBits(version));
-    definition.encodePayload(segment.payload, pack);
+    pack(segment.payload.length, getCharacterCountBits(segment.mode, version));
+    encodePayload(segment.mode, segment.payload, pack);
   }
 
   const encodedDataBitLength = buffer.length * 8 + (8 - remaining);
@@ -64,7 +63,7 @@ export function encode(
   // to overflow, but then the buffer truncated to the maximum size will
   // be valid as the truncated terminator mode bits and padding is
   // identical in appearance (cf. JIS X 0510:2004 sec 8.4.8).
-  pack(MODE_TERMINATOR, 4);
+  pack(0, 4);
   if (remaining < 8) {
     buffer.push(bits);
   }
