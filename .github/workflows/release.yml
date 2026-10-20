@@ -25,9 +25,9 @@ jobs:
       package-dir: ${{ steps.package.outputs.dir }}
       package-version: ${{ steps.package.outputs.version }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: dafnik/setup-node-pnpm@v5
+      - uses: dafnik/setup-node-pnpm@18e728bc3a6d51ee4c93cfd96394aa6cc711b970 # v5
         with:
           install-ignore-scripts: true
 
@@ -107,7 +107,7 @@ jobs:
           fi
 
       - name: Upload npm package
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: npm-package-${{ inputs.lib }}
           path: ${{ runner.temp }}/npm-package/*.tgz
@@ -120,14 +120,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure npm registry authentication
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '24'
           package-manager-cache: false
           registry-url: 'https://registry.npmjs.org'
 
       - name: Download npm package
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: npm-package-${{ inputs.lib }}
           path: npm-package
@@ -152,12 +152,12 @@ jobs:
     needs: [build, release-npm]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
 
       - name: Download npm package
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: npm-package-${{ inputs.lib }}
           path: npm-package
@@ -167,7 +167,7 @@ jobs:
         run: ./.github/extract-latest-version-changelog.sh '${{ needs.build.outputs.package-dir }}/CHANGELOG.md'
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
           body_path: RELEASE_CHANGELOG.md
           fail_on_unmatched_files: true

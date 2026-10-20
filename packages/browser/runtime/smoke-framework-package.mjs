@@ -60,168 +60,51 @@ try {
   const tarballs = await findTarballs(packageDirectory, ['core', 'browser', packageName]);
   logSuccess('found exactly one packed tarball for each required QRCodeSDK package');
 
-  if (framework === 'react') {
-    await run('npm', ['create', 'vite@latest', 'react-consumer', '--', '--template', 'react-ts'], {
-      cwd: temporaryDirectory,
-    });
-    await copyFile(
-      path.join(repositoryDirectory, 'packages', 'react', 'runtime', 'smoke-consumer.tsx'),
-      path.join(consumerDirectory, 'src', 'main.tsx'),
-    );
-    await run(
-      'npm',
-      [
-        'install',
-        '--ignore-scripts',
-        '--no-audit',
-        '--no-fund',
-        '--package-lock=false',
-        `react@${frameworkVersion}`,
-        `react-dom@${frameworkVersion}`,
-        ...tarballs,
+  const fixturesDirectory = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
+  const templateDirectory =
+    framework === 'next'
+      ? path.join(repositoryDirectory, 'packages', 'react', 'runtime', 'next-app')
+      : path.join(fixturesDirectory, 'templates', framework);
+  await cp(templateDirectory, consumerDirectory, {recursive: true});
+  await cp(path.join(fixturesDirectory, `${framework}-${frameworkVersion}`), consumerDirectory, {
+    recursive: true,
+  });
+
+  if (framework !== 'next') {
+    const sourceFiles = {
+      angular: [['smoke-consumer.ts', 'src/app.ts']],
+      react: [['smoke-consumer.tsx', 'src/main.tsx']],
+      svelte: [
+        ['smoke-consumer.svelte', 'src/smoke-consumer.svelte'],
+        ['smoke-main.ts', 'src/main.ts'],
       ],
-      {cwd: consumerDirectory},
-    );
-    await run(
-      'npm',
-      [
-        'install',
-        '--ignore-scripts',
-        '--no-audit',
-        '--no-fund',
-        '--package-lock=false',
-        '--save-dev',
-        `@types/react@${frameworkVersion}`,
-        `@types/react-dom@${frameworkVersion}`,
-      ],
-      {cwd: consumerDirectory},
-    );
-  } else if (framework === 'next') {
-    await cp(
-      path.join(repositoryDirectory, 'packages', 'react', 'runtime', 'next-app'),
-      consumerDirectory,
-      {recursive: true},
-    );
-    await run(
-      'npm',
-      [
-        'install',
-        '--ignore-scripts',
-        '--no-audit',
-        '--no-fund',
-        '--package-lock=false',
-        `next@${frameworkVersion}`,
-        'react@19',
-        'react-dom@19',
-        ...tarballs,
-      ],
-      {cwd: consumerDirectory},
-    );
-    await run(
-      'npm',
-      [
-        'install',
-        '--ignore-scripts',
-        '--no-audit',
-        '--no-fund',
-        '--package-lock=false',
-        '--save-dev',
-        '@types/node@24',
-        '@types/react@19',
-        '@types/react-dom@19',
-        'typescript@5.9',
-      ],
-      {cwd: consumerDirectory},
-    );
-  } else if (framework === 'svelte') {
-    await run(
-      'npm',
-      ['create', 'vite@latest', 'svelte-consumer', '--', '--template', 'svelte-ts'],
-      {
-        cwd: temporaryDirectory,
-      },
-    );
-    await copyFile(
-      path.join(repositoryDirectory, 'packages', 'svelte', 'runtime', 'smoke-consumer.svelte'),
-      path.join(consumerDirectory, 'src', 'smoke-consumer.svelte'),
-    );
-    await copyFile(
-      path.join(repositoryDirectory, 'packages', 'svelte', 'runtime', 'smoke-main.ts'),
-      path.join(consumerDirectory, 'src', 'main.ts'),
-    );
-    const minimumSvelte = frameworkVersion === '5.0';
-    await run(
-      'npm',
-      [
-        'install',
-        '--ignore-scripts',
-        '--no-audit',
-        '--no-fund',
-        '--package-lock=false',
-        `svelte@${frameworkVersion}`,
-        `@sveltejs/vite-plugin-svelte@${minimumSvelte ? '4' : '7'}`,
-        `vite@${minimumSvelte ? '5' : '8'}`,
-        'typescript@5.9',
-        ...tarballs,
-      ],
-      {cwd: consumerDirectory},
-    );
-  } else if (framework === 'vue') {
-    await run('npm', ['create', 'vite@latest', 'vue-consumer', '--', '--template', 'vue-ts'], {
-      cwd: temporaryDirectory,
-    });
-    await copyFile(
-      path.join(repositoryDirectory, 'packages', 'vue', 'runtime', 'smoke-consumer.ts'),
-      path.join(consumerDirectory, 'src', 'main.ts'),
-    );
-    await run(
-      'npm',
-      [
-        'install',
-        '--ignore-scripts',
-        '--no-audit',
-        '--no-fund',
-        '--package-lock=false',
-        `vue@${frameworkVersion}`,
-        ...tarballs,
-      ],
-      {cwd: consumerDirectory},
-    );
-  } else if (framework === 'angular') {
-    await run(
-      'npx',
-      [
-        '--yes',
-        `@angular/cli@${frameworkVersion}`,
-        'new',
-        'angular-consumer',
-        '--defaults',
-        '--skip-install',
-        '--skip-git',
-        '--routing=false',
-        '--style=css',
-        '--ssr=false',
-        '--package-manager=npm',
-      ],
-      {cwd: temporaryDirectory},
-    );
-    await copyFile(
-      path.join(repositoryDirectory, 'packages', 'angular', 'runtime', 'smoke-consumer.ts'),
-      path.join(consumerDirectory, 'src', 'app', 'app.ts'),
-    );
-    await run(
-      'npm',
-      [
-        'install',
-        '--ignore-scripts',
-        '--no-audit',
-        '--no-fund',
-        '--package-lock=false',
-        ...tarballs,
-      ],
-      {cwd: consumerDirectory},
-    );
+      vue: [['smoke-consumer.ts', 'src/main.ts']],
+    };
+    for (const [source, target] of sourceFiles[framework]) {
+      await copyFile(
+        path.join(repositoryDirectory, 'packages', framework, 'runtime', source),
+        path.join(consumerDirectory, target),
+      );
+    }
   }
+
+  await run('npm', ['ci', '--ignore-scripts', '--strict-peer-deps', '--no-audit', '--no-fund'], {
+    cwd: consumerDirectory,
+  });
+  await run(
+    'npm',
+    [
+      'install',
+      '--no-save',
+      '--package-lock=false',
+      '--ignore-scripts',
+      '--strict-peer-deps',
+      '--no-audit',
+      '--no-fund',
+      ...tarballs,
+    ],
+    {cwd: consumerDirectory},
+  );
 
   logSuccess(`created a ${frameworkName} consumer and installed the packed packages`);
 

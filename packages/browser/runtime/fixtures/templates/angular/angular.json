@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "analytics": false
+  },
+  "projects": {
+    "angular-consumer": {
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "index": "index.html",
+            "outputHashing": "all",
+            "outputPath": "dist/angular-consumer",
+            "tsConfig": "tsconfig.json"
+          }
+        }
+      },
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src"
+    }
+  },
+  "version": 1
+}

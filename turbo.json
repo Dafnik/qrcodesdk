@@ -6,12 +6,12 @@
     "QRCODESDK_CONSUMER",
     "QRCODESDK_FRAMEWORK",
     "QRCODESDK_FRAMEWORK_VERSION",
-    "QRCODESDK_PACKAGES",
     "QRCODESDK_RUNTIME",
     "UPDATE_PNG_SNAPSHOTS",
     "UPDATE_SVG_SNAPSHOTS",
     "UPDATE_TEXT_SNAPSHOTS"
   ],
+  "globalPassThroughEnv": ["QRCODESDK_PACKAGES"],
   "tasks": {
     "//#cspell": {
       "cache": false
@@ -22,7 +22,31 @@
     "//#format:check": {
       "cache": false
     },
+    "//#pack:runtime": {
+      "cache": false,
+      "dependsOn": [
+        "@qrcodesdk/core#build",
+        "@qrcodesdk/browser#build",
+        "@qrcodesdk/node#build",
+        "@qrcodesdk/cli#build",
+        "@qrcodesdk/react#build",
+        "@qrcodesdk/angular#build",
+        "@qrcodesdk/vue#build",
+        "@qrcodesdk/svelte#build"
+      ],
+      "env": ["QRCODESDK_PACKAGES"]
+    },
     "//#terminology": {
+      "cache": false
+    },
+    "//#test:browser-runtime": {
+      "cache": false
+    },
+    "//#test:framework-runtime": {
+      "cache": false,
+      "env": ["QRCODESDK_PACKAGES"]
+    },
+    "//#update:runtime-fixtures": {
       "cache": false
     },
     "benchmark": {

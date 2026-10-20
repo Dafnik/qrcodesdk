@@ -20,7 +20,11 @@
     "release:status": "changeset status --verbose",
     "release:version": "changeset version && pnpm install && pnpm format",
     "release:tag": "changeset git-tag",
-    "turbo": "turbo"
+    "turbo": "turbo",
+    "test:browser-runtime": "node packages/browser/runtime/smoke-package.mjs",
+    "test:framework-runtime": "node packages/browser/runtime/smoke-framework-package.mjs",
+    "update:runtime-fixtures": "node packages/browser/runtime/update-fixtures.mjs",
+    "pack:runtime": "node packages/browser/runtime/pack.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",
