@@ -19,6 +19,7 @@
     "pnpm-lock.yaml",
     "fixtures.ts",
     "PLAN.md",
+    "CHANGELOG.md",
     "*.svg",
     "apps/docs/src/libs",
     "apps/docs/src/content/docs/learn/performance.md"
