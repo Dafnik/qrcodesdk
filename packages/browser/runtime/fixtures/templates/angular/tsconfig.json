@@ -1,0 +1,19 @@
+{
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  },
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2022",
+    "useDefineForClassFields": false
+  },
+  "files": ["src/main.ts"],
+  "include": ["src"]
+}

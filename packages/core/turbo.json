@@ -1,0 +1,11 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "benchmark:matrix": {
+      "cache": false
+    },
+    "benchmark:styler": {
+      "cache": false
+    }
+  }
+}

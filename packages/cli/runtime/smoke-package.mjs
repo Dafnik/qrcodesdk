@@ -18,6 +18,8 @@ const executable = path.join(
   'bin.mjs',
 );
 const outputDirectory = await mkdtemp(path.join(tmpdir(), 'qrcodesdk-cli-runtime-'));
+// CI runs this script directly with Node, Deno, or Bun, outside Turbo.
+// eslint-disable-next-line turbo/no-undeclared-env-vars
 const runtime = process.env['QRCODESDK_RUNTIME'] ?? 'node';
 
 function logSuccess(message) {

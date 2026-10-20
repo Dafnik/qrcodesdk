@@ -1,0 +1,9 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "benchmark": {
+      "cache": false,
+      "dependsOn": ["build"]
+    }
+  }
+}

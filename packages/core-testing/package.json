@@ -19,7 +19,8 @@
     "test:roundtrips": "vitest --watch false tests/svg/*roundtrip.e2e.spec.ts",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint scripts src tests --max-warnings 0",
-    "clean": "rm -rf .turbo dist"
+    "clean": "rm -rf .turbo dist",
+    "test:snapshots": "vitest run tests/svg/svg-renderer.snapshot.e2e.spec.ts tests/text/text-renderer.snapshot.e2e.spec.ts"
   },
   "dependencies": {
     "@qrcodesdk/core": "workspace:*"

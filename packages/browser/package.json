@@ -69,7 +69,10 @@
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint src tests runtime --max-warnings 0",
     "clean": "rm -rf .turbo dist",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "test:browser-runtime": "node runtime/smoke-package.mjs",
+    "test:framework-runtime": "node runtime/smoke-framework-package.mjs",
+    "update:runtime-fixtures": "node runtime/update-fixtures.mjs"
   },
   "peerDependencies": {
     "@qrcodesdk/core": "workspace:0.0.3"

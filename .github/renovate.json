@@ -13,7 +13,7 @@
     ":semanticCommitTypeAll(chore)",
     "schedule:monthly"
   ],
-  "ignorePaths": ["**/libs/**"],
+  "ignorePaths": ["**/libs/**", "packages/browser/runtime/fixtures/**"],
   "labels": ["dependencies"],
   "lockFileMaintenance": {
     "automerge": true,

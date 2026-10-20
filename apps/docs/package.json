@@ -12,7 +12,7 @@
     "generate-readmes": "node scripts/readmes/generate-readmes.mjs --write",
     "preview": "astro preview",
     "check-types": "astro check",
-    "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0 && pnpm run check-readmes",
+    "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
     "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/explain/*.test.ts src/components/playground/*.test.ts src/utils/*.test.mjs",
     "astro": "astro",
     "clean": "rm -rf .turbo dist .astro"

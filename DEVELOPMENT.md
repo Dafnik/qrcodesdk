@@ -1,34 +1,69 @@
 ## Workspace development
 
+Install dependencies once, then run tasks through Turbo from the workspace root:
+
 ```sh
 pnpm install
-pnpm build
+pnpm turbo run build
+```
+
+The root `package.json` keeps shortcuts for common workspace commands and release operations.
+Shared task defaults live in the root `turbo.json`. Package-specific tasks and overrides live
+in each package's `package.json` and `turbo.json`.
+
+Use a filter to work on one package. Turbo builds its dependencies first:
+
+```sh
+pnpm turbo run build --filter=@qrcodesdk/node
+pnpm turbo run check-types --filter=docs
+```
+
+To rebuild a package and its dependencies when source files change, use Turbo's watch mode:
+
+```sh
+pnpm turbo watch build --filter=@qrcodesdk/node
 ```
 
 ### Checks
 
-Run the following command to check for formatting, linting, spelling, type errors, build errors, and test failures:
-
-```shell
-pnpm check
+```sh
+pnpm turbo run check
 ```
 
-### Linting
+This runs formatting, spelling, terminology, linting, type checking, builds, and the regular
+tests. Docs linting also checks the generated package READMEs. Roundtrip tests, coverage,
+benchmarks, performance-file checks, and installed-package smoke tests run separately.
+
+To run individual checks:
 
 ```sh
-pnpm format:check
-pnpm lint
-pnpm cspell
-pnpm check-types
+pnpm turbo run format:check
+pnpm turbo run lint
+pnpm turbo run cspell
+pnpm turbo run terminology
+pnpm turbo run check-types
 ```
 
 ### Testing
 
 ```sh
-pnpm test
-pnpm test:roundtrips
-pnpm test:coverage
+pnpm turbo run test
+pnpm turbo run test:roundtrips --filter=@repo/core-testing --filter=@qrcodesdk/browser --filter=@qrcodesdk/node
+pnpm turbo run test:coverage
 ```
+
+The `pnpm test:roundtrips` shortcut includes these filters. Keep them to avoid scheduling
+builds for packages outside the roundtrip suites.
+
+The browser package's tests require Playwright Chromium and its system dependencies.
+Install the browser prerequisites using the same Playwright version as the workspace.
+The CI setup is documented in `.github/actions/setup-playwright/action.yml`.
+
+Coverage clears previous reports, runs every package's raw coverage task through Turbo,
+then merges the results. HTML, LCOV, and combined JSON reports are written to `coverage/`.
+
+Installed-package smoke tests have separate consumer and browser prerequisites. See
+[the runtime test guide](packages/browser/runtime/README.md) for their commands.
 
 ### Docs
 
@@ -38,49 +73,53 @@ Run the documentation site locally:
 pnpm turbo run start --filter=docs
 ```
 
-#### Generate and check readmes and performance files:
+To build and preview the site:
+
+```sh
+pnpm turbo run preview --filter=docs
+```
+
+Generate or check package READMEs:
 
 ```sh
 pnpm turbo run generate-readmes --filter=docs
 pnpm turbo run check-readmes --filter=docs
 ```
 
+Performance generation and validation read `benchmark-results/latest.json`.
+Run the full benchmark task first to create that file:
+
 ```sh
+pnpm turbo run benchmark --filter=@repo/benchmarks
 pnpm turbo run generate-performance --filter=docs
 pnpm turbo run check-performance --filter=docs
 ```
 
 ### Benchmarks
 
-```sh
-pnpm benchmark
-```
-
-Run the focused matrix hot-path benchmarks:
+Run the full benchmark suite, or either focused benchmark against the core source:
 
 ```sh
+pnpm turbo run benchmark --filter=@repo/benchmarks
 pnpm turbo run benchmark:matrix --filter=@qrcodesdk/core
+pnpm turbo run benchmark:styler --filter=@qrcodesdk/core
 ```
 
 ### Updating snapshots
 
-#### Core
+Snapshot tasks build the required packages first and always execute, including when updating
+tracked snapshot files. Without the update flags, they compare against the existing snapshots.
 
-```shell
-UPDATE_SVG_SNAPSHOTS=1 \
-UPDATE_TEXT_SNAPSHOTS=1 \
-pnpm --filter @repo/core-testing exec vitest run \
-tests/svg/svg-renderer.snapshot.e2e.spec.ts \
-tests/svg/svg-renderer.snapshot.unit.spec.ts \
-tests/text/text-renderer.snapshot.e2e.spec.ts \
-tests/text/text-renderer.snapshot.unit.spec.ts
+For SVG and text snapshots:
+
+```sh
+UPDATE_SVG_SNAPSHOTS=1 UPDATE_TEXT_SNAPSHOTS=1 \
+pnpm turbo run test:snapshots --filter=@repo/core-testing
 ```
 
-#### Node
+For PNG snapshots:
 
-```shell
+```sh
 UPDATE_PNG_SNAPSHOTS=1 \
-pnpm --filter @qrcodesdk/node exec vitest run \
-tests/png/png-renderer.snapshot.e2e.spec.ts \
-tests/png/png-renderer.snapshot.unit.spec.ts
+pnpm turbo run test:snapshots --filter=@qrcodesdk/node
 ```
