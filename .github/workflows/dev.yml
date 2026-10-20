@@ -353,7 +353,7 @@ jobs:
         env:
           QRCODESDK_BROWSER: ${{ matrix.browser }}
           QRCODESDK_CONSUMER: ${{ runner.temp }}/browser-consumer
-        run: pnpm turbo run test:browser-runtime
+        run: pnpm turbo run test:browser-runtime --filter=@qrcodesdk/browser
 
   framework-runtime:
     name: ${{ matrix.framework }} ${{ matrix.version }} consumer
@@ -411,7 +411,7 @@ jobs:
           QRCODESDK_FRAMEWORK: ${{ matrix.framework }}
           QRCODESDK_FRAMEWORK_VERSION: ${{ matrix.version }}
           QRCODESDK_PACKAGES: ${{ runner.temp }}/runtime-packages
-        run: pnpm turbo run test:framework-runtime
+        run: pnpm turbo run test:framework-runtime --filter=@qrcodesdk/browser
 
   required:
     name: required

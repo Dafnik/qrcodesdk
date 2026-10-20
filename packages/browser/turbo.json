@@ -1,0 +1,16 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test:browser-runtime": {
+      "cache": false,
+      "env": ["QRCODESDK_BROWSER", "QRCODESDK_CONSUMER"]
+    },
+    "test:framework-runtime": {
+      "cache": false,
+      "env": ["QRCODESDK_FRAMEWORK", "QRCODESDK_FRAMEWORK_VERSION", "QRCODESDK_PACKAGES"]
+    },
+    "update:runtime-fixtures": {
+      "cache": false
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": ["$TURBO_EXTENDS$", "!scripts/verify-package-artifact.mjs"]
+    },
+    "test": {
+      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
+    },
+    "test:coverage:raw": {
+      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
+    },
+    "test:snapshots": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
+    }
+  }
+}

@@ -1,11 +1,33 @@
 {
   "extends": ["//"],
   "tasks": {
+    "check-performance": {
+      "cache": false
+    },
+    "check-readmes": {
+      "cache": false
+    },
     "check-types": {
       "dependsOn": ["$TURBO_EXTENDS$", "build"]
     },
+    "generate-performance": {
+      "cache": false
+    },
+    "generate-readmes": {
+      "cache": false
+    },
+    "lint": {
+      "dependsOn": ["check-readmes"]
+    },
+    "preview": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "persistent": true
+    },
     "start": {
-      "dependsOn": ["^build"]
+      "cache": false,
+      "dependsOn": ["^build"],
+      "persistent": true
     },
     "test": {
       "dependsOn": ["$TURBO_EXTENDS$", "@qrcodesdk/cli#build"]

@@ -1,0 +1,16 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test": {
+      "env": ["UPDATE_PNG_SNAPSHOTS"]
+    },
+    "test:coverage:raw": {
+      "env": ["UPDATE_PNG_SNAPSHOTS"]
+    },
+    "test:snapshots": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "env": ["UPDATE_PNG_SNAPSHOTS"]
+    }
+  }
+}

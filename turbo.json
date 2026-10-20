@@ -1,17 +1,5 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "globalDependencies": ["packages/core-testing/scripts/verify-package-artifact.mjs"],
-  "globalEnv": [
-    "QRCODESDK_BROWSER",
-    "QRCODESDK_CONSUMER",
-    "QRCODESDK_FRAMEWORK",
-    "QRCODESDK_FRAMEWORK_VERSION",
-    "QRCODESDK_RUNTIME",
-    "UPDATE_PNG_SNAPSHOTS",
-    "UPDATE_SVG_SNAPSHOTS",
-    "UPDATE_TEXT_SNAPSHOTS"
-  ],
-  "globalPassThroughEnv": ["QRCODESDK_PACKAGES"],
   "tasks": {
     "//#cspell": {
       "cache": false
@@ -39,32 +27,13 @@
     "//#terminology": {
       "cache": false
     },
-    "//#test:browser-runtime": {
+    "//#test:coverage": {
       "cache": false
-    },
-    "//#test:framework-runtime": {
-      "cache": false,
-      "env": ["QRCODESDK_PACKAGES"]
-    },
-    "//#update:runtime-fixtures": {
-      "cache": false
-    },
-    "benchmark": {
-      "cache": false,
-      "dependsOn": ["build"]
-    },
-    "benchmark:matrix": {
-      "cache": false,
-      "dependsOn": ["build"]
-    },
-    "benchmark:styler": {
-      "cache": false,
-      "dependsOn": ["build"]
     },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", "!.turbo/**", "!.astro-cache/**"]
+      "outputs": ["dist/**"]
     },
     "check": {
       "dependsOn": [
@@ -77,43 +46,26 @@
         "check-types"
       ]
     },
-    "check-performance": {
-      "cache": false
-    },
-    "check-readmes": {
-      "cache": false
-    },
     "check-types": {
       "dependsOn": ["^build", "^check-types"]
     },
     "clean": {
       "cache": false
     },
-    "generate-performance": {
-      "cache": false
-    },
-    "generate-readmes": {
-      "cache": false
-    },
     "lint": {},
-    "preview": {
-      "cache": false,
-      "dependsOn": ["build"],
-      "persistent": true
-    },
-    "start": {
-      "cache": false,
-      "persistent": true
-    },
     "test": {
-      "dependsOn": ["build", "^build"]
+      "dependsOn": ["build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/core-testing/scripts/verify-package-artifact.mjs"
+      ]
     },
     "test:coverage:raw": {
       "cache": false,
       "dependsOn": ["^build"]
     },
     "test:roundtrips": {
-      "dependsOn": ["build", "^build"]
+      "dependsOn": ["build"]
     }
   },
   "ui": "tui"

@@ -6,7 +6,7 @@
     "build": "turbo run build",
     "start": "turbo run start",
     "test": "turbo run test",
-    "test:coverage": "rm -rf .coverage coverage && mkdir -p .coverage/raw .coverage/merge coverage && turbo run test:coverage:raw && cp .coverage/raw/*/*.json .coverage/merge/ && nyc merge .coverage/merge coverage/coverage-final.json && nyc report --temp-dir coverage --report-dir coverage --reporter=text-summary --reporter=html --reporter=lcov",
+    "test:coverage": "node scripts/coverage.mjs",
     "test:roundtrips": "turbo run test:roundtrips --filter=@repo/core-testing --filter=@qrcodesdk/browser --filter=@qrcodesdk/node",
     "terminology": "node scripts/check-terminology.mjs",
     "check-types": "turbo run check-types",
@@ -20,11 +20,7 @@
     "release:status": "changeset status --verbose",
     "release:version": "changeset version && pnpm install && pnpm format",
     "release:tag": "changeset git-tag",
-    "turbo": "turbo",
-    "test:browser-runtime": "node packages/browser/runtime/smoke-package.mjs",
-    "test:framework-runtime": "node packages/browser/runtime/smoke-framework-package.mjs",
-    "update:runtime-fixtures": "node packages/browser/runtime/update-fixtures.mjs",
-    "pack:runtime": "node packages/browser/runtime/pack.mjs"
+    "pack:runtime": "node scripts/pack-runtime.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",

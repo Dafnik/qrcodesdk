@@ -19,7 +19,7 @@ to a different framework version. Update their dependencies deliberately, then r
 the lock files from the workspace root:
 
 ```sh
-pnpm turbo run update:runtime-fixtures
+pnpm turbo run update:runtime-fixtures --filter=@qrcodesdk/browser
 ```
 
 Build and pack the libraries, then run a consumer test:
@@ -28,9 +28,16 @@ Build and pack the libraries, then run a consumer test:
 QRCODESDK_PACKAGES=/tmp/qrcodesdk-runtime-packages pnpm turbo run pack:runtime
 QRCODESDK_PACKAGES=/tmp/qrcodesdk-runtime-packages \
 QRCODESDK_FRAMEWORK=vue QRCODESDK_FRAMEWORK_VERSION=3.3 \
-pnpm turbo run test:framework-runtime
+pnpm turbo run test:framework-runtime --filter=@qrcodesdk/browser
 ```
 
 The selected Playwright browser and its system dependencies must already be installed.
-All framework consumers need Chromium. The browser package test uses `QRCODESDK_BROWSER`
-and `QRCODESDK_CONSUMER` to select a browser and an installed-package directory.
+All framework consumers need Chromium.
+
+For the browser smoke test, point `QRCODESDK_CONSUMER` at a consumer directory with the packed
+`@qrcodesdk/core` and `@qrcodesdk/browser` packages installed in its `node_modules`:
+
+```sh
+QRCODESDK_BROWSER=chromium QRCODESDK_CONSUMER=/absolute/path/to/consumer \
+pnpm turbo run test:browser-runtime --filter=@qrcodesdk/browser
+```

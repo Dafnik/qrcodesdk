@@ -1,7 +1,8 @@
 import {defineConfig} from 'vitest/config';
 
-export default defineConfig({
+export default defineConfig(({mode}) => ({
   test: {
+    testTimeout: mode === 'coverage' ? 30_000 : undefined,
     coverage: {
       clean: false,
       include: ['src/**/*.{ts,tsx}'],
@@ -10,4 +11,4 @@ export default defineConfig({
       reportsDirectory: '../../.coverage/raw/node',
     },
   },
-});
+}));
