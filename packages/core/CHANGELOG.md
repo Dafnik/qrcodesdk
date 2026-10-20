@@ -1,5 +1,19 @@
 # @qrcodesdk/core
 
+## 0.0.3
+
+### Patch Changes
+
+- Added subpath entrypoints for direct runtime imports without a bundler: `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/text`, and `@qrcodesdk/core/error` as well as `@qrcodesdk/browser/canvas`, `@qrcodesdk/browser/image`, and `@qrcodesdk/browser/svg`. `@qrcodesdk/core/drawing` now also exports `createQRCodeStyler`. The root entrypoints keep exporting the same APIs and the runtime bundles are smaller.
+- Removed `cubicTo` from `QRCodeStyledDrawingTarget`. The styler no longer emits cubic curves, so custom drawing targets no longer need to implement it.
+- Hardened input validation:
+
+  - `qrcode(...).matrix()` now returns a frozen matrix.
+  - Payloads that are neither a string nor a number are rejected with `INVALID_PAYLOAD`.
+  - The payload helpers (`emailPayload`, `phonePayload`, `smsPayload`, `geoPayload`, `wifiPayload`) reject non-object input, non-list recipients, non-string phone extensions and SMS bodies, and phone numbers without digits.
+  - The SVG renderer rejects `accessibility.ariaLabel`, `accessibility.title`, and center image sources that contain characters that are invalid in XML.
+  - The text renderer validates the `ansi` option and its `mode`, `foreground`, and `background` fields, and matrix option errors report the rejected field and value.
+
 ## 0.0.2
 
 ### Patch Changes

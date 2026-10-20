@@ -1,5 +1,22 @@
 # @qrcodesdk/cli
 
+## 0.0.3
+
+### Patch Changes
+
+- Removed the `commander` and `@clack/prompts` dependencies in favor of `node:util` argument parsing and built-in prompts, which makes the CLI start faster.
+
+  - `--eci` is now a flag: use `--eci` or `--no-eci` instead of `--eci true` / `--eci false`.
+  - Option values that start with `-` must use the `--option=value` form.
+  - Choose the output format in the interactive prompt with the arrow keys, `j`/`k`, or a number key. Press Escape or Ctrl+C to cancel.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @qrcodesdk/core@0.0.3
+  - @qrcodesdk/node@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes

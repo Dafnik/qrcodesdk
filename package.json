@@ -18,7 +18,7 @@
     "format:check": "prettier --check .",
     "check": "turbo run check",
     "release:status": "changeset status --verbose",
-    "release:version": "changeset version && pnpm install",
+    "release:version": "changeset version && pnpm install && pnpm format",
     "release:tag": "changeset git-tag",
     "turbo": "turbo"
   },

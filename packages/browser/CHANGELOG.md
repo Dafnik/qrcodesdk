@@ -1,5 +1,16 @@
 # @qrcodesdk/browser
 
+## 0.0.3
+
+### Patch Changes
+
+- Added subpath entrypoints for direct runtime imports without a bundler: `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/text`, and `@qrcodesdk/core/error` as well as `@qrcodesdk/browser/canvas`, `@qrcodesdk/browser/image`, and `@qrcodesdk/browser/svg`. `@qrcodesdk/core/drawing` now also exports `createQRCodeStyler`. The root entrypoints keep exporting the same APIs and the runtime bundles are smaller.
+- The canvas renderer throws `INVALID_IMAGE_SOURCE` when `centerImage` is configured without an image source. The image renderer throws `RENDER_FAILED` with a descriptive message when the canvas is tainted by a cross-origin center image.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @qrcodesdk/core@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes

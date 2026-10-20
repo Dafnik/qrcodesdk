@@ -1,5 +1,15 @@
 # @qrcodesdk/node
 
+## 0.0.3
+
+### Patch Changes
+
+- Replaced the `pngjs` dependency with a built-in PNG encoder and decoder, so `@qrcodesdk/node` no longer has runtime dependencies. PNG center image sources are limited to 16 MiB and 16,777,216 pixels.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @qrcodesdk/core@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
