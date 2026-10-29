@@ -1,5 +1,16 @@
 # @qrcodesdk/svelte
 
+## 0.0.4
+
+### Patch Changes
+
+- Refreshed the package READMEs with clearer option examples and consolidated links to the documentation guides.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @qrcodesdk/browser@0.0.4
+  - @qrcodesdk/core@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes

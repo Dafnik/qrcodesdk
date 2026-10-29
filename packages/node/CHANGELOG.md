@@ -1,5 +1,16 @@
 # @qrcodesdk/node
 
+## 0.0.4
+
+### Patch Changes
+
+- Refreshed the package READMEs with clearer option examples and consolidated links to the documentation guides.
+- Fixed the `extra-rounded` finder styling. The finder ring now keeps straight edges and a consistent one-module thickness around its corners in SVG, canvas, image, and PNG output.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @qrcodesdk/core@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes

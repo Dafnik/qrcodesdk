@@ -1,5 +1,18 @@
 # @qrcodesdk/core
 
+## 0.0.4
+
+### Patch Changes
+
+- Refreshed the package READMEs with clearer option examples and consolidated links to the documentation guides.
+- `createQRCodeStyler` is no longer exported from the `@qrcodesdk/core` root entrypoint. Import it from `@qrcodesdk/core/drawing` instead:
+
+  ```ts
+  import {createQRCodeStyler} from '@qrcodesdk/core/drawing';
+  ```
+
+- Fixed the `extra-rounded` finder styling. The finder ring now keeps straight edges and a consistent one-module thickness around its corners in SVG, canvas, image, and PNG output.
+
 ## 0.0.3
 
 ### Patch Changes
