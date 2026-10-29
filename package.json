@@ -18,7 +18,7 @@
     "format:check": "prettier --check .",
     "check": "turbo run check",
     "release:status": "changeset status --verbose",
-    "release:version": "changeset version && pnpm install && pnpm format",
+    "release:version": "changeset version",
     "release:tag": "changeset git-tag",
     "pack:runtime": "node scripts/pack-runtime.mjs"
   },

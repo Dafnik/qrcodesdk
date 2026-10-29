@@ -132,17 +132,22 @@ function collectQRCodeSdkDependencies(packageJson, field) {
   );
 }
 
-function assertExactSdkDependency(packageJson, sourcePackageJson, field, name) {
-  const sourceSpecifier = sourcePackageJson[field]?.[name];
-  assert.match(
-    sourceSpecifier ?? '',
-    /^workspace:\d+\.\d+\.\d+$/u,
-    `${packageJson.name} must pin ${name} with an exact workspace version before 1.0`,
+async function assertExactSdkDependency(packageJson, sourcePackageJson, field, name) {
+  assert.equal(
+    sourcePackageJson[field]?.[name],
+    'workspace:*',
+    `${packageJson.name} must reference ${name} with workspace:*`,
+  );
+  const dependencyPackageJson = JSON.parse(
+    await readFile(
+      path.join(packageDirectory, '..', name.slice('@qrcodesdk/'.length), 'package.json'),
+      'utf8',
+    ),
   );
   assert.equal(
     packageJson[field]?.[name],
-    sourceSpecifier.slice('workspace:'.length),
-    `${packageJson.name} must publish ${name} as an exact version`,
+    dependencyPackageJson.version,
+    `${packageJson.name} must publish ${name} as an exact version before 1.0`,
   );
 }
 
@@ -204,7 +209,7 @@ test('packed package contains every declared entrypoint', async () => {
         `${packageJson.name} must publish its SDK ${field}`,
       );
       for (const name of expectedDependencies) {
-        assertExactSdkDependency(packageJson, sourcePackageJson, field, name);
+        await assertExactSdkDependency(packageJson, sourcePackageJson, field, name);
       }
     }
   } finally {

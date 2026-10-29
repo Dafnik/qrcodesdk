@@ -71,8 +71,8 @@
     "vue": "^3.3.0"
   },
   "dependencies": {
-    "@qrcodesdk/browser": "workspace:0.0.3",
-    "@qrcodesdk/core": "workspace:0.0.3"
+    "@qrcodesdk/browser": "workspace:*",
+    "@qrcodesdk/core": "workspace:*"
   },
   "devDependencies": {
     "@qrcodesdk/browser": "workspace:*",

@@ -73,8 +73,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@qrcodesdk/core": "workspace:0.0.3",
-    "@qrcodesdk/node": "workspace:0.0.3"
+    "@qrcodesdk/core": "workspace:*",
+    "@qrcodesdk/node": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

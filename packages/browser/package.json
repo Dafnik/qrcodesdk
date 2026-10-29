@@ -75,7 +75,7 @@
     "update:runtime-fixtures": "node runtime/update-fixtures.mjs"
   },
   "peerDependencies": {
-    "@qrcodesdk/core": "workspace:0.0.3"
+    "@qrcodesdk/core": "workspace:*"
   },
   "devDependencies": {
     "@qrcodesdk/core": "workspace:*",

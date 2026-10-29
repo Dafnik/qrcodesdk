@@ -73,7 +73,7 @@
     "test:snapshots": "vitest run tests/png/png-renderer.snapshot.e2e.spec.ts"
   },
   "peerDependencies": {
-    "@qrcodesdk/core": "workspace:0.0.3"
+    "@qrcodesdk/core": "workspace:*"
   },
   "devDependencies": {
     "@qrcodesdk/core": "workspace:*",

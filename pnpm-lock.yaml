@@ -544,10 +544,10 @@ importers:
   packages/angular:
     dependencies:
       '@qrcodesdk/browser':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../browser
       '@qrcodesdk/core':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../core
       tslib:
         specifier: ^2.8.1
@@ -685,10 +685,10 @@ importers:
   packages/cli:
     dependencies:
       '@qrcodesdk/core':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../core
       '@qrcodesdk/node':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../node
     devDependencies:
       '@repo/eslint-config':
@@ -837,10 +837,10 @@ importers:
   packages/react:
     dependencies:
       '@qrcodesdk/browser':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../browser
       '@qrcodesdk/core':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../core
     devDependencies:
       '@repo/core-testing':
@@ -886,10 +886,10 @@ importers:
   packages/svelte:
     dependencies:
       '@qrcodesdk/browser':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../browser
       '@qrcodesdk/core':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../core
     devDependencies:
       '@repo/core-testing':
@@ -940,10 +940,10 @@ importers:
   packages/vue:
     dependencies:
       '@qrcodesdk/browser':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../browser
       '@qrcodesdk/core':
-        specifier: workspace:0.0.3
+        specifier: workspace:*
         version: link:../core
     devDependencies:
       '@repo/core-testing':
