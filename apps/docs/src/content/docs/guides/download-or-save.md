@@ -13,7 +13,7 @@ related:
   - ../packages/cli.mdx
 ---
 
-Choose the file format first, then use the workflow for the runtime that owns the output.
+Choose the file format first, then follow the instructions for your runtime or framework.
 
 ## Choose whether to download SVG or PNG
 
@@ -22,8 +22,9 @@ Choose the file format first, then use the workflow for the runtime that owns th
 | SVG    | The QR code must scale cleanly, stay editable, or remain text-based | SVG `string` from `@qrcodesdk/core`                       |
 | PNG    | The destination requires raster bytes or a conventional image file  | Browser Image/Canvas, Node.js `Buffer`, or CLI PNG output |
 
-Both formats support the same shared appearance. PNG has a fixed pixel size; choose `size` for the
-smallest display or print resolution you need.
+Both formats support the same styling options. PNG has a fixed pixel size. Set `style.moduleSize`
+to provide enough pixels for the largest display or print size you need. The image width and height
+are `moduleSize × (matrix width + 2 × quietZone)`.
 
 ## Download in the browser
 
@@ -44,7 +45,7 @@ qrcode('https://qrcodesdk.dev').render(
 For PNG, use `QRCodeDownloadImageRenderer({renderer: QRCodeImageRenderer(), filename})`. Each helper
 appends `.svg` or `.png` when needed, triggers a temporary link click, and returns `void`. Call it
 from a user action when required by the browser. See the
-[browser download reference](/reference/renderers/browser-downloads/) for the exact wrapper contract.
+[browser download reference](/reference/renderers/browser-downloads/) for options and filename handling.
 
 ## Download from React
 

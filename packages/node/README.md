@@ -76,10 +76,6 @@ The public TypeScript API uses Node's global `Buffer` type. TypeScript consumers
 `@types/node` in their development dependencies and make Node types available in their TypeScript
 options.
 
-## Package boundary
-
-`@qrcodesdk/node` provides Node-specific renderers and does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation and builder options.
-
 ## Public API
 
 ```ts

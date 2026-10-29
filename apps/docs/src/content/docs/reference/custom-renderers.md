@@ -27,7 +27,8 @@ The matrix is a two-dimensional array. `1` means a dark module and `0` means a l
 
 ## Styled renderer
 
-`createQRCodeStyler()` validates and snapshots a `QRCodeVisualStyle` immediately. Its `draw()`
+Import `createQRCodeStyler()` and the drawing types from `@qrcodesdk/core/drawing`.
+The factory validates and snapshots a `QRCodeVisualStyle` immediately. Its `draw()`
 method caches immutable drawings by matrix identity. Implement `QRCodeStyledDrawingTarget` to translate
 the callback stream into your output format.
 
@@ -93,14 +94,58 @@ const commands = qrcode('custom output').render(
 );
 ```
 
-Coordinates are finite module units. RGBA channels are integers from 0 through 255. A paint starts
-with one background callback, then emits balanced, non-nested layer and path lifecycles. Target
-exceptions propagate unchanged. Callback counts, batching, command order within those lifecycle
-rules, and exact path segmentation are implementation details.
+### Drawing dimensions
 
-For a renderer-specific center image, call `drawing.placeCenterImage({size, padding,
-clearBackground})`. It returns the image box and optional clear box in the same module coordinate
-system. Loading, decoding, clearing, and compositing the actual source remain the renderer's job.
+`styler.draw(matrix)` returns an immutable `QRCodeStyledDrawing` with these properties and methods:
+
+| Member                       | Type             | Meaning                                                            |
+| ---------------------------- | ---------------- | ------------------------------------------------------------------ |
+| `moduleCount`                | `number`         | Matrix width before adding the quiet zone                          |
+| `moduleSize`                 | `number`         | Requested output pixels per module                                 |
+| `quietZone`                  | `number`         | Quiet-zone width in modules                                        |
+| `viewSize`                   | `number`         | Drawing width and height in modules: `moduleCount + 2 × quietZone` |
+| `outputSize`                 | `number`         | Output width and height in pixels: `viewSize × moduleSize`         |
+| `paint(target)`              | `void`           | Sends drawing commands to a `QRCodeStyledDrawingTarget`            |
+| `placeCenterImage(options?)` | placement object | Returns center-image and optional clearing boxes in module units   |
+
+Coordinates start at the upper-left corner of the drawing, including its quiet zone. X increases to
+the right and Y increases downward. All coordinates and lengths are finite module units. Scale
+them by `moduleSize` when drawing to pixels. For SVG, use `viewSize` for the viewBox and `outputSize`
+for the output width and height.
+
+### Drawing callbacks
+
+Implement every method of `QRCodeStyledDrawingTarget`. RGBA channels are integers from `0` through
+`255`, including alpha.
+
+| Callback                                                                | Required behavior                                                                                             |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `drawBackground(r, g, b, a)`                                            | Fill the entire `viewSize × viewSize` drawing with this color                                                 |
+| `beginLayer(r, g, b, a)`                                                | Select the fill color for subsequent rectangles and paths                                                     |
+| `drawRectangle(x, y, width, height)`                                    | Fill a rectangle in module units without a stroke                                                             |
+| `beginPath(fillRule)`                                                   | Begin a path using the `'nonzero'` or `'evenodd'` fill rule                                                   |
+| `moveTo(x, y)`                                                          | Start a new subpath at these coordinates                                                                      |
+| `lineTo(x, y)`                                                          | Add a straight segment from the current point                                                                 |
+| `arc(centerX, centerY, radius, startAngle, endAngle, counterclockwise)` | Add a circular arc with angles in radians, measured from the positive X axis; increasing angles run clockwise |
+| `closePath()`                                                           | Close the current subpath                                                                                     |
+| `endPath()`                                                             | Fill the complete path with the current layer color and path fill rule                                        |
+| `endLayer()`                                                            | Finish the current layer                                                                                      |
+
+Each `paint()` call starts with one background callback, followed by layers. Layers do not nest.
+Paths begin and end within their layer. Each begin callback has a matching end callback. Errors
+thrown by a target propagate to the caller unchanged. Callback counts, batching, command order
+within these rules, and exact path segmentation may change between releases.
+
+### Center-image placement
+
+For a center image, call `drawing.placeCenterImage()` with the layout options `size`, `padding`, and
+`clearBackground`. The returned `centerImage` box has `x`, `y`, and `size` in module units. The
+`clear` property has the same shape when clearing is enabled and is `undefined` otherwise. The clear
+box includes padding around the image.
+
+The placement method only calculates boxes. Your renderer must load and decode the source, clear
+the covered QR modules when a clear box is present, and composite the image. See
+[Add a center image](/guides/center-images/#configure-the-center-image) for defaults and constraints.
 
 ## Store a renderer on the builder
 

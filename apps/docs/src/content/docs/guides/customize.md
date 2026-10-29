@@ -1,6 +1,6 @@
 ---
 title: Customize appearance
-description: Style QR code dimensions, colors, modules, and finder patterns with the shared visual style contract.
+description: Set QR code dimensions, colors, module shapes, and finder patterns with shared styling options.
 docType: guide
 
 related:
@@ -12,8 +12,9 @@ related:
   - ./center-images.md
 ---
 
-SVG, Canvas, browser Image, and Node.js PNG renderers consume the same `QRCodeVisualStyle`.
-Styling is renderer-owned, so matrix generation remains independent of presentation.
+SVG, Canvas, browser Image, and Node.js PNG renderers accept the same `QRCodeVisualStyle`.
+Pass it to the renderer's `style` option. Styling changes the appearance without changing the encoded
+matrix.
 
 ## Apply a visual theme
 
@@ -67,18 +68,19 @@ preserved by all graphical renderers.
 
 Ordinary modules support `square`, `circle`, `rounded`, `extra-rounded`, `diagonal`, and
 `diagonal-rounded`. Finder outer rings and centers support `square`, `rounded`, `extra-rounded`, and
-`circle`. The `extra-rounded` finder shape has larger rounded corners with short straight edges;
-`circle` is fully circular. Finder shapes do not inherit the ordinary module shape.
+`circle`. The `extra-rounded` finder shape has rounder corners than `rounded`, with short straight
+edges. The `circle` shape is fully circular. Finder shapes do not inherit the ordinary module shape.
 
 The output width and height are `moduleSize × (matrix width + 2 × quietZone)`.
 
 ## Text styling
 
-Terminal text deliberately exposes a smaller `QRCodeTextStyle` with only `moduleSize` and
-`quietZone`. ANSI colors and compact/full layout belong to `QRCodeTextRenderer` itself because they
-cannot be represented by graphical renderers.
+Terminal text accepts a smaller `QRCodeTextStyle` with only `moduleSize` and `quietZone`.
+Configure ANSI colors and the compact or full layout on `QRCodeTextRenderer`.
 
 ```ts
+import {QRCodeTextRenderer} from '@qrcodesdk/core';
+
 QRCodeTextRenderer({
   style: {moduleSize: 1, quietZone: 2},
   layout: 'compact',
@@ -98,4 +100,4 @@ Center images also remain renderer options because their source types differ by 
 
 The API accepts transparent colors, low contrast, a zero quiet zone, all supported shapes, and the
 full image-size range. Those values are structurally valid, but not necessarily easy to scan. Test
-the final displayed or printed artifact on the devices and at the sizes used in production.
+the final displayed or printed QR code on the devices and at the sizes used in production.

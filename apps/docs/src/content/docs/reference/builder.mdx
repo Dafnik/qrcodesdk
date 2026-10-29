@@ -112,10 +112,10 @@ fails, shorten or change the payload.
 The builder's types prevent `.matrix()` or `.render()` before a payload is set, and prevent `.render()`
 without either a stored or directly supplied renderer.
 
-## Matrix output and renderer contract
+## Matrix output and renderers
 
 `.matrix()` returns a two-dimensional `QRCodeMatrix`. Each module is `1` for dark or `0` for light.
-This is the only raw matrix-output contract.
+Rows and their modules are read-only.
 
 ```ts
 import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
@@ -135,5 +135,5 @@ const direct = qrcode('renderer output').render(jsonRenderer);
 const stored = qrcode('renderer output').renderer(jsonRenderer).render();
 ```
 
-Built-in renderers follow the same function contract. Custom renderers own their output geometry,
-styling, validation, and return type; see [Custom renderers](/reference/custom-renderers/).
+Built-in renderers use the same function signature. Custom renderers define their output geometry,
+styling, validation, and return type. See [Custom renderers](/reference/custom-renderers/).

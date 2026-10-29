@@ -58,7 +58,7 @@ document.body.append(image);
 
 `QRCodeImageRenderer()` returns an `HTMLImageElement`. Its `src` is a PNG data URL, and its `width` and `height` match the rendered QR code size.
 
-[Learn here](/guides/browser-usage/) more about using the library in the browser.
+See [Render QR codes in the browser](/guides/browser-usage/) for inserting and replacing browser output.
 
 ## Configure and download output
 
@@ -76,10 +76,6 @@ Follow [Add a center image](/guides/center-images/) to prepare a `CanvasImageSou
 Create these renderers only where `document`, Canvas, and browser download APIs are available.
 For server rendering, defer them until hydration or use the runtime-neutral SVG renderer from
 `@qrcodesdk/core`. Use `@qrcodesdk/node` when you need PNG bytes without a DOM.
-
-## Package boundary
-
-`@qrcodesdk/browser` depends on browser DOM APIs and does not replace `@qrcodesdk/core`. The core package still provides `qrcode()`, matrix generation, builder options, and shared styling normalization.
 
 ## Public API
 

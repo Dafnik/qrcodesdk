@@ -213,23 +213,12 @@ component and template.
 
 ## Download files
 
-- `QRCodeSVG` exposes `download(filename?)` and writes an SVG file.
-- `QRCodeImage` exposes `download(filename?)` and writes a PNG file.
+`QRCodeSVG` and `QRCodeImage` expose `download(filename?)` for SVG and PNG files respectively.
+The method appends the file extension when needed. `QRCodeCanvas` has no download method.
 
-```angular-html
-<qrcode-svg #qrcodeSvg payload="https://qrcodesdk.dev" />
-<button (click)="qrcodeSvg.download('qrcodesdk')" type="button">Download SVG</button>
-
-<qrcode-image #qrcodeImage payload="https://qrcodesdk.dev" />
-<button (click)="qrcodeImage.download('qrcodesdk')" type="button">Download PNG</button>
-```
-
-The appropriate `.svg` or `.png` extension is appended when necessary.
-
-`QRCodeCanvas` does not include a download method. Use `QRCodeImage` when you want built-in PNG download support.
-
-See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-angular) for template-reference
-downloads and manual Canvas export.
+See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-angular) for the complete
+Angular example, or its [Canvas export section](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually)
+for manual downloads.
 
 ## Server-side rendering
 
@@ -239,10 +228,25 @@ downloads and manual Canvas export.
 
 ## Shared options
 
-The `options` input combines matrix options with the selected renderer's options. Use the
-[builder reference](https://qrcodesdk.dev/reference/builder/) for encoding, version, mask, and error correction;
-[Customize output](https://qrcodesdk.dev/guides/customize/) for shared visual options; and the dedicated
-[renderer references](https://qrcodesdk.dev/reference/renderers/) for output-specific options and constraints.
+The `options` input groups encoding settings under `matrix`. Renderer settings such as
+`style`, `accessibility`, and `centerImage` go alongside it:
+
+```ts
+import type {QRCodeSVGOptions} from '@qrcodesdk/angular';
+
+const options: QRCodeSVGOptions = {
+  matrix: {errorCorrectionLevel: 'H'},
+  style: {moduleSize: 8, quietZone: 4},
+  accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+};
+```
+
+Pass this object through the component's `options` input. Use `QRCodeImageOptions` or
+`QRCodeCanvasOptions` for the corresponding component.
+
+See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
+[Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
+[Renderer outputs](https://qrcodesdk.dev/reference/renderers/) for output-specific options.
 
 ## Public API
 

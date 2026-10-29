@@ -4,18 +4,16 @@ description: QRCodeSDK authorship, licensing, and acknowledgements.
 docType: concept
 ---
 
-QRCodeSDK is an MIT-licensed project and is developed within the [QRCodeSDK repository](https://github.com/Dafnik/qrcodesdk).
+QRCodeSDK is [MIT-licensed](https://github.com/Dafnik/qrcodesdk/blob/main/LICENSE).
 
-The library’s matrix-calculation foundation traces back to [LostInBrittany/qr-esm](https://github.com/LostInBrittany/qr-esm),
-which itself draws from Kang Seonghoon's [qr.js](https://github.com/lifthrasiir/qr.js).
+The matrix-generation code was adapted from [LostInBrittany/qr-esm](https://github.com/LostInBrittany/qr-esm),
+which was based on Kang Seonghoon's [qr.js](https://github.com/lifthrasiir/qr.js).
 
-Additional recognition goes to [soldair/node-qrcode](https://github.com/soldair/node-qrcode), published as `qrcode`,
-for driving broader progress in the JavaScript QR ecosystem.
+QRCodeSDK uses [soldair/node-qrcode](https://github.com/soldair/node-qrcode), published as `qrcode`,
+and [`qrcode-generator`](https://github.com/kazuhikoarase/qrcode-generator) for validation and
+benchmark comparisons. Styled SVG benchmarks also use
+[`qr-code-styling`](https://github.com/kozakdenys/qr-code-styling).
 
-For validation and benchmarking QRCodeSDK relies on `qrcode` and [`qrcode-generator`](https://github.com/kazuhikoarase/qrcode-generator).
+The published packages do not depend on these libraries at runtime.
 
-These credits reflect historical lineage and testing standards rather than runtime requirements. QRCodeSDK carries zero runtime dependencies on any credited package.
-
-:::caution[AI Disclaimer]
-AI tools were used to assist in the development of this project.
-:::
+AI tools assisted with development.

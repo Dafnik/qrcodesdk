@@ -25,7 +25,8 @@ const image = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-[Learn here](/guides/browser-usage/#image-element) more about using the Image Element in the browser.
+See the [Image element section of Render QR codes in the browser](/guides/browser-usage/#image-element)
+for insertion and PNG data URL examples.
 
 ## Return value
 
@@ -66,5 +67,5 @@ For server output, choose SVG or the Node.js PNG renderer.
 
 - [Customize appearance](/guides/customize/) for shared styling, labels, and scan reliability.
 - [Add a center image](/guides/center-images/) for preparing a `CanvasImageSource`.
-- [Browser Usage](/guides/browser-usage/) for rendering in the browser.
+- [Render QR codes in the browser](/guides/browser-usage/) for DOM insertion and layout.
 - [Download or save](/guides/download-or-save/) for PNG downloads.

@@ -41,18 +41,18 @@ centerImage: {
 | `padding`         |     `1` | non-negative finite number                     | Cleared space around the image, in modules                   |
 | `clearBackground` |  `true` | `boolean`                                      | Replaces covered modules and padding with the light color    |
 
-The source is centered and contained without cropping. `size: 1` is valid value, not a promise that
+The source is centered and contained without cropping. `size: 1` is a valid value, not a promise that
 the result will scan. Start around `0.2`–`0.3`, preserve padding, and increase only after testing.
 
 ## Choose and prepare a source
 
-| Output                             | Source type                                                | Preparation                                                          |
-| ---------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
-| Core SVG                           | `QRCodeDataImageURL`                                       | Convert bytes or a Blob to an embedded `data:image/...` URL          |
-| Browser Canvas or PNG-backed Image | loaded `CanvasImageSource`                                 | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
-| Node.js PNG                        | PNG `Buffer`                                               | Read or download valid PNG bytes before rendering                    |
-| Framework Adapter SVG's            | `QRCodeDataImageURL` in `options.centerImage.source`       | Prepare outside render; memoize options when useful                  |
-| Framework Adapter Image or Canvas  | loaded `CanvasImageSource` in `options.centerImage.source` | Store the decoded source in state before mounting output             |
+| Output                               | Source type                                                | Preparation                                                          |
+| ------------------------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------- |
+| Core SVG                             | `QRCodeDataImageURL`                                       | Convert bytes or a Blob to an embedded `data:image/...` URL          |
+| Browser Canvas or PNG-backed Image   | loaded `CanvasImageSource`                                 | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
+| Node.js PNG                          | PNG `Buffer`                                               | Read or download valid PNG bytes before rendering                    |
+| Framework SVG components             | `QRCodeDataImageURL` in `options.centerImage.source`       | Prepare outside render; memoize options when useful                  |
+| Framework Image or Canvas components | loaded `CanvasImageSource` in `options.centerImage.source` | Store the decoded source in state before mounting output             |
 
 QRCodeSDK never reads an image path or fetches a URL on your behalf.
 
@@ -114,7 +114,7 @@ const png = qrcode('https://qrcodesdk.dev')
 
 The Node renderer accepts PNG bytes only. It decodes and alpha-composites the source in memory.
 
-## Wire prepared sources into frameworks
+## Use prepared sources in framework components
 
 React, Vue, Svelte, and Angular do not load image sources inside their QR components. Prepare
 browser sources in application state, then pass stable options after decoding.
@@ -221,6 +221,8 @@ import {QRCodeImage} from '@qrcodesdk/angular';
       <qrcode-image
         [options]="{matrix: {errorCorrectionLevel: 'H'}, centerImage: {source: image, size: 0.3}}"
         payload="https://qrcodesdk.dev" />
+    } @else {
+      <button (click)="loadLogo('/logo.png')" type="button">Load logo</button>
     }
   `,
 })
@@ -238,8 +240,8 @@ export class QRCodeWithLogo {
 
 ## Verify the result
 
-Test the rendered or downloaded artifact—not only the preview—at the smallest expected size and
-after taking screenshots, optimizing images, printing, or compressing. Test several scanner apps
+Test the rendered or downloaded QR code at the smallest expected size. Test it again
+after taking screenshots, optimizing images, printing, or compressing. Use several scanner apps
 and representative devices. If scanning is unreliable, reduce the image, restore padding and the
 four-module quiet zone, increase module size, simplify curved styling, or shorten the payload.
 

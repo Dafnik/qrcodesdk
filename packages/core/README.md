@@ -61,14 +61,6 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 The result is an SVG `string`. See the [SVG renderer reference](https://qrcodesdk.dev/reference/renderers/svg/) for its
 options and constraints.
 
-For direct runtime imports, use `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`,
-`@qrcodesdk/core/text`, or `@qrcodesdk/core/error`. When running ESM directly without a bundler,
-these entrypoints avoid loading unrelated renderers through the root entrypoint. These APIs are
-also exported from the root, which supports tree shaking in application bundles.
-
-Import `createQRCodeStyler` and its drawing types from `@qrcodesdk/core/drawing`.
-They are available only through that subpath.
-
 ## What Core adds
 
 | Capability                    | API                        | Return type    |
@@ -77,8 +69,8 @@ They are available only through that subpath.
 | Render scalable vector output | `QRCodeSVGRenderer`        | SVG `string`   |
 | Render terminal output        | `QRCodeTextRenderer`       | text `string`  |
 
-The complete payload, matrix-option, builder-method, and matrix-output contracts live in
-[Builder and matrix](https://qrcodesdk.dev/reference/builder/). Shared visual options and scan-reliability guidance live in
+See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for accepted payloads, matrix options, builder methods,
+and matrix output. Shared visual options and scan-reliability guidance are in
 [Customize appearance](https://qrcodesdk.dev/guides/customize/).
 
 Typed helpers serialize common application values before generation. See
@@ -89,21 +81,21 @@ Typed helpers serialize common application values before generation. See
 > `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
 > It has no Node.js, DOM, filesystem, or framework dependency.
 
-| Runtime                         | Support policy                                     |
-| ------------------------------- | -------------------------------------------------- |
-| Node.js                         | All maintained LTS lines                           |
-| Deno                            | Current stable major                               |
-| Bun                             | Current stable release                             |
-| Browsers                        | Current evergreen browser families                 |
-| Other runtimes and edge workers | Supported when they meet the Core runtime contract |
+| Runtime                         | Support policy                                          |
+| ------------------------------- | ------------------------------------------------------- |
+| Node.js                         | All maintained LTS lines                                |
+| Deno                            | Current stable major                                    |
+| Bun                             | Current stable release                                  |
+| Browsers                        | Current evergreen browser families                      |
+| Other runtimes and edge workers | Native ESM, ES2020, and a global `TextEncoder` required |
 
-For runtime-specific output, add the owning package:
+For runtime-specific output, add the package for your runtime or framework:
 
-| Package                                                         | Additional output                                           | Output                                          |
+| Package                                                         | Use it for                                                  | Return value                                    |
 | --------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------- |
 | [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) | Canvas element, PNG-backed Image element, browser downloads | `HTMLCanvasElement`, `HTMLImageElement`, `void` |
 | [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       | PNG bytes                                                   | `Buffer`                                        |
-| [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         | Command line generation from terminals and scripts.         | Terminal text, SVG files, PNG files.            |
+| [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         | Command line generation from terminals and scripts          | Terminal text, SVG files, PNG files             |
 | [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)     | React SVG, Image, and Canvas components                     | React element                                   |
 | [`@qrcodesdk/vue`](https://qrcodesdk.dev/packages/vue/)         | Vue SVG, Image, and Canvas components                       | Vue component                                   |
 | [`@qrcodesdk/svelte`](https://qrcodesdk.dev/packages/svelte/)   | Svelte SVG, Image, and Canvas components                    | Svelte component                                |
@@ -112,6 +104,15 @@ For runtime-specific output, add the owning package:
 Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/reference/renderers/).
 
 ## Public API
+
+The root exports the builder, renderers, errors, and shared types. For direct ESM imports without a
+bundler, use `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/text`, or
+`@qrcodesdk/core/error` to avoid loading unrelated renderers. Bundled applications can use root
+imports with tree shaking.
+
+Import the styler and drawing types from `@qrcodesdk/core/drawing`, and payload helpers from
+`@qrcodesdk/core/payload`. These APIs are available only through those entry points. See
+[Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for the drawing protocol.
 
 ```ts
 import {
@@ -122,6 +123,7 @@ import {
   QRCodeError,
   type QRCodeErrorCode,
   type QRCodeErrorCorrectionLevel,
+  type QRCodeErrorOptions,
   type QRCodeFinderShape,
   type QRCodeMask,
   type QRCodeMatrix,
@@ -142,6 +144,7 @@ import {
   type QRCodeTextStyle,
   type QRCodeVersion,
   type QRCodeVisualStyle,
+  QR_CODE_ERROR_CODES,
   qrcode,
 } from '@qrcodesdk/core';
 import {
@@ -164,9 +167,6 @@ import {
   wifiPayload,
 } from '@qrcodesdk/core/payload';
 ```
-
-The styler, drawing types, and payload helpers are deliberately not re-exported from the package
-root. Import them from the stable subpath entry points shown above.
 
 ## Generated output stability
 

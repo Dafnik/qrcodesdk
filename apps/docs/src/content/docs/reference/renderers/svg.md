@@ -11,12 +11,8 @@ related:
 ## When to use
 
 Use `QRCodeSVGRenderer` for scalable output in web pages, email, print, generated assets, or HTTP
-responses. It is the recommended default when the consumer accepts SVG text.
-
-:::tip[Recommended default]
-Choose SVG when the consumer accepts it: output stays sharp at every size and the renderer has no
-browser or Node.js dependency.
-:::
+responses. It is the recommended default when the consumer accepts SVG text. Output stays sharp at
+every size, and the renderer has no browser or Node.js dependency.
 
 ## Minimal example
 
@@ -26,7 +22,8 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
-[Learn here](/guides/browser-usage/#svg-string) more about using the SVG string in the browser.
+See the [SVG string section of Render QR codes in the browser](/guides/browser-usage/#svg-string)
+for DOM insertion examples.
 
 ## Return value
 
@@ -50,10 +47,10 @@ square shapes uses `shape-rendering="crispEdges"`; curved styles omit that hint.
 
 ## Renderer-specific constraints
 
-:::caution[Keep the application's trust boundary]
-Renderer-generated text is escaped, but inserting any HTML string into a document still requires
-the normal trust decision for that application.
-:::
+The renderer escapes label text and image URL attributes. It encodes the payload as QR modules,
+so payload text does not become HTML. When inserting the returned SVG into a page, do not
+concatenate unescaped user input into it. Validate uploaded center images before creating a data
+URL; the renderer checks the URL format but does not inspect the embedded image.
 
 - `centerImage.source` must be a non-empty embedded image data URL. The renderer does not read paths or
   fetch remote URLs.
@@ -61,13 +58,13 @@ the normal trust decision for that application.
 - Image `size` must be finite, greater than `0`, and at most `1`; padding must be finite and
   non-negative.
 - Options are validated and copied when `QRCodeSVGRenderer()` is called.
-- The renderer is runtime-neutral under the [Core compatibility contract](/packages/core/#runtime-compatibility).
+- The renderer supports the same [runtimes as Core](/packages/core/#runtime-compatibility).
 
 ## Related guides
 
 - [Customize appearance](/guides/customize/) for shared colors, module shapes, quiet zones, labels,
   and scan reliability.
 - [Add a center image](/guides/center-images/) for preparing an SVG center image source.
-- [Browser Usage](/guides/browser-usage/) for rendering in the browser.
+- [Render QR codes in the browser](/guides/browser-usage/) for DOM insertion and layout.
 - [Download or save](/guides/download-or-save/) for files and browser downloads.
 - [Serve a QR code](/guides/server-output/) for HTTP responses.

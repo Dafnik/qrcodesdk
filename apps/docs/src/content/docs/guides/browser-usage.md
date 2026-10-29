@@ -63,8 +63,11 @@ if (container) {
 <div id="qrcode"></div>
 ```
 
-Only insert the string as HTML when the renderer and its options are inside your application's
-trust boundary.
+Insert the SVG string returned by `QRCodeSVGRenderer()` directly. The renderer escapes label text
+and image URL attributes; it encodes the payload as modules rather than inserting it as text.
+Do not concatenate unescaped user input into the SVG or its surrounding HTML. For center images,
+validate uploaded image content before converting it to a data URL; the renderer checks the URL
+format but does not inspect the embedded image.
 
 ### Include it in browser-generated markup
 

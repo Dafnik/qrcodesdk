@@ -10,8 +10,15 @@ head:
 
 import QRCodeExplain from '../../../components/astro/qrcode-explain.astro';
 
-A QR code combines reserved functional modules with placed codeword bits. Some versions also need a
-few remainder bits to complete the placement path. Configure a symbol, then hover or focus any
-module to see which region it belongs to. Click, tap, or press <kbd>Enter</kbd> to pin a selection.
+A QR code is a grid of small squares called modules. The three large squares in its corners are
+finder patterns. They help scanners locate and orient the code. Other reserved patterns help a
+scanner read the grid and identify its encoding settings.
+
+The remaining modules hold the payload and error-correction data. The encoder groups this data into
+bytes called codewords, then places their bits in a zigzag path through the grid. Some QR code sizes
+need extra remainder bits to fill that path.
+
+Use the explorer below to see these regions. Configure a QR code, then hover or focus a module to
+read its explanation. Click, tap, or press <kbd>Enter</kbd> to keep a selection visible.
 
 <QRCodeExplain />

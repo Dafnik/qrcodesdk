@@ -1,6 +1,7 @@
 ---
 title: Version and output policy
 description: Framework support windows and generated-artifact compatibility guarantees.
+docType: reference
 ---
 
 ## Generated artifacts

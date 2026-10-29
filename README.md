@@ -53,7 +53,7 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 
 SVG is the recommended default for most user-facing QR codes: it stays sharp at any size and works
 in browsers, servers and static assets. See the [SVG renderer reference](https://qrcodesdk.dev/reference/renderers/svg/)
-when you need its options or exact return contract.
+for its options and return value.
 
 ## Choose by runtime and output
 

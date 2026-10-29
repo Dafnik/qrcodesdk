@@ -22,7 +22,8 @@ import {qrcode} from '@qrcodesdk/core';
 const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
 ```
 
-[Learn here](/guides/browser-usage/#canvas-element) more about using the Canvas Element in the browser.
+See the [Canvas element section of Render QR codes in the browser](/guides/browser-usage/#canvas-element)
+for insertion and compositing examples.
 
 ## Return value
 
@@ -66,5 +67,5 @@ renderer.
 
 - [Customize appearance](/guides/customize/) for shared styling and scan reliability.
 - [Add a center image](/guides/center-images/) for loading browser image sources.
-- [Browser Usage](/guides/browser-usage/) for rendering in the browser.
+- [Render QR codes in the browser](/guides/browser-usage/) for DOM insertion and layout.
 - [Download or save](/guides/download-or-save/) for `toBlob()` export.

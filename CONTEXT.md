@@ -36,7 +36,7 @@ _Avoid_: Builder preset, QR code helper
 **Renderer**:
 A function that converts a valid QR code matrix produced by QRCodeSDK into an output value. A custom
 renderer receives only the raw light-and-dark module matrix, not styling information or the semantic
-roles of modules.
+roles of modules. It can apply shared visual styling through the public styler and drawing protocol.
 
 **QR code matrix**:
 An immutable square grid of light and dark modules produced by symbol generation. Renderers read the
