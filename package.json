@@ -20,6 +20,7 @@
     "release:status": "changeset status --verbose",
     "release:version": "changeset version",
     "release:tag": "changeset git-tag",
+    "release:push": "node scripts/push-release-tags.mjs",
     "pack:runtime": "node scripts/pack-runtime.mjs"
   },
   "devDependencies": {

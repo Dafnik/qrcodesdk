@@ -123,3 +123,22 @@ For PNG snapshots:
 UPDATE_PNG_SNAPSHOTS=1 \
 pnpm turbo run test:snapshots --filter=@qrcodesdk/node
 ```
+
+## Releasing
+
+Each package is published by its own release workflow when its `@qrcodesdk/<package>@<version>`
+tag is pushed.
+
+1. Add changesets for the unreleased changes with `pnpm changeset`.
+2. Run `pnpm release:version`. It bumps the versions, writes the changelogs, and commits them
+   as `chore: release <version>`.
+3. Push `main`.
+4. Run `pnpm release:tag` to create the release tags locally.
+5. Run `pnpm release:push` to push the tags in dependency order.
+
+`pnpm release:push` waits for a package to be available on npm before pushing the tags of
+the packages that depend on it, starting with core, then browser and node, then the
+framework adapters and the CLI. It watches the release workflows through the GitHub CLI (`gh`)
+and stops when a workflow fails or a package does not appear on npm within 20 minutes. Running
+it again pushes the remaining tags. Use `pnpm release:push --dry-run` to print the push order
+without pushing anything.
