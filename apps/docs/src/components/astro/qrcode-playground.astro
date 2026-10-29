@@ -22,9 +22,9 @@ import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview
     <Card title="">
       <PlaygroundControls client:load />
     </Card>
-    <div class="xl:sticky xl:top-20">
-      <div class="grid gap-8">
-        <div class="playground-preview-output grid min-h-96 content-center">
+    <div class="min-w-0 xl:sticky xl:top-20">
+      <div class="grid min-w-0 grid-cols-1 gap-8">
+        <div class="grid min-h-104 content-center place-items-center overflow-auto rounded-[0.5rem] border border-dashed border-(--sl-color-gray-5) bg-[linear-gradient(45deg,rgb(255_255_255_/_0.04)_25%,transparent_25%),linear-gradient(-45deg,rgb(255_255_255_/_0.04)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgb(255_255_255_/_0.04)_75%),linear-gradient(-45deg,transparent_75%,rgb(255_255_255_/_0.04)_75%)] bg-size-[1.2rem_1.2rem] bg-position-[0_0,0_0.6rem,0.6rem_-0.6rem,-0.6rem_0] p-4">
           <QRCodeReactPlaygroundPreview client:only="react" />
           <QRCodeSveltePlaygroundPreview client:only="svelte" />
           <QRCodeVuePlaygroundPreview client:only="vue" />
@@ -32,7 +32,9 @@ import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview
           <CliPlaygroundPreview client:load />
         </div>
 
-        <PlaygroundCode client:load />
+        <div class="min-w-0">
+          <PlaygroundCode client:load />
+        </div>
       </div>
     </div>
   </div>

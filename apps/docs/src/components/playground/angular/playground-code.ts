@@ -15,7 +15,7 @@ import {type CodePreview, generatePlaygroundCode} from './playground-code-genera
 
 @Component({
   host: {
-    class: 'playground-code-snippet block',
+    class: 'block',
   },
   template: `
     <div class="border-border bg-card text-card-foreground overflow-hidden rounded-md border">
@@ -43,7 +43,9 @@ import {type CodePreview, generatePlaygroundCode} from './playground-code-genera
       </div>
 
       @if (preview()) {
-        <div [innerHTML]="highlightedCode()"></div>
+        <div
+          class="[&_.shiki]:m-0 [&_.shiki]:max-h-[200rem] [&_.shiki]:overflow-auto [&_.shiki]:p-4 [&_.shiki]:text-sm [&_.shiki]:leading-3 [&_.shiki_.line]:block [&_.shiki_code]:block"
+          [innerHTML]="highlightedCode()"></div>
       } @else {
         <p class="text-muted-foreground p-4 text-sm">
           Fix the QR code options to generate a command.
