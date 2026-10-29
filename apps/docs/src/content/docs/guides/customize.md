@@ -67,7 +67,8 @@ preserved by all graphical renderers.
 
 Ordinary modules support `square`, `circle`, `rounded`, `extra-rounded`, `diagonal`, and
 `diagonal-rounded`. Finder outer rings and centers support `square`, `rounded`, `extra-rounded`, and
-`circle`. Finder shapes do not inherit the ordinary module shape.
+`circle`. The `extra-rounded` finder shape has larger rounded corners with short straight edges;
+`circle` is fully circular. Finder shapes do not inherit the ordinary module shape.
 
 The output width and height are `moduleSize × (matrix width + 2 × quietZone)`.
 

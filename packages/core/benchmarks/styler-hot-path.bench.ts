@@ -1,6 +1,7 @@
 import {describe, test} from 'vitest';
 
-import {createQRCodeStyler, qrcode} from '../src';
+import {qrcode} from '../src';
+import {createQRCodeStyler} from '../src/drawing';
 import type {QRCodeStyledDrawingTarget} from '../src/drawing';
 import type {QRCodeVersion, QRCodeVisualStyle} from '../src/types';
 

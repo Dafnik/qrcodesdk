@@ -34,5 +34,4 @@ export {
   type QRCodeSVGRendererOptions,
   QRCodeSVGRenderer,
 } from './svg';
-export {createQRCodeStyler} from './drawing/styler';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';

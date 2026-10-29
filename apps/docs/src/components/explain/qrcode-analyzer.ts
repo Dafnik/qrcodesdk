@@ -6,9 +6,9 @@ import {
   type QRCodeMode,
   type QRCodeTextStyle,
   type QRCodeVersion,
-  createQRCodeStyler,
   qrcode,
 } from '@qrcodesdk/core';
+import {createQRCodeStyler} from '@qrcodesdk/core/drawing';
 
 type QRCodeModule = QRCodeMatrix[number][number];
 

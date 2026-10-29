@@ -333,7 +333,12 @@ function paintPrimitive(target: QRCodeStyledDrawingTarget, primitive: Primitive)
           x + inset,
           y + inset,
           insetSize,
-          shape === 'square' ? 0 : shape === 'rounded' ? Math.min(1, insetSize / 2) : insetSize / 2,
+          // Keep straight edges and a one-module ring thickness around the corners.
+          shape === 'square'
+            ? 0
+            : shape === 'rounded'
+              ? Math.min(1, insetSize / 2)
+              : size * 0.4 - inset,
         );
       }
     }

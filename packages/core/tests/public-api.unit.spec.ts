@@ -1,14 +1,7 @@
 import {describe, expect, expectTypeOf, test} from 'vitest';
 
 import * as core from '../src';
-import {
-  QRCodeBuilder,
-  QRCodeError,
-  QRCodeSVGRenderer,
-  QRCodeTextRenderer,
-  createQRCodeStyler,
-  qrcode,
-} from '../src';
+import {QRCodeBuilder, QRCodeError, QRCodeSVGRenderer, QRCodeTextRenderer, qrcode} from '../src';
 import type {
   QRCodeColor,
   QRCodeFinderShape,
@@ -36,11 +29,10 @@ describe('public API', () => {
       'QRCodeSVGRenderer',
       'QRCodeTextRenderer',
       'QR_CODE_ERROR_CODES',
-      'createQRCodeStyler',
       'qrcode',
     ]);
     expect(qrcode).toBeTypeOf('function');
-    expect(createQRCodeStyler).toBeTypeOf('function');
+    expectTypeOf<typeof core>().not.toHaveProperty('createQRCodeStyler');
     expect(QRCodeBuilder).toBeTypeOf('function');
     expect(QRCodeError).toBeTypeOf('function');
     expect(QRCodeSVGRenderer).toBeTypeOf('function');
@@ -64,8 +56,9 @@ describe('public API', () => {
   });
 
   test('exposes the styler and drawing types from the drawing subpath', () => {
-    expect(drawing.createQRCodeStyler).toBe(createQRCodeStyler);
-    expectTypeOf(createQRCodeStyler).returns.toEqualTypeOf<QRCodeStyler>();
+    expect(Object.keys(drawing)).toEqual(['createQRCodeStyler']);
+    expect(drawing.createQRCodeStyler).toBeTypeOf('function');
+    expectTypeOf(drawing.createQRCodeStyler).returns.toEqualTypeOf<QRCodeStyler>();
     expectTypeOf<QRCodeStyler['draw']>().returns.toEqualTypeOf<QRCodeStyledDrawing>();
     expectTypeOf<QRCodeStyledDrawing['paint']>()
       .parameter(0)

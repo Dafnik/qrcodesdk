@@ -63,6 +63,13 @@ for (const exportName of ['qrcode', 'QRCodeSVGRenderer', 'QRCodeTextRenderer']) 
 }
 logSuccess('package exposes the qrcode builder and bundled renderers');
 
+assert(typeof drawing.createQRCodeStyler === 'function', 'Expected the drawing styler factory');
+assert(
+  !('createQRCodeStyler' in core),
+  'Expected createQRCodeStyler to be exported only from the drawing subpath',
+);
+logSuccess('drawing subpath exclusively exposes the styler factory');
+
 for (const exportName of [
   'emailPayload',
   'geoPayload',

@@ -1,6 +1,7 @@
 import {describe, expect, test, vi} from 'vitest';
 
-import {createQRCodeStyler, qrcode} from '../src';
+import {qrcode} from '../src';
+import {createQRCodeStyler} from '../src/drawing';
 import type {QRCodeStyledDrawingTarget} from '../src/drawing';
 
 function target(): QRCodeStyledDrawingTarget {
@@ -59,4 +60,36 @@ describe('createQRCodeStyler', () => {
     expect(placement.clear?.size).toBeCloseTo(10.4);
     expect(drawing.placeCenterImage({clearBackground: false}).clear).toBeUndefined();
   });
+
+  test.each(['outer', 'center'] as const)(
+    'draws extra-rounded finder %s with corners between rounded and circle',
+    (part) => {
+      const matrix = qrcode('finder shapes').matrix();
+      const [rounded, extraRounded, circle] = (['rounded', 'extra-rounded', 'circle'] as const).map(
+        (shape) => {
+          const paintTarget = target();
+          createQRCodeStyler({finder: {[part]: {shape}}})
+            .draw(matrix)
+            .paint(paintTarget);
+          return paintTarget;
+        },
+      );
+      const roundedRadius = vi.mocked(rounded!.arc).mock.calls[0]![2];
+      const extraRoundedArcs = vi.mocked(extraRounded!.arc).mock.calls;
+      const extraRoundedRadius = extraRoundedArcs[0]![2];
+      const circleRadius = vi.mocked(circle!.arc).mock.calls[0]![2];
+
+      expect(extraRoundedRadius).toBeGreaterThan(roundedRadius);
+      expect(extraRoundedRadius).toBeLessThan(circleRadius);
+      const start = vi.mocked(extraRounded!.moveTo).mock.calls[0]!;
+      const end = vi.mocked(extraRounded!.lineTo).mock.calls[0]!;
+      expect(end[0]).toBeGreaterThan(start[0]);
+      expect(end[1]).toBe(start[1]);
+
+      if (part === 'outer') {
+        const innerRadius = extraRoundedArcs[4]![2];
+        expect(extraRoundedRadius - innerRadius).toBeCloseTo(1);
+      }
+    },
+  );
 });

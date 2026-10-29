@@ -47,7 +47,6 @@ test('runtime subpaths share the root exports', async () => {
           './svg': ['QRCodeSVGRenderer'],
           './text': ['QRCodeTextRenderer'],
           './error': ['QRCodeError', 'QR_CODE_ERROR_CODES'],
-          './drawing': ['createQRCodeStyler'],
         }
       : packageJson.name === '@qrcodesdk/browser'
         ? {
@@ -66,6 +65,19 @@ test('runtime subpaths share the root exports', async () => {
       assert.equal(module[name], root[name], `${packageJson.name}${subpath} must share ${name}`);
     }
   }
+});
+
+test('core exposes the styler only from the drawing subpath', async () => {
+  const packageJson = JSON.parse(
+    await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
+  );
+  if (packageJson.name !== '@qrcodesdk/core') return;
+
+  const importTarget = (target) => import(pathToFileURL(path.join(packageDirectory, target)).href);
+  const root = await importTarget(packageJson.exports['.']);
+  const drawing = await importTarget(packageJson.exports['./drawing']);
+  assert.equal(typeof drawing.createQRCodeStyler, 'function');
+  assert.equal('createQRCodeStyler' in root, false);
 });
 
 function readTarEntries(gzippedTarball) {

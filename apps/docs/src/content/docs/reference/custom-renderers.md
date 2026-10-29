@@ -32,13 +32,8 @@ method caches immutable drawings by matrix identity. Implement `QRCodeStyledDraw
 the callback stream into your output format.
 
 ```ts
-import {
-  type QRCodeRenderer,
-  type QRCodeVisualStyle,
-  createQRCodeStyler,
-  qrcode,
-} from '@qrcodesdk/core';
-import type {QRCodeStyledDrawingTarget} from '@qrcodesdk/core/drawing';
+import {type QRCodeRenderer, type QRCodeVisualStyle, qrcode} from '@qrcodesdk/core';
+import {type QRCodeStyledDrawingTarget, createQRCodeStyler} from '@qrcodesdk/core/drawing';
 
 class CommandTarget implements QRCodeStyledDrawingTarget {
   readonly commands: string[] = [];

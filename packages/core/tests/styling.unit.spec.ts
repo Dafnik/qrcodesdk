@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeError, QRCodeSVGRenderer, QRCodeTextRenderer, createQRCodeStyler} from '../src';
+import {QRCodeError, QRCodeSVGRenderer, QRCodeTextRenderer} from '../src';
+import {createQRCodeStyler} from '../src/drawing';
 
 describe('styling validation', () => {
   test.each([
