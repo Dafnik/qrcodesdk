@@ -28,6 +28,7 @@ import {titleCase} from './title-case.ts';
   template: `
     <div class="grid gap-4">
       <div hlmField>
+        <label [for]="idPrefix() + 'payload'" hlmFieldLabel>Payload</label>
         <textarea
           #autosize="cdkTextareaAutosize"
           [id]="idPrefix() + 'payload'"

@@ -65,7 +65,8 @@ for (const env of worksWith ?? []) {
     ]}
     aria-label={`${packageName} package information`}
     data-package-card
-    data-package-name={packageName}>
+    data-package-name={packageName}
+    data-package-version={stats?.version}>
     <h2 class="m-0 p-2 text-[length:var(--sl-text-sm)] leading-normal font-semibold">
       <a
         href={`https://npmx.dev/${packageName}`}
@@ -98,7 +99,9 @@ for (const env of worksWith ?? []) {
       <div class={rowClass}>
         <Icon name="database" class={rowIconClass} />
         <dt>Install size</dt>
-        <dd class={valueClass}>{formatBytes(stats?.installSize)}</dd>
+        <dd class={valueClass} data-package-stat="installSize">
+          {formatBytes(stats?.installSize)}
+        </dd>
       </div>
       <div class={rowClass}>
         <Icon name="puzzle" class={rowIconClass} />
@@ -178,11 +181,14 @@ for (const env of worksWith ?? []) {
     formatVersion,
   } from '../utils/package-stats.mjs';
 
-  /** Refreshes the build-time stats; values that fail to load keep their build-time fallback. */
+  /**
+   * Refreshes the build-time stats; values that fail to load keep their build-time fallback. The
+   * install size can only be fetched at build time, so it is hidden once a newer version is out.
+   */
   const requests = new Map<string, ReturnType<typeof fetchClientPackageStats>>();
 
   for (const card of document.querySelectorAll<HTMLElement>('[data-package-card]')) {
-    const {packageName} = card.dataset;
+    const {packageName, packageVersion} = card.dataset;
     if (!packageName) continue;
 
     let request = requests.get(packageName);
@@ -197,6 +203,7 @@ for (const env of worksWith ?? []) {
         monthlyDownloads:
           monthlyDownloads === undefined ? undefined : formatCount(monthlyDownloads),
         bundledSize: bundledSize === undefined ? undefined : formatBytes(bundledSize),
+        installSize: version && version !== packageVersion ? formatBytes(undefined) : undefined,
       };
 
       for (const element of card.querySelectorAll<HTMLElement>('[data-package-stat]')) {
