@@ -11,6 +11,7 @@ import type {
 export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue' | 'cli';
 export type PlaygroundOutput = 'svg' | 'image' | 'canvas';
 export type PlaygroundView = 'preview' | 'code';
+export const PLAYGROUND_VIEWS = ['preview', 'code'] as const satisfies readonly PlaygroundView[];
 export type PlaygroundSection = 'image' | 'styling' | 'accessibility';
 
 export const PLAYGROUND_SECTIONS = [
@@ -61,6 +62,7 @@ export const defaultPlaygroundOptions: PlaygroundOptions = {
 export const playgroundOptions = atom<PlaygroundOptions>(defaultPlaygroundOptions);
 export const playgroundPreparedImage = atom<PlaygroundPreparedImage | undefined>(undefined);
 export const playgroundImageStatus = atom<PlaygroundImageStatus>({state: 'idle'});
+/** Selected preview panel. Kept apart from the options so resetting values keeps the view. */
 export const playgroundView = atom<PlaygroundView>('preview');
 /** Open control sections. Kept apart from the options so resetting values keeps the layout. */
 export const playgroundOpenSections = atom<readonly PlaygroundSection[]>([]);

@@ -10,16 +10,21 @@ import {cliPlaygroundOptions} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
 import {
   PLAYGROUND_SECTIONS,
+  PLAYGROUND_VIEWS,
   type PlaygroundOptions,
   type PlaygroundOutput,
   type PlaygroundPackage,
   type PlaygroundSection,
+  type PlaygroundView,
   defaultPlaygroundOptions,
   playgroundOpenSections,
   playgroundOptions,
+  playgroundView,
 } from './playground-options.ts';
 
 const OPEN_SECTIONS_KEY = 'open';
+const VIEW_KEY = 'view';
+const DEFAULT_VIEW: PlaygroundView = 'preview';
 
 const PLAYGROUND_PACKAGES = [
   'angular',
@@ -294,6 +299,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   playgroundOpenSections.set(
     readOpenSectionsFromSearchParams(new URLSearchParams(window.location.search)),
   );
+  playgroundView.set(readViewFromSearchParams(new URLSearchParams(window.location.search)));
 
   applyingUrlState = false;
 
@@ -313,6 +319,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   const unsubscribe = playgroundOptions.subscribe(scheduleWrite);
   const unsubscribeCli = cliPlaygroundOptions.subscribe(scheduleWrite);
   const unsubscribeSections = playgroundOpenSections.subscribe(scheduleWrite);
+  const unsubscribeView = playgroundView.subscribe(scheduleWrite);
 
   const handlePopState = (): void => {
     clearTimeout(updateTimer);
@@ -326,6 +333,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
       playgroundOpenSections.set(
         readOpenSectionsFromSearchParams(new URLSearchParams(window.location.search)),
       );
+      playgroundView.set(readViewFromSearchParams(new URLSearchParams(window.location.search)));
     } finally {
       applyingUrlState = false;
     }
@@ -338,6 +346,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
     unsubscribe();
     unsubscribeCli();
     unsubscribeSections();
+    unsubscribeView();
     window.removeEventListener('popstate', handlePopState);
     activeCleanup = undefined;
   };
@@ -398,6 +407,7 @@ export function writeQrOptionsToUrl(
   );
   writeCliOptionsToSearchParams(url.searchParams, cliPlaygroundOptions.get(), omitDefaults);
   writeOpenSectionsToSearchParams(url.searchParams, playgroundOpenSections.get());
+  writeViewToSearchParams(url.searchParams, playgroundView.get());
 
   if (url.href === window.location.href) {
     return;
@@ -440,6 +450,26 @@ export function writeOpenSectionsToSearchParams(
 ): URLSearchParams {
   if (sections.length === 0) params.delete(OPEN_SECTIONS_KEY);
   else params.set(OPEN_SECTIONS_KEY, sections.join(','));
+
+  return params;
+}
+
+/**
+ * Reads the selected preview panel from the `view` parameter, falling back to the preview.
+ */
+export function readViewFromSearchParams(params: URLSearchParams): PlaygroundView {
+  return parseStringUnion(params.get(VIEW_KEY), PLAYGROUND_VIEWS, DEFAULT_VIEW);
+}
+
+/**
+ * Writes the selected preview panel, removing the parameter for the default preview.
+ */
+export function writeViewToSearchParams(
+  params: URLSearchParams,
+  view: PlaygroundView,
+): URLSearchParams {
+  if (view === DEFAULT_VIEW) params.delete(VIEW_KEY);
+  else params.set(VIEW_KEY, view);
 
   return params;
 }

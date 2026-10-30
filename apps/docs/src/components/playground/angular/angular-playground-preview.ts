@@ -22,38 +22,36 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
   imports: [QRCodeCanvas, QRCodeImage, QRCodeSVG, HlmButtonImports, HlmAlertImports],
   template: `
     <div class="flex flex-col items-center justify-center gap-4">
-      @if (options().packageName === 'angular') {
-        @if (hasError(); as error) {
-          <hlm-alert class="max-w-md" variant="destructive">
-            <h4 hlmAlertTitle>QR code generation failed</h4>
-            <p hlmAlertDescription>
-              {{ error || 'This QR code options is invalid.' }}
-            </p>
-          </hlm-alert>
+      @if (hasError(); as error) {
+        <hlm-alert class="max-w-md" variant="destructive">
+          <h4 hlmAlertTitle>QR code generation failed</h4>
+          <p hlmAlertDescription>
+            {{ error || 'This QR code options is invalid.' }}
+          </p>
+        </hlm-alert>
+      } @else {
+        @if (options().output === 'svg') {
+          <qrcode-svg #qrcode [payload]="options().payload" [options]="svgOptions()" />
+          <button
+            class="min-w-64"
+            (click)="qrcode.download('qrcodesdk')"
+            size="lg"
+            hlmBtn
+            type="button">
+            Download SVG
+          </button>
+        } @else if (options().output === 'image') {
+          <qrcode-image #qrcode [payload]="options().payload" [options]="imageOptions()" />
+          <button
+            class="min-w-64"
+            (click)="qrcode.download('qrcodesdk')"
+            size="lg"
+            hlmBtn
+            type="button">
+            Download PNG
+          </button>
         } @else {
-          @if (options().output === 'svg') {
-            <qrcode-svg #qrcode [payload]="options().payload" [options]="svgOptions()" />
-            <button
-              class="min-w-64"
-              (click)="qrcode.download('qrcodesdk')"
-              size="lg"
-              hlmBtn
-              type="button">
-              Download SVG
-            </button>
-          } @else if (options().output === 'image') {
-            <qrcode-image #qrcode [payload]="options().payload" [options]="imageOptions()" />
-            <button
-              class="min-w-64"
-              (click)="qrcode.download('qrcodesdk')"
-              size="lg"
-              hlmBtn
-              type="button">
-              Download PNG
-            </button>
-          } @else {
-            <qrcode-canvas [payload]="options().payload" [options]="canvasOptions()" />
-          }
+          <qrcode-canvas [payload]="options().payload" [options]="canvasOptions()" />
         }
       }
     </div>
@@ -78,9 +76,7 @@ export class AngularPlaygroundPreview {
     createPlaygroundCanvasOptions(this.options(), this.preparedImage()),
   );
   protected readonly hasError = computed(() =>
-    this.options().packageName === 'angular'
-      ? hasQRCodeError(this.options(), this.preparedImage())
-      : undefined,
+    hasQRCodeError(this.options(), this.preparedImage()),
   );
 
   constructor() {

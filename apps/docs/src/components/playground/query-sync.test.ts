@@ -11,6 +11,7 @@ import {defaultPlaygroundOptions} from './playground-options.ts';
 import {
   playgroundOpenSections,
   playgroundOptions,
+  playgroundView,
   resetQrOptions,
   setPlaygroundSectionOpen,
   updateQrOptions,
@@ -18,9 +19,11 @@ import {
 import {
   readOpenSectionsFromSearchParams,
   readQrOptionsFromSearchParams,
+  readViewFromSearchParams,
   startQrQuerySync,
   writeOpenSectionsToSearchParams,
   writeQrOptionsToSearchParams,
+  writeViewToSearchParams,
 } from './query-sync.ts';
 
 describe('playground ECI query synchronization', () => {
@@ -60,7 +63,7 @@ describe('playground ECI query synchronization', () => {
 test('live query synchronization restores both stores, debounces edits, and handles navigation', (context) => {
   context.mock.timers.enable({apis: ['setTimeout']});
   let url = new URL(
-    'https://qrcodesdk.dev/playground/?package=cli&payload=Framework&cli-payload=Terminal&cli-format=svg&open=styling&other=keep',
+    'https://qrcodesdk.dev/playground/?package=cli&payload=Framework&cli-payload=Terminal&cli-format=svg&open=styling&view=code&other=keep',
   );
   let writes = 0;
   const events = new EventTarget();
@@ -89,6 +92,7 @@ test('live query synchronization restores both stores, debounces edits, and hand
     assert.equal(cliPlaygroundOptions.get().payload, 'Terminal');
     assert.equal(cliPlaygroundOptions.get().format, 'svg');
     assert.deepEqual(playgroundOpenSections.get(), ['styling']);
+    assert.equal(playgroundView.get(), 'code');
     setPlaygroundSectionOpen('image', true);
     updateCliOptions({payload: 'Changed', launcher: 'bun'});
     updateQrOptions({moduleSize: 3});
@@ -101,12 +105,17 @@ test('live query synchronization restores both stores, debounces edits, and hand
     assert.equal(url.searchParams.get('module-size'), '3');
     assert.equal(url.searchParams.get('open'), 'image,styling');
 
-    // Resetting values keeps the open sections and their parameter.
+    assert.equal(url.searchParams.get('view'), 'code');
+
+    // Resetting values keeps the open sections, the selected view, and their parameters.
     resetQrOptions();
+    resetCliOptions();
     context.mock.timers.tick(150);
     assert.equal(writes, 2);
     assert.equal(url.searchParams.get('module-size'), null);
     assert.equal(url.searchParams.get('open'), 'image,styling');
+    assert.equal(url.searchParams.get('view'), 'code');
+    assert.equal(playgroundView.get(), 'code');
     assert.equal(url.searchParams.get('other'), 'keep');
 
     // Simulate Back with an edit still pending. Navigation must cancel that write.
@@ -120,6 +129,7 @@ test('live query synchronization restores both stores, debounces edits, and hand
     assert.equal(cliPlaygroundOptions.get().payload, 'Saved');
     assert.equal(cliPlaygroundOptions.get().layout, 'full');
     assert.deepEqual(playgroundOpenSections.get(), []);
+    assert.equal(playgroundView.get(), 'preview');
     context.mock.timers.tick(150);
     assert.equal(writes, 2);
 
@@ -137,8 +147,25 @@ test('live query synchronization restores both stores, debounces edits, and hand
     else Reflect.deleteProperty(globalThis, 'window');
     playgroundOptions.set({...defaultPlaygroundOptions});
     playgroundOpenSections.set([]);
+    playgroundView.set('preview');
     resetCliOptions();
   }
+});
+
+describe('playground view query synchronization', () => {
+  test('reads the code view and falls back to the preview', () => {
+    assert.equal(readViewFromSearchParams(new URLSearchParams('view=code')), 'code');
+    assert.equal(readViewFromSearchParams(new URLSearchParams('view=unknown')), 'preview');
+    assert.equal(readViewFromSearchParams(new URLSearchParams()), 'preview');
+  });
+
+  test('writes the code view and omits the default preview', () => {
+    assert.equal(writeViewToSearchParams(new URLSearchParams(), 'code').get('view'), 'code');
+    assert.equal(
+      writeViewToSearchParams(new URLSearchParams('view=code'), 'preview').has('view'),
+      false,
+    );
+  });
 });
 
 describe('playground open sections query synchronization', () => {
