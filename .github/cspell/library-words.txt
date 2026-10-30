@@ -27,3 +27,5 @@ haspopup
 googlechrome
 JSDOM
 vitesse
+Vuedotjs
+nums

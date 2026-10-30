@@ -1,0 +1,215 @@
+---
+import {Icon} from '@astrojs/starlight/components';
+import {getCollection} from 'astro:content';
+import {
+  createBundleJsUrl,
+  fetchPackageStats,
+  formatBytes,
+  formatCount,
+  formatVersion,
+} from '../utils/index.js';
+
+interface Props {
+  class?: string;
+}
+
+const {class: className} = Astro.props;
+
+const {packageName, worksWith} = Astro.locals.starlightRoute.entry.data;
+const packageDirectory = packageName?.split('/').at(-1);
+
+const stats = packageName ? await fetchPackageStats(packageName) : undefined;
+
+const changelogBase = `changelog/${packageDirectory}`;
+const hasChangelog =
+  packageName &&
+  (await getCollection('changelogs', (entry) => entry.data.base === changelogBase)).length > 0;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const rowClass =
+  'flex items-center gap-2.5 rounded-md px-2 py-1 text-[length:var(--sl-text-xs)] text-[var(--sl-color-gray-2)]';
+const linkRowClass = `${rowClass} no-underline transition-colors hover:bg-[var(--sl-color-gray-6)] hover:text-[var(--sl-color-white)]`;
+const iconClass = 'shrink-0 text-[var(--sl-color-gray-3)]';
+// The right sidebar gets narrow on medium screens, so the leading row icons only show when the
+// card has room for them.
+const rowIconClass = `${iconClass} hidden @[14rem]:block`;
+const valueClass = 'ml-auto font-medium text-[var(--sl-color-white)] tabular-nums';
+
+const WORKS_WITH: Record<string, {label: string; group: string; invertInDark?: boolean}> = {
+  googlechrome: {label: 'Google Chrome', group: 'browser'},
+  firefox: {label: 'Firefox', group: 'browser'},
+  safari: {label: 'Safari', group: 'browser'},
+  node: {label: 'Node.js', group: 'runtime'},
+  bun: {label: 'Bun', group: 'runtime'},
+  deno: {label: 'Deno', group: 'runtime', invertInDark: true},
+};
+
+// Consecutive logos of the same kind (browsers, runtimes) are stacked, the first one on top.
+const worksWithGroups: {id: string; label: string; invertInDark?: boolean}[][] = [];
+let previousGroup: string | undefined;
+for (const env of worksWith ?? []) {
+  const id = env.toLowerCase();
+  const {group = id, ...logo} = WORKS_WITH[id] ?? {label: env};
+  if (group !== previousGroup) worksWithGroups.push([]);
+  worksWithGroups.at(-1)?.push({id, ...logo});
+  previousGroup = group;
+}
+---
+
+{packageName && (
+  <section
+    class:list={[
+      'not-content @container overflow-hidden rounded-lg border border-[var(--sl-color-gray-5)] bg-[var(--sl-color-bg-nav)]',
+      className,
+    ]}
+    aria-label={`${packageName} package information`}
+    data-package-card
+    data-package-name={packageName}
+    data-package-version={stats?.version}>
+    <h2 class="m-0 p-2 text-[length:var(--sl-text-sm)] leading-normal font-semibold">
+      <a
+        href={`https://npmx.dev/${packageName}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class={`${linkRowClass} text-[length:var(--sl-text-sm)] text-[var(--sl-color-white)]`}
+        title={`Open ${packageName} on npmx.dev`}>
+        <Icon name="npmx" size="1.1rem" class="shrink-0" />
+        <span class="min-w-0 truncate">{packageName}</span>
+        <Icon name="external" class:list={[iconClass, 'ml-auto']} />
+      </a>
+    </h2>
+
+    <dl class="m-0 border-t border-[var(--sl-color-gray-5)] p-2">
+      <div class={rowClass}>
+        <Icon name="rocket" class={rowIconClass} />
+        <dt>Version</dt>
+        <dd class={valueClass} data-package-stat="version">
+          {formatVersion(stats?.version)}
+        </dd>
+      </div>
+      <div class={rowClass}>
+        <Icon name="download" class={rowIconClass} />
+        <dt>Downloads</dt>
+        <dd class={valueClass}>
+          <span data-package-stat="monthlyDownloads">{formatCount(stats?.monthlyDownloads)}</span>
+          <span class="font-normal text-[var(--sl-color-gray-3)]">/mo</span>
+        </dd>
+      </div>
+      <div class={rowClass}>
+        <Icon name="database" class={rowIconClass} />
+        <dt>Install size</dt>
+        <dd class={valueClass} data-package-stat="installSize">
+          {formatBytes(stats?.installSize)}
+        </dd>
+      </div>
+      <div class={rowClass}>
+        <Icon name="puzzle" class={rowIconClass} />
+        <dt>Bundled size</dt>
+        <dd class={valueClass}>
+          <a
+            href={createBundleJsUrl(packageName)}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-[var(--sl-color-white)] underline decoration-[var(--sl-color-gray-4)] underline-offset-2 hover:decoration-current"
+            title="Tree-shaken, minified and gzipped, framework peer dependencies excluded">
+            <span data-package-stat="bundledSize">{formatBytes(stats?.bundledSize)}</span>
+          </a>
+        </dd>
+      </div>
+    </dl>
+
+    <ul class="m-0 list-none border-t border-[var(--sl-color-gray-5)] p-2">
+      <li>
+        <a
+          href={`https://github.com/Dafnik/qrcodesdk/tree/main/packages/${packageDirectory}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class={linkRowClass}>
+          <Icon name="github" class={rowIconClass} />
+          Source code
+          <Icon name="external" class:list={[iconClass, 'ml-auto']} />
+        </a>
+      </li>
+      {hasChangelog && (
+        <li>
+          <a href={`${base}/${changelogBase}/`} class={linkRowClass}>
+            <Icon name="document" class={rowIconClass} />
+            Changelog
+            <Icon name="right-arrow" class:list={[iconClass, 'ml-auto']} />
+          </a>
+        </li>
+      )}
+    </ul>
+
+    {worksWith?.length && (
+      <div class="border-t border-[var(--sl-color-gray-5)] p-2">
+        <div class:list={[rowClass, 'flex-wrap gap-y-2']}>
+          <Icon name="laptop" class={rowIconClass} />
+          Works with
+          <div class="ml-auto flex shrink-0 items-center gap-2.5">
+            {worksWithGroups.map((group) => (
+              <div class="flex items-center">
+                {group.map(({id, label, invertInDark}, index) => (
+                  <img
+                    src={`/logos/${id}.svg`}
+                    width="20"
+                    height="20"
+                    alt={`Works with ${label}`}
+                    title={label}
+                    class:list={[
+                      'relative size-5 rounded-full bg-[var(--sl-color-bg-nav)] object-contain ring-2 ring-[var(--sl-color-bg-nav)] select-none not-first:-ml-1.5',
+                      invertInDark && 'dark:invert',
+                    ]}
+                    style={{zIndex: group.length - index}}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+  </section>
+)}
+
+<script>
+  import {
+    fetchClientPackageStats,
+    formatBytes,
+    formatCount,
+    formatVersion,
+  } from '../utils/package-stats.mjs';
+
+  /**
+   * Refreshes the build-time stats; values that fail to load keep their build-time fallback. The
+   * install size can only be fetched at build time, so it is hidden once a newer version is out.
+   */
+  const requests = new Map<string, ReturnType<typeof fetchClientPackageStats>>();
+
+  for (const card of document.querySelectorAll<HTMLElement>('[data-package-card]')) {
+    const {packageName, packageVersion} = card.dataset;
+    if (!packageName) continue;
+
+    let request = requests.get(packageName);
+    if (!request) {
+      request = fetchClientPackageStats(packageName);
+      requests.set(packageName, request);
+    }
+
+    void request.then(({version, monthlyDownloads, bundledSize}) => {
+      const values: Record<string, string | undefined> = {
+        version: version && formatVersion(version),
+        monthlyDownloads:
+          monthlyDownloads === undefined ? undefined : formatCount(monthlyDownloads),
+        bundledSize: bundledSize === undefined ? undefined : formatBytes(bundledSize),
+        installSize: version && version !== packageVersion ? formatBytes(undefined) : undefined,
+      };
+
+      for (const element of card.querySelectorAll<HTMLElement>('[data-package-stat]')) {
+        const value = values[element.dataset.packageStat ?? ''];
+        if (value) element.textContent = value;
+      }
+    });
+  }
+</script>

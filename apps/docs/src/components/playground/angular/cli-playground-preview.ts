@@ -6,6 +6,7 @@ import {HlmAlertImports} from '@spartan-ng/helm/alert';
 
 import {QRCodeSVG} from '@qrcodesdk/angular';
 
+import {suppressInitialTransitions} from '../../angular/suppress-initial-transitions.ts';
 import {cliPlaygroundOptions, cliPreview, createTerminalRows} from '../cli-playground.ts';
 
 @Component({
@@ -212,4 +213,8 @@ export class CliPlaygroundPreview {
     const result = this.preview();
     return result?.state === 'ready' ? createTerminalRows(result.runs) : [];
   });
+
+  constructor() {
+    suppressInitialTransitions();
+  }
 }

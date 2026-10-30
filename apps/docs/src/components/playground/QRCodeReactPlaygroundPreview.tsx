@@ -20,7 +20,6 @@ export default function QRCodeReactPlaygroundPreview() {
   const imageRef = useRef<QRCodeDownloadHandle>(null);
 
   const content = useMemo(() => {
-    if (options.packageName !== 'react') return null;
     const hasError = hasQRCodeError(options, preparedImage);
     if (hasError) return <PreviewError message={hasError} />;
 
@@ -64,7 +63,7 @@ export default function QRCodeReactPlaygroundPreview() {
     );
   }, [options, preparedImage]);
 
-  return <div data-active={options.packageName === 'react'}>{content}</div>;
+  return content;
 }
 
 function DownloadButton({label, onClick}: {label: string; onClick(): void}) {

@@ -13,6 +13,7 @@ import {
   LIGHT_COLOR_PRESETS,
   PlaygroundColorInput,
 } from './playground-color-input.ts';
+import {PlaygroundPresetControls} from './preset-controls.ts';
 import {QrMatrixControls} from './qr-matrix-controls.ts';
 
 @Component({
@@ -23,41 +24,11 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
     HlmInputImports,
     HlmNativeSelectImports,
     PlaygroundColorInput,
+    PlaygroundPresetControls,
     QrMatrixControls,
   ],
   template: `
     <div class="grid gap-4">
-      <div class="grid gap-4 md:grid-cols-2">
-        <div hlmField>
-          <label hlmFieldLabel for="cli-launcher">Command launcher</label>
-          <hlm-native-select
-            class="w-full"
-            [ngModel]="options().launcher"
-            (ngModelChange)="update({launcher: $event})"
-            selectId="cli-launcher">
-            <option hlmNativeSelectOption value="installed">qrc (installed)</option>
-            <option hlmNativeSelectOption value="npm">npx</option>
-            <option hlmNativeSelectOption value="pnpm">pnpm dlx</option>
-            <option hlmNativeSelectOption value="viteplus">vp dlx</option>
-            <option hlmNativeSelectOption value="bun">bunx</option>
-            <option hlmNativeSelectOption value="yarn">yarn dlx</option>
-          </hlm-native-select>
-        </div>
-        <div hlmField>
-          <label hlmFieldLabel for="cli-format">Output</label>
-          <hlm-native-select
-            class="w-full"
-            [ngModel]="options().format"
-            (ngModelChange)="update({format: $event})"
-            selectId="cli-format">
-            <option hlmNativeSelectOption value="text">Text</option>
-            <option hlmNativeSelectOption value="svg">SVG</option>
-          </hlm-native-select>
-        </div>
-      </div>
-      <p class="text-muted-foreground text-sm">
-        PNG output requires Node APIs and is available when you run the CLI locally.
-      </p>
       @if (options().format === 'svg') {
         <div hlmField>
           <label hlmFieldLabel for="cli-output-path">Output path</label>
@@ -134,6 +105,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
             buttonId="cli-background" />
         </div>
       </div>
+      <playground-preset-controls [disabled]="colorsDisabled()" idPrefix="cli-" />
       @if (options().format === 'svg') {
         <div class="grid gap-4 md:grid-cols-2">
           <div hlmField>

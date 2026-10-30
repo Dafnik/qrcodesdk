@@ -1,7 +1,7 @@
 ---
-import {Card} from '@astrojs/starlight/components';
 import {AngularPlaygroundPreview} from '../playground/angular/angular-playground-preview.ts';
 import {PlaygroundControls} from '../playground/angular/playground-controls.ts';
+import {PlaygroundToolbar} from '../playground/angular/playground-toolbar.ts';
 import {PlaygroundCode} from '../playground/angular/playground-code.ts';
 import {CliPlaygroundPreview} from '../playground/angular/cli-playground-preview.ts';
 import QRCodeReactPlaygroundPreview from '../playground/QRCodeReactPlaygroundPreview';
@@ -10,29 +10,53 @@ import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview
 ---
 
 <script>
+  import {playgroundOptions, playgroundView} from '../playground/playground-options.ts';
   import {startQrQuerySync} from '../playground/query-sync.ts';
 
   startQrQuerySync({
     debounceMs: 150,
   });
+
+  /** Show only the panels whose data attribute matches the selected value. */
+  function showMatchingPanels(attribute: string, value: string): void {
+    for (const panel of document.querySelectorAll<HTMLElement>(`[${attribute}]`)) {
+      panel.hidden = panel.getAttribute(attribute) !== value;
+    }
+  }
+
+  playgroundView.subscribe((view) => showMatchingPanels('data-playground-view', view));
+  playgroundOptions.subscribe(({packageName}) =>
+    showMatchingPanels('data-playground-package', packageName),
+  );
 </script>
 
 <section class="not-content w-full min-w-0" aria-label="QR code package playground">
   <div class="grid min-w-0 grid-cols-1 items-start gap-4 xl:grid-cols-2">
-    <Card title="">
-      <PlaygroundControls client:load />
-    </Card>
+    <PlaygroundControls client:load />
     <div class="min-w-0 xl:sticky xl:top-20">
-      <div class="grid min-w-0 grid-cols-1 gap-8">
-        <div class="grid min-h-104 content-center place-items-center overflow-auto rounded-[0.5rem] border border-dashed border-(--sl-color-gray-5) bg-[linear-gradient(45deg,rgb(255_255_255_/_0.04)_25%,transparent_25%),linear-gradient(-45deg,rgb(255_255_255_/_0.04)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgb(255_255_255_/_0.04)_75%),linear-gradient(-45deg,transparent_75%,rgb(255_255_255_/_0.04)_75%)] bg-size-[1.2rem_1.2rem] bg-position-[0_0,0_0.6rem,0.6rem_-0.6rem,-0.6rem_0] p-4">
-          <QRCodeReactPlaygroundPreview client:only="react" />
-          <QRCodeSveltePlaygroundPreview client:only="svelte" />
-          <QRCodeVuePlaygroundPreview client:only="vue" />
-          <AngularPlaygroundPreview client:load />
-          <CliPlaygroundPreview client:load />
+      <div class="grid min-w-0 grid-cols-1 gap-2">
+        <PlaygroundToolbar client:load />
+        <div class="min-w-0" data-playground-view="preview">
+          <div class="grid min-h-104 content-center place-items-center overflow-auto rounded-[0.5rem] border border-dashed border-(--sl-color-gray-5) bg-[linear-gradient(45deg,rgb(255_255_255_/_0.04)_25%,transparent_25%),linear-gradient(-45deg,rgb(255_255_255_/_0.04)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgb(255_255_255_/_0.04)_75%),linear-gradient(-45deg,transparent_75%,rgb(255_255_255_/_0.04)_75%)] bg-size-[1.2rem_1.2rem] bg-position-[0_0,0_0.6rem,0.6rem_-0.6rem,-0.6rem_0] p-4">
+            <div class="min-w-0" data-playground-package="react" hidden>
+              <QRCodeReactPlaygroundPreview client:only="react" />
+            </div>
+            <div class="min-w-0" data-playground-package="svelte" hidden>
+              <QRCodeSveltePlaygroundPreview client:only="svelte" />
+            </div>
+            <div class="min-w-0" data-playground-package="vue" hidden>
+              <QRCodeVuePlaygroundPreview client:only="vue" />
+            </div>
+            <div class="min-w-0" data-playground-package="angular" hidden>
+              <AngularPlaygroundPreview client:load />
+            </div>
+            <div class="min-w-0" data-playground-package="cli" hidden>
+              <CliPlaygroundPreview client:load />
+            </div>
+          </div>
         </div>
 
-        <div class="min-w-0">
+        <div class="min-w-0" data-playground-view="code" hidden>
           <PlaygroundCode client:load />
         </div>
       </div>

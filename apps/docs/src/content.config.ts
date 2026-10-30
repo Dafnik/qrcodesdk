@@ -18,6 +18,8 @@ export const collections = {
         packageName: z.string().optional(),
         worksWith: z.array(z.string()).optional(),
         related: z.array(z.string()).optional(),
+        // Visually hides the page title while keeping it as the accessible page heading.
+        hideTitle: z.boolean().optional(),
       }),
     }),
   }),

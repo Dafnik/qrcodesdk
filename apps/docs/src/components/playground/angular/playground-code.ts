@@ -8,6 +8,7 @@ import {NgIcon, provideIcons} from '@ng-icons/core';
 import {lucideCheck, lucideCopy} from '@ng-icons/lucide';
 import {HlmButton} from '@spartan-ng/helm/button';
 
+import {suppressInitialTransitions} from '../../angular/suppress-initial-transitions.ts';
 import {cliPreview} from '../cli-playground.ts';
 import {playgroundOptions, playgroundPreparedImage} from '../playground-options.ts';
 import {createCodeHighlighter} from './code-highlighter.ts';
@@ -112,6 +113,7 @@ export class PlaygroundCode {
   private copyResetTimeout: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
+    suppressInitialTransitions();
     this.destroyRef.onDestroy(() => {
       if (this.copyResetTimeout) {
         clearTimeout(this.copyResetTimeout);
