@@ -11,6 +11,7 @@ import {HlmSwitchImports} from '@spartan-ng/helm/switch';
 import {HlmTextareaImports} from '@spartan-ng/helm/textarea';
 
 import {type PlaygroundOptions, playgroundOptions, updateQrOptions} from '../playground-options.ts';
+import {titleCase} from './title-case.ts';
 
 @Component({
   selector: 'qr-matrix-controls',
@@ -27,7 +28,6 @@ import {type PlaygroundOptions, playgroundOptions, updateQrOptions} from '../pla
   template: `
     <div class="grid gap-4">
       <div hlmField>
-        <label [for]="idPrefix() + 'payload'" hlmFieldLabel>Payload</label>
         <textarea
           #autosize="cdkTextareaAutosize"
           [id]="idPrefix() + 'payload'"
@@ -37,10 +37,10 @@ import {type PlaygroundOptions, playgroundOptions, updateQrOptions} from '../pla
           cdkTextareaAutosize></textarea>
       </div>
 
-      <div class="border-input rounded-md border p-4" hlmField>
+      <label class="border-input rounded-md border p-4" [for]="idPrefix() + 'eci'" hlmField>
         <div class="flex items-center justify-between gap-4">
           <div class="grid gap-1">
-            <label [for]="idPrefix() + 'eci'" hlmFieldLabel>UTF-8 ECI</label>
+            <span hlmFieldLabel>UTF-8 ECI</span>
             <p hlmFieldDescription>
               Emit assignment 26 before the first octet segment to explicitly declare UTF-8.
             </p>
@@ -50,13 +50,14 @@ import {type PlaygroundOptions, playgroundOptions, updateQrOptions} from '../pla
             [inputId]="idPrefix() + 'eci'"
             (checkedChange)="updateQrOptions({eci: $event})" />
         </div>
-      </div>
+      </label>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div hlmField>
           <label [for]="idPrefix() + 'mode'" hlmFieldLabel>Mode</label>
           <hlm-select
             [ngModel]="currentOptions().mode"
+            [itemToString]="titleCase"
             (ngModelChange)="updateQrOptions({mode: $event})">
             <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'mode'">
               <hlm-select-value placeholder="Auto" />
@@ -176,6 +177,7 @@ export class QrMatrixControls {
 
   protected readonly currentOptions = computed(() => this.options() ?? this.storedOptions());
 
+  protected readonly titleCase = titleCase;
   protected readonly VERSION_OPTIONS = Array.from({length: 40}, (_, index) => index + 1);
   protected readonly MASK_OPTIONS = Array.from({length: 8}, (_, index) => index);
 }

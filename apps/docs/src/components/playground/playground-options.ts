@@ -10,6 +10,14 @@ import type {
 
 export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue' | 'cli';
 export type PlaygroundOutput = 'svg' | 'image' | 'canvas';
+export type PlaygroundView = 'preview' | 'code';
+export type PlaygroundSection = 'image' | 'styling' | 'accessibility';
+
+export const PLAYGROUND_SECTIONS = [
+  'image',
+  'styling',
+  'accessibility',
+] as const satisfies readonly PlaygroundSection[];
 
 export interface PlaygroundOptions extends QRCodeMatrixOptions {
   payload: string;
@@ -53,6 +61,9 @@ export const defaultPlaygroundOptions: PlaygroundOptions = {
 export const playgroundOptions = atom<PlaygroundOptions>(defaultPlaygroundOptions);
 export const playgroundPreparedImage = atom<PlaygroundPreparedImage | undefined>(undefined);
 export const playgroundImageStatus = atom<PlaygroundImageStatus>({state: 'idle'});
+export const playgroundView = atom<PlaygroundView>('preview');
+/** Open control sections. Kept apart from the options so resetting values keeps the layout. */
+export const playgroundOpenSections = atom<readonly PlaygroundSection[]>([]);
 
 let imagePreparationVersion = 0;
 const playgroundLogoPath = '/logo-square.png';
@@ -92,6 +103,17 @@ export function mergeQRCodeOptions(
 
 export function updateQrOptions(patch: Partial<PlaygroundOptions>): void {
   playgroundOptions.set(mergeQRCodeOptions(playgroundOptions.get(), patch));
+}
+
+export function setPlaygroundSectionOpen(section: PlaygroundSection, open: boolean): void {
+  const current = playgroundOpenSections.get();
+  if (current.includes(section) === open) return;
+
+  playgroundOpenSections.set(
+    PLAYGROUND_SECTIONS.filter((candidate) =>
+      candidate === section ? open : current.includes(candidate),
+    ),
+  );
 }
 
 export function resetQrOptions(): void {

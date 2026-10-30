@@ -7,6 +7,7 @@ import {HlmButtonImports} from '@spartan-ng/helm/button';
 
 import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
 
+import {suppressInitialTransitions} from '../../angular/suppress-initial-transitions.ts';
 import {
   createPlaygroundCanvasOptions,
   createPlaygroundImageOptions,
@@ -81,4 +82,8 @@ export class AngularPlaygroundPreview {
       ? hasQRCodeError(this.options(), this.preparedImage())
       : undefined,
   );
+
+  constructor() {
+    suppressInitialTransitions();
+  }
 }

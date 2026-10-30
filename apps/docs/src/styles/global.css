@@ -90,6 +90,12 @@ body {
   background: var(--sl-color-accent-high);
 }
 
+/* Set by suppressInitialTransitions() until an Angular island's first client render is painted. */
+[data-suppress-transitions],
+[data-suppress-transitions] * {
+  transition: none !important;
+}
+
 @layer components {
   html[data-theme='dark'] .shiki,
   html[data-theme='dark'] .shiki span {

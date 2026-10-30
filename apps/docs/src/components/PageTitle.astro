@@ -2,16 +2,24 @@
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 import PackageBadges from './package-badges.astro';
 
-const docType = Astro.locals.starlightRoute.entry.data.docType;
+const {docType, hideTitle} = Astro.locals.starlightRoute.entry.data;
 ---
 
-<div class="page-title-content" data-doc-type={docType}>
-  <Default {...Astro.props}>
-    <slot />
-  </Default>
+{hideTitle ? (
+  <div class="page-title-hidden sr-only">
+    <Default {...Astro.props}>
+      <slot />
+    </Default>
+  </div>
+) : (
+  <div class="page-title-content" data-doc-type={docType}>
+    <Default {...Astro.props}>
+      <slot />
+    </Default>
 
-  <PackageBadges />
-</div>
+    <PackageBadges />
+  </div>
+)}
 
 <style>
   .page-title-content {
@@ -20,5 +28,13 @@ const docType = Astro.locals.starlightRoute.entry.data.docType;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
+  }
+
+  :global(.content-panel:has(.page-title-hidden)) {
+    padding: 0;
+  }
+
+  :global(.content-panel:has(.page-title-hidden) + .content-panel) {
+    border-top: 0;
   }
 </style>

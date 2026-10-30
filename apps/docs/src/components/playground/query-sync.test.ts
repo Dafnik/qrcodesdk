@@ -8,10 +8,18 @@ import {
   updateCliOptions,
 } from './cli-playground.ts';
 import {defaultPlaygroundOptions} from './playground-options.ts';
-import {playgroundOptions, updateQrOptions} from './playground-options.ts';
 import {
+  playgroundOpenSections,
+  playgroundOptions,
+  resetQrOptions,
+  setPlaygroundSectionOpen,
+  updateQrOptions,
+} from './playground-options.ts';
+import {
+  readOpenSectionsFromSearchParams,
   readQrOptionsFromSearchParams,
   startQrQuerySync,
+  writeOpenSectionsToSearchParams,
   writeQrOptionsToSearchParams,
 } from './query-sync.ts';
 
@@ -52,7 +60,7 @@ describe('playground ECI query synchronization', () => {
 test('live query synchronization restores both stores, debounces edits, and handles navigation', (context) => {
   context.mock.timers.enable({apis: ['setTimeout']});
   let url = new URL(
-    'https://qrcodesdk.dev/playground/?package=cli&payload=Framework&cli-payload=Terminal&cli-format=svg&other=keep',
+    'https://qrcodesdk.dev/playground/?package=cli&payload=Framework&cli-payload=Terminal&cli-format=svg&open=styling&other=keep',
   );
   let writes = 0;
   const events = new EventTarget();
@@ -80,6 +88,8 @@ test('live query synchronization restores both stores, debounces edits, and hand
     assert.equal(playgroundOptions.get().payload, 'Framework');
     assert.equal(cliPlaygroundOptions.get().payload, 'Terminal');
     assert.equal(cliPlaygroundOptions.get().format, 'svg');
+    assert.deepEqual(playgroundOpenSections.get(), ['styling']);
+    setPlaygroundSectionOpen('image', true);
     updateCliOptions({payload: 'Changed', launcher: 'bun'});
     updateQrOptions({moduleSize: 3});
     context.mock.timers.tick(149);
@@ -89,6 +99,14 @@ test('live query synchronization restores both stores, debounces edits, and hand
     assert.equal(url.searchParams.get('cli-payload'), 'Changed');
     assert.equal(url.searchParams.get('cli-launcher'), 'bun');
     assert.equal(url.searchParams.get('module-size'), '3');
+    assert.equal(url.searchParams.get('open'), 'image,styling');
+
+    // Resetting values keeps the open sections and their parameter.
+    resetQrOptions();
+    context.mock.timers.tick(150);
+    assert.equal(writes, 2);
+    assert.equal(url.searchParams.get('module-size'), null);
+    assert.equal(url.searchParams.get('open'), 'image,styling');
     assert.equal(url.searchParams.get('other'), 'keep');
 
     // Simulate Back with an edit still pending. Navigation must cancel that write.
@@ -101,8 +119,9 @@ test('live query synchronization restores both stores, debounces edits, and hand
     assert.equal(playgroundOptions.get().payload, 'Previous');
     assert.equal(cliPlaygroundOptions.get().payload, 'Saved');
     assert.equal(cliPlaygroundOptions.get().layout, 'full');
+    assert.deepEqual(playgroundOpenSections.get(), []);
     context.mock.timers.tick(150);
-    assert.equal(writes, 1);
+    assert.equal(writes, 2);
 
     // Forward restores the CLI defaults when no CLI parameters are present.
     url = new URL('https://qrcodesdk.dev/playground/?package=cli');
@@ -111,14 +130,38 @@ test('live query synchronization restores both stores, debounces edits, and hand
     cleanup();
     updateCliOptions({payload: 'After cleanup'});
     context.mock.timers.tick(150);
-    assert.equal(writes, 1);
+    assert.equal(writes, 2);
   } finally {
     cleanup?.();
     if (previousWindow) Object.defineProperty(globalThis, 'window', previousWindow);
     else Reflect.deleteProperty(globalThis, 'window');
     playgroundOptions.set({...defaultPlaygroundOptions});
+    playgroundOpenSections.set([]);
     resetCliOptions();
   }
+});
+
+describe('playground open sections query synchronization', () => {
+  test('reads known sections in display order and ignores unknown names', () => {
+    assert.deepEqual(
+      readOpenSectionsFromSearchParams(new URLSearchParams('open=accessibility,unknown,image')),
+      ['image', 'accessibility'],
+    );
+    assert.deepEqual(readOpenSectionsFromSearchParams(new URLSearchParams()), []);
+  });
+
+  test('writes sections and removes the parameter when all are closed', () => {
+    assert.equal(
+      writeOpenSectionsToSearchParams(new URLSearchParams(), ['styling', 'accessibility']).get(
+        'open',
+      ),
+      'styling,accessibility',
+    );
+    assert.equal(
+      writeOpenSectionsToSearchParams(new URLSearchParams('open=image'), []).has('open'),
+      false,
+    );
+  });
 });
 
 describe('playground package query synchronization', () => {

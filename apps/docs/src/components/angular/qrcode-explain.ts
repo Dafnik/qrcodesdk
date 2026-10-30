@@ -27,6 +27,7 @@ import {
 } from '../explain/qrcode-analyzer.ts';
 import {QrMatrixControls} from '../playground/angular/qr-matrix-controls.ts';
 import {playgroundOptions, resetQrOptions} from '../playground/playground-options.ts';
+import {suppressInitialTransitions} from './suppress-initial-transitions.ts';
 
 type ExplainSelection = {
   groupId: string;
@@ -70,6 +71,10 @@ type LegendItem = {
 })
 export class QRCodeExplainControls {
   protected readonly resetQrOptions = resetQrOptions;
+
+  constructor() {
+    suppressInitialTransitions();
+  }
 }
 
 @Component({
@@ -647,5 +652,9 @@ export class QRCodeExplain {
     );
     const y = clientY - bounds.top;
     this.tooltipPosition.set({x, y, below: y < 88});
+  }
+
+  constructor() {
+    suppressInitialTransitions();
   }
 }

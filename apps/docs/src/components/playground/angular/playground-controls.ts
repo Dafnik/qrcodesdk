@@ -1,4 +1,3 @@
-import {TitleCasePipe, UpperCasePipe} from '@angular/common';
 import {Component, computed, effect, inject, linkedSignal} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
@@ -11,18 +10,18 @@ import {HlmButtonImports} from '@spartan-ng/helm/button';
 import {HlmFieldImports} from '@spartan-ng/helm/field';
 import {HlmInputImports} from '@spartan-ng/helm/input';
 import {HlmLabelImports} from '@spartan-ng/helm/label';
-import {HlmRadioGroupImports} from '@spartan-ng/helm/radio-group';
 import {HlmSelectImports} from '@spartan-ng/helm/select';
 import {HlmSwitchImports} from '@spartan-ng/helm/switch';
 
 import type {QRCodeFinderShape, QRCodeModuleShape} from '@qrcodesdk/core';
 
+import {suppressInitialTransitions} from '../../angular/suppress-initial-transitions.ts';
 import {resetCliOptions} from '../cli-playground.ts';
 import {
-  type PlaygroundOutput,
-  type PlaygroundPackage,
+  playgroundOpenSections,
   playgroundOptions,
   resetQrOptions,
+  setPlaygroundSectionOpen,
   updateQrOptions,
 } from '../playground-options.ts';
 import {CliPlaygroundControls} from './cli-playground-controls.ts';
@@ -32,71 +31,22 @@ import {
   LIGHT_COLOR_PRESETS,
   PlaygroundColorInput,
 } from './playground-color-input.ts';
+import {PlaygroundPresetControls} from './preset-controls.ts';
 import {QrMatrixControls} from './qr-matrix-controls.ts';
+import {titleCase} from './title-case.ts';
 
 @Component({
   template: `
     <div class="grid gap-4">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold">Configure</h1>
-        <button (click)="resetOptions()" type="button" hlmBtn>
+      <div class="flex justify-end">
+        <button (click)="resetOptions()" type="button" hlmBtn variant="outline">
           Reset
           <ng-icon name="lucideRotateCcw" />
         </button>
       </div>
-      <div hlmField>
-        <label hlmFieldLabel for="package-select">Package</label>
-        <div
-          class="bg-input/90 text-foreground inline-flex h-9 w-full rounded-md p-0.5"
-          id="package-select">
-          <hlm-radio-group
-            class="group after:bg-background relative grid w-full grid-cols-5 gap-0 font-medium after:absolute after:inset-y-0 after:w-1/5 after:rounded-sm after:transition-[translate,box-shadow] after:duration-300 after:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=angular]:after:translate-x-[300%] data-[state=cli]:after:translate-x-[400%] data-[state=react]:after:translate-x-0 data-[state=svelte]:after:translate-x-[200%] data-[state=vue]:after:translate-x-full after:motion-reduce:transition-none"
-            [attr.data-state]="currentOptions().packageName"
-            [ngModel]="currentOptions().packageName"
-            (ngModelChange)="updateQrOptions({packageName: $event})">
-            @for (package of packages; track package) {
-              <label
-                class="has-data-[checked=false]:text-muted-foreground/70 z-10 flex items-center justify-center px-1 text-xs has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-50 sm:text-sm"
-                [for]="'package-input-' + package"
-                hlmLabel>
-                {{ package === 'cli' ? 'CLI' : (package | titlecase) }}
-
-                <hlm-radio
-                  class="hidden"
-                  [inputId]="'package-input-' + package"
-                  [value]="package" />
-              </label>
-            }
-          </hlm-radio-group>
-        </div>
-      </div>
       @if (currentOptions().packageName === 'cli') {
         <cli-playground-controls />
       } @else {
-        <div hlmField>
-          <label hlmFieldLabel for="output-select">Output</label>
-
-          <div
-            class="bg-input/90 text-foreground inline-flex h-9 w-full rounded-md p-0.5"
-            id="output-select">
-            <hlm-radio-group
-              class="group after:bg-background relative grid w-full grid-cols-3 gap-0 font-medium after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:w-1/3 after:rounded-sm after:shadow-sm after:transition-transform after:duration-300 after:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=canvas]:after:translate-x-[200%] data-[state=image]:after:translate-x-full data-[state=svg]:after:translate-x-0 after:motion-reduce:transition-none"
-              [attr.data-state]="currentOptions().output"
-              [ngModel]="currentOptions().output"
-              (ngModelChange)="updateQrOptions({output: $event})">
-              @for (output of outputs; track output) {
-                <label
-                  class="has-data-[checked=false]:text-muted-foreground/70 z-10 flex cursor-pointer items-center justify-center px-1 text-xs has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-50 sm:text-sm"
-                  [for]="'output-input-' + output"
-                  hlmLabel>
-                  {{ output | uppercase }}
-
-                  <hlm-radio class="hidden" [inputId]="'output-input-' + output" [value]="output" />
-                </label>
-              }
-            </hlm-radio-group>
-          </div>
-        </div>
         <qr-matrix-controls />
         <div class="grid gap-4 md:grid-cols-2">
           <div hlmField>
@@ -118,8 +68,13 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
           </div>
         </div>
 
+        <playground-preset-controls />
+
         <hlm-accordion type="multiple">
-          <hlm-accordion-item isOpened>
+          <hlm-accordion-item
+            class="border-b-muted-foreground"
+            [isOpened]="openSections().includes('image')"
+            (openedChange)="setPlaygroundSectionOpen('image', $event)">
             <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
               Center Image
             </hlm-accordion-trigger>
@@ -127,7 +82,10 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
               <playground-image-controls />
             </hlm-accordion-content>
           </hlm-accordion-item>
-          <hlm-accordion-item isOpened>
+          <hlm-accordion-item
+            class="border-b-muted-foreground"
+            [isOpened]="openSections().includes('styling')"
+            (openedChange)="setPlaygroundSectionOpen('styling', $event)">
             <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
               Advanced Styling
             </hlm-accordion-trigger>
@@ -150,6 +108,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
                         <label hlmFieldLabel for="moduleShape">Type</label>
                         <hlm-select
                           [disabled]="!overrideModules()"
+                          [itemToString]="titleCase"
                           [ngModel]="moduleShape()"
                           (ngModelChange)="updateQrOptions({modules: {shape: $event}})">
                           <hlm-select-trigger class="w-full" buttonId="moduleShape">
@@ -163,7 +122,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
                                 track moduleShapeOption
                               ) {
                                 <hlm-select-item [value]="moduleShapeOption">
-                                  {{ moduleShapeOption }}
+                                  {{ titleCase(moduleShapeOption) }}
                                 </hlm-select-item>
                               }
                             </hlm-select-group>
@@ -201,6 +160,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
                         <label hlmFieldLabel for="finderOuterShape">Type</label>
                         <hlm-select
                           [disabled]="!overrideFinderOuter()"
+                          [itemToString]="titleCase"
                           [ngModel]="finderOuterType()"
                           (ngModelChange)="updateQrOptions({finder: {outer: {shape: $event}}})">
                           <hlm-select-trigger class="w-full" buttonId="finderOuterShape">
@@ -214,7 +174,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
                                 track finderOuterShapeOption
                               ) {
                                 <hlm-select-item [value]="finderOuterShapeOption">
-                                  {{ finderOuterShapeOption }}
+                                  {{ titleCase(finderOuterShapeOption) }}
                                 </hlm-select-item>
                               }
                             </hlm-select-group>
@@ -252,6 +212,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
                         <label hlmFieldLabel for="finderCenterShape">Type</label>
                         <hlm-select
                           [disabled]="!overrideFinderCenter()"
+                          [itemToString]="titleCase"
                           [ngModel]="finderCenterType()"
                           (ngModelChange)="updateQrOptions({finder: {center: {shape: $event}}})">
                           <hlm-select-trigger class="w-full" buttonId="finderCenterShape">
@@ -265,7 +226,7 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
                                 track finderCenterShapeOptions
                               ) {
                                 <hlm-select-item [value]="finderCenterShapeOptions">
-                                  {{ finderCenterShapeOptions }}
+                                  {{ titleCase(finderCenterShapeOptions) }}
                                 </hlm-select-item>
                               }
                             </hlm-select-group>
@@ -287,7 +248,10 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
               </div>
             </hlm-accordion-content>
           </hlm-accordion-item>
-          <hlm-accordion-item isOpened>
+          <hlm-accordion-item
+            class="border-b-muted-foreground"
+            [isOpened]="openSections().includes('accessibility')"
+            (openedChange)="setPlaygroundSectionOpen('accessibility', $event)">
             <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
               Accessibility
             </hlm-accordion-trigger>
@@ -327,34 +291,37 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
   providers: [{provide: NANOSTORES, useClass: NanostoresService}, provideIcons({lucideRotateCcw})],
   selector: 'playground-controls',
   imports: [
-    HlmRadioGroupImports,
     HlmLabelImports,
     HlmFieldImports,
     HlmSelectImports,
-    HlmButtonImports,
     HlmInputImports,
     HlmAccordionImports,
+    HlmButtonImports,
+    NgIcon,
     HlmSwitchImports,
     FormsModule,
-    TitleCasePipe,
-    UpperCasePipe,
-    NgIcon,
     PlaygroundColorInput,
     PlaygroundImageControls,
     QrMatrixControls,
     CliPlaygroundControls,
+    PlaygroundPresetControls,
   ],
 })
 export class PlaygroundControls {
   protected readonly updateQrOptions = updateQrOptions;
+  protected readonly titleCase = titleCase;
+  protected readonly setPlaygroundSectionOpen = setPlaygroundSectionOpen;
+
   /** Reset the selected package's settings without discarding the other configuration. */
   protected resetOptions(): void {
     if (this.currentOptions().packageName === 'cli') resetCliOptions();
     else resetQrOptions();
   }
-
   private readonly nanostores = inject(NanostoresService);
   protected readonly currentOptions = toSignal(this.nanostores.useStore(playgroundOptions), {
+    requireSync: true,
+  });
+  protected readonly openSections = toSignal(this.nanostores.useStore(playgroundOpenSections), {
     requireSync: true,
   });
   protected readonly foreground = computed(() => this.currentOptions().foreground ?? '#000000');
@@ -384,8 +351,6 @@ export class PlaygroundControls {
     () => !!this.currentOptions().finder?.center,
   );
 
-  protected readonly packages: PlaygroundPackage[] = ['react', 'vue', 'svelte', 'angular', 'cli'];
-  protected readonly outputs: PlaygroundOutput[] = ['svg', 'image', 'canvas'];
   protected readonly DARK_COLOR_PRESETS = DARK_COLOR_PRESETS;
   protected readonly LIGHT_COLOR_PRESETS = LIGHT_COLOR_PRESETS;
 
@@ -411,6 +376,7 @@ export class PlaygroundControls {
   ] as const satisfies readonly QRCodeFinderShape[];
 
   constructor() {
+    suppressInitialTransitions();
     effect(() => {
       if (!this.overrideModules() && this.currentOptions().modules !== undefined) {
         updateQrOptions({modules: undefined});
