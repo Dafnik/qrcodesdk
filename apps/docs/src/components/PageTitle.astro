@@ -1,6 +1,5 @@
 ---
 import Default from '@astrojs/starlight/components/PageTitle.astro';
-import PackageBadges from './package-badges.astro';
 
 const {docType, hideTitle} = Astro.locals.starlightRoute.entry.data;
 ---
@@ -16,8 +15,6 @@ const {docType, hideTitle} = Astro.locals.starlightRoute.entry.data;
     <Default {...Astro.props}>
       <slot />
     </Default>
-
-    <PackageBadges />
   </div>
 )}
 

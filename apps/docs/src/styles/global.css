@@ -135,3 +135,13 @@ body {
     white-space: nowrap;
   }
 }
+
+/*
+ * Below 72rem Starlight hides the right sidebar but keeps the content capped at 45rem, leaving an
+ * empty strip on the right. Let the content use that space instead.
+ */
+@media (width < 72rem) {
+  [data-has-toc] .content-panel .sl-container {
+    max-width: none;
+  }
+}

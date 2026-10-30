@@ -2,10 +2,15 @@
 import path from 'node:path';
 import {getCollection} from 'astro:content';
 import DefaultFooter from '@astrojs/starlight/components/Footer.astro';
+import PackageCard from './package-card.astro';
+import SupportCard from './support-card.astro';
 
 const route = Astro.locals.starlightRoute;
 const entryId = route.entry.id;
 const related = route.entry.data.related ?? [];
+// The right sidebar (and the cards in it) only exists on pages with a table of contents and is
+// hidden below Starlight's `lg` breakpoint, so the footer shows the cards in its place.
+const sidebarCardsClass = route.toc ? 'lg:sl-hidden' : undefined;
 const docs = await getCollection('docs');
 
 interface ResolvedRelatedPath {
@@ -61,6 +66,8 @@ const resolvedRelated = related.flatMap((relatedPath) => {
 });
 ---
 
+<PackageCard class:list={['mt-12', sidebarCardsClass]} />
+
 {resolvedRelated.length > 0 && (
   <section class="sl-markdown-content">
     <div class="sl-heading-wrapper level-h2" style="margin-top: 1.5em;">
@@ -87,3 +94,5 @@ const resolvedRelated = related.flatMap((relatedPath) => {
 )}
 
 <DefaultFooter />
+
+{route.toc && <SupportCard class="mt-8 lg:sl-hidden" />}
