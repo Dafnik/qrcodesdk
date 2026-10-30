@@ -9,6 +9,7 @@ import type {
   QRCodeModule,
   QRCodeVersion,
 } from '../../src/types';
+import {evaluateGroup} from './helpers';
 
 const REPRESENTATIVE_VERSIONS = [1, 2, 7, 20, 40] as const satisfies readonly QRCodeVersion[];
 const ERROR_CORRECTION_LEVELS = [
@@ -20,6 +21,46 @@ const ERROR_CORRECTION_LEVELS = [
 const MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const satisfies readonly QRCodeMask[];
 
 describe('evaluateMatrix', () => {
+  test('returns a sufficient lower bound when a candidate cannot beat the score limit', () => {
+    let pruned = false;
+    for (const version of REPRESENTATIVE_VERSIONS) {
+      for (let seed = 1; seed <= 4; seed++) {
+        const matrix = createDeterministicMatrix(version, seed);
+        const exact = evaluateMatrixLegacy(matrix);
+        for (const limit of [0, 1, Math.floor(exact / 2), exact, exact + 1, Infinity]) {
+          const score = evaluateMatrix(matrix, limit);
+          if (exact < limit) {
+            expect(score).toBe(exact);
+          } else {
+            expect(score).toBeGreaterThanOrEqual(limit);
+            expect(score).toBeLessThanOrEqual(exact);
+            pruned ||= score < exact;
+          }
+        }
+      }
+    }
+    expect(pruned).toBe(true);
+  });
+
+  test.each(REPRESENTATIVE_VERSIONS)(
+    'keeps the same automatic mask winner as complete scoring at version %s',
+    (version) => {
+      for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
+        for (const payload of ['A', '000123456789', 'é🦊']) {
+          const options = {version, errorCorrectionLevel};
+          const candidates = MASKS.map((mask) =>
+            qrcode(payload)
+              .options({...options, mask})
+              .matrix(),
+          );
+          const scores = candidates.map(evaluateMatrixLegacy);
+          const expected = candidates[scores.indexOf(Math.min(...scores))];
+          expect(qrcode(payload).options(options).matrix()).toEqual(expected);
+        }
+      }
+    },
+  );
+
   test('matches the legacy score for every mask across representative QR versions', () => {
     for (const version of REPRESENTATIVE_VERSIONS) {
       for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
@@ -83,12 +124,12 @@ function evaluateMatrixLegacy(matrix: QRCodeMatrix): number {
   for (let rowIndex = 0; rowIndex < matrixLength; rowIndex++) {
     const row = matrix[rowIndex]!;
     let groups = collectGroups(row);
-    score += evaluateGroupsLegacy(groups);
+    score += evaluateGroup(groups);
 
     groups = collectGroups(
       Array.from({length: matrixLength}, (_, index) => matrix[index]![rowIndex]!),
     );
-    score += evaluateGroupsLegacy(groups);
+    score += evaluateGroup(groups);
 
     const nextRow = matrix[rowIndex + 1] ?? [];
     numberOfBlackSquares += row[0]!;
@@ -131,30 +172,4 @@ function collectGroups(modules: readonly QRCodeModule[]): number[] {
   }
 
   return groups;
-}
-
-function evaluateGroupsLegacy(groups: readonly number[]): number {
-  let score = 0;
-  for (const length of groups) {
-    if (length >= 5) score += 3 + length - 5;
-  }
-
-  let finderLikeWindow = 0;
-  let numberOfModules = 0;
-  let lastMatchedModuleIndex = -1;
-  for (let groupIndex = 0; groupIndex < groups.length; groupIndex++) {
-    const module = groupIndex % 2;
-    for (let index = 0; index < groups[groupIndex]!; index++) {
-      finderLikeWindow = ((finderLikeWindow << 1) & 0x7ff) | module;
-      numberOfModules++;
-      const isLeftPaddedMatch = finderLikeWindow === 0x05d;
-      const isRightPaddedMatch = finderLikeWindow === 0x5d0;
-      if (numberOfModules >= 11 && (isLeftPaddedMatch || isRightPaddedMatch)) {
-        if (!(isRightPaddedMatch && lastMatchedModuleIndex === numberOfModules - 4)) score += 40;
-        lastMatchedModuleIndex = numberOfModules;
-      }
-    }
-  }
-
-  return score;
 }

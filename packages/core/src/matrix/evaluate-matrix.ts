@@ -28,9 +28,10 @@ const FINDER_LIKE_WINDOW_MASK = 0x7ff;
  * agrees with ours, but sometimes it does not. Practically it doesn't matter.
  *
  * @param {QRCodeMatrix} matrix - The matrix to be evaluated.
- * @returns {number} The score of the matrix evaluation (lower is better).
+ * @param {number} scoreLimit - Stop when the candidate cannot beat this score.
+ * @returns {number} The exact score, or a partial score at least scoreLimit after early exit.
  */
-export function evaluateMatrix(matrix: QRCodeMatrix): number {
+export function evaluateMatrix(matrix: QRCodeMatrix, scoreLimit = Infinity): number {
   const matrixLength = matrix.length;
   let score = 0;
   let numberOfBlackSquares = 0;
@@ -106,6 +107,8 @@ export function evaluateMatrix(matrix: QRCodeMatrix): number {
 
     if (rowRunLength >= 5) score += PENALTY_CONSECUTIVE + rowRunLength - 5;
     if (columnRunLength >= 5) score += PENALTY_CONSECUTIVE + columnRunLength - 5;
+    // Every remaining penalty is nonnegative, so ties and losing masks can stop here.
+    if (score >= scoreLimit) return score;
   }
 
   score +=

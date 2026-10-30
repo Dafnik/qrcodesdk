@@ -58,6 +58,36 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     let layer = '';
     let path = '';
     let hasCurves = false;
+    // Paths use relative commands, so repeated module shapes serialize to identical text.
+    // Positions are tracked after rounding, which keeps rounding errors from accumulating.
+    let hasPoint = false;
+    let currentX = 0;
+    let currentY = 0;
+    let startX = 0;
+    let startY = 0;
+    const moveTo = (x: number, y: number) => {
+      path += hasPoint
+        ? `m${formatNumber(x - currentX)} ${formatNumber(y - currentY)}`
+        : `M${formatNumber(x)} ${formatNumber(y)}`;
+      hasPoint = true;
+      currentX = startX = x;
+      currentY = startY = y;
+    };
+    const arcTo = (
+      centerX: number,
+      centerY: number,
+      radius: number,
+      angle: number,
+      counterclockwise: boolean,
+      largeArc: boolean,
+    ) => {
+      const x = roundNumber(centerX + Math.cos(angle) * radius);
+      const y = roundNumber(centerY + Math.sin(angle) * radius);
+      const formattedRadius = formatNumber(radius);
+      path += `a${formattedRadius} ${formattedRadius} 0 ${largeArc ? 1 : 0} ${counterclockwise ? 0 : 1} ${formatNumber(x - currentX)} ${formatNumber(y - currentY)}`;
+      currentX = x;
+      currentY = y;
+    };
     paint({
       drawBackground(red, green, blue, alpha) {
         background = `<path fill="${rgbHex(red, green, blue)}"${opacityAttribute(alpha)} d="M0 0h${viewSize}v${viewSize}H0z"/>`;
@@ -65,18 +95,31 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
       beginLayer(red, green, blue, alpha) {
         layer = `<path fill="${rgbHex(red, green, blue)}"${opacityAttribute(alpha)} fill-rule="evenodd" d="`;
         path = '';
+        hasPoint = false;
       },
       drawRectangle(x, y, width, height) {
-        path += `M${point(x, y)}h${formatNumber(width)}v${formatNumber(height)}h-${formatNumber(width)}Z`;
+        // Compacted module rectangles always have integer coordinates and dimensions, and
+        // every layer draws them before curves, so the current point is still an integer.
+        path += hasPoint
+          ? `m${x - currentX} ${y - currentY}h${width}v${height}h-${width}z`
+          : `M${x} ${y}h${width}v${height}h-${width}z`;
+        hasPoint = true;
+        currentX = startX = x;
+        currentY = startY = y;
       },
       beginPath() {
         hasCurves = true;
       },
       moveTo(x, y) {
-        path += `M${point(x, y)}`;
+        moveTo(roundNumber(x), roundNumber(y));
       },
       lineTo(x, y) {
-        path += `L${point(x, y)}`;
+        const deltaX = formatNumber(roundNumber(x) - currentX);
+        const deltaY = formatNumber(roundNumber(y) - currentY);
+        path +=
+          deltaY === '0' ? `h${deltaX}` : deltaX === '0' ? `v${deltaY}` : `l${deltaX} ${deltaY}`;
+        currentX = roundNumber(x);
+        currentY = roundNumber(y);
       },
       arc(centerX, centerY, radius, startAngle, endAngle, counterclockwise) {
         let delta = endAngle - startAngle;
@@ -86,21 +129,16 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
           while (delta <= 0) delta += Math.PI * 2;
         }
         if (Math.abs(delta) >= Math.PI * 2 - 1e-10) {
-          path += arcTo(centerX, centerY, radius, startAngle + delta / 2, counterclockwise, true);
-          path += arcTo(centerX, centerY, radius, endAngle, counterclockwise, true);
+          arcTo(centerX, centerY, radius, startAngle + delta / 2, counterclockwise, true);
+          arcTo(centerX, centerY, radius, endAngle, counterclockwise, true);
         } else {
-          path += arcTo(
-            centerX,
-            centerY,
-            radius,
-            endAngle,
-            counterclockwise,
-            Math.abs(delta) > Math.PI,
-          );
+          arcTo(centerX, centerY, radius, endAngle, counterclockwise, Math.abs(delta) > Math.PI);
         }
       },
       closePath() {
-        path += 'Z';
+        path += 'z';
+        currentX = startX;
+        currentY = startY;
       },
       endPath() {},
       endLayer() {
@@ -153,17 +191,6 @@ function isXMLString(value: string): boolean {
   return /^[\t\n\r\u0020-\ud7ff\ue000-\ufffd\u{10000}-\u{10ffff}]*$/u.test(value);
 }
 
-function arcTo(
-  centerX: number,
-  centerY: number,
-  radius: number,
-  angle: number,
-  counterclockwise: boolean,
-  largeArc: boolean,
-): string {
-  return `A${formatNumber(radius)} ${formatNumber(radius)} 0 ${largeArc ? 1 : 0} ${counterclockwise ? 0 : 1} ${point(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius)}`;
-}
-
 function rgbHex(red: number, green: number, blue: number): string {
   return `#${((1 << 24) | (red << 16) | (green << 8) | blue).toString(16).slice(1)}`;
 }
@@ -172,12 +199,12 @@ function opacityAttribute(alpha: number): string {
   return alpha === 255 ? '' : ` fill-opacity="${formatNumber(alpha / 255)}"`;
 }
 
-function point(x: number, y: number): string {
-  return `${formatNumber(x)} ${formatNumber(y)}`;
+function roundNumber(value: number): number {
+  return Math.round(value * 1_000_000) / 1_000_000;
 }
 
 function formatNumber(value: number): string {
-  return String(Math.round(value * 1_000_000) / 1_000_000);
+  return String(roundNumber(value));
 }
 
 function escapeXML(value: string, attribute?: boolean): string {

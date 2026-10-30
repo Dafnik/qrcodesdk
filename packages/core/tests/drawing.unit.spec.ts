@@ -20,6 +20,43 @@ function target(): QRCodeStyledDrawingTarget {
 }
 
 describe('createQRCodeStyler', () => {
+  test('does not create empty module layers for a matrix without dark cells', () => {
+    const paintTarget = target();
+    createQRCodeStyler({modules: {shape: 'square'}})
+      .draw([[0]])
+      .paint(paintTarget);
+    expect(paintTarget.drawBackground).toHaveBeenCalledOnce();
+    expect(paintTarget.beginLayer).not.toHaveBeenCalled();
+  });
+
+  test('compacts square finder layers while keeping circle modules as paths', () => {
+    const paintTarget = target();
+    const drawing = createQRCodeStyler({
+      modules: {shape: 'circle', color: '#ff0000'},
+      finder: {
+        outer: {shape: 'square', color: '#0000ff'},
+        center: {shape: 'square', color: '#0000ff'},
+      },
+    }).draw(qrcode('mixed layers').matrix());
+    drawing.paint(paintTarget);
+    expect(paintTarget.beginLayer).toHaveBeenCalledTimes(2);
+    expect(paintTarget.beginLayer).toHaveBeenNthCalledWith(1, 255, 0, 0, 255);
+    expect(paintTarget.beginLayer).toHaveBeenNthCalledWith(2, 0, 0, 255, 255);
+    expect(paintTarget.drawRectangle).toHaveBeenCalled();
+    expect(paintTarget.arc).toHaveBeenCalled();
+    const firstPaint = Object.fromEntries(
+      Object.entries(paintTarget).map(([name, method]) => [
+        name,
+        vi.mocked(method).mock.calls.slice(),
+      ]),
+    );
+    const repaintTarget = target();
+    drawing.paint(repaintTarget);
+    for (const [name, method] of Object.entries(repaintTarget)) {
+      expect(vi.mocked(method).mock.calls).toEqual(firstPaint[name]);
+    }
+  });
+
   test('snapshots options and caches drawings by matrix identity', () => {
     const style = {moduleSize: 3, quietZone: 2} as const;
     const styler = createQRCodeStyler(style);

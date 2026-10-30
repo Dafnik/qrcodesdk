@@ -3,12 +3,11 @@ import {describe, expect, test} from 'vitest';
 import {applyMaskToMatrix} from '../../src/matrix/apply-mask-to-matrix';
 import {createBaseMatrix} from '../../src/matrix/create-base-matrix';
 import {ECC_LEVEL_Q} from '../../src/matrix/error-correction';
-import {evaluateGroup} from '../../src/matrix/evaluate-group';
 import {evaluateMatrix} from '../../src/matrix/evaluate-matrix';
 import {fillDataInMatrix} from '../../src/matrix/fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from '../../src/matrix/fill-format-information-in-matrix';
 import type {QRCodeMatrix, QRCodeMutableMatrix, QRCodeReservedMatrix} from '../../src/types';
-import {formatBitsMatch} from './helpers';
+import {MASK_FUNCTIONS, QR_CODE_MASKS, evaluateGroup, formatBitsMatch} from './helpers';
 
 describe('matrix construction and mutation helpers', () => {
   test.each([1, 40] as const)('preallocates dense version %s matrix rows', (version) => {
@@ -85,6 +84,20 @@ describe('matrix construction and mutation helpers', () => {
     expect(matrix[1][1]).toBe(original[1][1]);
     expect(matrix[2][2]).toBe(original[2][2]);
     expect(matrix[0][2]).toBe(0);
+  });
+
+  test.each(QR_CODE_MASKS)('applies mask %s to exactly its unreserved pattern modules', (mask) => {
+    const {matrix, reserved} = createBaseMatrix(7);
+    const original = matrix.map((row) => row.slice());
+
+    applyMaskToMatrix(matrix, reserved, mask);
+
+    for (let i = 0; i < matrix.length; i++) {
+      for (let j = 0; j < matrix.length; j++) {
+        const toggled = !reserved[i]![j] && MASK_FUNCTIONS[mask]!(i, j);
+        expect(matrix[i]![j]).toBe(toggled ? original[i]![j]! ^ 1 : original[i]![j]);
+      }
+    }
   });
 });
 

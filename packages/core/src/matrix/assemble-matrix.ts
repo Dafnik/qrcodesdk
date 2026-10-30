@@ -32,7 +32,7 @@ export function assembleQRCodeMatrix(
     const candidate = unmaskedMatrix.map((row) => row.slice());
     applyMaskToMatrix(candidate, reserved, mask);
     fillFormatInformationInMatrix(candidate, errorCorrectionLevel, mask);
-    const score = evaluateMatrix(candidate);
+    const score = evaluateMatrix(candidate, bestScore);
     if (score < bestScore) {
       bestScore = score;
       bestMatrix = candidate;
