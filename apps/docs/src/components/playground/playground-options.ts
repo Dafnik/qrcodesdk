@@ -1,12 +1,20 @@
 import {atom} from 'nanostores';
 
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
-import type {
-  QRCodeDataImageURL,
-  QRCodeMatrixOptions,
-  QRCodeSVGOptions,
-  QRCodeVisualStyle,
+import {
+  type QRCodeCanvasOptions,
+  type QRCodeImageOptions,
+  canvasCenterImage,
+} from '@qrcodesdk/browser';
+import {
+  type QRCodeCenterImageLayout,
+  type QRCodeDataImageURL,
+  type QRCodeMatrixOptions,
+  type QRCodeSVGOptions,
+  type QRCodeVisualStyle,
+  svgCenterImage,
 } from '@qrcodesdk/core';
+
+import {type PlaygroundStyleState, createPlaygroundStyle} from './playground-style.ts';
 
 export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue' | 'cli';
 export type PlaygroundOutput = 'svg' | 'image' | 'canvas';
@@ -20,7 +28,7 @@ export const PLAYGROUND_SECTIONS = [
   'accessibility',
 ] as const satisfies readonly PlaygroundSection[];
 
-export interface PlaygroundOptions extends QRCodeMatrixOptions {
+export interface PlaygroundOptions extends QRCodeMatrixOptions, PlaygroundStyleState {
   payload: string;
   packageName: PlaygroundPackage;
   output: PlaygroundOutput;
@@ -28,8 +36,6 @@ export interface PlaygroundOptions extends QRCodeMatrixOptions {
   quietZone?: number;
   foreground?: QRCodeVisualStyle['foreground'];
   background?: QRCodeVisualStyle['background'];
-  modules?: QRCodeVisualStyle['modules'];
-  finder?: QRCodeVisualStyle['finder'];
   alt?: string;
   ariaLabel?: string;
   title?: string;
@@ -71,40 +77,8 @@ let imagePreparationVersion = 0;
 const playgroundLogoPath = '/logo-square.png';
 const playgroundLogoFileName = 'QRCodeSDK logo.png';
 
-function mergeOptionalObject<T extends object>(
-  current: T | undefined,
-  patch: T | undefined,
-  isPresent: boolean,
-): T | undefined {
-  if (!isPresent) {
-    return current;
-  }
-
-  if (patch === undefined) {
-    return undefined;
-  }
-
-  return {
-    ...current,
-    ...patch,
-  };
-}
-
-export function mergeQRCodeOptions(
-  current: PlaygroundOptions,
-  patch: Partial<PlaygroundOptions>,
-): PlaygroundOptions {
-  return {
-    ...current,
-    ...patch,
-
-    modules: mergeOptionalObject(current.modules, patch.modules, Object.hasOwn(patch, 'modules')),
-    finder: mergeFinder(current.finder, patch.finder, Object.hasOwn(patch, 'finder')),
-  };
-}
-
 export function updateQrOptions(patch: Partial<PlaygroundOptions>): void {
-  playgroundOptions.set(mergeQRCodeOptions(playgroundOptions.get(), patch));
+  playgroundOptions.set({...playgroundOptions.get(), ...patch});
 }
 
 export function setPlaygroundSectionOpen(section: PlaygroundSection, open: boolean): void {
@@ -195,20 +169,28 @@ export function clearPlaygroundImage(): void {
   playgroundImageStatus.set({state: 'idle'});
 }
 
+export function playgroundCenterImageLayout(
+  preparedImage: PlaygroundPreparedImage,
+): QRCodeCenterImageLayout {
+  return {
+    size: preparedImage.size,
+    padding: preparedImage.padding,
+    clearBackground: preparedImage.clearBackground,
+  };
+}
+
 export function createPlaygroundSVGOptions(
   playgroundOptionsValue: PlaygroundOptions,
   preparedImage = playgroundPreparedImage.get(),
 ): QRCodeSVGOptions {
-  const rendererOptions = svgOptions(playgroundOptionsValue);
+  const rendererOptions = visualOptions(playgroundOptionsValue);
   return preparedImage
     ? {
         ...rendererOptions,
-        centerImage: {
-          source: preparedImage.dataUrl,
-          size: preparedImage.size,
-          padding: preparedImage.padding,
-          clearBackground: preparedImage.clearBackground,
-        },
+        centerImage: svgCenterImage(
+          preparedImage.dataUrl,
+          playgroundCenterImageLayout(preparedImage),
+        ),
       }
     : rendererOptions;
 }
@@ -221,12 +203,10 @@ export function createPlaygroundImageOptions(
   return preparedImage
     ? {
         ...rendererOptions,
-        centerImage: {
-          source: preparedImage.element,
-          size: preparedImage.size,
-          padding: preparedImage.padding,
-          clearBackground: preparedImage.clearBackground,
-        },
+        centerImage: canvasCenterImage(
+          preparedImage.element,
+          playgroundCenterImageLayout(preparedImage),
+        ),
       }
     : rendererOptions;
 }
@@ -235,16 +215,14 @@ export function createPlaygroundCanvasOptions(
   playgroundOptionsValue: PlaygroundOptions,
   preparedImage = playgroundPreparedImage.get(),
 ): QRCodeCanvasOptions {
-  const rendererOptions = canvasOptions(playgroundOptionsValue);
+  const rendererOptions = visualOptions(playgroundOptionsValue);
   return preparedImage
     ? {
         ...rendererOptions,
-        centerImage: {
-          source: preparedImage.element,
-          size: preparedImage.size,
-          padding: preparedImage.padding,
-          clearBackground: preparedImage.clearBackground,
-        },
+        centerImage: canvasCenterImage(
+          preparedImage.element,
+          playgroundCenterImageLayout(preparedImage),
+        ),
       }
     : rendererOptions;
 }
@@ -263,13 +241,12 @@ function baseOptions(playgroundOptionsValue: PlaygroundOptions) {
       quietZone: playgroundOptionsValue.quietZone,
       foreground: playgroundOptionsValue.foreground,
       background: playgroundOptionsValue.background,
-      modules: playgroundOptionsValue.modules,
-      finder: playgroundOptionsValue.finder,
+      ...createPlaygroundStyle(playgroundOptionsValue),
     },
   };
 }
 
-function svgOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeSVGOptions {
+function visualOptions(playgroundOptionsValue: PlaygroundOptions) {
   return {
     ...baseOptions(playgroundOptionsValue),
     accessibility: {
@@ -287,38 +264,6 @@ function imageOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeImageOpt
       ariaLabel: playgroundOptionsValue.ariaLabel,
       title: playgroundOptionsValue.title,
     },
-  };
-}
-
-function canvasOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeCanvasOptions {
-  return {
-    ...baseOptions(playgroundOptionsValue),
-    accessibility: {
-      ariaLabel: playgroundOptionsValue.ariaLabel,
-      title: playgroundOptionsValue.title,
-    },
-  };
-}
-
-function mergeFinder(
-  current: QRCodeVisualStyle['finder'],
-  patch: QRCodeVisualStyle['finder'],
-  isPresent: boolean,
-): QRCodeVisualStyle['finder'] {
-  const finder = mergeOptionalObject(current, patch, isPresent);
-  if (!finder) return finder;
-  return {
-    ...finder,
-    outer: mergeOptionalObject(
-      current?.outer,
-      patch?.outer,
-      Boolean(patch && Object.hasOwn(patch, 'outer')),
-    ),
-    center: mergeOptionalObject(
-      current?.center,
-      patch?.center,
-      Boolean(patch && Object.hasOwn(patch, 'center')),
-    ),
   };
 }
 

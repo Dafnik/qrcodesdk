@@ -1,89 +1,116 @@
-import type {
-  QRCodeCodewords,
-  QRCodeModule,
-  QRCodeMutableMatrix,
-  QRCodeReservedMatrix,
-  QRCodeVersion,
-} from '../types';
+import type {QRCodeModuleRole, QRCodeVersion} from '../types';
 import {augmentBCH} from './augment-bch';
 import {getSizeByVersion} from './get-size-by-version';
 import {needsVersionInfo} from './needs-version-info';
 import {getAlignmentPatternPositions} from './version-config';
 
-type QRCodeMatrixBuildState = {
-  matrix: QRCodeMutableMatrix;
-  reserved: QRCodeReservedMatrix;
+export const DATA_ROLE = 0;
+const FINDER_RING_ROLE = 1;
+const FINDER_CENTER_ROLE = 2;
+const SEPARATOR_ROLE = 3;
+const ALIGNMENT_RING_ROLE = 4;
+const ALIGNMENT_CENTER_ROLE = 5;
+const TIMING_ROLE = 6;
+const FORMAT_ROLE = 7;
+const VERSION_ROLE = 8;
+
+/** Function patterns of one version. Every non-data module is reserved. */
+export type QRCodeBaseMatrix = {
+  readonly size: number;
+  readonly modules: Uint8Array;
+  readonly roles: Uint8Array;
+  readonly publicRoles: readonly number[];
 };
 
+const bases = new Map<QRCodeVersion, QRCodeBaseMatrix>();
+
 /**
- * Creates the base matrix for a given version of the QR code. It returns two matrices,
- * one of which is the actual matrix and the other represents the "reserved" portion
- * (e.g., finder and timing patterns) of the matrix.
- *
- * Rows are initialized densely to keep subsequent data placement, masking, and
- * rendering on V8's packed-array fast path. `fillDataInMatrix` overwrites every
- * non-reserved module before the matrix is returned publicly.
- *
- * @param {QRCodeVersion} version - The version number of the QR code.
- * @returns {QRCodeMatrixBuildState} The base matrix and the reserved portion matrix.
+ * Returns the function patterns and module roles of a version. Both depend only on the version, so
+ * they are built once and shared. Callers must copy `modules` before writing to it.
  */
-export function createBaseMatrix(version: QRCodeVersion): QRCodeMatrixBuildState {
-  const sizeOfVersion = getSizeByVersion(version),
-    matrix: QRCodeMutableMatrix = [],
-    reserved: QRCodeReservedMatrix = [];
+export function createBaseMatrix(version: QRCodeVersion): QRCodeBaseMatrix {
+  let base = bases.get(version);
+  if (!base) bases.set(version, (base = buildBaseMatrix(version)));
+  return base;
+}
 
-  for (let i = 0; i < sizeOfVersion; i++) {
-    matrix.push(new Array<QRCodeModule>(sizeOfVersion).fill(0));
-    reserved.push(new Array<QRCodeModule>(sizeOfVersion).fill(0));
-  }
-
-  const blit = function (y: number, x: number, h: number, w: number, bits: QRCodeCodewords): void {
-    for (let i = 0; i < h; i++) {
-      const matrixRow = matrix[y + i]!;
-      const reservedRow = reserved[y + i]!;
-      for (let j = 0; j < w; j++) {
-        matrixRow[x + j] = ((bits[i]! >> j) & 1) as QRCodeModule;
-        reservedRow[x + j] = 1;
-      }
-    }
+function buildBaseMatrix(version: QRCodeVersion): QRCodeBaseMatrix {
+  const n = getSizeByVersion(version);
+  const modules = new Uint8Array(n * n);
+  const roles = new Uint8Array(n * n);
+  const set = (x: number, y: number, dark: number, role: QRCodeModuleRole) => {
+    modules[y * n + x] = dark;
+    roles[y * n + x] = role;
   };
 
-  // finder patterns and a part of timing patterns
-  // will also mark the format information area (not yet written) as reserved.
-  blit(0, 0, 9, 9, [0x7f, 0x41, 0x5d, 0x5d, 0x5d, 0x41, 0x17f, 0x00, 0x40]);
-  blit(sizeOfVersion - 8, 0, 8, 9, [0x100, 0x7f, 0x41, 0x5d, 0x5d, 0x5d, 0x41, 0x7f]);
-  blit(0, sizeOfVersion - 8, 9, 8, [0xfe, 0x82, 0xba, 0xba, 0xba, 0x82, 0xfe, 0x00, 0x00]);
-
-  // the rest of timing patterns
-  for (let i = 9; i < sizeOfVersion - 8; i++) {
-    matrix[6]![i] = matrix[i]![6] = (~i & 1) as QRCodeModule;
-    reserved[6]![i] = reserved[i]![6] = 1;
+  // Timing patterns first; finders, separators, and alignment patterns overwrite their crossings.
+  for (let i = 0; i < n; i++) {
+    set(i, 6, ~i & 1, TIMING_ROLE);
+    set(6, i, ~i & 1, TIMING_ROLE);
   }
 
-  // alignment patterns
-  const alignmentPatterns = getAlignmentPatternPositions(version),
-    m = alignmentPatterns.length;
+  // Finder patterns with their separators.
+  for (const [left, top] of [
+    [0, 0],
+    [n - 7, 0],
+    [0, n - 7],
+  ] as const) {
+    for (let dy = -1; dy <= 7; dy++) {
+      for (let dx = -1; dx <= 7; dx++) {
+        const x = left + dx;
+        const y = top + dy;
+        if (x < 0 || y < 0 || x >= n || y >= n) continue;
+        const distance = Math.max(Math.abs(dx - 3), Math.abs(dy - 3));
+        if (distance > 3) set(x, y, 0, SEPARATOR_ROLE);
+        else set(x, y, +(distance !== 2), distance < 2 ? FINDER_CENTER_ROLE : FINDER_RING_ROLE);
+      }
+    }
+  }
 
+  // Alignment patterns, except where they would overlap a finder pattern.
+  const positions = getAlignmentPatternPositions(version);
+  const m = positions.length;
   for (let i = 0; i < m; i++) {
     const minJ = i == 0 || i == m - 1 ? 1 : 0,
       maxJ = i == 0 ? m - 1 : m;
     for (let j = minJ; j < maxJ; j++) {
-      blit(alignmentPatterns[i]!, alignmentPatterns[j]!, 5, 5, [0x1f, 0x11, 0x15, 0x11, 0x1f]);
+      for (let dy = 0; dy < 5; dy++) {
+        for (let dx = 0; dx < 5; dx++) {
+          const distance = Math.max(Math.abs(dx - 2), Math.abs(dy - 2));
+          set(
+            positions[j]! + dx,
+            positions[i]! + dy,
+            +(distance !== 1),
+            distance === 0 ? ALIGNMENT_CENTER_ROLE : ALIGNMENT_RING_ROLE,
+          );
+        }
+      }
     }
   }
 
-  // version information
+  // Format information areas, written for each mask later, and the always-dark module.
+  for (let i = 0; i <= 8; i++) {
+    if (i === 6) continue;
+    set(8, i, 0, FORMAT_ROLE);
+    set(i, 8, 0, FORMAT_ROLE);
+  }
+  for (let i = n - 8; i < n; i++) {
+    set(8, i, 0, FORMAT_ROLE);
+    set(i, 8, 0, FORMAT_ROLE);
+  }
+  set(8, n - 8, 1, FORMAT_ROLE);
+
   if (needsVersionInfo(version)) {
     const code = augmentBCH(version, 6, 0x1f25, 12);
     let k = 0;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 3; j++) {
-        matrix[i]![sizeOfVersion - 11 + j] = matrix[sizeOfVersion - 11 + j]![i] = ((code >> k++) &
-          1) as QRCodeModule;
-        reserved[i]![sizeOfVersion - 11 + j] = reserved[sizeOfVersion - 11 + j]![i] = 1;
+        const bit = (code >> k++) & 1;
+        set(n - 11 + j, i, bit, VERSION_ROLE);
+        set(i, n - 11 + j, bit, VERSION_ROLE);
       }
     }
   }
 
-  return {matrix, reserved};
+  return {size: n, modules, roles, publicRoles: Object.freeze(Array.from(roles))};
 }

@@ -8,8 +8,8 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
-`@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK.
-It turns a payload into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
+`@qrcodesdk/core` generates QR matrices, SVG strings, and terminal text without browser or Node.js
+APIs. Custom renderers can turn its matrices into other formats.
 
 ## Install
 
@@ -70,8 +70,29 @@ options and constraints.
 | Render terminal output        | `QRCodeTextRenderer`       | text `string`  |
 
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for accepted payloads, matrix options, builder methods,
-and matrix output. Shared visual options and scan-reliability guidance are in
-[Customize appearance](https://qrcodesdk.dev/guides/customize/).
+and matrix output.
+
+## Style the output
+
+Import shapes and pattern parts from `@qrcodesdk/core/style`:
+
+```ts
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {circle, finder, rounded} from '@qrcodesdk/core/style';
+
+const svg = qrcode('https://qrcodesdk.dev').render(
+  QRCodeSVGRenderer({
+    style: {
+      moduleSize: 8,
+      foreground: '#0f172a',
+      modules: rounded(),
+      finder: finder({ring: rounded({radius: 1}), center: circle(), color: '#e11d48'}),
+    },
+  }),
+);
+```
+
+See [Customize appearance](https://qrcodesdk.dev/guides/customize/) for style options and custom shapes.
 
 Typed helpers serialize common application values before generation. See
 [Payload helpers](https://qrcodesdk.dev/reference/payloads/) for email, phone, SMS, geographic, and Wi-Fi payloads.
@@ -110,21 +131,26 @@ bundler, use `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/t
 `@qrcodesdk/core/error` to avoid loading unrelated renderers. Bundled applications can use root
 imports with tree shaking.
 
-Import the styler and drawing types from `@qrcodesdk/core/drawing`, and payload helpers from
-`@qrcodesdk/core/payload`. These APIs are available only through those entry points. See
-[Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for the drawing protocol.
+Import shapes and the finder and alignment parts from `@qrcodesdk/core/style`, the styler, module
+roles, and drawing helpers from `@qrcodesdk/core/drawing`, and payload helpers from
+`@qrcodesdk/core/payload`. These APIs are available only through those entry points.
+`@qrcodesdk/core/drawing` also re-exports the `QRCodeCenterImageLayout`, `QRCodeModuleRole`, and
+`QRCodeStylePart` types. See [Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for the matrix roles
+and the drawing data.
 
 ```ts
 import {
+  type QRCodeAlignmentCenterShape,
+  type QRCodeAlignmentRingShape,
   QRCodeBuilder,
-  type QRCodeCenterImageOptions,
   type QRCodeColor,
   type QRCodeDataImageURL,
   QRCodeError,
   type QRCodeErrorCode,
   type QRCodeErrorCorrectionLevel,
   type QRCodeErrorOptions,
-  type QRCodeFinderShape,
+  type QRCodeFinderCenterShape,
+  type QRCodeFinderRingShape,
   type QRCodeMask,
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
@@ -133,10 +159,12 @@ import {
   type QRCodePayload,
   type QRCodeRenderer,
   type QRCodeSVGAccessibilityOptions,
-  type QRCodeSVGCenterImageOptions,
+  type QRCodeSVGCenterImage,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
+  type QRCodeShape,
+  type QRCodeShapePath,
   type QRCodeTextANSIBackgroundOptions,
   type QRCodeTextANSIOptions,
   QRCodeTextRenderer,
@@ -146,12 +174,23 @@ import {
   type QRCodeVisualStyle,
   QR_CODE_ERROR_CODES,
   qrcode,
+  svgCenterImage,
 } from '@qrcodesdk/core';
 import {
-  type QRCodeStyledDrawing,
-  type QRCodeStyledDrawingTarget,
+  type QRCodeCenterImageBox,
+  type QRCodeCenterImageLayout,
+  type QRCodeCenterImagePlacement,
+  type QRCodeDrawContext,
+  type QRCodeDrawLayer,
+  type QRCodeDrawing,
+  type QRCodeDrawingLayer,
+  type QRCodeModuleRole,
+  type QRCodeStylePart,
   type QRCodeStyler,
+  QR_CODE_MODULE_ROLES,
+  createQRCodeCenterImage,
   createQRCodeStyler,
+  toQRCodePathData,
 } from '@qrcodesdk/core/drawing';
 import {
   type QRCodeEmailPayload,
@@ -166,6 +205,17 @@ import {
   smsPayload,
   wifiPayload,
 } from '@qrcodesdk/core/payload';
+import {
+  type QRCodeAlignmentOptions,
+  type QRCodeCircleShapeOptions,
+  type QRCodeFinderOptions,
+  type QRCodeRoundedShapeOptions,
+  alignment,
+  circle,
+  diagonal,
+  finder,
+  rounded,
+} from '@qrcodesdk/core/style';
 ```
 
 ## Generated output stability

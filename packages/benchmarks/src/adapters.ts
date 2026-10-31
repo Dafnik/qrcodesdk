@@ -86,7 +86,7 @@ const qrcodeSDKAdapter: BenchmarkAdapter = {
   label: 'QRCodeSDK',
   version: qrcodeSDKPackage.version,
   matrix: (fixture) =>
-    createQRCodeSDK(fixture.payload).options(qrcodeSDKOptions(fixture)).matrix().length,
+    createQRCodeSDK(fixture.payload).options(qrcodeSDKOptions(fixture)).matrix().size,
   svg: (fixture) =>
     createQRCodeSDK(fixture.payload)
       .options(qrcodeSDKOptions(fixture))

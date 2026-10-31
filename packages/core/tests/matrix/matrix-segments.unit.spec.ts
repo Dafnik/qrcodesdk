@@ -14,6 +14,21 @@ import type {QRCodeEncodedSegment, QRCodeVersion} from '../../src/types';
 const MODES = [MODE_NUMERIC, MODE_ALPHANUMERIC, MODE_OCTET] as const;
 
 describe('mixed-mode segmentation', () => {
+  test.each([1, 9, 10, 26, 27, 40] as const)(
+    'preserves numeric segments across character-count boundaries at version %s',
+    (version) => {
+      for (const payload of ['', '0', '000001', 0, 123456, '0123456789'.repeat(100)]) {
+        for (const eci of [false, true]) {
+          const segments = optimizeSegments(payload, version, eci);
+          expect(segments).toEqual([{mode: MODE_NUMERIC, payload: String(payload)}]);
+          expect(getSegmentsBitLength(version, segments, eci)).toBe(
+            getSegmentsBitLength(version, [{mode: MODE_NUMERIC, payload: String(payload)}], false),
+          );
+        }
+      }
+    },
+  );
+
   test.each([1, 10, 27] as const)(
     'optimizes numeric, alphanumeric, and octet runs for version group starting at %s',
     (version) => {

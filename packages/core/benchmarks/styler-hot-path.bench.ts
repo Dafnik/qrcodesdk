@@ -1,53 +1,41 @@
 import {describe, test} from 'vitest';
 
 import {qrcode} from '../src';
-import {createQRCodeStyler} from '../src/drawing';
-import type {QRCodeStyledDrawingTarget} from '../src/drawing';
+import {createQRCodeStyler, toQRCodePathData} from '../src/drawing';
+import {circle, finder, rounded} from '../src/style';
 import type {QRCodeVersion, QRCodeVisualStyle} from '../src/types';
 
 const VERSIONS = [1, 10, 40] as const satisfies readonly QRCodeVersion[];
 const STYLE = {
   background: '#f8fafccc',
   foreground: '#0f172aff',
-  modules: {shape: 'rounded' as const},
-  finder: {
-    outer: {shape: 'extra-rounded' as const, color: '#7c3aedff'},
-    center: {shape: 'circle' as const, color: '#2563ebff'},
-  },
+  modules: rounded(),
+  finder: finder({ring: rounded({radius: 1}), center: circle(), color: '#7c3aedff'}),
 } as const satisfies QRCodeVisualStyle;
-
-const target: QRCodeStyledDrawingTarget = {
-  drawBackground() {},
-  beginLayer() {},
-  drawRectangle() {},
-  beginPath() {},
-  moveTo() {},
-  lineTo() {},
-  arc() {},
-  closePath() {},
-  endPath() {},
-  endLayer() {},
-};
 
 describe('styler hot paths', () => {
   for (const version of VERSIONS) {
     test(`version ${String(version)}`, async ({bench}) => {
       const matrix = qrcode('A').options({mode: 'alphanumeric', version, mask: 0}).matrix();
-      const styler = createQRCodeStyler(STYLE);
-      const drawing = styler.draw(matrix);
+      const plain = createQRCodeStyler();
+      const styled = createQRCodeStyler(STYLE);
+      const drawing = styled(matrix);
 
       await bench.compare(
-        bench('compile style', () => {
-          createQRCodeStyler(STYLE);
+        bench('create shapes and styler', () => {
+          createQRCodeStyler({
+            modules: rounded(),
+            finder: finder({ring: rounded({radius: 1}), center: circle()}),
+          });
         }),
-        bench('first draw', () => {
-          createQRCodeStyler(STYLE).draw(matrix);
+        bench('draw plain', () => {
+          plain(matrix);
         }),
-        bench('cached draw', () => {
-          styler.draw(matrix);
+        bench('draw styled', () => {
+          styled(matrix);
         }),
-        bench('cached repaint', () => {
-          drawing.paint(target);
+        bench('serialize styled path data', () => {
+          for (const layer of drawing.layers) toQRCodePathData(layer);
         }),
       );
     });

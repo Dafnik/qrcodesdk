@@ -5,6 +5,9 @@ import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 
 import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
 import type {QRCodeSVGOptions} from '@qrcodesdk/core';
+import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
+import {canvasCenterImage} from '@qrcodesdk/browser';
+import {svgCenterImage} from '@qrcodesdk/core';
 
 import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '../src';
 
@@ -155,11 +158,9 @@ describe('React QR code components', () => {
       style: {
         moduleSize: 2,
         quietZone: 1,
-        modules: {color: '#112233' as const, shape: 'diagonal-rounded' as const},
-        finder: {
-          outer: {color: '#445566' as const, shape: 'extra-rounded' as const},
-          center: {color: '#778899' as const, shape: 'circle' as const},
-        },
+        foreground: '#112233' as const,
+        modules: diagonal({radius: 1}),
+        finder: finder({ring: rounded({radius: 1}), center: circle(), color: '#445566'}),
       },
     };
     const {container} = render(
@@ -177,7 +178,7 @@ describe('React QR code components', () => {
 
     expect(
       Array.from(container.querySelectorAll('svg path')).map((path) => path.getAttribute('fill')),
-    ).toEqual(['#ffffff', '#112233', '#445566', '#778899']);
+    ).toEqual(['#ffffff', '#445566', '#112233']);
   });
 
   test('passes prepared center images through SVG, image, and canvas components', async () => {
@@ -189,15 +190,15 @@ describe('React QR code components', () => {
       <>
         <QRCodeSVG
           payload="CENTER IMAGE"
-          options={{...svgOptions, centerImage: {source: svgSource, size: 0.2}}}
+          options={{...svgOptions, centerImage: svgCenterImage(svgSource, {size: 0.2})}}
         />
         <QRCodeImage
           payload="CENTER IMAGE"
-          options={{...imageOptions, centerImage: {source, size: 0.2}}}
+          options={{...imageOptions, centerImage: canvasCenterImage(source, {size: 0.2})}}
         />
         <QRCodeCanvas
           payload="CENTER IMAGE"
-          options={{...canvasOptions, centerImage: {source, size: 0.2}}}
+          options={{...canvasOptions, centerImage: canvasCenterImage(source, {size: 0.2})}}
         />
       </>,
     );
@@ -212,21 +213,21 @@ describe('React QR code components', () => {
     const firstCanvas = renderedElement<HTMLCanvasElement>(container, 'div > canvas');
 
     expect(embeddedImage.getAttribute('href')).toBe(svgSource);
-    expect(container.querySelector('svg rect')).not.toBeNull();
+    expect(container.querySelector('svg mask')).toBeNull();
 
     rerender(
       <>
         <QRCodeSVG
           payload="CENTER IMAGE"
-          options={{...svgOptions, centerImage: {source: svgSource, size: 0.3}}}
+          options={{...svgOptions, centerImage: svgCenterImage(svgSource, {size: 0.3})}}
         />
         <QRCodeImage
           payload="CENTER IMAGE"
-          options={{...imageOptions, centerImage: {source, size: 0.3}}}
+          options={{...imageOptions, centerImage: canvasCenterImage(source, {size: 0.3})}}
         />
         <QRCodeCanvas
           payload="CENTER IMAGE"
-          options={{...canvasOptions, centerImage: {source, size: 0.3}}}
+          options={{...canvasOptions, centerImage: canvasCenterImage(source, {size: 0.3})}}
         />
       </>,
     );
@@ -254,13 +255,13 @@ describe('React QR code components', () => {
           payload="CENTER IMAGE"
           options={{
             ...svgOptions,
-            centerImage: {source: 'data:image/png;base64,cHJlcGFyZWQ='},
+            centerImage: svgCenterImage('data:image/png;base64,cHJlcGFyZWQ='),
           }}
         />
         <QRCodeImage
           ref={imageQRCode}
           payload="CENTER IMAGE"
-          options={{...imageOptions, centerImage: {source}}}
+          options={{...imageOptions, centerImage: canvasCenterImage(source)}}
         />
       </>,
     );

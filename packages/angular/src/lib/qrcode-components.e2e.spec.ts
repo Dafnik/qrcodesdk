@@ -5,7 +5,10 @@ import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 
 import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import {canvasCenterImage} from '@qrcodesdk/browser';
 import type {QRCodePayload, QRCodeSVGOptions} from '@qrcodesdk/core';
+import {svgCenterImage} from '@qrcodesdk/core';
+import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
 import {QRCodeCanvas} from './QRCodeCanvas';
 import {QRCodeImage} from './QRCodeImage';
@@ -184,11 +187,9 @@ describe('Angular QR code components', () => {
       style: {
         moduleSize: 3,
         quietZone: 2,
-        modules: {color: '#112233' as const, shape: 'diagonal-rounded' as const},
-        finder: {
-          outer: {color: '#445566' as const, shape: 'extra-rounded' as const},
-          center: {color: '#778899' as const, shape: 'circle' as const},
-        },
+        foreground: '#112233' as const,
+        modules: diagonal({radius: 1}),
+        finder: finder({ring: rounded({radius: 1}), center: circle(), color: '#445566'}),
       },
     };
     const svgFixture = TestBed.createComponent(QRCodeSVGHost);
@@ -206,7 +207,7 @@ describe('Angular QR code components', () => {
 
     expect(
       Array.from(svg.querySelectorAll('path')).map((path) => path.getAttribute('fill')),
-    ).toEqual(['#ffffff', '#112233', '#445566', '#778899']);
+    ).toEqual(['#ffffff', '#445566', '#112233']);
     expect(svg.getAttribute('width')).toBe('75');
     expect(svg.getAttribute('height')).toBe('75');
 
@@ -232,15 +233,15 @@ describe('Angular QR code components', () => {
 
     svgFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      centerImage: {source: 'data:image/png;base64,cHJlcGFyZWQ=', size: 0.2},
+      centerImage: svgCenterImage('data:image/png;base64,cHJlcGFyZWQ=', {size: 0.2}),
     });
     imageFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      centerImage: {source, size: 0.2},
+      centerImage: canvasCenterImage(source, {size: 0.2}),
     });
     canvasFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      centerImage: {source, size: 0.2},
+      centerImage: canvasCenterImage(source, {size: 0.2}),
     });
     await Promise.all([
       svgFixture.whenStable(),
@@ -253,15 +254,15 @@ describe('Angular QR code components', () => {
     const firstCanvas = getRenderedElement<HTMLCanvasElement>(canvasFixture, 'canvas');
 
     expect(embeddedImage.getAttribute('href')).toBe('data:image/png;base64,cHJlcGFyZWQ=');
-    expect(svgFixture.nativeElement.querySelector('svg rect')).not.toBeNull();
+    expect(svgFixture.nativeElement.querySelector('svg mask')).toBeNull();
 
     imageFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      centerImage: {source, size: 0.3},
+      centerImage: canvasCenterImage(source, {size: 0.3}),
     });
     canvasFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      centerImage: {source, size: 0.3},
+      centerImage: canvasCenterImage(source, {size: 0.3}),
     });
     await Promise.all([imageFixture.whenStable(), canvasFixture.whenStable()]);
 
@@ -281,11 +282,11 @@ describe('Angular QR code components', () => {
 
     svgFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      centerImage: {source: 'data:image/png;base64,cHJlcGFyZWQ='},
+      centerImage: svgCenterImage('data:image/png;base64,cHJlcGFyZWQ='),
     });
     imageFixture.componentRef.setInput('options', {
       style: {moduleSize: 2, quietZone: 1},
-      centerImage: {source},
+      centerImage: canvasCenterImage(source),
     });
     await Promise.all([svgFixture.whenStable(), imageFixture.whenStable()]);
 

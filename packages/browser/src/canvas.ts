@@ -1,16 +1,27 @@
 import type {
-  QRCodeCenterImageOptions,
+  QRCodeCenterImageLayout,
   QRCodeMatrix,
   QRCodeMatrixOptions,
   QRCodeRenderer,
   QRCodeVisualStyle,
 } from '@qrcodesdk/core';
-import {createQRCodeStyler} from '@qrcodesdk/core/drawing';
+import {
+  type QRCodeDrawing,
+  type QRCodeStylePart,
+  createQRCodeCenterImage,
+  createQRCodeStyler,
+  toQRCodePathData,
+} from '@qrcodesdk/core/drawing';
 import {QRCodeError} from '@qrcodesdk/core/error';
+import {ɵassertCenterImage as assertCenterImage} from '@qrcodesdk/core/internal';
 
 import {assertKnownKeys, assertOptionalString} from './options';
 
-export type QRCodeCanvasCenterImageOptions = QRCodeCenterImageOptions<CanvasImageSource>;
+/** A center image for Canvas and Image output, created with `canvasCenterImage()`. */
+export type QRCodeCanvasCenterImage = {
+  readonly part: QRCodeStylePart;
+  draw(context: CanvasRenderingContext2D, drawing: QRCodeDrawing): void;
+};
 export type QRCodeCanvasAccessibilityOptions = {
   readonly ariaLabel?: string;
   readonly title?: string;
@@ -18,7 +29,7 @@ export type QRCodeCanvasAccessibilityOptions = {
 export type QRCodeCanvasRendererOptions = {
   readonly style?: QRCodeVisualStyle;
   readonly accessibility?: QRCodeCanvasAccessibilityOptions;
-  readonly centerImage?: QRCodeCanvasCenterImageOptions;
+  readonly centerImage?: QRCodeCanvasCenterImage;
 };
 export type QRCodeCanvasOptions = QRCodeCanvasRendererOptions & {
   readonly matrix?: QRCodeMatrixOptions;
@@ -29,22 +40,15 @@ export function QRCodeCanvasRenderer(
 ): QRCodeRenderer<HTMLCanvasElement> {
   assertKnownKeys(options, 'options', ['style', 'accessibility', 'centerImage']);
   assertKnownKeys(options?.accessibility, 'accessibility', ['ariaLabel', 'title']);
-  assertKnownKeys(options?.centerImage, 'centerImage', [
-    'source',
-    'size',
-    'padding',
-    'clearBackground',
-  ]);
   assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
   assertOptionalString(options?.accessibility?.title, 'accessibility.title');
-  const styler = createQRCodeStyler(options?.style);
+  const centerImage = options?.centerImage;
+  assertCenterImage(centerImage, 'draw', 'canvasCenterImage');
+  const draw = createQRCodeStyler(options?.style, [centerImage?.part]);
   const accessibility = options?.accessibility ? {...options.accessibility} : undefined;
-  const hasCenterImage = !!options?.centerImage;
-  const {source, ...centerImageLayout} = options?.centerImage ?? {};
-  if (hasCenterImage) styler.draw([[1]]).placeCenterImage(centerImageLayout);
 
   return (matrix: QRCodeMatrix) => {
-    const drawing = styler.draw(matrix);
+    const drawing = draw(matrix);
     const {moduleSize, viewSize} = drawing;
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = drawing.outputSize;
@@ -57,52 +61,40 @@ export function QRCodeCanvasRenderer(
         'Canvas QR code renderer requires a 2D canvas context',
       );
     }
-    let background = '';
-    const fillBackground = (x: number, y: number, width: number, height: number) => {
-      context.clearRect(x, y, width, height);
-      context.fillStyle = background;
-      context.fillRect(x, y, width, height);
-    };
     // Draw in module units.
     context.setTransform(moduleSize, 0, 0, moduleSize, 0, 0);
-    drawing.paint({
-      drawBackground(red, green, blue, alpha) {
-        background = rgba(red, green, blue, alpha);
-        fillBackground(0, 0, viewSize, viewSize);
-      },
-      beginLayer(red, green, blue, alpha) {
-        context.fillStyle = rgba(red, green, blue, alpha);
-      },
-      drawRectangle: context.fillRect.bind(context),
-      beginPath: () => context.beginPath(),
-      moveTo: context.moveTo.bind(context),
-      lineTo: context.lineTo.bind(context),
-      arc: context.arc.bind(context),
-      closePath: context.closePath.bind(context),
-      endPath: () => context.fill('evenodd'),
-      endLayer() {},
-    });
-
-    if (hasCenterImage) {
-      const {centerImage, clear} = drawing.placeCenterImage(centerImageLayout);
-      const sourceSize = getCanvasImageSourceSize(source!);
-      if (clear) fillBackground(clear.x, clear.y, clear.size, clear.size);
-      const boxX = centerImage.x * moduleSize;
-      const boxY = centerImage.y * moduleSize;
-      const boxSize = centerImage.size * moduleSize;
-      const scale = Math.min(boxSize / sourceSize.width, boxSize / sourceSize.height);
-      const width = sourceSize.width * scale;
-      const height = sourceSize.height * scale;
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      context.drawImage(
-        source!,
-        boxX + (boxSize - width) / 2,
-        boxY + (boxSize - height) / 2,
-        width,
-        height,
-      );
+    context.fillStyle = drawing.background;
+    context.fillRect(0, 0, viewSize, viewSize);
+    for (const layer of drawing.layers) {
+      context.fillStyle = layer.color;
+      context.fill(new Path2D(toQRCodePathData(layer)), 'evenodd');
     }
+    centerImage?.draw(context, drawing);
     return canvas;
+  };
+}
+
+/** Creates a Canvas and Image center image from a loaded image source. */
+export function canvasCenterImage(
+  source: CanvasImageSource,
+  layout?: QRCodeCenterImageLayout,
+): QRCodeCanvasCenterImage {
+  const {part, place} = createQRCodeCenterImage(layout);
+  return {
+    part,
+    draw(context, drawing) {
+      const {width, height} = getCanvasImageSourceSize(source);
+      const box = place(drawing);
+      // The context draws in module units; fit the image inside its box.
+      const scale = Math.min(box.size / width, box.size / height);
+      context.drawImage(
+        source,
+        box.x + (box.size - width * scale) / 2,
+        box.y + (box.size - height * scale) / 2,
+        width * scale,
+        height * scale,
+      );
+    },
   };
 }
 
@@ -174,8 +166,4 @@ function throwInvalidImageDimensions(): never {
     'INVALID_IMAGE_SOURCE',
     'QR code canvas image source must have positive intrinsic dimensions before rendering',
   );
-}
-
-function rgba(red: number, green: number, blue: number, alpha: number): string {
-  return `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
 }

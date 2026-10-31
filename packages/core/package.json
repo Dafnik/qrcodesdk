@@ -57,6 +57,7 @@
     "./internal": "./dist/internal.mjs",
     "./matrix": "./dist/matrix.mjs",
     "./payload": "./dist/payload.mjs",
+    "./style": "./dist/style.mjs",
     "./svg": "./dist/svg.mjs",
     "./text": "./dist/text.mjs",
     "./package.json": "./package.json"

@@ -35,13 +35,20 @@ _Avoid_: Builder preset, QR code helper
 
 **Renderer**:
 A function that converts a valid QR code matrix produced by QRCodeSDK into an output value. A custom
-renderer receives only the raw light-and-dark module matrix, not styling information or the semantic
-roles of modules. It can apply shared visual styling through the public styler and drawing protocol.
+renderer receives the matrix, including module roles, but not styling information. It can apply
+shared visual styling by turning the matrix into a styled drawing with the public styler.
 
 **QR code matrix**:
-An immutable square grid of light and dark modules produced by symbol generation. Renderers read the
-matrix but do not transform it in place.
-_Avoid_: Mutable matrix
+An immutable square grid produced by symbol generation: its size, a flat row-major array of dark
+(`1`) and light (`0`) modules, and the module role of every module. Renderers read the matrix but do
+not transform it in place.
+_Avoid_: Mutable matrix, two-dimensional matrix
+
+**Module role**:
+The function of a module, light or dark, stored in the matrix's role grid separately from its color:
+data, finder ring, finder center, separator, alignment ring, alignment center, timing, format, or
+version. Roles depend only on the version, so all matrices of one size share one role grid.
+_Avoid_: Module type, module value
 
 **QR code builder**:
 An immutable payload and matrix-options value that lazily generates one QR code matrix. It
@@ -69,15 +76,32 @@ output-specific options such as accessibility, center images, compression, and A
 outside shared visual styling.
 _Avoid_: Renderer-specific styling
 
+**Shape**:
+Imported, serializable path data that replaces filled squares for modules, finder rings, finder
+centers, alignment rings, or alignment centers. Filled squares are the absence of a shape.
+_Avoid_: Shape name, module type
+
+**Style part**:
+An imported function that draws one group of modules, such as the finder or alignment patterns, by
+claiming their module roles, or that removes the modules in an area, such as behind a center image.
+_Avoid_: Plugin, style preset
+
 **Styled drawing**:
-An immutable, renderer-neutral description of a QR code matrix with shared visual styling applied.
-Graphical renderers paint the same styled drawing into their output formats.
-_Avoid_: Renderer-specific geometry
+Plain, renderer-neutral data describing a QR code matrix with shared visual styling and style parts
+applied: color layers of merged rectangles and shape paths. Graphical renderers fill the same styled
+drawing in their output formats.
+_Avoid_: Renderer-specific geometry, drawing protocol
 
 **Prepared image source**:
 Image content that the developer has already loaded or decoded into the source type required by a
-renderer. QRCodeSDK does not fetch URLs or read paths to prepare image sources.
+renderer's center-image factory. QRCodeSDK does not fetch URLs or read paths to prepare image
+sources.
 _Avoid_: Image URL, image path
+
+**Center image**:
+An opt-in image drawn over the middle of a QR code, created from a prepared image source by the
+output's own factory, such as `svgCenterImage()`.
+_Avoid_: Logo option, center-image options object
 
 **Framework parity**:
 Equivalent framework-facing capabilities across React, Vue, Svelte, and Angular wherever each

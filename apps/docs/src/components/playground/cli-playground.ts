@@ -237,7 +237,7 @@ export function createCliPreview(options: CliPlaygroundOptions): CliPreview {
     const builder = qrcode(options.payload).options(svgOptions.matrix);
     // Bound allocation in the browser without restricting the real CLI's capabilities.
     const matrix = builder.matrix();
-    const size = (matrix.length + options.quietZone * 2) * options.moduleSize;
+    const size = (matrix.size + options.quietZone * 2) * options.moduleSize;
     if (size > 512)
       throw new Error(
         'This QR code exceeds the browser preview limit of 512 modules per side. Reduce module size or quiet zone.',

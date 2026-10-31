@@ -1,5 +1,3 @@
-import type {QRCodeMatrix} from '../types';
-
 // N1+(k-5) points for each consecutive row of k same-colored modules,
 // where k >= 5. no overlapping row counts.
 const PENALTY_CONSECUTIVE = 3;
@@ -27,31 +25,37 @@ const FINDER_LIKE_WINDOW_MASK = 0x7ff;
  * Note: ZXing seems to use the same procedure and in many cases its choice
  * agrees with ours, but sometimes it does not. Practically it doesn't matter.
  *
- * @param {QRCodeMatrix} matrix - The matrix to be evaluated.
- * @returns {number} The score of the matrix evaluation (lower is better).
+ * @param {Uint8Array} modules - Row-major light and dark modules.
+ * @param {number} matrixLength - Modules per side.
+ * @param {number} scoreLimit - Stop when the candidate cannot beat this score.
+ * @returns {number} The exact score, or a partial score at least scoreLimit after early exit.
  */
-export function evaluateMatrix(matrix: QRCodeMatrix): number {
-  const matrixLength = matrix.length;
+export function evaluateMatrix(
+  modules: Readonly<Uint8Array>,
+  matrixLength: number,
+  scoreLimit = Infinity,
+): number {
   let score = 0;
   let numberOfBlackSquares = 0;
 
   for (let i = 0; i < matrixLength; i++) {
-    const row = matrix[i]!;
-    const nextRow = matrix[i + 1];
+    const row = i * matrixLength;
+    const nextRow = row + matrixLength;
+    const hasNextRow = i + 1 < matrixLength;
 
-    let rowRunModule = row[0]!;
+    let rowRunModule = modules[row]!;
     let rowRunLength = 0;
     let rowFinderLikeWindow = 0;
     let rowLastMatchedModuleIndex = -1;
 
-    let columnRunModule = matrix[0]![i]!;
+    let columnRunModule = modules[i]!;
     let columnRunLength = 0;
     let columnFinderLikeWindow = 0;
     let columnLastMatchedModuleIndex = -1;
 
     for (let j = 0; j < matrixLength; j++) {
-      const rowModule = row[j]!;
-      const columnModule = matrix[j]![i]!;
+      const rowModule = modules[row + j]!;
+      const columnModule = modules[j * matrixLength + i]!;
 
       if (rowModule === rowRunModule) {
         rowRunLength++;
@@ -94,11 +98,11 @@ export function evaluateMatrix(matrix: QRCodeMatrix): number {
 
       numberOfBlackSquares += rowModule;
       if (
-        nextRow !== undefined &&
+        hasNextRow &&
         j > 0 &&
-        row[j - 1] === rowModule &&
-        nextRow[j] === rowModule &&
-        nextRow[j - 1] === rowModule
+        modules[row + j - 1] === rowModule &&
+        modules[nextRow + j] === rowModule &&
+        modules[nextRow + j - 1] === rowModule
       ) {
         score += PENALTY_TWO_BY_TWO;
       }
@@ -106,6 +110,8 @@ export function evaluateMatrix(matrix: QRCodeMatrix): number {
 
     if (rowRunLength >= 5) score += PENALTY_CONSECUTIVE + rowRunLength - 5;
     if (columnRunLength >= 5) score += PENALTY_CONSECUTIVE + columnRunLength - 5;
+    // Every remaining penalty is nonnegative, so ties and losing masks can stop here.
+    if (score >= scoreLimit) return score;
   }
 
   score +=

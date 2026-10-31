@@ -7,10 +7,9 @@ import {
   ECC_LEVEL_L,
   ECC_LEVEL_M,
   ECC_LEVEL_Q,
-  getGF256GeneratorPolynomials,
+  getGF256GeneratorPolynomial,
   getGF256LookupTables,
 } from '../../src/matrix/error-correction';
-import {MASK_FUNCTIONS, QR_CODE_MASKS} from '../../src/matrix/mask';
 import {
   ALPHANUMERIC_CHARACTERS,
   MODES_MAP,
@@ -25,6 +24,7 @@ import {
   getErrorCorrectionBlockCount,
   getErrorCorrectionCodewordsPerBlock,
 } from '../../src/matrix/version-config';
+import {MASK_FUNCTIONS, QR_CODE_MASKS, getGF256GeneratorPolynomials} from './helpers';
 
 // JIS X 0510:2004 Table 9, indexed by the internal ECC value (M, L, H, Q) and version 1-40.
 const EXPECTED_ERROR_CORRECTION_CODEWORDS_PER_BLOCK = [
@@ -168,7 +168,7 @@ describe('matrix constants', () => {
 
   test('caches generated lookup tables', () => {
     expect(getGF256LookupTables()).toBe(getGF256LookupTables());
-    expect(getGF256GeneratorPolynomials()).toBe(getGF256GeneratorPolynomials());
+    expect(getGF256GeneratorPolynomial(30)).toBe(getGF256GeneratorPolynomial(30));
   });
 
   test('implements all QR mask predicates', () => {

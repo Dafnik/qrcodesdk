@@ -13,8 +13,19 @@ describe('Vue QR code component API', () => {
     mockCanvasRendering(vi);
   });
 
-  test('exports only the documented runtime components', () => {
-    expect(Object.keys(vueApi).sort()).toEqual(['QRCodeCanvas', 'QRCodeImage', 'QRCodeSVG']);
+  test('exports the components, shapes, and center-image factories', () => {
+    expect(Object.keys(vueApi).sort()).toEqual([
+      'QRCodeCanvas',
+      'QRCodeImage',
+      'QRCodeSVG',
+      'alignment',
+      'canvasCenterImage',
+      'circle',
+      'diagonal',
+      'finder',
+      'rounded',
+      'svgCenterImage',
+    ]);
   });
 
   test('includes wrapper attributes and excludes managed content attributes', () => {

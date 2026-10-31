@@ -81,10 +81,12 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
     const darkModules = (scaledRow: number): Uint8Array => {
       const modules = new Uint8Array(outputSize);
       const row = Math.floor(scaledRow / moduleSize) - quietZone;
-      const matrixRow = row >= 0 ? matrix[row] : undefined;
-      for (let column = 0; matrixRow && column < outputSize; column++) {
+      if (row < 0 || row >= matrix.size) return modules;
+      for (let column = 0; column < outputSize; column++) {
         const matrixColumn = Math.floor(column / moduleSize) - quietZone;
-        modules[column] = +(matrixColumn >= 0 && matrixRow[matrixColumn] === 1);
+        if (matrixColumn >= 0 && matrixColumn < matrix.size) {
+          modules[column] = matrix.modules[row * matrix.size + matrixColumn]!;
+        }
       }
       return modules;
     };

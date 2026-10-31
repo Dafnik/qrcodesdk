@@ -1,50 +1,53 @@
-import type {QRCodeMatrix} from '../types';
+import type {QRCodeColor, QRCodeMatrix, QRCodeShapePath} from '../types';
 
 export {createQRCodeStyler} from './styler';
+export {toQRCodePathData} from './path-data';
+export {
+  type QRCodeCenterImageBox,
+  type QRCodeCenterImagePlacement,
+  createQRCodeCenterImage,
+} from './center-image';
+export type {
+  QRCodeCenterImageLayout,
+  QRCodeDrawContext,
+  QRCodeDrawLayer,
+  QRCodeModuleRole,
+  QRCodeStylePart,
+} from '../types';
 
-export interface QRCodeStyler {
-  draw(matrix: QRCodeMatrix): QRCodeStyledDrawing;
-}
+/** Names for the `QRCodeModuleRole` values in `QRCodeMatrix.roles`. */
+export const QR_CODE_MODULE_ROLES = {
+  data: 0,
+  finderRing: 1,
+  finderCenter: 2,
+  separator: 3,
+  alignmentRing: 4,
+  alignmentCenter: 5,
+  timing: 6,
+  format: 7,
+  version: 8,
+} as const;
 
-export interface QRCodeStyledDrawing {
+export type QRCodeStyler = (matrix: QRCodeMatrix) => QRCodeDrawing;
+
+/** Renderer-neutral geometry in view coordinates, where one unit is one module. */
+export type QRCodeDrawing = {
   readonly moduleCount: number;
   readonly moduleSize: number;
   readonly quietZone: number;
+  /** Width and height in modules, including the quiet zone. */
   readonly viewSize: number;
+  /** Width and height in pixels. */
   readonly outputSize: number;
-  paint(target: QRCodeStyledDrawingTarget): void;
-  placeCenterImage(
-    options?: QRCodeStyledDrawingCenterImageOptions,
-  ): QRCodeStyledDrawingCenterImagePlacement;
-}
+  readonly background: QRCodeColor;
+  /** Layers in paint order. Geometry never overlaps, within or across layers. */
+  readonly layers: readonly QRCodeDrawingLayer[];
+};
 
-export interface QRCodeStyledDrawingTarget {
-  drawBackground(red: number, green: number, blue: number, alpha: number): void;
-  beginLayer(red: number, green: number, blue: number, alpha: number): void;
-  drawRectangle(x: number, y: number, width: number, height: number): void;
-  beginPath(fillRule: 'nonzero' | 'evenodd'): void;
-  moveTo(x: number, y: number): void;
-  lineTo(x: number, y: number): void;
-  arc(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    startAngle: number,
-    endAngle: number,
-    counterclockwise: boolean,
-  ): void;
-  closePath(): void;
-  endPath(): void;
-  endLayer(): void;
-}
-
-interface QRCodeStyledDrawingCenterImageOptions {
-  readonly size?: number;
-  readonly padding?: number;
-  readonly clearBackground?: boolean;
-}
-
-interface QRCodeStyledDrawingCenterImagePlacement {
-  readonly centerImage: {readonly x: number; readonly y: number; readonly size: number};
-  readonly clear: {readonly x: number; readonly y: number; readonly size: number} | undefined;
-}
+export type QRCodeDrawingLayer = {
+  readonly color: QRCodeColor;
+  /** Filled rectangles as flat x, y, width, height values. */
+  readonly rects: readonly number[];
+  /** Shaped pieces: one path and the flat x, y positions of its top-left corners. */
+  readonly tiles: readonly (readonly [path: QRCodeShapePath, positions: readonly number[]])[];
+};

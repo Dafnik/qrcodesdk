@@ -149,7 +149,7 @@ import {
           <div class="md:col-span-2" hlmField orientation="horizontal">
             <div hlmFieldContent>
               <label hlmFieldLabel for="clear-image-background">Clear modules behind image</label>
-              <p hlmFieldDescription>Paint the light color below the image and its padding.</p>
+              <p hlmFieldDescription>Remove every module the image or its padding touches.</p>
             </div>
             <hlm-switch
               [checked]="image.clearBackground"

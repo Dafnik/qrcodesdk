@@ -63,9 +63,10 @@ colors are preserved, including transparent backgrounds.
 
 ## Work with PNG output
 
-See the [PNG Buffer renderer](https://qrcodesdk.dev/reference/renderers/png/) for compression, prepared PNG center images,
-and exact constraints. Follow [Download or save](https://qrcodesdk.dev/guides/download-or-save/) to write the Buffer to
-disk or [Serve a QR code](https://qrcodesdk.dev/guides/server-output/) to return it as `image/png`.
+See the [PNG Buffer renderer](https://qrcodesdk.dev/reference/renderers/png/) for compression, PNG center images created
+with `pngCenterImage()`, and exact constraints. Follow [Download or save](https://qrcodesdk.dev/guides/download-or-save/)
+to write the Buffer to disk or [Serve a QR code](https://qrcodesdk.dev/guides/server-output/) to return it as
+`image/png`.
 
 ## Runtime requirements
 
@@ -80,9 +81,10 @@ options.
 
 ```ts
 import {
-  type QRCodePNGCenterImageOptions,
+  type QRCodePNGCenterImage,
   QRCodePNGRenderer,
   type QRCodePNGRendererOptions,
+  pngCenterImage,
 } from '@qrcodesdk/node';
 ```
 

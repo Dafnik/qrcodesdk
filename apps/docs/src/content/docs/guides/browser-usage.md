@@ -66,8 +66,8 @@ if (container) {
 Insert the SVG string returned by `QRCodeSVGRenderer()` directly. The renderer escapes label text
 and image URL attributes; it encodes the payload as modules rather than inserting it as text.
 Do not concatenate unescaped user input into the SVG or its surrounding HTML. For center images,
-validate uploaded image content before converting it to a data URL; the renderer checks the URL
-format but does not inspect the embedded image.
+validate uploaded image content before converting it to a data URL; `svgCenterImage()` checks the
+URL format but does not inspect the embedded image.
 
 ### Include it in browser-generated markup
 

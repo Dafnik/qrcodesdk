@@ -114,13 +114,17 @@ without either a stored or directly supplied renderer.
 
 ## Matrix output and renderers
 
-`.matrix()` returns a two-dimensional `QRCodeMatrix`. Each module is `1` for dark or `0` for light.
-Rows and their modules are read-only.
+`.matrix()` returns a read-only `QRCodeMatrix` with flat, row-major module data. `size` is the
+number of modules per side. `modules` is a frozen array with `1` for dark and `0` for light modules,
+and `roles` is a frozen array with the role of every module, such as data, finder, or timing. The
+module at column `x` and row `y` is at index `y * size + x` in both arrays. See
+[Module roles](/reference/custom-renderers/#module-roles) for every role.
 
 ```ts
 import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
 
 const matrix: QRCodeMatrix = qrcode('custom output').matrix();
+const isDark = (x: number, y: number) => matrix.modules[y * matrix.size + x] === 1;
 ```
 
 A `QRCodeRenderer<TOutput>` receives that matrix and returns `TOutput`:
@@ -128,8 +132,8 @@ A `QRCodeRenderer<TOutput>` receives that matrix and returns `TOutput`:
 ```ts
 import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
-const jsonRenderer: QRCodeRenderer<string> = (matrix) =>
-  JSON.stringify({size: matrix.length, matrix});
+const jsonRenderer: QRCodeRenderer<string> = ({size, modules}) =>
+  JSON.stringify({size, modules: Array.from(modules)});
 
 const direct = qrcode('renderer output').render(jsonRenderer);
 const stored = qrcode('renderer output').renderer(jsonRenderer).render();

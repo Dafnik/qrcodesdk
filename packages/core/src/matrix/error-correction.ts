@@ -57,9 +57,3 @@ export function getGF256GeneratorPolynomial(degree: number): QRCodePolynomial {
   }
   return generatorPolynomials[degree]!;
 }
-
-// Generator polynomials up to degree 30.
-export function getGF256GeneratorPolynomials(): QRCodePolynomial[] {
-  getGF256GeneratorPolynomial(30);
-  return generatorPolynomials;
-}
