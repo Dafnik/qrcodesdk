@@ -3,7 +3,7 @@ import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 
-import {QRCodeCanvasRenderer} from '../src';
+import {QRCodeCanvasRenderer, canvasCenterImage} from '../src';
 import {JSQR_ROUNDTRIP_COMBINATIONS_ONE, decodeCanvasQRCode} from './helper';
 
 describe('QRCodeCanvasRenderer', () => {
@@ -22,7 +22,7 @@ describe('QRCodeCanvasRenderer', () => {
           .render(
             QRCodeCanvasRenderer({
               style: {moduleSize: 4, quietZone: 4},
-              centerImage: {source: logo, size: 0.16, padding: 0.25},
+              centerImage: canvasCenterImage(logo, {size: 0.16, padding: 0.25}),
             }),
           ),
       ),

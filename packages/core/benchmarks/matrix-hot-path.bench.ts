@@ -9,31 +9,30 @@ import {evaluateMatrix} from '../src/matrix/evaluate-matrix';
 import {fillDataInMatrix} from '../src/matrix/fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from '../src/matrix/fill-format-information-in-matrix';
 import {resolveQRCodeMatrixOptions} from '../src/matrix/resolve-matrix-options';
-import type {QRCodeMask, QRCodeMatrix, QRCodeModule, QRCodeVersion} from '../src/types';
+import type {QRCodeMask, QRCodeVersion} from '../src/types';
 
 const VERSIONS = [1, 7, 20, 40] as const satisfies readonly QRCodeVersion[];
 const MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const satisfies readonly QRCodeMask[];
 
-function createDeterministicMatrix(version: QRCodeVersion): QRCodeMatrix {
+function createDeterministicModules(version: QRCodeVersion): Uint8Array {
   const size = 17 + 4 * version;
   let state = version;
 
-  return Array.from({length: size}, () =>
-    Array.from({length: size}, () => {
-      state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
-      return (state >>> 31) as QRCodeModule;
-    }),
-  );
+  return Uint8Array.from({length: size * size}, () => {
+    state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
+    return state >>> 31;
+  });
 }
 
 describe('matrix hot paths', () => {
   for (const version of VERSIONS) {
     test(`version ${String(version)}`, async ({bench}) => {
-      const matrix = createDeterministicMatrix(version);
+      const modules = createDeterministicModules(version);
+      const size = 17 + 4 * version;
 
       await bench.compare(
         bench('evaluate matrix', () => {
-          evaluateMatrix(matrix);
+          evaluateMatrix(modules, size);
         }),
         bench('automatic mask', () => {
           qrcode('A').options({mode: 'alphanumeric', version}).matrix();
@@ -64,7 +63,8 @@ describe('explicit mask stages', () => {
       const options = {mask: 0 as const, mode: 'alphanumeric' as const, version};
       const resolved = resolveQRCodeMatrixOptions('A', options);
       const codewords = createQRCodeCodewords(resolved);
-      const {matrix, reserved} = createBaseMatrix(version);
+      const {size, modules: base, roles} = createBaseMatrix(version);
+      const modules = base.slice();
 
       await bench.compare(
         bench('resolve options', () => {
@@ -73,17 +73,17 @@ describe('explicit mask stages', () => {
         bench('create codewords', () => {
           createQRCodeCodewords(resolved);
         }),
-        bench('create base matrix', () => {
-          createBaseMatrix(version);
+        bench('copy cached base matrix', () => {
+          createBaseMatrix(version).modules.slice();
         }),
         bench('fill data', () => {
-          fillDataInMatrix(matrix, reserved, codewords);
+          fillDataInMatrix(modules, roles, size, codewords);
         }),
         bench('apply mask', () => {
-          applyMaskToMatrix(matrix, reserved, 0);
+          applyMaskToMatrix(modules, roles, size, 0);
         }),
         bench('fill format', () => {
-          fillFormatInformationInMatrix(matrix, resolved.errorCorrectionLevel, 0);
+          fillFormatInformationInMatrix(modules, size, resolved.errorCorrectionLevel, 0);
         }),
         bench('assemble matrix', () => {
           assembleQRCodeMatrix(version, resolved.errorCorrectionLevel, codewords, 0);

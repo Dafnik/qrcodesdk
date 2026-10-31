@@ -193,9 +193,9 @@ export default function QRCodeDownloadImageExample() {
 
 ## Center images
 
-Load and decode a browser image first, store the resulting `HTMLImageElement` in state, and pass
-it through `options.centerImage.source`. Updating that state rerenders the component with the prepared
-source. See
+Load and decode a browser image first, then store options with
+`centerImage: canvasCenterImage(image)` in state. Updating that state rerenders the component with
+the prepared image. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
 [Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete
 React lifecycle.
 
@@ -220,17 +220,19 @@ The `options` prop groups encoding settings under `matrix`. Renderer settings su
 `style`, `accessibility`, and `centerImage` go alongside it:
 
 ```ts
-import type {QRCodeSVGOptions} from '@qrcodesdk/react';
+import {type QRCodeSVGOptions, circle, finder, rounded} from '@qrcodesdk/react';
 
 const options: QRCodeSVGOptions = {
   matrix: {errorCorrectionLevel: 'H'},
-  style: {moduleSize: 8, quietZone: 4},
+  style: {moduleSize: 8, quietZone: 4, modules: rounded(), finder: finder({center: circle()})},
   accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
 };
 ```
 
 Pass this object through the component's `options` prop. Use `QRCodeImageOptions` or
 `QRCodeCanvasOptions` for the corresponding component.
+
+Import shapes, pattern parts, and center-image factories from `@qrcodesdk/react` alongside the components.
 
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
 [Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
@@ -242,12 +244,28 @@ See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the field
 import {
   type QRCodeBaseProps,
   QRCodeCanvas,
+  type QRCodeCanvasCenterImage,
+  type QRCodeCanvasOptions,
   type QRCodeCanvasProps,
+  type QRCodeCenterImageLayout,
+  type QRCodeDataImageURL,
   type QRCodeDownloadHandle,
   QRCodeImage,
+  type QRCodeImageOptions,
   type QRCodeImageProps,
   QRCodeSVG,
+  type QRCodeSVGCenterImage,
+  type QRCodeSVGOptions,
   type QRCodeSVGProps,
+  type QRCodeShape,
+  type QRCodeStylePart,
+  alignment,
+  canvasCenterImage,
+  circle,
+  diagonal,
+  finder,
+  rounded,
+  svgCenterImage,
 } from '@qrcodesdk/react';
 ```
 

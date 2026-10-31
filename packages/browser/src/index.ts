@@ -1,5 +1,6 @@
 export {
-  type QRCodeCanvasCenterImageOptions,
+  canvasCenterImage,
+  type QRCodeCanvasCenterImage,
   type QRCodeCanvasAccessibilityOptions,
   type QRCodeCanvasOptions,
   QRCodeCanvasRenderer,

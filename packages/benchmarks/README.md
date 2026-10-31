@@ -24,8 +24,9 @@ adapters include matrix generation, styling, and SVG serialization in the timed 
 
 `qr-code-styling` has no public option for a fixed mask, so both styled adapters select the mask
 automatically. The adapter converts each fixture's module size and margin to matching pixel width,
-height, and margin values. It also maps global colors to the background and part-color fallbacks
-before applying explicit dot and finder colors.
+height, and margin values. It maps the foreground to the dots and the finder color to both finder
+parts. Each fixture describes its shapes by name, and the adapters map those names to each library's
+shape options.
 
 Before measurement, each library receives five warm-up passes over the fixtures used by its
 category. The matrix and SVG categories also receive one pass over all 3,840 combinations. Every

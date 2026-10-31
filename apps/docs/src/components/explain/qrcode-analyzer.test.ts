@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import {describe, test} from 'node:test';
 
 import {type QRCodeMask, qrcode} from '@qrcodesdk/core';
+import {QR_CODE_MODULE_ROLES} from '@qrcodesdk/core/drawing';
 
 import {QR_CODE_EXPLAIN_ROLE_ORDER, explainQRCode} from './qrcode-analyzer.ts';
 
@@ -16,13 +17,35 @@ describe('explainQRCode', () => {
       moduleSize: 8,
       quietZone: 4,
     });
-    assert.equal(explanation.modules.length, explanation.matrix.length ** 2);
-    assert.equal(explanation.moduleGrid.length, explanation.matrix.length);
+    const {size, modules} = explanation.matrix;
+    assert.equal(explanation.modules.length, size ** 2);
+    assert.equal(explanation.moduleGrid.length, size);
     assert.ok(explanation.modules.some(({role}) => role === 'functional'));
     assert.ok(explanation.modules.some(({role}) => role === 'encoded'));
     for (const module of explanation.modules) {
       assert.ok(QR_CODE_EXPLAIN_ROLE_ORDER.includes(module.role));
-      assert.equal(module.value, explanation.matrix[module.row]![module.column]);
+      assert.equal(module.value, modules[module.row * size + module.column]);
+    }
+  });
+
+  test('reserves finder and alignment patterns from the module roles', () => {
+    const capacities = [
+      [1, 26, 0],
+      [2, 44, 7],
+      [7, 196, 0],
+      [14, 581, 3],
+    ] as const;
+    for (const [version, codewords, remainderBits] of capacities) {
+      const explanation = explainQRCode({payload: 'ROLES', version, mask: 0});
+      const count = (role: string) =>
+        explanation.modules.filter((module) => module.role === role).length;
+      assert.equal(count('encoded'), codewords * 8);
+      assert.equal(count('remainder'), remainderBits);
+      const {size, roles} = explanation.matrix;
+      for (const module of explanation.modules) {
+        const isData = roles[module.row * size + module.column] === QR_CODE_MODULE_ROLES.data;
+        assert.equal(module.role === 'functional', !isData);
+      }
     }
   });
 
@@ -40,7 +63,7 @@ describe('explainQRCode', () => {
     assert.equal(explanation.mask, 0);
     assert.equal(explanation.moduleSize, 8);
     assert.equal(explanation.quietZone, 4);
-    assert.equal(explanation.viewSize, explanation.matrix.length + 8);
+    assert.equal(explanation.viewSize, explanation.matrix.size + 8);
   });
 
   test('maps encoded bits to zig-zag coordinates and stable unmasked values', () => {

@@ -4,7 +4,7 @@ import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 
-import {QRCodePNGRenderer} from '../../src';
+import {QRCodePNGRenderer, pngCenterImage} from '../../src';
 import {decodePngQRCode} from './png-helpers';
 
 describe('PNG QR roundtrips', () => {
@@ -22,11 +22,7 @@ describe('PNG QR roundtrips', () => {
           .render(
             QRCodePNGRenderer({
               style: {moduleSize: 4, quietZone: 4},
-              centerImage: {
-                source: logo,
-                size: 0.16,
-                padding: 0.25,
-              },
+              centerImage: pngCenterImage(logo, {size: 0.16, padding: 0.25}),
             }),
           ),
       ),

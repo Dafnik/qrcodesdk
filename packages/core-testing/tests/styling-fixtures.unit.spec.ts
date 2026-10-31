@@ -6,25 +6,25 @@ import {createQRCodeStyler} from '@qrcodesdk/core/drawing';
 import {QR_CODE_STYLING_FIXTURES, QR_CODE_STYLING_ROUNDTRIP_FIXTURES} from '../src';
 
 describe('QR_CODE_STYLING_FIXTURES', () => {
-  test('provides 60 unique, valid production style cases', () => {
+  test('provides 60 distinct style fixtures', () => {
     expect(QR_CODE_STYLING_FIXTURES).toHaveLength(60);
     expect(new Set(QR_CODE_STYLING_FIXTURES.map(({name}) => name)).size).toBe(60);
     for (const fixture of QR_CODE_STYLING_FIXTURES) {
       const matrix = qrcode(fixture.payload).options(fixture.matrixOptions).matrix();
-      const drawing = createQRCodeStyler(fixture.styling).draw(matrix);
+      const drawing = createQRCodeStyler(fixture.styling)(matrix);
       expect(drawing.moduleSize).toBe(12);
       expect(drawing.quietZone).toBe(4);
       expect(drawing.outputSize).toBeGreaterThan(0);
     }
   });
 
-  test('covers every public module and finder shape', () => {
-    expect(new Set(QR_CODE_STYLING_FIXTURES.map(({styling}) => styling.modules?.shape))).toEqual(
+  test('covers every module and finder shape', () => {
+    expect(new Set(QR_CODE_STYLING_FIXTURES.map(({design}) => design.modules))).toEqual(
       new Set(['square', 'circle', 'rounded', 'extra-rounded', 'diagonal', 'diagonal-rounded']),
     );
-    const finderShapes = QR_CODE_STYLING_FIXTURES.flatMap(({styling}) => [
-      styling.finder?.outer?.shape,
-      styling.finder?.center?.shape,
+    const finderShapes = QR_CODE_STYLING_FIXTURES.flatMap(({design}) => [
+      design.finder.ring,
+      design.finder.center,
     ]);
     expect(new Set(finderShapes)).toEqual(
       new Set(['square', 'rounded', 'extra-rounded', 'circle']),
@@ -33,28 +33,16 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
 
   test('covers every shape and palette pair', () => {
     const palettes = new Set(['default', 'navy', 'jewel', 'slate', 'mono', 'mixed']);
-    const pairs = [
-      [
-        'modules',
-        (styling: (typeof QR_CODE_STYLING_FIXTURES)[number]['styling']) => styling.modules?.shape,
-      ],
-      [
-        'outer',
-        (styling: (typeof QR_CODE_STYLING_FIXTURES)[number]['styling']) =>
-          styling.finder?.outer?.shape,
-      ],
-      [
-        'center',
-        (styling: (typeof QR_CODE_STYLING_FIXTURES)[number]['styling']) =>
-          styling.finder?.center?.shape,
-      ],
-    ] as const;
+    const getters = [
+      ({design}: (typeof QR_CODE_STYLING_FIXTURES)[number]) => design.modules,
+      ({design}: (typeof QR_CODE_STYLING_FIXTURES)[number]) => design.finder.ring,
+      ({design}: (typeof QR_CODE_STYLING_FIXTURES)[number]) => design.finder.center,
+    ];
 
-    for (const [, getShape] of pairs) {
-      const shapes = new Set(QR_CODE_STYLING_FIXTURES.map(({styling}) => getShape(styling)));
-      for (const shape of shapes) {
+    for (const getShape of getters) {
+      for (const shape of new Set(QR_CODE_STYLING_FIXTURES.map(getShape))) {
         const coveredPalettes = new Set(
-          QR_CODE_STYLING_FIXTURES.filter(({styling}) => getShape(styling) === shape).map(
+          QR_CODE_STYLING_FIXTURES.filter((fixture) => getShape(fixture) === shape).map(
             ({name}) => name.match(/palette-(.+)$/u)?.[1],
           ),
         );
@@ -64,7 +52,7 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
   });
 
   test('keeps scanner-sensitive combinations out of the roundtrip contract', () => {
-    expect(QR_CODE_STYLING_ROUNDTRIP_FIXTURES).toHaveLength(57);
+    expect(QR_CODE_STYLING_ROUNDTRIP_FIXTURES).toHaveLength(58);
     expect(
       QR_CODE_STYLING_ROUNDTRIP_FIXTURES.every((fixture) =>
         QR_CODE_STYLING_FIXTURES.includes(fixture),

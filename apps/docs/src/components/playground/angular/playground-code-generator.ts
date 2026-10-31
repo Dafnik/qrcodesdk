@@ -1,8 +1,10 @@
 import {
   type PlaygroundOptions,
   type PlaygroundOutput,
+  type PlaygroundPackage,
   type PlaygroundPreparedImage,
 } from '../playground-options.ts';
+import {formatPlaygroundStyle} from '../playground-style.ts';
 
 export type HighlighterLang = 'angular-ts' | 'svelte' | 'tsx' | 'vue' | 'sh';
 
@@ -40,6 +42,19 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
   },
 };
 
+/** Center image factory per output. Every framework package exports both factories. */
+const CENTER_IMAGE_FACTORIES: Record<PlaygroundOutput, string> = {
+  svg: 'svgCenterImage',
+  image: 'canvasCenterImage',
+  canvas: 'canvasCenterImage',
+};
+
+/** Prettier `printWidth` used to wrap generated imports. */
+const PRINT_WIDTH = 100;
+
+/** Center image layout defaults, omitted from generated factory calls. */
+const CENTER_IMAGE_DEFAULTS = {size: 0.4, padding: 1, clearBackground: true} as const;
+
 /** Generate a framework component example; CLI commands use their separate generator. */
 export function generatePlaygroundCode(
   playgroundOptionsValue: PlaygroundOptions,
@@ -66,11 +81,12 @@ function generateSvelteCode(
   const meta = META_BY_OUTPUT[playgroundOptionsValue.output];
   const hasDownload = meta.downloadLabel !== undefined;
   const hasImage = preparedImage !== undefined;
-  const componentImport = `import {${meta.componentName}, type ${[
-    meta.optionsType,
-    ...(hasDownload ? ['QRCodeDownloadHandle'] : []),
-  ].join(', type ')}} from '@qrcodesdk/svelte';`;
-  const qrcodeRef = hasDownload ? `let qrcode: QRCodeDownloadHandle | undefined;\n` : '';
+  const imports = qrcodesdkImports('svelte', playgroundOptionsValue, {
+    hasImage,
+    types: [meta.optionsType, ...(hasDownload ? ['QRCodeDownloadHandle'] : [])],
+    indentation: 1,
+  });
+  const qrcodeRef = hasDownload ? `let qrcode = $state<QRCodeDownloadHandle>();\n` : '';
   const optionsDeclaration = hasImage
     ? `let imageSource = $state<${
         playgroundOptionsValue.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
@@ -101,7 +117,7 @@ ${downloadButton}  ${component}
   return {
     lang: 'svelte',
     code: `<script lang="ts">
-  ${hasImage && playgroundOptionsValue.output === 'svg' ? "import type {QRCodeDataImageURL} from '@qrcodesdk/core';\n  " : ''}${componentImport}
+${indent(imports, 1)}
 
   const payload = ${quote(playgroundOptionsValue.payload)};
   ${qrcodeRef}${optionsDeclaration.replaceAll('\n', '\n  ')}
@@ -127,17 +143,12 @@ function generateReactCode(
   const reactImport =
     reactImports.length > 0 ? `import {${reactImports.join(', ')}} from 'react';\n\n` : '';
 
-  const componentImport = `import {${meta.componentName}, type ${[
-    meta.optionsType,
-    ...(hasDownload ? ['QRCodeDownloadHandle'] : []),
-  ].join(', type ')}} from '@qrcodesdk/react';`;
-
   const imports =
-    `${reactImport}` +
-    (hasImage && playgroundOptionsValue.output === 'svg'
-      ? "import type {QRCodeDataImageURL} from '@qrcodesdk/core';\n"
-      : '') +
-    componentImport;
+    reactImport +
+    qrcodesdkImports('react', playgroundOptionsValue, {
+      hasImage,
+      types: [meta.optionsType, ...(hasDownload ? ['QRCodeDownloadHandle'] : [])],
+    });
 
   const refDeclaration = hasDownload
     ? `  const qrcode = useRef<QRCodeDownloadHandle>(null);\n\n`
@@ -213,11 +224,14 @@ function generateVueCode(
     ...(hasImage ? ['computed', 'shallowRef'] : []),
     ...(hasDownload ? ['ref'] : []),
   ];
-  const vueImport = vueImports.length > 0 ? `import {${vueImports.join(', ')}} from 'vue';\n` : '';
-  const componentImport = `import {${meta.componentName}, type ${[
-    meta.optionsType,
-    ...(hasDownload ? ['QRCodeDownloadHandle'] : []),
-  ].join(', type ')}} from '@qrcodesdk/vue';`;
+  const vueImport =
+    vueImports.length > 0 ? `import {${vueImports.join(', ')}} from 'vue';\n\n` : '';
+  const imports =
+    vueImport +
+    qrcodesdkImports('vue', playgroundOptionsValue, {
+      hasImage,
+      types: [meta.optionsType, ...(hasDownload ? ['QRCodeDownloadHandle'] : [])],
+    });
   const qrcodeRef = hasDownload ? `const qrcode = ref<QRCodeDownloadHandle | null>(null);\n` : '';
   const optionsDeclaration = hasImage
     ? `const imageSource = shallowRef<${
@@ -247,8 +261,7 @@ ${vueImagePreparation(playgroundOptionsValue.output)}`
   return {
     lang: 'vue',
     code: `<script setup lang="ts">
-${hasImage && playgroundOptionsValue.output === 'svg' ? "import type {QRCodeDataImageURL} from '@qrcodesdk/core';\n" : ''}${componentImport}
-${vueImport}
+${imports}
 
 const payload = ${quote(playgroundOptionsValue.payload)};
 ${qrcodeRef}${optionsDeclaration}
@@ -297,7 +310,7 @@ ${indent(qrcodeTemplate, 3)}
     ? `
   readonly imageSource = signal<${
     playgroundOptionsValue.output === 'svg' ? 'QRCodeDataImageURL' : 'HTMLImageElement'
-  }>();
+  } | undefined>(undefined);
   readonly options = computed<${meta.optionsType} | undefined>(() => {
     const source = this.imageSource();
     if (!source) return undefined;
@@ -316,8 +329,7 @@ ${indent(angularImagePreparation(playgroundOptionsValue.output), 1)}
 
     code: `import {${angularImports}} from '@angular/core';
 
-import {${meta.componentName}, type ${meta.optionsType}} from '@qrcodesdk/angular';
-${hasImage && playgroundOptionsValue.output === 'svg' ? "import type {QRCodeDataImageURL} from '@qrcodesdk/core';\n" : ''}
+${qrcodesdkImports('angular', playgroundOptionsValue, {hasImage, types: [meta.optionsType]})}
 
 @Component({
   selector: 'qrcode-app-example',
@@ -356,23 +368,10 @@ function formatOptions(
   if (playgroundOptionsValue.background !== undefined) {
     styleEntries.push(`background: ${quote(playgroundOptionsValue.background)}`);
   }
-  if (shouldIncludeShapeOptions(playgroundOptionsValue.modules, 'square')) {
-    styleEntries.push(`modules: ${formatShapeOptions(playgroundOptionsValue.modules, depth + 2)}`);
-  }
-  const finderEntries: string[] = [];
-  if (shouldIncludeShapeOptions(playgroundOptionsValue.finder?.outer, 'square')) {
-    finderEntries.push(
-      `outer: ${formatShapeOptions(playgroundOptionsValue.finder?.outer, depth + 3)}`,
-    );
-  }
-  if (shouldIncludeShapeOptions(playgroundOptionsValue.finder?.center, 'square')) {
-    finderEntries.push(
-      `center: ${formatShapeOptions(playgroundOptionsValue.finder?.center, depth + 3)}`,
-    );
-  }
-  if (finderEntries.length > 0) {
-    styleEntries.push(`finder: ${formatObject(finderEntries, depth + 2)}`);
-  }
+  styleEntries.push(
+    ...formatPlaygroundStyle(playgroundOptionsValue, (entries) => formatObject(entries, depth + 2))
+      .entries,
+  );
   if (styleEntries.length > 0) {
     entries.push(`style: ${formatObject(styleEntries, depth + 1)}`);
   }
@@ -420,20 +419,31 @@ function formatOptions(
   }
 
   if (image) {
-    entries.push(
-      `centerImage: ${formatObject(
-        [
-          `source: ${image.source}`,
-          `size: ${image.preparedImage.size}`,
-          `padding: ${image.preparedImage.padding}`,
-          `clearBackground: ${image.preparedImage.clearBackground}`,
-        ],
-        depth + 1,
-      )}`,
-    );
+    entries.push(`centerImage: ${formatCenterImage(playgroundOptionsValue.output, image, depth)}`);
   }
 
   return formatObject(entries, depth);
+}
+
+/** Format the center image factory call, passing only the layout values that differ from the defaults. */
+function formatCenterImage(
+  output: PlaygroundOutput,
+  {source, preparedImage}: {source: string; preparedImage: PlaygroundPreparedImage},
+  depth: number,
+): string {
+  const layoutEntries: string[] = [];
+  if (preparedImage.size !== CENTER_IMAGE_DEFAULTS.size) {
+    layoutEntries.push(`size: ${preparedImage.size}`);
+  }
+  if (preparedImage.padding !== CENTER_IMAGE_DEFAULTS.padding) {
+    layoutEntries.push(`padding: ${preparedImage.padding}`);
+  }
+  if (preparedImage.clearBackground !== CENTER_IMAGE_DEFAULTS.clearBackground) {
+    layoutEntries.push(`clearBackground: ${preparedImage.clearBackground}`);
+  }
+  const layout = layoutEntries.length > 0 ? `, ${formatObject(layoutEntries, depth + 1)}` : '';
+
+  return `${CENTER_IMAGE_FACTORIES[output]}(${source}${layout})`;
 }
 
 function reactImagePreparation(output: PlaygroundOutput): string {
@@ -545,44 +555,37 @@ function indent(value: string, depth: number): string {
     .join('\n');
 }
 
-function shouldIncludeShapeOptions(
-  options:
-    | {
-        readonly shape?: string;
-        color?: string;
-      }
-    | undefined,
-  defaultType: string,
-): boolean {
-  if (options === undefined) {
-    return false;
-  }
-
-  return (
-    options.color !== undefined || (options.shape !== undefined && options.shape !== defaultType)
-  );
+function qrcodesdkImports(
+  packageName: Exclude<PlaygroundPackage, 'cli'>,
+  playgroundOptionsValue: PlaygroundOptions,
+  {hasImage, types, indentation = 0}: {hasImage: boolean; types: string[]; indentation?: number},
+): string {
+  const {output} = playgroundOptionsValue;
+  const {factories} = formatPlaygroundStyle(playgroundOptionsValue, () => '');
+  const specifiers = [
+    META_BY_OUTPUT[output].componentName,
+    ...types.map((type) => `type ${type}`),
+    ...(hasImage ? [CENTER_IMAGE_FACTORIES[output]] : []),
+    ...(hasImage && output === 'svg' ? ['type QRCodeDataImageURL'] : []),
+    ...factories,
+  ];
+  return formatImport(specifiers, `@qrcodesdk/${packageName}`, indentation);
 }
 
-function formatShapeOptions(
-  options:
-    | {
-        readonly shape?: string;
-        color?: string;
-      }
-    | undefined,
-  depth: number,
-): string {
-  const entries: string[] = [];
+function formatImport(specifiers: string[], moduleName: string, indentation: number): string {
+  const sorted = [...specifiers].sort((a, b) =>
+    compare(a.replace(/^type /, ''), b.replace(/^type /, '')),
+  );
+  const singleLine = `import {${sorted.join(', ')}} from '${moduleName}';`;
+  if (indentation * 2 + singleLine.length <= PRINT_WIDTH) return singleLine;
 
-  if (options?.shape !== undefined) {
-    entries.push(`shape: ${quote(options.shape)}`);
-  }
+  return `import {
+${sorted.map((specifier) => `  ${specifier},`).join('\n')}
+} from '${moduleName}';`;
+}
 
-  if (options?.color !== undefined) {
-    entries.push(`color: ${quote(options.color)}`);
-  }
-
-  return formatObject(entries, depth);
+function compare(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 function formatObject(entries: string[], depth: number): string {

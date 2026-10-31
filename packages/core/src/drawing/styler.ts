@@ -1,447 +1,240 @@
 import {assertKnownKeys, throwInvalid} from '../options';
-import {
-  type QRCodeRGBA,
-  calculateQRCodeOutputSize,
-  parseQRCodeColor,
-  resolveQRCodeVisualStyle,
-} from '../styling';
-import type {QRCodeColor, QRCodeFinderShape, QRCodeMatrix, QRCodeVisualStyle} from '../types';
-import type {QRCodeStyledDrawing, QRCodeStyledDrawingTarget, QRCodeStyler} from './index';
+import {validateShapePath} from '../shape-path';
+import {calculateQRCodeOutputSize, resolveColor, resolveQRCodeTextStyle} from '../styling';
+import type {
+  QRCodeColor,
+  QRCodeDrawContext,
+  QRCodeDrawLayer,
+  QRCodeMatrix,
+  QRCodeModuleShape,
+  QRCodeShapePath,
+  QRCodeStylePart,
+  QRCodeVisualStyle,
+} from '../types';
+import type {QRCodeDrawingLayer, QRCodeStyler} from './index';
 
-type Rotation = 0 | 90 | 180 | 270;
-type ModuleShape =
-  | 'circle'
-  | 'side-rounded'
-  | 'corner-rounded'
-  | 'corner-extra-rounded'
-  | 'opposite-corners-rounded';
-type ResolvedModuleShape = readonly [shape: ModuleShape | 'square', rotation: Rotation];
-type Primitive =
-  | {kind: 'module'; shape: ModuleShape; x: number; y: number; rotation: Rotation}
-  | {kind: 'ring' | 'center'; shape: QRCodeFinderShape; x: number; y: number; size: number};
-type Rectangle = {x: number; y: number; width: number; height: number};
-type Layer = {
-  rgba: QRCodeRGBA;
-  squareModules: Uint8Array | undefined;
-  primitives: Primitive[];
+type Layer = QRCodeDrawLayer & {
+  readonly color: QRCodeColor;
+  readonly rects: number[];
+  readonly tiles: Map<QRCodeShapePath, number[]>;
 };
-type DrawingLayer = Pick<Layer, 'rgba' | 'primitives'> & {rectangles: Rectangle[]};
-// Path points in local module coordinates: [x, y] for move/line and
-// [centerX, centerY, radius, startAngle, endAngle] for counterclockwise arcs.
-type PathCommand = readonly number[];
+type ModuleTiles = readonly (QRCodeShapePath | undefined)[];
 
-const FINDER_ROWS = [0x7f, 0x41, 0x5d, 0x5d, 0x5d, 0x41, 0x7f];
-const HALF_PI = Math.PI / 2;
-const MODULE_PATHS: Record<Exclude<ModuleShape, 'circle'>, readonly PathCommand[]> = {
-  'side-rounded': [
-    [0, 0],
-    [0, 1],
-    [0.5, 1],
-    [0.5, 0.5, 0.5, HALF_PI, -HALF_PI],
-  ],
-  'corner-rounded': [
-    [0, 0],
-    [0, 1],
-    [1, 1],
-    [1, 0.5],
-    [0.5, 0.5, 0.5, 0, -HALF_PI],
-  ],
-  'corner-extra-rounded': [
-    [0, 0],
-    [0, 1],
-    [1, 1],
-    [0, 1, 1, 0, -HALF_PI],
-  ],
-  'opposite-corners-rounded': [
-    [0, 0],
-    [0, 0.5],
-    [0.5, 0.5, 0.5, Math.PI, HALF_PI],
-    [1, 1],
-    [1, 0.5],
-    [0.5, 0.5, 0.5, 0, -HALF_PI],
-  ],
-};
+// Roles that take the module shape. Finder modules stay square unless a finder part draws them.
+const SHAPED_ROLES = 0b111111001;
+const SHAPE_KEYS = ['module', 'finderRing', 'finderCenter', 'alignmentRing', 'alignmentCenter'];
 
-export function createQRCodeStyler(style?: QRCodeVisualStyle): QRCodeStyler {
-  const resolved = resolveQRCodeVisualStyle(style);
-  const {quietZone, moduleSize, modules, finder} = resolved;
-  const background = parseQRCodeColor(resolved.background);
-  const drawings = new WeakMap<QRCodeMatrix, QRCodeStyledDrawing>();
-
-  return Object.freeze({
-    draw(matrix: QRCodeMatrix) {
-      const cached = drawings.get(matrix);
-      if (cached) return cached;
-
-      const moduleCount = matrix.length;
-      const viewSize = moduleCount + 2 * quietZone;
-      const gridWidth = Math.max(
-        viewSize,
-        quietZone + matrix.reduce((maximum, row) => Math.max(maximum, row.length), 0),
-      );
-      const finders =
-        moduleCount >= 21 && matrix.every((row) => row.length === moduleCount)
-          ? [
-              [0, 0],
-              [moduleCount - 7, 0],
-              [0, moduleCount - 7],
-            ].filter(([x, y]) => isCanonicalFinder(matrix, x!, y!))
-          : [];
-      const finderModules = new Uint8Array(moduleCount * moduleCount);
-      for (const [x, y] of finders) {
-        for (let row = 0; row < 7; row++) {
-          finderModules.fill(1, (y! + row) * moduleCount + x!, (y! + row) * moduleCount + x! + 7);
-        }
-      }
-
-      const layersByColor = new Map<QRCodeColor, Layer>();
-      const layer = (color: QRCodeColor): Layer => {
-        let existing = layersByColor.get(color);
-        if (!existing) {
-          existing = {
-            rgba: parseQRCodeColor(color),
-            squareModules: undefined,
-            primitives: [],
-          };
-          layersByColor.set(color, existing);
-        }
-        return existing;
-      };
-      const fill = (target: Layer, x: number, y: number, width: number, height: number) => {
-        const squares = (target.squareModules ??= new Uint8Array(gridWidth * viewSize));
-        for (let row = y; row < y + height; row++) {
-          squares.fill(1, row * gridWidth + x, row * gridWidth + x + width);
-        }
-      };
-      const resolvedShapes: ResolvedModuleShape[] = [];
-
-      // Keep the common square path free of shape and neighbor resolution.
-      if (modules.shape === 'square') {
-        let squares: Uint8Array | undefined;
-        for (let row = 0; row < moduleCount; row++) {
-          const matrixRow = matrix[row]!;
-          for (let column = 0; column < matrixRow.length; column++) {
-            if (!matrixRow[column] || finderModules[row * moduleCount + column] === 1) continue;
-            squares ??= layer(modules.color).squareModules = new Uint8Array(gridWidth * viewSize);
-            squares[(quietZone + row) * gridWidth + quietZone + column] = 1;
-          }
-        }
-      } else {
-        let moduleLayer: Layer | undefined;
-        // Dark non-finder modules with a one-cell border, so neighbor reads need no bounds checks.
-        const darkWidth = gridWidth - quietZone + 2;
-        const dark = new Uint8Array(modules.shape === 'circle' ? 0 : darkWidth * (moduleCount + 2));
-        if (dark.length > 0) {
-          for (let row = 0; row < moduleCount; row++) {
-            const matrixRow = matrix[row]!;
-            for (let column = 0; column < matrixRow.length; column++) {
-              if (matrixRow[column] && finderModules[row * moduleCount + column] !== 1) {
-                dark[(row + 1) * darkWidth + column + 1] = 1;
-              }
-            }
-          }
-        }
-        for (let row = 0; row < moduleCount; row++) {
-          const matrixRow = matrix[row]!;
-          for (let column = 0; column < matrixRow.length; column++) {
-            if (!matrixRow[column] || finderModules[row * moduleCount + column] === 1) continue;
-            let shape: ModuleShape | 'square' = modules.shape === 'circle' ? 'circle' : 'square';
-            let rotation: Rotation = 0;
-            if (modules.shape !== 'circle') {
-              const index = (row + 1) * darkWidth + column + 1;
-              const left = dark[index - 1] === 1;
-              const right = dark[index + 1] === 1;
-              const top = dark[index - darkWidth] === 1;
-              const bottom = dark[index + darkWidth] === 1;
-              const neighborMask = +left | (+right << 1) | (+top << 2) | (+bottom << 3);
-              [shape, rotation] = resolvedShapes[neighborMask] ??= resolveModuleShape(
-                modules.shape,
-                left,
-                right,
-                top,
-                bottom,
-              );
-            }
-
-            moduleLayer ??= layer(modules.color);
-            const x = quietZone + column;
-            const y = quietZone + row;
-            if (shape === 'square') {
-              (moduleLayer.squareModules ??= new Uint8Array(gridWidth * viewSize))[
-                y * gridWidth + x
-              ] = 1;
-            } else {
-              moduleLayer.primitives.push({kind: 'module', shape, x, y, rotation});
-            }
-          }
-        }
-      }
-
-      for (const kind of ['ring', 'center'] as const) {
-        const {shape, color} = kind === 'ring' ? finder.outer : finder.center;
-        const offset = kind === 'ring' ? 0 : 2;
-        const size = kind === 'ring' ? 7 : 3;
-        for (const [finderX, finderY] of finders) {
-          const target = layer(color);
-          const x = quietZone + finderX! + offset;
-          const y = quietZone + finderY! + offset;
-          if (shape !== 'square') {
-            target.primitives.push({kind, shape, x, y, size});
-          } else if (kind === 'center') {
-            fill(target, x, y, 3, 3);
-          } else {
-            fill(target, x, y, 7, 1);
-            fill(target, x, y + 6, 7, 1);
-            fill(target, x, y + 1, 1, 5);
-            fill(target, x + 6, y + 1, 1, 5);
-          }
-        }
-      }
-
-      // Cache only paint-time geometry. Preparation grids must not escape into drawing closures.
-      const layers: DrawingLayer[] = [...layersByColor.values()].map(
-        ({rgba, squareModules, primitives}) => ({
-          rgba,
-          rectangles: squareModules ? compactSquareModules(squareModules, gridWidth, viewSize) : [],
-          primitives,
-        }),
-      );
-      const drawing = createDrawing(
-        {
-          moduleCount,
-          moduleSize,
-          quietZone,
-          viewSize,
-          outputSize: calculateQRCodeOutputSize(matrix, resolved),
-        },
-        background,
-        layers,
-      );
-      drawings.set(matrix, drawing);
-      return drawing;
-    },
-  });
-}
-
-function createDrawing(
-  layout: Omit<QRCodeStyledDrawing, 'paint' | 'placeCenterImage'>,
-  background: QRCodeRGBA,
-  layers: DrawingLayer[],
-): QRCodeStyledDrawing {
-  return Object.freeze({
-    ...layout,
-    paint(target: QRCodeStyledDrawingTarget) {
-      target.drawBackground(...background);
-      for (const {rgba, rectangles, primitives} of layers) {
-        target.beginLayer(...rgba);
-        for (const {x, y, width, height} of rectangles) {
-          target.drawRectangle(x, y, width, height);
-        }
-        if (primitives.length > 0) {
-          target.beginPath('evenodd');
-          for (const primitive of primitives) paintPrimitive(target, primitive);
-          target.endPath();
-        }
-        target.endLayer();
-      }
-    },
-    placeCenterImage(options: Parameters<QRCodeStyledDrawing['placeCenterImage']>[0]) {
-      return resolveCenterImagePlacement(layout.moduleCount, layout.quietZone, options);
-    },
-  });
-}
-
-function isCanonicalFinder(matrix: QRCodeMatrix, x: number, y: number): boolean {
-  for (let row = 0; row < 7; row++) {
-    for (let column = 0; column < 7; column++) {
-      if (!!matrix[y + row]![x + column] !== !!((FINDER_ROWS[row]! >> column) & 1)) return false;
+/**
+ * Creates a styler for a style. Renderers may pass extra parts, such as a center image, which run
+ * before the style's own parts so those can skip claimed areas.
+ */
+export function createQRCodeStyler(
+  style?: QRCodeVisualStyle,
+  parts: readonly (QRCodeStylePart | undefined)[] = [],
+): QRCodeStyler {
+  assertKnownKeys(style, 'style', [
+    'moduleSize',
+    'quietZone',
+    'foreground',
+    'background',
+    'modules',
+    'finder',
+    'alignment',
+  ]);
+  const {moduleSize, quietZone} = resolveQRCodeTextStyle(style, false);
+  const foreground = resolveColor('style.foreground', style?.foreground ?? '#000000');
+  const background = resolveColor('style.background', style?.background ?? '#ffffff');
+  const tiles = resolveModuleTiles(style?.modules);
+  for (const key of ['finder', 'alignment'] as const) {
+    const part = style?.[key];
+    if (part !== undefined && typeof part !== 'function') {
+      throwInvalid(`style.${key}`, `a style part such as ${key}()`, part);
     }
   }
-  return true;
-}
+  const allParts = [...parts, style?.finder, style?.alignment];
 
-function resolveModuleShape(
-  type: 'rounded' | 'extra-rounded' | 'diagonal' | 'diagonal-rounded',
-  left: boolean,
-  right: boolean,
-  top: boolean,
-  bottom: boolean,
-): ResolvedModuleShape {
-  const neighborCount = +left + +right + +top + +bottom;
+  return (matrix: QRCodeMatrix) => {
+    const outputSize = calculateQRCodeOutputSize(matrix, {moduleSize, quietZone});
+    const layers = new Map<QRCodeColor, Layer>();
+    let claimedRoles = 0;
+    const areas: number[] = [];
+    const context: QRCodeDrawContext = {
+      matrix,
+      claimRoles(...roles) {
+        for (const role of roles) claimedRoles |= 1 << role;
+      },
+      claimArea(x, y, width, height) {
+        validateRectangle('claimArea', x, y, width, height);
+        if (width === 0 || height === 0) return;
+        const startX = Math.floor(x);
+        const startY = Math.floor(y);
+        areas.push(startX, startY, Math.ceil(x + width) - startX, Math.ceil(y + height) - startY);
+      },
+      isAreaClaimed(x, y, width, height) {
+        for (let index = 0; index < areas.length; index += 4) {
+          if (
+            x < areas[index]! + areas[index + 2]! &&
+            areas[index]! < x + width &&
+            y < areas[index + 1]! + areas[index + 3]! &&
+            areas[index + 1]! < y + height
+          ) {
+            return true;
+          }
+        }
+        return false;
+      },
+      layer(color = foreground) {
+        color = resolveColor('layer.color', color);
+        let layer = layers.get(color);
+        if (!layer) layers.set(color, (layer = createLayer(color, quietZone)));
+        return layer;
+      },
+    };
+    for (const part of allParts) part?.(context);
+    drawModules(matrix, claimedRoles, areas, tiles, context.layer() as Layer, quietZone);
 
-  if (type === 'diagonal' || type === 'diagonal-rounded') {
-    if (neighborCount === 0) return ['opposite-corners-rounded', 90];
-    const corner = type === 'diagonal' ? 'corner-rounded' : 'corner-extra-rounded';
-    if (!left && !top) return [corner, 270];
-    if (!right && !bottom) return [corner, 90];
-    return ['square', 0];
-  }
-
-  if (neighborCount === 0) return ['circle', 0];
-  if (neighborCount > 2 || (left && right) || (top && bottom)) return ['square', 0];
-  if (neighborCount === 2) {
-    return [
-      type === 'rounded' ? 'corner-rounded' : 'corner-extra-rounded',
-      left && top ? 90 : top && right ? 180 : right && bottom ? 270 : 0,
-    ];
-  }
-  return ['side-rounded', top ? 90 : right ? 180 : bottom ? 270 : 0];
-}
-
-function compactSquareModules(modules: Uint8Array, width: number, height: number): Rectangle[] {
-  const rectangles: Rectangle[] = [];
-  let previousWidths = new Uint16Array(width);
-  let previousRectangleIndexes = new Int32Array(width);
-  let currentWidths = new Uint16Array(width);
-  let currentRectangleIndexes = new Int32Array(width);
-
-  for (let y = 0; y < height; y++) {
-    currentWidths.fill(0);
-    const rowOffset = y * width;
-    let x = 0;
-
-    while (x < width) {
-      while (x < width && modules[rowOffset + x] === 0) x++;
-      if (x === width) break;
-
-      const start = x;
-      while (x < width && modules[rowOffset + x] === 1) x++;
-      const runWidth = x - start;
-      let rectangleIndex: number;
-      if (previousWidths[start] === runWidth) {
-        rectangleIndex = previousRectangleIndexes[start]!;
-        rectangles[rectangleIndex]!.height++;
-      } else {
-        rectangleIndex = rectangles.length;
-        rectangles.push({x: start, y, width: runWidth, height: 1});
-      }
-
-      currentWidths[start] = runWidth;
-      currentRectangleIndexes[start] = rectangleIndex;
-    }
-
-    [previousWidths, currentWidths] = [currentWidths, previousWidths];
-    [previousRectangleIndexes, currentRectangleIndexes] = [
-      currentRectangleIndexes,
-      previousRectangleIndexes,
-    ];
-  }
-
-  return rectangles;
-}
-
-function resolveCenterImagePlacement(
-  moduleCount: number,
-  quietZone: number,
-  options?: Parameters<QRCodeStyledDrawing['placeCenterImage']>[0],
-): ReturnType<QRCodeStyledDrawing['placeCenterImage']> {
-  assertKnownKeys(options, 'centerImage', ['size', 'padding', 'clearBackground']);
-  const size = options?.size ?? 0.4;
-  const padding = options?.padding ?? 1;
-  const clearBackground = options?.clearBackground ?? true;
-  if (!Number.isFinite(size) || size <= 0 || size > 1) {
-    throwInvalid('centerImage.size', 'greater than 0 and at most 1', size);
-  }
-  if (!Number.isFinite(padding) || padding < 0) {
-    throwInvalid('centerImage.padding', 'a non-negative finite number', padding);
-  }
-  if (typeof clearBackground !== 'boolean') {
-    throwInvalid('centerImage.clearBackground', 'a boolean', clearBackground);
-  }
-
-  const centerImageSize = moduleCount * size;
-  const position = quietZone + (moduleCount - centerImageSize) / 2;
-  const clearStart = Math.max(quietZone, position - padding);
-  const clearEnd = Math.min(quietZone + moduleCount, position + centerImageSize + padding);
-  return {
-    centerImage: {x: position, y: position, size: centerImageSize},
-    clear: clearBackground
-      ? {x: clearStart, y: clearStart, size: clearEnd - clearStart}
-      : undefined,
+    return {
+      moduleCount: matrix.size,
+      moduleSize,
+      quietZone,
+      viewSize: matrix.size + 2 * quietZone,
+      outputSize,
+      background,
+      layers: [...layers.values()]
+        .filter(({rects, tiles}) => rects.length > 0 || tiles.size > 0)
+        .map(({color, rects, tiles}): QRCodeDrawingLayer => ({color, rects, tiles: [...tiles]})),
+    };
   };
 }
 
-function paintPrimitive(target: QRCodeStyledDrawingTarget, primitive: Primitive): void {
-  const {x, y} = primitive;
-  if (primitive.kind !== 'module') {
-    const {size, shape} = primitive;
-    for (let inset = 0; inset <= (primitive.kind === 'ring' ? 1 : 0); inset++) {
-      const insetSize = size - 2 * inset;
-      if (shape === 'circle') {
-        circle(target, x + inset, y + inset, insetSize);
-      } else {
-        roundedSquare(
-          target,
-          x + inset,
-          y + inset,
-          insetSize,
-          // Keep straight edges and a one-module ring thickness around the corners.
-          shape === 'square'
-            ? 0
-            : shape === 'rounded'
-              ? Math.min(1, insetSize / 2)
-              : size * 0.4 - inset,
-        );
+function resolveModuleTiles(shape: QRCodeModuleShape | undefined): ModuleTiles {
+  assertKnownKeys(shape, 'style.modules', SHAPE_KEYS);
+  if (shape === undefined) return [];
+  const module = shape.module;
+  if (typeof module === 'string') {
+    validateShapePath('style.modules.module', module);
+    return Array.from({length: 16}, () => module);
+  }
+  if (!Array.isArray(module) || module.length > 16) {
+    throwInvalid('style.modules.module', 'path data or up to 16 neighbor paths', module);
+  }
+  const tiles: ModuleTiles = Array.from({length: 16}, (_, mask) => module[mask]);
+  tiles.forEach((path, mask) => {
+    if (path !== undefined) validateShapePath(`style.modules.module[${mask}]`, path);
+  });
+  return tiles;
+}
+
+function createLayer(color: QRCodeColor, offset: number): Layer {
+  const rects: number[] = [];
+  const tiles = new Map<QRCodeShapePath, number[]>();
+  return {
+    color,
+    rects,
+    tiles,
+    rect(x, y, width, height) {
+      validateRectangle('rect', x, y, width, height);
+      if (width === 0 || height === 0) return;
+      rects.push(x + offset, y + offset, width, height);
+    },
+    tile(path, x, y) {
+      if (![x, y].every(Number.isFinite)) throwInvalid('tile', 'finite coordinates', [x, y]);
+      let positions = tiles.get(path);
+      if (!positions) {
+        validateShapePath('tile', path);
+        tiles.set(path, (positions = []));
       }
-    }
-    return;
-  }
-
-  if (primitive.shape === 'circle') {
-    circle(target, x, y, 1);
-    return;
-  }
-  const rotation = (primitive.rotation * Math.PI) / 180;
-  const commands = MODULE_PATHS[primitive.shape];
-  for (let index = 0; index < commands.length; index++) {
-    const command = commands[index]!;
-    let localX = command[0]!;
-    let localY = command[1]!;
-    for (let turn = primitive.rotation; turn > 0; turn -= 90) {
-      const previousX = localX;
-      localX = 1 - localY;
-      localY = previousX;
-    }
-    if (command.length > 2) {
-      target.arc(
-        x + localX,
-        y + localY,
-        command[2]!,
-        command[3]! + rotation,
-        command[4]! + rotation,
-        true,
-      );
-    } else if (index) {
-      target.lineTo(x + localX, y + localY);
-    } else {
-      target.moveTo(x + localX, y + localY);
-    }
-  }
-  target.closePath();
+      positions.push(x + offset, y + offset);
+    },
+  };
 }
 
-function circle(target: QRCodeStyledDrawingTarget, x: number, y: number, size: number): void {
-  const radius = size / 2;
-  target.moveTo(x + radius + radius, y + radius);
-  target.arc(x + radius, y + radius, radius, 0, Math.PI * 2, false);
-  target.closePath();
-}
-
-function roundedSquare(
-  target: QRCodeStyledDrawingTarget,
+function validateRectangle(
+  field: string,
   x: number,
   y: number,
-  size: number,
-  radius: number,
+  width: number,
+  height: number,
 ): void {
-  target.moveTo(x + radius, y);
-  target.lineTo(x + size - radius, y);
-  if (radius > 0) target.arc(x + size - radius, y + radius, radius, -HALF_PI, 0, false);
-  target.lineTo(x + size, y + size - radius);
-  if (radius > 0) target.arc(x + size - radius, y + size - radius, radius, 0, HALF_PI, false);
-  target.lineTo(x + radius, y + size);
-  if (radius > 0) target.arc(x + radius, y + size - radius, radius, HALF_PI, Math.PI, false);
-  target.lineTo(x, y + radius);
-  if (radius > 0) target.arc(x + radius, y + radius, radius, Math.PI, Math.PI * 1.5, false);
-  target.closePath();
+  if (
+    ![x, y, width, height, x + width, y + height].every(Number.isFinite) ||
+    width < 0 ||
+    height < 0
+  ) {
+    throwInvalid(field, 'finite coordinates and non-negative dimensions', [x, y, width, height]);
+  }
+}
+
+/**
+ * Draws every dark module that no part claimed. Filled modules are merged into horizontal runs,
+ * and equal runs in consecutive rows are merged into one rectangle.
+ */
+function drawModules(
+  {size: n, modules, roles}: QRCodeMatrix,
+  claimedRoles: number,
+  areas: readonly number[],
+  tiles: ModuleTiles,
+  layer: Layer,
+  offset: number,
+): void {
+  const {rects} = layer;
+  const stride = n + 2;
+  // How each module is drawn, with a light border so neighbor reads stay in bounds:
+  // 0 not drawn, 1 filled, 2 shaped.
+  const cells = new Uint8Array(stride * stride);
+  for (let y = 0; y < n; y++) {
+    for (let x = 0, index = y * n, cell = (y + 1) * stride + 1; x < n; x++, index++, cell++) {
+      const role = roles[index]!;
+      cells[cell] =
+        modules[index]! * (1 - ((claimedRoles >> role) & 1)) * (1 + ((SHAPED_ROLES >> role) & 1));
+    }
+  }
+  for (let index = 0; index < areas.length; index += 4) {
+    const startX = Math.max(0, areas[index]!);
+    const endX = Math.min(n, areas[index]! + areas[index + 2]!);
+    for (
+      let y = Math.max(0, areas[index + 1]!);
+      y < Math.min(n, areas[index + 1]! + areas[index + 3]!);
+      y++
+    ) {
+      if (endX > startX) cells.fill(0, (y + 1) * stride + 1 + startX, (y + 1) * stride + 1 + endX);
+    }
+  }
+  const runRow = new Int32Array(stride).fill(-2);
+  const runWidth = new Int32Array(stride);
+  const runIndex = new Int32Array(stride);
+
+  for (let y = 0; y < n; y++) {
+    let start = -1;
+    // The border cell after each row ends the last run.
+    for (let x = 0, index = (y + 1) * stride + 1; x <= n; x++, index++) {
+      const cell = cells[index]!;
+      let fill = cell === 1;
+      if (cell === 2) {
+        const path =
+          tiles[
+            +(cells[index - 1] !== 0) |
+              (+(cells[index + 1] !== 0) << 1) |
+              (+(cells[index - stride] !== 0) << 2) |
+              (+(cells[index + stride] !== 0) << 3)
+          ];
+        if (path === undefined) fill = true;
+        else layer.tile(path, x, y);
+      }
+      if (fill) {
+        if (start < 0) start = x;
+      } else if (start >= 0) {
+        const runLength = x - start;
+        if (runRow[start] === y - 1 && runWidth[start] === runLength) {
+          rects[runIndex[start]! + 3]!++;
+        } else {
+          runIndex[start] = rects.length;
+          runWidth[start] = runLength;
+          rects.push(start + offset, y + offset, runLength, 1);
+        }
+        runRow[start] = y;
+        start = -1;
+      }
+    }
+  }
 }

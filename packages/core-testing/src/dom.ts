@@ -43,6 +43,8 @@ export function captureDownloads(mockApi: Pick<MockApi, 'spyOn'>): CapturedDownl
 }
 
 export function mockCanvasRendering(mockApi: MockApi): void {
+  // DOM test environments without canvas support also lack Path2D.
+  globalThis.Path2D ??= class {} as unknown as typeof Path2D;
   mockApi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(((
     contextId: string,
   ) => {

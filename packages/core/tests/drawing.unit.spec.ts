@@ -1,132 +1,252 @@
-import {describe, expect, test, vi} from 'vitest';
+import {describe, expect, test} from 'vitest';
 
-import {qrcode} from '../src';
-import {createQRCodeStyler} from '../src/drawing';
-import type {QRCodeStyledDrawingTarget} from '../src/drawing';
+import {type QRCodeMatrix, qrcode} from '../src';
+import {
+  type QRCodeDrawing,
+  type QRCodeStylePart,
+  QR_CODE_MODULE_ROLES,
+  createQRCodeCenterImage,
+  createQRCodeStyler,
+} from '../src/drawing';
+import {alignment, circle, finder, rounded} from '../src/style';
+import {fromRows} from './helpers';
 
-function target(): QRCodeStyledDrawingTarget {
-  return {
-    drawBackground: vi.fn(),
-    beginLayer: vi.fn(),
-    drawRectangle: vi.fn(),
-    beginPath: vi.fn(),
-    moveTo: vi.fn(),
-    lineTo: vi.fn(),
-    arc: vi.fn(),
-    closePath: vi.fn(),
-    endPath: vi.fn(),
-    endLayer: vi.fn(),
-  };
+const {finderRing, finderCenter, alignmentRing, alignmentCenter} = QR_CODE_MODULE_ROLES;
+
+function area(rects: readonly number[]): number {
+  let total = 0;
+  for (let index = 0; index < rects.length; index += 4) {
+    total += rects[index + 2]! * rects[index + 3]!;
+  }
+  return total;
+}
+
+function tileCount(layer: QRCodeDrawing['layers'][number]): number {
+  return layer.tiles.reduce((count, [, positions]) => count + positions.length / 2, 0);
+}
+
+function countDark(matrix: QRCodeMatrix, roles?: readonly number[]): number {
+  let count = 0;
+  for (let index = 0; index < matrix.modules.length; index++) {
+    if (matrix.modules[index] && (!roles || roles.includes(matrix.roles[index]!))) count++;
+  }
+  return count;
 }
 
 describe('createQRCodeStyler', () => {
-  test('does not create empty module layers for a matrix without dark cells', () => {
-    const paintTarget = target();
-    createQRCodeStyler({modules: {shape: 'square'}})
-      .draw([[0]])
-      .paint(paintTarget);
-    expect(paintTarget.drawBackground).toHaveBeenCalledOnce();
-    expect(paintTarget.beginLayer).not.toHaveBeenCalled();
+  test('creates no layers for a matrix without dark modules', () => {
+    expect(createQRCodeStyler()(fromRows([[0]])).layers).toEqual([]);
   });
 
-  test('compacts square finder layers while keeping circle modules as paths', () => {
-    const paintTarget = target();
-    const drawing = createQRCodeStyler({
-      modules: {shape: 'circle', color: '#ff0000'},
-      finder: {
-        outer: {shape: 'square', color: '#0000ff'},
-        center: {shape: 'square', color: '#0000ff'},
-      },
-    }).draw(qrcode('mixed layers').matrix());
-    drawing.paint(paintTarget);
-    expect(paintTarget.beginLayer).toHaveBeenCalledTimes(2);
-    expect(paintTarget.beginLayer).toHaveBeenNthCalledWith(1, 255, 0, 0, 255);
-    expect(paintTarget.beginLayer).toHaveBeenNthCalledWith(2, 0, 0, 255, 255);
-    expect(paintTarget.drawRectangle).toHaveBeenCalled();
-    expect(paintTarget.arc).toHaveBeenCalled();
-    const firstPaint = Object.fromEntries(
-      Object.entries(paintTarget).map(([name, method]) => [
-        name,
-        vi.mocked(method).mock.calls.slice(),
-      ]),
+  test('reports layout and the lowercase background color', () => {
+    const drawing = createQRCodeStyler({moduleSize: 3, quietZone: 2, background: '#ABCDEF'})(
+      qrcode('layout').matrix(),
     );
-    const repaintTarget = target();
-    drawing.paint(repaintTarget);
-    for (const [name, method] of Object.entries(repaintTarget)) {
-      expect(vi.mocked(method).mock.calls).toEqual(firstPaint[name]);
+
+    expect(drawing).toMatchObject({
+      moduleCount: 21,
+      moduleSize: 3,
+      quietZone: 2,
+      viewSize: 25,
+      outputSize: 75,
+      background: '#abcdef',
+    });
+  });
+
+  test('draws an unstyled matrix as one layer of filled rectangles', () => {
+    const matrix = qrcode('plain').matrix();
+    const {layers} = createQRCodeStyler({foreground: '#123456'})(matrix);
+
+    expect(layers).toHaveLength(1);
+    expect(layers[0]!.color).toBe('#123456');
+    expect(layers[0]!.tiles).toEqual([]);
+    expect(area(layers[0]!.rects)).toBe(countDark(matrix));
+  });
+
+  test('shapes every module except unstyled finders, which stay square', () => {
+    const matrix = qrcode('shaped').version(2).matrix();
+    const [layer] = createQRCodeStyler({modules: circle()})(matrix).layers;
+    const finders = [finderRing, finderCenter];
+
+    expect(tileCount(layer!)).toBe(countDark(matrix) - countDark(matrix, finders));
+    expect(area(layer!.rects)).toBe(countDark(matrix, finders));
+  });
+
+  test('draws finder parts separately from the remaining modules', () => {
+    const matrix = qrcode('finder').matrix();
+    const [finderLayer, moduleLayer] = createQRCodeStyler({
+      finder: finder({ring: rounded(), color: '#ff0000'}),
+    })(matrix).layers;
+
+    expect(finderLayer!.color).toBe('#ff0000');
+    expect(finderLayer!.tiles).toEqual([[rounded().finderRing, [4, 4, 18, 4, 4, 18]]]);
+    expect(area(finderLayer!.rects)).toBe(27);
+    expect(area(moduleLayer!.rects)).toBe(
+      countDark(matrix) - countDark(matrix, [finderRing, finderCenter]),
+    );
+  });
+
+  test('draws every alignment pattern through its part', () => {
+    const matrix = qrcode('alignment').version(7).matrix();
+    const [alignmentLayer, moduleLayer] = createQRCodeStyler({
+      quietZone: 0,
+      alignment: alignment({center: circle(), color: '#00ff00'}),
+    })(matrix).layers;
+
+    expect(alignmentLayer!.color).toBe('#00ff00');
+    // Version 7 has six alignment patterns: square rings and dot centers.
+    expect(area(alignmentLayer!.rects)).toBe(6 * 16);
+    expect(alignmentLayer!.tiles[0]![1]).toContain(22);
+    expect(tileCount(alignmentLayer!)).toBe(6);
+    expect(area(moduleLayer!.rects)).toBe(
+      countDark(matrix) - countDark(matrix, [alignmentRing, alignmentCenter]),
+    );
+  });
+
+  test('merges parts that share the foreground color into one layer', () => {
+    const {layers} = createQRCodeStyler({finder: finder(), alignment: alignment()})(
+      qrcode('shared').version(2).matrix(),
+    );
+
+    expect(layers).toHaveLength(1);
+  });
+
+  test('runs custom parts with role and area claims in matrix coordinates', () => {
+    const corner: QRCodeStylePart = (context) => {
+      context.claimRoles(finderRing, finderCenter);
+      context.claimArea(9, 9, 3, 3);
+      context.layer('#00ff00').rect(0, 0, 1, 1);
+    };
+    const matrix = qrcode('custom part').matrix();
+    const {layers} = createQRCodeStyler({quietZone: 1}, [corner])(matrix);
+    const cleared = [9, 10, 11].flatMap((y) =>
+      [9, 10, 11].map((x) => matrix.modules[y * matrix.size + x]!),
+    );
+
+    expect(layers[0]!.rects).toEqual([1, 1, 1, 1]);
+    expect(area(layers[1]!.rects)).toBe(
+      countDark(matrix) -
+        countDark(matrix, [finderRing, finderCenter]) -
+        cleared.filter(Boolean).length,
+    );
+  });
+
+  test('validates and merges custom layer colors case-insensitively', () => {
+    const draw = createQRCodeStyler({foreground: '#abcdef'}, [
+      (context) => {
+        context.layer('#ABCDEF').rect(1, 0, 1, 1);
+      },
+    ]);
+    const {layers} = draw(fromRows([[1]]));
+    expect(layers).toHaveLength(1);
+    expect(layers[0]!.color).toBe('#abcdef');
+    expect(area(layers[0]!.rects)).toBe(2);
+    expect(() =>
+      createQRCodeStyler({}, [(context) => context.layer('#12')])(fromRows([[0]])),
+    ).toThrowError(expect.objectContaining({code: 'INVALID_OPTIONS'}));
+  });
+
+  test('clears every module touched by a fractional claimed area', () => {
+    const matrix = fromRows([
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 1],
+    ]);
+    const draw = createQRCodeStyler({quietZone: 0}, [
+      (context) => {
+        context.claimArea(0.5, 0.5, 1, 1);
+        expect(context.isAreaClaimed(0, 0, 1, 1)).toBe(true);
+      },
+    ]);
+    expect(draw(matrix).layers[0]!.rects).toEqual([2, 0, 1, 2, 0, 2, 3, 1]);
+    const empty = createQRCodeStyler({}, [(context) => context.claimArea(0.5, 0.5, 0, 1)]);
+    expect(area(empty(matrix).layers[0]!.rects)).toBe(9);
+  });
+
+  test('rejects non-finite geometry and negative dimensions from custom parts', () => {
+    const parts: QRCodeStylePart[] = [
+      (context) => context.claimArea(NaN, 0, 1, 1),
+      (context) => context.claimArea(0, 0, -1, 1),
+      (context) => context.layer().rect(0, Infinity, 1, 1),
+      (context) => context.layer().rect(0, 0, 1, -1),
+      (context) => context.layer().tile('m0 0z', NaN, 0),
+    ];
+    for (const part of parts) {
+      expect(() => createQRCodeStyler({}, [part])(fromRows([[1]]))).toThrowError(
+        expect.objectContaining({code: 'INVALID_OPTIONS'}),
+      );
     }
   });
 
-  test('snapshots options and caches drawings by matrix identity', () => {
-    const style = {moduleSize: 3, quietZone: 2} as const;
-    const styler = createQRCodeStyler(style);
-    const matrix = qrcode('cache').matrix();
-    const first = styler.draw(matrix);
-    (style as {moduleSize: number}).moduleSize = 99;
+  test('rejects invalid path data from custom parts', () => {
+    const draw = createQRCodeStyler({
+      finder: (context) => context.layer().tile('M0 0h1v1h-1z', 0, 0),
+    });
 
-    expect(styler.draw(matrix)).toBe(first);
-    expect(first.moduleSize).toBe(3);
-    expect(first.quietZone).toBe(2);
-    expect(first.outputSize).toBe(first.viewSize * 3);
-  });
-
-  test('paints balanced layers with integer RGBA channels', () => {
-    const drawing = createQRCodeStyler({
-      background: '#11223344',
-      modules: {shape: 'extra-rounded', color: '#aabbccdd'},
-      finder: {outer: {shape: 'extra-rounded'}, center: {shape: 'rounded'}},
-    }).draw(qrcode('paint').matrix());
-    const paintTarget = target();
-
-    drawing.paint(paintTarget);
-
-    expect(paintTarget.drawBackground).toHaveBeenCalledWith(17, 34, 51, 68);
-    expect(paintTarget.beginLayer).toHaveBeenCalled();
-    expect(paintTarget.beginLayer).toHaveBeenCalledTimes(
-      (paintTarget.endLayer as ReturnType<typeof vi.fn>).mock.calls.length,
+    expect(() => draw(fromRows([[1]]))).toThrowError(
+      expect.objectContaining({
+        code: 'INVALID_OPTIONS',
+        details: expect.objectContaining({field: 'tile'}),
+      }),
     );
-    expect(paintTarget.arc).toHaveBeenCalled();
   });
 
-  test('centralizes image placement', () => {
-    const drawing = createQRCodeStyler({quietZone: 4}).draw(qrcode('image').matrix());
-    const placement = drawing.placeCenterImage({size: 0.4, padding: 1});
-    expect(placement.centerImage).toEqual({x: 10.3, y: 10.3, size: 8.4});
-    expect(placement.clear?.x).toBe(9.3);
-    expect(placement.clear?.y).toBe(9.3);
-    expect(placement.clear?.size).toBeCloseTo(10.4);
-    expect(drawing.placeCenterImage({clearBackground: false}).clear).toBeUndefined();
+  test('snapshots options when the styler is created', () => {
+    const style = {moduleSize: 3, quietZone: 2};
+    const draw = createQRCodeStyler(style);
+    style.moduleSize = 99;
+
+    expect(draw(qrcode('snapshot').matrix()).moduleSize).toBe(3);
+  });
+});
+
+describe('createQRCodeCenterImage', () => {
+  test('places the image box in view coordinates', () => {
+    const drawing = createQRCodeStyler({quietZone: 4})(qrcode('image').matrix());
+
+    expect(createQRCodeCenterImage({size: 0.4}).place(drawing)).toEqual({
+      x: 10.3,
+      y: 10.3,
+      size: 8.4,
+    });
   });
 
-  test.each(['outer', 'center'] as const)(
-    'draws extra-rounded finder %s with corners between rounded and circle',
-    (part) => {
-      const matrix = qrcode('finder shapes').matrix();
-      const [rounded, extraRounded, circle] = (['rounded', 'extra-rounded', 'circle'] as const).map(
-        (shape) => {
-          const paintTarget = target();
-          createQRCodeStyler({finder: {[part]: {shape}}})
-            .draw(matrix)
-            .paint(paintTarget);
-          return paintTarget;
-        },
-      );
-      const roundedRadius = vi.mocked(rounded!.arc).mock.calls[0]![2];
-      const extraRoundedArcs = vi.mocked(extraRounded!.arc).mock.calls;
-      const extraRoundedRadius = extraRoundedArcs[0]![2];
-      const circleRadius = vi.mocked(circle!.arc).mock.calls[0]![2];
+  test('clears every module the image or its padding touches', () => {
+    const matrix = qrcode('image').matrix();
+    const {part} = createQRCodeCenterImage({size: 0.4, padding: 1});
+    const drawing = createQRCodeStyler({quietZone: 0}, [part])(matrix);
+    // The image spans 6.3 to 14.7, so padding clears modules 5 through 15.
+    let cleared = 0;
+    for (let y = 5; y <= 15; y++) {
+      for (let x = 5; x <= 15; x++) cleared += matrix.modules[y * matrix.size + x]!;
+    }
 
-      expect(extraRoundedRadius).toBeGreaterThan(roundedRadius);
-      expect(extraRoundedRadius).toBeLessThan(circleRadius);
-      const start = vi.mocked(extraRounded!.moveTo).mock.calls[0]!;
-      const end = vi.mocked(extraRounded!.lineTo).mock.calls[0]!;
-      expect(end[0]).toBeGreaterThan(start[0]);
-      expect(end[1]).toBe(start[1]);
+    expect(area(drawing.layers[0]!.rects)).toBe(countDark(matrix) - cleared);
+    const kept = createQRCodeStyler({quietZone: 0}, [
+      createQRCodeCenterImage({clearBackground: false}).part,
+    ])(matrix);
+    expect(area(kept.layers[0]!.rects)).toBe(countDark(matrix));
+  });
 
-      if (part === 'outer') {
-        const innerRadius = extraRoundedArcs[4]![2];
-        expect(extraRoundedRadius - innerRadius).toBeCloseTo(1);
-      }
-    },
-  );
+  test('skips alignment patterns behind the image', () => {
+    const matrix = qrcode('alignment behind image').version(7).matrix();
+    const [alignmentLayer] = createQRCodeStyler(
+      {quietZone: 0, alignment: alignment({color: '#00ff00'})},
+      [createQRCodeCenterImage({size: 0.2, padding: 0}).part],
+    )(matrix).layers;
+
+    // The center alignment pattern of version 7 is behind the image; five patterns remain.
+    expect(area(alignmentLayer!.rects)).toBe(5 * 17);
+  });
+
+  test.each([
+    [{size: 2}, 'centerImage.size'],
+    [{padding: -1}, 'centerImage.padding'],
+    [{clearBackground: 'yes'}, 'centerImage.clearBackground'],
+    [{source: 'x'}, 'centerImage.source'],
+  ])('validates the layout %#', (layout, field) => {
+    expect(() => createQRCodeCenterImage(layout as never)).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field})}),
+    );
+  });
 });

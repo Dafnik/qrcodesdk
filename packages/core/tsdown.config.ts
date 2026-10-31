@@ -5,6 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     matrix: 'src/qrcode-builder.ts',
     svg: 'src/svg.ts',
+    style: 'src/style.ts',
     text: 'src/text.ts',
     error: 'src/error.ts',
     internal: 'src/internal.ts',

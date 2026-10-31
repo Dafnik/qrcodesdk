@@ -206,8 +206,10 @@ export class QRCodeDownloadImageExample {
 
 ## Center images
 
-Load and decode a browser image first, store the resulting `HTMLImageElement` in a signal, and
-instantiate the component inside an `@if` block once the signal has a value. See
+Load and decode a browser image first, then store options with
+`centerImage: canvasCenterImage(image)` in a signal. Instantiate the component inside an `@if` block
+once the signal has a value. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead.
+See
 [Add a center image](https://qrcodesdk.dev/guides/center-images/#angular) for the complete
 component and template.
 
@@ -232,17 +234,19 @@ The `options` input groups encoding settings under `matrix`. Renderer settings s
 `style`, `accessibility`, and `centerImage` go alongside it:
 
 ```ts
-import type {QRCodeSVGOptions} from '@qrcodesdk/angular';
+import {type QRCodeSVGOptions, circle, finder, rounded} from '@qrcodesdk/angular';
 
 const options: QRCodeSVGOptions = {
   matrix: {errorCorrectionLevel: 'H'},
-  style: {moduleSize: 8, quietZone: 4},
+  style: {moduleSize: 8, quietZone: 4, modules: rounded(), finder: finder({center: circle()})},
   accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
 };
 ```
 
 Pass this object through the component's `options` input. Use `QRCodeImageOptions` or
 `QRCodeCanvasOptions` for the corresponding component.
+
+Import shapes, pattern parts, and center-image factories from `@qrcodesdk/angular` alongside the components.
 
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
 [Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
@@ -253,11 +257,24 @@ See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the field
 ```ts
 import {
   QRCodeCanvas,
+  type QRCodeCanvasCenterImage,
   type QRCodeCanvasOptions,
+  type QRCodeCenterImageLayout,
+  type QRCodeDataImageURL,
   QRCodeImage,
   type QRCodeImageOptions,
   QRCodeSVG,
+  type QRCodeSVGCenterImage,
   type QRCodeSVGOptions,
+  type QRCodeShape,
+  type QRCodeStylePart,
+  alignment,
+  canvasCenterImage,
+  circle,
+  diagonal,
+  finder,
+  rounded,
+  svgCenterImage,
 } from '@qrcodesdk/angular';
 ```
 

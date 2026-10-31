@@ -8,9 +8,10 @@ import {
   type QRCodeVersion,
   qrcode,
 } from '@qrcodesdk/core';
-import {createQRCodeStyler} from '@qrcodesdk/core/drawing';
+import {QR_CODE_MODULE_ROLES, createQRCodeStyler} from '@qrcodesdk/core/drawing';
 
-type QRCodeModule = QRCodeMatrix[number][number];
+/** `1` for a dark module and `0` for a light module. */
+export type QRCodeExplainModuleValue = 0 | 1;
 
 export type QRCodeExplainRole = 'functional' | 'encoded' | 'remainder';
 
@@ -22,8 +23,8 @@ export interface QRCodeExplainModule {
   readonly key: string;
   readonly row: number;
   readonly column: number;
-  readonly value: QRCodeModule;
-  readonly sourceValue?: QRCodeModule;
+  readonly value: QRCodeExplainModuleValue;
+  readonly sourceValue?: QRCodeExplainModuleValue;
   readonly role: QRCodeExplainRole;
   readonly groupId: string;
   readonly placementBitIndex?: number;
@@ -94,36 +95,32 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
     eci: options.eci,
   };
   const matrix = qrcode(options.payload).options(matrixOptions).matrix();
-  const version = ((matrix.length - 17) / 4) as QRCodeVersion;
+  const {size} = matrix;
+  const version = ((size - 17) / 4) as QRCodeVersion;
   const mask = options.mask ?? resolveMask(options.payload, matrixOptions, matrix, version);
   const drawing = createQRCodeStyler({
     moduleSize: options.moduleSize,
     quietZone: options.quietZone,
-  }).draw(matrix);
-  const reserved = createReservedGrid(version);
-  const placements = createPlacements(reserved);
+  })(matrix);
+  const placements = createPlacements(matrix);
   const codewordBitCount = Math.floor(placements.length / 8) * 8;
-  const placementByPosition = new Map(
-    placements.map(([row, column], placementBitIndex) => [
-      row * matrix.length + column,
-      placementBitIndex,
-    ]),
+  const placementByIndex = new Map(
+    placements.map((index, placementBitIndex) => [index, placementBitIndex]),
   );
-  const moduleGrid = matrix.map((row, rowIndex) =>
-    row.map((value, columnIndex) => {
-      const placementBitIndex = placementByPosition.get(rowIndex * matrix.length + columnIndex);
+  const moduleGrid = Array.from({length: size}, (_, row) =>
+    Array.from({length: size}, (_, column): QRCodeExplainModule => {
+      const index = row * size + column;
+      const value = matrix.modules[index] as QRCodeExplainModuleValue;
+      const placementBitIndex = placementByIndex.get(index);
       if (placementBitIndex === undefined) {
-        return createModule(rowIndex, columnIndex, value, 'functional');
+        return createModule(row, column, value, 'functional');
       }
       if (placementBitIndex >= codewordBitCount) {
-        return {
-          ...createModule(rowIndex, columnIndex, value, 'remainder'),
-          placementBitIndex,
-        };
+        return {...createModule(row, column, value, 'remainder'), placementBitIndex};
       }
-      const sourceValue = (value ^ +MASKS[mask](rowIndex, columnIndex)) as QRCodeModule;
+      const sourceValue = (value ^ +MASKS[mask](row, column)) as QRCodeExplainModuleValue;
       return {
-        ...createModule(rowIndex, columnIndex, value, 'encoded'),
+        ...createModule(row, column, value, 'encoded'),
         sourceValue,
         placementBitIndex,
         codewordIndex: Math.floor(placementBitIndex / 8),
@@ -149,64 +146,27 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
 function createModule(
   row: number,
   column: number,
-  value: QRCodeModule,
+  value: QRCodeExplainModuleValue,
   role: QRCodeExplainRole,
 ): QRCodeExplainModule {
   return {key: `${row}:${column}`, row, column, value, role, groupId: role};
 }
 
-function createReservedGrid(version: QRCodeVersion): boolean[][] {
-  const size = version * 4 + 17;
-  const grid = Array.from({length: size}, () => Array<boolean>(size).fill(false));
-  mark(grid, 0, 0, 9, 9);
-  mark(grid, size - 8, 0, 8, 9);
-  mark(grid, 0, size - 8, 9, 8);
-  for (let index = 9; index < size - 8; index++) {
-    grid[6]![index] = true;
-    grid[index]![6] = true;
-  }
-  const alignments = alignmentPositions(version);
-  for (let rowIndex = 0; rowIndex < alignments.length; rowIndex++) {
-    const minimumColumn = rowIndex === 0 || rowIndex === alignments.length - 1 ? 1 : 0;
-    const maximumColumn = rowIndex === 0 ? alignments.length - 1 : alignments.length;
-    for (let columnIndex = minimumColumn; columnIndex < maximumColumn; columnIndex++) {
-      mark(grid, alignments[columnIndex]!, alignments[rowIndex]!, 5, 5);
-    }
-  }
-  if (version >= 7) {
-    mark(grid, size - 11, 0, 3, 6);
-    mark(grid, 0, size - 11, 6, 3);
-  }
-  return grid;
-}
-
-function mark(grid: boolean[][], x: number, y: number, width: number, height: number): void {
-  for (let row = y; row < y + height; row++) {
-    for (let column = x; column < x + width; column++) grid[row]![column] = true;
-  }
-}
-
-function alignmentPositions(version: QRCodeVersion): number[] {
-  if (version === 1) return [];
-  const count = Math.floor(version / 7) + 2;
-  const step = Math.floor((version * 8 + count * 3 + 5) / (count * 4 - 4)) * 2;
-  const positions = [4];
-  for (let position = version * 4 + 8; positions.length < count; position -= step) {
-    positions.splice(1, 0, position);
-  }
-  return positions;
-}
-
-function createPlacements(reserved: readonly (readonly boolean[])[]): [number, number][] {
-  const placements: [number, number][] = [];
-  const size = reserved.length;
+/**
+ * Returns the matrix indexes of the data region in QR placement order: two-module columns from
+ * the right, zig-zagging up and down and skipping the vertical timing pattern. Every module with
+ * the data role belongs to the placement path; all other roles are reserved function patterns.
+ */
+function createPlacements({size, roles}: QRCodeMatrix): number[] {
+  const placements: number[] = [];
   let direction = -1;
   for (let right = size - 1; right >= 0; right -= 2) {
     if (right === 6) right--;
     let row = direction < 0 ? size - 1 : 0;
     for (let step = 0; step < size; step++) {
       for (let column = right; column > right - 2; column--) {
-        if (!reserved[row]![column]) placements.push([row, column]);
+        const index = row * size + column;
+        if (roles[index] === QR_CODE_MODULE_ROLES.data) placements.push(index);
       }
       row += direction;
     }
@@ -225,11 +185,7 @@ function resolveMask(
     const candidate = qrcode(payload)
       .options({...options, version, mask: mask as QRCodeMask})
       .matrix();
-    if (
-      candidate.every((row, index) =>
-        row.every((value, column) => value === matrix[index]?.[column]),
-      )
-    ) {
+    if (candidate.modules.every((value, index) => value === matrix.modules[index])) {
       return mask as QRCodeMask;
     }
   }

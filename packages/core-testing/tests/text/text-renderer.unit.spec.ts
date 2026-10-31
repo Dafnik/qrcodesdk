@@ -2,11 +2,13 @@ import {describe, expect, test} from 'vitest';
 
 import {QRCodeTextRenderer} from '@qrcodesdk/core';
 
+import {matrixFromRows} from '../../src';
+
 describe('QRCodeTextRenderer', () => {
-  const matrix = [
+  const matrix = matrixFromRows([
     [1, 0],
     [0, 1],
-  ] as const;
+  ]);
 
   test('renders compact and full layouts', () => {
     expect(
@@ -37,6 +39,6 @@ describe('QRCodeTextRenderer', () => {
     const options = {style: {moduleSize: 1, quietZone: 0}};
     const renderer = QRCodeTextRenderer(options);
     options.style.moduleSize = 4;
-    expect(renderer([[1]])).toBe('▀');
+    expect(renderer(matrixFromRows([[1]]))).toBe('▀');
   });
 });

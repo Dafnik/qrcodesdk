@@ -2,14 +2,16 @@ import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '../../src';
 import {evaluateMatrix} from '../../src/matrix/evaluate-matrix';
-import type {
-  QRCodeErrorCorrectionLevel,
-  QRCodeMask,
-  QRCodeMatrix,
-  QRCodeModule,
-  QRCodeVersion,
-} from '../../src/types';
+import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeVersion} from '../../src/types';
+import {toRows} from '../helpers';
 import {evaluateGroup} from './helpers';
+
+type Rows = readonly (readonly number[])[];
+
+/** Scores rows with the production evaluator. */
+function evaluateRows(rows: Rows, scoreLimit?: number): number {
+  return evaluateMatrix(Uint8Array.from(rows.flat()), rows.length, scoreLimit);
+}
 
 const REPRESENTATIVE_VERSIONS = [1, 2, 7, 20, 40] as const satisfies readonly QRCodeVersion[];
 const ERROR_CORRECTION_LEVELS = [
@@ -28,7 +30,7 @@ describe('evaluateMatrix', () => {
         const matrix = createDeterministicMatrix(version, seed);
         const exact = evaluateMatrixLegacy(matrix);
         for (const limit of [0, 1, Math.floor(exact / 2), exact, exact + 1, Infinity]) {
-          const score = evaluateMatrix(matrix, limit);
+          const score = evaluateRows(matrix, limit);
           if (exact < limit) {
             expect(score).toBe(exact);
           } else {
@@ -49,13 +51,15 @@ describe('evaluateMatrix', () => {
         for (const payload of ['A', '000123456789', 'é🦊']) {
           const options = {version, errorCorrectionLevel};
           const candidates = MASKS.map((mask) =>
-            qrcode(payload)
-              .options({...options, mask})
-              .matrix(),
+            toRows(
+              qrcode(payload)
+                .options({...options, mask})
+                .matrix(),
+            ),
           );
           const scores = candidates.map(evaluateMatrixLegacy);
           const expected = candidates[scores.indexOf(Math.min(...scores))];
-          expect(qrcode(payload).options(options).matrix()).toEqual(expected);
+          expect(toRows(qrcode(payload).options(options).matrix())).toEqual(expected);
         }
       }
     },
@@ -65,11 +69,13 @@ describe('evaluateMatrix', () => {
     for (const version of REPRESENTATIVE_VERSIONS) {
       for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
         for (const mask of MASKS) {
-          const matrix = qrcode('A')
-            .options({errorCorrectionLevel, mask, mode: 'alphanumeric', version})
-            .matrix();
+          const matrix = toRows(
+            qrcode('A')
+              .options({errorCorrectionLevel, mask, mode: 'alphanumeric', version})
+              .matrix(),
+          );
 
-          expect(evaluateMatrix(matrix)).toBe(evaluateMatrixLegacy(matrix));
+          expect(evaluateRows(matrix)).toBe(evaluateMatrixLegacy(matrix));
         }
       }
     }
@@ -79,7 +85,7 @@ describe('evaluateMatrix', () => {
     for (const version of REPRESENTATIVE_VERSIONS) {
       for (let seed = 1; seed <= 16; seed++) {
         const matrix = createDeterministicMatrix(version, seed);
-        expect(evaluateMatrix(matrix)).toBe(evaluateMatrixLegacy(matrix));
+        expect(evaluateRows(matrix)).toBe(evaluateMatrixLegacy(matrix));
       }
     }
   });
@@ -98,25 +104,25 @@ describe('evaluateMatrix', () => {
     const width = rows[0]!.length;
     const squareRows = [...rows];
     while (squareRows.length < width) squareRows.push('01'.repeat(width).slice(0, width));
-    const matrix = squareRows.map((row) => Array.from(row, Number)) as QRCodeMatrix;
+    const matrix = squareRows.map((row) => Array.from(row, Number));
 
-    expect(evaluateMatrix(matrix)).toBe(evaluateMatrixLegacy(matrix));
+    expect(evaluateRows(matrix)).toBe(evaluateMatrixLegacy(matrix));
   });
 });
 
-function createDeterministicMatrix(version: QRCodeVersion, seed: number): QRCodeMatrix {
+function createDeterministicMatrix(version: QRCodeVersion, seed: number): Rows {
   const size = 17 + 4 * version;
   let state = seed;
 
   return Array.from({length: size}, () =>
     Array.from({length: size}, () => {
       state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
-      return (state >>> 31) as QRCodeModule;
+      return state >>> 31;
     }),
   );
 }
 
-function evaluateMatrixLegacy(matrix: QRCodeMatrix): number {
+function evaluateMatrixLegacy(matrix: Rows): number {
   const matrixLength = matrix.length;
   let score = 0;
   let numberOfBlackSquares = 0;
@@ -151,7 +157,7 @@ function evaluateMatrixLegacy(matrix: QRCodeMatrix): number {
   );
 }
 
-function collectGroups(modules: readonly QRCodeModule[]): number[] {
+function collectGroups(modules: readonly number[]): number[] {
   const groups = [0];
   let index = 0;
 

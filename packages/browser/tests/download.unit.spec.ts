@@ -1,4 +1,4 @@
-import {captureDownloads} from '@repo/core-testing';
+import {captureDownloads, matrixFromRows} from '@repo/core-testing';
 import {afterEach, describe, expect, test, vi} from 'vitest';
 
 import {QRCodeDownloadImageRenderer, QRCodeDownloadSVGRenderer, QRCodeImageRenderer} from '../src';
@@ -14,7 +14,7 @@ describe('download QR code renderers', () => {
     QRCodeDownloadImageRenderer({
       renderer: QRCodeImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
       filename: 'ticket',
-    })([[1]]);
+    })(matrixFromRows([[1]]));
 
     expect(downloads).toEqual([
       {
@@ -30,7 +30,7 @@ describe('download QR code renderers', () => {
     QRCodeDownloadImageRenderer({
       renderer: QRCodeImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
       filename: 'ticket.png',
-    })([[1]]);
+    })(matrixFromRows([[1]]));
 
     expect(downloads[0]?.filename).toBe('ticket.png');
   });
@@ -43,7 +43,7 @@ describe('download QR code renderers', () => {
     QRCodeDownloadSVGRenderer({
       renderer: () => '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
       filename: 'ticket',
-    })([[1]]);
+    })(matrixFromRows([[1]]));
 
     expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
     expect(downloads).toEqual([
@@ -67,7 +67,7 @@ describe('download QR code renderers', () => {
     QRCodeDownloadSVGRenderer({
       renderer: () => '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
       filename: 'ticket.svg',
-    })([[1]]);
+    })(matrixFromRows([[1]]));
 
     expect(downloads[0]?.filename).toBe('ticket.svg');
 

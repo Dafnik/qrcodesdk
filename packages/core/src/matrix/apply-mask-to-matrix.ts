@@ -1,38 +1,36 @@
-import type {QRCodeMask, QRCodeModule, QRCodeMutableMatrix, QRCodeReservedMatrix} from '../types';
+import type {QRCodeMask} from '../types';
+import {DATA_ROLE} from './create-base-matrix';
 
 /**
- * Applies a QR mask to the data portion of a matrix.
+ * Applies a QR mask to the data modules of a matrix.
  */
 export function applyMaskToMatrix(
-  matrix: QRCodeMutableMatrix,
-  reserved: QRCodeReservedMatrix,
+  modules: Uint8Array,
+  roles: Readonly<Uint8Array>,
+  n: number,
   mask: QRCodeMask,
-): QRCodeMutableMatrix {
-  const n = matrix.length;
-
+): Uint8Array {
   if (mask < 3) {
     const rowStep = mask === 1 ? 2 : 1;
     const columnStep = mask === 2 ? 3 : mask === 0 ? 2 : 1;
     for (let i = 0; i < n; i += rowStep) {
-      const matrixRow = matrix[i]!;
-      const reservedRow = reserved[i]!;
       const columnStart = mask === 0 ? i & 1 : 0;
       for (let j = columnStart; j < n; j += columnStep) {
-        if (!reservedRow[j]) matrixRow[j] = (matrixRow[j]! ^ 1) as QRCodeModule;
+        const index = i * n + j;
+        if (roles[index] === DATA_ROLE) modules[index]! ^= 1;
       }
     }
-    return matrix;
+    return modules;
   }
 
   // Inline the remaining predicates (JIS X 0510:2004 Table 20). Calling MASK_FUNCTIONS
   // here sees five closures at one call site, which V8 cannot inline.
   for (let i = 0; i < n; i++) {
-    const matrixRow = matrix[i]!;
-    const reservedRow = reserved[i]!;
     for (let j = 0; j < n; j++) {
+      const index = i * n + j;
       const product = i * j;
       if (
-        !reservedRow[j] &&
+        roles[index] === DATA_ROLE &&
         (mask === 3
           ? (i + j) % 3 === 0
           : mask === 4
@@ -43,9 +41,9 @@ export function applyMaskToMatrix(
                 ? (((product & 1) + (product % 3)) & 1) === 0
                 : ((((i + j) & 1) + (product % 3)) & 1) === 0)
       ) {
-        matrixRow[j] = (matrixRow[j]! ^ 1) as QRCodeModule;
+        modules[index]! ^= 1;
       }
     }
   }
-  return matrix;
+  return modules;
 }

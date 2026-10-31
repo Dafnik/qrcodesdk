@@ -38,3 +38,13 @@ export function throwInvalid(field: string, expected: string, value: unknown): n
     {details: {field, value}},
   );
 }
+
+/** Checks that a renderer's center image was created by its factory, such as svgCenterImage(). */
+export function assertCenterImage(value: unknown, method: string, factory: string): void {
+  if (
+    value !== undefined &&
+    typeof (value as Record<string, unknown> | null)?.[method] !== 'function'
+  ) {
+    throwInvalid('centerImage', `created with ${factory}()`, value);
+  }
+}

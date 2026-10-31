@@ -3,7 +3,10 @@ import {render as renderComponent, waitFor} from '@testing-library/svelte';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 
 import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import {canvasCenterImage} from '@qrcodesdk/browser';
 import type {QRCodeSVGOptions} from '@qrcodesdk/core';
+import {svgCenterImage} from '@qrcodesdk/core';
+import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
 import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '../src/lib/index.js';
 
@@ -105,11 +108,9 @@ describe('Svelte QR code components', () => {
       style: {
         moduleSize: 2,
         quietZone: 1,
-        modules: {color: '#112233' as const, shape: 'diagonal-rounded' as const},
-        finder: {
-          outer: {color: '#445566' as const, shape: 'extra-rounded' as const},
-          center: {color: '#778899' as const, shape: 'circle' as const},
-        },
+        foreground: '#112233' as const,
+        modules: diagonal({radius: 1}),
+        finder: finder({ring: rounded({radius: 1}), center: circle(), color: '#445566'}),
       },
     };
     const svg = renderComponent(QRCodeSVG, {payload: 'STYLED', options: styledOptions});
@@ -125,7 +126,7 @@ describe('Svelte QR code components', () => {
       Array.from(svg.container.querySelectorAll('svg path')).map((path) =>
         path.getAttribute('fill'),
       ),
-    ).toEqual(['#ffffff', '#112233', '#445566', '#778899']);
+    ).toEqual(['#ffffff', '#445566', '#112233']);
   });
 
   test('passes prepared center images through every component', async () => {
@@ -135,15 +136,15 @@ describe('Svelte QR code components', () => {
     const svgSource = 'data:image/png;base64,cHJlcGFyZWQ=' as const;
     const svg = renderComponent(QRCodeSVG, {
       payload: 'CENTER IMAGE',
-      options: {...svgOptions, centerImage: {source: svgSource, size: 0.2}},
+      options: {...svgOptions, centerImage: svgCenterImage(svgSource, {size: 0.2})},
     });
     const image = renderComponent(QRCodeImage, {
       payload: 'CENTER IMAGE',
-      options: {...imageOptions, centerImage: {source, size: 0.2}},
+      options: {...imageOptions, centerImage: canvasCenterImage(source, {size: 0.2})},
     });
     const canvas = renderComponent(QRCodeCanvas, {
       payload: 'CENTER IMAGE',
-      options: {...canvasOptions, centerImage: {source, size: 0.2}},
+      options: {...canvasOptions, centerImage: canvasCenterImage(source, {size: 0.2})},
     });
 
     await waitFor(() => {
@@ -154,7 +155,7 @@ describe('Svelte QR code components', () => {
     expect(renderedElement<SVGImageElement>(svg.container, 'svg image').getAttribute('href')).toBe(
       svgSource,
     );
-    expect(svg.container.querySelector('svg rect')).not.toBeNull();
+    expect(svg.container.querySelector('svg mask')).toBeNull();
   });
 
   test('replaces rendered image and canvas when props change', async () => {

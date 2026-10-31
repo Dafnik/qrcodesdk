@@ -1,6 +1,6 @@
 ---
 title: Add a center image
-description: Prepare and add a center image with strong scan reliability across SVG, browser, Node.js, React, Vue, Svelte, and Angular output.
+description: Prepare image sources and configure their size, padding, and background clearing.
 docType: guide
 
 related:
@@ -11,77 +11,76 @@ related:
   - ../reference/renderers/png.mdx
 ---
 
-A center image can brand a QR code, but it intentionally covers encoded modules. Prepare the source
-before rendering, keep the center image modest, and test the final artifact with real scanners.
-
-## Prepare a logo or center image
-
-- Start with a QR code that scans without a center image.
-- Choose the renderer and prepare the source type it accepts.
-- Use high error correction for center images containing logos: `.errorCorrection('H')` or
-  `errorCorrectionLevel: 'H'`.
+A center image covers encoded modules. Use high error correction with `.errorCorrection('H')` or
+`errorCorrectionLevel: 'H'`, start with a small image, and test the result with scanners.
 
 ## Configure the center image
 
-Every visual renderer uses the same center-image geometry:
+Create the center image with the factory for your output:
 
 ```ts
-centerImage: {
-  source: preparedSource,
-  size: 0.3,
-  padding: 1,
-  clearBackground: true,
-}
+import {QRCodeSVGRenderer, svgCenterImage} from '@qrcodesdk/core';
+
+QRCodeSVGRenderer({
+  centerImage: svgCenterImage(preparedSource, {size: 0.3, padding: 1, clearBackground: true}),
+});
 ```
+
+The factories share these layout options:
 
 | Option            | Default | Accepted value                                 | Meaning                                                      |
 | ----------------- | ------: | ---------------------------------------------- | ------------------------------------------------------------ |
-| `source`          |    none | renderer-specific prepared source              | Image content; required when `centerImage` is set            |
 | `size`            |   `0.4` | finite number greater than `0` and at most `1` | Image box relative to matrix width, excluding the quiet zone |
 | `padding`         |     `1` | non-negative finite number                     | Cleared space around the image, in modules                   |
-| `clearBackground` |  `true` | `boolean`                                      | Replaces covered modules and padding with the light color    |
+| `clearBackground` |  `true` | `boolean`                                      | Removes every module the image or its padding touches        |
 
-The source is centered and contained without cropping. `size: 1` is a valid value, not a promise that
-the result will scan. Start around `0.2`–`0.3`, preserve padding, and increase only after testing.
+The image fits inside the centered square without cropping. Clearing removes whole modules, so the
+cleared area can be slightly larger than the image box plus padding. When clearing is enabled,
+`finder()` and `alignment()` omit any whole pattern that overlaps the cleared area. Without clearing,
+the image is drawn over the modules and patterns. Start with `size: 0.2` to `0.3` and increase it
+only after testing.
+
+Factories validate the layout when they are called and throw `INVALID_OPTIONS` for invalid values.
+Renderers also throw `INVALID_OPTIONS` for a plain option object such as `{source, size}`; pass the
+factory's result instead.
 
 ## Choose and prepare a source
 
-| Output                               | Source type                                                | Preparation                                                          |
-| ------------------------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------- |
-| Core SVG                             | `QRCodeDataImageURL`                                       | Convert bytes or a Blob to an embedded `data:image/...` URL          |
-| Browser Canvas or PNG-backed Image   | loaded `CanvasImageSource`                                 | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
-| Node.js PNG                          | PNG `Buffer`                                               | Read or download valid PNG bytes before rendering                    |
-| Framework SVG components             | `QRCodeDataImageURL` in `options.centerImage.source`       | Prepare outside render; memoize options when useful                  |
-| Framework Image or Canvas components | loaded `CanvasImageSource` in `options.centerImage.source` | Store the decoded source in state before mounting output             |
+| Output                             | Factory                                         | Source type                | Preparation                                                          |
+| ---------------------------------- | ----------------------------------------------- | -------------------------- | -------------------------------------------------------------------- |
+| Core SVG                           | `svgCenterImage()` from `@qrcodesdk/core`       | `QRCodeDataImageURL`       | Convert bytes or a Blob to an embedded `data:image/...` URL          |
+| Browser Canvas or PNG-backed Image | `canvasCenterImage()` from `@qrcodesdk/browser` | loaded `CanvasImageSource` | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
+| Node.js PNG                        | `pngCenterImage()` from `@qrcodesdk/node`       | PNG `Buffer`               | Read or download valid PNG bytes before rendering                    |
 
-QRCodeSDK never reads an image path or fetches a URL on your behalf.
+Load files and URLs in your application before calling a factory.
 
 ### Embedded data URL for SVG
 
-In Node.js, convert already-read bytes to an embedded image URL:
+In Node.js, read the file and convert its bytes to a data URL:
 
 ```ts
 import {readFile} from 'node:fs/promises';
 
-import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
 
 const bytes = await readFile('./logo.png');
 const source = `data:image/png;base64,${bytes.toString('base64')}` as QRCodeDataImageURL;
 
 const svg = qrcode('https://qrcodesdk.dev')
   .errorCorrection('H')
-  .render(QRCodeSVGRenderer({centerImage: {source, size: 0.3}}));
+  .render(QRCodeSVGRenderer({centerImage: svgCenterImage(source, {size: 0.3})}));
 ```
 
 In a browser, `FileReader.readAsDataURL()` prepares the same source type from a `Blob` or uploaded
-`File`.
+`File`. `svgCenterImage()` throws `INVALID_IMAGE_SOURCE` immediately when the source is not an
+embedded `data:image/...` URL.
 
 ### Loaded browser image source
 
 Decode the image before calling the synchronous Canvas or Image renderer:
 
 ```ts
-import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
+import {QRCodeCanvasRenderer, canvasCenterImage} from '@qrcodesdk/browser';
 import {qrcode} from '@qrcodesdk/core';
 
 const source = new Image();
@@ -90,13 +89,13 @@ await source.decode();
 
 const canvas = qrcode('https://qrcodesdk.dev')
   .errorCorrection('H')
-  .render(QRCodeCanvasRenderer({centerImage: {source, size: 0.3}}));
+  .render(QRCodeCanvasRenderer({centerImage: canvasCenterImage(source, {size: 0.3})}));
 ```
 
-Unloaded or zero-sized sources throw synchronously. When you render an Image element, export a
-Canvas, or create a PNG data URL, the browser must also keep the Canvas origin-clean. Use a
-same-origin image or a cross-origin image served with CORS permission and loaded with the matching
-`crossOrigin` setting.
+The source is checked when rendering: unloaded or zero-sized sources throw synchronously. When you
+render an Image element, export a Canvas, or create a PNG data URL, the browser must also keep the
+Canvas origin-clean. Use a same-origin image or a cross-origin image served with CORS permission and
+loaded with the matching `crossOrigin` setting.
 
 ### PNG Buffer for Node.js
 
@@ -104,43 +103,45 @@ same-origin image or a cross-origin image served with CORS permission and loaded
 import {readFile} from 'node:fs/promises';
 
 import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer, pngCenterImage} from '@qrcodesdk/node';
 
-const source = await readFile('./logo.png');
+const centerImage = pngCenterImage(await readFile('./logo.png'), {size: 0.3});
 const png = qrcode('https://qrcodesdk.dev')
   .errorCorrection('H')
-  .render(QRCodePNGRenderer({centerImage: {source, size: 0.3}}));
+  .render(QRCodePNGRenderer({centerImage}));
 ```
 
-The Node renderer accepts PNG bytes only. It decodes and alpha-composites the source in memory.
+`pngCenterImage()` accepts PNG bytes and decodes them once. Reuse its result across renders.
 
 ## Use prepared sources in framework components
 
 React, Vue, Svelte, and Angular do not load image sources inside their QR components. Prepare
-browser sources in application state, then pass stable options after decoding.
+browser sources in application state, then pass stable options after decoding. Image and Canvas
+components take `canvasCenterImage()`, and SVG components take `svgCenterImage()`. Every framework
+package exports both factories, so import them from the same package as the component.
 
 ### React
 
 ```tsx
 import {useState} from 'react';
 
-import {QRCodeImage} from '@qrcodesdk/react';
+import {QRCodeImage, type QRCodeImageOptions, canvasCenterImage} from '@qrcodesdk/react';
 
 export function QRCodeWithLogo() {
-  const [source, setSource] = useState<HTMLImageElement>();
+  const [options, setOptions] = useState<QRCodeImageOptions>();
 
   async function loadLogo(url: string) {
     const image = new Image();
     image.src = url;
     await image.decode();
-    setSource(image);
+    setOptions({
+      matrix: {errorCorrectionLevel: 'H'},
+      centerImage: canvasCenterImage(image, {size: 0.3}),
+    });
   }
 
-  return source ? (
-    <QRCodeImage
-      payload="https://qrcodesdk.dev"
-      options={{matrix: {errorCorrectionLevel: 'H'}, centerImage: {source, size: 0.3}}}
-    />
+  return options ? (
+    <QRCodeImage payload="https://qrcodesdk.dev" options={options} />
   ) : (
     <button type="button" onClick={() => void loadLogo('/logo.png')}>
       Load logo
@@ -155,13 +156,15 @@ export function QRCodeWithLogo() {
 <script setup lang="ts">
 import {computed, shallowRef} from 'vue';
 
-import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-import {QRCodeImage} from '@qrcodesdk/vue';
+import {QRCodeImage, type QRCodeImageOptions, canvasCenterImage} from '@qrcodesdk/vue';
 
 const source = shallowRef<HTMLImageElement>();
 const options = computed<QRCodeImageOptions | undefined>(() =>
   source.value
-    ? {matrix: {errorCorrectionLevel: 'H'}, centerImage: {source: source.value, size: 0.3}}
+    ? {
+        matrix: {errorCorrectionLevel: 'H'},
+        centerImage: canvasCenterImage(source.value, {size: 0.3}),
+      }
     : undefined,
 );
 
@@ -183,12 +186,13 @@ async function loadLogo(url: string) {
 
 ```svelte
 <script lang="ts">
-  import type {QRCodeImageOptions} from '@qrcodesdk/browser';
-  import {QRCodeImage} from '@qrcodesdk/svelte';
+  import {QRCodeImage, type QRCodeImageOptions, canvasCenterImage} from '@qrcodesdk/svelte';
 
   let source = $state<HTMLImageElement>();
   const options: QRCodeImageOptions | undefined = $derived(
-    source ? {matrix: {errorCorrectionLevel: 'H'}, centerImage: {source, size: 0.3}} : undefined,
+    source
+      ? {matrix: {errorCorrectionLevel: 'H'}, centerImage: canvasCenterImage(source, {size: 0.3})}
+      : undefined,
   );
 
   async function loadLogo(url: string) {
@@ -211,29 +215,30 @@ async function loadLogo(url: string) {
 ```angular-ts
 import {Component, signal} from '@angular/core';
 
-import {QRCodeImage} from '@qrcodesdk/angular';
+import {QRCodeImage, type QRCodeImageOptions, canvasCenterImage} from '@qrcodesdk/angular';
 
 @Component({
   selector: 'app-qrcode-with-logo',
   imports: [QRCodeImage],
   template: `
-    @if (source(); as image) {
-      <qrcode-image
-        [options]="{matrix: {errorCorrectionLevel: 'H'}, centerImage: {source: image, size: 0.3}}"
-        payload="https://qrcodesdk.dev" />
+    @if (options(); as options) {
+      <qrcode-image [options]="options" payload="https://qrcodesdk.dev" />
     } @else {
       <button (click)="loadLogo('/logo.png')" type="button">Load logo</button>
     }
   `,
 })
 export class QRCodeWithLogo {
-  readonly source = signal<HTMLImageElement | undefined>(undefined);
+  readonly options = signal<QRCodeImageOptions | undefined>(undefined);
 
   async loadLogo(url: string) {
     const image = new Image();
     image.src = url;
     await image.decode();
-    this.source.set(image);
+    this.options.set({
+      matrix: {errorCorrectionLevel: 'H'},
+      centerImage: canvasCenterImage(image, {size: 0.3}),
+    });
   }
 }
 ```

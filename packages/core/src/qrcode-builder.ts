@@ -88,7 +88,9 @@ export class QRCodeBuilder<
   }
 
   matrix(this: QRCodeBuilder<HasPayload, R>): QRCodeMatrix {
-    return (this.cachedMatrix ??= freezeMatrix(generateQRCodeMatrix(this._payload, this._options)));
+    return (this.cachedMatrix ??= Object.freeze(
+      generateQRCodeMatrix(this._payload, this._options),
+    ));
   }
 
   render<TOutput>(this: QRCodeBuilder<HasPayload, R>, renderer: QRCodeRenderer<TOutput>): TOutput;
@@ -116,11 +118,6 @@ export class QRCodeBuilder<
       this.currentRenderer,
     );
   }
-}
-
-function freezeMatrix(matrix: QRCodeMatrix): QRCodeMatrix {
-  for (const row of matrix) Object.freeze(row);
-  return Object.freeze(matrix);
 }
 
 export function qrcode(): QRCodeBuilder<NoPayload, NoRenderer>;

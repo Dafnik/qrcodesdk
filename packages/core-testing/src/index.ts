@@ -9,7 +9,18 @@ export type {QRCodeAutoMaskCombination} from './all-combinations';
 export {captureDownloads, mockCanvasRendering} from './dom';
 export type {CapturedDownload} from './dom';
 export {QR_CODE_ECI_TEST_FIXTURE, QR_CODE_TEST_FIXTURES} from './fixtures';
+export {matrixFromRows, matrixToRows} from './matrix';
 export type {QRCodeTestFixture} from './fixtures';
-export {QR_CODE_STYLING_FIXTURES, QR_CODE_STYLING_ROUNDTRIP_FIXTURES} from './styling-fixtures';
-export type {QRCodeStylingFixture} from './styling-fixtures';
+export {
+  createFixtureShape,
+  createFixtureStyle,
+  QR_CODE_STYLING_FIXTURES,
+  QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
+} from './styling-fixtures';
+export type {
+  QRCodeFixtureFinderShape,
+  QRCodeFixtureModuleShape,
+  QRCodeStylingFixture,
+  QRCodeStylingFixtureDesign,
+} from './styling-fixtures';
 export type {RGBAPixel} from './types';

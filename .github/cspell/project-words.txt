@@ -19,6 +19,8 @@ roundtrips
 Streamable
 organisation
 IHDR
+ɵassertCenterImage
+ɵparseShapePath
 ɵassertKnownKeys
 ɵassertOptionalString
 IDAT
@@ -27,3 +29,8 @@ PLTE
 truecolor
 libvips
 Colourspace
+subpath
+subpaths
+rects
+rasterizer
+rasterizes

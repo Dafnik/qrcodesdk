@@ -14,6 +14,11 @@ A QR code is a grid of small squares called modules. The three large squares in 
 finder patterns. They help scanners locate and orient the code. Other reserved patterns help a
 scanner read the grid and identify its encoding settings.
 
+A QRCodeSDK matrix keeps these roles. Next to its light and dark modules, it records the role of
+every module, such as finder ring, alignment center, or timing. That is how
+[styles](/guides/customize/#finder-patterns) shape finder and alignment patterns separately from the
+other modules. See [Module roles](/reference/custom-renderers/#module-roles) for every role.
+
 The remaining modules hold the payload and error-correction data. The encoder groups this data into
 bytes called codewords, then places their bits in a zigzag path through the grid. Some QR code sizes
 need extra remainder bits to fill that path.

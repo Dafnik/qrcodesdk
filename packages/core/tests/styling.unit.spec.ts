@@ -1,7 +1,8 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeError, QRCodeSVGRenderer, QRCodeTextRenderer} from '../src';
+import {QRCodeError, QRCodeSVGRenderer, QRCodeTextRenderer, svgCenterImage} from '../src';
 import {createQRCodeStyler} from '../src/drawing';
+import {fromRows} from './helpers';
 
 describe('styling validation', () => {
   test.each([
@@ -9,8 +10,13 @@ describe('styling validation', () => {
     [{quietZone: -1}, 'style.quietZone'],
     [{foreground: '#12345'}, 'style.foreground'],
     [{background: 'red'}, 'style.background'],
-    [{modules: {shape: 'hexagon'}}, 'style.modules.shape'],
-    [{finder: {outer: {shape: 'diagonal'}}}, 'style.finder.outer.shape'],
+    [{modules: {module: 'M0 0h1v1h-1z'}}, 'style.modules.module'],
+    [{modules: {}}, 'style.modules.module'],
+    [{modules: {finderRing: 'm0 0z'}}, 'style.modules.module'],
+    [{modules: {module: ['m0 0h1v1h-1z', 'm0 0']}}, 'style.modules.module[1]'],
+    [{modules: {module: Array.from({length: 17}, () => 'm0 0h1z')}}, 'style.modules.module'],
+    [{finder: 'square'}, 'style.finder'],
+    [{alignment: {}}, 'style.alignment'],
     [{unknown: true}, 'style.unknown'],
     [{modules: {unknown: true}}, 'style.modules.unknown'],
   ])('rejects invalid visual style %#', (style, field) => {
@@ -29,10 +35,30 @@ describe('styling validation', () => {
   });
 
   test.each([
+    'm0 0hz',
+    'm0 0l1z',
+    'm0 0h1v1h-1az',
+    'm0 0a1 1 0 2 1 1 1z',
+    'm0 0h1e999z',
+    'm0 0m1 1z',
+    'm0 0h1zz',
+    'm0,,0z',
+    'm0\u000b0h1v1h-1z',
+    'm0\u00a00h1v1h-1z',
+  ])('rejects malformed relative paths: %s', (module) => {
+    expect(() => QRCodeSVGRenderer({style: {modules: {module}}})).toThrowError(
+      expect.objectContaining({
+        code: 'INVALID_OPTIONS',
+        details: {field: 'style.modules.module', value: module},
+      }),
+    );
+  });
+
+  test.each([
     [null, 'style'],
     [[], 'style'],
     [{modules: null}, 'style.modules'],
-    [{finder: {outer: []}}, 'style.finder.outer'],
+    [{modules: []}, 'style.modules'],
   ])('rejects malformed visual style groups %#', (style, field) => {
     expect(() => createQRCodeStyler(style as never)).toThrowError(
       expect.objectContaining({details: expect.objectContaining({field})}),
@@ -56,9 +82,14 @@ describe('styling validation', () => {
     expect(() => QRCodeSVGRenderer({accessibility: {title: '\0'}})).toThrowError(
       expect.objectContaining({code: 'INVALID_OPTIONS'}),
     );
+    expect(() => svgCenterImage('data:image/png;base64,a\0' as never)).toThrowError(
+      expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}),
+    );
     expect(() =>
-      QRCodeSVGRenderer({centerImage: {source: 'data:image/png;base64,a\0' as never}}),
-    ).toThrowError(expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}));
+      QRCodeSVGRenderer({centerImage: {source: 'data:image/png;base64,a', size: 0.2}} as never),
+    ).toThrowError(
+      expect.objectContaining({details: expect.objectContaining({field: 'centerImage'})}),
+    );
     expect(() => QRCodeSVGRenderer({centerImage: []} as never)).toThrowError(
       expect.objectContaining({details: expect.objectContaining({field: 'centerImage'})}),
     );
@@ -94,7 +125,7 @@ describe('styling validation', () => {
     const output = QRCodeTextRenderer({
       style: {moduleSize: 1, quietZone: 0},
       ansi: {foreground: '#ff000080', background: '#0000ff80'},
-    })([[1]]);
+    })(fromRows([[1]]));
 
     expect(output).toContain('\u001b[38;2;191;63;127m');
     expect(output).toContain('\u001b[48;2;127;127;255m');

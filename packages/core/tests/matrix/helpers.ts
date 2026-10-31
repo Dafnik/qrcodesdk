@@ -2,12 +2,7 @@ import {expect} from 'vitest';
 
 import {augmentBCH} from '../../src/matrix/augment-bch';
 import {getGF256GeneratorPolynomial} from '../../src/matrix/error-correction';
-import type {
-  QRCodeMask,
-  QRCodeMatrix,
-  QRCodeMutableMatrix,
-  QRCodePolynomial,
-} from '../../src/types';
+import type {QRCodeMask, QRCodeMatrix, QRCodePolynomial} from '../../src/types';
 
 export const QR_CODE_MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const satisfies readonly QRCodeMask[];
 
@@ -34,13 +29,12 @@ export function bitsToBytes(bits: string, maxLength: number): number[] {
   return bytes.slice(0, maxLength);
 }
 
-export function expectSquareBinaryMatrix(matrix: QRCodeMatrix, size: number): void {
-  expect(matrix).toHaveLength(size);
-  for (let index = 0; index < matrix.length; index++) {
-    const row = matrix[index]!;
-    expect(row).toHaveLength(size);
-    expect(row.every((value) => value === 0 || value === 1)).toBe(true);
-  }
+export function expectSquareMatrix(matrix: QRCodeMatrix, size: number): void {
+  expect(matrix.size).toBe(size);
+  expect(matrix.modules).toHaveLength(size * size);
+  expect(matrix.roles).toHaveLength(size * size);
+  expect(matrix.modules.every((value) => value === 0 || value === 1)).toBe(true);
+  expect(matrix.roles.every((value) => value <= 8)).toBe(true);
 }
 
 export function formatBitsFor(eccLevel: number, mask: QRCodeMask): number[] {
@@ -49,16 +43,18 @@ export function formatBitsFor(eccLevel: number, mask: QRCodeMask): number[] {
 }
 
 export function formatBitsMatch(
-  matrix: QRCodeMutableMatrix,
+  modules: ArrayLike<number>,
+  n: number,
   eccLevel: number,
   mask: QRCodeMask,
 ): boolean {
-  const n = matrix.length;
   const rows = [0, 1, 2, 3, 4, 5, 7, 8, n - 7, n - 6, n - 5, n - 4, n - 3, n - 2, n - 1];
   const columns = [n - 1, n - 2, n - 3, n - 4, n - 5, n - 6, n - 7, n - 8, 7, 5, 4, 3, 2, 1, 0];
   const bits = formatBitsFor(eccLevel, mask);
 
-  return bits.every((bit, i) => matrix[rows[i]][8] === bit && matrix[8][columns[i]] === bit);
+  return bits.every(
+    (bit, i) => modules[rows[i]! * n + 8] === bit && modules[8 * n + columns[i]!] === bit,
+  );
 }
 
 // Generator polynomials of every degree used by QR codes, indexed by degree (0–30).

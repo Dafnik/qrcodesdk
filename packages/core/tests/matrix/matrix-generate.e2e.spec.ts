@@ -11,7 +11,8 @@ import {getNumberOfAvailableBitsForData} from '../../src/matrix/get-number-of-av
 import {MODES_MAP} from '../../src/matrix/mode';
 import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
 import {createSingleSegment} from '../../src/matrix/segments';
-import {expectSquareBinaryMatrix} from './helpers';
+import {toRows} from '../helpers';
+import {expectSquareMatrix} from './helpers';
 
 const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
 
@@ -40,9 +41,50 @@ const CAPACITY_CASES = Array.from({length: 40}, (_, index) => (index + 1) as QRC
 );
 
 describe('qrcode().matrix()', () => {
-  test('generates square binary matrices with expected sizes', () => {
-    expectSquareBinaryMatrix(qrcode('123456789').version(1).mask(1).matrix(), 21);
-    expectSquareBinaryMatrix(qrcode('123456789').version(40).mask(1).matrix(), 177);
+  test('generates square matrices with expected sizes', () => {
+    expectSquareMatrix(qrcode('123456789').version(1).mask(1).matrix(), 21);
+    expectSquareMatrix(qrcode('123456789').version(40).mask(1).matrix(), 177);
+  });
+
+  test('keeps modules binary and shares role grids between matrices of one version', () => {
+    const matrix = qrcode('roles').version(2).mask(0).matrix();
+    const other = qrcode('other roles').version(2).mask(3).matrix();
+    const rows = toRows(matrix);
+    const finder = [
+      [1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1],
+    ];
+
+    expect(rows.slice(0, 7).map((row) => row.slice(0, 7))).toEqual(finder);
+    expect(rows[18]!.slice(16, 21)).toEqual([1, 0, 1, 0, 1]);
+    expect(other.roles).toBe(matrix.roles);
+    expect(matrix.roles[18 * 25 + 18]).toBe(5);
+    expect(matrix.roles[2 * 25 + 2]).toBe(2);
+  });
+
+  test('prevents module and shared role mutations from changing later output', () => {
+    const builder = qrcode('immutable matrix').version(2).mask(0);
+    const matrix = builder.matrix();
+    const expected = qrcode('immutable matrix').version(2).mask(0).matrix();
+
+    expect(Object.isFrozen(matrix.modules)).toBe(true);
+    expect(Object.isFrozen(matrix.roles)).toBe(true);
+    for (const values of [matrix.modules, matrix.roles]) {
+      expect(() => (values as number[]).fill(0)).toThrow(TypeError);
+      expect(() => {
+        (values as number[])[0] = 0;
+      }).toThrow(TypeError);
+      const copy = values.slice();
+      copy.fill(0);
+      expect(values).not.toEqual(copy);
+    }
+    expect(builder.matrix()).toEqual(expected);
+    expect(qrcode('immutable matrix').version(2).mask(0).matrix()).toEqual(expected);
   });
 
   test('auto-detects modes and versions', () => {
@@ -55,7 +97,7 @@ describe('qrcode().matrix()', () => {
     expect(qrcode('hello world').mask(1).matrix()).toEqual(
       qrcode('hello world').mode('octet').mask(1).matrix(),
     );
-    expect(qrcode('1'.repeat(42)).mask(1).matrix()).toHaveLength(25);
+    expect(qrcode('1'.repeat(42)).mask(1).matrix().size).toBe(25);
   });
 
   test('uses mixed modes automatically while explicit modes remain forced', () => {
@@ -63,15 +105,15 @@ describe('qrcode().matrix()', () => {
     const automatic = qrcode(payload).mask(1).matrix();
     const forcedOctet = qrcode(payload).mode('octet').mask(1).matrix();
 
-    expect(automatic).toHaveLength(25);
-    expect(forcedOctet).toHaveLength(29);
+    expect(automatic.size).toBe(25);
+    expect(forcedOctet.size).toBe(29);
     expect(qrcode(payload).version(2).mask(1).matrix()).toEqual(automatic);
     expect(qrcode(payload).mode('octet').mode(undefined).mask(1).matrix()).toEqual(automatic);
     expect(
       qrcode(payload).options({mode: 'octet'}).options({mode: undefined}).mask(1).matrix(),
     ).toEqual(automatic);
-    expect(qrcode('ABCDE12345678?A1A').version(1).matrix()).toHaveLength(21);
-    expect(qrcode('ABCDE12345678?A1A').eci(true).matrix()).toHaveLength(25);
+    expect(qrcode('ABCDE12345678?A1A').version(1).matrix().size).toBe(21);
+    expect(qrcode('ABCDE12345678?A1A').eci(true).matrix().size).toBe(25);
     expect(() => qrcode('ABCDE12345678?A1A').eci(true).version(1).matrix()).toThrow(
       'QRCode: Payload too large',
     );
@@ -106,7 +148,7 @@ describe('qrcode().matrix()', () => {
       qrcode('123456789')
         .mode('numeric')
         .mask(1)
-        .render((value) => value.length),
+        .render((value) => value.size),
     ).toBe(21);
     // @ts-expect-error Testing Types
     expect(() => qrcode('123456789').render()).toThrow('QRCode: Renderer missing');
@@ -125,9 +167,8 @@ describe('qrcode().matrix()', () => {
     expect(builder.render()).toBe(matrix);
     expect(builder.render()).toBe(matrix);
     expect(Object.isFrozen(matrix)).toBe(true);
-    expect(Object.isFrozen(matrix[0])).toBe(true);
     expect(() => {
-      (matrix as never as number[][])[0]![0] = 0;
+      (matrix as {size: number}).size = 0;
     }).toThrow(TypeError);
     expect(renderedMatrices).toEqual([matrix, matrix]);
     expect(builder.payload('new payload').matrix()).not.toBe(matrix);
@@ -135,7 +176,7 @@ describe('qrcode().matrix()', () => {
   });
 
   test('builder options are immutable and retain the selected renderer', () => {
-    const original = qrcode('123').renderer((matrix) => matrix.length);
+    const original = qrcode('123').renderer((matrix) => matrix.size);
     const configuredBuilders = [
       original.mode('numeric'),
       original.options({mode: 'numeric'}),
@@ -158,7 +199,7 @@ describe('qrcode().matrix()', () => {
       const exactData = DATA_BY_MODE[mode].repeat(capacity);
       const oversizedData = `${exactData}${DATA_BY_MODE[mode]}`;
 
-      expectSquareBinaryMatrix(
+      expectSquareMatrix(
         qrcode(exactData)
           .mode(mode)
           .version(version)
@@ -238,9 +279,9 @@ describe('qrcode().matrix()', () => {
   });
 
   test('accepts non-negative safe integer payload', () => {
-    expect(qrcode(0).matrix()).toHaveLength(21);
-    expect(qrcode(12345).matrix()).toHaveLength(21);
-    expect(qrcode(Number.MAX_SAFE_INTEGER).matrix()).toHaveLength(21);
+    expect(qrcode(0).matrix().size).toBe(21);
+    expect(qrcode(12345).matrix().size).toBe(21);
+    expect(qrcode(Number.MAX_SAFE_INTEGER).matrix().size).toBe(21);
     for (const payload of [null, true, {}, []]) {
       expect(() => qrcode(payload as never).matrix()).toThrow(
         expect.objectContaining({code: 'INVALID_PAYLOAD'}),

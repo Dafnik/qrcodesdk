@@ -10,7 +10,8 @@ related:
 ---
 
 `QRCodeTextRenderer` returns a string with no trailing newline. It exposes only the dimensions a
-terminal can represent through `QRCodeTextStyle`; graphical colors and shapes are not accepted.
+terminal can represent through `QRCodeTextStyle`; graphical colors, shapes, and style parts are not
+accepted. Every dark module, including finder and alignment modules, prints as a dark cell.
 
 ```ts
 import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
