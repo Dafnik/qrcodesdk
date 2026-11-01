@@ -80,7 +80,7 @@
     "@repo/core-testing": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@vue/server-renderer": "3.5.43",
+    "@vue/server-renderer": "3.5.44",
     "@vue/test-utils": "2.5.1",
     "jsdom": "catalog:",
     "tsdown": "catalog:",

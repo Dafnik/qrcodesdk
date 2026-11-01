@@ -29,3 +29,4 @@ JSDOM
 vitesse
 Vuedotjs
 nums
+rehype

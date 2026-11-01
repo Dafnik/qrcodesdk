@@ -1,0 +1,9 @@
+diff --git a/src/middleware.js b/src/middleware.js
+--- a/src/middleware.js
++++ b/src/middleware.js
+@@ -1,4 +1,4 @@
+-import { rehype } from "../node_modules/.pnpm/rehype@13.0.2/node_modules/rehype/index.js";
++import { rehype } from "rehype";
+ //#region packages/astro-angular/src/middleware.ts
+ var processor = rehype();
+ var onRequest = async (_ctx, next) => {
