@@ -48,11 +48,13 @@ See [Customize appearance](/guides/customize/) for every color, shape, and finde
 
 The renderer synchronously returns a Node.js `Buffer` containing a complete PNG file. Its pixel
 width and height are `style.moduleSize × (matrix width + 2 × style.quietZone)`. Shaped edges are
-anti-aliased, and RGBA colors keep their alpha.
+anti-aliased, and RGBA colors keep their alpha. Output above 8192 × 8192 pixels (67,108,864 pixels)
+throws `QRCodeError` with code `INVALID_OPTIONS` before any pixels are allocated.
 
 ## Renderer-specific options
 
-`QRCodePNGRendererOptions` accepts `style`, `centerImage`, and `compression`. It rejects every other key.
+`QRCodePNGRendererOptions` accepts `style`, `centerImage`, and `compression`. TypeScript rejects
+every other key; the renderer does not repeat that check at runtime.
 
 | Option              | Type                   | Default         | Effect                                           |
 | ------------------- | ---------------------- | --------------- | ------------------------------------------------ |
@@ -90,14 +92,14 @@ const png = qrcode('https://qrcodesdk.dev')
 ## Renderer-specific constraints
 
 - `compression.level` must be a safe integer from `0` through `9`.
-- The center-image source must be a Node.js `Buffer` containing valid PNG bytes, at most 16 MiB and
+- The center-image source must be a `Uint8Array`, such as a Node.js `Buffer`, containing valid PNG bytes, at most 16 MiB and
   16,777,216 pixels. Other formats, paths, and URLs are not decoded. `pngCenterImage()` throws
   `INVALID_IMAGE_SOURCE` for invalid sources and `INVALID_OPTIONS` for an invalid layout.
 - Pass a `centerImage` created with `pngCenterImage()`; TypeScript checks the factory result type.
 - Center images preserve aspect ratio, are composited with alpha, and are contained within the
   configured square without cropping.
 - Option values are copied when `QRCodePNGRenderer()` is called. The center image is
-  decoded when `pngCenterImage()` is called, so later changes to the source Buffer have no effect.
+  decoded when `pngCenterImage()` is called, so later changes to the source bytes have no effect.
 
 ## Related guides
 

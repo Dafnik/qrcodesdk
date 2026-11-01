@@ -9,8 +9,10 @@ export type {
   QRCodeSVGProps,
 } from './types.js';
 export type {
+  QRCodeCanvasAccessibilityOptions,
   QRCodeCanvasCenterImage,
   QRCodeCanvasOptions,
+  QRCodeImageAccessibilityOptions,
   QRCodeImageOptions,
 } from '@qrcodesdk/browser';
 export type {
@@ -21,6 +23,7 @@ export type {
   QRCodeMode,
   QRCodePayload,
   QRCodeVersion,
+  QRCodeSVGAccessibilityOptions,
   QRCodeSVGCenterImage,
   QRCodeSVGOptions,
 } from '@qrcodesdk/core';

@@ -22,21 +22,20 @@ describe('React QR code component handles', () => {
   });
 
   test('exports the components, shapes, and center-image factories', () => {
-    expect(Object.keys(reactApi).sort()).toEqual(
-      expect.arrayContaining([
-        'QRCodeCanvas',
-        'QRCodeImage',
-        'QRCodeSVG',
-        'alignment',
-        'canvasCenterImage',
-        'circle',
-        'customShape',
-        'diagonal',
-        'finder',
-        'rounded',
-        'svgCenterImage',
-      ]),
-    );
+    // An exact list keeps internal helpers out of the package root.
+    expect(Object.keys(reactApi).sort()).toEqual([
+      'QRCodeCanvas',
+      'QRCodeImage',
+      'QRCodeSVG',
+      'alignment',
+      'canvasCenterImage',
+      'circle',
+      'customShape',
+      'diagonal',
+      'finder',
+      'rounded',
+      'svgCenterImage',
+    ]);
   });
 
   test('accepts payload and options props', () => {

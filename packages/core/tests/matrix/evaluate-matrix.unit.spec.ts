@@ -152,9 +152,8 @@ function evaluateMatrixLegacy(matrix: Rows): number {
     }
   }
 
-  return (
-    score + 10 * ((Math.abs(numberOfBlackSquares / matrixLength / matrixLength - 0.5) / 0.05) | 0)
-  );
+  const total = matrixLength * matrixLength;
+  return score + 10 * Math.floor((Math.abs(numberOfBlackSquares * 2 - total) * 10) / total);
 }
 
 function collectGroups(modules: readonly number[]): number[] {

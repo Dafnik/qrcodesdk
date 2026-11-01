@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
 import type {QRCodeVersion} from '../../src';
+import {applyMaskToMatrix} from '../../src/matrix/apply-mask-to-matrix';
 import {
   ECC_LEVELS_MAP,
   ECC_LEVEL_H,
@@ -170,9 +171,7 @@ describe('matrix constants', () => {
       [2, 3],
       [5, 7],
     ] as const;
-    expect(
-      MASK_FUNCTIONS.map((maskFunction) => points.map(([i, j]) => maskFunction(i, j))),
-    ).toEqual([
+    const expected = [
       [true, false, false, false, true],
       [true, true, false, true, false],
       [true, false, true, true, false],
@@ -181,7 +180,23 @@ describe('matrix constants', () => {
       [true, true, true, true, false],
       [true, true, true, true, false],
       [true, false, false, false, true],
-    ]);
+    ];
+    // Production masks, applied to an all-data matrix, toggle exactly the predicate's modules.
+    const size = 8;
+    const applied = QR_CODE_MASKS.map((mask) => {
+      const modules = applyMaskToMatrix(
+        new Uint8Array(size * size),
+        new Uint8Array(size * size),
+        size,
+        mask,
+      );
+      return points.map(([i, j]) => modules[i * size + j] === 1);
+    });
+
+    expect(
+      MASK_FUNCTIONS.map((maskFunction) => points.map(([i, j]) => maskFunction(i, j))),
+    ).toEqual(expected);
+    expect(applied).toEqual(expected);
   });
 
   test('decodes the packed error-correction tables', () => {

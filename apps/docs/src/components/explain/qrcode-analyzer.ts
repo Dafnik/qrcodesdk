@@ -4,11 +4,11 @@ import {
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
   type QRCodeMode,
+  QRCodeTextRenderer,
   type QRCodeTextStyle,
   type QRCodeVersion,
   qrcode,
 } from '@qrcodesdk/core';
-import {ɵcreateQRCodeStyler as createQRCodeStyler} from '@qrcodesdk/core/internal';
 import {QR_CODE_MODULE_ROLES} from '@qrcodesdk/core/matrix';
 
 /** `1` for a dark module and `0` for a light module. */
@@ -99,10 +99,10 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
   const {size} = matrix;
   const version = ((size - 17) / 4) as QRCodeVersion;
   const mask = options.mask ?? resolveMask(options.payload, matrixOptions, matrix, version);
-  const drawing = createQRCodeStyler({
-    moduleSize: options.moduleSize,
-    quietZone: options.quietZone,
-  })(matrix);
+  // The text renderer validates the shared dimensions without drawing anything.
+  QRCodeTextRenderer({style: {moduleSize: options.moduleSize, quietZone: options.quietZone}});
+  const moduleSize = options.moduleSize ?? 5;
+  const quietZone = options.quietZone ?? 4;
   const placements = createPlacements(matrix);
   const codewordBitCount = Math.floor(placements.length / 8) * 8;
   const placementByIndex = new Map(
@@ -138,9 +138,9 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
     mode: resolveMode(options),
     errorCorrectionLevel: options.errorCorrectionLevel ?? 'M',
     mask,
-    moduleSize: drawing.moduleSize,
-    quietZone: drawing.quietZone,
-    viewSize: drawing.viewSize,
+    moduleSize,
+    quietZone,
+    viewSize: size + 2 * quietZone,
   };
 }
 

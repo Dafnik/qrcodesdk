@@ -89,7 +89,7 @@ Import a shape from `@qrcodesdk/core/style` and pass it as `modules`. To keep sq
 | -------------------- | -------- | ------- | ---------------------------------------------------------------------- |
 | `rounded({radius})`  | `radius` | `0.5`   | Rounds module corners that face no dark neighbor; `0` to `1` modules   |
 | `diagonal({radius})` | `radius` | `0.5`   | Rounds only the top-left and bottom-right corners for a leaf-like look |
-| `circle({size})`     | `size`   | `1`     | Draws each module as a dot; diameter greater than `0` and at most `1`  |
+| `circle({size})`     | `size`   | `1`     | Draws each module as a dot; diameter from `0.001` to `1`               |
 
 Connected dark modules keep straight shared edges with `rounded()` and `diagonal()`. Modules drawn
 by finder/alignment styles or cleared for center images count as light neighbors, so the remaining modules round against
@@ -221,8 +221,11 @@ Built-in `rounded()` and `diagonal()` shapes contain an opaque `QRCodeModulePatt
 to neighboring dark modules. Its representation and neighbor masks are internal; custom shapes
 supply a single path for each piece.
 
-`customShape()` validates its paths and throws `INVALID_OPTIONS` for unsupported commands or open
-subpaths. Its result contains opaque `QRCodeShapePiece` values. Renderer factories reuse them
+`customShape()` validates its paths and throws `INVALID_OPTIONS` for unsupported commands, open
+subpaths, or geometry outside the piece's box. `module` and `alignmentCenter` paths must stay within
+1 × 1 module, `finderRing` within 7 × 7, `finderCenter` within 3 × 3, and `alignmentRing` within
+5 × 5. Curves and arcs count with their full extent, so pieces never overlap and SVG, Canvas, and
+PNG fill them identically. Its result contains opaque `QRCodeShapePiece` values. Renderer factories reuse them
 without parsing the paths again.
 
 ## Bundle size

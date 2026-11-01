@@ -19,6 +19,7 @@ const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}
 
 describe('Svelte QR code components', () => {
   beforeEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
     mockCanvasRendering(vi);
   });
@@ -66,6 +67,8 @@ describe('Svelte QR code components', () => {
     const svg = renderComponent(QRCodeSVG, {payload: 'HELLO', options: svgOptions});
     const image = renderComponent(QRCodeImage, {payload: 'HELLO', options: imageOptions});
 
+    // The SVG download revokes its object URL after a delay.
+    vi.useFakeTimers({toFake: ['setTimeout']});
     svg.component.download('qrcodesdk');
     image.component.download('qrcodesdk');
 
@@ -73,7 +76,8 @@ describe('Svelte QR code components', () => {
       {href: 'blob:qrcode-svg', filename: 'qrcodesdk.svg'},
       {href: expect.stringMatching(/^data:image\/png;base64,/), filename: 'qrcodesdk.png'},
     ]);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 

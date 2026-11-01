@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeSVGRenderer, qrcode, svgCenterImage} from '../src';
+import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode, svgCenterImage} from '../src';
 import {ɵtoQRCodePathData as toQRCodePathData} from '../src/internal';
 import type {PreparedShapePath} from '../src/shape-path';
 import {circle, customShape, finder, rounded} from '../src/style';
@@ -144,8 +144,14 @@ describe('svgCenterImage', () => {
   });
 
   test('validates data URL content when the image is created', () => {
-    expect(() => svgCenterImage('data:image/png;base64,')).toThrowError(
-      expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}),
-    );
+    for (const source of [
+      'data:image/png;base64,',
+      'http:image/png,AAAA',
+      'https://example.com/image/png,AAAA',
+    ]) {
+      expect(() => svgCenterImage(source as QRCodeDataImageURL)).toThrowError(
+        expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}),
+      );
+    }
   });
 });

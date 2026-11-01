@@ -5,7 +5,8 @@ import {circle, diagonal, rounded} from '@qrcodesdk/core/style';
 
 import {rasterizeShapePath} from '../src/raster';
 
-type PreparedPath = ReturnType<typeof import('@qrcodesdk/core/internal').ɵprepareShapePath>;
+// The internal representation of a prepared shape piece.
+type PreparedPath = {readonly data: string};
 
 function pixelCoverage(shape: QRCodeModuleShape, neighbors: number, x: number, y: number): number {
   const module = shape.module as unknown as PreparedPath | readonly (PreparedPath | undefined)[];

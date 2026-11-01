@@ -15,21 +15,20 @@ describe('Vue QR code component API', () => {
   });
 
   test('exports the components, shapes, and center-image factories', () => {
-    expect(Object.keys(vueApi).sort()).toEqual(
-      expect.arrayContaining([
-        'QRCodeCanvas',
-        'QRCodeImage',
-        'QRCodeSVG',
-        'alignment',
-        'canvasCenterImage',
-        'circle',
-        'customShape',
-        'diagonal',
-        'finder',
-        'rounded',
-        'svgCenterImage',
-      ]),
-    );
+    // An exact list keeps internal helpers out of the package root.
+    expect(Object.keys(vueApi).sort()).toEqual([
+      'QRCodeCanvas',
+      'QRCodeImage',
+      'QRCodeSVG',
+      'alignment',
+      'canvasCenterImage',
+      'circle',
+      'customShape',
+      'diagonal',
+      'finder',
+      'rounded',
+      'svgCenterImage',
+    ]);
   });
 
   test('includes wrapper attributes', () => {

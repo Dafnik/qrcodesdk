@@ -8,7 +8,7 @@ describe('public API types', () => {
   test('exports the PNG renderer options and opt-in center images', () => {
     expect(pngCenterImage).toBeTypeOf('function');
     expectTypeOf(pngCenterImage).parameters.toEqualTypeOf<
-      [source: Buffer, layout?: QRCodeCenterImageLayout]
+      [source: Uint8Array, layout?: QRCodeCenterImageLayout]
     >();
     expectTypeOf<QRCodePNGRendererOptions['centerImage']>().toEqualTypeOf<
       QRCodePNGCenterImage | undefined

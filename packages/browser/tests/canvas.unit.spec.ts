@@ -81,4 +81,34 @@ describe('QRCodeCanvasRenderer', () => {
     expectPixel(canvas, center, center, {red: 255, green: 0, blue: 0, alpha: 255});
     expectPixel(canvas, padding, center, WHITE);
   });
+
+  test('rejects center image sources that are not ready when rendering', async () => {
+    const render = (source: CanvasImageSource) =>
+      QRCodeCanvasRenderer({centerImage: canvasCenterImage(source)})(matrixFromRows([[1]]));
+    const invalidSource = expect.objectContaining({
+      name: 'QRCodeError',
+      code: 'INVALID_IMAGE_SOURCE',
+    });
+
+    const pending = new Image();
+    pending.src = 'data:image/png;base64,iVBORw0KGgo=';
+    if (!pending.complete) expect(() => render(pending)).toThrowError(invalidSource);
+
+    const empty = document.createElement('canvas');
+    empty.width = empty.height = 0;
+    expect(() => render(empty)).toThrowError(invalidSource);
+
+    const source = document.createElement('canvas');
+    source.width = source.height = 2;
+    const bitmap = await createImageBitmap(source);
+    bitmap.close();
+    expect(() => render(bitmap)).toThrowError(invalidSource);
+  });
+
+  test('rejects a loaded image without intrinsic dimensions', () => {
+    // An image without a source is complete but has no natural size.
+    expect(() =>
+      QRCodeCanvasRenderer({centerImage: canvasCenterImage(new Image())})(matrixFromRows([[1]])),
+    ).toThrowError(expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}));
+  });
 });

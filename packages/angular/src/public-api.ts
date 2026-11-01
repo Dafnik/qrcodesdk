@@ -5,9 +5,12 @@
 export {QRCodeCanvas} from './lib/QRCodeCanvas';
 export {QRCodeImage} from './lib/QRCodeImage';
 export {QRCodeSVG} from './lib/QRCodeSVG';
+export type {QRCodeDownloadHandle} from './lib/types';
 export type {
+  QRCodeCanvasAccessibilityOptions,
   QRCodeCanvasCenterImage,
   QRCodeCanvasOptions,
+  QRCodeImageAccessibilityOptions,
   QRCodeImageOptions,
 } from '@qrcodesdk/browser';
 export type {
@@ -18,6 +21,7 @@ export type {
   QRCodeMode,
   QRCodePayload,
   QRCodeVersion,
+  QRCodeSVGAccessibilityOptions,
   QRCodeSVGCenterImage,
   QRCodeSVGOptions,
 } from '@qrcodesdk/core';

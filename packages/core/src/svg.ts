@@ -14,6 +14,8 @@ import type {
   QRCodeVisualStyle,
 } from './types';
 
+export type {QRCodeCenterImageLayout} from './types';
+
 export type QRCodeDataImageURL = `data:image/${string}`;
 declare const svgCenterImageBrand: unique symbol;
 /** A center image for SVG output, created with `svgCenterImage()`. */
@@ -90,6 +92,7 @@ export function svgCenterImage(
 }
 
 function isValidImageDataURL(value: QRCodeDataImageURL): boolean {
+  if (!value.startsWith('data:')) return false;
   const commaIndex = value.indexOf(',');
   if (commaIndex < 0 || commaIndex === value.length - 1) return false;
   return /^image\/[a-z0-9.+-]+$/i.test(value.slice(5, commaIndex).split(';', 1)[0] ?? '');

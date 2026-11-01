@@ -1,11 +1,33 @@
-import type {QRCodeColor, QRCodeMatrix, QRCodeRenderer, QRCodeVisualStyle} from '@qrcodesdk/core';
+import type {
+  QRCodeCenterImageLayout,
+  QRCodeColor,
+  QRCodeMatrix,
+  QRCodeRenderer,
+  QRCodeVisualStyle,
+} from '@qrcodesdk/core';
 import {QRCodeError} from '@qrcodesdk/core/error';
-import {ɵcreateQRCodeStyler as createQRCodeStyler} from '@qrcodesdk/core/internal';
+import {
+  type ɵQRCodeDrawing as QRCodeDrawing,
+  type ɵQRCodeStylePart as QRCodeStylePart,
+  ɵcreateCenterImageStore as createCenterImageStore,
+  ɵcreateQRCodeCenterImagePlacement as createQRCodeCenterImagePlacement,
+  ɵcreateQRCodeStyler as createQRCodeStyler,
+} from '@qrcodesdk/core/internal';
 
-import {type QRCodePNGCenterImage, resolvePNGCenterImage} from './center-image';
+import {compositeImage, decodeImageSource} from './center-image';
 import {type Color, blendPixel} from './pixels';
 import {type PNGImage, encodePNG} from './png-codec';
 import {type Coverage, rasterizeShapePath} from './raster';
+
+declare const pngCenterImageBrand: unique symbol;
+/** A center image for PNG output, created with `pngCenterImage()`. */
+export type QRCodePNGCenterImage = {readonly [pngCenterImageBrand]: true};
+
+// Kept private so published declarations do not reference internal drawing types.
+const centerImages = createCenterImageStore<{
+  readonly part: QRCodeStylePart;
+  draw(png: PNGImage, drawing: QRCodeDrawing): void;
+}>();
 
 export type QRCodePNGRendererOptions = {
   readonly style?: QRCodeVisualStyle;
@@ -15,8 +37,12 @@ export type QRCodePNGRendererOptions = {
 
 type PackedColor = Color & {packed: number};
 
+// 8192 x 8192 pixels. Pixels and coverage need 8 bytes per pixel, so larger output risks exhausting
+// memory instead of failing with an error.
+const MAX_OUTPUT_PIXELS = 67_108_864;
+
 export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
-  const centerImage = resolvePNGCenterImage(options?.centerImage);
+  const centerImage = centerImages.resolve(options?.centerImage);
   const draw = createQRCodeStyler(options?.style, [centerImage?.part]);
   const compressionLevel = resolveCompressionLevel(options?.compression?.level);
   // Shape paths repeat across renders at one module size, so each is rasterized once.
@@ -25,6 +51,13 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
   return (matrix: QRCodeMatrix) => {
     const drawing = draw(matrix);
     const {moduleSize: scale, outputSize} = drawing;
+    if (outputSize * outputSize > MAX_OUTPUT_PIXELS) {
+      throw new QRCodeError(
+        'INVALID_OPTIONS',
+        `QR code PNG output must not exceed ${MAX_OUTPUT_PIXELS} pixels, received ${outputSize} x ${outputSize}`,
+        {details: {field: 'dimensions', value: outputSize}},
+      );
+    }
     const pixels = new Uint32Array(outputSize * outputSize);
     const png: PNGImage = {
       width: outputSize,
@@ -88,6 +121,23 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
     centerImage?.draw(png, drawing);
     return encodePNG(png, compressionLevel);
   };
+}
+
+/** Creates a PNG center image from PNG bytes, which are validated and decoded once. */
+export function pngCenterImage(
+  source: Uint8Array,
+  layout?: QRCodeCenterImageLayout,
+): QRCodePNGCenterImage {
+  const {part, place} = createQRCodeCenterImagePlacement(layout);
+  const image = decodeImageSource(source);
+  return centerImages.create({
+    part,
+    draw(png, drawing) {
+      const box = place(drawing);
+      const scale = drawing.moduleSize;
+      compositeImage(png, image, box.x * scale, box.y * scale, box.size * scale);
+    },
+  }) as QRCodePNGCenterImage;
 }
 
 function parseColor(color: QRCodeColor): PackedColor {

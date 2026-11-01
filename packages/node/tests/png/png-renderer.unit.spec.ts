@@ -3,14 +3,14 @@ import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
 
 import {QRCodeError, type QRCodeFinderStyle, qrcode} from '@qrcodesdk/core';
-import {
-  type ɵQRCodeStylePart as QRCodeStylePart,
-  ɵprepareShapePath as prepareShapePath,
-} from '@qrcodesdk/core/internal';
+import type {ɵQRCodeStylePart as QRCodeStylePart} from '@qrcodesdk/core/internal';
 import {circle, customShape, finder, rounded} from '@qrcodesdk/core/style';
 
 import {QRCodePNGRenderer, pngCenterImage} from '../../src';
 import {readPng} from './png-helpers';
+
+// A prepared unit square, passed to internal layers in place of their path type.
+const square = customShape({module: 'm0 0h1v1h-1z'}).module as never;
 
 // Exercise internal raster geometry without making drawing callbacks a consumer API.
 function internalFinder(part: QRCodeStylePart): QRCodeFinderStyle {
@@ -91,9 +91,7 @@ describe('QRCodePNGRenderer', () => {
         );
       const offset = 0.5 / moduleSize;
       const rect = await render((context) => context.layer().rect(offset, offset, 1, 1));
-      const tile = await render((context) =>
-        context.layer().tile(prepareShapePath('test', 'm0 0h1v1h-1z'), offset, offset),
-      );
+      const tile = await render((context) => context.layer().tile(square, offset, offset));
       expect(tile.data).toEqual(rect.data);
       expect([...tile.data.subarray(0, 4)]).toEqual([255, 0, 0, 64]);
     },
@@ -127,10 +125,10 @@ describe('QRCodePNGRenderer', () => {
             foreground: '#ff000080',
             finder: internalFinder((context) => {
               const layer = context.layer();
-              if (kind === 'tiles') layer.tile(prepareShapePath('test', 'm0 0h1v1h-1z'), 0.5, 0);
+              if (kind === 'tiles') layer.tile(square, 0.5, 0);
               else layer.rect(0.5, 0, 1, 1);
               if (kind === 'rectangles') layer.rect(1.5, 0, 1, 1);
-              else layer.tile(prepareShapePath('test', 'm0 0h1v1h-1z'), 1.5, 0);
+              else layer.tile(square, 1.5, 0);
             }),
           },
         })(
@@ -183,6 +181,61 @@ describe('QRCodePNGRenderer', () => {
 
     expect(pixel(center, center)).toEqual([255, 0, 0, 255]);
     expect(pixel(padding, center)).toEqual([255, 255, 255, 255]);
+  });
+
+  test('accepts PNG bytes in a plain Uint8Array view', async () => {
+    const logo = await sharp({
+      create: {width: 4, height: 4, channels: 4, background: {r: 255, g: 0, b: 0, alpha: 1}},
+    })
+      .png()
+      .toBuffer();
+    const padded = new Uint8Array(logo.length + 3);
+    padded.set(logo, 3);
+    const render = (source: Uint8Array) =>
+      QRCodePNGRenderer({style: {moduleSize: 2}, centerImage: pngCenterImage(source)})(
+        qrcode('byte view').matrix(),
+      );
+
+    expect(render(padded.subarray(3))).toEqual(render(logo));
+  });
+
+  test('fits non-square, semi-transparent images over modules without clearing', async () => {
+    const logo = await sharp({
+      create: {width: 8, height: 2, channels: 4, background: {r: 255, g: 0, b: 0, alpha: 0.5}},
+    })
+      .png()
+      .toBuffer();
+    const matrix = matrixFromRows(
+      Array.from({length: 10}, () => Array.from({length: 10}, () => 1)),
+    );
+    const png = await readPng(
+      QRCodePNGRenderer({
+        style: {moduleSize: 4, quietZone: 0},
+        centerImage: pngCenterImage(logo, {size: 0.4, clearBackground: false}),
+      })(matrix),
+    );
+    const pixel = (x: number, y: number) => {
+      const index = (y * png.width + x) * 4;
+      return [...png.data.subarray(index, index + 4)];
+    };
+
+    // The 16 x 4 pixel image box is centered vertically inside its 16 x 16 pixel square.
+    const [red, green, blue, alpha] = pixel(20, 20);
+    expect(Math.abs(red! - 128)).toBeLessThanOrEqual(1);
+    expect([green, blue, alpha]).toEqual([0, 0, 255]);
+    expect(pixel(20, 14)).toEqual([0, 0, 0, 255]);
+  });
+
+  test('rejects output above the pixel budget before allocating it', () => {
+    // 8193 x 8193 pixels is one row and column above the budget.
+    expect(() =>
+      QRCodePNGRenderer({style: {moduleSize: 8193, quietZone: 0}})(matrixFromRows([[1]])),
+    ).toThrowError(
+      expect.objectContaining({
+        code: 'INVALID_OPTIONS',
+        details: {field: 'dimensions', value: 8193},
+      }),
+    );
   });
 
   test('validates compression levels eagerly', () => {

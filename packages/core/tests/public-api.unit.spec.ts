@@ -93,6 +93,9 @@ describe('public API', () => {
     const withRenderer: QRCodeBuilder = qrcode('typed builder').renderer(QRCodeSVGRenderer());
     const size = (builder: QRCodeBuilder) => builder.render((value) => value.size);
     expect(size(plain)).toBe(size(withRenderer));
+    expect(() => plain.render()).toThrowError(
+      expect.objectContaining({name: 'QRCodeError', code: 'RENDERER_MISSING'}),
+    );
   });
 
   test('creates SVG center images through the exported factory', () => {

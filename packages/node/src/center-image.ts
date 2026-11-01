@@ -1,47 +1,21 @@
-import type {QRCodeCenterImageLayout} from '@qrcodesdk/core';
 import {QRCodeError} from '@qrcodesdk/core/error';
-import type {
-  ɵQRCodeDrawing as QRCodeDrawing,
-  ɵQRCodeStylePart as QRCodeStylePart,
-} from '@qrcodesdk/core/internal';
-import {ɵcreateCenterImageStore as createCenterImageStore} from '@qrcodesdk/core/internal';
-import {ɵcreateQRCodeCenterImagePlacement as createQRCodeCenterImagePlacement} from '@qrcodesdk/core/internal';
 
 import {blendPixel} from './pixels';
 import {type PNGImage, decodePNG} from './png-codec';
 
-declare const pngCenterImageBrand: unique symbol;
-/** A center image for PNG output, created with `pngCenterImage()`. */
-export type QRCodePNGCenterImage = {readonly [pngCenterImageBrand]: true};
-
-const centerImages = createCenterImageStore<{
-  readonly part: QRCodeStylePart;
-  draw(png: PNGImage, drawing: QRCodeDrawing): void;
-}>();
-
-export const resolvePNGCenterImage = centerImages.resolve;
-
 const MAX_CENTER_IMAGE_BYTES = 16 * 1024 * 1024;
 const MAX_CENTER_IMAGE_PIXELS = 16_777_216;
 
-/** Creates a PNG center image from PNG bytes, which are validated and decoded once. */
-export function pngCenterImage(
-  source: Buffer,
-  layout?: QRCodeCenterImageLayout,
-): QRCodePNGCenterImage {
-  const {part, place} = createQRCodeCenterImagePlacement(layout);
-  const image = decodeImageSource(source);
-  return centerImages.create({
-    part,
-    draw(png, drawing) {
-      const box = place(drawing);
-      const scale = drawing.moduleSize;
-      compositeImage(png, image, box.x * scale, box.y * scale, box.size * scale);
-    },
-  }) as QRCodePNGCenterImage;
+/** Validates and decodes center-image PNG bytes. */
+export function decodeImageSource(source: Uint8Array): PNGImage {
+  // View plain byte arrays as a Buffer without copying them.
+  const bytes = Buffer.isBuffer(source)
+    ? source
+    : Buffer.from(source.buffer, source.byteOffset, source.byteLength);
+  return decodeImageBytes(bytes);
 }
 
-function decodeImageSource(source: Buffer): PNGImage {
+function decodeImageBytes(source: Buffer): PNGImage {
   if (source.length > MAX_CENTER_IMAGE_BYTES) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
@@ -89,7 +63,8 @@ function assertImageDimensions(width: number, height: number): void {
   }
 }
 
-function compositeImage(
+/** Draws an image into a square box, keeping its aspect ratio. */
+export function compositeImage(
   target: PNGImage,
   source: PNGImage,
   boxX: number,

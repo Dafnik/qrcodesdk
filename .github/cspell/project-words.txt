@@ -33,4 +33,7 @@ rects
 rasterizer
 rasterizes
 ɵcreate
-ɵprepare
+ɵarc
+ɵresolve
+unstub
+librsvg

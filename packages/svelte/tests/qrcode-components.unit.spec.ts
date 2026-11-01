@@ -12,21 +12,20 @@ describe('Svelte QR code component API', () => {
   });
 
   test('exports the components, shapes, and center-image factories', () => {
-    expect(Object.keys(svelteApi).sort()).toEqual(
-      expect.arrayContaining([
-        'QRCodeCanvas',
-        'QRCodeImage',
-        'QRCodeSVG',
-        'alignment',
-        'canvasCenterImage',
-        'circle',
-        'customShape',
-        'diagonal',
-        'finder',
-        'rounded',
-        'svgCenterImage',
-      ]),
-    );
+    // An exact list keeps internal helpers out of the package root.
+    expect(Object.keys(svelteApi).sort()).toEqual([
+      'QRCodeCanvas',
+      'QRCodeImage',
+      'QRCodeSVG',
+      'alignment',
+      'canvasCenterImage',
+      'circle',
+      'customShape',
+      'diagonal',
+      'finder',
+      'rounded',
+      'svgCenterImage',
+    ]);
   });
 
   test('exposes SVG and image download handles', () => {

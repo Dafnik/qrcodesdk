@@ -49,11 +49,11 @@ with rendering callbacks are unsupported.
 
 ## Choose and prepare a source
 
-| Output                             | Factory                                         | Source type                | Preparation                                                          |
-| ---------------------------------- | ----------------------------------------------- | -------------------------- | -------------------------------------------------------------------- |
-| Core SVG                           | `svgCenterImage()` from `@qrcodesdk/core`       | `QRCodeDataImageURL`       | Convert bytes or a Blob to an embedded `data:image/...` URL          |
-| Browser Canvas or PNG-backed Image | `canvasCenterImage()` from `@qrcodesdk/browser` | loaded `CanvasImageSource` | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
-| Node.js PNG                        | `pngCenterImage()` from `@qrcodesdk/node`       | PNG `Buffer`               | Read or download valid PNG bytes before rendering                    |
+| Output                             | Factory                                         | Source type                 | Preparation                                                          |
+| ---------------------------------- | ----------------------------------------------- | --------------------------- | -------------------------------------------------------------------- |
+| Core SVG                           | `svgCenterImage()` from `@qrcodesdk/core`       | `QRCodeDataImageURL`        | Convert bytes or a Blob to an embedded `data:image/...` URL          |
+| Browser Canvas or PNG-backed Image | `canvasCenterImage()` from `@qrcodesdk/browser` | loaded `CanvasImageSource`  | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
+| Node.js PNG                        | `pngCenterImage()` from `@qrcodesdk/node`       | PNG bytes in a `Uint8Array` | Read or download valid PNG bytes before rendering                    |
 
 Load files and URLs in your application before calling a factory.
 

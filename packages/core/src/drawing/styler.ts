@@ -50,18 +50,13 @@ export function createQRCodeStyler(
         const startY = Math.floor(y);
         areas.push(startX, startY, Math.ceil(x + width) - startX, Math.ceil(y + height) - startY);
       },
-      isAreaClaimed(x, y, width, height) {
-        for (let index = 0; index < areas.length; index += 4) {
-          if (
-            x < areas[index]! + areas[index + 2]! &&
-            areas[index]! < x + width &&
-            y < areas[index + 1]! + areas[index + 3]! &&
-            areas[index + 1]! < y + height
-          ) {
-            return true;
+      isAreaCleared(x, y, width, height) {
+        for (let row = y; row < y + height; row++) {
+          for (let column = x; column < x + width; column++) {
+            if (!isModuleInAreas(areas, column, row)) return false;
           }
         }
-        return false;
+        return true;
       },
       layer(color = foreground) {
         color = resolveColor('layer.color', color);
@@ -97,6 +92,20 @@ export function createQRCodeStyler(
         })),
     };
   };
+}
+
+function isModuleInAreas(areas: readonly number[], x: number, y: number): boolean {
+  for (let index = 0; index < areas.length; index += 4) {
+    if (
+      x >= areas[index]! &&
+      x < areas[index]! + areas[index + 2]! &&
+      y >= areas[index + 1]! &&
+      y < areas[index + 1]! + areas[index + 3]!
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function createLayer(color: QRCodeColor, offset: number): Layer {

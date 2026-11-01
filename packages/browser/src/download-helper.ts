@@ -5,7 +5,7 @@ export function resolveDownloadOptions<T>(
 ): Required<QRCodeDownloadRendererOptions<T>> {
   return {
     renderer: options.renderer,
-    filename: options.filename?.trim() ? options.filename : 'qrcode',
+    filename: options.filename?.trim() || 'qrcode',
   };
 }
 

@@ -56,7 +56,8 @@ modules are left out of the paths.
 
 ## Renderer-specific options
 
-`QRCodeSVGRendererOptions` accepts `style`, `accessibility`, and `centerImage`. It rejects every other key.
+`QRCodeSVGRendererOptions` accepts `style`, `accessibility`, and `centerImage`. TypeScript rejects
+every other key; the renderer does not repeat that check at runtime.
 
 | Option                    | Type                   | Default         | Effect                                           |
 | ------------------------- | ---------------------- | --------------- | ------------------------------------------------ |

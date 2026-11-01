@@ -120,7 +120,7 @@ ${downloadButton}  ${component}
 ${indent(imports, 1)}
 
   const payload = ${quote(playgroundOptionsValue.payload)};
-  ${qrcodeRef}${optionsDeclaration.replaceAll('\n', '\n  ')}
+${indent(qrcodeRef + optionsDeclaration, 1)}
 ${hasImage ? `\n${indent(fileReaderHelper(playgroundOptionsValue.output === 'svg'), 1)}` : ''}
 </script>
 
@@ -141,7 +141,7 @@ function generateReactCode(
     ...(hasDownload ? ['useRef'] : []),
   ];
   const reactImport =
-    reactImports.length > 0 ? `import {${reactImports.join(', ')}} from 'react';\n\n` : '';
+    reactImports.length > 0 ? `${formatImport(reactImports, 'react', 0)}\n\n` : '';
 
   const imports =
     reactImport +
@@ -167,29 +167,23 @@ function generateReactCode(
 
   const refProperty = hasDownload ? ' ref={qrcode}' : '';
 
-  const downloadButton = hasDownload
-    ? [
-        `      <button`,
-        `        type="button"`,
-        `        onClick={() => qrcode.current?.download('qrcodesdk')}`,
-        `      >`,
-        `        ${meta.downloadLabel}`,
-        `      </button>`,
-        '',
-      ].join('\n')
-    : '';
-
-  const body = hasDownload
-    ? [
-        `    <>`,
-        downloadButton,
-        `      <${meta.componentName}${refProperty} payload={payload} options={options} />`,
-        `    </>`,
-      ].join('\n')
-    : `    <${meta.componentName} payload={payload} options={options} />`;
-  const imageInput = hasImage
-    ? `      <input type="file" accept="image/*" onChange={selectImage} />\n`
-    : '';
+  const children = [
+    ...(hasImage ? ['<input type="file" accept="image/*" onChange={selectImage} />'] : []),
+    ...(hasDownload
+      ? [
+          [
+            `<button type="button" onClick={() => qrcode.current?.download('qrcodesdk')}>`,
+            `  ${meta.downloadLabel}`,
+            `</button>`,
+          ].join('\n'),
+        ]
+      : []),
+    `<${meta.componentName}${refProperty} payload={payload} options={options} />`,
+  ];
+  const body =
+    children.length === 1
+      ? indent(children[0]!, 2)
+      : `    <>\n${indent(children.join('\n'), 3)}\n    </>`;
 
   return {
     lang: 'tsx',
@@ -206,7 +200,7 @@ ${refDeclaration}${imageDeclaration}  const options: ${meta.optionsType} = ${for
     )};
 
   return (
-${hasImage ? `    <>\n${imageInput}${indent(body, 2)}\n    </>` : body}
+${body}
   );
 }
 ${hasImage ? `\n${fileReaderHelper(playgroundOptionsValue.output === 'svg')}` : ''}`,
@@ -224,8 +218,7 @@ function generateVueCode(
     ...(hasImage ? ['computed', 'shallowRef'] : []),
     ...(hasDownload ? ['ref'] : []),
   ];
-  const vueImport =
-    vueImports.length > 0 ? `import {${vueImports.join(', ')}} from 'vue';\n\n` : '';
+  const vueImport = vueImports.length > 0 ? `${formatImport(vueImports, 'vue', 0)}\n\n` : '';
   const imports =
     vueImport +
     qrcodesdkImports('vue', playgroundOptionsValue, {
@@ -302,7 +295,7 @@ function generateAngularCode(
   const template = hasImage
     ? `    <input type="file" accept="image/*" (change)="selectImage($event)" />
     @if (options(); as options) {
-${indent(qrcodeTemplate, 3)}
+${indent(qrcodeTemplate, 1)}
     }`
     : qrcodeTemplate;
   const angularImports = hasImage ? 'Component, computed, signal' : 'Component';
@@ -551,7 +544,7 @@ function indent(value: string, depth: number): string {
   const indentation = '  '.repeat(depth);
   return value
     .split('\n')
-    .map((line) => `${indentation}${line}`)
+    .map((line) => (line ? `${indentation}${line}` : line))
     .join('\n');
 }
 
@@ -601,6 +594,15 @@ ${entries.map((entry) => `${indentation}${entry},`).join('\n')}
 ${closingIndentation}}`;
 }
 
-function quote(value: string): string {
-  return JSON.stringify(value);
+/**
+ * Quotes a value as a single-quoted string literal. `</script` is escaped so payloads cannot end
+ * the `<script>` block of generated Vue and Svelte components.
+ */
+export function quote(value: string): string {
+  const escaped = JSON.stringify(value)
+    .slice(1, -1)
+    .replaceAll('\\"', '"')
+    .replaceAll("'", "\\'")
+    .replace(/<\/(script)/giu, '<\\/$1');
+  return `'${escaped}'`;
 }

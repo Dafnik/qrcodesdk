@@ -20,6 +20,7 @@ const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}
 
 describe('React QR code components', () => {
   beforeEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
     mockCanvasRendering(vi);
   });
@@ -81,6 +82,8 @@ describe('React QR code components', () => {
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
     render(<QRCodeSVG payload="HELLO" options={svgOptions} ref={svgQRCode} />);
+    // The SVG download revokes its object URL after a delay.
+    vi.useFakeTimers({toFake: ['setTimeout']});
     svgQRCode.current?.download('qrcodesdk');
 
     expect(downloads).toEqual([
@@ -89,7 +92,8 @@ describe('React QR code components', () => {
         filename: 'qrcodesdk.svg',
       },
     ]);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 
@@ -266,6 +270,8 @@ describe('React QR code components', () => {
       </>,
     );
 
+    // The SVG download revokes its object URL after a delay.
+    vi.useFakeTimers({toFake: ['setTimeout']});
     svgQRCode.current?.download('center-image');
     imageQRCode.current?.download('center-image');
 
@@ -274,7 +280,8 @@ describe('React QR code components', () => {
       {href: 'data:image/png;base64,qrcode', filename: 'center-image.png'},
     ]);
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   test('replaces existing rendered image when props change', async () => {

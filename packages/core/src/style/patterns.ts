@@ -20,7 +20,7 @@ export type QRCodeRoundedShapeOptions = {
   readonly radius?: number;
 };
 export type QRCodeCircleShapeOptions = {
-  /** Module dot diameter from 0 to 1. Finder pieces always use full-size circles. */
+  /** Module dot diameter from 0.001 to 1. Finder pieces always use full-size circles. */
   readonly size?: number;
 };
 export type QRCodeFinderOptions = {
@@ -58,8 +58,9 @@ export function diagonal(options?: QRCodeRoundedShapeOptions): QRCodeShape {
 /** Draws every module as a dot and finder pieces as circles. */
 export function circle(options?: QRCodeCircleShapeOptions): QRCodeShape {
   const size = options?.size ?? 1;
-  if (!(size > 0 && size <= 1)) {
-    throwInvalid('circle.size', 'greater than 0 and at most 1', size);
+  // Paths keep three decimals, so smaller dots would round to nothing.
+  if (!(size >= 0.001 && size <= 1)) {
+    throwInvalid('circle.size', 'a number from 0.001 to 1', size);
   }
   const offset = (1 - size) / 2;
   let dot: QRCodeShapePiece | undefined;
@@ -98,7 +99,7 @@ export function finder(options?: QRCodeFinderOptions): QRCodeFinderStyle {
       [n - 7, 0],
       [0, n - 7],
     ] as const) {
-      if (context.isAreaClaimed(x, y, 7, 7)) continue;
+      if (context.isAreaCleared(x, y, 7, 7)) continue;
       drawPattern(layer, ring, x, y, 7);
       drawPattern(layer, center, x + 2, y + 2, 3);
     }
@@ -121,7 +122,7 @@ export function alignment(options?: QRCodeAlignmentOptions): QRCodeAlignmentStyl
       if (roles[index] !== ALIGNMENT_CENTER_ROLE) continue;
       const x = index % n;
       const y = (index - x) / n;
-      if (context.isAreaClaimed(x - 2, y - 2, 5, 5)) continue;
+      if (context.isAreaCleared(x - 2, y - 2, 5, 5)) continue;
       drawPattern(layer, ring, x - 2, y - 2, 5);
       drawPattern(layer, center, x, y, 1);
     }

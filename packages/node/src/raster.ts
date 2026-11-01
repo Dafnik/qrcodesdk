@@ -1,5 +1,9 @@
 import type {QRCodeShapePath} from '@qrcodesdk/core';
-import {ɵparseShapePath as parseShapePath} from '@qrcodesdk/core/internal';
+import {
+  ɵarcPoint as arcPoint,
+  ɵparseShapePath as parseShapePath,
+  ɵresolveArc as resolveArc,
+} from '@qrcodesdk/core/internal';
 
 /** Coverage of one shape path in 4x4 samples per pixel, from 0 to 16. */
 export type Coverage = {
@@ -156,7 +160,7 @@ function curveSteps(length: number, scale: number): number {
   return Math.max(4, Math.ceil(length * scale));
 }
 
-/** Flattens an SVG endpoint arc, following the SVG implementation notes (B.2.4). */
+/** Flattens an SVG endpoint arc. */
 function arc(
   fromX: number,
   fromY: number,
@@ -170,52 +174,13 @@ function arc(
   add: (x: number, y: number) => void,
   scale: number,
 ): void {
-  radiusX = Math.abs(radiusX);
-  radiusY = Math.abs(radiusY);
-  if (radiusX === 0 || radiusY === 0 || (fromX === toX && fromY === toY)) {
-    add(toX, toY);
-    return;
-  }
-  const phi = (rotation * Math.PI) / 180;
-  const cos = Math.cos(phi);
-  const sin = Math.sin(phi);
-  const halfX = (fromX - toX) / 2;
-  const halfY = (fromY - toY) / 2;
-  const x1 = cos * halfX + sin * halfY;
-  const y1 = -sin * halfX + cos * halfY;
-  const lambda = (x1 * x1) / (radiusX * radiusX) + (y1 * y1) / (radiusY * radiusY);
-  if (lambda > 1) {
-    radiusX *= Math.sqrt(lambda);
-    radiusY *= Math.sqrt(lambda);
-  }
-  const numerator =
-    radiusX * radiusX * radiusY * radiusY -
-    radiusX * radiusX * y1 * y1 -
-    radiusY * radiusY * x1 * x1;
-  const denominator = radiusX * radiusX * y1 * y1 + radiusY * radiusY * x1 * x1;
-  const factor = (largeArc === sweep ? -1 : 1) * Math.sqrt(Math.max(0, numerator / denominator));
-  const centerX1 = (factor * radiusX * y1) / radiusY;
-  const centerY1 = (-factor * radiusY * x1) / radiusX;
-  const centerX = cos * centerX1 - sin * centerY1 + (fromX + toX) / 2;
-  const centerY = sin * centerX1 + cos * centerY1 + (fromY + toY) / 2;
-  const angle = (ux: number, uy: number, vx: number, vy: number) =>
-    Math.atan2(ux * vy - uy * vx, ux * vx + uy * vy);
-  const startAngle = angle(1, 0, (x1 - centerX1) / radiusX, (y1 - centerY1) / radiusY);
-  let delta = angle(
-    (x1 - centerX1) / radiusX,
-    (y1 - centerY1) / radiusY,
-    (-x1 - centerX1) / radiusX,
-    (-y1 - centerY1) / radiusY,
-  );
-  if (!sweep && delta > 0) delta -= 2 * Math.PI;
-  if (sweep && delta < 0) delta += 2 * Math.PI;
-
-  const steps = curveSteps(Math.abs(delta) * Math.max(radiusX, radiusY), scale);
-  for (let step = 1; step < steps; step++) {
-    const theta = startAngle + (delta * step) / steps;
-    const pointX = radiusX * Math.cos(theta);
-    const pointY = radiusY * Math.sin(theta);
-    add(cos * pointX - sin * pointY + centerX, sin * pointX + cos * pointY + centerY);
+  const resolved = resolveArc(fromX, fromY, toX, toY, radiusX, radiusY, rotation, largeArc, sweep);
+  if (resolved) {
+    const {startAngle, delta} = resolved;
+    const steps = curveSteps(Math.abs(delta) * Math.max(resolved.radiusX, resolved.radiusY), scale);
+    for (let step = 1; step < steps; step++) {
+      add(...arcPoint(resolved, startAngle + (delta * step) / steps));
+    }
   }
   add(toX, toY);
 }

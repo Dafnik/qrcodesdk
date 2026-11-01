@@ -4,6 +4,7 @@ import {getSizeByVersion} from './get-size-by-version';
 import {needsVersionInfo} from './needs-version-info';
 import {getAlignmentPatternPositions} from './version-config';
 
+// Role numbers match QR_CODE_MODULE_ROLES; literals keep the public object out of the hot path.
 export const DATA_ROLE = 0;
 const FINDER_RING_ROLE = 1;
 const FINDER_CENTER_ROLE = 2;

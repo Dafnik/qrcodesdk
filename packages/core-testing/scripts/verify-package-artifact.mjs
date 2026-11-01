@@ -80,9 +80,13 @@ test('core exports style factories and internal drawing helpers', async () => {
     assert.equal(typeof style[name], 'function');
   }
   for (const name of [
-    'ɵcreateQRCodeStyler',
-    'ɵtoQRCodePathData',
+    'ɵarcPoint',
+    'ɵcreateCenterImageStore',
     'ɵcreateQRCodeCenterImagePlacement',
+    'ɵcreateQRCodeStyler',
+    'ɵparseShapePath',
+    'ɵresolveArc',
+    'ɵtoQRCodePathData',
   ]) {
     assert.equal(typeof internal[name], 'function');
   }
@@ -95,6 +99,11 @@ test('React publishes a client entry', async () => {
   if (packageJson.name !== '@qrcodesdk/react') return;
   const entry = await readFile(path.join(packageDirectory, packageJson.exports['.']), 'utf8');
   assert.match(entry, /^['"]use client['"];?/);
+  const declarations = await readFile(
+    path.join(packageDirectory, packageJson.exports['.'].replace(/\.mjs$/u, '.d.mts')),
+    'utf8',
+  );
+  assert.doesNotMatch(declarations, /^\s*['"]use client['"]/u);
 });
 
 function readTarEntries(gzippedTarball) {

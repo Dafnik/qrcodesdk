@@ -35,8 +35,8 @@ _Avoid_: Builder preset, QR code helper
 
 **Renderer**:
 A function that converts a valid QR code matrix produced by QRCodeSDK into an output value. A custom
-renderer receives the matrix, including module roles, but not styling information. It can apply
-shared visual styling by turning the matrix into a styled drawing with the public styler.
+renderer receives the matrix, including module roles, but not styling information, and owns its
+drawing logic. The shared styler that applies visual styling for the bundled renderers is internal.
 
 **QR code matrix**:
 An immutable square grid produced by symbol generation: its size, a flat row-major array of dark
@@ -77,19 +77,20 @@ outside shared visual styling.
 _Avoid_: Renderer-specific styling
 
 **Shape**:
-Imported, serializable path data that replaces filled squares for modules, finder rings, finder
-centers, alignment rings, or alignment centers. Filled squares are the absence of a shape.
+Opaque prepared path pieces, created by an imported factory such as `rounded()` or `customShape()`,
+that replace filled squares for modules, finder rings, finder centers, alignment rings, or alignment
+centers. Each piece stays within its own box. Filled squares are the absence of a shape.
 _Avoid_: Shape name, module type
 
-**Style part**:
-An imported function that draws one group of modules, such as the finder or alignment patterns, by
-claiming their module roles, or that removes the modules in an area, such as behind a center image.
-_Avoid_: Plugin, style preset
+**Finder or alignment style**:
+An opaque value returned by `finder()` or `alignment()` that selects the ring shape, center shape,
+and color of those patterns. Consumers cannot call or inspect it.
+_Avoid_: Style part, plugin, style preset
 
 **Styled drawing**:
-Plain, renderer-neutral data describing a QR code matrix with shared visual styling and style parts
-applied: color layers of merged rectangles and shape paths. Graphical renderers fill the same styled
-drawing in their output formats.
+Internal, renderer-neutral data describing a QR code matrix with shared visual styling applied:
+color layers of merged rectangles and shape paths. The bundled graphical renderers fill the same
+styled drawing in their output formats. It is not part of the public API.
 _Avoid_: Renderer-specific geometry, drawing protocol
 
 **Prepared image source**:

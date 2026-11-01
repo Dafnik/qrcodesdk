@@ -66,6 +66,7 @@ function getRenderedElement<TElement extends Element>(
 
 describe('Angular QR code components', () => {
   beforeEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
     TestBed.resetTestingModule();
     mockCanvasRendering(vi);
@@ -131,6 +132,8 @@ describe('Angular QR code components', () => {
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
     fixture.detectChanges();
+    // The SVG download revokes its object URL after a delay.
+    vi.useFakeTimers({toFake: ['setTimeout']});
     fixture.componentInstance.svgQRCode().download('qrcodesdk');
 
     expect(downloads).toEqual([
@@ -139,7 +142,8 @@ describe('Angular QR code components', () => {
         filename: 'qrcodesdk.svg',
       },
     ]);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 
@@ -290,6 +294,8 @@ describe('Angular QR code components', () => {
     });
     await Promise.all([svgFixture.whenStable(), imageFixture.whenStable()]);
 
+    // The SVG download revokes its object URL after a delay.
+    vi.useFakeTimers({toFake: ['setTimeout']});
     svgFixture.componentInstance.svgQRCode().download('center-image');
     imageFixture.componentInstance.imageQRCode().download('center-image');
 
@@ -298,7 +304,8 @@ describe('Angular QR code components', () => {
       {href: 'data:image/png;base64,qrcode', filename: 'center-image.png'},
     ]);
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   test('replaces existing rendered image when inputs change', () => {

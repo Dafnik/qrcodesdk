@@ -21,6 +21,9 @@ from `packages/core-testing/src/styling-fixtures.ts` at 1, 10, and 50 repetition
 `qr-code-styling` adapter renders SVG through a shared JSDOM environment and serializes it with
 `getRawData('svg')`. JSDOM starts before measurement. QRCodeSDK uses its public SVG renderer. Both
 adapters include matrix generation, styling, and SVG serialization in the timed operation.
+QRCodeSDK fixtures create their shape and finder values once when the fixture module loads, so
+factory setup is not part of the timed operation. The core styler benchmark measures factory setup
+separately.
 
 `qr-code-styling` has no public option for a fixed mask, so both styled adapters select the mask
 automatically. The adapter converts each fixture's module size and margin to matching pixel width,

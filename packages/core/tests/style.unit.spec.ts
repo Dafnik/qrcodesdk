@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeSVGRenderer, qrcode} from '../src';
+import {QRCodeSVGRenderer, type QRCodeShape, qrcode} from '../src';
 import {ɵcreateQRCodeStyler as createQRCodeStyler} from '../src/internal';
 import {type PreparedShapePath, prepareShapePath} from '../src/shape-path';
 import {alignment, circle, customShape, diagonal, finder, rounded} from '../src/style';
@@ -10,6 +10,7 @@ describe('style option validation', () => {
     [() => rounded({radius: 2}), 'rounded.radius'],
     [() => diagonal({radius: -1}), 'diagonal.radius'],
     [() => circle({size: 0}), 'circle.size'],
+    [() => circle({size: 0.0009}), 'circle.size'],
     [() => finder({color: '#gggggg'}), 'finder.color'],
     [() => customShape({finderRing: 'M0 0z'}), 'customShape.finderRing'],
     [() => alignment({color: '#12'}), 'alignment.color'],
@@ -17,6 +18,42 @@ describe('style option validation', () => {
     expect(create).toThrowError(
       expect.objectContaining({code: 'INVALID_OPTIONS', details: expect.objectContaining({field})}),
     );
+  });
+});
+
+describe('custom shape bounds', () => {
+  const prepare = (piece: keyof QRCodeShape, path: string) =>
+    customShape({[piece]: path} as Record<keyof QRCodeShape, string>);
+  test.each([
+    ['module', 'm-.25 -.25h1.5v1.5h-1.5z'],
+    ['module', 'm0 0h1.01v1h-1.01z'],
+    // The curve bulges above y = 0 between endpoints that stay inside.
+    ['module', 'm0 0c.25 -.5 .75 -.5 1 0v1h-1z'],
+    // A semicircle above its chord leaves the box although its endpoints stay inside.
+    ['module', 'm0 .25a.5 .5 0 0 1 1 0v.75h-1z'],
+    ['alignmentCenter', 'm0 0h2v1h-2z'],
+    ['finderCenter', 'm0 0h3v3.5h-3z'],
+    ['alignmentRing', 'm0 0h6v5h-6z'],
+    ['finderRing', 'm0 0h7v7.1h-7z'],
+  ] as const)('rejects %s path %s outside its box', (piece, path) => {
+    expect(() => prepare(piece, path)).toThrowError(
+      expect.objectContaining({
+        code: 'INVALID_OPTIONS',
+        details: expect.objectContaining({field: `customShape.${piece}`}),
+      }),
+    );
+  });
+
+  test.each([
+    ['module', 'm0 0h1v1h-1z'],
+    ['module', 'm.5 0a.5 .5 0 0 1 0 1a.5 .5 0 0 1 0 -1z'],
+    ['module', 'm0 .5c0 -.66 1 -.66 1 0c0 .66 -1 .66 -1 0z'],
+    ['module', 'm.5 0 .5 .25v.5l-.5 .25-.5-.25v-.5z'],
+    ['finderRing', 'm1 0h5l1 1v5l-1 1h-5l-1 -1v-5zm0 1v5h5v-5z'],
+    ['finderCenter', 'm.75 0h1.5l.75 .75v1.5l-.75 .75h-1.5l-.75 -.75v-1.5z'],
+    ['alignmentRing', 'm1 0h3l1 1v3l-1 1h-3l-1 -1v-3zm0 1v3h3v-3z'],
+  ] as const)('accepts %s path %s inside its box', (piece, path) => {
+    expect(() => prepare(piece, path)).not.toThrow();
   });
 });
 

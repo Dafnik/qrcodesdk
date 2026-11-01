@@ -58,10 +58,10 @@ for (const exportName of ['qrcode', 'QRCodeSVGRenderer', 'QRCodeTextRenderer', '
 }
 logSuccess('package exposes the qrcode builder and bundled renderers');
 
-for (const exportName of ['alignment', 'circle', 'diagonal', 'finder', 'rounded']) {
+for (const exportName of ['alignment', 'circle', 'customShape', 'diagonal', 'finder', 'rounded']) {
   assert(typeof style[exportName] === 'function', `Expected style export ${exportName}`);
 }
-logSuccess('style subpath exposes the shapes and the finder and alignment parts');
+logSuccess('style subpath exposes the shapes, custom shapes, and the finder and alignment parts');
 
 for (const exportName of [
   'emailPayload',

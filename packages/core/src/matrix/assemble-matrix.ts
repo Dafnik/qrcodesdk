@@ -21,7 +21,7 @@ export function assembleQRCodeMatrix(
   if (requestedMask !== undefined) {
     return {
       size,
-      modules: Object.freeze(Array.from(finish(unmasked, requestedMask)) as (0 | 1)[]),
+      modules: toPublicModules(finish(unmasked, requestedMask)),
       roles: publicRoles,
     };
   }
@@ -39,7 +39,14 @@ export function assembleQRCodeMatrix(
 
   return {
     size,
-    modules: Object.freeze(Array.from(bestModules!) as (0 | 1)[]),
+    modules: toPublicModules(bestModules!),
     roles: publicRoles,
   };
+}
+
+/** Copies modules into a frozen array. An indexed loop avoids the slow typed-array iterator. */
+function toPublicModules(modules: Uint8Array): readonly (0 | 1)[] {
+  const copy = new Array<0 | 1>(modules.length);
+  for (let index = 0; index < modules.length; index++) copy[index] = modules[index] as 0 | 1;
+  return Object.freeze(copy);
 }

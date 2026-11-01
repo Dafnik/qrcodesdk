@@ -157,7 +157,7 @@ export function formatPlaygroundStyle(
     const center = formatShape(pattern.center, used);
     if (ring) partEntries.push(`ring: ${ring}`);
     if (center) partEntries.push(`center: ${center}`);
-    if (pattern.color !== undefined) partEntries.push(`color: ${JSON.stringify(pattern.color)}`);
+    if (pattern.color !== undefined) partEntries.push(`color: '${pattern.color}'`);
     entries.push(`${part}: ${part}(${partEntries.length > 0 ? formatObject(partEntries) : ''})`);
   }
 

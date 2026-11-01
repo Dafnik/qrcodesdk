@@ -147,7 +147,8 @@ describe('createQRCodeStyler', () => {
     const draw = createQRCodeStyler({quietZone: 0}, [
       (context) => {
         context.claimArea(0.5, 0.5, 1, 1);
-        expect(context.isAreaClaimed(0, 0, 1, 1)).toBe(true);
+        expect(context.isAreaCleared(0, 0, 2, 2)).toBe(true);
+        expect(context.isAreaCleared(0, 0, 3, 3)).toBe(false);
       },
     ]);
     expect(draw(matrix).layers[0]!.rects).toEqual([2, 0, 1, 2, 0, 2, 3, 1]);
@@ -181,6 +182,23 @@ describe('createQRCodeStyler', () => {
       [(context) => context.claimArea(0, 0, matrix.size, matrix.size)],
     );
     expect(draw(matrix).layers).toEqual([]);
+  });
+
+  test('keeps finder and alignment patterns that a default center image only partly covers', () => {
+    for (const version of [1, 2, 3] as const) {
+      const matrix = qrcode('partly covered').version(version).matrix();
+      const {part} = createQRCodeCenterImagePlacement({padding: 2});
+      const {layers} = createQRCodeStyler(
+        {
+          finder: finder({ring: circle(), center: circle(), color: '#ff0000'}),
+          alignment: alignment({ring: circle(), center: circle(), color: '#00ff00'}),
+        },
+        [part],
+      )(matrix);
+
+      const finderLayer = layers.find(({color}) => color === '#ff0000');
+      expect(tileCount(finderLayer!)).toBe(6);
+    }
   });
 });
 

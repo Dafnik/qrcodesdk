@@ -1,9 +1,11 @@
 import {describe, expect, test} from 'vitest';
 
+import {qrcode} from '../../src';
+import {QR_CODE_MODULE_ROLES} from '../../src/matrix';
 import {applyMaskToMatrix} from '../../src/matrix/apply-mask-to-matrix';
 import {createBaseMatrix} from '../../src/matrix/create-base-matrix';
 import {ECC_LEVEL_Q} from '../../src/matrix/error-correction';
-import {evaluateMatrix} from '../../src/matrix/evaluate-matrix';
+import {densityPenalty, evaluateMatrix} from '../../src/matrix/evaluate-matrix';
 import {fillDataInMatrix} from '../../src/matrix/fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from '../../src/matrix/fill-format-information-in-matrix';
 import {toRows} from '../helpers';
@@ -19,6 +21,39 @@ describe('matrix construction and mutation helpers', () => {
     expect(base.roles).toHaveLength(expectedSize * expectedSize);
     expect(base.modules.every((value) => value === 0 || value === 1)).toBe(true);
     expect(createBaseMatrix(version)).toBe(base);
+  });
+
+  test('leaves the shared base matrix unchanged while generating every mask', () => {
+    const base = createBaseMatrix(7);
+    const modules = base.modules.slice();
+    const roles = base.roles.slice();
+
+    for (const mask of QR_CODE_MASKS) {
+      qrcode('shared base matrix').version(7).mask(mask).matrix();
+    }
+    qrcode('shared base matrix').version(7).matrix();
+
+    expect(createBaseMatrix(7)).toBe(base);
+    expect(base.modules).toEqual(modules);
+    expect(base.roles).toEqual(roles);
+  });
+
+  test('uses the public role numbers for internal roles', () => {
+    const {size, roles} = createBaseMatrix(7);
+    const role = (x: number, y: number) => roles[y * size + x];
+
+    expect(Object.isFrozen(QR_CODE_MODULE_ROLES)).toBe(true);
+    expect({
+      data: role(9, 9),
+      finderRing: role(0, 0),
+      finderCenter: role(3, 3),
+      separator: role(7, 7),
+      alignmentRing: role(20, 20),
+      alignmentCenter: role(22, 22),
+      timing: role(10, 6),
+      format: role(8, 0),
+      version: role(size - 11, 0),
+    }).toEqual(QR_CODE_MODULE_ROLES);
   });
 
   test('creates finder, timing, alignment, and version patterns', () => {
@@ -97,7 +132,8 @@ describe('matrix construction and mutation helpers', () => {
 });
 
 describe('matrix evaluation helpers', () => {
-  test('penalizes consecutive and finder-like groups', () => {
+  // The reference group evaluator backs the legacy score comparison in evaluate-matrix tests.
+  test('reference evaluator penalizes consecutive and finder-like groups', () => {
     expect(evaluateGroup([0, 4])).toBe(0);
     expect(evaluateGroup([0, 5])).toBe(3);
     expect(evaluateGroup([0, 7])).toBe(5);
@@ -110,5 +146,16 @@ describe('matrix evaluation helpers', () => {
   test('penalizes blocks and black density', () => {
     expect(evaluateMatrix(Uint8Array.of(0, 1, 1, 0), 2)).toBe(0);
     expect(evaluateMatrix(Uint8Array.of(1, 1, 1, 1), 2)).toBe(103);
+  });
+
+  test.each([
+    [250, 625, 20],
+    [375, 625, 20],
+    [490, 1225, 20],
+    [810, 2025, 20],
+    [251, 625, 10],
+    [313, 625, 0],
+  ])('scores %s of %s dark modules with a density penalty of %s', (dark, total, penalty) => {
+    expect(densityPenalty(dark, total)).toBe(penalty);
   });
 });

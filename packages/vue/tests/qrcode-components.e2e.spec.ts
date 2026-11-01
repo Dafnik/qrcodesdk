@@ -21,6 +21,7 @@ const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}
 
 describe('Vue QR code components', () => {
   beforeEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
     mockCanvasRendering(vi);
   });
@@ -62,6 +63,8 @@ describe('Vue QR code components', () => {
     const svg = mount(QRCodeSVG, {props: {payload: 'HELLO', options: svgOptions}});
     const image = mount(QRCodeImage, {props: {payload: 'HELLO', options: imageOptions}});
 
+    // The SVG download revokes its object URL after a delay.
+    vi.useFakeTimers({toFake: ['setTimeout']});
     (svg.vm as unknown as QRCodeDownloadHandle).download('qrcodesdk');
     (image.vm as unknown as QRCodeDownloadHandle).download('qrcodesdk');
 
@@ -69,7 +72,8 @@ describe('Vue QR code components', () => {
       {href: 'blob:qrcode-svg', filename: 'qrcodesdk.svg'},
       {href: expect.stringMatching(/^data:image\/png;base64,/), filename: 'qrcodesdk.png'},
     ]);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 

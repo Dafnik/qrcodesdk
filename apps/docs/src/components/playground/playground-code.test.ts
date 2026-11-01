@@ -4,7 +4,7 @@ import {describe, test} from 'node:test';
 import type {QRCodeDataImageURL} from '@qrcodesdk/core';
 
 import {createCodeHighlighter} from './angular/code-highlighter.ts';
-import {generatePlaygroundCode} from './angular/playground-code-generator.ts';
+import {generatePlaygroundCode, quote} from './angular/playground-code-generator.ts';
 import {defaultCliOptions, generateCliCommand} from './cli-playground.ts';
 import {
   type PlaygroundOptions,
@@ -177,7 +177,7 @@ describe('generated playground style options', () => {
       assertStyleFactories(code, packageName, ['circle', 'finder', 'rounded']);
       assert.match(code, /modules: rounded\(\),/);
       assert.match(code, /finder: finder\(\{\s+ring: rounded\(\{radius: 1\}\),/);
-      assert.match(code, /center: circle\(\),\s+color: "#e11d48",\s+\}\),/);
+      assert.match(code, /center: circle\(\),\s+color: '#e11d48',\s+\}\),/);
     });
 
     test(`${packageName} imports and configures the diagonal shape`, () => {
@@ -203,7 +203,7 @@ describe('generated playground style options', () => {
       assertStyleFactories(styled, packageName, ['alignment', 'circle', 'rounded']);
       assert.match(
         styled,
-        /alignment: alignment\(\{\s+ring: rounded\(\{radius: 1\}\),\s+center: circle\(\),\s+color: "#1d4ed8",\s+\}\),/,
+        /alignment: alignment\(\{\s+ring: rounded\(\{radius: 1\}\),\s+center: circle\(\),\s+color: '#1d4ed8',\s+\}\),/,
       );
     });
 
@@ -226,7 +226,7 @@ describe('generated playground style options', () => {
       });
 
       assertStyleFactories(code, packageName, ['finder']);
-      assert.match(code, /finder: finder\(\{\s+color: "#123456",\s+\}\),/);
+      assert.match(code, /finder: finder\(\{\s+color: '#123456',\s+\}\),/);
     });
   }
 
@@ -262,4 +262,26 @@ describe('generated playground style options', () => {
 } from '@qrcodesdk/react';`),
     );
   });
+});
+
+describe('generated string literals', () => {
+  test('quotes payloads with single quotes and escapes script end tags', () => {
+    assert.equal(quote("it's"), "'it\\'s'");
+    assert.equal(quote('say "hi"'), `'say "hi"'`);
+    assert.equal(quote('a\\b\n'), "'a\\\\b\\n'");
+    assert.equal(quote('</script><script>'), "'<\\/script><script>'");
+    for (const value of ["it's", 'say "hi"', 'a\\b\n', '</SCRIPT>', "\\'"]) {
+      assert.equal(new Function(`return ${quote(value)};`)(), value);
+    }
+  });
+
+  for (const packageName of ['vue', 'svelte'] as const) {
+    test(`${packageName} keeps a payload with a script end tag inside the script block`, () => {
+      const {code} = generatePlaygroundCode({
+        ...createOptions(packageName, 'svg'),
+        payload: '</script><h1>x</h1>',
+      });
+      assert.equal(code.match(/<\/script>/g)?.length, 1);
+    });
+  }
 });

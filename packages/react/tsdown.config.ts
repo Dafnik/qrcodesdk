@@ -1,7 +1,8 @@
 import {defineConfig} from 'tsdown';
 
 export default defineConfig({
-  banner: "'use client';",
+  // Declaration files cannot contain directives.
+  banner: {js: "'use client';"},
   dts: {
     generator: 'tsgo',
   },

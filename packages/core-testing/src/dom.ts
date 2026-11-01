@@ -12,6 +12,7 @@ type SpyHandle<TValue> = TValue extends (...args: infer TArgs) => infer TReturn
 
 type MockApi = {
   fn(): () => void;
+  stubGlobal(name: string, value: unknown): unknown;
   spyOn<TObject, TKey extends keyof TObject>(
     object: TObject,
     methodName: TKey,
@@ -43,8 +44,9 @@ export function captureDownloads(mockApi: Pick<MockApi, 'spyOn'>): CapturedDownl
 }
 
 export function mockCanvasRendering(mockApi: MockApi): void {
-  // DOM test environments without canvas support also lack Path2D.
-  globalThis.Path2D ??= class {} as unknown as typeof Path2D;
+  // DOM test environments without canvas support also lack Path2D. Test configs set
+  // `unstubGlobals` so the stub is removed after each test.
+  if (!('Path2D' in globalThis)) mockApi.stubGlobal('Path2D', class {});
   mockApi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(((
     contextId: string,
   ) => {

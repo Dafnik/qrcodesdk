@@ -3,8 +3,10 @@ export {QRCodeImage, type QRCodeImageProps} from './QRCodeImage';
 export {QRCodeSVG, type QRCodeSVGProps} from './QRCodeSVG';
 export type {QRCodeBaseProps, QRCodeDownloadHandle} from './types';
 export type {
+  QRCodeCanvasAccessibilityOptions,
   QRCodeCanvasCenterImage,
   QRCodeCanvasOptions,
+  QRCodeImageAccessibilityOptions,
   QRCodeImageOptions,
 } from '@qrcodesdk/browser';
 export type {
@@ -15,6 +17,7 @@ export type {
   QRCodeMode,
   QRCodePayload,
   QRCodeVersion,
+  QRCodeSVGAccessibilityOptions,
   QRCodeSVGCenterImage,
   QRCodeSVGOptions,
 } from '@qrcodesdk/core';

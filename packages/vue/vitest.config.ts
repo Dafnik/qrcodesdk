@@ -10,5 +10,6 @@ export default defineConfig({
       reportsDirectory: '../../.coverage/raw/vue',
     },
     environment: 'jsdom',
+    unstubGlobals: true,
   },
 });

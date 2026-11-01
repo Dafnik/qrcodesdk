@@ -37,8 +37,11 @@ export interface QRCodeDrawContext {
   claimRoles(...roles: QRCodeModuleRole[]): void;
   /** Stops drawing every module touched by this area in matrix coordinates, leaving the background. */
   claimArea(x: number, y: number, width: number, height: number): void;
-  /** Whether a claimed area overlaps this area, so a part can skip patterns behind it. */
-  isAreaClaimed(x: number, y: number, width: number, height: number): boolean;
+  /**
+   * Whether claimed areas cover every module of this integer area, so a part can skip patterns
+   * hidden behind them. Partly covered patterns stay complete to keep the symbol scannable.
+   */
+  isAreaCleared(x: number, y: number, width: number, height: number): boolean;
   /** Returns the layer for a color, or for the foreground when the color is omitted. */
   layer(color?: QRCodeColor): QRCodeDrawLayer;
 }

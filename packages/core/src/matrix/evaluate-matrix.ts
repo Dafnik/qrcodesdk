@@ -114,8 +114,10 @@ export function evaluateMatrix(
     if (score >= scoreLimit) return score;
   }
 
-  score +=
-    PENALTY_DENSITY *
-    ((Math.abs(numberOfBlackSquares / matrixLength / matrixLength - 0.5) / 0.05) | 0);
-  return score;
+  return score + densityPenalty(numberOfBlackSquares, matrixLength * matrixLength);
+}
+
+/** N4 penalty. Integer math keeps exact 40% and 60% densities at k=2 instead of rounding down. */
+export function densityPenalty(dark: number, total: number): number {
+  return PENALTY_DENSITY * (((Math.abs(dark * 2 - total) * 10) / total) | 0);
 }

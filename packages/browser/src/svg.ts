@@ -3,6 +3,9 @@ import type {QRCodeMatrix, QRCodeRenderer} from '@qrcodesdk/core';
 import {downloadQRCode, ensureExtension, resolveDownloadOptions} from './download-helper';
 import type {QRCodeDownloadRendererOptions} from './types';
 
+// Some browsers start downloads asynchronously and cancel them when the URL is revoked too early.
+const REVOKE_DELAY_MS = 40_000;
+
 export type QRCodeDownloadSVGRendererOptions = QRCodeDownloadRendererOptions<string>;
 
 export function QRCodeDownloadSVGRenderer(
@@ -20,6 +23,6 @@ export function QRCodeDownloadSVGRenderer(
 
     downloadQRCode(url, ensureExtension(filename, '.svg'));
 
-    setTimeout(() => URL.revokeObjectURL(url), 0);
+    setTimeout(() => URL.revokeObjectURL(url), REVOKE_DELAY_MS);
   };
 }
