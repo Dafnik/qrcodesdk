@@ -64,6 +64,7 @@ packageExtensions:
       typescript: 6.0.3
 
 patchedDependencies:
+  '@analogjs/astro-angular@3.0.0-beta.18': patches/@analogjs__astro-angular@3.0.0-beta.18.patch
   qrcode-generator@2.0.4: patches/qrcode-generator@2.0.4.patch
 
 overrides:

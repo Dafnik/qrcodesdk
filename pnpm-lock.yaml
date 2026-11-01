@@ -278,6 +278,7 @@ overrides:
 packageExtensionsChecksum: sha256-UEifdGSNdNOw5ffE5gtaUS36QcerlLv6gROk9IprHfw=
 
 patchedDependencies:
+  '@analogjs/astro-angular@3.0.0-beta.18': 6b1a6e1394084f1483ab7d77f4fb4d40d9f5cb853a6e8b5b0650a77071df101e
   qrcode-generator@2.0.4: c98e53f3d0a080d3bdc8bdfbdbe41837086b66e201780921019c646ce2eca1ed
 
 importers:
@@ -470,7 +471,7 @@ importers:
     devDependencies:
       '@analogjs/astro-angular':
         specifier: 3.0.0-beta.18
-        version: 3.0.0-beta.18(e40967892607127feac8c54f369339f8)
+        version: 3.0.0-beta.18(patch_hash=6b1a6e1394084f1483ab7d77f4fb4d40d9f5cb853a6e8b5b0650a77071df101e)(e40967892607127feac8c54f369339f8)
       '@angular/animations':
         specifier: 'catalog:'
         version: 22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))
@@ -10116,7 +10117,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@analogjs/astro-angular@3.0.0-beta.18(e40967892607127feac8c54f369339f8)':
+  '@analogjs/astro-angular@3.0.0-beta.18(patch_hash=6b1a6e1394084f1483ab7d77f4fb4d40d9f5cb853a6e8b5b0650a77071df101e)(e40967892607127feac8c54f369339f8)':
     dependencies:
       '@analogjs/vite-plugin-angular': 3.0.0-beta.18(@angular/build@22.2.5(e15a3e1ccf0cd8ac7f2dda299125becd))(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))
       '@angular/animations': 22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))
