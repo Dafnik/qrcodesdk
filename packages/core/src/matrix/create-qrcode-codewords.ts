@@ -1,8 +1,8 @@
-import type {QRCodeCodewords, QRCodeResolvedMatrixOptions} from '../types';
 import {augmentECCs} from './augment-eccs';
 import {encode} from './encode';
 import {getGF256GeneratorPolynomial} from './error-correction';
 import {getNumberOfAvailableBitsForData} from './get-number-of-available-bits-for-data';
+import type {QRCodeCodewords, QRCodeResolvedMatrixOptions} from './types';
 import {getErrorCorrectionBlockCount, getErrorCorrectionCodewordsPerBlock} from './version-config';
 
 export function createQRCodeCodewords({

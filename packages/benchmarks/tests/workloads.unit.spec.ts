@@ -22,11 +22,11 @@ import {
 } from '../src/workloads';
 
 describe('benchmark workloads', () => {
-  test('removes version and mask from every automatic static fixture', () => {
+  test('preserves source names and payloads in automatic static fixtures', () => {
     expect(AUTOMATIC_QR_CODE_TEST_FIXTURES).toHaveLength(QR_CODE_TEST_FIXTURES.length);
-    for (const fixture of AUTOMATIC_QR_CODE_TEST_FIXTURES) {
-      expect(fixture).not.toHaveProperty('version');
-      expect(fixture).not.toHaveProperty('mask');
+    for (const [index, fixture] of AUTOMATIC_QR_CODE_TEST_FIXTURES.entries()) {
+      const source = QR_CODE_TEST_FIXTURES[index]!;
+      expect(fixture).toMatchObject({name: source.name, payload: source.payload});
     }
   });
 

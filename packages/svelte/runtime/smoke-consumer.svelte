@@ -1,7 +1,13 @@
 <script lang="ts">
   import {VERSION} from 'svelte/compiler';
 
-  import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/svelte';
+  import {
+    QRCodeCanvas,
+    QRCodeImage,
+    QRCodeSVG,
+    type QRCodeSVGOptions,
+    svgCenterImage,
+  } from '@qrcodesdk/svelte';
 
   const options = {style: {moduleSize: 2, quietZone: 1}};
   const imageOptions = {
@@ -11,6 +17,12 @@
       ariaLabel: 'Framework runtime QR code',
     },
   };
+  let styledOptions = $state<QRCodeSVGOptions>({
+    ...options,
+    centerImage: svgCenterImage(
+      `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>')}`,
+    ),
+  });
 </script>
 
 <main>
@@ -23,5 +35,14 @@
   </section>
   <section data-testid="qrcode-canvas">
     <QRCodeCanvas payload="HELLO" {options} />
+  </section>
+  <section data-testid="qrcode-reactive-svg">
+    <QRCodeSVG payload="REACTIVE" options={styledOptions} />
+    <button
+      onclick={() => {
+        styledOptions = {...styledOptions};
+      }}>
+      Update options
+    </button>
   </section>
 </main>

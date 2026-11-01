@@ -1,10 +1,4 @@
-import type {
-  QRCodeColor,
-  QRCodeFinderShape,
-  QRCodeMask,
-  QRCodeModuleShape,
-  QRCodeVersion,
-} from '@qrcodesdk/core';
+import type {QRCodeColor, QRCodeMask, QRCodeVersion} from '@qrcodesdk/core';
 
 import {cliPlaygroundOptions} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
@@ -21,6 +15,7 @@ import {
   playgroundOptions,
   playgroundView,
 } from './playground-options.ts';
+import {PLAYGROUND_SHAPES} from './playground-style.ts';
 
 const OPEN_SECTIONS_KEY = 'open';
 const VIEW_KEY = 'view';
@@ -41,20 +36,13 @@ const PLAYGROUND_OUTPUTS = [
 ] as const satisfies readonly PlaygroundOutput[];
 const MODES = ['numeric', 'alphanumeric', 'octet'] as const;
 const ERROR_CORRECTION_LEVELS = ['L', 'M', 'Q', 'H'] as const;
-const MODULE_SHAPES = [
-  'square',
-  'circle',
-  'rounded',
-  'extra-rounded',
-  'diagonal',
-  'diagonal-rounded',
-] as const satisfies readonly QRCodeModuleShape[];
-const FINDER_SHAPES = [
-  'square',
-  'rounded',
-  'extra-rounded',
-  'circle',
-] as const satisfies readonly QRCodeFinderShape[];
+/** Parameters of removed styling options. They are ignored on read and dropped on write. */
+const REMOVED_QUERY_KEYS = [
+  'modules-color',
+  'finder-outer-shape',
+  'finder-outer-color',
+  'finder-center-color',
+] as const;
 
 interface QueryFieldCodec {
   readonly key: string;
@@ -165,70 +153,53 @@ const QUERY_FIELD_CODECS = [
     serializeColor,
   ),
   defineQueryField(
-    'modules-color',
-    (currentOptions) => currentOptions.modules?.color,
-    (currentOptions, color) => {
-      currentOptions.modules = compactObject({...currentOptions.modules, color});
-    },
-    parseOptionalColor,
-    serializeColor,
-  ),
-  defineQueryField(
     'modules-shape',
-    (currentOptions) => currentOptions.modules?.shape,
-    (currentOptions, shape) => {
-      currentOptions.modules = compactObject({...currentOptions.modules, shape});
-    },
-    (value, fallback) => parseOptionalStringUnion(value, MODULE_SHAPES, fallback),
+    (currentOptions) => currentOptions.moduleShape,
+    (currentOptions, shape) => setOptionalProperty(currentOptions, 'moduleShape', shape),
+    (value, fallback) => parseOptionalStringUnion(value, PLAYGROUND_SHAPES, fallback),
     serializeString,
   ),
   defineQueryField(
-    'finder-outer-color',
-    (currentOptions) => currentOptions.finder?.outer?.color,
-    (currentOptions, color) => {
-      currentOptions.finder = {
-        ...currentOptions.finder,
-        outer: compactObject({...currentOptions.finder?.outer, color}),
-      };
-    },
-    parseOptionalColor,
-    serializeColor,
-  ),
-  defineQueryField(
-    'finder-outer-shape',
-    (currentOptions) => currentOptions.finder?.outer?.shape,
-    (currentOptions, shape) => {
-      currentOptions.finder = {
-        ...currentOptions.finder,
-        outer: compactObject({...currentOptions.finder?.outer, shape}),
-      };
-    },
-    (value, fallback) => parseOptionalStringUnion(value, FINDER_SHAPES, fallback),
+    'finder-ring-shape',
+    (currentOptions) => currentOptions.finderRingShape,
+    (currentOptions, shape) => setOptionalProperty(currentOptions, 'finderRingShape', shape),
+    (value, fallback) => parseOptionalStringUnion(value, PLAYGROUND_SHAPES, fallback),
     serializeString,
-  ),
-  defineQueryField(
-    'finder-center-color',
-    (currentOptions) => currentOptions.finder?.center?.color,
-    (currentOptions, color) => {
-      currentOptions.finder = {
-        ...currentOptions.finder,
-        center: compactObject({...currentOptions.finder?.center, color}),
-      };
-    },
-    parseOptionalColor,
-    serializeColor,
   ),
   defineQueryField(
     'finder-center-shape',
-    (currentOptions) => currentOptions.finder?.center?.shape,
-    (currentOptions, shape) => {
-      currentOptions.finder = {
-        ...currentOptions.finder,
-        center: compactObject({...currentOptions.finder?.center, shape}),
-      };
-    },
-    (value, fallback) => parseOptionalStringUnion(value, FINDER_SHAPES, fallback),
+    (currentOptions) => currentOptions.finderCenterShape,
+    (currentOptions, shape) => setOptionalProperty(currentOptions, 'finderCenterShape', shape),
+    (value, fallback) => parseOptionalStringUnion(value, PLAYGROUND_SHAPES, fallback),
     serializeString,
+  ),
+  defineQueryField(
+    'finder-color',
+    (currentOptions) => currentOptions.finderColor,
+    (currentOptions, color) => setOptionalProperty(currentOptions, 'finderColor', color),
+    parseOptionalColor,
+    serializeColor,
+  ),
+  defineQueryField(
+    'alignment-ring-shape',
+    (currentOptions) => currentOptions.alignmentRingShape,
+    (currentOptions, shape) => setOptionalProperty(currentOptions, 'alignmentRingShape', shape),
+    (value, fallback) => parseOptionalStringUnion(value, PLAYGROUND_SHAPES, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'alignment-center-shape',
+    (currentOptions) => currentOptions.alignmentCenterShape,
+    (currentOptions, shape) => setOptionalProperty(currentOptions, 'alignmentCenterShape', shape),
+    (value, fallback) => parseOptionalStringUnion(value, PLAYGROUND_SHAPES, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'alignment-color',
+    (currentOptions) => currentOptions.alignmentColor,
+    (currentOptions, color) => setOptionalProperty(currentOptions, 'alignmentColor', color),
+    parseOptionalColor,
+    serializeColor,
   ),
   defineQueryField(
     'alt',
@@ -361,7 +332,7 @@ export function readQrOptionsFromUrl(
   fallback: PlaygroundOptions = defaultPlaygroundOptions,
 ): PlaygroundOptions {
   if (typeof window === 'undefined') {
-    return clonePlaygroundOptions(fallback);
+    return {...fallback};
   }
 
   return readQrOptionsFromSearchParams(new URLSearchParams(window.location.search), fallback);
@@ -374,7 +345,7 @@ export function readQrOptionsFromSearchParams(
   params: URLSearchParams,
   fallback: PlaygroundOptions = defaultPlaygroundOptions,
 ): PlaygroundOptions {
-  const currentOptions = clonePlaygroundOptions(fallback);
+  const currentOptions = {...fallback};
 
   for (const codec of QUERY_FIELD_CODECS) {
     codec.read(params, fallback, currentOptions);
@@ -428,6 +399,9 @@ export function writeQrOptionsToSearchParams(
 ): URLSearchParams {
   for (const codec of QUERY_FIELD_CODECS) {
     codec.write(params, currentOptions, defaults);
+  }
+  for (const key of REMOVED_QUERY_KEYS) {
+    params.delete(key);
   }
 
   return params;
@@ -625,12 +599,6 @@ function isQRCodeMask(value: unknown): value is QRCodeMask {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 && value <= 7;
 }
 
-function compactObject<T extends object>(value: T): T | undefined {
-  const entries = Object.entries(value).filter(([, entry]) => entry !== undefined);
-
-  return entries.length > 0 ? (Object.fromEntries(entries) as T) : undefined;
-}
-
 type OptionalPlaygroundOptionsKey =
   | 'version'
   | 'mode'
@@ -640,6 +608,13 @@ type OptionalPlaygroundOptionsKey =
   | 'quietZone'
   | 'foreground'
   | 'background'
+  | 'moduleShape'
+  | 'finderRingShape'
+  | 'finderCenterShape'
+  | 'finderColor'
+  | 'alignmentRingShape'
+  | 'alignmentCenterShape'
+  | 'alignmentColor'
   | 'alt'
   | 'ariaLabel'
   | 'title';
@@ -654,19 +629,6 @@ function setOptionalProperty<K extends OptionalPlaygroundOptionsKey>(
   } else {
     currentOptions[key] = value;
   }
-}
-
-function clonePlaygroundOptions(currentOptions: PlaygroundOptions): PlaygroundOptions {
-  return {
-    ...currentOptions,
-    modules: currentOptions.modules ? {...currentOptions.modules} : undefined,
-    finder: currentOptions.finder
-      ? {
-          outer: currentOptions.finder.outer ? {...currentOptions.finder.outer} : undefined,
-          center: currentOptions.finder.center ? {...currentOptions.finder.center} : undefined,
-        }
-      : undefined,
-  };
 }
 
 function isPositiveInteger(value: unknown): value is number {

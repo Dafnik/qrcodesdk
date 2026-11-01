@@ -1,8 +1,10 @@
 import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
 
-import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
+import {alignment, circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
+import {fixtureMatrixOptions} from '../../src';
 import {
   QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
   QR_CODE_TEST_FIXTURES,
@@ -38,7 +40,7 @@ describe('SVG QR roundtrips', () => {
           .render(
             QRCodeSVGRenderer({
               style: {moduleSize: 4, quietZone: 4},
-              centerImage: {source, size: 0.16, padding: 0.25},
+              centerImage: svgCenterImage(source, {size: 0.16, padding: 0.25}),
             }),
           ),
       ),
@@ -67,13 +69,17 @@ describe('SVG QR roundtrips', () => {
 
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
     await expect(
-      decodeSvgQRCode(qrcode(fixture.payload).options(fixture).render(testSVGRenderer)),
+      decodeSvgQRCode(
+        qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(testSVGRenderer),
+      ),
     ).resolves.toBe(fixture.payload);
   });
 
   test.each(JSQR_ROUNDTRIP_COMBINATIONS)('decodes $name SVG output', async (fixture) => {
     await expect(
-      decodeSvgQRCode(qrcode(fixture.payload).options(fixture).render(testSVGRenderer)),
+      decodeSvgQRCode(
+        qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(testSVGRenderer),
+      ),
     ).resolves.toBe(fixture.payload);
   });
 
@@ -89,4 +95,29 @@ describe('SVG QR roundtrips', () => {
       ).resolves.toBe(fixture.payload);
     },
   );
+
+  test.each([
+    ['rounded', rounded()],
+    ['extra-rounded', rounded({radius: 1})],
+    ['diagonal', diagonal()],
+    ['circle', circle()],
+  ] as const)('decodes SVG output with %s alignment patterns', async (_name, shape) => {
+    const payload = 'https://qrcodesdk.dev/alignment/' + 'x'.repeat(120);
+    await expect(
+      decodeSvgQRCode(
+        qrcode(payload)
+          .errorCorrection('M')
+          .render(
+            QRCodeSVGRenderer({
+              style: {
+                moduleSize: 6,
+                modules: rounded(),
+                finder: finder({ring: rounded(), color: '#1d4ed8'}),
+                alignment: alignment({ring: shape, center: shape, color: '#1d4ed8'}),
+              },
+            }),
+          ),
+      ),
+    ).resolves.toBe(payload);
+  });
 });

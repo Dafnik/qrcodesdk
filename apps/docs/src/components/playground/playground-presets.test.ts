@@ -3,6 +3,7 @@ import {afterEach, describe, test} from 'node:test';
 
 import {cliPlaygroundOptions, defaultCliOptions, resetCliOptions} from './cli-playground.ts';
 import {
+  createPlaygroundSVGOptions,
   defaultPlaygroundOptions,
   playgroundOpenSections,
   playgroundOptions,
@@ -58,8 +59,45 @@ describe('playground presets', () => {
     applyQrPreset('dots');
     applyQrPreset('classic');
 
-    assert.equal(playgroundOptions.get().modules, undefined);
-    assert.equal(playgroundOptions.get().finder, undefined);
+    const options = playgroundOptions.get();
+    assert.equal(options.moduleShape, undefined);
+    assert.equal(options.finderRingShape, undefined);
+    assert.equal(options.finderCenterShape, undefined);
+    assert.equal(options.finderColor, undefined);
+    assert.equal(options.alignmentRingShape, undefined);
+    assert.equal(options.alignmentCenterShape, undefined);
+    assert.equal(options.alignmentColor, undefined);
+  });
+
+  test('styles alignment patterns through the alignment style part', () => {
+    applyQrPreset('dots');
+    const {style} = createPlaygroundSVGOptions(playgroundOptions.get(), undefined);
+
+    assert.equal(playgroundOptions.get().alignmentRingShape, 'circle');
+    assert.equal(typeof style?.alignment, 'function');
+  });
+
+  test('keeps an explicit square alignment shape apart from the module-shaped default', () => {
+    applyQrPreset('grape');
+    updateQrOptions({alignmentRingShape: 'square'});
+
+    assert.equal(findQrPreset(playgroundOptions.get()), undefined);
+  });
+
+  test('treats an explicit square shape like the omitted default', () => {
+    applyQrPreset('grape');
+    updateQrOptions({finderRingShape: 'square', finderCenterShape: 'square'});
+
+    assert.equal(findQrPreset(playgroundOptions.get())?.id, 'grape');
+  });
+
+  test('keeps one finder color and renders it through the finder style part', () => {
+    applyQrPreset('sunset');
+    const {style} = createPlaygroundSVGOptions(playgroundOptions.get(), undefined);
+
+    assert.equal(playgroundOptions.get().finderColor, '#C2410C');
+    assert.equal(typeof style?.modules, 'object');
+    assert.equal(typeof style?.finder, 'function');
   });
 
   test('reports custom styles as no preset', () => {

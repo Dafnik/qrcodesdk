@@ -92,7 +92,8 @@ Each output has a dedicated reference for its return value, options, and browser
 - [PNG-backed Image element](https://qrcodesdk.dev/reference/renderers/image/)
 - [SVG and PNG download wrappers](https://qrcodesdk.dev/reference/renderers/browser-downloads/)
 
-Follow [Add a center image](https://qrcodesdk.dev/guides/center-images/) to prepare a `CanvasImageSource`, and
+Canvas and Image output take an optional center image created with `canvasCenterImage()`. Follow
+[Add a center image](https://qrcodesdk.dev/guides/center-images/) to prepare a `CanvasImageSource`, and
 [Download or save](https://qrcodesdk.dev/guides/download-or-save/) for browser helpers and manual Canvas export.
 
 ## Runtime constraints
@@ -105,7 +106,8 @@ For server rendering, defer them until hydration or use the runtime-neutral SVG 
 
 ```ts
 import {
-  type QRCodeCanvasCenterImageOptions,
+  type QRCodeCanvasAccessibilityOptions,
+  type QRCodeCanvasCenterImage,
   type QRCodeCanvasOptions,
   QRCodeCanvasRenderer,
   type QRCodeCanvasRendererOptions,
@@ -113,9 +115,11 @@ import {
   type QRCodeDownloadImageRendererOptions,
   QRCodeDownloadSVGRenderer,
   type QRCodeDownloadSVGRendererOptions,
+  type QRCodeImageAccessibilityOptions,
   type QRCodeImageOptions,
   QRCodeImageRenderer,
   type QRCodeImageRendererOptions,
+  canvasCenterImage,
 } from '@qrcodesdk/browser';
 ```
 

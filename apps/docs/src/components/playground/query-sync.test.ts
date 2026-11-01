@@ -7,8 +7,9 @@ import {
   resetCliOptions,
   updateCliOptions,
 } from './cli-playground.ts';
-import {defaultPlaygroundOptions} from './playground-options.ts';
 import {
+  createPlaygroundSVGOptions,
+  defaultPlaygroundOptions,
   playgroundOpenSections,
   playgroundOptions,
   playgroundView,
@@ -212,5 +213,74 @@ describe('playground package query synchronization', () => {
       'svelte',
     );
     assert.equal(unknown.packageName, defaultPlaygroundOptions.packageName);
+  });
+});
+
+describe('playground styling query synchronization', () => {
+  test('round-trips shape names and the single finder color', () => {
+    const options = readQrOptionsFromSearchParams(
+      new URLSearchParams(
+        'modules-shape=diagonal-rounded&finder-ring-shape=extra-rounded&finder-center-shape=circle&finder-color=E11D48',
+      ),
+    );
+
+    assert.equal(options.moduleShape, 'diagonal-rounded');
+    assert.equal(options.finderRingShape, 'extra-rounded');
+    assert.equal(options.finderCenterShape, 'circle');
+    assert.equal(options.finderColor, '#e11d48');
+
+    const params = writeQrOptionsToSearchParams(
+      new URLSearchParams(),
+      options,
+      defaultPlaygroundOptions,
+    );
+    assert.equal(params.get('modules-shape'), 'diagonal-rounded');
+    assert.equal(params.get('finder-ring-shape'), 'extra-rounded');
+    assert.equal(params.get('finder-center-shape'), 'circle');
+    assert.equal(params.get('finder-color'), 'e11d48');
+  });
+
+  test('round-trips alignment shapes, including an explicit square, and the alignment color', () => {
+    const options = readQrOptionsFromSearchParams(
+      new URLSearchParams(
+        'alignment-ring-shape=square&alignment-center-shape=circle&alignment-color=1D4ED8',
+      ),
+    );
+
+    assert.equal(options.alignmentRingShape, 'square');
+    assert.equal(options.alignmentCenterShape, 'circle');
+    assert.equal(options.alignmentColor, '#1d4ed8');
+    assert.equal(
+      typeof createPlaygroundSVGOptions(options, undefined).style?.alignment,
+      'function',
+    );
+
+    const params = writeQrOptionsToSearchParams(
+      new URLSearchParams(),
+      options,
+      defaultPlaygroundOptions,
+    );
+    assert.equal(params.get('alignment-ring-shape'), 'square');
+    assert.equal(params.get('alignment-center-shape'), 'circle');
+    assert.equal(params.get('alignment-color'), '1d4ed8');
+
+    const defaults = writeQrOptionsToSearchParams(params, defaultPlaygroundOptions, undefined);
+    assert.equal(defaults.has('alignment-ring-shape'), false);
+    assert.equal(defaults.has('alignment-center-shape'), false);
+    assert.equal(defaults.has('alignment-color'), false);
+  });
+
+  test('ignores unknown shapes and invalid colors', () => {
+    const options = readQrOptionsFromSearchParams(
+      new URLSearchParams(
+        'modules-shape=star&finder-ring-shape=&finder-color=nope&alignment-ring-shape=star&alignment-color=nope',
+      ),
+    );
+
+    assert.equal(options.moduleShape, undefined);
+    assert.equal(options.finderRingShape, undefined);
+    assert.equal(options.finderColor, undefined);
+    assert.equal(options.alignmentRingShape, undefined);
+    assert.equal(options.alignmentColor, undefined);
   });
 });

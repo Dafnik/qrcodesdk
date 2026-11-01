@@ -47,6 +47,9 @@ describe('payload serializers', () => {
   test.each([
     () => emailPayload({to: []}),
     () => phonePayload({number: 'call me'}),
+    () => phonePayload({number: '---'}),
+    () => phonePayload({number: '1', extension: 'abc'}),
+    () => smsPayload({recipients: '()'}),
     () => smsPayload({recipients: []}),
     () => geoPayload({latitude: 91, longitude: 0}),
     () => wifiPayload({ssid: '', password: 'secret'}),
@@ -57,29 +60,6 @@ describe('payload serializers', () => {
       serialize();
     } catch (error) {
       expect(error).toMatchObject({code: 'INVALID_PAYLOAD', details: {field: expect.any(String)}});
-    }
-  });
-
-  test.each([
-    () => emailPayload(null as never),
-    () => emailPayload({to: null as never}),
-    () => phonePayload(null as never),
-    () => phonePayload({number: '1', extension: 1 as never}),
-    () => phonePayload({number: '---'}),
-    () => smsPayload(null as never),
-    () => smsPayload({recipients: '1', body: Symbol('body') as never}),
-    () => smsPayload({recipients: '()'}),
-    () => geoPayload(null as never),
-    () => wifiPayload(null as never),
-  ])('rejects malformed unchecked payloads through QRCodeError', (serialize) => {
-    expect.assertions(1);
-    try {
-      serialize();
-    } catch (error) {
-      expect(error).toMatchObject({
-        code: 'INVALID_PAYLOAD',
-        details: {field: expect.any(String)},
-      });
     }
   });
 

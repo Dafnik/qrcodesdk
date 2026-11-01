@@ -1,5 +1,5 @@
-import type {QRCodeCodewords, QRCodePolynomial} from '../types';
 import {getGF256LookupTables} from './error-correction';
+import type {QRCodeCodewords, QRCodePolynomial} from './types';
 
 /**
  * Calculates ECC code words for given code words and generator polynomial.

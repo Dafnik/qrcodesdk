@@ -5,7 +5,10 @@ import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {createSSRApp, defineComponent, h, nextTick, ref} from 'vue';
 
 import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import {canvasCenterImage} from '@qrcodesdk/browser';
 import type {QRCodeSVGOptions} from '@qrcodesdk/core';
+import {svgCenterImage} from '@qrcodesdk/core';
+import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
 import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '../src';
 
@@ -18,6 +21,7 @@ const canvasOptions: QRCodeCanvasOptions = {style: {moduleSize: 2, quietZone: 1}
 
 describe('Vue QR code components', () => {
   beforeEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
     mockCanvasRendering(vi);
   });
@@ -59,6 +63,8 @@ describe('Vue QR code components', () => {
     const svg = mount(QRCodeSVG, {props: {payload: 'HELLO', options: svgOptions}});
     const image = mount(QRCodeImage, {props: {payload: 'HELLO', options: imageOptions}});
 
+    // The SVG download revokes its object URL after a delay.
+    vi.useFakeTimers({toFake: ['setTimeout']});
     (svg.vm as unknown as QRCodeDownloadHandle).download('qrcodesdk');
     (image.vm as unknown as QRCodeDownloadHandle).download('qrcodesdk');
 
@@ -66,7 +72,8 @@ describe('Vue QR code components', () => {
       {href: 'blob:qrcode-svg', filename: 'qrcodesdk.svg'},
       {href: expect.stringMatching(/^data:image\/png;base64,/), filename: 'qrcodesdk.png'},
     ]);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:qrcode-svg');
   });
 
@@ -94,11 +101,9 @@ describe('Vue QR code components', () => {
       style: {
         moduleSize: 2,
         quietZone: 1,
-        modules: {color: '#112233' as const, shape: 'diagonal-rounded' as const},
-        finder: {
-          outer: {color: '#445566' as const, shape: 'extra-rounded' as const},
-          center: {color: '#778899' as const, shape: 'circle' as const},
-        },
+        foreground: '#112233' as const,
+        modules: diagonal({radius: 1}),
+        finder: finder({ring: rounded({radius: 1}), center: circle(), color: '#445566'}),
       },
     };
     const svg = mount(QRCodeSVG, {props: {payload: 'STYLED', options: styledOptions}});
@@ -107,9 +112,8 @@ describe('Vue QR code components', () => {
 
     expect(svg.findAll('svg path').map((path) => path.attributes('fill'))).toEqual([
       '#ffffff',
-      '#112233',
       '#445566',
-      '#778899',
+      '#112233',
     ]);
     expect(image.find('img').exists()).toBe(true);
     expect(canvas.find('canvas').exists()).toBe(true);
@@ -123,24 +127,24 @@ describe('Vue QR code components', () => {
     const svg = mount(QRCodeSVG, {
       props: {
         payload: 'CENTER IMAGE',
-        options: {...svgOptions, centerImage: {source: svgSource, size: 0.2}},
+        options: {...svgOptions, centerImage: svgCenterImage(svgSource, {size: 0.2})},
       },
     });
     const image = mount(QRCodeImage, {
       props: {
         payload: 'CENTER IMAGE',
-        options: {...imageOptions, centerImage: {source, size: 0.2}},
+        options: {...imageOptions, centerImage: canvasCenterImage(source, {size: 0.2})},
       },
     });
     const canvas = mount(QRCodeCanvas, {
       props: {
         payload: 'CENTER IMAGE',
-        options: {...canvasOptions, centerImage: {source, size: 0.2}},
+        options: {...canvasOptions, centerImage: canvasCenterImage(source, {size: 0.2})},
       },
     });
 
     expect(svg.get('svg image').attributes('href')).toBe(svgSource);
-    expect(svg.find('svg rect').exists()).toBe(true);
+    expect(svg.find('svg mask').exists()).toBe(false);
     expect(image.find('img').exists()).toBe(true);
     expect(canvas.find('canvas').exists()).toBe(true);
   });

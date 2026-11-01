@@ -1,10 +1,11 @@
+import {fixtureMatrixOptions} from '@repo/core-testing';
 import {QR_CODE_STYLING_ROUNDTRIP_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 
-import {QRCodePNGRenderer} from '../../src';
+import {QRCodePNGRenderer, pngCenterImage} from '../../src';
 import {decodePngQRCode} from './png-helpers';
 
 describe('PNG QR roundtrips', () => {
@@ -22,11 +23,7 @@ describe('PNG QR roundtrips', () => {
           .render(
             QRCodePNGRenderer({
               style: {moduleSize: 4, quietZone: 4},
-              centerImage: {
-                source: logo,
-                size: 0.16,
-                padding: 0.25,
-              },
+              centerImage: pngCenterImage(logo, {size: 0.16, padding: 0.25}),
             }),
           ),
       ),
@@ -48,7 +45,9 @@ describe('PNG QR roundtrips', () => {
 
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name PNG output', async (fixture) => {
     await expect(
-      decodePngQRCode(qrcode(fixture.payload).options(fixture).render(defaultRenderer)),
+      decodePngQRCode(
+        qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(defaultRenderer),
+      ),
     ).resolves.toBe(fixture.payload);
   });
 

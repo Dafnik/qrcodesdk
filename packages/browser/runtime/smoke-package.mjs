@@ -105,10 +105,10 @@ try {
 
     const builder = core.qrcode('Runtime ✅ 你好').mode('octet').errorCorrection('H').mask(3);
     const matrix = builder.matrix();
-    check(matrix.length === 29, 'Expected a 29×29 QR code matrix');
+    check(matrix.size === 29, 'Expected a 29×29 QR code matrix');
     check(
-      matrix.every((row) => row.length === 29),
-      'Expected square QR code matrix rows',
+      matrix.modules.length === 29 * 29 && matrix.roles.length === 29 * 29,
+      'Expected row-major QR code modules and roles',
     );
 
     const style = {moduleSize: 2, quietZone: 1};

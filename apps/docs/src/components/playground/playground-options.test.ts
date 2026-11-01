@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {afterEach, describe, test} from 'node:test';
 
-import type {QRCodeDataImageURL} from '@qrcodesdk/core';
+import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 import {
   type PlaygroundPreparedImage,
@@ -10,6 +10,7 @@ import {
   createPlaygroundImageOptions,
   createPlaygroundSVGOptions,
   defaultPlaygroundOptions,
+  playgroundCenterImageLayout,
   playgroundImageStatus,
   playgroundOptions,
   playgroundPreparedImage,
@@ -35,23 +36,35 @@ describe('playground prepared image options', () => {
     clearPlaygroundImage();
   });
 
-  test('maps the embedded URL to SVG and the loaded element to browser renderers', () => {
+  test('creates center image factories from the embedded URL and the loaded element', () => {
     const svgOptions = createPlaygroundSVGOptions(defaultPlaygroundOptions, preparedImage);
     const imageOptions = createPlaygroundImageOptions(defaultPlaygroundOptions, preparedImage);
     const canvasOptions = createPlaygroundCanvasOptions(defaultPlaygroundOptions, preparedImage);
 
-    assert.equal(svgOptions.centerImage?.source, preparedImage.dataUrl);
-    assert.equal(imageOptions.centerImage?.source, preparedImage.element);
-    assert.equal(canvasOptions.centerImage?.source, preparedImage.element);
-    assert.equal(svgOptions.matrix?.eci, false);
-    assert.equal(imageOptions.matrix?.eci, false);
-    assert.equal(canvasOptions.matrix?.eci, false);
-    assert.deepEqual(svgOptions.centerImage, {
-      source: preparedImage.dataUrl,
+    assert.deepEqual(playgroundCenterImageLayout(preparedImage), {
       size: 0.3,
       padding: 0.5,
       clearBackground: false,
     });
+    assert.ok(svgOptions.centerImage);
+    assert.ok(imageOptions.centerImage);
+    assert.ok(canvasOptions.centerImage);
+    assert.equal(svgOptions.matrix?.eci, false);
+    assert.equal(imageOptions.matrix?.eci, false);
+    assert.equal(canvasOptions.matrix?.eci, false);
+
+    const {matrix, ...rendererOptions} = svgOptions;
+    const builder = qrcode(defaultPlaygroundOptions.payload).options(matrix);
+    const width = builder.matrix().size * 0.3;
+    const svg = builder.render(QRCodeSVGRenderer(rendererOptions));
+    assert.match(svg, new RegExp(`<image href="${preparedImage.dataUrl}"[^>]* width="${width}"`));
+  });
+
+  test('reports an invalid center image layout as a QR code error', () => {
+    const invalid = {...preparedImage, size: 2};
+
+    assert.throws(() => createPlaygroundSVGOptions(defaultPlaygroundOptions, invalid));
+    assert.match(String(hasQRCodeError(defaultPlaygroundOptions, invalid)), /centerImage\.size/);
   });
 
   test('forwards enabled ECI through every renderer and error-checking path', () => {
@@ -61,10 +74,6 @@ describe('playground prepared image options', () => {
     assert.equal(createPlaygroundImageOptions(options, preparedImage).matrix?.eci, true);
     assert.equal(createPlaygroundCanvasOptions(options, preparedImage).matrix?.eci, true);
     assert.equal(hasQRCodeError(options, undefined), undefined);
-    assert.match(
-      String(hasQRCodeError({...options, eci: 'true' as never}, undefined)),
-      /Invalid ECI setting/,
-    );
   });
 
   test('updates options without replacing prepared sources', () => {

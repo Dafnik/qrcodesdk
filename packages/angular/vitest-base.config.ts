@@ -10,5 +10,6 @@ export default defineConfig({
       reporter: [['json', {file: 'angular.json'}]],
       reportsDirectory: '../../.coverage/raw/angular',
     },
+    unstubGlobals: true,
   },
 });

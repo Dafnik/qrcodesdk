@@ -19,12 +19,13 @@ import {type QRCodePayload, qrcode} from '@qrcodesdk/core';
 
 import {replaceElementChildren} from './render-element';
 import {splitOptions} from './split-options';
+import type {QRCodeDownloadHandle} from './types';
 
 @Component({
   selector: 'qrcode-image',
   template: '',
 })
-export class QRCodeImage {
+export class QRCodeImage implements QRCodeDownloadHandle {
   private readonly renderer = inject(Renderer2);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);

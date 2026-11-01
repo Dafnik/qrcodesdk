@@ -45,13 +45,15 @@ string or Image element.
 
 `renderer` is required. `filename` is optional; the wrapper appends its extension when the supplied
 name does not already end with that extension, using a case-insensitive check.
+Surrounding whitespace is trimmed, and empty or whitespace-only filenames use `qrcode`. Both factories copy their options
+when called; changing the original object later does not change the download.
 
 ## Renderer-specific constraints
 
 - Both wrappers require browser DOM download behavior and must be called in a context where the
   browser permits a programmatic link click.
-- The SVG wrapper creates an `image/svg+xml;charset=utf-8` Blob and revokes its object URL on the next
-  task after triggering the download.
+- The SVG wrapper creates an `image/svg+xml;charset=utf-8` Blob and revokes its object URL 40 seconds
+  after triggering the download, so browsers that start downloads asynchronously can finish reading it.
 - The PNG wrapper downloads the wrapped Image element's existing `src`; it does not re-encode it.
 - Wrapped renderer options, output validity, and runtime requirements remain the responsibility of
   the wrapped renderer.

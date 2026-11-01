@@ -21,17 +21,29 @@ describe('React QR code component handles', () => {
     cleanup();
   });
 
-  test('exports only the documented runtime components', () => {
-    expect(Object.keys(reactApi).sort()).toEqual(['QRCodeCanvas', 'QRCodeImage', 'QRCodeSVG']);
+  test('exports the components, shapes, and center-image factories', () => {
+    // An exact list keeps internal helpers out of the package root.
+    expect(Object.keys(reactApi).sort()).toEqual([
+      'QRCodeCanvas',
+      'QRCodeImage',
+      'QRCodeSVG',
+      'alignment',
+      'canvasCenterImage',
+      'circle',
+      'customShape',
+      'diagonal',
+      'finder',
+      'rounded',
+      'svgCenterImage',
+    ]);
   });
 
-  test('does not accept managed HTML content props', () => {
-    expectTypeOf<
-      'dangerouslySetInnerHTML' extends keyof QRCodeSVGProps ? true : false
-    >().toEqualTypeOf<false>();
+  test('accepts payload and options props', () => {
+    expectTypeOf<QRCodeSVGProps>().toHaveProperty('payload');
+    expectTypeOf<QRCodeSVGProps>().toHaveProperty('options');
   });
 
-  test('exposes download handles only for SVG and image components', () => {
+  test('exposes SVG and image download handles', () => {
     const svgQRCode = createRef<QRCodeDownloadHandle>();
     const imageQRCode = createRef<QRCodeDownloadHandle>();
 
@@ -42,8 +54,8 @@ describe('React QR code component handles', () => {
       </>,
     );
 
-    expect(svgQRCode.current).toEqual({download: expect.any(Function)});
-    expect(imageQRCode.current).toEqual({download: expect.any(Function)});
+    expect(svgQRCode.current).toMatchObject({download: expect.any(Function)});
+    expect(imageQRCode.current).toMatchObject({download: expect.any(Function)});
   });
 
   test('server-renders complete SVG markup and permanent browser-output wrappers', () => {

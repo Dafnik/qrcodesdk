@@ -1,5 +1,5 @@
 import {QRCodeError} from '../error';
-import type {QRCodeCodewords, QRCodeEncodedSegment, QRCodeVersion} from '../types';
+import type {QRCodeVersion} from '../types';
 import {
   ECI_UTF8_ASSIGNMENT,
   MODE_ECI,
@@ -7,6 +7,7 @@ import {
   encodePayload,
   getCharacterCountBits,
 } from './mode';
+import type {QRCodeCodewords, QRCodeEncodedSegment} from './types';
 
 /**
  * Returns the code words (sans ECC bits) for given payload segments and options.

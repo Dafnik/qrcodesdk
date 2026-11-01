@@ -24,7 +24,7 @@ This plan covers the docs feature. The CLI continues to support PNG locally.
 - `@qrcodesdk/core` exports browser-compatible `qrcode`, `QRCodeTextRenderer`, and `QRCodeSVGRenderer` APIs. The CLI runner imports filesystem, process, and PNG APIs and cannot enter the browser bundle.
 - The docs use Angular 22, signals, Nanostores, existing Helm controls, and Node's test runner for playground helpers.
 
-Use the current CLI source and tests as the flag contract. ADR 0025 still names older ANSI flags.
+Use the current CLI source and tests as the flag contract.
 
 ## Controls and command builder
 

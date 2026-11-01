@@ -10,5 +10,6 @@ export default defineConfig({
       reportsDirectory: '../../.coverage/raw/react',
     },
     environment: 'jsdom',
+    unstubGlobals: true,
   },
 });

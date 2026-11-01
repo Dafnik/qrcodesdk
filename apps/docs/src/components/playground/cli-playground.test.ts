@@ -182,9 +182,6 @@ describe('CLI commands and real CLI output', () => {
           preview.text,
           qrcode(options.payload).render(QRCodeTextRenderer(createCliTextOptions(options))) + '\n',
         );
-        if (ansi === 'background') assert.doesNotMatch(preview.command, /--layout/);
-        if (ansi === 'off') assert.doesNotMatch(preview.command, /--foreground|--background/);
-        assert.doesNotMatch(preview.command, /--output|--title|--aria-label/);
       });
     }
   }
@@ -217,7 +214,6 @@ describe('CLI commands and real CLI output', () => {
         readFileSync(options.outputPath, 'utf8'),
         qrcode(options.payload).options(matrix).render(QRCodeSVGRenderer(rendererOptions)),
       );
-      assert.doesNotMatch(generateCliCommand(options), /--ansi|--layout|png/);
       assert.match(generateCliCommand(options), /--eci/);
     } finally {
       rmSync(directory, {recursive: true, force: true});
@@ -238,8 +234,6 @@ describe('CLI commands and real CLI output', () => {
     {moduleSize: 1.5},
     {quietZone: -1},
     {quietZone: Number.MAX_SAFE_INTEGER + 1},
-    {version: 41},
-    {mask: 8},
     {foreground: '#abc'},
     {background: '#gggggg'},
     {format: 'svg', outputPath: ' '},

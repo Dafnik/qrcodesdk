@@ -1,16 +1,16 @@
 import {describe, expect, test} from 'vitest';
 
 import type {QRCodeVersion} from '../../src';
+import {applyMaskToMatrix} from '../../src/matrix/apply-mask-to-matrix';
 import {
   ECC_LEVELS_MAP,
   ECC_LEVEL_H,
   ECC_LEVEL_L,
   ECC_LEVEL_M,
   ECC_LEVEL_Q,
-  getGF256GeneratorPolynomials,
+  getGF256GeneratorPolynomial,
   getGF256LookupTables,
 } from '../../src/matrix/error-correction';
-import {MASK_FUNCTIONS, QR_CODE_MASKS} from '../../src/matrix/mask';
 import {
   ALPHANUMERIC_CHARACTERS,
   MODES_MAP,
@@ -25,6 +25,7 @@ import {
   getErrorCorrectionBlockCount,
   getErrorCorrectionCodewordsPerBlock,
 } from '../../src/matrix/version-config';
+import {MASK_FUNCTIONS, QR_CODE_MASKS, getGF256GeneratorPolynomials} from './helpers';
 
 // JIS X 0510:2004 Table 9, indexed by the internal ECC value (M, L, H, Q) and version 1-40.
 const EXPECTED_ERROR_CORRECTION_CODEWORDS_PER_BLOCK = [
@@ -139,16 +140,6 @@ describe('matrix constants', () => {
       MODE_ALPHANUMERIC,
       MODE_OCTET,
     ]);
-    expect(() => resolveMode('1', 'kanji' as never)).toThrow('QRCode: Invalid mode');
-  });
-
-  test.each(['kanji', 'toString'])('reports the rejected mode %s in error details', (mode) => {
-    expect(() => resolveMode('1', mode as never)).toThrowError(
-      expect.objectContaining({
-        code: 'INVALID_OPTIONS',
-        details: {field: 'mode', value: mode},
-      }),
-    );
   });
 
   test('builds GF256 lookup tables and generator polynomial degrees', () => {
@@ -168,7 +159,7 @@ describe('matrix constants', () => {
 
   test('caches generated lookup tables', () => {
     expect(getGF256LookupTables()).toBe(getGF256LookupTables());
-    expect(getGF256GeneratorPolynomials()).toBe(getGF256GeneratorPolynomials());
+    expect(getGF256GeneratorPolynomial(30)).toBe(getGF256GeneratorPolynomial(30));
   });
 
   test('implements all QR mask predicates', () => {
@@ -180,9 +171,7 @@ describe('matrix constants', () => {
       [2, 3],
       [5, 7],
     ] as const;
-    expect(
-      MASK_FUNCTIONS.map((maskFunction) => points.map(([i, j]) => maskFunction(i, j))),
-    ).toEqual([
+    const expected = [
       [true, false, false, false, true],
       [true, true, false, true, false],
       [true, false, true, true, false],
@@ -191,7 +180,23 @@ describe('matrix constants', () => {
       [true, true, true, true, false],
       [true, true, true, true, false],
       [true, false, false, false, true],
-    ]);
+    ];
+    // Production masks, applied to an all-data matrix, toggle exactly the predicate's modules.
+    const size = 8;
+    const applied = QR_CODE_MASKS.map((mask) => {
+      const modules = applyMaskToMatrix(
+        new Uint8Array(size * size),
+        new Uint8Array(size * size),
+        size,
+        mask,
+      );
+      return points.map(([i, j]) => modules[i * size + j] === 1);
+    });
+
+    expect(
+      MASK_FUNCTIONS.map((maskFunction) => points.map(([i, j]) => maskFunction(i, j))),
+    ).toEqual(expected);
+    expect(applied).toEqual(expected);
   });
 
   test('decodes the packed error-correction tables', () => {

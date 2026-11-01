@@ -1,5 +1,5 @@
-import type {QRCodeCodewords, QRCodePolynomial} from '../types';
 import {calculateECC} from './calculate-ecc';
+import type {QRCodeCodewords, QRCodePolynomial} from './types';
 
 /**
  * Augments ECC code words to given code words. The resulting words are

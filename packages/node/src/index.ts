@@ -1,5 +1,6 @@
 export {
-  type QRCodePNGCenterImageOptions,
+  type QRCodePNGCenterImage,
   type QRCodePNGRendererOptions,
   QRCodePNGRenderer,
+  pngCenterImage,
 } from './png';

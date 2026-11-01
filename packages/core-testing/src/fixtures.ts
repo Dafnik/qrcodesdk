@@ -7,6 +7,12 @@ export type QRCodeTestFixture = Readonly<
   }
 >;
 
+/** Extracts encoding options without fixture names or payloads. */
+export function fixtureMatrixOptions(fixture: QRCodeMatrixOptions): QRCodeMatrixOptions {
+  const {mode, version, mask, eci, errorCorrectionLevel} = fixture;
+  return {mode, version, mask, eci, errorCorrectionLevel};
+}
+
 export const QR_CODE_ECI_TEST_FIXTURE = {
   name: 'bytes-utf8-eci',
   payload: 'Grüße ✅',

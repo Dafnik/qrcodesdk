@@ -4,6 +4,7 @@ import {describe, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
+import {fixtureMatrixOptions} from '../../src';
 import {QR_CODE_STYLING_FIXTURES, QR_CODE_TEST_FIXTURES} from '../../src';
 import {expectSvgToMatchFileSnapshot} from './svg-helpers';
 
@@ -13,7 +14,7 @@ describe('QRCodeSVGRenderer snapshots', () => {
   const renderer = QRCodeSVGRenderer({style: {moduleSize: 8, quietZone: 4}});
   test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR SVG snapshot', (fixture) => {
     expectSvgToMatchFileSnapshot(
-      qrcode(fixture.payload).options(fixture).render(renderer),
+      qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(renderer),
       join(SNAPSHOT_DIR, `${fixture.name}.svg`),
     );
   });

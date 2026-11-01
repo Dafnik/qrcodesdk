@@ -13,5 +13,6 @@ export default defineConfig({
       reportsDirectory: '../../.coverage/raw/svelte',
     },
     environment: 'jsdom',
+    unstubGlobals: true,
   },
 });

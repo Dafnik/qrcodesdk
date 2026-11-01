@@ -52,11 +52,11 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
-    "./drawing": "./dist/drawing/index.mjs",
     "./error": "./dist/error.mjs",
     "./internal": "./dist/internal.mjs",
     "./matrix": "./dist/matrix.mjs",
     "./payload": "./dist/payload.mjs",
+    "./style": "./dist/style.mjs",
     "./svg": "./dist/svg.mjs",
     "./text": "./dist/text.mjs",
     "./package.json": "./package.json"
@@ -68,7 +68,7 @@
   ],
   "scripts": {
     "benchmark:matrix": "vitest bench --run benchmarks/matrix-hot-path.bench.ts",
-    "benchmark:styler": "vitest bench --run benchmarks/styler-hot-path.bench.ts",
+    "benchmark:styler": "vitest bench --run benchmarks/styler-hot-path.bench.mjs",
     "build": "tsdown",
     "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",

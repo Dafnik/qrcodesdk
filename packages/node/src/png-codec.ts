@@ -20,6 +20,15 @@ export function encodePNG({width, height, data}: PNGImage, level: number): Buffe
   const byteWidth = width * 4;
   const filtered = Buffer.alloc((byteWidth + 1) * height);
   for (let y = 0, position = 0; y < height; y++, position += byteWidth) {
+    // Module rows repeat for the module size. The Up filter turns a repeated row into zeros,
+    // which `filtered` already holds.
+    if (
+      y > 0 &&
+      data.compare(data, position - byteWidth, position, position, position + byteWidth) === 0
+    ) {
+      filtered[y * (byteWidth + 1)] = 2;
+      continue;
+    }
     let filter = 0;
     let minimum = Infinity;
     for (let type = 0; type < 5; type++) {

@@ -4,6 +4,7 @@ import {describe, test} from 'vitest';
 
 import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
 
+import {fixtureMatrixOptions} from '../../src';
 import {QR_CODE_TEST_FIXTURES} from '../../src';
 import {expectTextToMatchFileSnapshot} from './text-helpers';
 
@@ -18,7 +19,7 @@ describe('QRCodeTextRenderer snapshots', () => {
     test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR text snapshot', (fixture) => {
       expectTextToMatchFileSnapshot(
         qrcode(fixture.payload)
-          .options(fixture)
+          .options(fixtureMatrixOptions(fixture))
           .render(
             QRCodeTextRenderer({
               style: {moduleSize: 2, quietZone: 4},

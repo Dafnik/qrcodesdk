@@ -13,17 +13,17 @@ import {HlmLabelImports} from '@spartan-ng/helm/label';
 import {HlmSelectImports} from '@spartan-ng/helm/select';
 import {HlmSwitchImports} from '@spartan-ng/helm/switch';
 
-import type {QRCodeFinderShape, QRCodeModuleShape} from '@qrcodesdk/core';
-
 import {suppressInitialTransitions} from '../../angular/suppress-initial-transitions.ts';
 import {resetCliOptions} from '../cli-playground.ts';
 import {
+  type PlaygroundOptions,
   playgroundOpenSections,
   playgroundOptions,
   resetQrOptions,
   setPlaygroundSectionOpen,
   updateQrOptions,
 } from '../playground-options.ts';
+import {PLAYGROUND_SHAPES} from '../playground-style.ts';
 import {CliPlaygroundControls} from './cli-playground-controls.ts';
 import {PlaygroundImageControls} from './image-controls.ts';
 import {
@@ -103,78 +103,61 @@ import {titleCase} from './title-case.ts';
                       <hlm-switch [(checked)]="overrideModules" inputId="override-modules" />
                     </div>
 
-                    <div class="grid gap-2 md:grid-cols-2">
+                    <div class="grid gap-2">
                       <div hlmField>
-                        <label hlmFieldLabel for="moduleShape">Type</label>
+                        <label hlmFieldLabel for="moduleShape">Module shape</label>
                         <hlm-select
                           [disabled]="!overrideModules()"
                           [itemToString]="titleCase"
                           [ngModel]="moduleShape()"
-                          (ngModelChange)="updateQrOptions({modules: {shape: $event}})">
+                          (ngModelChange)="updateQrOptions({moduleShape: $event})">
                           <hlm-select-trigger class="w-full" buttonId="moduleShape">
                             <hlm-select-value placeholder="Auto" />
                           </hlm-select-trigger>
                           <hlm-select-content *hlmSelectPortal>
                             <hlm-select-group>
                               <hlm-select-label>Module shape</hlm-select-label>
-                              @for (
-                                moduleShapeOption of MODULE_SHAPE_OPTIONS;
-                                track moduleShapeOption
-                              ) {
-                                <hlm-select-item [value]="moduleShapeOption">
-                                  {{ titleCase(moduleShapeOption) }}
+                              @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
+                                <hlm-select-item [value]="shapeOption">
+                                  {{ titleCase(shapeOption) }}
                                 </hlm-select-item>
                               }
                             </hlm-select-group>
                           </hlm-select-content>
                         </hlm-select>
                       </div>
-                      <div hlmField>
-                        <label hlmFieldLabel for="moduleColor">Color</label>
-                        <playground-color-input
-                          [presets]="DARK_COLOR_PRESETS"
-                          [color]="moduleColor()"
-                          [disabled]="!overrideModules()"
-                          (colorChange)="updateQrOptions({modules: {color: $event}})"
-                          buttonId="moduleColor" />
-                      </div>
                     </div>
                   </label>
                 </div>
                 <div
                   class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
-                  [attr.data-checked]="overrideFinderOuter() ? 'true' : 'false'">
+                  [attr.data-checked]="overrideFinder() ? 'true' : 'false'">
                   <label
                     class="grid w-full gap-2 p-4 has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-70"
-                    for="override-finder-outer"
+                    for="override-finder"
                     hlmLabel>
                     <div class="flex items-center justify-between gap-2">
-                      <span class="text-sm leading-4">Finder outer ring</span>
-                      <hlm-switch
-                        [(checked)]="overrideFinderOuter"
-                        inputId="override-finder-outer" />
+                      <span class="text-sm leading-4">Finder patterns</span>
+                      <hlm-switch [(checked)]="overrideFinder" inputId="override-finder" />
                     </div>
 
                     <div class="grid gap-2 md:grid-cols-2">
                       <div hlmField>
-                        <label hlmFieldLabel for="finderOuterShape">Type</label>
+                        <label hlmFieldLabel for="finderRingShape">Finder ring</label>
                         <hlm-select
-                          [disabled]="!overrideFinderOuter()"
+                          [disabled]="!overrideFinder()"
                           [itemToString]="titleCase"
-                          [ngModel]="finderOuterType()"
-                          (ngModelChange)="updateQrOptions({finder: {outer: {shape: $event}}})">
-                          <hlm-select-trigger class="w-full" buttonId="finderOuterShape">
+                          [ngModel]="finderRingShape()"
+                          (ngModelChange)="updateQrOptions({finderRingShape: $event})">
+                          <hlm-select-trigger class="w-full" buttonId="finderRingShape">
                             <hlm-select-value placeholder="Auto" />
                           </hlm-select-trigger>
                           <hlm-select-content *hlmSelectPortal>
                             <hlm-select-group>
-                              <hlm-select-label>Finder-outer shape</hlm-select-label>
-                              @for (
-                                finderOuterShapeOption of FINDER_OUTER_SHAPE_OPTIONS;
-                                track finderOuterShapeOption
-                              ) {
-                                <hlm-select-item [value]="finderOuterShapeOption">
-                                  {{ titleCase(finderOuterShapeOption) }}
+                              <hlm-select-label>Finder ring shape</hlm-select-label>
+                              @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
+                                <hlm-select-item [value]="shapeOption">
+                                  {{ titleCase(shapeOption) }}
                                 </hlm-select-item>
                               }
                             </hlm-select-group>
@@ -182,51 +165,68 @@ import {titleCase} from './title-case.ts';
                         </hlm-select>
                       </div>
                       <div hlmField>
-                        <label hlmFieldLabel for="finderOuterColor">Color</label>
-                        <playground-color-input
-                          [presets]="DARK_COLOR_PRESETS"
-                          [color]="finderOuterColor()"
-                          [disabled]="!overrideFinderOuter()"
-                          (colorChange)="updateQrOptions({finder: {outer: {color: $event}}})"
-                          buttonId="finderOuterColor" />
-                      </div>
-                    </div>
-                  </label>
-                </div>
-                <div
-                  class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
-                  [attr.data-checked]="overrideFinderCenter() ? 'true' : 'false'">
-                  <label
-                    class="grid w-full gap-2 p-4 has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-70"
-                    for="override-finder-center"
-                    hlmLabel>
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="text-sm leading-4">Finder center</span>
-                      <hlm-switch
-                        [(checked)]="overrideFinderCenter"
-                        inputId="override-finder-center" />
-                    </div>
-
-                    <div class="grid gap-2 md:grid-cols-2">
-                      <div hlmField>
-                        <label hlmFieldLabel for="finderCenterShape">Type</label>
+                        <label hlmFieldLabel for="finderCenterShape">Finder center</label>
                         <hlm-select
-                          [disabled]="!overrideFinderCenter()"
+                          [disabled]="!overrideFinder()"
                           [itemToString]="titleCase"
-                          [ngModel]="finderCenterType()"
-                          (ngModelChange)="updateQrOptions({finder: {center: {shape: $event}}})">
+                          [ngModel]="finderCenterShape()"
+                          (ngModelChange)="updateQrOptions({finderCenterShape: $event})">
                           <hlm-select-trigger class="w-full" buttonId="finderCenterShape">
                             <hlm-select-value placeholder="Auto" />
                           </hlm-select-trigger>
                           <hlm-select-content *hlmSelectPortal>
                             <hlm-select-group>
-                              <hlm-select-label>Finder-center shape</hlm-select-label>
-                              @for (
-                                finderCenterShapeOptions of FINDER_CENTER_SHAPE_OPTIONS;
-                                track finderCenterShapeOptions
-                              ) {
-                                <hlm-select-item [value]="finderCenterShapeOptions">
-                                  {{ titleCase(finderCenterShapeOptions) }}
+                              <hlm-select-label>Finder center shape</hlm-select-label>
+                              @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
+                                <hlm-select-item [value]="shapeOption">
+                                  {{ titleCase(shapeOption) }}
+                                </hlm-select-item>
+                              }
+                            </hlm-select-group>
+                          </hlm-select-content>
+                        </hlm-select>
+                      </div>
+                      <div class="md:col-span-2" hlmField>
+                        <label hlmFieldLabel for="finderColor">Finder color</label>
+                        <playground-color-input
+                          [presets]="DARK_COLOR_PRESETS"
+                          [color]="finderColor()"
+                          [disabled]="!overrideFinder()"
+                          (colorChange)="updateQrOptions({finderColor: $event})"
+                          buttonId="finderColor" />
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                <div
+                  class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
+                  [attr.data-checked]="overrideAlignment() ? 'true' : 'false'">
+                  <label
+                    class="grid w-full gap-2 p-4 has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-70"
+                    for="override-alignment"
+                    hlmLabel>
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-sm leading-4">Alignment patterns</span>
+                      <hlm-switch [(checked)]="overrideAlignment" inputId="override-alignment" />
+                    </div>
+
+                    <div class="grid gap-2 md:grid-cols-2">
+                      <div hlmField>
+                        <label hlmFieldLabel for="alignmentRingShape">Alignment ring</label>
+                        <hlm-select
+                          [disabled]="!overrideAlignment()"
+                          [itemToString]="titleCase"
+                          [ngModel]="alignmentRingShape()"
+                          (ngModelChange)="updateQrOptions({alignmentRingShape: $event})">
+                          <hlm-select-trigger class="w-full" buttonId="alignmentRingShape">
+                            <hlm-select-value placeholder="Auto" />
+                          </hlm-select-trigger>
+                          <hlm-select-content *hlmSelectPortal>
+                            <hlm-select-group>
+                              <hlm-select-label>Alignment ring shape</hlm-select-label>
+                              @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
+                                <hlm-select-item [value]="shapeOption">
+                                  {{ titleCase(shapeOption) }}
                                 </hlm-select-item>
                               }
                             </hlm-select-group>
@@ -234,13 +234,35 @@ import {titleCase} from './title-case.ts';
                         </hlm-select>
                       </div>
                       <div hlmField>
-                        <label hlmFieldLabel for="finderCenterColor">Color</label>
+                        <label hlmFieldLabel for="alignmentCenterShape">Alignment center</label>
+                        <hlm-select
+                          [disabled]="!overrideAlignment()"
+                          [itemToString]="titleCase"
+                          [ngModel]="alignmentCenterShape()"
+                          (ngModelChange)="updateQrOptions({alignmentCenterShape: $event})">
+                          <hlm-select-trigger class="w-full" buttonId="alignmentCenterShape">
+                            <hlm-select-value placeholder="Auto" />
+                          </hlm-select-trigger>
+                          <hlm-select-content *hlmSelectPortal>
+                            <hlm-select-group>
+                              <hlm-select-label>Alignment center shape</hlm-select-label>
+                              @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
+                                <hlm-select-item [value]="shapeOption">
+                                  {{ titleCase(shapeOption) }}
+                                </hlm-select-item>
+                              }
+                            </hlm-select-group>
+                          </hlm-select-content>
+                        </hlm-select>
+                      </div>
+                      <div class="md:col-span-2" hlmField>
+                        <label hlmFieldLabel for="alignmentColor">Alignment color</label>
                         <playground-color-input
                           [presets]="DARK_COLOR_PRESETS"
-                          [color]="finderCenterColor()"
-                          [disabled]="!overrideFinderCenter()"
-                          (colorChange)="updateQrOptions({finder: {center: {color: $event}}})"
-                          buttonId="finderCenterColor" />
+                          [color]="alignmentColor()"
+                          [disabled]="!overrideAlignment()"
+                          (colorChange)="updateQrOptions({alignmentColor: $event})"
+                          buttonId="alignmentColor" />
                       </div>
                     </div>
                   </label>
@@ -326,71 +348,88 @@ export class PlaygroundControls {
   });
   protected readonly foreground = computed(() => this.currentOptions().foreground ?? '#000000');
   protected readonly background = computed(() => this.currentOptions().background ?? '#FFFFFF');
-  protected readonly moduleShape = computed(() => this.currentOptions().modules?.shape ?? 'square');
-  protected readonly moduleColor = computed(
-    () => this.currentOptions().modules?.color ?? '#000000',
+  protected readonly moduleShape = computed(() => this.currentOptions().moduleShape ?? 'square');
+  protected readonly finderRingShape = computed(
+    () => this.currentOptions().finderRingShape ?? 'square',
   );
-  protected readonly finderOuterType = computed(
-    () => this.currentOptions().finder?.outer?.shape ?? 'square',
+  protected readonly finderCenterShape = computed(
+    () => this.currentOptions().finderCenterShape ?? 'square',
   );
-  protected readonly finderOuterColor = computed(
-    () => this.currentOptions().finder?.outer?.color ?? '#000000',
-  );
-  protected readonly finderCenterType = computed(
-    () => this.currentOptions().finder?.center?.shape ?? 'square',
-  );
-  protected readonly finderCenterColor = computed(
-    () => this.currentOptions().finder?.center?.color ?? '#000000',
+  protected readonly finderColor = computed(
+    () => this.currentOptions().finderColor ?? this.foreground(),
   );
 
-  protected readonly overrideModules = linkedSignal(() => !!this.currentOptions().modules);
-  protected readonly overrideFinderOuter = linkedSignal(
-    () => !!this.currentOptions().finder?.outer,
+  /**
+   * Alignment patterns take the module shape until a part styles them. Inside the part, an unset
+   * shape is square, so the selects show "Auto" only while no alignment option is set.
+   */
+  protected readonly alignmentRingShape = computed(
+    () =>
+      this.currentOptions().alignmentRingShape ??
+      (hasAlignmentOptions(this.currentOptions()) ? 'square' : undefined),
   );
-  protected readonly overrideFinderCenter = linkedSignal(
-    () => !!this.currentOptions().finder?.center,
+  protected readonly alignmentCenterShape = computed(
+    () =>
+      this.currentOptions().alignmentCenterShape ??
+      (hasAlignmentOptions(this.currentOptions()) ? 'square' : undefined),
+  );
+  protected readonly alignmentColor = computed(
+    () => this.currentOptions().alignmentColor ?? this.foreground(),
+  );
+
+  protected readonly overrideModules = linkedSignal(
+    () => this.currentOptions().moduleShape !== undefined,
+  );
+  protected readonly overrideFinder = linkedSignal(() => hasFinderOptions(this.currentOptions()));
+  protected readonly overrideAlignment = linkedSignal(() =>
+    hasAlignmentOptions(this.currentOptions()),
   );
 
   protected readonly DARK_COLOR_PRESETS = DARK_COLOR_PRESETS;
   protected readonly LIGHT_COLOR_PRESETS = LIGHT_COLOR_PRESETS;
 
-  protected readonly MODULE_SHAPE_OPTIONS = [
-    'square',
-    'rounded',
-    'circle',
-    'diagonal',
-    'diagonal-rounded',
-    'extra-rounded',
-  ] as const satisfies QRCodeModuleShape[];
-  protected readonly FINDER_OUTER_SHAPE_OPTIONS = [
-    'square',
-    'extra-rounded',
-    'rounded',
-    'circle',
-  ] as const satisfies readonly QRCodeFinderShape[];
-  protected readonly FINDER_CENTER_SHAPE_OPTIONS = [
-    'square',
-    'rounded',
-    'extra-rounded',
-    'circle',
-  ] as const satisfies readonly QRCodeFinderShape[];
+  protected readonly SHAPE_OPTIONS = PLAYGROUND_SHAPES;
 
   constructor() {
     suppressInitialTransitions();
     effect(() => {
-      if (!this.overrideModules() && this.currentOptions().modules !== undefined) {
-        updateQrOptions({modules: undefined});
+      if (!this.overrideModules() && this.currentOptions().moduleShape !== undefined) {
+        updateQrOptions({moduleShape: undefined});
       }
     });
     effect(() => {
-      if (!this.overrideFinderOuter() && this.currentOptions().finder?.outer !== undefined) {
-        updateQrOptions({finder: {...this.currentOptions().finder, outer: undefined}});
+      if (!this.overrideFinder() && hasFinderOptions(this.currentOptions())) {
+        updateQrOptions({
+          finderRingShape: undefined,
+          finderCenterShape: undefined,
+          finderColor: undefined,
+        });
       }
     });
     effect(() => {
-      if (!this.overrideFinderCenter() && this.currentOptions().finder?.center !== undefined) {
-        updateQrOptions({finder: {...this.currentOptions().finder, center: undefined}});
+      if (!this.overrideAlignment() && hasAlignmentOptions(this.currentOptions())) {
+        updateQrOptions({
+          alignmentRingShape: undefined,
+          alignmentCenterShape: undefined,
+          alignmentColor: undefined,
+        });
       }
     });
   }
+}
+
+function hasFinderOptions(options: PlaygroundOptions): boolean {
+  return (
+    options.finderRingShape !== undefined ||
+    options.finderCenterShape !== undefined ||
+    options.finderColor !== undefined
+  );
+}
+
+function hasAlignmentOptions(options: PlaygroundOptions): boolean {
+  return (
+    options.alignmentRingShape !== undefined ||
+    options.alignmentCenterShape !== undefined ||
+    options.alignmentColor !== undefined
+  );
 }

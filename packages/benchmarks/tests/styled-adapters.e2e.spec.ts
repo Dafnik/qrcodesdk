@@ -38,14 +38,14 @@ describe('styled SVG benchmark adapters', {timeout: 15_000}, () => {
     });
   });
 
-  test('keeps per-part colors and every fixture shape type', () => {
+  test('keeps the finder color and every fixture shape type', () => {
     const featureFixture = QR_CODE_STYLING_FIXTURES.find(({name}) =>
       name.endsWith('palette-jewel'),
     )!;
     expect(createQRCodeStylingLibraryOptions(featureFixture)).toMatchObject({
       dotsOptions: {color: '#112233'},
       cornersSquareOptions: {color: '#1f4d3a'},
-      cornersDotOptions: {color: '#4a234a'},
+      cornersDotOptions: {color: '#1f4d3a'},
     });
 
     const mapped = QR_CODE_STYLING_FIXTURES.map(createQRCodeStylingLibraryOptions);

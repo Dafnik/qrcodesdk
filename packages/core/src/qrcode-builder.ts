@@ -25,8 +25,8 @@ type HasRenderer<TOutput> = {
 };
 
 export class QRCodeBuilder<
-  P extends NoPayload | HasPayload,
-  R extends NoRenderer | HasRenderer<unknown>,
+  P extends NoPayload | HasPayload = HasPayload,
+  R extends NoRenderer | HasRenderer<unknown> = NoRenderer | HasRenderer<unknown>,
 > {
   private cachedMatrix: QRCodeMatrix | undefined;
 
@@ -88,7 +88,9 @@ export class QRCodeBuilder<
   }
 
   matrix(this: QRCodeBuilder<HasPayload, R>): QRCodeMatrix {
-    return (this.cachedMatrix ??= freezeMatrix(generateQRCodeMatrix(this._payload, this._options)));
+    return (this.cachedMatrix ??= Object.freeze(
+      generateQRCodeMatrix(this._payload, this._options),
+    ));
   }
 
   render<TOutput>(this: QRCodeBuilder<HasPayload, R>, renderer: QRCodeRenderer<TOutput>): TOutput;
@@ -98,9 +100,9 @@ export class QRCodeBuilder<
     renderer?: QRCodeRenderer<TOutput>,
   ): TOutput {
     const selectedRenderer = renderer ?? this.currentRenderer;
-
+    // A bare `QRCodeBuilder` type allows `render()` without a renderer.
     if (!selectedRenderer) {
-      throw new QRCodeError('RENDERER_MISSING', 'QRCode: Renderer missing');
+      throw new QRCodeError('RENDERER_MISSING', 'QR code renderer is missing');
     }
 
     return selectedRenderer(this.matrix()) as TOutput;
@@ -116,11 +118,6 @@ export class QRCodeBuilder<
       this.currentRenderer,
     );
   }
-}
-
-function freezeMatrix(matrix: QRCodeMatrix): QRCodeMatrix {
-  for (const row of matrix) Object.freeze(row);
-  return Object.freeze(matrix);
 }
 
 export function qrcode(): QRCodeBuilder<NoPayload, NoRenderer>;

@@ -2,6 +2,7 @@ import {describe, expect, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
+import {fixtureMatrixOptions} from '../../src';
 import {getAllQRCodeECICombinations} from '../../src';
 import {decodeSvgQRCode} from './svg-helpers';
 
@@ -20,7 +21,9 @@ describe('SVG QR eci roundtrips', () => {
     'decodes eci $name SVG output',
     async (fixture) => {
       await expect(
-        decodeSvgQRCode(qrcode(fixture.payload).options(fixture).render(testSVGRenderer)),
+        decodeSvgQRCode(
+          qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(testSVGRenderer),
+        ),
       ).resolves.toBe(fixture.payload);
     },
   );

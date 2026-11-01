@@ -1,11 +1,5 @@
-import {QRCodeError} from '../error';
-import type {
-  QRCodeEncodedPayload,
-  QRCodeMode,
-  QRCodePayload,
-  QRCodeSupportedModeIndicator,
-  QRCodeVersion,
-} from '../types';
+import type {QRCodeMode, QRCodePayload, QRCodeVersion} from '../types';
+import type {QRCodeEncodedPayload, QRCodeSupportedModeIndicator} from './types';
 
 export const MODE_NUMERIC = 1,
   MODE_ALPHANUMERIC = 2,
@@ -77,13 +71,7 @@ export function resolveMode(
   requestedMode: QRCodeMode | undefined,
 ): QRCodeSupportedModeIndicator {
   if (requestedMode !== undefined) {
-    const mode = MODES_MAP[requestedMode];
-    if (typeof mode !== 'number') {
-      throw new QRCodeError('INVALID_OPTIONS', 'QRCode: Invalid mode', {
-        details: {field: 'mode', value: requestedMode},
-      });
-    }
-    return mode;
+    return MODES_MAP[requestedMode];
   }
 
   if (typeof payload === 'number' || isNumericPayload(payload)) return MODE_NUMERIC;

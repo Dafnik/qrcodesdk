@@ -10,7 +10,8 @@ related:
 ---
 
 `QRCodeTextRenderer` returns a string with no trailing newline. It exposes only the dimensions a
-terminal can represent through `QRCodeTextStyle`; graphical colors and shapes are not accepted.
+terminal can represent through `QRCodeTextStyle`; graphical colors, shapes, and finder or alignment styles
+are not accepted. Every dark module, including finder and alignment modules, prints as a dark cell.
 
 ```ts
 import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
@@ -36,8 +37,8 @@ const text = qrcode('HELLO WORLD').render(
 | `ansi.foreground`  | `'#000000'` | RGB or RGBA hexadecimal dark color                                      |
 | `ansi.background`  | `'#ffffff'` | RGB or RGBA hexadecimal light color                                     |
 
-An ANSI object enables ANSI output. Background mode has fixed full-cell geometry and therefore
-rejects an explicitly supplied `layout`. The renderer does not inspect TTY state or `NO_COLOR`;
+An ANSI object enables ANSI output. Background mode has fixed full-cell geometry, so its option type
+does not accept `layout`. The renderer does not inspect TTY state or `NO_COLOR`;
 callers such as the CLI choose that policy before creating it.
 
 Terminals have no alpha channel. RGBA background colors are composited over white, then RGBA
@@ -47,5 +48,6 @@ written. Alpha is therefore deterministic and never silently discarded.
 For `S = (matrix width + 2 × quietZone) × moduleSize`, compact output is `S` cells wide and
 `ceil(S / 2)` lines high. Full and ANSI-background output are `2 × S` cells wide and `S` lines high.
 
-Renderer options are validated and copied at factory creation. Unknown keys and unsupported
-combinations throw immediately.
+Renderer options are validated and copied at factory creation. Invalid dimensions and colors throw
+immediately. TypeScript rejects unknown keys and unsupported combinations; the renderer does not
+repeat those checks at runtime.

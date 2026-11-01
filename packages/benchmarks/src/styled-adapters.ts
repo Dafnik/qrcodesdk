@@ -1,4 +1,8 @@
-import type {QRCodeStylingFixture} from '@repo/core-testing';
+import type {
+  QRCodeFixtureFinderShape,
+  QRCodeFixtureModuleShape,
+  QRCodeStylingFixture,
+} from '@repo/core-testing';
 import {JSDOM} from 'jsdom';
 import {createRequire} from 'node:module';
 import type QRCodeStylingClass from 'qr-code-styling';
@@ -6,7 +10,7 @@ import type {Options as QRCodeStylingLibraryOptions} from 'qr-code-styling';
 import qrCodeStylingPackage from 'qr-code-styling/package.json' with {type: 'json'};
 
 import {QRCodeSVGRenderer, qrcode as createQRCodeSDK} from '@qrcodesdk/core';
-import type {QRCodeFinderShape, QRCodeMatrixOptions, QRCodeModuleShape} from '@qrcodesdk/core';
+import type {QRCodeMatrixOptions} from '@qrcodesdk/core';
 import qrcodeSDKPackage from '@qrcodesdk/core/package.json' with {type: 'json'};
 
 import type {StyledSVGAdapter} from './types';
@@ -48,11 +52,11 @@ export function createQRCodeStylingLibraryOptions(
     throw new Error(`Styled benchmark fixture ${fixture.name} must specify a QR code version`);
   }
 
-  const size = fixture.styling.moduleSize ?? 5;
-  const quietZone = fixture.styling.quietZone ?? 4;
+  const {design} = fixture;
+  const size = design.moduleSize;
+  const quietZone = design.quietZone;
   const moduleCount = 17 + 4 * version;
   const renderedSize = (moduleCount + 2 * quietZone) * size;
-  const colorDark = fixture.styling.foreground ?? '#000000';
 
   return {
     type: 'svg',
@@ -67,19 +71,19 @@ export function createQRCodeStylingLibraryOptions(
       errorCorrectionLevel: fixture.matrixOptions.errorCorrectionLevel ?? 'M',
     },
     backgroundOptions: {
-      color: fixture.styling.background ?? '#ffffff',
+      color: design.background,
     },
     dotsOptions: {
-      color: fixture.styling.modules?.color ?? colorDark,
-      type: mapModuleShape(fixture.styling.modules?.shape),
+      color: design.foreground,
+      type: mapModuleShape(design.modules),
     },
     cornersSquareOptions: {
-      color: fixture.styling.finder?.outer?.color ?? colorDark,
-      type: mapFinderShape(fixture.styling.finder?.outer?.shape),
+      color: design.finder.color,
+      type: mapFinderShape(design.finder.ring),
     },
     cornersDotOptions: {
-      color: fixture.styling.finder?.center?.color ?? colorDark,
-      type: mapFinderShape(fixture.styling.finder?.center?.shape),
+      color: design.finder.color,
+      type: mapFinderShape(design.finder.center),
     },
   };
 }
@@ -112,7 +116,7 @@ export const STYLED_SVG_BENCHMARK_ADAPTERS = [
 ] as const satisfies readonly StyledSVGAdapter[];
 
 function mapModuleShape(
-  shape: QRCodeModuleShape | undefined,
+  shape: QRCodeFixtureModuleShape,
 ): NonNullable<QRCodeStylingLibraryOptions['dotsOptions']>['type'] {
   switch (shape) {
     case 'circle':
@@ -131,7 +135,7 @@ function mapModuleShape(
 }
 
 function mapFinderShape(
-  shape: QRCodeFinderShape | undefined,
+  shape: QRCodeFixtureFinderShape,
 ): NonNullable<QRCodeStylingLibraryOptions['cornersSquareOptions']>['type'] {
   switch (shape) {
     case 'circle':

@@ -22,9 +22,7 @@
 
     qrcode(payload)
       .options(resolvedOptions[0])
-      .render(
-        QRCodeDownloadImageRenderer({renderer: imageRenderer, filename: filename || undefined}),
-      );
+      .render(QRCodeDownloadImageRenderer({renderer: imageRenderer, filename}));
   }
 </script>
 

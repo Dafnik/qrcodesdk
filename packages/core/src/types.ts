@@ -1,22 +1,22 @@
 export type QRCodePayload = string | number;
 
-export type QRCodeModule = 0 | 1;
-export type QRCodeMatrix = readonly (readonly QRCodeModule[])[];
-export type QRCodeMutableMatrix = QRCodeModule[][];
-export type QRCodeReservedMatrix = QRCodeModule[][];
+/**
+ * The function of a module, independent of its color: `0` data and error correction, `1` finder
+ * ring (including its light gap), `2` finder center, `3` separator, `4` alignment ring (including
+ * its light gap), `5` alignment center, `6` timing, `7` format information, and `8` version
+ * information.
+ */
+export type QRCodeModuleRole = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
-export type QRCodeCodeword = number;
-export type QRCodeCodewords = QRCodeCodeword[];
-export type QRCodePolynomial = QRCodeCodeword[];
-export type QRCodeEncodedPayload = string | QRCodeCodewords;
-
-export type QRCodeEncodedSegment = {
-  readonly mode: QRCodeSupportedModeIndicator;
-  readonly payload: QRCodeEncodedPayload;
+/** An immutable square QR code symbol with row-major module data. */
+export type QRCodeMatrix = {
+  /** Modules per side. */
+  readonly size: number;
+  /** `1` for dark and `0` for light modules, at index `y * size + x`. */
+  readonly modules: readonly (0 | 1)[];
+  /** `QRCodeModuleRole` of every module, shared by all matrices of the same size. */
+  readonly roles: readonly QRCodeModuleRole[];
 };
-
-export type QRCodeSupportedModeIndicator = 1 | 2 | 4;
-export type QRCodeErrorCorrectionLevelValue = 0 | 1 | 2 | 3;
 
 export type QRCodeVersion =
   | 1
@@ -66,30 +66,50 @@ export type QRCodeMask = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type QRCodeColor = `#${string}`;
 
-export type QRCodeModuleShape =
-  'square' | 'circle' | 'rounded' | 'extra-rounded' | 'diagonal' | 'diagonal-rounded';
+/**
+ * Path data for one shaped piece. It uses only relative `m`, `l`, `h`, `v`, `c`, `a`, and `z`
+ * commands in module units, starting from the piece's top-left corner, and is filled with the
+ * even-odd rule.
+ */
+export type QRCodeShapePath = string;
 
-export type QRCodeFinderShape = 'square' | 'rounded' | 'extra-rounded' | 'circle';
+declare const styleValue: unique symbol;
+
+/** A prepared path produced by a shape factory. */
+export type QRCodeShapePiece = {readonly [styleValue]: 'path'};
+/** A neighbor-dependent module pattern produced by a built-in shape factory. */
+export type QRCodeModulePattern = {readonly [styleValue]: 'module'};
+/** A finder style produced by `finder()`. */
+export type QRCodeFinderStyle = {readonly [styleValue]: 'finder'};
+/** An alignment style produced by `alignment()`. */
+export type QRCodeAlignmentStyle = {readonly [styleValue]: 'alignment'};
+
+/** A prepared module path or a built-in neighbor-dependent pattern. */
+export type QRCodeModuleShape = {
+  readonly module: QRCodeShapePiece | QRCodeModulePattern;
+};
+/** A 7x7 finder ring, including its 5x5 hole. */
+export type QRCodeFinderRingShape = {readonly finderRing: QRCodeShapePiece};
+/** A 3x3 finder center. */
+export type QRCodeFinderCenterShape = {readonly finderCenter: QRCodeShapePiece};
+/** A 5x5 alignment ring, including its 3x3 hole. */
+export type QRCodeAlignmentRingShape = {readonly alignmentRing: QRCodeShapePiece};
+/** A 1x1 alignment center. */
+export type QRCodeAlignmentCenterShape = {readonly alignmentCenter: QRCodeShapePiece};
+export type QRCodeShape = QRCodeModuleShape &
+  QRCodeFinderRingShape &
+  QRCodeFinderCenterShape &
+  QRCodeAlignmentRingShape &
+  QRCodeAlignmentCenterShape;
 
 export type QRCodeVisualStyle = {
   readonly moduleSize?: number;
   readonly quietZone?: number;
   readonly foreground?: QRCodeColor;
   readonly background?: QRCodeColor;
-  readonly modules?: {
-    readonly shape?: QRCodeModuleShape;
-    readonly color?: QRCodeColor;
-  };
-  readonly finder?: {
-    readonly outer?: {
-      readonly shape?: QRCodeFinderShape;
-      readonly color?: QRCodeColor;
-    };
-    readonly center?: {
-      readonly shape?: QRCodeFinderShape;
-      readonly color?: QRCodeColor;
-    };
-  };
+  readonly modules?: QRCodeModuleShape;
+  readonly finder?: QRCodeFinderStyle;
+  readonly alignment?: QRCodeAlignmentStyle;
 };
 
 export type QRCodeTextStyle = {
@@ -107,29 +127,11 @@ export type QRCodeMatrixOptions = {
   eci?: boolean;
 };
 
-export type QRCodeCenterImageOptions<TSource> = {
-  readonly source: TSource;
+export type QRCodeCenterImageLayout = {
+  /** Image width and height as a fraction of the symbol, greater than 0 and at most 1. */
   readonly size?: number;
+  /** Cleared border around the image in modules. */
   readonly padding?: number;
+  /** Removes the modules behind the image and its padding. */
   readonly clearBackground?: boolean;
-};
-
-export type QRCodeResolvedVisualStyle = {
-  moduleSize: number;
-  quietZone: number;
-  foreground: QRCodeColor;
-  background: QRCodeColor;
-  modules: {shape: QRCodeModuleShape; color: QRCodeColor};
-  finder: {
-    outer: {shape: QRCodeFinderShape; color: QRCodeColor};
-    center: {shape: QRCodeFinderShape; color: QRCodeColor};
-  };
-};
-
-export type QRCodeResolvedMatrixOptions = {
-  segments: readonly QRCodeEncodedSegment[];
-  version: QRCodeVersion;
-  errorCorrectionLevel: QRCodeErrorCorrectionLevelValue;
-  mask: QRCodeMask | undefined;
-  eci: boolean;
 };

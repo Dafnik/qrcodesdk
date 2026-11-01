@@ -1,6 +1,10 @@
 {
   "extends": ["//"],
   "tasks": {
+    "benchmark:bundles": {
+      "cache": false,
+      "dependsOn": ["build"]
+    },
     "test:browser-runtime": {
       "cache": false,
       "env": ["QRCODESDK_BROWSER", "QRCODESDK_CONSUMER"]

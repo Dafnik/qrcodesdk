@@ -8,8 +8,8 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
-`@qrcodesdk/core` is the runtime-neutral foundation of QRCodeSDK.
-It turns a payload into a QR code matrix and lets renderers decide how that matrix becomes SVG, terminal text, PNG, DOM output, or any custom format.
+`@qrcodesdk/core` generates QR matrices, SVG strings, and terminal text without browser or Node.js
+APIs. Custom renderers can turn its matrices into other formats.
 
 ## Install
 
@@ -70,8 +70,29 @@ options and constraints.
 | Render terminal output        | `QRCodeTextRenderer`       | text `string`  |
 
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for accepted payloads, matrix options, builder methods,
-and matrix output. Shared visual options and scan-reliability guidance are in
-[Customize appearance](https://qrcodesdk.dev/guides/customize/).
+and matrix output.
+
+## Style the output
+
+Import shape and pattern factories from `@qrcodesdk/core/style`:
+
+```ts
+import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
+import {circle, finder, rounded} from '@qrcodesdk/core/style';
+
+const svg = qrcode('https://qrcodesdk.dev').render(
+  QRCodeSVGRenderer({
+    style: {
+      moduleSize: 8,
+      foreground: '#0f172a',
+      modules: rounded(),
+      finder: finder({ring: rounded({radius: 1}), center: circle(), color: '#e11d48'}),
+    },
+  }),
+);
+```
+
+See [Customize appearance](https://qrcodesdk.dev/guides/customize/) for style options and custom shapes.
 
 Typed helpers serialize common application values before generation. See
 [Payload helpers](https://qrcodesdk.dev/reference/payloads/) for email, phone, SMS, geographic, and Wi-Fi payloads.
@@ -80,6 +101,9 @@ Typed helpers serialize common application values before generation. See
 
 > `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
 > It has no Node.js, DOM, filesystem, or framework dependency.
+
+TypeScript projects should use `moduleResolution: 'bundler'`, `'node16'`, or `'nodenext'` to resolve
+the package's ESM entry points and subpaths.
 
 | Runtime                         | Support policy                                          |
 | ------------------------------- | ------------------------------------------------------- |
@@ -110,30 +134,19 @@ bundler, use `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/t
 `@qrcodesdk/core/error` to avoid loading unrelated renderers. Bundled applications can use root
 imports with tree shaking.
 
-Import the styler and drawing types from `@qrcodesdk/core/drawing`, and payload helpers from
-`@qrcodesdk/core/payload`. These APIs are available only through those entry points. See
-[Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for the drawing protocol.
+Import shape and pattern factories and custom path types from `@qrcodesdk/core/style`. Matrix
+types and role names belong to `@qrcodesdk/core/matrix`; payload serializers belong to
+`@qrcodesdk/core/payload`. See [Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for matrix-based
+custom renderer examples.
 
 ```ts
 import {
-  QRCodeBuilder,
-  type QRCodeCenterImageOptions,
-  type QRCodeColor,
   type QRCodeDataImageURL,
   QRCodeError,
   type QRCodeErrorCode,
-  type QRCodeErrorCorrectionLevel,
   type QRCodeErrorOptions,
-  type QRCodeFinderShape,
-  type QRCodeMask,
-  type QRCodeMatrix,
-  type QRCodeMatrixOptions,
-  type QRCodeMode,
-  type QRCodeModuleShape,
-  type QRCodePayload,
-  type QRCodeRenderer,
   type QRCodeSVGAccessibilityOptions,
-  type QRCodeSVGCenterImageOptions,
+  type QRCodeSVGCenterImage,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
@@ -142,17 +155,23 @@ import {
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeTextStyle,
-  type QRCodeVersion,
-  type QRCodeVisualStyle,
   QR_CODE_ERROR_CODES,
-  qrcode,
+  svgCenterImage,
 } from '@qrcodesdk/core';
 import {
-  type QRCodeStyledDrawing,
-  type QRCodeStyledDrawingTarget,
-  type QRCodeStyler,
-  createQRCodeStyler,
-} from '@qrcodesdk/core/drawing';
+  QRCodeBuilder,
+  type QRCodeErrorCorrectionLevel,
+  type QRCodeMask,
+  type QRCodeMatrix,
+  type QRCodeMatrixOptions,
+  type QRCodeMode,
+  type QRCodeModuleRole,
+  type QRCodePayload,
+  type QRCodeRenderer,
+  type QRCodeVersion,
+  QR_CODE_MODULE_ROLES,
+  qrcode,
+} from '@qrcodesdk/core/matrix';
 import {
   type QRCodeEmailPayload,
   type QRCodeGeoPayload,
@@ -166,6 +185,32 @@ import {
   smsPayload,
   wifiPayload,
 } from '@qrcodesdk/core/payload';
+import {
+  type QRCodeAlignmentCenterShape,
+  type QRCodeAlignmentOptions,
+  type QRCodeAlignmentRingShape,
+  type QRCodeAlignmentStyle,
+  type QRCodeCenterImageLayout,
+  type QRCodeCircleShapeOptions,
+  type QRCodeColor,
+  type QRCodeFinderCenterShape,
+  type QRCodeFinderOptions,
+  type QRCodeFinderRingShape,
+  type QRCodeFinderStyle,
+  type QRCodeModulePattern,
+  type QRCodeModuleShape,
+  type QRCodeRoundedShapeOptions,
+  type QRCodeShape,
+  type QRCodeShapePath,
+  type QRCodeShapePiece,
+  type QRCodeVisualStyle,
+  alignment,
+  circle,
+  customShape,
+  diagonal,
+  finder,
+  rounded,
+} from '@qrcodesdk/core/style';
 ```
 
 ## Generated output stability

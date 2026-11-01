@@ -19,12 +19,13 @@ import {
 } from '@qrcodesdk/core';
 
 import {splitOptions} from './split-options';
+import type {QRCodeDownloadHandle} from './types';
 
 @Component({
   selector: 'qrcode-svg',
   template: '',
 })
-export class QRCodeSVG {
+export class QRCodeSVG implements QRCodeDownloadHandle {
   private readonly renderer = inject(Renderer2);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly qrcode = inject(ElementRef);

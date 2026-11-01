@@ -36,9 +36,9 @@ from an intermediate Canvas element, and its width and height match that Canvas 
 
 ## Renderer-specific options
 
-The renderer accepts the [shared visual style](/guides/customize/#shared-visual-style), the same
-prepared `centerImage` and `ariaLabel` as the
-[Canvas renderer](/reference/renderers/canvas/#renderer-specific-options), and these DOM attributes:
+The renderer accepts the [shared visual style](/guides/customize/#shared-visual-style), a
+`centerImage` created with [`canvasCenterImage()`](/reference/renderers/canvas/#center-image) as for
+the Canvas renderer, and these DOM attributes:
 
 | Option                    | Type     | Default     | Effect                                           |
 | ------------------------- | -------- | ----------- | ------------------------------------------------ |
@@ -57,8 +57,8 @@ For server output, choose SVG or the Node.js PNG renderer.
   dimensions.
 - Center images must be same-origin or CORS-enabled to encode the Canvas as a PNG data URL. Otherwise
   rendering throws `QRCodeError` with code `RENDER_FAILED`.
-- Options are validated and copied when `QRCodeImageRenderer()` is called. The prepared image
-  source is retained by identity and checked when rendering.
+- Options are validated and copied when `QRCodeImageRenderer()` is called. The center image
+  retains its source by identity and checks it when rendering.
 - The PNG is encoded into the element's data URL. Use the
   [Canvas renderer](/reference/renderers/canvas/) when the next step needs direct drawing or
   `toBlob()` rather than an Image element.

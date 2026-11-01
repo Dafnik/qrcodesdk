@@ -1,3 +1,4 @@
+import {fixtureMatrixOptions} from '@repo/core-testing';
 import {QR_CODE_STYLING_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -14,7 +15,7 @@ describe('QRCodePNGRenderer snapshots', () => {
   test.each(QR_CODE_TEST_FIXTURES)('matches %s generated QR PNG snapshot', (fixture) => {
     expectPngToMatchFileSnapshot(
       qrcode(fixture.payload)
-        .options(fixture)
+        .options(fixtureMatrixOptions(fixture))
         .render(QRCodePNGRenderer({style: {moduleSize: 8, quietZone: 4}})),
       join(SNAPSHOT_DIR, `${fixture.name}.png`),
     );

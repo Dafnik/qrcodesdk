@@ -21,6 +21,14 @@ const stylingFixture: QRCodeStylingFixture = {
   name: 'styled-fixture',
   payload: '1',
   matrixOptions: {version: 1, mode: 'numeric'},
+  design: {
+    moduleSize: 5,
+    quietZone: 4,
+    background: '#ffffff',
+    foreground: '#000000',
+    modules: 'square',
+    finder: {ring: 'square', center: 'square', color: '#000000'},
+  },
   styling: {moduleSize: 5, quietZone: 4},
 };
 
