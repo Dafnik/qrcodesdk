@@ -44,24 +44,26 @@ describe('evaluateMatrix', () => {
     expect(pruned).toBe(true);
   });
 
-  test.each(REPRESENTATIVE_VERSIONS)(
-    'keeps the same automatic mask winner as complete scoring at version %s',
-    (version) => {
-      for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
-        for (const payload of ['A', '000123456789', 'é🦊']) {
-          const options = {version, errorCorrectionLevel};
-          const candidates = MASKS.map((mask) =>
-            toRows(
-              qrcode(payload)
-                .options({...options, mask})
-                .matrix(),
-            ),
-          );
-          const scores = candidates.map(evaluateMatrixLegacy);
-          const expected = candidates[scores.indexOf(Math.min(...scores))];
-          expect(toRows(qrcode(payload).options(options).matrix())).toEqual(expected);
-        }
-      }
+  test.each(
+    REPRESENTATIVE_VERSIONS.flatMap((version) =>
+      ERROR_CORRECTION_LEVELS.flatMap((errorCorrectionLevel) =>
+        ['A', '000123456789', 'é🦊'].map((payload) => ({version, errorCorrectionLevel, payload})),
+      ),
+    ),
+  )(
+    'keeps the same automatic mask winner as complete scoring at version $version, level $errorCorrectionLevel, payload $payload',
+    ({version, errorCorrectionLevel, payload}) => {
+      const options = {version, errorCorrectionLevel};
+      const candidates = MASKS.map((mask) =>
+        toRows(
+          qrcode(payload)
+            .options({...options, mask})
+            .matrix(),
+        ),
+      );
+      const scores = candidates.map(evaluateMatrixLegacy);
+      const expected = candidates[scores.indexOf(Math.min(...scores))];
+      expect(toRows(qrcode(payload).options(options).matrix())).toEqual(expected);
     },
   );
 
