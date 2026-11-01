@@ -1,25 +1,28 @@
-import {createQRCodeCenterImage} from './drawing/center-image';
-import type {QRCodeDrawing} from './drawing/index';
+import {createCenterImageStore} from './center-image-store';
+import {createQRCodeCenterImagePlacement} from './drawing/center-image';
 import {toQRCodePathData} from './drawing/path-data';
 import {createQRCodeStyler} from './drawing/styler';
+import type {QRCodeStylePart} from './drawing/types';
+import type {QRCodeDrawing} from './drawing/types';
 import {QRCodeError} from './error';
-import {assertCenterImage, assertKnownKeys, assertOptionalString} from './options';
 import type {
   QRCodeCenterImageLayout,
   QRCodeColor,
   QRCodeMatrix,
   QRCodeMatrixOptions,
   QRCodeRenderer,
-  QRCodeStylePart,
   QRCodeVisualStyle,
 } from './types';
 
 export type QRCodeDataImageURL = `data:image/${string}`;
+declare const svgCenterImageBrand: unique symbol;
 /** A center image for SVG output, created with `svgCenterImage()`. */
-export type QRCodeSVGCenterImage = {
+export type QRCodeSVGCenterImage = {readonly [svgCenterImageBrand]: true};
+
+const centerImages = createCenterImageStore<{
   readonly part: QRCodeStylePart;
   markup(drawing: QRCodeDrawing): string;
-};
+}>();
 export type QRCodeSVGAccessibilityOptions = {
   readonly ariaLabel?: string;
   readonly title?: string;
@@ -34,13 +37,10 @@ export type QRCodeSVGOptions = QRCodeSVGRendererOptions & {
 };
 
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
-  assertKnownKeys(options, 'options', ['style', 'accessibility', 'centerImage']);
-  assertKnownKeys(options?.accessibility, 'accessibility', ['ariaLabel', 'title']);
   const {ariaLabel, title} = options?.accessibility ?? {};
-  assertOptionalXMLString(ariaLabel, 'accessibility.ariaLabel');
-  assertOptionalXMLString(title, 'accessibility.title');
-  const centerImage = options?.centerImage;
-  assertCenterImage(centerImage, 'markup', 'svgCenterImage');
+  validateOptionalXMLText(ariaLabel, 'accessibility.ariaLabel');
+  validateOptionalXMLText(title, 'accessibility.title');
+  const centerImage = centerImages.resolve(options?.centerImage);
   const draw = createQRCodeStyler(options?.style, [centerImage?.part]);
   const accessibleName = ariaLabel?.trim();
 
@@ -71,37 +71,32 @@ export function svgCenterImage(
   source: QRCodeDataImageURL,
   layout?: QRCodeCenterImageLayout,
 ): QRCodeSVGCenterImage {
-  if (!isQRCodeDataImageURL(source) || !isXMLString(source)) {
+  if (!isValidImageDataURL(source) || !isXMLString(source)) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
       'QR code SVG image source must be an embedded data:image URL',
       {details: {source}},
     );
   }
-  const {part, place} = createQRCodeCenterImage(layout);
+  const {part, place} = createQRCodeCenterImagePlacement(layout);
   const href = escapeXML(source, true);
-  return {
+  return centerImages.create({
     part,
     markup(drawing) {
       const {x, y, size} = place(drawing);
       return `<image href="${href}" x="${formatNumber(x)}" y="${formatNumber(y)}" width="${formatNumber(size)}" height="${formatNumber(size)}" preserveAspectRatio="xMidYMid meet"/>`;
     },
-  };
+  }) as QRCodeSVGCenterImage;
 }
 
-function isQRCodeDataImageURL(value: unknown): value is QRCodeDataImageURL {
-  if (typeof value !== 'string' || !value.startsWith('data:')) return false;
+function isValidImageDataURL(value: QRCodeDataImageURL): boolean {
   const commaIndex = value.indexOf(',');
   if (commaIndex < 0 || commaIndex === value.length - 1) return false;
   return /^image\/[a-z0-9.+-]+$/i.test(value.slice(5, commaIndex).split(';', 1)[0] ?? '');
 }
 
-function assertOptionalXMLString(
-  value: unknown,
-  field: string,
-): asserts value is string | undefined {
-  assertOptionalString(value, field);
-  if (typeof value === 'string' && !isXMLString(value)) {
+function validateOptionalXMLText(value: string | undefined, field: string): void {
+  if (value !== undefined && !isXMLString(value)) {
     throw new QRCodeError('INVALID_OPTIONS', `QR code ${field} must contain valid XML characters`, {
       details: {field, value},
     });

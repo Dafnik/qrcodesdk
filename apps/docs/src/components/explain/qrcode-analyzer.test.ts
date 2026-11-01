@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import {describe, test} from 'node:test';
 
 import {type QRCodeMask, qrcode} from '@qrcodesdk/core';
-import {QR_CODE_MODULE_ROLES} from '@qrcodesdk/core/drawing';
+import {QR_CODE_MODULE_ROLES} from '@qrcodesdk/core/matrix';
 
 import {QR_CODE_EXPLAIN_ROLE_ORDER, explainQRCode} from './qrcode-analyzer.ts';
 

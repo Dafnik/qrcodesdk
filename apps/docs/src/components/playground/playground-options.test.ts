@@ -46,9 +46,9 @@ describe('playground prepared image options', () => {
       padding: 0.5,
       clearBackground: false,
     });
-    assert.equal(typeof svgOptions.centerImage?.part, 'function');
-    assert.equal(typeof imageOptions.centerImage?.draw, 'function');
-    assert.equal(typeof canvasOptions.centerImage?.draw, 'function');
+    assert.ok(svgOptions.centerImage);
+    assert.ok(imageOptions.centerImage);
+    assert.ok(canvasOptions.centerImage);
     assert.equal(svgOptions.matrix?.eci, false);
     assert.equal(imageOptions.matrix?.eci, false);
     assert.equal(canvasOptions.matrix?.eci, false);
@@ -58,19 +58,6 @@ describe('playground prepared image options', () => {
     const width = builder.matrix().size * 0.3;
     const svg = builder.render(QRCodeSVGRenderer(rendererOptions));
     assert.match(svg, new RegExp(`<image href="${preparedImage.dataUrl}"[^>]* width="${width}"`));
-  });
-
-  test('draws the loaded image element on Canvas and Image output', () => {
-    const {centerImage} = createPlaygroundCanvasOptions(defaultPlaygroundOptions, preparedImage);
-    const drawn: unknown[][] = [];
-    const context = {
-      drawImage: (...args: unknown[]) => drawn.push(args),
-    } as unknown as CanvasRenderingContext2D;
-
-    centerImage?.draw(context, {moduleCount: 21, quietZone: 4} as never);
-
-    assert.equal(drawn.length, 1);
-    assert.equal(drawn[0]?.[0], preparedImage.element);
   });
 
   test('reports an invalid center image layout as a QR code error', () => {
@@ -87,10 +74,6 @@ describe('playground prepared image options', () => {
     assert.equal(createPlaygroundImageOptions(options, preparedImage).matrix?.eci, true);
     assert.equal(createPlaygroundCanvasOptions(options, preparedImage).matrix?.eci, true);
     assert.equal(hasQRCodeError(options, undefined), undefined);
-    assert.match(
-      String(hasQRCodeError({...options, eci: 'true' as never}, undefined)),
-      /Invalid ECI setting/,
-    );
   });
 
   test('updates options without replacing prepared sources', () => {

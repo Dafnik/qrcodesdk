@@ -74,7 +74,7 @@ and matrix output.
 
 ## Style the output
 
-Import shapes and pattern parts from `@qrcodesdk/core/style`:
+Import shape and pattern factories from `@qrcodesdk/core/style`:
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -101,6 +101,9 @@ Typed helpers serialize common application values before generation. See
 
 > `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
 > It has no Node.js, DOM, filesystem, or framework dependency.
+
+TypeScript projects should use `moduleResolution: 'bundler'`, `'node16'`, or `'nodenext'` to resolve
+the package's ESM entry points and subpaths.
 
 | Runtime                         | Support policy                                          |
 | ------------------------------- | ------------------------------------------------------- |
@@ -131,67 +134,44 @@ bundler, use `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/t
 `@qrcodesdk/core/error` to avoid loading unrelated renderers. Bundled applications can use root
 imports with tree shaking.
 
-Import shapes and the finder and alignment parts from `@qrcodesdk/core/style`, the styler, module
-roles, and drawing helpers from `@qrcodesdk/core/drawing`, and payload helpers from
-`@qrcodesdk/core/payload`. These APIs are available only through those entry points.
-`@qrcodesdk/core/drawing` also re-exports the `QRCodeCenterImageLayout`, `QRCodeModuleRole`, and
-`QRCodeStylePart` types. See [Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for the matrix roles
-and the drawing data.
+Import shape and pattern factories and custom path types from `@qrcodesdk/core/style`. Matrix
+types and role names belong to `@qrcodesdk/core/matrix`; payload serializers belong to
+`@qrcodesdk/core/payload`. See [Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for matrix-based
+custom renderer examples.
 
 ```ts
 import {
-  type QRCodeAlignmentCenterShape,
-  type QRCodeAlignmentRingShape,
-  QRCodeBuilder,
-  type QRCodeColor,
   type QRCodeDataImageURL,
   QRCodeError,
   type QRCodeErrorCode,
-  type QRCodeErrorCorrectionLevel,
   type QRCodeErrorOptions,
-  type QRCodeFinderCenterShape,
-  type QRCodeFinderRingShape,
-  type QRCodeMask,
-  type QRCodeMatrix,
-  type QRCodeMatrixOptions,
-  type QRCodeMode,
-  type QRCodeModuleShape,
-  type QRCodePayload,
-  type QRCodeRenderer,
   type QRCodeSVGAccessibilityOptions,
   type QRCodeSVGCenterImage,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,
-  type QRCodeShape,
-  type QRCodeShapePath,
   type QRCodeTextANSIBackgroundOptions,
   type QRCodeTextANSIOptions,
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   type QRCodeTextStyle,
-  type QRCodeVersion,
-  type QRCodeVisualStyle,
   QR_CODE_ERROR_CODES,
-  qrcode,
   svgCenterImage,
 } from '@qrcodesdk/core';
 import {
-  type QRCodeCenterImageBox,
-  type QRCodeCenterImageLayout,
-  type QRCodeCenterImagePlacement,
-  type QRCodeDrawContext,
-  type QRCodeDrawLayer,
-  type QRCodeDrawing,
-  type QRCodeDrawingLayer,
+  QRCodeBuilder,
+  type QRCodeErrorCorrectionLevel,
+  type QRCodeMask,
+  type QRCodeMatrix,
+  type QRCodeMatrixOptions,
+  type QRCodeMode,
   type QRCodeModuleRole,
-  type QRCodeStylePart,
-  type QRCodeStyler,
+  type QRCodePayload,
+  type QRCodeRenderer,
+  type QRCodeVersion,
   QR_CODE_MODULE_ROLES,
-  createQRCodeCenterImage,
-  createQRCodeStyler,
-  toQRCodePathData,
-} from '@qrcodesdk/core/drawing';
+  qrcode,
+} from '@qrcodesdk/core/matrix';
 import {
   type QRCodeEmailPayload,
   type QRCodeGeoPayload,
@@ -206,12 +186,27 @@ import {
   wifiPayload,
 } from '@qrcodesdk/core/payload';
 import {
+  type QRCodeAlignmentCenterShape,
   type QRCodeAlignmentOptions,
+  type QRCodeAlignmentRingShape,
+  type QRCodeAlignmentStyle,
+  type QRCodeCenterImageLayout,
   type QRCodeCircleShapeOptions,
+  type QRCodeColor,
+  type QRCodeFinderCenterShape,
   type QRCodeFinderOptions,
+  type QRCodeFinderRingShape,
+  type QRCodeFinderStyle,
+  type QRCodeModulePattern,
+  type QRCodeModuleShape,
   type QRCodeRoundedShapeOptions,
+  type QRCodeShape,
+  type QRCodeShapePath,
+  type QRCodeShapePiece,
+  type QRCodeVisualStyle,
   alignment,
   circle,
+  customShape,
   diagonal,
   finder,
   rounded,

@@ -112,6 +112,13 @@ fails, shorten or change the payload.
 The builder's types prevent `.matrix()` or `.render()` before a payload is set, and prevent `.render()`
 without either a stored or directly supplied renderer.
 
+Use `QRCodeBuilder` without type arguments to annotate a payload-configured builder in application
+helpers. Its default type accepts builders with or without a stored renderer; supply a renderer
+when calling `.render()` through that general type.
+
+TypeScript checks matrix option names, types, and supported literal values. Payload format and
+capacity are checked when the matrix is first requested.
+
 ## Matrix output and renderers
 
 `.matrix()` returns a read-only `QRCodeMatrix` with flat, row-major module data. `size` is the

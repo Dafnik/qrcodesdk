@@ -24,18 +24,6 @@ describe('QRCodeImageRenderer', () => {
     expect(image.title).toBe('Code');
   });
 
-  test('rejects unsupported fields instead of ignoring them', () => {
-    expect(() => QRCodeImageRenderer({alt: 'legacy' as never} as never)).toThrow(
-      expect.objectContaining({details: expect.objectContaining({field: 'options.alt'})}),
-    );
-    expect(() => QRCodeImageRenderer({accessibility: {alt: 1 as never}})).toThrow(
-      expect.objectContaining({details: expect.objectContaining({field: 'accessibility.alt'})}),
-    );
-    expect(() => QRCodeImageRenderer({accessibility: null} as never)).toThrow(
-      expect.objectContaining({details: expect.objectContaining({field: 'accessibility'})}),
-    );
-  });
-
   test('wraps canvas encoding failures in QRCodeError', () => {
     const toDataURL = HTMLCanvasElement.prototype.toDataURL;
     HTMLCanvasElement.prototype.toDataURL = () => {

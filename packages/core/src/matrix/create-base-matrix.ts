@@ -19,7 +19,7 @@ export type QRCodeBaseMatrix = {
   readonly size: number;
   readonly modules: Uint8Array;
   readonly roles: Uint8Array;
-  readonly publicRoles: readonly number[];
+  readonly publicRoles: readonly QRCodeModuleRole[];
 };
 
 const bases = new Map<QRCodeVersion, QRCodeBaseMatrix>();
@@ -112,5 +112,10 @@ function buildBaseMatrix(version: QRCodeVersion): QRCodeBaseMatrix {
     }
   }
 
-  return {size: n, modules, roles, publicRoles: Object.freeze(Array.from(roles))};
+  return {
+    size: n,
+    modules,
+    roles,
+    publicRoles: Object.freeze(Array.from(roles) as QRCodeModuleRole[]),
+  };
 }

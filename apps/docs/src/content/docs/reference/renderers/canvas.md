@@ -95,12 +95,11 @@ renderer.
   dimensions before rendering; unloaded or zero-sized sources throw.
 - The center-image source may be any ready `CanvasImageSource`, such as an `HTMLImageElement`,
   another canvas, or an `ImageBitmap`.
-- `centerImage` must be created with `canvasCenterImage()`; plain option objects throw
-  `INVALID_OPTIONS`. `canvasCenterImage()` validates its layout when it is called.
+- Pass a `centerImage` created with `canvasCenterImage()`; TypeScript checks the factory result type. `canvasCenterImage()` validates its layout when it is called.
 - A non-empty `ariaLabel`, or a non-empty `title` when `ariaLabel` is blank, sets `role="img"` and
   `aria-label` on the Canvas element. The Canvas is decorative only when both are blank. For more accessibility controls, use the
   [PNG-backed Image renderer](/reference/renderers/image/) for native image attributes.
-- Options are validated and copied when `QRCodeCanvasRenderer()` is called. The center image
+- Option values are copied when `QRCodeCanvasRenderer()` is called. The center image
   retains its source by identity and checks it when rendering.
 
 ## Related guides

@@ -73,4 +73,33 @@ describe('download QR code renderers', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
+
+  test('snapshots image download options and defaults blank filenames', () => {
+    const downloads = captureDownloads(vi);
+    const options = {
+      renderer: () => ({src: 'data:image/png;base64,original'}) as HTMLImageElement,
+      filename: '',
+    };
+    const render = QRCodeDownloadImageRenderer(options);
+    options.filename = 'changed';
+    options.renderer = () => ({src: 'data:image/png;base64,changed'}) as HTMLImageElement;
+    render(matrixFromRows([[1]]));
+    expect(downloads).toEqual([{href: 'data:image/png;base64,original', filename: 'qrcode.png'}]);
+  });
+
+  test('snapshots SVG download options and defaults whitespace-only filenames', async () => {
+    const downloads = captureDownloads(vi);
+    const renderer = vi.fn(() => '<svg/>');
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:original');
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    const options = {renderer, filename: '  '};
+    const render = QRCodeDownloadSVGRenderer(options);
+    options.filename = 'changed';
+    options.renderer = vi.fn(() => '<svg id="changed"/>');
+    render(matrixFromRows([[1]]));
+    expect(renderer).toHaveBeenCalledOnce();
+    expect(options.renderer).not.toHaveBeenCalled();
+    expect(downloads).toEqual([{href: 'blob:original', filename: 'qrcode.svg'}]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
 });

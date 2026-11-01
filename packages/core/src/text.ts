@@ -1,5 +1,3 @@
-import {QRCodeError} from './error';
-import {assertKnownKeys, throwInvalid} from './options';
 import {
   calculateQRCodeOutputSize,
   parseQRCodeColor,
@@ -7,6 +5,8 @@ import {
   validateColor,
 } from './styling';
 import type {QRCodeColor, QRCodeMatrix, QRCodeRenderer, QRCodeTextStyle} from './types';
+
+export type {QRCodeColor, QRCodeTextStyle} from './types';
 
 const ANSI_RESET = '\u001b[0m';
 
@@ -35,23 +35,12 @@ export type QRCodeTextRendererOptions =
     };
 
 export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeRenderer<string> {
-  assertKnownKeys(options, 'options', ['style', 'layout', 'ansi']);
   const {moduleSize, quietZone} = resolveQRCodeTextStyle(options?.style);
   const layout = options?.layout ?? 'compact';
-  if (layout !== 'compact' && layout !== 'full') {
-    throwInvalid('layout', 'compact or full', layout);
-  }
 
   const ansi = options?.ansi === undefined ? false : options.ansi;
-  if (typeof ansi !== 'boolean' && (typeof ansi !== 'object' || ansi === null)) {
-    throwInvalid('ansi', 'a boolean or ANSI options object', ansi);
-  }
   const ansiOptions = typeof ansi === 'object' ? ansi : {};
-  assertKnownKeys(ansiOptions, 'ansi', ['mode', 'foreground', 'background']);
   const mode = ansiOptions.mode ?? 'blocks';
-  if (mode !== 'blocks' && mode !== 'background') {
-    throwInvalid('ansi.mode', 'blocks or background', mode);
-  }
   const foregroundColor = ansiOptions.foreground ?? '#000000';
   const backgroundColor = ansiOptions.background ?? '#ffffff';
   validateColor('ansi.foreground', foregroundColor);
@@ -59,13 +48,6 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
   const background = compositeANSIColor(parseQRCodeColor(backgroundColor), [255, 255, 255]);
   const foreground = compositeANSIColor(parseQRCodeColor(foregroundColor), background);
   const backgroundOnly = ansi !== false && mode === 'background';
-  if (backgroundOnly && options?.layout !== undefined) {
-    throw new QRCodeError(
-      'INVALID_OPTIONS',
-      'QR code text layout is not supported when ANSI background mode is enabled',
-      {details: {field: 'layout', value: options.layout}},
-    );
-  }
 
   const compact = !backgroundOnly && layout === 'compact';
   const dark = backgroundOnly ? `${ansiColor('48', foreground)}  ` : '██';

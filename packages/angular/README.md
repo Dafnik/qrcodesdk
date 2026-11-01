@@ -246,7 +246,7 @@ const options: QRCodeSVGOptions = {
 Pass this object through the component's `options` input. Use `QRCodeImageOptions` or
 `QRCodeCanvasOptions` for the corresponding component.
 
-Import shapes, pattern parts, and center-image factories from `@qrcodesdk/angular` alongside the components.
+Import shape and pattern factories, and center-image factories from `@qrcodesdk/angular` alongside the components.
 
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
 [Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
@@ -256,21 +256,43 @@ See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the field
 
 ```ts
 import {
+  type QRCodeAlignmentCenterShape,
+  type QRCodeAlignmentOptions,
+  type QRCodeAlignmentRingShape,
+  type QRCodeAlignmentStyle,
   QRCodeCanvas,
   type QRCodeCanvasCenterImage,
   type QRCodeCanvasOptions,
   type QRCodeCenterImageLayout,
+  type QRCodeCircleShapeOptions,
+  type QRCodeColor,
   type QRCodeDataImageURL,
+  type QRCodeErrorCorrectionLevel,
+  type QRCodeFinderCenterShape,
+  type QRCodeFinderOptions,
+  type QRCodeFinderRingShape,
+  type QRCodeFinderStyle,
   QRCodeImage,
   type QRCodeImageOptions,
+  type QRCodeMask,
+  type QRCodeMatrixOptions,
+  type QRCodeMode,
+  type QRCodeModulePattern,
+  type QRCodeModuleShape,
+  type QRCodePayload,
+  type QRCodeRoundedShapeOptions,
   QRCodeSVG,
   type QRCodeSVGCenterImage,
   type QRCodeSVGOptions,
   type QRCodeShape,
-  type QRCodeStylePart,
+  type QRCodeShapePath,
+  type QRCodeShapePiece,
+  type QRCodeVersion,
+  type QRCodeVisualStyle,
   alignment,
   canvasCenterImage,
   circle,
+  customShape,
   diagonal,
   finder,
   rounded,

@@ -13,23 +13,10 @@ export type QRCodeMatrix = {
   /** Modules per side. */
   readonly size: number;
   /** `1` for dark and `0` for light modules, at index `y * size + x`. */
-  readonly modules: readonly number[];
+  readonly modules: readonly (0 | 1)[];
   /** `QRCodeModuleRole` of every module, shared by all matrices of the same size. */
-  readonly roles: readonly number[];
+  readonly roles: readonly QRCodeModuleRole[];
 };
-
-export type QRCodeCodeword = number;
-export type QRCodeCodewords = QRCodeCodeword[];
-export type QRCodePolynomial = QRCodeCodeword[];
-export type QRCodeEncodedPayload = string | QRCodeCodewords;
-
-export type QRCodeEncodedSegment = {
-  readonly mode: QRCodeSupportedModeIndicator;
-  readonly payload: QRCodeEncodedPayload;
-};
-
-export type QRCodeSupportedModeIndicator = 1 | 2 | 4;
-export type QRCodeErrorCorrectionLevelValue = 0 | 1 | 2 | 3;
 
 export type QRCodeVersion =
   | 1
@@ -86,53 +73,34 @@ export type QRCodeColor = `#${string}`;
  */
 export type QRCodeShapePath = string;
 
-/**
- * Module path data indexed by the module's remaining dark neighbors: left `1`, right `2`, top `4`,
- * and bottom `8`. Claimed roles and areas count as light. A single path applies to every neighbor
- * combination. `undefined` fills the module.
- */
+declare const styleValue: unique symbol;
+
+/** A prepared path produced by a shape factory. */
+export type QRCodeShapePiece = {readonly [styleValue]: 'path'};
+/** A neighbor-dependent module pattern produced by a built-in shape factory. */
+export type QRCodeModulePattern = {readonly [styleValue]: 'module'};
+/** A finder style produced by `finder()`. */
+export type QRCodeFinderStyle = {readonly [styleValue]: 'finder'};
+/** An alignment style produced by `alignment()`. */
+export type QRCodeAlignmentStyle = {readonly [styleValue]: 'alignment'};
+
+/** A prepared module path or a built-in neighbor-dependent pattern. */
 export type QRCodeModuleShape = {
-  readonly module: QRCodeShapePath | readonly (QRCodeShapePath | undefined)[];
+  readonly module: QRCodeShapePiece | QRCodeModulePattern;
 };
 /** A 7x7 finder ring, including its 5x5 hole. */
-export type QRCodeFinderRingShape = {readonly finderRing: QRCodeShapePath};
+export type QRCodeFinderRingShape = {readonly finderRing: QRCodeShapePiece};
 /** A 3x3 finder center. */
-export type QRCodeFinderCenterShape = {readonly finderCenter: QRCodeShapePath};
+export type QRCodeFinderCenterShape = {readonly finderCenter: QRCodeShapePiece};
 /** A 5x5 alignment ring, including its 3x3 hole. */
-export type QRCodeAlignmentRingShape = {readonly alignmentRing: QRCodeShapePath};
+export type QRCodeAlignmentRingShape = {readonly alignmentRing: QRCodeShapePiece};
 /** A 1x1 alignment center. */
-export type QRCodeAlignmentCenterShape = {readonly alignmentCenter: QRCodeShapePath};
+export type QRCodeAlignmentCenterShape = {readonly alignmentCenter: QRCodeShapePiece};
 export type QRCodeShape = QRCodeModuleShape &
   QRCodeFinderRingShape &
   QRCodeFinderCenterShape &
   QRCodeAlignmentRingShape &
   QRCodeAlignmentCenterShape;
-
-/**
- * Draws one group of modules, such as the finder patterns, before the remaining modules. Renderer
- * parts, such as center images, run before style parts.
- */
-export type QRCodeStylePart = (context: QRCodeDrawContext) => void;
-
-export interface QRCodeDrawContext {
-  readonly matrix: QRCodeMatrix;
-  /** Stops drawing modules with these roles as modules, because the part draws them itself. */
-  claimRoles(...roles: QRCodeModuleRole[]): void;
-  /** Stops drawing every module touched by this area in matrix coordinates, leaving the background. */
-  claimArea(x: number, y: number, width: number, height: number): void;
-  /** Whether a claimed area overlaps this area, so a part can skip patterns behind it. */
-  isAreaClaimed(x: number, y: number, width: number, height: number): boolean;
-  /** Returns the layer for a color, or for the foreground when the color is omitted. */
-  layer(color?: QRCodeColor): QRCodeDrawLayer;
-}
-
-/** Collects geometry in matrix coordinates. */
-export interface QRCodeDrawLayer {
-  /** Draws a rectangle with finite coordinates and non-negative dimensions. */
-  rect(x: number, y: number, width: number, height: number): void;
-  /** Places a path at finite coordinates, which may be fractional. */
-  tile(path: QRCodeShapePath, x: number, y: number): void;
-}
 
 export type QRCodeVisualStyle = {
   readonly moduleSize?: number;
@@ -140,8 +108,8 @@ export type QRCodeVisualStyle = {
   readonly foreground?: QRCodeColor;
   readonly background?: QRCodeColor;
   readonly modules?: QRCodeModuleShape;
-  readonly finder?: QRCodeStylePart;
-  readonly alignment?: QRCodeStylePart;
+  readonly finder?: QRCodeFinderStyle;
+  readonly alignment?: QRCodeAlignmentStyle;
 };
 
 export type QRCodeTextStyle = {
@@ -166,12 +134,4 @@ export type QRCodeCenterImageLayout = {
   readonly padding?: number;
   /** Removes the modules behind the image and its padding. */
   readonly clearBackground?: boolean;
-};
-
-export type QRCodeResolvedMatrixOptions = {
-  segments: readonly QRCodeEncodedSegment[];
-  version: QRCodeVersion;
-  errorCorrectionLevel: QRCodeErrorCorrectionLevelValue;
-  mask: QRCodeMask | undefined;
-  eci: boolean;
 };

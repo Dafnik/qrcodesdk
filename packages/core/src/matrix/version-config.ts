@@ -1,4 +1,5 @@
-import type {QRCodeErrorCorrectionLevelValue, QRCodeVersion} from '../types';
+import type {QRCodeVersion} from '../types';
+import type {QRCodeErrorCorrectionLevelValue} from './types';
 
 // Indexed by the internal error-correction value and then QR version (1-40).
 // Each character stores its value offset by 40.

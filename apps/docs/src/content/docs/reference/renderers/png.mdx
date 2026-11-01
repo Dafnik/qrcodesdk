@@ -93,11 +93,10 @@ const png = qrcode('https://qrcodesdk.dev')
 - The center-image source must be a Node.js `Buffer` containing valid PNG bytes, at most 16 MiB and
   16,777,216 pixels. Other formats, paths, and URLs are not decoded. `pngCenterImage()` throws
   `INVALID_IMAGE_SOURCE` for invalid sources and `INVALID_OPTIONS` for an invalid layout.
-- `centerImage` must be created with `pngCenterImage()`; plain option objects throw
-  `INVALID_OPTIONS`.
+- Pass a `centerImage` created with `pngCenterImage()`; TypeScript checks the factory result type.
 - Center images preserve aspect ratio, are composited with alpha, and are contained within the
   configured square without cropping.
-- Options are validated and copied when `QRCodePNGRenderer()` is called. The center image is
+- Option values are copied when `QRCodePNGRenderer()` is called. The center image is
   decoded when `pngCenterImage()` is called, so later changes to the source Buffer have no effect.
 
 ## Related guides

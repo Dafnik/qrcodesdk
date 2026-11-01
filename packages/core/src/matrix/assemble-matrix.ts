@@ -1,15 +1,10 @@
-import type {
-  QRCodeCodewords,
-  QRCodeErrorCorrectionLevelValue,
-  QRCodeMask,
-  QRCodeMatrix,
-  QRCodeVersion,
-} from '../types';
+import type {QRCodeMask, QRCodeMatrix, QRCodeVersion} from '../types';
 import {applyMaskToMatrix} from './apply-mask-to-matrix';
 import {createBaseMatrix} from './create-base-matrix';
 import {evaluateMatrix} from './evaluate-matrix';
 import {fillDataInMatrix} from './fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from './fill-format-information-in-matrix';
+import type {QRCodeCodewords, QRCodeErrorCorrectionLevelValue} from './types';
 
 export function assembleQRCodeMatrix(
   version: QRCodeVersion,
@@ -26,7 +21,7 @@ export function assembleQRCodeMatrix(
   if (requestedMask !== undefined) {
     return {
       size,
-      modules: Object.freeze(Array.from(finish(unmasked, requestedMask))),
+      modules: Object.freeze(Array.from(finish(unmasked, requestedMask)) as (0 | 1)[]),
       roles: publicRoles,
     };
   }
@@ -42,5 +37,9 @@ export function assembleQRCodeMatrix(
     }
   }
 
-  return {size, modules: Object.freeze(Array.from(bestModules!)), roles: publicRoles};
+  return {
+    size,
+    modules: Object.freeze(Array.from(bestModules!) as (0 | 1)[]),
+    roles: publicRoles,
+  };
 }

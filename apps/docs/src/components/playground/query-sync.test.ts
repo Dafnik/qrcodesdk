@@ -283,17 +283,4 @@ describe('playground styling query synchronization', () => {
     assert.equal(options.alignmentRingShape, undefined);
     assert.equal(options.alignmentColor, undefined);
   });
-
-  test('ignores parameters of removed options and drops them on write', () => {
-    const params = new URLSearchParams(
-      'modules-color=ff0000&finder-outer-shape=circle&finder-outer-color=00ff00&finder-center-color=0000ff&other=keep',
-    );
-    const options = readQrOptionsFromSearchParams(params);
-
-    assert.deepEqual(options, defaultPlaygroundOptions);
-    assert.doesNotThrow(() => createPlaygroundSVGOptions(options, undefined));
-
-    writeQrOptionsToSearchParams(params, options, defaultPlaygroundOptions);
-    assert.equal(params.toString(), 'other=keep');
-  });
 });

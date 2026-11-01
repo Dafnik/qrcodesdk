@@ -2,12 +2,12 @@ import {describe, expect, test} from 'vitest';
 
 import {type QRCodeMatrix, qrcode} from '../src';
 import {
-  type QRCodeDrawing,
-  type QRCodeStylePart,
-  QR_CODE_MODULE_ROLES,
-  createQRCodeCenterImage,
-  createQRCodeStyler,
-} from '../src/drawing';
+  type ɵQRCodeDrawing as QRCodeDrawing,
+  type ɵQRCodeStylePart as QRCodeStylePart,
+  ɵcreateQRCodeCenterImagePlacement as createQRCodeCenterImagePlacement,
+  ɵcreateQRCodeStyler as createQRCodeStyler,
+} from '../src/internal';
+import {QR_CODE_MODULE_ROLES} from '../src/matrix';
 import {alignment, circle, finder, rounded} from '../src/style';
 import {fromRows} from './helpers';
 
@@ -131,19 +131,11 @@ describe('createQRCodeStyler', () => {
     );
   });
 
-  test('validates and merges custom layer colors case-insensitively', () => {
-    const draw = createQRCodeStyler({foreground: '#abcdef'}, [
-      (context) => {
-        context.layer('#ABCDEF').rect(1, 0, 1, 1);
-      },
-    ]);
-    const {layers} = draw(fromRows([[1]]));
+  test('merges factory colors case-insensitively with the foreground', () => {
+    const draw = createQRCodeStyler({foreground: '#abcdef', finder: finder({color: '#ABCDEF'})});
+    const {layers} = draw(qrcode('colors').matrix());
     expect(layers).toHaveLength(1);
     expect(layers[0]!.color).toBe('#abcdef');
-    expect(area(layers[0]!.rects)).toBe(2);
-    expect(() =>
-      createQRCodeStyler({}, [(context) => context.layer('#12')])(fromRows([[0]])),
-    ).toThrowError(expect.objectContaining({code: 'INVALID_OPTIONS'}));
   });
 
   test('clears every module touched by a fractional claimed area', () => {
@@ -163,32 +155,15 @@ describe('createQRCodeStyler', () => {
     expect(area(empty(matrix).layers[0]!.rects)).toBe(9);
   });
 
-  test('rejects non-finite geometry and negative dimensions from custom parts', () => {
-    const parts: QRCodeStylePart[] = [
-      (context) => context.claimArea(NaN, 0, 1, 1),
-      (context) => context.claimArea(0, 0, -1, 1),
-      (context) => context.layer().rect(0, Infinity, 1, 1),
-      (context) => context.layer().rect(0, 0, 1, -1),
-      (context) => context.layer().tile('m0 0z', NaN, 0),
-    ];
-    for (const part of parts) {
+  test('rejects non-finite or negative cleared areas', () => {
+    for (const part of [
+      (context: Parameters<QRCodeStylePart>[0]) => context.claimArea(NaN, 0, 1, 1),
+      (context: Parameters<QRCodeStylePart>[0]) => context.claimArea(0, 0, -1, 1),
+    ]) {
       expect(() => createQRCodeStyler({}, [part])(fromRows([[1]]))).toThrowError(
         expect.objectContaining({code: 'INVALID_OPTIONS'}),
       );
     }
-  });
-
-  test('rejects invalid path data from custom parts', () => {
-    const draw = createQRCodeStyler({
-      finder: (context) => context.layer().tile('M0 0h1v1h-1z', 0, 0),
-    });
-
-    expect(() => draw(fromRows([[1]]))).toThrowError(
-      expect.objectContaining({
-        code: 'INVALID_OPTIONS',
-        details: expect.objectContaining({field: 'tile'}),
-      }),
-    );
   });
 
   test('snapshots options when the styler is created', () => {
@@ -198,13 +173,22 @@ describe('createQRCodeStyler', () => {
 
     expect(draw(qrcode('snapshot').matrix()).moduleSize).toBe(3);
   });
+
+  test('runs renderer clearing before finder and alignment styles', () => {
+    const matrix = qrcode('cleared patterns').version(7).matrix();
+    const draw = createQRCodeStyler(
+      {finder: finder({color: '#ff0000'}), alignment: alignment({color: '#00ff00'})},
+      [(context) => context.claimArea(0, 0, matrix.size, matrix.size)],
+    );
+    expect(draw(matrix).layers).toEqual([]);
+  });
 });
 
-describe('createQRCodeCenterImage', () => {
+describe('createQRCodeCenterImagePlacement', () => {
   test('places the image box in view coordinates', () => {
     const drawing = createQRCodeStyler({quietZone: 4})(qrcode('image').matrix());
 
-    expect(createQRCodeCenterImage({size: 0.4}).place(drawing)).toEqual({
+    expect(createQRCodeCenterImagePlacement({size: 0.4}).place(drawing)).toEqual({
       x: 10.3,
       y: 10.3,
       size: 8.4,
@@ -213,7 +197,7 @@ describe('createQRCodeCenterImage', () => {
 
   test('clears every module the image or its padding touches', () => {
     const matrix = qrcode('image').matrix();
-    const {part} = createQRCodeCenterImage({size: 0.4, padding: 1});
+    const {part} = createQRCodeCenterImagePlacement({size: 0.4, padding: 1});
     const drawing = createQRCodeStyler({quietZone: 0}, [part])(matrix);
     // The image spans 6.3 to 14.7, so padding clears modules 5 through 15.
     let cleared = 0;
@@ -223,7 +207,7 @@ describe('createQRCodeCenterImage', () => {
 
     expect(area(drawing.layers[0]!.rects)).toBe(countDark(matrix) - cleared);
     const kept = createQRCodeStyler({quietZone: 0}, [
-      createQRCodeCenterImage({clearBackground: false}).part,
+      createQRCodeCenterImagePlacement({clearBackground: false}).part,
     ])(matrix);
     expect(area(kept.layers[0]!.rects)).toBe(countDark(matrix));
   });
@@ -232,7 +216,7 @@ describe('createQRCodeCenterImage', () => {
     const matrix = qrcode('alignment behind image').version(7).matrix();
     const [alignmentLayer] = createQRCodeStyler(
       {quietZone: 0, alignment: alignment({color: '#00ff00'})},
-      [createQRCodeCenterImage({size: 0.2, padding: 0}).part],
+      [createQRCodeCenterImagePlacement({size: 0.2, padding: 0}).part],
     )(matrix).layers;
 
     // The center alignment pattern of version 7 is behind the image; five patterns remain.
@@ -242,10 +226,8 @@ describe('createQRCodeCenterImage', () => {
   test.each([
     [{size: 2}, 'centerImage.size'],
     [{padding: -1}, 'centerImage.padding'],
-    [{clearBackground: 'yes'}, 'centerImage.clearBackground'],
-    [{source: 'x'}, 'centerImage.source'],
   ])('validates the layout %#', (layout, field) => {
-    expect(() => createQRCodeCenterImage(layout as never)).toThrowError(
+    expect(() => createQRCodeCenterImagePlacement(layout as never)).toThrowError(
       expect.objectContaining({details: expect.objectContaining({field})}),
     );
   });

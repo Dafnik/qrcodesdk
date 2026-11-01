@@ -5,10 +5,13 @@ import {circle, diagonal, rounded} from '@qrcodesdk/core/style';
 
 import {rasterizeShapePath} from '../src/raster';
 
+type PreparedPath = ReturnType<typeof import('@qrcodesdk/core/internal').ɵprepareShapePath>;
+
 function pixelCoverage(shape: QRCodeModuleShape, neighbors: number, x: number, y: number): number {
-  const path = typeof shape.module === 'string' ? shape.module : shape.module[neighbors];
+  const module = shape.module as unknown as PreparedPath | readonly (PreparedPath | undefined)[];
+  const path = Array.isArray(module) ? module[neighbors] : (module as PreparedPath);
   if (path === undefined) return 16;
-  const coverage = rasterizeShapePath(path, 16);
+  const coverage = rasterizeShapePath(path.data, 16);
   x -= coverage.x;
   y -= coverage.y;
   if (x < 0 || x >= coverage.width || y < 0 || y >= coverage.height) return 0;

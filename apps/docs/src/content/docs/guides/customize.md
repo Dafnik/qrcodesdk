@@ -39,26 +39,27 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-Import shapes and the `finder()` and `alignment()` parts from `@qrcodesdk/core/style`.
+Import shapes and the `finder()` and `alignment()` factories from `@qrcodesdk/core/style`.
 React, Vue, Svelte, and Angular users import them from their framework package, such as
 `import {finder, rounded} from '@qrcodesdk/react'`, and pass the style through the component's
 `options`.
 
-Renderer factories validate style options when called and copy their values. Replacing a `style`
-property later does not change the renderer. Custom parts run when rendering and validate their
-geometry then.
+Renderer factories check style value constraints when called and copy their values. TypeScript
+checks option names and types. Replacing a `style`
+property later does not change the renderer. `finder()` and `alignment()` return opaque style
+values. Pass those values to the matching style property; they expose no drawing methods.
 
 ## Shared visual style
 
-| Property     | Default     | Validation and meaning                                     |
-| ------------ | ----------- | ---------------------------------------------------------- |
-| `moduleSize` | `5`         | Positive safe integer; pixels per module                   |
-| `quietZone`  | `4`         | Non-negative safe integer; quiet-zone width in modules     |
-| `foreground` | `'#000000'` | RGB or RGBA hexadecimal color of every dark module         |
-| `background` | `'#ffffff'` | RGB or RGBA hexadecimal color behind the code              |
-| `modules`    | square      | `QRCodeModuleShape`, such as `rounded()` or `circle()`     |
-| `finder`     | square      | `QRCodeStylePart`, such as `finder({ring, center, color})` |
-| `alignment`  | `modules`   | `QRCodeStylePart`, such as `alignment({ring, center})`     |
+| Property     | Default     | Validation and meaning                                            |
+| ------------ | ----------- | ----------------------------------------------------------------- |
+| `moduleSize` | `5`         | Positive safe integer; pixels per module                          |
+| `quietZone`  | `4`         | Non-negative safe integer; quiet-zone width in modules            |
+| `foreground` | `'#000000'` | RGB or RGBA hexadecimal color of every dark module                |
+| `background` | `'#ffffff'` | RGB or RGBA hexadecimal color behind the code                     |
+| `modules`    | square      | `QRCodeModuleShape`, such as `rounded()` or `circle()`            |
+| `finder`     | square      | `QRCodeFinderStyle`, created with `finder({ring, center, color})` |
+| `alignment`  | `modules`   | `QRCodeAlignmentStyle`, created with `alignment({ring, center})`  |
 
 Colors must be exactly `#RRGGBB` or `#RRGGBBAA`, with case-insensitive hexadecimal digits. Alpha is
 preserved by all graphical renderers.
@@ -68,8 +69,8 @@ The output width and height are `moduleSize × (matrix width + 2 × quietZone)`.
 ## Colors
 
 `foreground` colors every dark module, and `background` fills the whole output, including the quiet
-zone. The only other colors are the finder and alignment colors, set with
-[`finder()`](#finder-patterns) and [`alignment()`](#alignment-patterns). Colors need no import:
+zone. Use [`finder()`](#finder-patterns) and [`alignment()`](#alignment-patterns) to override
+pattern colors. Colors need no import:
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -90,8 +91,8 @@ Import a shape from `@qrcodesdk/core/style` and pass it as `modules`. To keep sq
 | `diagonal({radius})` | `radius` | `0.5`   | Rounds only the top-left and bottom-right corners for a leaf-like look |
 | `circle({size})`     | `size`   | `1`     | Draws each module as a dot; diameter greater than `0` and at most `1`  |
 
-Connected dark modules keep straight shared edges with `rounded()` and `diagonal()`. Modules claimed
-by style parts or cleared areas count as light neighbors, so the remaining modules round against
+Connected dark modules keep straight shared edges with `rounded()` and `diagonal()`. Modules drawn
+by finder/alignment styles or cleared for center images count as light neighbors, so the remaining modules round against
 those boundaries. A `radius` of `1` gives the roundest result. Alignment patterns take the module
 shape unless you style them with [`alignment()`](#alignment-patterns).
 
@@ -134,7 +135,7 @@ draws full circles for finder pieces; its `size` option only applies to modules.
 ## Alignment patterns
 
 Larger QR codes, from version 2, contain smaller alignment patterns: a 5 × 5 ring around a single
-center module. Without a part, they take the module shape and the foreground color. Pass
+center module. Without an alignment style, they take the module shape and the foreground color. Pass
 `alignment()` to draw every alignment pattern with its own shapes and color:
 
 ```ts
@@ -164,21 +165,21 @@ draws full circles. `alignment()` without a `ring` or `center` draws square piec
 
 ## Custom shapes
 
-A shape is plain, serializable data, so you can define your own. Each piece is SVG path data in
-module units, measured from the piece's top-left corner:
+Use `customShape()` to prepare your own paths once, then share the result across renderers. Each
+piece is SVG path data in module units, measured from the piece's top-left corner:
 
 ```ts
 import {QRCodeSVGRenderer, type QRCodeShape, qrcode} from '@qrcodesdk/core';
-import {alignment, finder} from '@qrcodesdk/core/style';
+import {alignment, customShape, finder} from '@qrcodesdk/core/style';
 
 const dot = 'm.25 0h.5l.25 .25v.5l-.25 .25h-.5l-.25 -.25v-.5z';
-const octagon: QRCodeShape = {
+const octagon: QRCodeShape = customShape({
   module: dot,
   finderRing: 'm1 0h5l1 1v5l-1 1h-5l-1 -1v-5zm0 1v5h5v-5z',
   finderCenter: 'm.75 0h1.5l.75 .75v1.5l-.75 .75h-1.5l-.75 -.75v-1.5z',
   alignmentRing: 'm1 0h3l1 1v3l-1 1h-3l-1 -1v-3zm0 1v3h3v-3z',
   alignmentCenter: dot,
-};
+});
 
 const svg = qrcode('https://qrcodesdk.dev').render(
   QRCodeSVGRenderer({
@@ -191,13 +192,13 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-| Property          | Size  | Meaning                                                     |
-| ----------------- | ----- | ----------------------------------------------------------- |
-| `module`          | 1 × 1 | One path for every module, or 16 paths indexed by neighbors |
-| `finderRing`      | 7 × 7 | The finder ring, including its 5 × 5 hole                   |
-| `finderCenter`    | 3 × 3 | The finder center                                           |
-| `alignmentRing`   | 5 × 5 | The alignment ring, including its 3 × 3 hole                |
-| `alignmentCenter` | 1 × 1 | The alignment center                                        |
+| Property          | Size  | Meaning                                      |
+| ----------------- | ----- | -------------------------------------------- |
+| `module`          | 1 × 1 | One path for every module                    |
+| `finderRing`      | 7 × 7 | The finder ring, including its 5 × 5 hole    |
+| `finderCenter`    | 3 × 3 | The finder center                            |
+| `alignmentRing`   | 5 × 5 | The alignment ring, including its 3 × 3 hole |
+| `alignmentCenter` | 1 × 1 | The alignment center                         |
 
 Path data must use only the relative `m`, `l`, `h`, `v`, `c`, `a`, and `z` commands, and every
 subpath must be closed. Pieces are filled with the even-odd rule, so a second subpath inside the
@@ -206,26 +207,30 @@ first one cuts a hole, like the 5 × 5 hole of the finder ring above. `modules` 
 `alignment()` only reads `alignmentRing` and `alignmentCenter` the same way. A shape used in one
 place may omit the other properties.
 
-`module` may also be an array of 16 paths indexed by the module's remaining dark neighbors: add `1` for left,
-`2` for right, `4` for top, and `8` for bottom. An `undefined` entry draws a filled square. This
-example draws isolated modules as dots and keeps connected modules square:
+For example, this module shape draws a hexagon:
 
 ```ts
-import type {QRCodeModuleShape} from '@qrcodesdk/core';
+import {type QRCodeModuleShape, customShape} from '@qrcodesdk/core/style';
 
-const dot = 'm0 .5a.5 .5 0 0 1 1 0a.5 .5 0 0 1 -1 0z';
-const isolatedDots: QRCodeModuleShape = {
-  module: Array.from({length: 16}, (_, neighbors) => (neighbors === 0 ? dot : undefined)),
-};
+const hexagon: QRCodeModuleShape = customShape({
+  module: 'm.5 0 .5 .25v.5l-.5 .25-.5-.25v-.5z',
+});
 ```
 
-Renderer factories validate custom paths and throw `INVALID_OPTIONS` for unsupported commands or
-open subpaths.
+Built-in `rounded()` and `diagonal()` shapes contain an opaque `QRCodeModulePattern` that adapts
+to neighboring dark modules. Its representation and neighbor masks are internal; custom shapes
+supply a single path for each piece.
+
+`customShape()` validates its paths and throws `INVALID_OPTIONS` for unsupported commands or open
+subpaths. Its result contains opaque `QRCodeShapePiece` values. Renderer factories reuse them
+without parsing the paths again.
 
 ## Bundle size
 
-Import only the shapes, parts, and center-image factories you use. Bundlers with tree shaking can
+Import only the shape, pattern, and center-image factories you use. Bundlers with tree shaking can
 remove the others. Dimensions and colors need no import from `@qrcodesdk/core/style`.
+Built-in factories generate prepared geometry directly. The custom-path parser is included only
+when you import `customShape()` in SVG and Canvas consumers. PNG rasterization also uses the parser.
 
 ## Text styling
 

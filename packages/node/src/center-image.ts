@@ -1,19 +1,25 @@
 import type {QRCodeCenterImageLayout} from '@qrcodesdk/core';
-import {
-  type QRCodeDrawing,
-  type QRCodeStylePart,
-  createQRCodeCenterImage,
-} from '@qrcodesdk/core/drawing';
 import {QRCodeError} from '@qrcodesdk/core/error';
+import type {
+  ɵQRCodeDrawing as QRCodeDrawing,
+  ɵQRCodeStylePart as QRCodeStylePart,
+} from '@qrcodesdk/core/internal';
+import {ɵcreateCenterImageStore as createCenterImageStore} from '@qrcodesdk/core/internal';
+import {ɵcreateQRCodeCenterImagePlacement as createQRCodeCenterImagePlacement} from '@qrcodesdk/core/internal';
 
 import {blendPixel} from './pixels';
 import {type PNGImage, decodePNG} from './png-codec';
 
+declare const pngCenterImageBrand: unique symbol;
 /** A center image for PNG output, created with `pngCenterImage()`. */
-export type QRCodePNGCenterImage = {
+export type QRCodePNGCenterImage = {readonly [pngCenterImageBrand]: true};
+
+const centerImages = createCenterImageStore<{
   readonly part: QRCodeStylePart;
   draw(png: PNGImage, drawing: QRCodeDrawing): void;
-};
+}>();
+
+export const resolvePNGCenterImage = centerImages.resolve;
 
 const MAX_CENTER_IMAGE_BYTES = 16 * 1024 * 1024;
 const MAX_CENTER_IMAGE_PIXELS = 16_777_216;
@@ -23,25 +29,19 @@ export function pngCenterImage(
   source: Buffer,
   layout?: QRCodeCenterImageLayout,
 ): QRCodePNGCenterImage {
-  const {part, place} = createQRCodeCenterImage(layout);
+  const {part, place} = createQRCodeCenterImagePlacement(layout);
   const image = decodeImageSource(source);
-  return {
+  return centerImages.create({
     part,
     draw(png, drawing) {
       const box = place(drawing);
       const scale = drawing.moduleSize;
       compositeImage(png, image, box.x * scale, box.y * scale, box.size * scale);
     },
-  };
+  }) as QRCodePNGCenterImage;
 }
 
 function decodeImageSource(source: Buffer): PNGImage {
-  if (!Buffer.isBuffer(source)) {
-    throw new QRCodeError(
-      'INVALID_IMAGE_SOURCE',
-      'QR code PNG image source must be a Buffer containing PNG bytes',
-    );
-  }
   if (source.length > MAX_CENTER_IMAGE_BYTES) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',

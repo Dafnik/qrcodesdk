@@ -5,6 +5,7 @@ import {describe, expect, test} from 'vitest';
 import {qrcode} from '@qrcodesdk/core';
 import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeRenderer} from '@qrcodesdk/core';
 
+import {fixtureMatrixOptions} from '../src';
 import {
   type QRCodeTestFixture,
   QR_CODE_ECI_TEST_FIXTURE,
@@ -134,7 +135,9 @@ describe('qrcode().render(binaryMatrix)', () => {
     for (const fixture of QR_CODE_TEST_FIXTURES.filter(
       (candidate) => !('eci' in candidate) || candidate.eci !== true,
     )) {
-      const matrix = qrcode(fixture.payload).options(fixture).render(binaryMatrix);
+      const matrix = qrcode(fixture.payload)
+        .options(fixtureMatrixOptions(fixture))
+        .render(binaryMatrix);
       expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
       expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
     }
@@ -142,7 +145,7 @@ describe('qrcode().render(binaryMatrix)', () => {
 
   test('intentionally differs from reference generators when UTF-8 ECI is enabled', () => {
     const matrix = qrcode(QR_CODE_ECI_TEST_FIXTURE.payload)
-      .options(QR_CODE_ECI_TEST_FIXTURE)
+      .options(fixtureMatrixOptions(QR_CODE_ECI_TEST_FIXTURE))
       .render(binaryMatrix);
 
     expect(matrix).not.toEqual(referenceMatrixQRCodePackage(QR_CODE_ECI_TEST_FIXTURE));
@@ -157,9 +160,9 @@ describe('qrcode().render(binaryMatrix)', () => {
       mask: 0 as const,
     };
 
-    expect(qrcode(fixture.payload).options(fixture).render(binaryMatrix)).toEqual(
-      referenceMatrixQRCodePackage(fixture),
-    );
+    expect(
+      qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(binaryMatrix),
+    ).toEqual(referenceMatrixQRCodePackage(fixture));
   });
 
   test('matches reference matrices for every mask and ECC level', () => {
@@ -190,7 +193,9 @@ describe('qrcode().render(binaryMatrix)', () => {
       version: 2 as const,
       errorCorrectionLevel: 'M' as const,
     };
-    const matrix = qrcode(fixture.payload).options(fixture).render(binaryMatrix);
+    const matrix = qrcode(fixture.payload)
+      .options(fixtureMatrixOptions(fixture))
+      .render(binaryMatrix);
 
     expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
   });
@@ -204,15 +209,17 @@ describe('qrcode().render(binaryMatrix)', () => {
       errorCorrectionLevel: 'M' as const,
     };
 
-    expect(qrcode(fixture.payload).options(fixture).render(binaryMatrix)).toEqual(
-      referenceMatrixQRCodePackage(fixture),
-    );
+    expect(
+      qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(binaryMatrix),
+    ).toEqual(referenceMatrixQRCodePackage(fixture));
   });
 
   test.each(REFERENCE_QR_CODE_COMBINATIONS)(
     'matches explicit-mask reference matrices for $name',
     (fixture) => {
-      const matrix = qrcode(fixture.payload).options(fixture).render(binaryMatrix);
+      const matrix = qrcode(fixture.payload)
+        .options(fixtureMatrixOptions(fixture))
+        .render(binaryMatrix);
 
       expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
       expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
@@ -222,7 +229,9 @@ describe('qrcode().render(binaryMatrix)', () => {
   test.each(REFERENCE_QR_CODE_AUTO_MASK_COMBINATIONS)(
     'matches automatic-mask reference matrix for $name',
     (fixture) => {
-      const matrix = qrcode(fixture.payload).options(fixture).render(binaryMatrix);
+      const matrix = qrcode(fixture.payload)
+        .options(fixtureMatrixOptions(fixture))
+        .render(binaryMatrix);
       const referenceMatrix = referenceMatrixQRCodePackage(fixture);
       const knownDivergence =
         AUTOMATIC_MASK_N3_DIVERGENCES.get(fixture.name) ??
@@ -236,13 +245,13 @@ describe('qrcode().render(binaryMatrix)', () => {
 
       expect(matrix).toEqual(
         qrcode(fixture.payload)
-          .options(fixture)
+          .options(fixtureMatrixOptions(fixture))
           .mask(knownDivergence.qrcodeSdk)
           .render(binaryMatrix),
       );
       expect(referenceMatrix).toEqual(
         qrcode(fixture.payload)
-          .options(fixture)
+          .options(fixtureMatrixOptions(fixture))
           .mask(knownDivergence.reference)
           .render(binaryMatrix),
       );

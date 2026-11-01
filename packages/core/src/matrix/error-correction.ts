@@ -1,9 +1,5 @@
-import type {
-  QRCodeCodewords,
-  QRCodeErrorCorrectionLevel,
-  QRCodeErrorCorrectionLevelValue,
-  QRCodePolynomial,
-} from '../types';
+import type {QRCodeErrorCorrectionLevel} from '../types';
+import type {QRCodeCodewords, QRCodeErrorCorrectionLevelValue, QRCodePolynomial} from './types';
 
 // ECC levels (cf. Table 22 in JIS X 0510:2004 p. 45)
 export const ECC_LEVEL_L = 1,

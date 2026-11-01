@@ -1,4 +1,3 @@
-import {QRCodeError} from './error';
 import {generateQRCodeMatrix} from './matrix/generate-qrcode-matrix';
 import type {
   QRCodeErrorCorrectionLevel,
@@ -25,8 +24,8 @@ type HasRenderer<TOutput> = {
 };
 
 export class QRCodeBuilder<
-  P extends NoPayload | HasPayload,
-  R extends NoRenderer | HasRenderer<unknown>,
+  P extends NoPayload | HasPayload = HasPayload,
+  R extends NoRenderer | HasRenderer<unknown> = NoRenderer | HasRenderer<unknown>,
 > {
   private cachedMatrix: QRCodeMatrix | undefined;
 
@@ -101,11 +100,7 @@ export class QRCodeBuilder<
   ): TOutput {
     const selectedRenderer = renderer ?? this.currentRenderer;
 
-    if (!selectedRenderer) {
-      throw new QRCodeError('RENDERER_MISSING', 'QRCode: Renderer missing');
-    }
-
-    return selectedRenderer(this.matrix()) as TOutput;
+    return selectedRenderer!(this.matrix()) as TOutput;
   }
 
   private withOptions(options: QRCodeMatrixOptions = {}): QRCodeBuilder<P, R> {

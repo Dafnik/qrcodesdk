@@ -139,16 +139,6 @@ describe('matrix constants', () => {
       MODE_ALPHANUMERIC,
       MODE_OCTET,
     ]);
-    expect(() => resolveMode('1', 'kanji' as never)).toThrow('QRCode: Invalid mode');
-  });
-
-  test.each(['kanji', 'toString'])('reports the rejected mode %s in error details', (mode) => {
-    expect(() => resolveMode('1', mode as never)).toThrowError(
-      expect.objectContaining({
-        code: 'INVALID_OPTIONS',
-        details: {field: 'mode', value: mode},
-      }),
-    );
   });
 
   test('builds GF256 lookup tables and generator polynomial degrees', () => {

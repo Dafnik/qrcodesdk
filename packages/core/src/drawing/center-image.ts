@@ -1,6 +1,7 @@
-import {assertKnownKeys, throwInvalid} from '../options';
-import type {QRCodeCenterImageLayout, QRCodeStylePart} from '../types';
-import type {QRCodeDrawing} from './index';
+import {throwInvalid} from '../options';
+import type {QRCodeCenterImageLayout} from '../types';
+import type {QRCodeStylePart} from './types';
+import type {QRCodeDrawing} from './types';
 
 /** A square box in view coordinates. */
 export type QRCodeCenterImageBox = {readonly x: number; readonly y: number; readonly size: number};
@@ -13,21 +14,17 @@ export type QRCodeCenterImagePlacement = {
 };
 
 /** Validates a center-image layout and returns its clearing part and placement. */
-export function createQRCodeCenterImage(
+export function createQRCodeCenterImagePlacement(
   layout?: QRCodeCenterImageLayout,
 ): QRCodeCenterImagePlacement {
-  assertKnownKeys(layout, 'centerImage', ['size', 'padding', 'clearBackground']);
   const size = layout?.size ?? 0.4;
   const padding = layout?.padding ?? 1;
   const clearBackground = layout?.clearBackground ?? true;
-  if (typeof size !== 'number' || !Number.isFinite(size) || size <= 0 || size > 1) {
+  if (!Number.isFinite(size) || size <= 0 || size > 1) {
     throwInvalid('centerImage.size', 'greater than 0 and at most 1', size);
   }
-  if (typeof padding !== 'number' || !Number.isFinite(padding) || padding < 0) {
+  if (!Number.isFinite(padding) || padding < 0) {
     throwInvalid('centerImage.padding', 'a non-negative finite number', padding);
-  }
-  if (typeof clearBackground !== 'boolean') {
-    throwInvalid('centerImage.clearBackground', 'a boolean', clearBackground);
   }
   // Image position in matrix coordinates.
   const position = (moduleCount: number) => (moduleCount * (1 - size)) / 2;

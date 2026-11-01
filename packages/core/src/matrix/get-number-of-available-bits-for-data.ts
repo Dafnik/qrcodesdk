@@ -1,5 +1,6 @@
-import type {QRCodeErrorCorrectionLevelValue, QRCodeVersion} from '../types';
+import type {QRCodeVersion} from '../types';
 import {getNumberOfAvailableBitsByVersion} from './get-number-of-available-bits-by-version';
+import type {QRCodeErrorCorrectionLevelValue} from './types';
 import {getErrorCorrectionBlockCount, getErrorCorrectionCodewordsPerBlock} from './version-config';
 
 /**

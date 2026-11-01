@@ -111,6 +111,11 @@ function hasPatternStyle(part: PatternPart, {ring, center, color}: PatternState)
     : ring !== undefined || center !== undefined;
 }
 
+function createPattern(state: PlaygroundStyleState, part: 'finder'): QRCodeVisualStyle['finder'];
+function createPattern(
+  state: PlaygroundStyleState,
+  part: 'alignment',
+): QRCodeVisualStyle['alignment'];
 function createPattern(state: PlaygroundStyleState, part: PatternPart) {
   const pattern = patternState(state, part);
   if (!hasPatternStyle(part, pattern)) return undefined;

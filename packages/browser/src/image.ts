@@ -2,8 +2,7 @@ import type {QRCodeMatrix, QRCodeMatrixOptions, QRCodeRenderer} from '@qrcodesdk
 import {QRCodeError} from '@qrcodesdk/core/error';
 
 import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from './canvas';
-import {downloadQRCode, ensureExtension} from './download-helper';
-import {assertKnownKeys, assertOptionalString} from './options';
+import {downloadQRCode, ensureExtension, resolveDownloadOptions} from './download-helper';
 import type {QRCodeDownloadRendererOptions} from './types';
 
 export type QRCodeImageAccessibilityOptions = {
@@ -23,11 +22,6 @@ export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<H
 export function QRCodeImageRenderer(
   options?: QRCodeImageRendererOptions,
 ): QRCodeRenderer<HTMLImageElement> {
-  assertKnownKeys(options, 'options', ['style', 'accessibility', 'centerImage']);
-  assertKnownKeys(options?.accessibility, 'accessibility', ['alt', 'ariaLabel', 'title']);
-  assertOptionalString(options?.accessibility?.alt, 'accessibility.alt');
-  assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
-  assertOptionalString(options?.accessibility?.title, 'accessibility.title');
   const accessibility: Required<QRCodeImageAccessibilityOptions> = {
     alt: options?.accessibility?.alt ?? '',
     ariaLabel: options?.accessibility?.ariaLabel ?? '',
@@ -66,10 +60,11 @@ export function QRCodeImageRenderer(
 export function QRCodeDownloadImageRenderer(
   options: QRCodeDownloadImageRendererOptions,
 ): QRCodeRenderer<void> {
+  const {renderer, filename} = resolveDownloadOptions(options);
   return (matrix: QRCodeMatrix) => {
-    const image = options.renderer(matrix);
+    const image = renderer(matrix);
 
-    downloadQRCode(image.src, ensureExtension(options.filename ?? 'qrcode', '.png'));
+    downloadQRCode(image.src, ensureExtension(filename, '.png'));
   };
 }
 

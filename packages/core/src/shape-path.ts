@@ -8,14 +8,13 @@ const ARGUMENTS = {m: 2, l: 2, h: 1, v: 1, c: 6, a: 7} as const;
 const NUMBER = /[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/iy;
 
 /** Parses closed subpaths of relative commands shared by SVG, Canvas, and PNG. */
-export function parseShapePath(field: string, value: unknown): ShapeCommand[] {
+export function parseShapePath(field: string, value: QRCodeShapePath): ShapeCommand[] {
   const invalid = (): never =>
     throwInvalid(
       field,
       'closed path data using only relative m, l, h, v, c, a, and z commands',
       value,
     );
-  if (typeof value !== 'string') return invalid();
   const commands: ShapeCommand[] = [];
   let index = 0;
   let open = false;
@@ -72,6 +71,21 @@ export function parseShapePath(field: string, value: unknown): ShapeCommand[] {
   return commands;
 }
 
-export function validateShapePath(field: string, value: unknown): asserts value is QRCodeShapePath {
-  parseShapePath(field, value);
+/** Validated path data and its current point after the final close. */
+export type PreparedShapePath = {
+  readonly data: QRCodeShapePath;
+  readonly endX: number;
+  readonly endY: number;
+};
+
+export function prepareShapePath(field: string, value: QRCodeShapePath): PreparedShapePath {
+  const commands = parseShapePath(field, value);
+  let endX = 0;
+  let endY = 0;
+  for (const {command, values} of commands) {
+    if (command !== 'm') continue;
+    endX += values[0]!;
+    endY += values[1]!;
+  }
+  return {data: value, endX, endY};
 }

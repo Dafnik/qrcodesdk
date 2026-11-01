@@ -2,7 +2,8 @@ import {expect} from 'vitest';
 
 import {augmentBCH} from '../../src/matrix/augment-bch';
 import {getGF256GeneratorPolynomial} from '../../src/matrix/error-correction';
-import type {QRCodeMask, QRCodeMatrix, QRCodePolynomial} from '../../src/types';
+import type {QRCodePolynomial} from '../../src/matrix/types';
+import type {QRCodeMask, QRCodeMatrix} from '../../src/types';
 
 export const QR_CODE_MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const satisfies readonly QRCodeMask[];
 

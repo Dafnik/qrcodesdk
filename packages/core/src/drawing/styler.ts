@@ -1,57 +1,37 @@
-import {assertKnownKeys, throwInvalid} from '../options';
-import {validateShapePath} from '../shape-path';
+import {throwInvalid} from '../options';
+import type {PreparedShapePath} from '../shape-path';
 import {calculateQRCodeOutputSize, resolveColor, resolveQRCodeTextStyle} from '../styling';
-import type {
-  QRCodeColor,
-  QRCodeDrawContext,
-  QRCodeDrawLayer,
-  QRCodeMatrix,
-  QRCodeModuleShape,
-  QRCodeShapePath,
-  QRCodeStylePart,
-  QRCodeVisualStyle,
-} from '../types';
-import type {QRCodeDrawingLayer, QRCodeStyler} from './index';
+import type {QRCodeColor, QRCodeMatrix, QRCodeVisualStyle} from '../types';
+import type {QRCodeDrawContext, QRCodeDrawLayer, QRCodeStylePart} from './types';
+import type {QRCodeDrawingLayer, QRCodeStyler} from './types';
 
 type Layer = QRCodeDrawLayer & {
   readonly color: QRCodeColor;
   readonly rects: number[];
-  readonly tiles: Map<QRCodeShapePath, number[]>;
+  readonly tiles: Map<string, [PreparedShapePath, number[]]>;
 };
-type ModuleTiles = readonly (QRCodeShapePath | undefined)[];
+type ModuleTiles = PreparedShapePath | readonly (PreparedShapePath | undefined)[] | undefined;
 
 // Roles that take the module shape. Finder modules stay square unless a finder part draws them.
 const SHAPED_ROLES = 0b111111001;
-const SHAPE_KEYS = ['module', 'finderRing', 'finderCenter', 'alignmentRing', 'alignmentCenter'];
 
 /**
- * Creates a styler for a style. Renderers may pass extra parts, such as a center image, which run
- * before the style's own parts so those can skip claimed areas.
+ * Creates a styler for a style. Renderer parts, such as a center image, run before finder and
+ * alignment styles so those can skip claimed areas.
  */
 export function createQRCodeStyler(
   style?: QRCodeVisualStyle,
-  parts: readonly (QRCodeStylePart | undefined)[] = [],
+  rendererParts: readonly (QRCodeStylePart | undefined)[] = [],
 ): QRCodeStyler {
-  assertKnownKeys(style, 'style', [
-    'moduleSize',
-    'quietZone',
-    'foreground',
-    'background',
-    'modules',
-    'finder',
-    'alignment',
-  ]);
-  const {moduleSize, quietZone} = resolveQRCodeTextStyle(style, false);
+  const {moduleSize, quietZone} = resolveQRCodeTextStyle(style);
   const foreground = resolveColor('style.foreground', style?.foreground ?? '#000000');
   const background = resolveColor('style.background', style?.background ?? '#ffffff');
-  const tiles = resolveModuleTiles(style?.modules);
-  for (const key of ['finder', 'alignment'] as const) {
-    const part = style?.[key];
-    if (part !== undefined && typeof part !== 'function') {
-      throwInvalid(`style.${key}`, `a style part such as ${key}()`, part);
-    }
-  }
-  const allParts = [...parts, style?.finder, style?.alignment];
+  const tiles = style?.modules?.module as unknown as ModuleTiles;
+  const neighbors = Array.isArray(tiles) ? tiles : undefined;
+  const constant = neighbors ? undefined : (tiles as PreparedShapePath | undefined);
+  const allParts = [...rendererParts, style?.finder, style?.alignment] as readonly (
+    QRCodeStylePart | undefined
+  )[];
 
   return (matrix: QRCodeMatrix) => {
     const outputSize = calculateQRCodeOutputSize(matrix, {moduleSize, quietZone});
@@ -91,7 +71,15 @@ export function createQRCodeStyler(
       },
     };
     for (const part of allParts) part?.(context);
-    drawModules(matrix, claimedRoles, areas, tiles, context.layer() as Layer, quietZone);
+    drawModules(
+      matrix,
+      claimedRoles,
+      areas,
+      neighbors,
+      constant,
+      context.layer() as Layer,
+      quietZone,
+    );
 
     return {
       moduleCount: matrix.size,
@@ -102,49 +90,30 @@ export function createQRCodeStyler(
       background,
       layers: [...layers.values()]
         .filter(({rects, tiles}) => rects.length > 0 || tiles.size > 0)
-        .map(({color, rects, tiles}): QRCodeDrawingLayer => ({color, rects, tiles: [...tiles]})),
+        .map(({color, rects, tiles}): QRCodeDrawingLayer => ({
+          color,
+          rects,
+          tiles: [...tiles.values()],
+        })),
     };
   };
 }
 
-function resolveModuleTiles(shape: QRCodeModuleShape | undefined): ModuleTiles {
-  assertKnownKeys(shape, 'style.modules', SHAPE_KEYS);
-  if (shape === undefined) return [];
-  const module = shape.module;
-  if (typeof module === 'string') {
-    validateShapePath('style.modules.module', module);
-    return Array.from({length: 16}, () => module);
-  }
-  if (!Array.isArray(module) || module.length > 16) {
-    throwInvalid('style.modules.module', 'path data or up to 16 neighbor paths', module);
-  }
-  const tiles: ModuleTiles = Array.from({length: 16}, (_, mask) => module[mask]);
-  tiles.forEach((path, mask) => {
-    if (path !== undefined) validateShapePath(`style.modules.module[${mask}]`, path);
-  });
-  return tiles;
-}
-
 function createLayer(color: QRCodeColor, offset: number): Layer {
   const rects: number[] = [];
-  const tiles = new Map<QRCodeShapePath, number[]>();
+  const tiles = new Map<string, [PreparedShapePath, number[]]>();
   return {
     color,
     rects,
     tiles,
     rect(x, y, width, height) {
-      validateRectangle('rect', x, y, width, height);
       if (width === 0 || height === 0) return;
       rects.push(x + offset, y + offset, width, height);
     },
     tile(path, x, y) {
-      if (![x, y].every(Number.isFinite)) throwInvalid('tile', 'finite coordinates', [x, y]);
-      let positions = tiles.get(path);
-      if (!positions) {
-        validateShapePath('tile', path);
-        tiles.set(path, (positions = []));
-      }
-      positions.push(x + offset, y + offset);
+      let tile = tiles.get(path.data);
+      if (!tile) tiles.set(path.data, (tile = [path, []]));
+      tile[1].push(x + offset, y + offset);
     },
   };
 }
@@ -173,12 +142,14 @@ function drawModules(
   {size: n, modules, roles}: QRCodeMatrix,
   claimedRoles: number,
   areas: readonly number[],
-  tiles: ModuleTiles,
+  neighbors: readonly (PreparedShapePath | undefined)[] | undefined,
+  constant: PreparedShapePath | undefined,
   layer: Layer,
   offset: number,
 ): void {
   const {rects} = layer;
   const stride = n + 2;
+  const shapedRoles = neighbors || constant ? SHAPED_ROLES : 0;
   // How each module is drawn, with a light border so neighbor reads stay in bounds:
   // 0 not drawn, 1 filled, 2 shaped.
   const cells = new Uint8Array(stride * stride);
@@ -186,7 +157,7 @@ function drawModules(
     for (let x = 0, index = y * n, cell = (y + 1) * stride + 1; x < n; x++, index++, cell++) {
       const role = roles[index]!;
       cells[cell] =
-        modules[index]! * (1 - ((claimedRoles >> role) & 1)) * (1 + ((SHAPED_ROLES >> role) & 1));
+        modules[index]! * (1 - ((claimedRoles >> role) & 1)) * (1 + ((shapedRoles >> role) & 1));
     }
   }
   for (let index = 0; index < areas.length; index += 4) {
@@ -211,13 +182,14 @@ function drawModules(
       const cell = cells[index]!;
       let fill = cell === 1;
       if (cell === 2) {
-        const path =
-          tiles[
-            +(cells[index - 1] !== 0) |
-              (+(cells[index + 1] !== 0) << 1) |
-              (+(cells[index - stride] !== 0) << 2) |
-              (+(cells[index + stride] !== 0) << 3)
-          ];
+        const path = neighbors
+          ? neighbors[
+              +(cells[index - 1] !== 0) |
+                (+(cells[index + 1] !== 0) << 1) |
+                (+(cells[index - stride] !== 0) << 2) |
+                (+(cells[index + stride] !== 0) << 3)
+            ]
+          : constant;
         if (path === undefined) fill = true;
         else layer.tile(path, x, y);
       }

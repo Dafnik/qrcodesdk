@@ -35,7 +35,6 @@ export type QRCodeWiFiPayload = {
 };
 
 export function emailPayload(value: QRCodeEmailPayload): string {
-  assertPayloadObject(value);
   const recipients = resolveList(value.to, 'to');
   const query = [
     queryEntry('cc', value.cc === undefined ? undefined : resolveList(value.cc, 'cc').join(',')),
@@ -51,17 +50,15 @@ export function emailPayload(value: QRCodeEmailPayload): string {
 }
 
 export function phonePayload(value: QRCodePhonePayload): string {
-  assertPayloadObject(value);
   const number = resolvePhoneNumber(value.number, 'number');
   if (value.extension === undefined) return `tel:${number}`;
-  if (typeof value.extension !== 'string' || !/^\d+$/.test(value.extension)) {
+  if (!/^\d+$/.test(value.extension)) {
     invalidPayload('extension', value.extension, 'Phone extensions must contain only digits');
   }
   return `tel:${number};ext=${value.extension}`;
 }
 
 export function smsPayload(value: QRCodeSMSPayload): string {
-  assertPayloadObject(value);
   const recipients = resolveList(value.recipients, 'recipients').map((recipient) =>
     resolvePhoneNumber(recipient, 'recipients'),
   );
@@ -71,7 +68,6 @@ export function smsPayload(value: QRCodeSMSPayload): string {
 }
 
 export function geoPayload(value: QRCodeGeoPayload): string {
-  assertPayloadObject(value);
   validateCoordinate('latitude', value.latitude, -90, 90);
   validateCoordinate('longitude', value.longitude, -180, 180);
   if (value.altitude !== undefined && !Number.isFinite(value.altitude)) {
@@ -92,17 +88,10 @@ export function geoPayload(value: QRCodeGeoPayload): string {
 }
 
 export function wifiPayload(value: QRCodeWiFiPayload): string {
-  assertPayloadObject(value);
   validateText('ssid', value.ssid, false);
   if (value.password !== undefined) validateText('password', value.password, true);
-  if (value.hidden !== undefined && typeof value.hidden !== 'boolean') {
-    invalidPayload('hidden', value.hidden, 'Hidden must be a boolean');
-  }
 
   const encryption = value.encryption ?? (value.password === undefined ? 'nopass' : 'WPA');
-  if (!['WPA', 'WEP', 'nopass'].includes(encryption)) {
-    invalidPayload('encryption', encryption, 'Unsupported Wi-Fi encryption');
-  }
   if (encryption === 'nopass' && value.password !== undefined) {
     invalidPayload('password', value.password, 'Open Wi-Fi networks cannot include a password');
   }
@@ -117,9 +106,7 @@ export function wifiPayload(value: QRCodeWiFiPayload): string {
 }
 
 function resolveList(value: string | readonly string[], field: string): readonly string[] {
-  const values = typeof value === 'string' ? [value] : Array.isArray(value) ? value : undefined;
-  if (values === undefined)
-    invalidPayload(field, value, `${field} must be a string or array of strings`);
+  const values = typeof value === 'string' ? [value] : value;
   if (values.length === 0) invalidPayload(field, value, `${field} must not be empty`);
   for (const item of values) validateText(field, item, false);
   return values;
@@ -141,12 +128,6 @@ function resolvePhoneNumber(value: string, field: string): string {
     invalidPayload(field, value, 'Phone numbers may contain digits and RFC 3966 separators');
   }
   return value;
-}
-
-function assertPayloadObject(value: unknown): asserts value is Record<string, unknown> {
-  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
-    invalidPayload('payload', value, 'Payload must be an object');
-  }
 }
 
 function validateCoordinate(field: string, value: number, minimum: number, maximum: number): void {
@@ -174,7 +155,7 @@ function formatDecimalLiteral(value: number): string {
 }
 
 function validateText(field: string, value: string, allowEmpty: boolean): void {
-  if (typeof value !== 'string' || (!allowEmpty && value.length === 0) || /[\0\r\n]/.test(value)) {
+  if ((!allowEmpty && value.length === 0) || /[\0\r\n]/.test(value)) {
     invalidPayload(field, value, `${field} contains invalid text`);
   }
 }

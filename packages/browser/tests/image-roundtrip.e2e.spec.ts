@@ -1,3 +1,4 @@
+import {fixtureMatrixOptions} from '@repo/core-testing';
 import {QR_CODE_STYLING_ROUNDTRIP_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
@@ -15,13 +16,20 @@ describe('QRCodeImageRenderer', () => {
 
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name image output', async (fixture) => {
     await expect(
-      decodeImageQRCode(qrcode().payload(fixture.payload).options(fixture).render(defaultRenderer)),
+      decodeImageQRCode(
+        qrcode()
+          .payload(fixture.payload)
+          .options(fixtureMatrixOptions(fixture))
+          .render(defaultRenderer),
+      ),
     ).resolves.toBe(fixture.payload);
   });
 
   test.each(JSQR_ROUNDTRIP_COMBINATIONS_TWO)('decodes $name image output', async (fixture) => {
     await expect(
-      decodeImageQRCode(qrcode(fixture.payload).options(fixture).render(defaultRenderer)),
+      decodeImageQRCode(
+        qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(defaultRenderer),
+      ),
     ).resolves.toBe(fixture.payload);
   });
 

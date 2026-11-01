@@ -133,6 +133,9 @@ try {
   const initialHTML = await initialResponse.text();
   if (framework === 'next') {
     assert.match(initialHTML, /data-testid="qrcode-svg"[^]*<svg/);
+    assert.match(initialHTML, /data-testid="qrcode-server-svg"[^]*<svg/);
+    assert.match(initialHTML, /data-testid="qrcode-styled-svg"[^]*<svg/);
+    assert.match(initialHTML, /<image href="data:image\/svg\+xml/);
     assert.doesNotMatch(initialHTML, /data-testid="qrcode-image"[^]*<img/);
     assert.doesNotMatch(initialHTML, /data-testid="qrcode-canvas"[^]*<canvas/);
     logSuccess('Next.js initial HTML contains SVG markup and permanent image and canvas wrappers');
@@ -142,6 +145,24 @@ try {
   await page.locator('[data-testid="qrcode-svg"] svg').waitFor();
   await page.locator('[data-testid="qrcode-canvas"] canvas').waitFor();
   await page.locator('[data-testid="qrcode-image"] img').waitFor();
+  if (framework === 'next') {
+    await page.locator('[data-testid="qrcode-server-svg"] svg').waitFor();
+    await page.locator('[data-testid="qrcode-styled-svg"] svg image').waitFor();
+    assert.equal(
+      await page.locator('[data-testid="qrcode-styled-svg"] path[fill="#ff0000"]').count(),
+      1,
+    );
+    logSuccess(
+      'Next.js supports direct server component imports and client-owned style and center-image factories',
+    );
+  }
+  if (framework === 'svelte') {
+    const section = page.locator('[data-testid="qrcode-reactive-svg"]');
+    await section.locator('svg image').waitFor();
+    await section.getByRole('button', {name: 'Update options'}).click();
+    await section.locator('svg image').waitFor();
+    logSuccess('Svelte preserves opaque center images in deep reactive options');
+  }
   logSuccess('built consumer loads in Chromium and mounts all QR renderers');
 
   const result = await page.evaluate(async () => {

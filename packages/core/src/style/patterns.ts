@@ -1,28 +1,19 @@
-import {assertKnownKeys, throwInvalid} from './options';
-import {validateShapePath} from './shape-path';
-import {resolveColor} from './styling';
+import type {QRCodeDrawLayer, QRCodeStylePart} from '../drawing/types';
+import {throwInvalid} from '../options';
+import type {PreparedShapePath} from '../shape-path';
+import {resolveColor} from '../styling';
 import type {
   QRCodeAlignmentCenterShape,
   QRCodeAlignmentRingShape,
+  QRCodeAlignmentStyle,
   QRCodeColor,
-  QRCodeDrawLayer,
   QRCodeFinderCenterShape,
   QRCodeFinderRingShape,
+  QRCodeFinderStyle,
+  QRCodeModulePattern,
   QRCodeShape,
-  QRCodeShapePath,
-  QRCodeStylePart,
-} from './types';
-
-export type {
-  QRCodeAlignmentCenterShape,
-  QRCodeAlignmentRingShape,
-  QRCodeFinderCenterShape,
-  QRCodeFinderRingShape,
-  QRCodeModuleShape,
-  QRCodeShape,
-  QRCodeShapePath,
-  QRCodeStylePart,
-} from './types';
+  QRCodeShapePiece,
+} from '../types';
 
 export type QRCodeRoundedShapeOptions = {
   /** Module corner radius from 0 to 1. Finder and alignment pieces scale it to their size. */
@@ -48,7 +39,6 @@ type Radii = readonly [topLeft: number, topRight: number, bottomRight: number, b
 // Corners a shape may round: top left 1, top right 2, bottom right 4, bottom left 8.
 const ALL_CORNERS = 0b1111;
 const DIAGONAL_CORNERS = 0b0101;
-const SHAPE_KEYS = ['module', 'finderRing', 'finderCenter', 'alignmentRing', 'alignmentCenter'];
 // Module roles, see QRCodeModuleRole.
 const FINDER_RING_ROLE = 1;
 const FINDER_CENTER_ROLE = 2;
@@ -67,26 +57,39 @@ export function diagonal(options?: QRCodeRoundedShapeOptions): QRCodeShape {
 
 /** Draws every module as a dot and finder pieces as circles. */
 export function circle(options?: QRCodeCircleShapeOptions): QRCodeShape {
-  assertKnownKeys(options, 'circle', ['size']);
   const size = options?.size ?? 1;
-  if (typeof size !== 'number' || !(size > 0 && size <= 1)) {
+  if (!(size > 0 && size <= 1)) {
     throwInvalid('circle.size', 'greater than 0 and at most 1', size);
   }
   const offset = (1 - size) / 2;
-  const dot = path((p) => roundedRect(p, offset, size, uniform(size / 2)));
+  let dot: QRCodeShapePiece | undefined;
+  let finderRing: QRCodeShapePiece | undefined;
+  let finderCenter: QRCodeShapePiece | undefined;
+  let alignmentRing: QRCodeShapePiece | undefined;
+  const module = () => (dot ??= circlePath(size, offset));
   return {
-    module: dot,
-    finderRing: ringPath(7, uniform(3.5), uniform(2.5)),
-    finderCenter: path((p) => roundedRect(p, 0, 3, uniform(1.5))),
-    alignmentRing: ringPath(5, uniform(2.5), uniform(1.5)),
-    alignmentCenter: dot,
+    get module() {
+      return module();
+    },
+    get finderRing() {
+      return (finderRing ??= circlePath(7, 0, true));
+    },
+    get finderCenter() {
+      return (finderCenter ??= circlePath(3));
+    },
+    get alignmentRing() {
+      return (alignmentRing ??= circlePath(5, 0, true));
+    },
+    get alignmentCenter() {
+      return module();
+    },
   };
 }
 
 /** Draws the three finder patterns with their own shapes and color. */
-export function finder(options?: QRCodeFinderOptions): QRCodeStylePart {
+export function finder(options?: QRCodeFinderOptions): QRCodeFinderStyle {
   const {ring, center, color} = resolvePartOptions('finder', options, 'finderRing', 'finderCenter');
-  return (context) => {
+  return ((context) => {
     context.claimRoles(FINDER_RING_ROLE, FINDER_CENTER_ROLE);
     const n = context.matrix.size;
     const layer = context.layer(color);
@@ -99,18 +102,18 @@ export function finder(options?: QRCodeFinderOptions): QRCodeStylePart {
       drawPattern(layer, ring, x, y, 7);
       drawPattern(layer, center, x + 2, y + 2, 3);
     }
-  };
+  }) satisfies QRCodeStylePart as unknown as QRCodeFinderStyle;
 }
 
 /** Draws the alignment patterns with their own shapes and color. */
-export function alignment(options?: QRCodeAlignmentOptions): QRCodeStylePart {
+export function alignment(options?: QRCodeAlignmentOptions): QRCodeAlignmentStyle {
   const {ring, center, color} = resolvePartOptions(
     'alignment',
     options,
     'alignmentRing',
     'alignmentCenter',
   );
-  return (context) => {
+  return ((context) => {
     context.claimRoles(ALIGNMENT_RING_ROLE, ALIGNMENT_CENTER_ROLE);
     const {size: n, roles} = context.matrix;
     const layer = context.layer(color);
@@ -122,7 +125,7 @@ export function alignment(options?: QRCodeAlignmentOptions): QRCodeStylePart {
       drawPattern(layer, ring, x - 2, y - 2, 5);
       drawPattern(layer, center, x, y, 1);
     }
-  };
+  }) satisfies QRCodeStylePart as unknown as QRCodeAlignmentStyle;
 }
 
 function resolvePartOptions(
@@ -131,17 +134,13 @@ function resolvePartOptions(
     {readonly ring?: object; readonly center?: object; readonly color?: QRCodeColor} | undefined,
   ringKey: string,
   centerKey: string,
-): {ring?: QRCodeShapePath; center?: QRCodeShapePath; color?: QRCodeColor} {
-  assertKnownKeys(options, name, ['ring', 'center', 'color']);
+): {ring?: PreparedShapePath; center?: PreparedShapePath; color?: QRCodeColor} {
   const color =
     options?.color === undefined ? undefined : resolveColor(`${name}.color`, options.color);
   const read = (option: 'ring' | 'center', key: string) => {
     const shape = options?.[option];
-    assertKnownKeys(shape, `${name}.${option}`, SHAPE_KEYS);
     if (shape === undefined) return undefined;
-    const value = (shape as Record<string, unknown>)[key];
-    validateShapePath(`${name}.${option}.${key}`, value);
-    return value;
+    return (shape as Record<string, PreparedShapePath>)[key]!;
   };
   return {ring: read('ring', ringKey), center: read('center', centerKey), color};
 }
@@ -149,7 +148,7 @@ function resolvePartOptions(
 /** Sizes 5 and 7 are rings; sizes 1 and 3 are filled centers. */
 function drawPattern(
   layer: QRCodeDrawLayer,
-  shape: QRCodeShapePath | undefined,
+  shape: PreparedShapePath | undefined,
   x: number,
   y: number,
   size: number,
@@ -172,55 +171,98 @@ function roundedShape(
   options: QRCodeRoundedShapeOptions | undefined,
   corners: number,
 ): QRCodeShape {
-  assertKnownKeys(options, name, ['radius']);
   const radius = options?.radius ?? 0.5;
-  if (typeof radius !== 'number' || !(radius >= 0 && radius <= 1)) {
+  if (!(radius >= 0 && radius <= 1)) {
     throwInvalid(`${name}.radius`, 'a number from 0 to 1', radius);
   }
   const cornerRadii = (value: number) =>
     [0, 1, 2, 3].map((corner) => ((corners >> corner) & 1 ? value : 0)) as unknown as Radii;
 
+  let module: QRCodeModulePattern | undefined;
+  let finderRing: QRCodeShapePiece | undefined;
+  let finderCenter: QRCodeShapePiece | undefined;
+  let alignmentRing: QRCodeShapePiece | undefined;
+  let alignmentCenter: QRCodeShapePiece | undefined;
   return {
-    module: Array.from({length: 16}, (_, mask) => {
-      const left = mask & 1;
-      const right = mask & 2;
-      const top = mask & 4;
-      const bottom = mask & 8;
-      const free = [!left && !top, !right && !top, !right && !bottom, !left && !bottom].map(
-        (isFree, corner) => isFree && radius > 0 && ((corners >> corner) & 1) === 1,
-      );
-      if (!free.includes(true)) return undefined;
-      // Two rounded corners on one side share it, so each can use at most half of it.
-      const radii = free.map((isFree, corner) =>
-        !isFree
-          ? 0
-          : free[(corner + 1) % 4] || free[(corner + 3) % 4]
-            ? Math.min(radius, 0.5)
-            : radius,
-      ) as unknown as Radii;
-      return path((p) => roundedRect(p, 0, 1, radii));
-    }),
-    // Finder and alignment pieces scale the radius with their size.
-    finderRing: ringPath(7, cornerRadii(radius * 2.8), cornerRadii(Math.max(0, radius * 2.8 - 1))),
-    finderCenter: path((p) => roundedRect(p, 0, 3, cornerRadii(radius * 1.2))),
-    alignmentRing: ringPath(5, cornerRadii(radius * 2), cornerRadii(Math.max(0, radius * 2 - 1))),
-    // Rounded corners of the 1x1 center share their sides, so each uses at most half of them.
-    alignmentCenter: path((p) =>
-      roundedRect(p, 0, 1, cornerRadii(corners === ALL_CORNERS ? Math.min(radius, 0.5) : radius)),
-    ),
+    get module() {
+      return (module ??= Array.from({length: 16}, (_, mask) => {
+        const left = mask & 1;
+        const right = mask & 2;
+        const top = mask & 4;
+        const bottom = mask & 8;
+        const free = [!left && !top, !right && !top, !right && !bottom, !left && !bottom].map(
+          (isFree, corner) => isFree && radius > 0 && ((corners >> corner) & 1) === 1,
+        );
+        if (!free.includes(true)) return undefined;
+        // Two rounded corners on one side share it, so each can use at most half of it.
+        const radii = free.map((isFree, corner) =>
+          !isFree
+            ? 0
+            : free[(corner + 1) % 4] || free[(corner + 3) % 4]
+              ? Math.min(radius, 0.5)
+              : radius,
+        ) as unknown as Radii;
+        return path((p) => roundedRect(p, 0, 1, radii));
+      }) as unknown as QRCodeModulePattern);
+    },
+    get finderRing() {
+      return (finderRing ??= ringPath(
+        7,
+        cornerRadii(radius * 2.8),
+        cornerRadii(Math.max(0, radius * 2.8 - 1)),
+      ));
+    },
+    get finderCenter() {
+      return (finderCenter ??= path((p) => roundedRect(p, 0, 3, cornerRadii(radius * 1.2))));
+    },
+    get alignmentRing() {
+      return (alignmentRing ??= ringPath(
+        5,
+        cornerRadii(radius * 2),
+        cornerRadii(Math.max(0, radius * 2 - 1)),
+      ));
+    },
+    get alignmentCenter() {
+      return (alignmentCenter ??= path((p) =>
+        roundedRect(p, 0, 1, cornerRadii(corners === ALL_CORNERS ? Math.min(radius, 0.5) : radius)),
+      ));
+    },
   };
 }
 
 /** A square ring of `size` modules with a hole one module inside it. */
-function ringPath(size: number, outer: Radii, inner: Radii): QRCodeShapePath {
+function ringPath(size: number, outer: Radii, inner: Radii): QRCodeShapePiece {
   return path((p) => {
     roundedRect(p, 0, size, outer);
     roundedRect(p, 1, size - 2, inner);
   });
 }
 
-function uniform(radius: number): Radii {
-  return [radius, radius, radius, radius];
+/** Two semicircles draw a circle; a ring adds a second, inset circle. */
+function circlePath(size: number, offset = 0, ring = false): QRCodeShapePiece {
+  const endX = round(offset + size / 2);
+  const top = round(offset);
+  const diameter = round(offset + size) - top;
+  const subpath = (x: number, y: number, radius: number, diameter: number) =>
+    `m${format(x, y)}a${format(radius, radius, 0, 0, 1, 0, diameter)}a${format(radius, radius, 0, 0, 1, 0, -diameter)}z`;
+  const data =
+    subpath(endX, top, size / 2, diameter) + (ring ? subpath(0, 1, (size - 2) / 2, size - 2) : '');
+  return {data, endX, endY: top + (ring ? 1 : 0)} as unknown as QRCodeShapePiece;
+}
+
+function round(value: number): number {
+  return Math.round(value * 1000) / 1000;
+}
+
+/** Separators are only needed where the next number would extend the previous one. */
+function format(...values: number[]): string {
+  return values
+    .map((value) => String(round(value)).replace(/^(-?)0\./, '$1.'))
+    .reduce((joined, value) =>
+      value[0] === '-' || (value[0] === '.' && /\.\d*$/.test(joined))
+        ? joined + value
+        : `${joined} ${value}`,
+    );
 }
 
 type PathBuilder = {
@@ -235,23 +277,13 @@ type Point = readonly [x: number, y: number];
  * Builds relative path data, tracking rounded positions so rounding never accumulates. Quarter
  * circles around one center merge into as few arcs as possible.
  */
-function path(build: (builder: PathBuilder) => void): QRCodeShapePath {
+function path(build: (builder: PathBuilder) => void): QRCodeShapePiece {
   let data = '';
   let currentX = 0;
   let currentY = 0;
   let startX = 0;
   let startY = 0;
   let arc: {centerX: number; centerY: number; radius: number; ends: Point[]} | undefined;
-  const round = (value: number) => Math.round(value * 1000) / 1000;
-  // Separators are only needed where the next number would otherwise extend the previous one.
-  const format = (...values: number[]) =>
-    values
-      .map((value) => String(round(value)).replace(/^(-?)0\./, '$1.'))
-      .reduce((joined, value) =>
-        value[0] === '-' || (value[0] === '.' && /\.\d*$/.test(joined))
-          ? joined + value
-          : `${joined} ${value}`,
-      );
   const to = (x: number, y: number) => {
     currentX = round(x);
     currentY = round(y);
@@ -320,7 +352,7 @@ function path(build: (builder: PathBuilder) => void): QRCodeShapePath {
       currentY = startY;
     },
   });
-  return data;
+  return {data, endX: currentX, endY: currentY} as unknown as QRCodeShapePiece;
 }
 
 /** Adds a clockwise square at (offset, offset) with per-corner radii. */

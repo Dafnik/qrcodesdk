@@ -1,5 +1,4 @@
-import {parseShapePath} from '../shape-path';
-import type {QRCodeDrawingLayer} from './index';
+import type {QRCodeDrawingLayer} from './types';
 
 /**
  * Serializes one drawing layer into compact SVG path data, which SVG and `Path2D` both accept.
@@ -19,22 +18,14 @@ export function toQRCodePathData({rects, tiles}: QRCodeDrawingLayer): string {
     currentY = y;
   }
   for (const [tile, positions] of tiles) {
-    // After the tile's final close, the current point is the start of its last subpath.
-    let endX = 0;
-    let endY = 0;
-    for (const {command, values} of parseShapePath('tile', tile)) {
-      if (command !== 'm') continue;
-      endX += values[0]!;
-      endY += values[1]!;
-    }
     for (let index = 0; index < positions.length; index += 2) {
       const x = positions[index]!;
       const y = positions[index + 1]!;
       const moveX = round(x - currentX);
       const moveY = round(y - currentY);
-      path += `m${moveX} ${moveY}${tile}`;
-      currentX += moveX + endX;
-      currentY += moveY + endY;
+      path += `m${moveX} ${moveY}${tile.data}`;
+      currentX += moveX + tile.endX;
+      currentY += moveY + tile.endY;
     }
   }
   return path;

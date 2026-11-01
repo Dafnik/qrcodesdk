@@ -12,11 +12,14 @@ export type {
   QRCodeMode,
   QRCodeModuleRole,
   QRCodeModuleShape,
+  QRCodeModulePattern,
+  QRCodeFinderStyle,
+  QRCodeAlignmentStyle,
   QRCodePayload,
   QRCodeRenderer,
   QRCodeShape,
   QRCodeShapePath,
-  QRCodeStylePart,
+  QRCodeShapePiece,
   QRCodeTextStyle,
   QRCodeVersion,
   QRCodeVisualStyle,
@@ -43,3 +46,4 @@ export {
   svgCenterImage,
 } from './svg';
 export {qrcode, QRCodeBuilder} from './qrcode-builder';
+export {QR_CODE_MODULE_ROLES} from './matrix/module-roles';

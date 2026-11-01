@@ -5,23 +5,26 @@ import type {
   QRCodeRenderer,
   QRCodeVisualStyle,
 } from '@qrcodesdk/core';
-import {
-  type QRCodeDrawing,
-  type QRCodeStylePart,
-  createQRCodeCenterImage,
-  createQRCodeStyler,
-  toQRCodePathData,
-} from '@qrcodesdk/core/drawing';
 import {QRCodeError} from '@qrcodesdk/core/error';
-import {ɵassertCenterImage as assertCenterImage} from '@qrcodesdk/core/internal';
+import type {
+  ɵQRCodeDrawing as QRCodeDrawing,
+  ɵQRCodeStylePart as QRCodeStylePart,
+} from '@qrcodesdk/core/internal';
+import {ɵcreateCenterImageStore as createCenterImageStore} from '@qrcodesdk/core/internal';
+import {
+  ɵcreateQRCodeCenterImagePlacement as createQRCodeCenterImagePlacement,
+  ɵcreateQRCodeStyler as createQRCodeStyler,
+  ɵtoQRCodePathData as toQRCodePathData,
+} from '@qrcodesdk/core/internal';
 
-import {assertKnownKeys, assertOptionalString} from './options';
-
+declare const canvasCenterImageBrand: unique symbol;
 /** A center image for Canvas and Image output, created with `canvasCenterImage()`. */
-export type QRCodeCanvasCenterImage = {
+export type QRCodeCanvasCenterImage = {readonly [canvasCenterImageBrand]: true};
+
+const centerImages = createCenterImageStore<{
   readonly part: QRCodeStylePart;
   draw(context: CanvasRenderingContext2D, drawing: QRCodeDrawing): void;
-};
+}>();
 export type QRCodeCanvasAccessibilityOptions = {
   readonly ariaLabel?: string;
   readonly title?: string;
@@ -38,12 +41,7 @@ export type QRCodeCanvasOptions = QRCodeCanvasRendererOptions & {
 export function QRCodeCanvasRenderer(
   options?: QRCodeCanvasRendererOptions,
 ): QRCodeRenderer<HTMLCanvasElement> {
-  assertKnownKeys(options, 'options', ['style', 'accessibility', 'centerImage']);
-  assertKnownKeys(options?.accessibility, 'accessibility', ['ariaLabel', 'title']);
-  assertOptionalString(options?.accessibility?.ariaLabel, 'accessibility.ariaLabel');
-  assertOptionalString(options?.accessibility?.title, 'accessibility.title');
-  const centerImage = options?.centerImage;
-  assertCenterImage(centerImage, 'draw', 'canvasCenterImage');
+  const centerImage = centerImages.resolve(options?.centerImage);
   const draw = createQRCodeStyler(options?.style, [centerImage?.part]);
   const accessibility = options?.accessibility ? {...options.accessibility} : undefined;
 
@@ -79,8 +77,8 @@ export function canvasCenterImage(
   source: CanvasImageSource,
   layout?: QRCodeCenterImageLayout,
 ): QRCodeCanvasCenterImage {
-  const {part, place} = createQRCodeCenterImage(layout);
-  return {
+  const {part, place} = createQRCodeCenterImagePlacement(layout);
+  return centerImages.create({
     part,
     draw(context, drawing) {
       const {width, height} = getCanvasImageSourceSize(source);
@@ -95,7 +93,7 @@ export function canvasCenterImage(
         height * scale,
       );
     },
-  };
+  }) as QRCodeCanvasCenterImage;
 }
 
 function applyAccessibility(
@@ -113,52 +111,30 @@ function applyAccessibility(
 }
 
 type CanvasImageSourceDimensions = {width: number; height: number};
-const DIMENSION_PAIRS = [
-  ['naturalWidth', 'naturalHeight'],
-  ['videoWidth', 'videoHeight'],
-  ['displayWidth', 'displayHeight'],
-  ['width', 'height'],
-] as const;
-
 function getCanvasImageSourceSize(source: CanvasImageSource): CanvasImageSourceDimensions {
-  if (source === null || source === undefined) {
-    throw new QRCodeError(
-      'INVALID_IMAGE_SOURCE',
-      'QR code canvas image source is required when centerImage is configured',
-    );
-  }
-  const candidate = source as unknown as Record<string, unknown>;
-  if (candidate['complete'] === false) {
-    throw new QRCodeError(
-      'INVALID_IMAGE_SOURCE',
-      'QR code canvas image source must be loaded before rendering',
-    );
-  }
-  for (const [widthKey, heightKey] of DIMENSION_PAIRS) {
-    const width = candidate[widthKey];
-    const height = candidate[heightKey];
-    if (typeof width !== 'number' || typeof height !== 'number') continue;
-    if (width > 0 && height > 0) return {width, height};
-    throwInvalidImageDimensions();
-  }
-  const width = animatedLength(candidate['width']);
-  const height = animatedLength(candidate['height']);
-  if (width !== undefined || height !== undefined) {
-    if (width !== undefined && height !== undefined && width > 0 && height > 0) {
-      return {width, height};
+  let width: number;
+  let height: number;
+  if ('naturalWidth' in source) {
+    if (!source.complete) {
+      throw new QRCodeError(
+        'INVALID_IMAGE_SOURCE',
+        'QR code canvas image source must be loaded before rendering',
+      );
     }
-    throwInvalidImageDimensions();
+    width = source.naturalWidth;
+    height = source.naturalHeight;
+  } else if ('videoWidth' in source) {
+    width = source.videoWidth;
+    height = source.videoHeight;
+  } else if ('displayWidth' in source) {
+    width = source.displayWidth;
+    height = source.displayHeight;
+  } else {
+    width = typeof source.width === 'number' ? source.width : source.width.baseVal.value;
+    height = typeof source.height === 'number' ? source.height : source.height.baseVal.value;
   }
-  throw new QRCodeError(
-    'INVALID_IMAGE_SOURCE',
-    'QR code canvas image source must expose intrinsic dimensions before rendering',
-  );
-}
-
-function animatedLength(value: unknown): number | undefined {
-  if (!value || typeof value !== 'object') return undefined;
-  const baseValue = (value as {baseVal?: {value?: unknown}}).baseVal?.value;
-  return typeof baseValue === 'number' ? baseValue : undefined;
+  if (width <= 0 || height <= 0) throwInvalidImageDimensions();
+  return {width, height};
 }
 
 function throwInvalidImageDimensions(): never {

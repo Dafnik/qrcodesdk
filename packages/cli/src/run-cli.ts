@@ -344,11 +344,7 @@ function promptString(value: string | symbol, prompt: PromptAdapter): string {
     throw new CliError('Cancelled.');
   }
 
-  if (typeof value !== 'string') {
-    throw new CliError('Invalid prompt response.');
-  }
-
-  return value;
+  return value as string;
 }
 
 function resolveStyle(rawOptions: RawCliOptions): QRCodeVisualStyle {

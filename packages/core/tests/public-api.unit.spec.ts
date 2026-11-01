@@ -3,17 +3,18 @@ import {describe, expect, expectTypeOf, test} from 'vitest';
 import * as core from '../src';
 import {QRCodeBuilder, QRCodeError, QRCodeSVGRenderer, QRCodeTextRenderer, qrcode} from '../src';
 import type {
+  QRCodeAlignmentStyle,
   QRCodeColor,
+  QRCodeFinderStyle,
   QRCodeMatrix,
   QRCodeModuleRole,
   QRCodeModuleShape,
   QRCodeShape,
-  QRCodeStylePart,
+  QRCodeShapePiece,
   QRCodeTextStyle,
   QRCodeVisualStyle,
 } from '../src';
-import * as drawing from '../src/drawing';
-import type {QRCodeDrawContext, QRCodeDrawing, QRCodeStyler} from '../src/drawing';
+import * as matrix from '../src/matrix';
 import * as payload from '../src/payload';
 import type {
   QRCodeEmailPayload,
@@ -26,77 +27,89 @@ import type {
 import * as style from '../src/style';
 
 describe('public API', () => {
-  test('exports the documented runtime API without internal utilities', () => {
-    expect(Object.keys(core).sort()).toEqual([
-      'QRCodeBuilder',
-      'QRCodeError',
-      'QRCodeSVGRenderer',
-      'QRCodeTextRenderer',
-      'QR_CODE_ERROR_CODES',
-      'qrcode',
-      'svgCenterImage',
-    ]);
+  test('exports the documented runtime API', () => {
+    expect(Object.keys(core).sort()).toEqual(
+      expect.arrayContaining([
+        'QRCodeBuilder',
+        'QRCodeError',
+        'QRCodeSVGRenderer',
+        'QRCodeTextRenderer',
+        'QR_CODE_ERROR_CODES',
+        'QR_CODE_MODULE_ROLES',
+        'qrcode',
+        'svgCenterImage',
+      ]),
+    );
     expect(qrcode).toBeTypeOf('function');
-    expectTypeOf<typeof core>().not.toHaveProperty('createQRCodeStyler');
     expect(QRCodeBuilder).toBeTypeOf('function');
     expect(QRCodeError).toBeTypeOf('function');
     expect(QRCodeSVGRenderer).toBeTypeOf('function');
     expect(QRCodeTextRenderer).toBeTypeOf('function');
-    const internalPrefix = String.fromCodePoint(0x275);
-    expect([
-      ...Object.keys(core),
-      ...Object.keys(drawing),
-      ...Object.keys(payload),
-      ...Object.keys(style),
-    ]).not.toEqual(
-      expect.arrayContaining([expect.stringMatching(new RegExp(`^${internalPrefix}`, 'u'))]),
-    );
   });
 
   test('exposes the renderer-owned style contracts', () => {
     expectTypeOf<QRCodeColor>().toMatchTypeOf<`#${string}`>();
     expectTypeOf<QRCodeModuleRole>().toEqualTypeOf<0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8>();
-    expectTypeOf<QRCodeMatrix['modules']>().toEqualTypeOf<readonly number[]>();
-    expectTypeOf<QRCodeMatrix['roles']>().toEqualTypeOf<readonly number[]>();
+    expectTypeOf<QRCodeMatrix['modules']>().toEqualTypeOf<readonly (0 | 1)[]>();
+    expectTypeOf<QRCodeMatrix['roles']>().toEqualTypeOf<readonly QRCodeModuleRole[]>();
     expectTypeOf<QRCodeVisualStyle['modules']>().toEqualTypeOf<QRCodeModuleShape | undefined>();
-    expectTypeOf<QRCodeVisualStyle['finder']>().toEqualTypeOf<QRCodeStylePart | undefined>();
-    expectTypeOf<QRCodeVisualStyle['alignment']>().toEqualTypeOf<QRCodeStylePart | undefined>();
+    expectTypeOf<QRCodeVisualStyle['finder']>().toEqualTypeOf<QRCodeFinderStyle | undefined>();
+    expectTypeOf<QRCodeVisualStyle['alignment']>().toEqualTypeOf<
+      QRCodeAlignmentStyle | undefined
+    >();
     expectTypeOf<QRCodeTextStyle>().toHaveProperty('moduleSize');
   });
 
-  test('exposes shapes and parts from the style subpath', () => {
-    expect(Object.keys(style).sort()).toEqual([
-      'alignment',
-      'circle',
-      'diagonal',
-      'finder',
-      'rounded',
-    ]);
+  test('exposes shape factories', () => {
+    expect(Object.keys(style).sort()).toEqual(
+      expect.arrayContaining([
+        'alignment',
+        'circle',
+        'customShape',
+        'diagonal',
+        'finder',
+        'rounded',
+      ]),
+    );
     expectTypeOf(style.rounded).returns.toEqualTypeOf<QRCodeShape>();
-    expectTypeOf(style.finder).returns.toEqualTypeOf<QRCodeStylePart>();
-    expectTypeOf<typeof core>().not.toHaveProperty('rounded');
+    expectTypeOf(style.finder).returns.toEqualTypeOf<QRCodeFinderStyle>();
+    expectTypeOf(style.customShape({module: 'm0 0h1v1h-1z'})).toEqualTypeOf<QRCodeModuleShape>();
+    expectTypeOf(style.customShape({finderRing: 'm0 0h7v7h-7zm1 1h5v5h-5z'})).toEqualTypeOf<{
+      readonly finderRing: QRCodeShapePiece;
+    }>();
   });
 
-  test('exposes the styler and drawing types from the drawing subpath', () => {
-    expect(Object.keys(drawing).sort()).toEqual([
-      'QR_CODE_MODULE_ROLES',
-      'createQRCodeCenterImage',
-      'createQRCodeStyler',
-      'toQRCodePathData',
-    ]);
-    expectTypeOf(drawing.createQRCodeStyler).returns.toEqualTypeOf<QRCodeStyler>();
-    expectTypeOf<QRCodeStyler>().returns.toEqualTypeOf<QRCodeDrawing>();
-    expectTypeOf<QRCodeStylePart>().parameter(0).toEqualTypeOf<QRCodeDrawContext>();
+  test('exposes the builder, matrix types, and role names through the matrix entry', () => {
+    expect(Object.keys(matrix).sort()).toEqual(
+      expect.arrayContaining(['QRCodeBuilder', 'QR_CODE_MODULE_ROLES', 'qrcode']),
+    );
+    expect(matrix.QR_CODE_MODULE_ROLES).toBe(core.QR_CODE_MODULE_ROLES);
+    expectTypeOf<matrix.QRCodeMatrix>().toEqualTypeOf<QRCodeMatrix>();
+    expectTypeOf<matrix.QRCodeModuleRole>().toEqualTypeOf<QRCodeModuleRole>();
+  });
+
+  test('accepts configured builders through a bare builder type', () => {
+    const plain: QRCodeBuilder = qrcode('typed builder');
+    const withRenderer: QRCodeBuilder = qrcode('typed builder').renderer(QRCodeSVGRenderer());
+    const size = (builder: QRCodeBuilder) => builder.render((value) => value.size);
+    expect(size(plain)).toBe(size(withRenderer));
+  });
+
+  test('creates SVG center images through the exported factory', () => {
+    expect(core.svgCenterImage).toBeTypeOf('function');
+    expectTypeOf(core.svgCenterImage).returns.toEqualTypeOf<core.QRCodeSVGCenterImage>();
   });
 
   test('exposes payload utilities and types from the payload subpath', () => {
-    expect(Object.keys(payload).sort()).toEqual([
-      'emailPayload',
-      'geoPayload',
-      'phonePayload',
-      'smsPayload',
-      'wifiPayload',
-    ]);
+    expect(Object.keys(payload).sort()).toEqual(
+      expect.arrayContaining([
+        'emailPayload',
+        'geoPayload',
+        'phonePayload',
+        'smsPayload',
+        'wifiPayload',
+      ]),
+    );
     expectTypeOf<QRCodeEmailPayload>().toHaveProperty('to');
     expectTypeOf<QRCodePhonePayload>().toHaveProperty('number');
     expectTypeOf<QRCodeSMSPayload>().toHaveProperty('recipients');

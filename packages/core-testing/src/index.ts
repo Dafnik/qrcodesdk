@@ -8,7 +8,7 @@ export {
 export type {QRCodeAutoMaskCombination} from './all-combinations';
 export {captureDownloads, mockCanvasRendering} from './dom';
 export type {CapturedDownload} from './dom';
-export {QR_CODE_ECI_TEST_FIXTURE, QR_CODE_TEST_FIXTURES} from './fixtures';
+export {fixtureMatrixOptions, QR_CODE_ECI_TEST_FIXTURE, QR_CODE_TEST_FIXTURES} from './fixtures';
 export {matrixFromRows, matrixToRows} from './matrix';
 export type {QRCodeTestFixture} from './fixtures';
 export {

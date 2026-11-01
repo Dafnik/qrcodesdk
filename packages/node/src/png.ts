@@ -1,12 +1,8 @@
 import type {QRCodeColor, QRCodeMatrix, QRCodeRenderer, QRCodeVisualStyle} from '@qrcodesdk/core';
-import {createQRCodeStyler} from '@qrcodesdk/core/drawing';
 import {QRCodeError} from '@qrcodesdk/core/error';
-import {
-  ɵassertCenterImage as assertCenterImage,
-  ɵassertKnownKeys as assertKeys,
-} from '@qrcodesdk/core/internal';
+import {ɵcreateQRCodeStyler as createQRCodeStyler} from '@qrcodesdk/core/internal';
 
-import type {QRCodePNGCenterImage} from './center-image';
+import {type QRCodePNGCenterImage, resolvePNGCenterImage} from './center-image';
 import {type Color, blendPixel} from './pixels';
 import {type PNGImage, encodePNG} from './png-codec';
 import {type Coverage, rasterizeShapePath} from './raster';
@@ -20,10 +16,7 @@ export type QRCodePNGRendererOptions = {
 type PackedColor = Color & {packed: number};
 
 export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRenderer<Buffer> {
-  assertKeys(options, 'options', ['style', 'centerImage', 'compression']);
-  assertKeys(options?.compression, 'compression', ['level']);
-  const centerImage = options?.centerImage;
-  assertCenterImage(centerImage, 'draw', 'pngCenterImage');
+  const centerImage = resolvePNGCenterImage(options?.centerImage);
   const draw = createQRCodeStyler(options?.style, [centerImage?.part]);
   const compressionLevel = resolveCompressionLevel(options?.compression?.level);
   // Shape paths repeat across renders at one module size, so each is rasterized once.
@@ -75,10 +68,10 @@ export function QRCodePNGRenderer(options?: QRCodePNGRendererOptions): QRCodeRen
           const originY = Math.floor(pixelY);
           const offsetX = pixelX - originX;
           const offsetY = pixelY - originY;
-          const key = `${path}:${offsetX},${offsetY}`;
+          const key = `${path.data}:${offsetX},${offsetY}`;
           let coverage = coverages.get(key);
           if (!coverage)
-            coverages.set(key, (coverage = rasterizeShapePath(path, scale, offsetX, offsetY)));
+            coverages.set(key, (coverage = rasterizeShapePath(path.data, scale, offsetX, offsetY)));
           blitCoverage(png.width, png.height, coveragePixels!, coverage, originX, originY);
         }
       }

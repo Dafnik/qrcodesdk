@@ -1,9 +1,4 @@
-import type {
-  QRCodeEncodedSegment,
-  QRCodePayload,
-  QRCodeSupportedModeIndicator,
-  QRCodeVersion,
-} from '../types';
+import type {QRCodePayload, QRCodeVersion} from '../types';
 import {
   ECI_UTF8_BIT_LENGTH,
   MODE_ALPHANUMERIC,
@@ -14,6 +9,7 @@ import {
   isNumericPayload,
   validatePayload,
 } from './mode';
+import type {QRCodeEncodedSegment, QRCodeSupportedModeIndicator} from './types';
 
 // State keys are mode * 6 + remainder * 2 + hasUTF8ECI, so 26 slots cover every state.
 const STATE_COUNT = 26;

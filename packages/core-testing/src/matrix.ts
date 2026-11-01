@@ -1,11 +1,11 @@
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 /** Creates a test matrix from rows of light (`0`) and dark (`1`) modules, all in the data role. */
-export function matrixFromRows(rows: readonly (readonly number[])[]): QRCodeMatrix {
+export function matrixFromRows(rows: readonly (readonly (0 | 1)[])[]): QRCodeMatrix {
   return {
     size: rows.length,
     modules: rows.flat(),
-    roles: Array<number>(rows.length * rows.length).fill(0),
+    roles: Array<0>(rows.length * rows.length).fill(0),
   };
 }
 

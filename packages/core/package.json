@@ -52,7 +52,6 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
-    "./drawing": "./dist/drawing/index.mjs",
     "./error": "./dist/error.mjs",
     "./internal": "./dist/internal.mjs",
     "./matrix": "./dist/matrix.mjs",
@@ -69,7 +68,7 @@
   ],
   "scripts": {
     "benchmark:matrix": "vitest bench --run benchmarks/matrix-hot-path.bench.ts",
-    "benchmark:styler": "vitest bench --run benchmarks/styler-hot-path.bench.ts",
+    "benchmark:styler": "vitest bench --run benchmarks/styler-hot-path.bench.mjs",
     "build": "tsdown",
     "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",

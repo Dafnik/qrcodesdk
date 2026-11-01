@@ -1,5 +1,6 @@
-import type {QRCodeErrorCorrectionLevelValue, QRCodeMask} from '../types';
+import type {QRCodeMask} from '../types';
 import {augmentBCH} from './augment-bch';
+import type {QRCodeErrorCorrectionLevelValue} from './types';
 
 /**
  * Puts the format information into the matrix.

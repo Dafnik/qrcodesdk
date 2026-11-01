@@ -4,6 +4,7 @@ import {describe, expect, test} from 'vitest';
 import {QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
 import {alignment, circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
+import {fixtureMatrixOptions} from '../../src';
 import {
   QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
   QR_CODE_TEST_FIXTURES,
@@ -68,13 +69,17 @@ describe('SVG QR roundtrips', () => {
 
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
     await expect(
-      decodeSvgQRCode(qrcode(fixture.payload).options(fixture).render(testSVGRenderer)),
+      decodeSvgQRCode(
+        qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(testSVGRenderer),
+      ),
     ).resolves.toBe(fixture.payload);
   });
 
   test.each(JSQR_ROUNDTRIP_COMBINATIONS)('decodes $name SVG output', async (fixture) => {
     await expect(
-      decodeSvgQRCode(qrcode(fixture.payload).options(fixture).render(testSVGRenderer)),
+      decodeSvgQRCode(
+        qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(testSVGRenderer),
+      ),
     ).resolves.toBe(fixture.payload);
   });
 

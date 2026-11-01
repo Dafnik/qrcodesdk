@@ -7,10 +7,10 @@ export function toRows({size, modules}: {size: number; modules: ArrayLike<number
 }
 
 /** Creates a matrix with every module in the data role. */
-export function fromRows(rows: readonly (readonly number[])[]): QRCodeMatrix {
+export function fromRows(rows: readonly (readonly (0 | 1)[])[]): QRCodeMatrix {
   return {
     size: rows.length,
     modules: rows.flat(),
-    roles: Array<number>(rows.length * rows.length).fill(0),
+    roles: Array<0>(rows.length * rows.length).fill(0),
   };
 }

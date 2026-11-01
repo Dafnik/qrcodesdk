@@ -40,9 +40,12 @@ cleared area can be slightly larger than the image box plus padding. When cleari
 the image is drawn over the modules and patterns. Start with `size: 0.2` to `0.3` and increase it
 only after testing.
 
-Factories validate the layout when they are called and throw `INVALID_OPTIONS` for invalid values.
-Renderers also throw `INVALID_OPTIONS` for a plain option object such as `{source, size}`; pass the
-factory's result instead.
+Factories check numeric layout constraints when they are called and throw `INVALID_OPTIONS` for
+invalid values. TypeScript checks option types and requires the matching factory result.
+
+Center-image values are opaque and belong to the factory that created them. Pass the original value
+to the matching renderer. Copying it with object spread or JSON does not preserve it. Custom objects
+with rendering callbacks are unsupported.
 
 ## Choose and prepare a source
 
@@ -122,7 +125,12 @@ package exports both factories, so import them from the same package as the comp
 
 ### React
 
+In Next.js, create center images inside a client component. They cannot be passed from a Server
+Component to a Client Component.
+
 ```tsx
+'use client';
+
 import {useState} from 'react';
 
 import {QRCodeImage, type QRCodeImageOptions, canvasCenterImage} from '@qrcodesdk/react';

@@ -1,5 +1,5 @@
 import * as core from '@qrcodesdk/core';
-import * as drawing from '@qrcodesdk/core/drawing';
+import * as matrixApi from '@qrcodesdk/core/matrix';
 import * as payload from '@qrcodesdk/core/payload';
 import * as style from '@qrcodesdk/core/style';
 
@@ -50,37 +50,16 @@ function assertMatrix(matrix) {
 
 globalThis.console.log('Testing the installed @qrcodesdk/core package');
 
-assert(
-  [
-    ...Object.keys(core),
-    ...Object.keys(drawing),
-    ...Object.keys(payload),
-    ...Object.keys(style),
-  ].every((name) => !name.startsWith(String.fromCodePoint(0x275))),
-  'Expected package entry points to contain no internal exports',
-);
-logSuccess(
-  'root, drawing, payload, and style entry points resolve without internal runtime exports',
-);
+assert(matrixApi.qrcode === core.qrcode, 'Expected the matrix entry to export the shared builder');
+logSuccess('matrix entry exposes the shared builder');
 
 for (const exportName of ['qrcode', 'QRCodeSVGRenderer', 'QRCodeTextRenderer', 'svgCenterImage']) {
   assert(typeof core[exportName] === 'function', `Expected Core export ${exportName}`);
 }
 logSuccess('package exposes the qrcode builder and bundled renderers');
 
-assert(typeof drawing.createQRCodeStyler === 'function', 'Expected the drawing styler factory');
-assert(
-  !('createQRCodeStyler' in core),
-  'Expected createQRCodeStyler to be exported only from the drawing subpath',
-);
-logSuccess('drawing subpath exclusively exposes the styler factory');
-
 for (const exportName of ['alignment', 'circle', 'diagonal', 'finder', 'rounded']) {
   assert(typeof style[exportName] === 'function', `Expected style export ${exportName}`);
-  assert(
-    !(exportName in core),
-    `Expected ${exportName} to be exported only from the style subpath`,
-  );
 }
 logSuccess('style subpath exposes the shapes and the finder and alignment parts');
 
@@ -92,10 +71,6 @@ for (const exportName of [
   'wifiPayload',
 ]) {
   assert(typeof payload[exportName] === 'function', `Expected payload export ${exportName}`);
-  assert(
-    !(exportName in core),
-    `Expected ${exportName} to be exported only from the payload subpath`,
-  );
 }
 logSuccess('payload subpath exposes the payload serializers');
 

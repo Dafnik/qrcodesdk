@@ -1,3 +1,4 @@
+import {fixtureMatrixOptions} from '@repo/core-testing';
 import {QR_CODE_STYLING_ROUNDTRIP_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
 import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
@@ -44,7 +45,9 @@ describe('PNG QR roundtrips', () => {
 
   test.each(QR_CODE_TEST_FIXTURES)('decodes $name PNG output', async (fixture) => {
     await expect(
-      decodePngQRCode(qrcode(fixture.payload).options(fixture).render(defaultRenderer)),
+      decodePngQRCode(
+        qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(defaultRenderer),
+      ),
     ).resolves.toBe(fixture.payload);
   });
 

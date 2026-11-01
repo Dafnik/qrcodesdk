@@ -16,7 +16,7 @@
 
     qrcode(payload)
       .options(resolvedOptions[0])
-      .render(QRCodeDownloadSVGRenderer({renderer: svgRenderer, filename: filename || undefined}));
+      .render(QRCodeDownloadSVGRenderer({renderer: svgRenderer, filename}));
   }
 </script>
 

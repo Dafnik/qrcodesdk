@@ -1,3 +1,14 @@
+import type {QRCodeDownloadRendererOptions} from './types';
+
+export function resolveDownloadOptions<T>(
+  options: QRCodeDownloadRendererOptions<T>,
+): Required<QRCodeDownloadRendererOptions<T>> {
+  return {
+    renderer: options.renderer,
+    filename: options.filename?.trim() ? options.filename : 'qrcode',
+  };
+}
+
 export function downloadQRCode(url: string, filename: string): void {
   const link = document.createElement('a');
   link.href = url;

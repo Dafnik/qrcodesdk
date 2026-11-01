@@ -97,13 +97,33 @@ pnpm turbo run check-performance --filter=docs
 
 ### Benchmarks
 
-Run the full benchmark suite, or either focused benchmark against the core source:
+Run the full benchmark suite or a focused matrix or styling benchmark:
 
 ```sh
 pnpm turbo run benchmark --filter=@repo/benchmarks
 pnpm turbo run benchmark:matrix --filter=@qrcodesdk/core
 pnpm turbo run benchmark:styler --filter=@qrcodesdk/core
 ```
+
+Measure minified, gzip, and Brotli sizes of standalone consumer bundles:
+
+```sh
+pnpm turbo run benchmark:bundles --filter=@qrcodesdk/browser
+```
+
+The measurements are written to `packages/browser/.turbo/style-bundles/measurements.json`.
+The styler benchmark separates fresh factory setup, setup with reused shapes, plain/styled/circle/
+custom-path drawing, pattern drawing, path serialization, and SVG output with a center image at
+versions 1, 10, and 40. Run performance
+measurements without other build or test tasks competing for CPU time.
+Factory setup measurements batch 100 calls; divide those timings by 100 for a single setup.
+Each workload retains its result so the runtime cannot discard unused output.
+It loads built artifacts natively to avoid Vitest's module-export tracking overhead. To compare
+against a previous build, set `QRCODESDK_BENCHMARK_CORE` to an absolute directory containing that
+build's `index.mjs`, `style.mjs`, `internal.mjs`, and their shared chunks.
+
+See [PUBLIC_API.md](./PUBLIC_API.md) for supported consumer entry points, the internal export
+boundary, and the breaking styling API changes.
 
 ### Updating snapshots
 

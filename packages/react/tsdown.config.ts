@@ -1,6 +1,7 @@
 import {defineConfig} from 'tsdown';
 
 export default defineConfig({
+  banner: "'use client';",
   dts: {
     generator: 'tsgo',
   },

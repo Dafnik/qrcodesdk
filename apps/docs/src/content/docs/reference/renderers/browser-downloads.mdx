@@ -45,6 +45,8 @@ string or Image element.
 
 `renderer` is required. `filename` is optional; the wrapper appends its extension when the supplied
 name does not already end with that extension, using a case-insensitive check.
+Empty or whitespace-only filenames use `qrcode`. Both factories copy their options
+when called; changing the original object later does not change the download.
 
 ## Renderer-specific constraints
 

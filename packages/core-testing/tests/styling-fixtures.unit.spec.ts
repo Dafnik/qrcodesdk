@@ -1,7 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
-import {createQRCodeStyler} from '@qrcodesdk/core/drawing';
+import {ɵcreateQRCodeStyler as createQRCodeStyler} from '@qrcodesdk/core/internal';
 
 import {QR_CODE_STYLING_FIXTURES, QR_CODE_STYLING_ROUNDTRIP_FIXTURES} from '../src';
 

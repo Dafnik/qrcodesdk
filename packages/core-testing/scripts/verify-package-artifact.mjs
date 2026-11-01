@@ -43,14 +43,14 @@ test('runtime subpaths share the root exports', async () => {
   const exportsBySubpath =
     packageJson.name === '@qrcodesdk/core'
       ? {
-          './matrix': ['qrcode', 'QRCodeBuilder'],
-          './svg': ['QRCodeSVGRenderer'],
+          './matrix': ['qrcode', 'QRCodeBuilder', 'QR_CODE_MODULE_ROLES'],
+          './svg': ['QRCodeSVGRenderer', 'svgCenterImage'],
           './text': ['QRCodeTextRenderer'],
           './error': ['QRCodeError', 'QR_CODE_ERROR_CODES'],
         }
       : packageJson.name === '@qrcodesdk/browser'
         ? {
-            './canvas': ['QRCodeCanvasRenderer'],
+            './canvas': ['QRCodeCanvasRenderer', 'canvasCenterImage'],
             './image': ['QRCodeImageRenderer', 'QRCodeDownloadImageRenderer'],
             './svg': ['QRCodeDownloadSVGRenderer'],
           }
@@ -67,17 +67,34 @@ test('runtime subpaths share the root exports', async () => {
   }
 });
 
-test('core exposes the styler only from the drawing subpath', async () => {
+test('core exports style factories and internal drawing helpers', async () => {
   const packageJson = JSON.parse(
     await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
   );
   if (packageJson.name !== '@qrcodesdk/core') return;
 
   const importTarget = (target) => import(pathToFileURL(path.join(packageDirectory, target)).href);
-  const root = await importTarget(packageJson.exports['.']);
-  const drawing = await importTarget(packageJson.exports['./drawing']);
-  assert.equal(typeof drawing.createQRCodeStyler, 'function');
-  assert.equal('createQRCodeStyler' in root, false);
+  const style = await importTarget(packageJson.exports['./style']);
+  const internal = await importTarget(packageJson.exports['./internal']);
+  for (const name of ['rounded', 'circle', 'customShape', 'diagonal', 'finder', 'alignment']) {
+    assert.equal(typeof style[name], 'function');
+  }
+  for (const name of [
+    'ɵcreateQRCodeStyler',
+    'ɵtoQRCodePathData',
+    'ɵcreateQRCodeCenterImagePlacement',
+  ]) {
+    assert.equal(typeof internal[name], 'function');
+  }
+});
+
+test('React publishes a client entry', async () => {
+  const packageJson = JSON.parse(
+    await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
+  );
+  if (packageJson.name !== '@qrcodesdk/react') return;
+  const entry = await readFile(path.join(packageDirectory, packageJson.exports['.']), 'utf8');
+  assert.match(entry, /^['"]use client['"];?/);
 });
 
 function readTarEntries(gzippedTarball) {

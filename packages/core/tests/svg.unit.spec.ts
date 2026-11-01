@@ -1,8 +1,9 @@
 import {describe, expect, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode, svgCenterImage} from '../src';
-import {toQRCodePathData} from '../src/drawing';
-import {circle, finder, rounded} from '../src/style';
+import {ɵtoQRCodePathData as toQRCodePathData} from '../src/internal';
+import type {PreparedShapePath} from '../src/shape-path';
+import {circle, customShape, finder, rounded} from '../src/style';
 import {fromRows} from './helpers';
 
 function paths(svg: string): string[] {
@@ -34,7 +35,7 @@ describe('SVG path data', () => {
   });
 
   test('serializes repeated shaped modules to identical relative text', () => {
-    const dot = circle().module as string;
+    const dot = (circle().module as unknown as PreparedShapePath).data;
     const svg = QRCodeSVGRenderer({style: {quietZone: 0, modules: circle()}})(
       fromRows([
         [1, 0, 1],
@@ -50,7 +51,7 @@ describe('SVG path data', () => {
 
   test('uses the neighbor-specific path for each module', () => {
     const shape = rounded();
-    const tiles = shape.module as readonly string[];
+    const tiles = shape.module as unknown as readonly PreparedShapePath[];
     const [, layer] = paths(
       QRCodeSVGRenderer({style: {quietZone: 0, modules: shape}})(
         fromRows([
@@ -60,12 +61,12 @@ describe('SVG path data', () => {
       ),
     );
 
-    expect(layer).toBe(`m0 0${tiles[0b10]}m0.5 0${tiles[0b01]}`);
+    expect(layer).toBe(`m0 0${tiles[0b10]!.data}m0.5 0${tiles[0b01]!.data}`);
   });
 
   test('tracks relative subpaths with signed and exponential coordinates', () => {
     const tile = 'm+1e-1,+.2h.2v.2h-.2zm.3-.1h.1v.1h-.1z';
-    const svg = QRCodeSVGRenderer({style: {quietZone: 0, modules: {module: tile}}})(
+    const svg = QRCodeSVGRenderer({style: {quietZone: 0, modules: customShape({module: tile})}})(
       fromRows([
         [1, 1],
         [0, 0],
@@ -81,7 +82,8 @@ describe('SVG path data', () => {
       rects: [],
       tiles: [
         [
-          `m${offset} ${offset}h.1v.1h-.1z`,
+          customShape({module: `m${offset} ${offset}h.1v.1h-.1z`})
+            .module as unknown as PreparedShapePath,
           Array.from({length: 512}, (_, index) =>
             index % 2 === 0 ? Math.floor(index / 2) % 16 : Math.floor(index / 32),
           ),
@@ -101,10 +103,10 @@ describe('SVG path data', () => {
     }
   });
 
-  test('preserves antialiasing for custom fractional rectangles', () => {
+  test('preserves antialiasing for custom fractional paths', () => {
     const svg = QRCodeSVGRenderer({
-      style: {finder: (context) => context.layer().rect(0.5, 0.5, 1, 1)},
-    })(fromRows([[0]]));
+      style: {modules: customShape({module: 'm.5 .5h.5v.5h-.5z'})},
+    })(fromRows([[1]]));
     expect(svg).not.toContain('shape-rendering');
   });
 
@@ -121,6 +123,12 @@ describe('SVG path data', () => {
 });
 
 describe('svgCenterImage', () => {
+  test('accepts original factory values', () => {
+    const image = svgCenterImage('data:image/png;base64,a');
+    expect(Object.isFrozen(image)).toBe(true);
+    expect(() => QRCodeSVGRenderer({centerImage: image})).not.toThrow();
+  });
+
   test('adds the image and clears modules instead of masking them', () => {
     const source = 'data:image/png;base64,iVBORw0KGgo=' as const;
     const matrix = qrcode('center image').errorCorrection('H').matrix();
@@ -135,8 +143,8 @@ describe('svgCenterImage', () => {
     expect(paths(svg)[1]).not.toBe(paths(plain)[1]);
   });
 
-  test('validates sources when the image is created', () => {
-    expect(() => svgCenterImage('https://example.com/logo.png' as never)).toThrowError(
+  test('validates data URL content when the image is created', () => {
+    expect(() => svgCenterImage('data:image/png;base64,')).toThrowError(
       expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}),
     );
   });

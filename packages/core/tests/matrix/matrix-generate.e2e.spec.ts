@@ -150,8 +150,6 @@ describe('qrcode().matrix()', () => {
         .mask(1)
         .render((value) => value.size),
     ).toBe(21);
-    // @ts-expect-error Testing Types
-    expect(() => qrcode('123456789').render()).toThrow('QRCode: Renderer missing');
   });
 
   test('caches one matrix for matrix and render calls', () => {
@@ -219,50 +217,11 @@ describe('qrcode().matrix()', () => {
     },
   );
 
-  test('rejects invalid public options and incompatible payload', () => {
+  test('rejects incompatible payload formats and invalid numeric values', () => {
     expect(() => qrcode('ABC').mode('numeric').matrix()).toThrow('QRCode: Invalid payload format');
     expect(() => qrcode('abc').mode('alphanumeric').matrix()).toThrow(
       'QRCode: Invalid payload format',
     );
-    expect(() =>
-      qrcode('123')
-        .mode('kanji' as never)
-        .matrix(),
-    ).toThrow('QRCode: Invalid mode');
-    expect(() =>
-      qrcode('123')
-        .errorCorrection('X' as never)
-        .matrix(),
-    ).toThrow('QRCode: Invalid ECC level');
-    expect(() =>
-      qrcode('123')
-        .version(0 as never)
-        .matrix(),
-    ).toThrow('QRCode: Invalid version');
-    expect(() =>
-      qrcode('123')
-        .version(41 as never)
-        .matrix(),
-    ).toThrow('QRCode: Invalid version');
-    for (const invalidVersion of [1.5, Number.NaN, '1']) {
-      expect(() =>
-        qrcode('123')
-          .version(invalidVersion as never)
-          .matrix(),
-      ).toThrow('QRCode: Invalid version');
-    }
-    expect(() =>
-      qrcode('123')
-        .mask(8 as never)
-        .matrix(),
-    ).toThrow('QRCode: Invalid mask');
-    for (const invalidECI of [0, 1, 'true', null]) {
-      expect(() =>
-        qrcode('abc')
-          .options({eci: invalidECI as never})
-          .matrix(),
-      ).toThrow('QRCode: Invalid ECI setting');
-    }
     expect(() => qrcode('1'.repeat(7_090)).mode('numeric').matrix()).toThrow(
       'QRCode: Payload too large',
     );
@@ -282,16 +241,9 @@ describe('qrcode().matrix()', () => {
     expect(qrcode(0).matrix().size).toBe(21);
     expect(qrcode(12345).matrix().size).toBe(21);
     expect(qrcode(Number.MAX_SAFE_INTEGER).matrix().size).toBe(21);
-    for (const payload of [null, true, {}, []]) {
-      expect(() => qrcode(payload as never).matrix()).toThrow(
-        expect.objectContaining({code: 'INVALID_PAYLOAD'}),
-      );
-    }
   });
 
   test('throws Error instances for invalid runtime usage', () => {
-    // @ts-expect-error Expected type error
-    expect(() => qrcode('123456789').render()).toThrow(Error);
     expect(() => qrcode('ABC').mode('numeric').matrix()).toThrow(Error);
   });
 });

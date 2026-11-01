@@ -19,10 +19,8 @@ roundtrips
 Streamable
 organisation
 IHDR
-ɵassertCenterImage
+ɵcreateCenterImageStore
 ɵparseShapePath
-ɵassertKnownKeys
-ɵassertOptionalString
 IDAT
 IEND
 PLTE
@@ -34,3 +32,5 @@ subpaths
 rects
 rasterizer
 rasterizes
+ɵcreate
+ɵprepare

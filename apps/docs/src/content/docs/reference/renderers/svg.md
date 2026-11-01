@@ -97,9 +97,8 @@ URL; `svgCenterImage()` checks the URL format but does not inspect the embedded 
 - SVG does not accept `accessibility.alt`; use `ariaLabel` and optionally `title`.
 - Image `size` must be finite, greater than `0`, and at most `1`; padding must be finite and
   non-negative. `svgCenterImage()` validates its layout when it is called.
-- `centerImage` must be created with `svgCenterImage()`; plain option objects throw
-  `INVALID_OPTIONS`.
-- Options are validated and copied when `QRCodeSVGRenderer()` is called.
+- Pass a `centerImage` created with `svgCenterImage()`; TypeScript checks the factory result type.
+- Option values are copied when `QRCodeSVGRenderer()` is called.
 - The renderer supports the same [runtimes as Core](/packages/core/#runtime-compatibility).
 
 ## Related guides

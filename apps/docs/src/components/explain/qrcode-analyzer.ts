@@ -8,7 +8,8 @@ import {
   type QRCodeVersion,
   qrcode,
 } from '@qrcodesdk/core';
-import {QR_CODE_MODULE_ROLES, createQRCodeStyler} from '@qrcodesdk/core/drawing';
+import {ɵcreateQRCodeStyler as createQRCodeStyler} from '@qrcodesdk/core/internal';
+import {QR_CODE_MODULE_ROLES} from '@qrcodesdk/core/matrix';
 
 /** `1` for a dark module and `0` for a light module. */
 export type QRCodeExplainModuleValue = 0 | 1;

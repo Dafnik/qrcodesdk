@@ -72,7 +72,8 @@
     "prepublishOnly": "pnpm run build",
     "test:browser-runtime": "node runtime/smoke-package.mjs",
     "test:framework-runtime": "node runtime/smoke-framework-package.mjs",
-    "update:runtime-fixtures": "node runtime/update-fixtures.mjs"
+    "update:runtime-fixtures": "node runtime/update-fixtures.mjs",
+    "benchmark:bundles": "node runtime/measure-style-bundles.mjs"
   },
   "peerDependencies": {
     "@qrcodesdk/core": "workspace:*"

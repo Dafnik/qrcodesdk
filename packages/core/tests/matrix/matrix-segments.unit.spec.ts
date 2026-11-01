@@ -9,7 +9,8 @@ import {
   validatePayload,
 } from '../../src/matrix/mode';
 import {getSegmentsBitLength, optimizeSegments} from '../../src/matrix/segments';
-import type {QRCodeEncodedSegment, QRCodeVersion} from '../../src/types';
+import type {QRCodeEncodedSegment} from '../../src/matrix/types';
+import type {QRCodeVersion} from '../../src/types';
 
 const MODES = [MODE_NUMERIC, MODE_ALPHANUMERIC, MODE_OCTET] as const;
 

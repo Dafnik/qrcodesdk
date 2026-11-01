@@ -1,5 +1,5 @@
-import type {QRCodeCodewords} from '../types';
 import {DATA_ROLE} from './create-base-matrix';
+import type {QRCodeCodewords} from './types';
 
 /**
  * Fills the data modules of the matrix with the given code words in zigzag order. The size of
