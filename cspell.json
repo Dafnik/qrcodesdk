@@ -22,7 +22,6 @@
     "CHANGELOG.md",
     "*.svg",
     "apps/docs/src/libs",
-    "apps/dev-tools/src/libs",
     "apps/docs/src/content/docs/learn/performance.md",
     "package-lock.json"
   ],

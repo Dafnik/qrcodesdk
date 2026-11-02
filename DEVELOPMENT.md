@@ -65,17 +65,6 @@ then merges the results. HTML, LCOV, and combined JSON reports are written to `c
 Installed-package smoke tests have separate consumer and browser prerequisites. See
 [the runtime test guide](packages/browser/runtime/README.md) for their commands.
 
-### Dev tools
-
-`apps/dev-tools` is an Angular app for inspecting the shared `@repo/core-testing` fixtures. It
-renders them with the `@qrcodesdk/angular` components (SVG, PNG, WebP, GIF, and Canvas), and can
-scan each output with jsQR. Nothing renders until you pick fixtures and renderers and press Run.
-Large selections, such as all combinations, render lazily in a virtual list.
-
-```sh
-pnpm turbo run start --filter=dev-tools
-```
-
 ### Docs
 
 Run the documentation site locally:
@@ -83,6 +72,12 @@ Run the documentation site locally:
 ```sh
 pnpm turbo run start --filter=docs
 ```
+
+The docs also serve the dev tools at `/devtools`, a standalone page outside Starlight. They render
+the shared `@repo/core-testing` fixtures with the `@qrcodesdk/angular` components (SVG, PNG, WebP,
+GIF, and Canvas), and can scan each output with jsQR. Nothing renders until you pick fixtures and
+renderers and press Run. Large selections, such as all combinations, render lazily in a virtual
+list. The code lives in `apps/docs/src/libs/dev-tools`.
 
 To build and preview the site:
 

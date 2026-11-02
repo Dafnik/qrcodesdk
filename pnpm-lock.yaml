@@ -204,18 +204,6 @@ catalogs:
     '@angular/platform-server':
       specifier: 22.2.4
       version: 22.2.4
-    '@ng-icons/core':
-      specifier: 36.1.0
-      version: 36.1.0
-    '@ng-icons/lucide':
-      specifier: 36.1.0
-      version: 36.1.0
-    '@spartan-ng/brain':
-      specifier: 1.9.0
-      version: 1.9.0
-    '@spartan-ng/cli':
-      specifier: 1.9.0
-      version: 1.9.0
     '@types/node':
       specifier: 25.9.9
       version: 25.9.9
@@ -228,12 +216,6 @@ catalogs:
     '@types/react-dom':
       specifier: 19.3.0
       version: 19.3.0
-    class-variance-authority:
-      specifier: 0.7.1
-      version: 0.7.1
-    clsx:
-      specifier: 2.1.1
-      version: 2.1.1
     eslint:
       specifier: 9.39.5
       version: 9.39.5
@@ -258,30 +240,18 @@ catalogs:
     react-dom:
       specifier: 19.3.1
       version: 19.3.1
-    rxjs:
-      specifier: 7.8.2
-      version: 7.8.2
     sharp:
       specifier: 0.35.5
       version: 0.35.5
     svelte:
       specifier: 5.57.3
       version: 5.57.3
-    tailwind-merge:
-      specifier: 3.7.0
-      version: 3.7.0
-    tailwindcss:
-      specifier: 4.3.3
-      version: 4.3.3
     tsdown:
       specifier: 0.23.4
       version: 0.23.4
     tslib:
       specifier: 2.8.1
       version: 2.8.1
-    tw-animate-css:
-      specifier: 1.4.0
-      version: 1.4.0
     typescript:
       specifier: 7.0.2
       version: 7.0.2
@@ -358,100 +328,6 @@ importers:
         specifier: 'catalog:'
         version: 7.0.2
 
-  apps/dev-tools:
-    dependencies:
-      '@angular/cdk':
-        specifier: 'catalog:'
-        version: 22.2.5(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(@angular/forms@22.2.4(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(@angular/platform-browser@22.2.4(@angular/animations@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)))(rxjs@7.8.2))(@angular/platform-browser@22.2.4(@angular/animations@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)))(rxjs@7.8.2)
-      '@angular/common':
-        specifier: 'catalog:'
-        version: 22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2)
-      '@angular/core':
-        specifier: 'catalog:'
-        version: 22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)
-      '@angular/forms':
-        specifier: 'catalog:'
-        version: 22.2.4(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(@angular/platform-browser@22.2.4(@angular/animations@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)))(rxjs@7.8.2)
-      '@angular/platform-browser':
-        specifier: 'catalog:'
-        version: 22.2.4(@angular/animations@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))
-      '@ng-icons/core':
-        specifier: 'catalog:'
-        version: 36.1.0(@angular-devkit/schematics@22.2.5(chokidar@5.0.0))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(@schematics/angular@22.2.5(chokidar@5.0.0))(rxjs@7.8.2)
-      '@ng-icons/lucide':
-        specifier: 'catalog:'
-        version: 36.1.0(@ng-icons/core@36.1.0(@angular-devkit/schematics@22.2.5(chokidar@5.0.0))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(@schematics/angular@22.2.5(chokidar@5.0.0))(rxjs@7.8.2))
-      '@qrcodesdk/angular':
-        specifier: workspace:*
-        version: link:../../packages/angular/dist/angular
-      '@qrcodesdk/browser':
-        specifier: workspace:*
-        version: link:../../packages/browser
-      '@qrcodesdk/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@repo/core-testing':
-        specifier: workspace:*
-        version: link:../../packages/core-testing
-      '@spartan-ng/brain':
-        specifier: 'catalog:'
-        version: 1.9.0(ca48018b7d68c1117cffdb95a4fdd29a)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      jsqr:
-        specifier: 'catalog:'
-        version: 1.4.0
-      rxjs:
-        specifier: 'catalog:'
-        version: 7.8.2
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
-      tslib:
-        specifier: 'catalog:'
-        version: 2.8.1
-    devDependencies:
-      '@angular/build':
-        specifier: 'catalog:'
-        version: 22.2.5(e15a3e1ccf0cd8ac7f2dda299125becd)
-      '@angular/cli':
-        specifier: 'catalog:'
-        version: 22.2.5(@types/node@25.9.9)(chokidar@5.0.0)
-      '@angular/compiler':
-        specifier: 'catalog:'
-        version: 22.2.4
-      '@angular/compiler-cli':
-        specifier: 'catalog:'
-        version: 22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3)
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
-      '@spartan-ng/cli':
-        specifier: 'catalog:'
-        version: 1.9.0(@angular-devkit/core@22.2.5(chokidar@5.0.0))(@angular-devkit/schematics@22.2.5(chokidar@5.0.0))(@angular/build@22.2.5(e15a3e1ccf0cd8ac7f2dda299125becd))(@angular/compiler@22.2.4)(@babel/traverse@7.29.10(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(chokidar@5.0.0)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(ng-packagr@22.2.5(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(@volar/typescript@2.4.30(typescript@6.0.3))(oxc-resolver@11.24.2)(supports-color@10.2.2)(tailwindcss@4.3.3)(tslib@2.8.1)(typescript@6.0.3))(rxjs@7.8.2)(supports-color@10.2.2)(tslib@2.8.1)
-      '@tailwindcss/postcss':
-        specifier: 4.3.3
-        version: 4.3.3
-      angular-eslint:
-        specifier: 22.6.0
-        version: 22.6.0(chokidar@5.0.0)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript-eslint@8.72.1(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(typescript@6.0.3)
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 4.3.3
-      tw-animate-css:
-        specifier: 'catalog:'
-        version: 1.4.0
-      typescript:
-        specifier: catalog:angular-typescript
-        version: 6.0.3
-
   apps/docs:
     dependencies:
       '@angular/cdk':
@@ -497,10 +373,10 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(nanostores@1.5.5)(vue@3.5.44(typescript@6.0.3))
       '@ng-icons/core':
-        specifier: 'catalog:'
+        specifier: 36.1.0
         version: 36.1.0(@angular-devkit/schematics@22.2.5(chokidar@5.0.0))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(@schematics/angular@22.2.5(chokidar@5.0.0))(rxjs@7.8.2)
       '@ng-icons/lucide':
-        specifier: 'catalog:'
+        specifier: 36.1.0
         version: 36.1.0(@ng-icons/core@36.1.0(@angular-devkit/schematics@22.2.5(chokidar@5.0.0))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2))(@schematics/angular@22.2.5(chokidar@5.0.0))(rxjs@7.8.2))
       '@ng-icons/simple-icons':
         specifier: 36.1.0
@@ -523,6 +399,9 @@ importers:
       '@qrcodesdk/vue':
         specifier: workspace:*
         version: link:../../packages/vue
+      '@repo/core-testing':
+        specifier: workspace:*
+        version: link:../../packages/core-testing
       '@shikijs/langs':
         specifier: 4.5.0
         version: 4.5.0
@@ -530,7 +409,7 @@ importers:
         specifier: 4.5.0
         version: 4.5.0
       '@spartan-ng/brain':
-        specifier: 'catalog:'
+        specifier: 1.9.0
         version: 1.9.0(ca48018b7d68c1117cffdb95a4fdd29a)
       '@tailwindcss/vite':
         specifier: 4.3.3
@@ -539,14 +418,17 @@ importers:
         specifier: 2.2.0
         version: 2.2.0(astro@7.4.4(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(mermaid@12.2.0)
       class-variance-authority:
-        specifier: 'catalog:'
+        specifier: ^0.7.1
         version: 0.7.1
       clsx:
-        specifier: 'catalog:'
+        specifier: 2.1.1
         version: 2.1.1
       culori:
         specifier: 4.0.2
         version: 4.0.2
+      jsqr:
+        specifier: 'catalog:'
+        version: 1.4.0
       mermaid:
         specifier: 12.2.0
         version: 12.2.0
@@ -560,7 +442,7 @@ importers:
         specifier: 'catalog:'
         version: 19.3.1(react@19.3.1)
       rxjs:
-        specifier: 'catalog:'
+        specifier: 7.8.2
         version: 7.8.2
       shiki:
         specifier: 4.5.0
@@ -581,10 +463,10 @@ importers:
         specifier: 'catalog:'
         version: 5.57.3(@typescript-eslint/types@8.72.1)
       tailwind-merge:
-        specifier: 'catalog:'
+        specifier: 3.7.0
         version: 3.7.0
       tailwindcss:
-        specifier: 'catalog:'
+        specifier: 4.3.3
         version: 4.3.3
       tslib:
         specifier: 'catalog:'
@@ -621,8 +503,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/eslint-config
       '@spartan-ng/cli':
-        specifier: 'catalog:'
+        specifier: 1.9.0
         version: 1.9.0(@angular-devkit/core@22.2.5(chokidar@5.0.0))(@angular-devkit/schematics@22.2.5(chokidar@5.0.0))(@angular/build@22.2.5(e15a3e1ccf0cd8ac7f2dda299125becd))(@angular/compiler@22.2.4)(@babel/traverse@7.29.10(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(chokidar@5.0.0)(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(ng-packagr@22.2.5(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(@volar/typescript@2.4.30(typescript@6.0.3))(oxc-resolver@11.24.2)(supports-color@10.2.2)(tailwindcss@4.3.3)(tslib@2.8.1)(typescript@6.0.3))(rxjs@7.8.2)(supports-color@10.2.2)(tslib@2.8.1)
+      '@types/culori':
+        specifier: 4.0.1
+        version: 4.0.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -654,7 +539,7 @@ importers:
         specifier: 'catalog:'
         version: 0.35.5(@types/node@25.9.9)
       tw-animate-css:
-        specifier: 'catalog:'
+        specifier: 1.4.0
         version: 1.4.0
       typescript:
         specifier: catalog:angular-typescript
@@ -1109,10 +994,6 @@ importers:
         version: 3.5.44(typescript@7.0.2)
 
 packages:
-
-  '@alloc/quick-lru@5.3.0':
-    resolution: {integrity: sha512-U4+70Pc5ZS9osnCBCE5Jha/ciHM+Yp+CNMNC/7HvYbNRk1Ldd+f7qO65W5qfhu/TCv+/ozljlXXe9Nj8419DMA==}
-    engines: {node: '>=10'}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -4504,9 +4385,6 @@ packages:
     resolution: {integrity: sha512-krXjAikiaFSPaK/FkAQT5UTx3VormQaiZ5hBFlJZ9UFQGB/rwg1MZIhHAG9smMQRTdyJxP6Qt5MwMtdyU5FWrA==}
     engines: {node: '>= 20'}
 
-  '@tailwindcss/postcss@4.3.3':
-    resolution: {integrity: sha512-JTSZZGQi1AyKirbLN3azmjVzef92tcX7h+iSqPdaeStyFpGpDlKvvpxeOE8njhbUanbRwr3z8DyzhICWnMtQeg==}
-
   '@tailwindcss/vite@4.3.3':
     resolution: {integrity: sha512-yYU8cogLeSh/ms2jh8Fj7jaba/EWa7Ja6GoUqYZaraEuCI5YS6ms6ObZgjjedm+jm6XZjdNRWBpPP6Z86oOxcw==}
     peerDependencies:
@@ -4628,6 +4506,9 @@ packages:
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
+
+  '@types/culori@4.0.1':
+    resolution: {integrity: sha512-43M51r/22CjhbOXyGT361GZ9vncSVQ39u62x5eJdBQFviI8zWp2X5jzqg7k4M6PVgDQAClpy2bUe2dtwEgEDVQ==}
 
   '@types/d3-array@3.2.2':
     resolution: {integrity: sha512-hOLWVbm7uRza0BYXpIIW5pxfrKe0W+D5lrFiAEYR+pb6w3N2SwSMaJbXdUfSEv+dT4MfHBLtn5js0LAWaO6otw==}
@@ -10184,8 +10065,6 @@ packages:
 
 snapshots:
 
-  '@alloc/quick-lru@5.3.0': {}
-
   '@ampproject/remapping@2.3.0':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
@@ -10238,7 +10117,7 @@ snapshots:
   '@angular-devkit/core@21.2.14(chokidar@5.0.0)':
     dependencies:
       ajv: 8.18.0
-      ajv-formats: 3.0.1
+      ajv-formats: 3.0.1(ajv@8.18.0)
       jsonc-parser: 3.3.1
       picomatch: 4.0.4
       rxjs: 7.8.2
@@ -10249,7 +10128,7 @@ snapshots:
   '@angular-devkit/core@22.2.5(chokidar@5.0.0)':
     dependencies:
       ajv: 8.20.0
-      ajv-formats: 3.0.1
+      ajv-formats: 3.0.1(ajv@8.20.0)
       jsonc-parser: 3.3.1
       picomatch: 4.0.7
       rxjs: 7.8.2
@@ -13587,14 +13466,6 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.3.3
       '@tailwindcss/oxide-win32-x64-msvc': 4.3.3
 
-  '@tailwindcss/postcss@4.3.3':
-    dependencies:
-      '@alloc/quick-lru': 5.3.0
-      '@tailwindcss/node': 4.3.3
-      '@tailwindcss/oxide': 4.3.3
-      postcss: 8.5.31
-      tailwindcss: 4.3.3
-
   '@tailwindcss/vite@4.3.3(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))':
     dependencies:
       '@tailwindcss/node': 4.3.3
@@ -13715,6 +13586,8 @@ snapshots:
     dependencies:
       '@types/deep-eql': 4.0.2
       assertion-error: 2.0.1
+
+  '@types/culori@4.0.1': {}
 
   '@types/d3-array@3.2.2': {}
 
@@ -14162,10 +14035,6 @@ snapshots:
     dependencies:
       vite: 8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1)
 
-  '@vitejs/plugin-basic-ssl@2.3.0(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass-embedded@1.106.1)(sass@1.106.1)(yaml@2.9.1))':
-    dependencies:
-      vite: 8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass-embedded@1.106.1)(sass@1.106.1)(yaml@2.9.1)
-
   '@vitejs/plugin-react@5.2.0(supports-color@10.2.2)(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@10.2.2))(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))':
     dependencies:
       '@babel/core': 7.29.7(supports-color@10.2.2)
@@ -14579,8 +14448,12 @@ snapshots:
     optionalDependencies:
       ajv: 8.20.0
 
-  ajv-formats@3.0.1:
-    dependencies:
+  ajv-formats@3.0.1(ajv@8.18.0):
+    optionalDependencies:
+      ajv: 8.18.0
+
+  ajv-formats@3.0.1(ajv@8.20.0):
+    optionalDependencies:
       ajv: 8.20.0
 
   ajv-i18n@4.2.0(ajv@8.20.0):

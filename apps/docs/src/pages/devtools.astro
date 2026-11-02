@@ -1,0 +1,33 @@
+---
+/*
+ * A standalone page outside Starlight: the dev tools need the whole viewport and no docs chrome.
+ * The Angular app touches localStorage and the DOM on startup, so it only renders in the browser.
+ */
+import {DevTools} from '../libs/dev-tools/dev-tools.ts';
+import '../styles/devtools.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Dev Tools | QRCodeSDK</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      // Applies Starlight's stored theme before the first paint.
+      const stored = localStorage.getItem('starlight-theme');
+      const theme =
+        stored === 'dark' || stored === 'light'
+          ? stored
+          : matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+      document.documentElement.dataset.theme = theme;
+    </script>
+  </head>
+  <body>
+    <DevTools client:only="@analogjs/astro-angular" />
+  </body>
+</html>

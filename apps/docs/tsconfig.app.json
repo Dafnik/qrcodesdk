@@ -1,6 +1,5 @@
 {
   "angularCompilerOptions": {
-    "allowJs": false,
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
@@ -8,15 +7,13 @@
   },
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "lib": ["es2020", "dom"],
-    "module": "es2020",
-    "moduleResolution": "node",
+    "lib": ["es2022", "dom"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "noEmit": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
@@ -26,9 +23,15 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es2020"
+    "target": "es2022",
+    "verbatimModuleSyntax": false
   },
+  "exclude": ["dist", "src/**/*.test.ts"],
   "extends": "./tsconfig.json",
   "files": [],
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/libs/ui/**/src/**/*.ts"]
+  "include": [
+    "src/components/angular/**/*.ts",
+    "src/components/playground/angular/**/*.ts",
+    "src/libs/**/*.ts"
+  ]
 }

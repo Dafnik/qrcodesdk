@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "declaration": false,
-    "declarationMap": false,
-    "outDir": "out-tsc/app"
-  },
-  "extends": "./tsconfig.json",
-  "include": ["src/**/*.ts", "src/libs/ui/**/src/**/*.ts"]
-}

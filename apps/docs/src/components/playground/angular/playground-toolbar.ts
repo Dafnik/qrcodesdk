@@ -79,7 +79,7 @@ interface PlaygroundToolbarOption<T extends string> {
           <span class="flex items-center gap-1.5" *hlmSelectValueTemplate="let value">
             <ng-container
               [ngTemplateOutlet]="packageOption"
-              [ngTemplateOutletContext]="{$implicit: packageByValue[value]}" />
+              [ngTemplateOutletContext]="{$implicit: packageFor(value)}" />
           </span>
         </hlm-select-trigger>
         <hlm-select-content *hlmSelectPortal>
@@ -211,6 +211,11 @@ export class PlaygroundToolbar {
   protected readonly packageByValue = Object.fromEntries(
     this.packages.map((option) => [option.value, option]),
   ) as Record<PlaygroundPackage, PlaygroundToolbarOption<PlaygroundPackage>>;
+
+  /** Looks up the selected package; the select value template's context is untyped. */
+  protected packageFor(value: PlaygroundPackage): PlaygroundToolbarOption<PlaygroundPackage> {
+    return this.packageByValue[value];
+  }
   protected readonly outputs: PlaygroundToolbarOption<PlaygroundOutput>[] = [
     {value: 'svg', label: 'SVG', icon: 'lucideCodeXml'},
     {value: 'png', label: 'PNG', icon: 'lucideImage'},

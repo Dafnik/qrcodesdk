@@ -1,6 +1,0 @@
-dist/
-out-tsc/
-.angular/
-node_modules/
-/.nx/workspace-data/nx_files.lock
-/.nx/workspace-data/nx_files_v2.nxt

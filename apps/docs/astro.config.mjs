@@ -185,6 +185,7 @@ export default defineConfig({
           id.includes('src/components/angular') ||
           id.includes('src/components/playground/angular') ||
           id.includes('src/libs/ui') ||
+          id.includes('src/libs/dev-tools') ||
           id.includes('src/libs/sim')
         ); // <- only transform Angular TypeScript files
       },
