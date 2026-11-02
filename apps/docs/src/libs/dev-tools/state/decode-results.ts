@@ -34,6 +34,7 @@ export class DecodeResults {
   private readonly _version = signal(0);
   private readonly _counts = signal<Counts>(EMPTY_COUNTS);
   private readonly _bulk = signal<{done: number; total: number} | undefined>(undefined);
+  private readonly _runId = signal(0);
 
   /** Changes whenever results change. Read it to make a computed depend on results. */
   readonly version = this._version.asReadonly();
@@ -44,6 +45,8 @@ export class DecodeResults {
   });
   /** Progress of "Decode all", or `undefined` when it isn't running. */
   readonly bulkProgress = this._bulk.asReadonly();
+  /** Changes when results are reset, so tiles that stay mounted across runs decode again. */
+  readonly runId = this._runId.asReadonly();
 
   get(key: string): DecodeResult | undefined {
     return this.results.get(key);
@@ -56,6 +59,7 @@ export class DecodeResults {
   /** Drops all results and cancels queued decodes and "Decode all". */
   reset(): void {
     this.generation++;
+    this._runId.update((id) => id + 1);
     this.results.clear();
     this.pending.clear();
     this.counts = {...EMPTY_COUNTS};
@@ -103,7 +107,10 @@ export class DecodeResults {
           } catch (error) {
             console.error(`Rendering ${key} failed`, error);
           }
-          this.store(key, await decodeOutput(output, fixture.payload, fixture.knownDecodeIssue));
+          const result = await decodeOutput(output, fixture.payload, fixture.knownDecodeIssue);
+          // A reset during the decode drops this run's results.
+          if (generation !== this.generation) break;
+          this.store(key, result);
         }
         // Yield to the browser every ~12ms.
         if (performance.now() - sliceStart > 12) {

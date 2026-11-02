@@ -1,8 +1,12 @@
 import {Injectable, computed, effect, inject, signal} from '@angular/core';
 
 import {
+  COMBINATION_SETS,
   type CombinationFilter,
   DEFAULT_COMBINATION_FILTER,
+  ERROR_CORRECTION_LEVELS,
+  MASKS,
+  MODES,
   combinationFixtures,
   countCombinations,
 } from '../fixtures/combinations';
@@ -54,16 +58,67 @@ const DEFAULT_SETTINGS: PersistedSettings = {
   tileSize: 'md',
 };
 
+/** Keeps the stored values that are in `allowed`, so stale or corrupt entries are dropped. */
+function known<T>(stored: unknown, allowed: readonly T[], fallback: readonly T[]): T[] {
+  if (!Array.isArray(stored)) return [...fallback];
+  return allowed.filter((value) => stored.includes(value));
+}
+
+function version(stored: unknown, fallback: number): number {
+  return Number.isInteger(stored) && (stored as number) >= 1 && (stored as number) <= 40
+    ? (stored as number)
+    : fallback;
+}
+
+/** Reads the stored settings, keeping only values the current catalog still knows. */
 function loadSettings(): PersistedSettings {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return DEFAULT_SETTINGS;
-    const parsed = JSON.parse(stored) as Partial<PersistedSettings>;
+    const parsed = JSON.parse(stored) as Partial<Record<keyof PersistedSettings, unknown>>;
+
+    const storedSelection = (parsed.selection ?? {}) as Partial<Record<FixtureCategoryId, unknown>>;
+    const selection = {...EMPTY_SELECTION};
+    for (const category of FIXTURE_CATEGORIES) {
+      const ids = category.fixtures.map(({id}) => id);
+      selection[category.id] = known(storedSelection[category.id], ids, []);
+    }
+
+    const combinations = (parsed.combinations ?? {}) as Partial<
+      Record<keyof CombinationFilter, unknown>
+    >;
+    const defaults = DEFAULT_COMBINATION_FILTER;
+    const versionFrom = version(combinations.versionFrom, defaults.versionFrom);
+
     return {
-      ...DEFAULT_SETTINGS,
-      ...parsed,
-      selection: {...EMPTY_SELECTION, ...parsed.selection},
-      combinations: {...DEFAULT_COMBINATION_FILTER, ...parsed.combinations},
+      selection,
+      combinations: {
+        enabled: combinations.enabled === true,
+        sets: known(
+          combinations.sets,
+          COMBINATION_SETS.map(({id}) => id),
+          defaults.sets,
+        ),
+        versionFrom,
+        versionTo: Math.max(versionFrom, version(combinations.versionTo, defaults.versionTo)),
+        errorCorrectionLevels: known(
+          combinations.errorCorrectionLevels,
+          ERROR_CORRECTION_LEVELS,
+          defaults.errorCorrectionLevels,
+        ),
+        masks: known(combinations.masks, MASKS, defaults.masks),
+        modes: known(combinations.modes, MODES, defaults.modes),
+      },
+      renderers: known(
+        parsed.renderers,
+        RENDERERS.map(({id}) => id),
+        DEFAULT_SETTINGS.renderers,
+      ),
+      decode: parsed.decode === true,
+      tileSize:
+        typeof parsed.tileSize === 'string' && parsed.tileSize in TILE_SIZES
+          ? (parsed.tileSize as TileSize)
+          : DEFAULT_SETTINGS.tileSize,
     };
   } catch {
     return DEFAULT_SETTINGS;

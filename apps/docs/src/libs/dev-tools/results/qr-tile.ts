@@ -118,6 +118,8 @@ export class QRTile {
     afterRenderEffect({
       read: () => {
         if (!this.decode()) return;
+        // Re-runs keep tiles whose fixture and renderer didn't change, but clear their results.
+        this.results.runId();
         const key = this.key();
         if (this.results.isKnown(key)) return;
         const renderer = this.renderer();
