@@ -91,12 +91,12 @@ try {
   await run('npm', ['ci', '--ignore-scripts', '--strict-peer-deps', '--no-audit', '--no-fund'], {
     cwd: consumerDirectory,
   });
+  // Keep using the fixture lockfile when adding the local tarballs.
   await run(
     'npm',
     [
       'install',
       '--no-save',
-      '--package-lock=false',
       '--ignore-scripts',
       '--strict-peer-deps',
       '--no-audit',

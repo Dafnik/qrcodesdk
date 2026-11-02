@@ -4,7 +4,7 @@
   import QRCodeImageBase from './QRCodeImageBase.svelte';
   import type {QRCodeDownloadHandle, QRCodeGIFProps} from './types.js';
 
-  let props: QRCodeGIFProps = $props();
+  let {...props}: QRCodeGIFProps = $props();
   let image = $state<QRCodeDownloadHandle>();
 
   export function download(filename = '') {
