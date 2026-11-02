@@ -1,13 +1,52 @@
+import type {QRCodeCenterImageLayout} from '@qrcodesdk/core';
 import {QRCodeError} from '@qrcodesdk/core/error';
+import {
+  type ɵQRCodeDrawing as QRCodeDrawing,
+  type ɵQRCodeStylePart as QRCodeStylePart,
+  ɵcreateCenterImageStore as createCenterImageStore,
+  ɵcreateQRCodeCenterImagePlacement as createQRCodeCenterImagePlacement,
+} from '@qrcodesdk/core/internal';
 
-import {blendPixel} from './pixels';
-import {type PNGImage, decodePNG} from './png-codec';
+import {type RGBAImage, blendPixel} from './pixels';
+import {decodePNG} from './png-codec';
+
+declare const rasterCenterImageBrand: unique symbol;
+/** A center image for PNG, WebP, and GIF output, created with `rasterCenterImage()`. */
+export type QRCodeRasterCenterImage = {readonly [rasterCenterImageBrand]: true};
+
+export type CenterImageRenderer = {
+  readonly part: QRCodeStylePart;
+  draw(image: RGBAImage, drawing: QRCodeDrawing): void;
+};
+
+// Kept private so published declarations do not reference internal drawing types.
+export const centerImages = createCenterImageStore<CenterImageRenderer>();
 
 const MAX_CENTER_IMAGE_BYTES = 16 * 1024 * 1024;
 const MAX_CENTER_IMAGE_PIXELS = 16_777_216;
 
+/**
+ * Creates a center image for PNG, WebP, and GIF output from PNG bytes, which are validated and
+ * decoded once.
+ */
+export function rasterCenterImage(
+  source: Uint8Array,
+  layout?: QRCodeCenterImageLayout,
+): QRCodeRasterCenterImage {
+  const {part, place} = createQRCodeCenterImagePlacement(layout);
+  const image = decodeImageSource(source);
+  return centerImages.create({
+    part,
+    draw(target, drawing) {
+      const box = place(drawing);
+      const scale = drawing.moduleSize;
+      compositeImage(target, image, box.x * scale, box.y * scale, box.size * scale);
+    },
+  }) as QRCodeRasterCenterImage;
+}
+
 /** Validates and decodes center-image PNG bytes. */
-export function decodeImageSource(source: Uint8Array): PNGImage {
+function decodeImageSource(source: Uint8Array): RGBAImage {
   // View plain byte arrays as a Buffer without copying them.
   const bytes = Buffer.isBuffer(source)
     ? source
@@ -15,7 +54,7 @@ export function decodeImageSource(source: Uint8Array): PNGImage {
   return decodeImageBytes(bytes);
 }
 
-function decodeImageBytes(source: Buffer): PNGImage {
+function decodeImageBytes(source: Buffer): RGBAImage {
   if (source.length > MAX_CENTER_IMAGE_BYTES) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
@@ -64,9 +103,9 @@ function assertImageDimensions(width: number, height: number): void {
 }
 
 /** Draws an image into a square box, keeping its aspect ratio. */
-export function compositeImage(
-  target: PNGImage,
-  source: PNGImage,
+function compositeImage(
+  target: RGBAImage,
+  source: RGBAImage,
   boxX: number,
   boxY: number,
   boxSize: number,

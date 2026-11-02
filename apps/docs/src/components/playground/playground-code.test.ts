@@ -74,7 +74,7 @@ describe('generated playground image snippets', () => {
       assert.match(code, conditionalRender);
     });
 
-    for (const output of ['image', 'canvas'] as const) {
+    for (const output of ['png', 'webp', 'gif', 'canvas'] as const) {
       test(`${packageName} ${output} passes a decoded image element after preparation`, () => {
         const {code} = generatePlaygroundCode(createOptions(packageName, output), preparedImage);
 
@@ -126,23 +126,47 @@ describe('generated playground languages', () => {
     assert.doesNotMatch(html, /<img/);
   });
   for (const packageName of ['react', 'vue', 'svelte', 'angular'] as const) {
-    for (const output of ['svg', 'image', 'canvas'] as const) {
+    for (const output of ['svg', 'png', 'webp', 'gif', 'canvas'] as const) {
       test(`${packageName} ${output} imports its option type from the adapter`, () => {
         const {code} = generatePlaygroundCode(createOptions(packageName, output));
-        const type =
-          output === 'svg'
-            ? 'QRCodeSVGOptions'
-            : output === 'image'
-              ? 'QRCodeImageOptions'
-              : 'QRCodeCanvasOptions';
+        const type = {
+          svg: 'QRCodeSVGOptions',
+          png: 'QRCodePNGImageOptions',
+          webp: 'QRCodeWebPImageOptions',
+          gif: 'QRCodeGIFImageOptions',
+          canvas: 'QRCodeCanvasOptions',
+        }[output];
 
-        assert.match(code, new RegExp(`type ${type}.*@qrcodesdk/${packageName}`));
+        assert.ok(frameworkSpecifiers(code, packageName).includes(`type ${type}`));
+      });
+    }
+
+    for (const [output, componentName, selector, label] of [
+      ['png', 'QRCodePNG', 'qrcode-png', 'Download PNG'],
+      ['webp', 'QRCodeWebP', 'qrcode-webp', 'Download WebP'],
+      ['gif', 'QRCodeGIF', 'qrcode-gif', 'Download GIF'],
+    ] as const) {
+      test(`${packageName} ${output} renders ${componentName} with a matching download`, () => {
+        const {code} = generatePlaygroundCode({
+          ...createOptions(packageName, output),
+          alt: 'QR code',
+        });
+
+        assert.ok(frameworkSpecifiers(code, packageName).includes(componentName));
+        assert.match(
+          code,
+          packageName === 'angular'
+            ? new RegExp(`<${selector}\\b`)
+            : new RegExp(`<${componentName}\\b`),
+        );
+        assert.match(code, new RegExp(label));
+        assert.match(code, /alt: 'QR code'/);
       });
     }
   }
 
   test('generates an idiomatic Vue single-file component', () => {
-    const preview = generatePlaygroundCode(createOptions('vue', 'image'));
+    const preview = generatePlaygroundCode(createOptions('vue', 'png'));
 
     assert.equal(preview.lang, 'vue');
     assert.match(preview.code, /<script setup lang="ts">/);
@@ -153,7 +177,7 @@ describe('generated playground languages', () => {
   });
 
   test('generates an idiomatic Svelte component', () => {
-    const preview = generatePlaygroundCode(createOptions('svelte', 'image'));
+    const preview = generatePlaygroundCode(createOptions('svelte', 'png'));
 
     assert.equal(preview.lang, 'svelte');
     assert.match(preview.code, /<script lang="ts">/);
@@ -221,7 +245,7 @@ describe('generated playground style options', () => {
 
     test(`${packageName} emits a finder part for a finder color alone`, () => {
       const {code} = generatePlaygroundCode({
-        ...createOptions(packageName, 'image'),
+        ...createOptions(packageName, 'webp'),
         finderColor: '#123456',
       });
 

@@ -1,6 +1,11 @@
 import type {HTMLAttributes} from 'svelte/elements';
 
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {
+  QRCodeCanvasOptions,
+  QRCodeGIFImageOptions,
+  QRCodePNGImageOptions,
+  QRCodeWebPImageOptions,
+} from '@qrcodesdk/browser';
 import type {QRCodePayload, QRCodeSVGOptions} from '@qrcodesdk/core';
 
 export type QRCodeBaseProps<TOptions> = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
@@ -9,7 +14,9 @@ export type QRCodeBaseProps<TOptions> = Omit<HTMLAttributes<HTMLDivElement>, 'ch
 };
 
 export type QRCodeSVGProps = QRCodeBaseProps<QRCodeSVGOptions>;
-export type QRCodeImageProps = QRCodeBaseProps<QRCodeImageOptions>;
+export type QRCodePNGProps = QRCodeBaseProps<QRCodePNGImageOptions>;
+export type QRCodeWebPProps = QRCodeBaseProps<QRCodeWebPImageOptions>;
+export type QRCodeGIFProps = QRCodeBaseProps<QRCodeGIFImageOptions>;
 export type QRCodeCanvasProps = QRCodeBaseProps<QRCodeCanvasOptions>;
 
 export type QRCodeDownloadHandle = {

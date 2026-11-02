@@ -2,16 +2,16 @@ import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {render as renderComponent, waitFor} from '@testing-library/svelte';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeCanvasOptions, QRCodePNGImageOptions} from '@qrcodesdk/browser';
 import {canvasCenterImage} from '@qrcodesdk/browser';
 import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {svgCenterImage} from '@qrcodesdk/core';
 import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
-import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '../src/lib/index.js';
+import {QRCodeCanvas, QRCodeGIF, QRCodePNG, QRCodeSVG, QRCodeWebP} from '../src/lib/index.js';
 
 const svgOptions: QRCodeSVGOptions = {style: {moduleSize: 2, quietZone: 1}};
-const imageOptions: QRCodeImageOptions = {
+const imageOptions: QRCodePNGImageOptions = {
   style: {moduleSize: 2, quietZone: 1},
   accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
 };
@@ -47,7 +47,7 @@ describe('Svelte QR code components', () => {
   });
 
   test('renders image QR code output with PNG data and accessibility attributes', async () => {
-    const {container} = renderComponent(QRCodeImage, {payload: 'HELLO', options: imageOptions});
+    const {container} = renderComponent(QRCodePNG, {payload: 'HELLO', options: imageOptions});
 
     await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
 
@@ -60,12 +60,38 @@ describe('Svelte QR code components', () => {
     expect(image.title).toBe('QR title');
   });
 
+  test.each([
+    ['WebP', QRCodeWebP, 'webp'],
+    ['GIF', QRCodeGIF, 'gif'],
+  ] as const)('renders and downloads %s image output', async (_name, Component, extension) => {
+    const downloads = captureDownloads(vi);
+    const {container, component} = renderComponent(Component, {
+      payload: 'HELLO',
+      options: imageOptions,
+    });
+
+    await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
+
+    const image = renderedElement<HTMLImageElement>(container, 'img');
+    expect(image.src.startsWith(`data:image/${extension};base64,`)).toBe(true);
+    expect(image.width).toBe(46);
+    expect(image.alt).toBe('QR alt');
+
+    component.download('qrcodesdk');
+    expect(downloads).toEqual([
+      {
+        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
+        filename: `qrcodesdk.${extension}`,
+      },
+    ]);
+  });
+
   test('downloads image and SVG QR code output', async () => {
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
     const svg = renderComponent(QRCodeSVG, {payload: 'HELLO', options: svgOptions});
-    const image = renderComponent(QRCodeImage, {payload: 'HELLO', options: imageOptions});
+    const image = renderComponent(QRCodePNG, {payload: 'HELLO', options: imageOptions});
 
     // The SVG download revokes its object URL after a delay.
     vi.useFakeTimers({toFake: ['setTimeout']});
@@ -118,7 +144,7 @@ describe('Svelte QR code components', () => {
       },
     };
     const svg = renderComponent(QRCodeSVG, {payload: 'STYLED', options: styledOptions});
-    const image = renderComponent(QRCodeImage, {payload: 'STYLED', options: styledOptions});
+    const image = renderComponent(QRCodePNG, {payload: 'STYLED', options: styledOptions});
     const canvas = renderComponent(QRCodeCanvas, {payload: 'STYLED', options: styledOptions});
 
     await waitFor(() => {
@@ -142,7 +168,7 @@ describe('Svelte QR code components', () => {
       payload: 'CENTER IMAGE',
       options: {...svgOptions, centerImage: svgCenterImage(svgSource, {size: 0.2})},
     });
-    const image = renderComponent(QRCodeImage, {
+    const image = renderComponent(QRCodePNG, {
       payload: 'CENTER IMAGE',
       options: {...imageOptions, centerImage: canvasCenterImage(source, {size: 0.2})},
     });
@@ -163,7 +189,7 @@ describe('Svelte QR code components', () => {
   });
 
   test('replaces rendered image and canvas when props change', async () => {
-    const image = renderComponent(QRCodeImage, {payload: 'HELLO', options: imageOptions});
+    const image = renderComponent(QRCodePNG, {payload: 'HELLO', options: imageOptions});
     const canvas = renderComponent(QRCodeCanvas, {payload: 'HELLO', options: canvasOptions});
 
     await waitFor(() => {

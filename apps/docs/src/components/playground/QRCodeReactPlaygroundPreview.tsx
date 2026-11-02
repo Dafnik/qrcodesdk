@@ -1,16 +1,30 @@
 import {useMemo, useRef} from 'react';
 
-import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '@qrcodesdk/react';
+import {
+  QRCodeCanvas,
+  type QRCodeDownloadHandle,
+  QRCodeGIF,
+  QRCodePNG,
+  QRCodeSVG,
+  QRCodeWebP,
+} from '@qrcodesdk/react';
 
 import {useStore} from '@nanostores/react';
 import {
   createPlaygroundCanvasOptions,
   createPlaygroundImageOptions,
   createPlaygroundSVGOptions,
+  isPlaygroundImageOutput,
   playgroundOptions,
   playgroundPreparedImage,
 } from './playground-options.ts';
 import {hasQRCodeError} from './qrcode-error-checker.ts';
+
+const IMAGE_COMPONENTS = {
+  png: {component: QRCodePNG, label: 'Download PNG'},
+  webp: {component: QRCodeWebP, label: 'Download WebP'},
+  gif: {component: QRCodeGIF, label: 'Download GIF'},
+} as const;
 
 export default function QRCodeReactPlaygroundPreview() {
   const options = useStore(playgroundOptions);
@@ -39,18 +53,17 @@ export default function QRCodeReactPlaygroundPreview() {
       );
     }
 
-    if (options.output === 'image') {
+    if (isPlaygroundImageOutput(options.output)) {
+      const {component: ImageComponent, label} = IMAGE_COMPONENTS[options.output];
       return (
         <div className="flex flex-col items-center justify-center gap-4">
-          <QRCodeImage
+          <ImageComponent
+            key={options.output}
             ref={imageRef}
             payload={options.payload}
             options={createPlaygroundImageOptions(options, preparedImage)}
           />
-          <DownloadButton
-            label="Download PNG"
-            onClick={() => imageRef.current?.download('qrcodesdk')}
-          />
+          <DownloadButton label={label} onClick={() => imageRef.current?.download('qrcodesdk')} />
         </div>
       );
     }

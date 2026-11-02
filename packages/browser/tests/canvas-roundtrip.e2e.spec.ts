@@ -1,34 +1,35 @@
 import {fixtureMatrixOptions} from '@repo/core-testing';
-import {QR_CODE_STYLING_ROUNDTRIP_FIXTURES, QR_CODE_TEST_FIXTURES} from '@repo/core-testing';
+import {
+  QR_CODE_CENTER_IMAGE_FIXTURES,
+  QR_CODE_STYLE_VARIANT_FIXTURES,
+  QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
+  QR_CODE_TEST_FIXTURES,
+} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 
 import {QRCodeCanvasRenderer, canvasCenterImage} from '../src';
-import {JSQR_ROUNDTRIP_COMBINATIONS_ONE, decodeCanvasQRCode} from './helper';
+import {JSQR_ROUNDTRIP_COMBINATIONS_ONE, decodeCanvasQRCode, fixtureImageCanvas} from './helper';
 
 describe('QRCodeCanvasRenderer', () => {
-  test('decodes output with a small prepared center image', () => {
-    const logo = document.createElement('canvas');
-    logo.width = 8;
-    logo.height = 4;
-    const context = logo.getContext('2d')!;
-    context.fillStyle = '#dc2626';
-    context.fillRect(0, 0, logo.width, logo.height);
-
-    expect(
-      decodeCanvasQRCode(
-        qrcode('prepared browser image')
-          .errorCorrection('H')
-          .render(
-            QRCodeCanvasRenderer({
-              style: {moduleSize: 4, quietZone: 4},
-              centerImage: canvasCenterImage(logo, {size: 0.16, padding: 0.25}),
-            }),
-          ),
-      ),
-    ).toBe('prepared browser image');
-  });
+  test.each(QR_CODE_CENTER_IMAGE_FIXTURES)(
+    'decodes $name canvas center image fixture',
+    (fixture) => {
+      expect(
+        decodeCanvasQRCode(
+          qrcode(fixture.payload)
+            .options(fixture.matrixOptions)
+            .render(
+              QRCodeCanvasRenderer({
+                style: fixture.style,
+                centerImage: canvasCenterImage(fixtureImageCanvas(fixture.image), fixture.layout),
+              }),
+            ),
+        ),
+      ).toBe(fixture.payload);
+    },
+  );
 
   const defaultRenderer = QRCodeCanvasRenderer({style: {moduleSize: 4, quietZone: 4}});
 
@@ -63,4 +64,14 @@ describe('QRCodeCanvasRenderer', () => {
       ).toBe(fixture.payload);
     },
   );
+
+  test.each(QR_CODE_STYLE_VARIANT_FIXTURES)('decodes $name canvas style variant', (fixture) => {
+    expect(
+      decodeCanvasQRCode(
+        qrcode(fixture.payload)
+          .options(fixture.matrixOptions)
+          .render(QRCodeCanvasRenderer({style: fixture.styling})),
+      ),
+    ).toBe(fixture.payload);
+  });
 });

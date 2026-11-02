@@ -1,0 +1,10 @@
+---
+import QRCodeDownloadPNGExample, {
+  content,
+} from '../../angular/qrcode-download-png-example.ts?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content}>
+  <QRCodeDownloadPNGExample client:load />
+</QRCodeExample>

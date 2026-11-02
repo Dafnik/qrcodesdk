@@ -1,0 +1,10 @@
+---
+import QRCodeDownloadPNGExample, {
+  content,
+} from '../../react/qrcode-download-png-example.tsx?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content} lang="tsx">
+  <QRCodeDownloadPNGExample client:load />
+</QRCodeExample>

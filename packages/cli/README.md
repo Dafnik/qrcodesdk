@@ -8,9 +8,10 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
-`@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG and PNG files.
+`@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG, PNG, WebP, and GIF files.
 
 Build a command and preview SVG or terminal text in the [CLI playground](https://qrcodesdk.dev/playground/?package=cli).
+The playground does not preview PNG, WebP, or GIF output, which requires Node.js APIs.
 
 ## Runtime requirements
 
@@ -231,7 +232,24 @@ Or pass the format explicitly:
 qrc "https://qrcodesdk.dev" --format png --output qrcode.png
 ```
 
-SVG and PNG output require `--output`. If the extension is not `.svg` or `.png`, pass `--format` explicitly.
+## Write WebP and GIF files
+
+`.webp` and `.gif` output paths select WebP and GIF automatically:
+
+```sh
+qrc "https://qrcodesdk.dev" --output qrcode.webp
+qrc "https://qrcodesdk.dev" --output qrcode.gif
+```
+
+WebP output is lossless and usually much smaller than PNG. GIF output has at most 256 colors and
+binary transparency, so prefer PNG or WebP with a semi-transparent `--background`.
+
+SVG, PNG, WebP, and GIF output require `--output`. If the extension is not `.svg`, `.png`, `.webp`, or
+`.gif`, pass `--format` explicitly:
+
+```sh
+qrc "https://qrcodesdk.dev" --format webp --output qrcode.image
+```
 
 ## Configure generated files
 
@@ -269,27 +287,27 @@ see [Customize appearance](https://qrcodesdk.dev/guides/customize/).
 
 ## Options
 
-| Option                                  | Description                                                 | Default     |
-| --------------------------------------- | ----------------------------------------------------------- | :---------- |
-| `[payload]`                             | Positional QR code payload.                                 | -           |
-| `--payload <value>`                     | QR code payload, equivalent to positional `[payload]`.      | -           |
-| `-V`                                    | Print the installed CLI package version.                    | -           |
-| `--format <text\|svg\|png>`             | Output format. Inferred from `.svg` or `.png` output paths. | -           |
-| `-o, --output <path>`                   | Required output path for SVG and PNG.                       | -           |
-| `--mode <numeric\|alphanumeric\|octet>` | QR code mode.                                               | `Auto`      |
-| `--error-correction <L\|M\|Q\|H>`       | Error correction level.                                     | `M`         |
-| `--version <1-40>`                      | Pin a QR code version.                                      | `Auto`      |
-| `--mask <0-7>`                          | Pin a QR code mask.                                         | `Auto`      |
-| `--eci`                                 | Emit UTF-8 ECI assignment 26 for octet segments.            | `false`     |
-| `--no-eci`                              | Do not emit UTF-8 ECI assignment 26.                        | `false`     |
-| `--module-size <number>`                | Module size as a positive integer.                          | `1`         |
-| `--quiet-zone <number>`                 | Quiet zone as a non-negative integer.                       | `2`         |
-| `--layout <compact\|full>`              | Text block layout.                                          | `compact`   |
-| `--ansi <off\|blocks\|background>`      | Explicit ANSI output mode.                                  | Environment |
-| `--foreground <#rrggbb[aa]>`            | Dark module color.                                          | `#000000`   |
-| `--background <#rrggbb[aa]>`            | Light module color.                                         | `#ffffff`   |
-| `--aria-label <text>`                   | SVG `aria-label` accessible name.                           | `undefined` |
-| `--title <text>`                        | SVG child `<title>` text.                                   | `undefined` |
+| Option                                  | Description                                             | Default     |
+| --------------------------------------- | ------------------------------------------------------- | :---------- |
+| `[payload]`                             | Positional QR code payload.                             | -           |
+| `--payload <value>`                     | QR code payload, equivalent to positional `[payload]`.  | -           |
+| `-V`                                    | Print the installed CLI package version.                | -           |
+| `--format <text\|svg\|png\|webp\|gif>`  | Output format. Inferred from the output path extension. | -           |
+| `-o, --output <path>`                   | Required output path for SVG, PNG, WebP, and GIF.       | -           |
+| `--mode <numeric\|alphanumeric\|octet>` | QR code mode.                                           | `Auto`      |
+| `--error-correction <L\|M\|Q\|H>`       | Error correction level.                                 | `M`         |
+| `--version <1-40>`                      | Pin a QR code version.                                  | `Auto`      |
+| `--mask <0-7>`                          | Pin a QR code mask.                                     | `Auto`      |
+| `--eci`                                 | Emit UTF-8 ECI assignment 26 for octet segments.        | `false`     |
+| `--no-eci`                              | Do not emit UTF-8 ECI assignment 26.                    | `false`     |
+| `--module-size <number>`                | Module size as a positive integer.                      | `1`         |
+| `--quiet-zone <number>`                 | Quiet zone as a non-negative integer.                   | `2`         |
+| `--layout <compact\|full>`              | Text block layout.                                      | `compact`   |
+| `--ansi <off\|blocks\|background>`      | Explicit ANSI output mode.                              | Environment |
+| `--foreground <#rrggbb[aa]>`            | Dark module color.                                      | `#000000`   |
+| `--background <#rrggbb[aa]>`            | Light module color.                                     | `#ffffff`   |
+| `--aria-label <text>`                   | SVG `aria-label` accessible name.                       | `undefined` |
+| `--title <text>`                        | SVG child `<title>` text.                               | `undefined` |
 
 Colors must be RGB or RGBA hex values. `--module-size` must be positive and `--quiet-zone` must be non-negative.
 For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI

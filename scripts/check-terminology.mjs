@@ -37,13 +37,13 @@ const rules = [
   ['legacy payload type', /\bQRCode(?:InputData|EncodedData)\b/g],
   [
     'legacy center-image type',
-    /\bQRCode(?:ImageOverlayOptions|SVGImageOptions|CanvasImageOptions|PNGImageOptions)\b/g,
+    /\bQRCode(?:ImageOverlayOptions|SVGImageOptions|CanvasImageOptions)\b/g,
   ],
   ['legacy center-image method', /\bplaceImage\s*\(/g],
   ['legacy builder method', /\.(?:config|data)\s*\(/g],
   [
     'legacy framework payload prop',
-    /<(?:QRCode(?:SVG|Image|Canvas)|qrcode-(?:svg|image|canvas))\b[^>]{0,500}\b(?::|\[)?data(?:\])?=/g,
+    /<(?:QRCode(?:SVG|Image|PNG|WebP|GIF|Canvas)|qrcode-(?:svg|image|png|webp|gif|canvas))\b[^>]{0,500}\b(?::|\[)?data(?:\])?=/g,
   ],
   ['legacy CLI payload option', /--input(?:\s|[=<])/g],
   ['legacy CLI positional payload', /\[data\]/g],

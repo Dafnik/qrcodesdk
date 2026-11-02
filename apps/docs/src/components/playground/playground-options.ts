@@ -2,7 +2,7 @@ import {atom} from 'nanostores';
 
 import {
   type QRCodeCanvasOptions,
-  type QRCodeImageOptions,
+  type QRCodePNGImageOptions,
   canvasCenterImage,
 } from '@qrcodesdk/browser';
 import {
@@ -17,7 +17,10 @@ import {
 import {type PlaygroundStyleState, createPlaygroundStyle} from './playground-style.ts';
 
 export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue' | 'cli';
-export type PlaygroundOutput = 'svg' | 'image' | 'canvas';
+export type PlaygroundImageOutput = 'png' | 'webp' | 'gif';
+export type PlaygroundOutput = 'svg' | PlaygroundImageOutput | 'canvas';
+/** Options shared by the PNG, WebP, and GIF components. */
+export type PlaygroundImageOptions = QRCodePNGImageOptions;
 export type PlaygroundView = 'preview' | 'code';
 export const PLAYGROUND_VIEWS = ['preview', 'code'] as const satisfies readonly PlaygroundView[];
 export type PlaygroundSection = 'image' | 'styling' | 'accessibility';
@@ -198,7 +201,7 @@ export function createPlaygroundSVGOptions(
 export function createPlaygroundImageOptions(
   playgroundOptionsValue: PlaygroundOptions,
   preparedImage = playgroundPreparedImage.get(),
-): QRCodeImageOptions {
+): PlaygroundImageOptions {
   const rendererOptions = imageOptions(playgroundOptionsValue);
   return preparedImage
     ? {
@@ -256,7 +259,11 @@ function visualOptions(playgroundOptionsValue: PlaygroundOptions) {
   };
 }
 
-function imageOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeImageOptions {
+export function isPlaygroundImageOutput(output: PlaygroundOutput): output is PlaygroundImageOutput {
+  return output === 'png' || output === 'webp' || output === 'gif';
+}
+
+function imageOptions(playgroundOptionsValue: PlaygroundOptions): PlaygroundImageOptions {
   return {
     ...baseOptions(playgroundOptionsValue),
     accessibility: {

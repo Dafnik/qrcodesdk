@@ -1,4 +1,8 @@
-import {type RGBAPixel, getAllQRCodeCombinations} from '@repo/core-testing';
+import {
+  type QRCodeFixtureImage,
+  type RGBAPixel,
+  getAllQRCodeCombinations,
+} from '@repo/core-testing';
 import jsQR from 'jsqr';
 import {expect} from 'vitest';
 
@@ -45,8 +49,24 @@ export function expectPixel(
   expect(getPixel(canvas, x, y)).toEqual(rgba);
 }
 
-export function decodeCanvasQRCode(canvas: HTMLCanvasElement): string {
+/** Draws fixture pixels on a canvas, for use with `canvasCenterImage()`. */
+export function fixtureImageCanvas({width, height, data}: QRCodeFixtureImage): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  getCanvasContext(canvas).putImageData(new ImageData(new Uint8ClampedArray(data), width), 0, 0);
+  return canvas;
+}
+
+// Scans the code as displayed on a white page, so transparent backgrounds stay light.
+export function decodeCanvasQRCode(source: HTMLCanvasElement): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = source.width;
+  canvas.height = source.height;
   const context = getCanvasContext(canvas);
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(source, 0, 0);
   const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
   const result = jsQR(imageData.data, canvas.width, canvas.height, {
     inversionAttempts: 'dontInvert',

@@ -12,7 +12,7 @@ A `QRCodeRenderer<T>` receives an immutable QR matrix and returns any output typ
 layout, drawing, and output-specific options. The shared drawing pipeline used by built-in renderers
 is internal to the SDK.
 
-For custom shapes in SVG, Canvas, Image, and PNG output, use the public
+For custom shapes in SVG, Canvas, Image element, and Node.js raster output, use the public
 [shape paths and styling factories](/guides/customize/#custom-shapes).
 
 ## Matrix-only renderer

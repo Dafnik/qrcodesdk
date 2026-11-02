@@ -1,11 +1,11 @@
-import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
-import {alignment, circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
-import {fixtureMatrixOptions} from '../../src';
+import {fixtureImageDataURL, fixtureMatrixOptions} from '../../src';
 import {
+  QR_CODE_CENTER_IMAGE_FIXTURES,
+  QR_CODE_STYLE_VARIANT_FIXTURES,
   QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
   QR_CODE_TEST_FIXTURES,
   getAllQRCodeCombinations,
@@ -20,32 +20,23 @@ const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
   ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
 );
 describe('SVG QR roundtrips', () => {
-  test('decodes SVG output with a small prepared center image', async () => {
-    const logo = await sharp({
-      create: {
-        width: 4,
-        height: 4,
-        channels: 4,
-        background: {r: 220, g: 38, b: 38, alpha: 1},
-      },
-    })
-      .png()
-      .toBuffer();
-    const source = `data:image/png;base64,${logo.toString('base64')}` as const;
-
-    await expect(
-      decodeSvgQRCode(
-        qrcode('prepared SVG image')
-          .errorCorrection('H')
-          .render(
-            QRCodeSVGRenderer({
-              style: {moduleSize: 4, quietZone: 4},
-              centerImage: svgCenterImage(source, {size: 0.16, padding: 0.25}),
-            }),
-          ),
-      ),
-    ).resolves.toBe('prepared SVG image');
-  });
+  test.each(QR_CODE_CENTER_IMAGE_FIXTURES)(
+    'decodes $name SVG center image fixture',
+    async (fixture) => {
+      await expect(
+        decodeSvgQRCode(
+          qrcode(fixture.payload)
+            .options(fixture.matrixOptions)
+            .render(
+              QRCodeSVGRenderer({
+                style: fixture.style,
+                centerImage: svgCenterImage(fixtureImageDataURL(fixture.image), fixture.layout),
+              }),
+            ),
+        ),
+      ).resolves.toBe(fixture.payload);
+    },
+  );
 
   const testSVGRenderer = QRCodeSVGRenderer({style: {moduleSize: 4, quietZone: 4}});
 
@@ -96,28 +87,13 @@ describe('SVG QR roundtrips', () => {
     },
   );
 
-  test.each([
-    ['rounded', rounded()],
-    ['extra-rounded', rounded({radius: 1})],
-    ['diagonal', diagonal()],
-    ['circle', circle()],
-  ] as const)('decodes SVG output with %s alignment patterns', async (_name, shape) => {
-    const payload = 'https://qrcodesdk.dev/alignment/' + 'x'.repeat(120);
+  test.each(QR_CODE_STYLE_VARIANT_FIXTURES)('decodes $name SVG style variant', async (fixture) => {
     await expect(
       decodeSvgQRCode(
-        qrcode(payload)
-          .errorCorrection('M')
-          .render(
-            QRCodeSVGRenderer({
-              style: {
-                moduleSize: 6,
-                modules: rounded(),
-                finder: finder({ring: rounded(), color: '#1d4ed8'}),
-                alignment: alignment({ring: shape, center: shape, color: '#1d4ed8'}),
-              },
-            }),
-          ),
+        qrcode(fixture.payload)
+          .options(fixture.matrixOptions)
+          .render(QRCodeSVGRenderer({style: fixture.styling})),
       ),
-    ).resolves.toBe(payload);
+    ).resolves.toBe(fixture.payload);
   });
 });

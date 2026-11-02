@@ -6,10 +6,10 @@ const coreExample = `import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());`;
 
-const browserExample = `import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+const browserExample = `import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {qrcode} from '@qrcodesdk/core';
 
-const image = qrcode('https://qrcodesdk.dev').render(QRCodeImageRenderer());
+const image = qrcode('https://qrcodesdk.dev').render(QRCodePNGImageRenderer());
 
 document.body.append(image);`;
 
@@ -66,7 +66,7 @@ export class App {}`;
   </TabItem>
   <TabItem label="Node.js">
     <PackageManagerTabs mode="add" packages={['@qrcodesdk/core', '@qrcodesdk/node']} />
-    <p>Render PNG bytes on the server:</p>
+    <p>Render PNG bytes on the server, or WebP and GIF bytes with their renderers:</p>
     <Code code={nodeExample} lang="ts" />
   </TabItem>
   <TabItem label="React">

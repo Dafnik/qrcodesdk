@@ -4,16 +4,23 @@ import {mount} from '@vue/test-utils';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {createSSRApp, defineComponent, h, nextTick, ref} from 'vue';
 
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeCanvasOptions, QRCodePNGImageOptions} from '@qrcodesdk/browser';
 import {canvasCenterImage} from '@qrcodesdk/browser';
 import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {svgCenterImage} from '@qrcodesdk/core';
 import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
-import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '../src';
+import {
+  QRCodeCanvas,
+  type QRCodeDownloadHandle,
+  QRCodeGIF,
+  QRCodePNG,
+  QRCodeSVG,
+  QRCodeWebP,
+} from '../src';
 
 const svgOptions: QRCodeSVGOptions = {style: {moduleSize: 2, quietZone: 1}};
-const imageOptions: QRCodeImageOptions = {
+const imageOptions: QRCodePNGImageOptions = {
   style: {moduleSize: 2, quietZone: 1},
   accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
 };
@@ -45,7 +52,7 @@ describe('Vue QR code components', () => {
   });
 
   test('renders image QR code output with PNG data and accessibility attributes', () => {
-    const wrapper = mount(QRCodeImage, {props: {payload: 'HELLO', options: imageOptions}});
+    const wrapper = mount(QRCodePNG, {props: {payload: 'HELLO', options: imageOptions}});
     const image = wrapper.get('img');
 
     expect(image.attributes('src')).toMatch(/^data:image\/png;base64,/);
@@ -56,12 +63,33 @@ describe('Vue QR code components', () => {
     expect(image.attributes('title')).toBe('QR title');
   });
 
+  test.each([
+    ['WebP', QRCodeWebP, 'webp'],
+    ['GIF', QRCodeGIF, 'gif'],
+  ] as const)('renders and downloads %s image output', (_name, Component, extension) => {
+    const downloads = captureDownloads(vi);
+    const wrapper = mount(Component, {props: {payload: 'HELLO', options: imageOptions}});
+    const image = wrapper.get('img');
+
+    expect(image.attributes('src')?.startsWith(`data:image/${extension};base64,`)).toBe(true);
+    expect(image.element.width).toBe(46);
+    expect(image.attributes('alt')).toBe('QR alt');
+
+    (wrapper.vm as unknown as QRCodeDownloadHandle).download('qrcodesdk');
+    expect(downloads).toEqual([
+      {
+        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
+        filename: `qrcodesdk.${extension}`,
+      },
+    ]);
+  });
+
   test('downloads image and SVG QR code output', async () => {
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
     const svg = mount(QRCodeSVG, {props: {payload: 'HELLO', options: svgOptions}});
-    const image = mount(QRCodeImage, {props: {payload: 'HELLO', options: imageOptions}});
+    const image = mount(QRCodePNG, {props: {payload: 'HELLO', options: imageOptions}});
 
     // The SVG download revokes its object URL after a delay.
     vi.useFakeTimers({toFake: ['setTimeout']});
@@ -107,7 +135,7 @@ describe('Vue QR code components', () => {
       },
     };
     const svg = mount(QRCodeSVG, {props: {payload: 'STYLED', options: styledOptions}});
-    const image = mount(QRCodeImage, {props: {payload: 'STYLED', options: styledOptions}});
+    const image = mount(QRCodePNG, {props: {payload: 'STYLED', options: styledOptions}});
     const canvas = mount(QRCodeCanvas, {props: {payload: 'STYLED', options: styledOptions}});
 
     expect(svg.findAll('svg path').map((path) => path.attributes('fill'))).toEqual([
@@ -130,7 +158,7 @@ describe('Vue QR code components', () => {
         options: {...svgOptions, centerImage: svgCenterImage(svgSource, {size: 0.2})},
       },
     });
-    const image = mount(QRCodeImage, {
+    const image = mount(QRCodePNG, {
       props: {
         payload: 'CENTER IMAGE',
         options: {...imageOptions, centerImage: canvasCenterImage(source, {size: 0.2})},
@@ -150,7 +178,7 @@ describe('Vue QR code components', () => {
   });
 
   test('replaces rendered image and canvas when props change', async () => {
-    const image = mount(QRCodeImage, {props: {payload: 'HELLO', options: imageOptions}});
+    const image = mount(QRCodePNG, {props: {payload: 'HELLO', options: imageOptions}});
     const canvas = mount(QRCodeCanvas, {props: {payload: 'HELLO', options: canvasOptions}});
     const firstImage = image.get('img').element;
     const firstCanvas = canvas.get('canvas').element;
@@ -188,7 +216,7 @@ describe('Vue QR code components', () => {
       createSSRApp({render: () => h(QRCodeSVG, {payload: 'HELLO', options: svgOptions})}),
     );
     const image = await renderToString(
-      createSSRApp({render: () => h(QRCodeImage, {payload: 'HELLO', options: imageOptions})}),
+      createSSRApp({render: () => h(QRCodePNG, {payload: 'HELLO', options: imageOptions})}),
     );
     const canvas = await renderToString(
       createSSRApp({render: () => h(QRCodeCanvas, {payload: 'HELLO', options: canvasOptions})}),

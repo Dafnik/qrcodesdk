@@ -2,14 +2,7 @@
 
 import {version} from 'react';
 
-import {
-  QRCodeCanvas,
-  QRCodeImage,
-  QRCodeSVG,
-  circle,
-  finder,
-  svgCenterImage,
-} from '@qrcodesdk/react';
+import {QRCodeCanvas, QRCodePNG, QRCodeSVG, circle, finder, svgCenterImage} from '@qrcodesdk/react';
 
 const options = {style: {moduleSize: 2, quietZone: 1}};
 const imageOptions = {
@@ -30,7 +23,7 @@ export function QRCodeConsumer() {
         <QRCodeSVG payload="HELLO" options={options} />
       </section>
       <section data-testid="qrcode-image">
-        <QRCodeImage payload="HELLO" options={imageOptions} />
+        <QRCodePNG payload="HELLO" options={imageOptions} />
       </section>
       <section data-testid="qrcode-canvas">
         <QRCodeCanvas payload="HELLO" options={options} />

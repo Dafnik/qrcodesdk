@@ -51,8 +51,11 @@ test('runtime subpaths share the root exports', async () => {
       : packageJson.name === '@qrcodesdk/browser'
         ? {
             './canvas': ['QRCodeCanvasRenderer', 'canvasCenterImage'],
-            './image': ['QRCodeImageRenderer', 'QRCodeDownloadImageRenderer'],
+            './gif': ['QRCodeGIFImageRenderer'],
+            './image': ['QRCodeDownloadImageRenderer'],
+            './png': ['QRCodePNGImageRenderer'],
             './svg': ['QRCodeDownloadSVGRenderer'],
+            './webp': ['QRCodeWebPImageRenderer'],
           }
         : {};
   if (Object.keys(exportsBySubpath).length === 0) return;
@@ -67,7 +70,7 @@ test('runtime subpaths share the root exports', async () => {
   }
 });
 
-test('core exports style factories and internal drawing helpers', async () => {
+test('core exports style factories, internal drawing helpers, and encoders', async () => {
   const packageJson = JSON.parse(
     await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
   );
@@ -90,6 +93,11 @@ test('core exports style factories and internal drawing helpers', async () => {
   ]) {
     assert.equal(typeof internal[name], 'function');
   }
+  const gif = await importTarget(packageJson.exports['./internal/gif']);
+  const webp = await importTarget(packageJson.exports['./internal/webp']);
+  assert.equal(typeof gif.ɵencodeGIF, 'function');
+  assert.equal(typeof gif.ɵresolveGIFTransparencyThreshold, 'function');
+  assert.equal(typeof webp.ɵencodeWebP, 'function');
 });
 
 test('React publishes a client entry', async () => {

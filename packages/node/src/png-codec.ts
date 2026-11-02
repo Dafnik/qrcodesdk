@@ -1,6 +1,6 @@
 import {deflateSync, inflateSync} from 'node:zlib';
 
-export type PNGImage = {width: number; height: number; data: Buffer};
+import type {RGBAImage} from './pixels';
 
 const SIGNATURE = '89504e470d0a1a0a';
 // Adam7 passes as [x start, y start, x step, y step].
@@ -16,7 +16,7 @@ const PASSES: readonly (readonly [number, number, number, number])[] = [
 let crcTable: Int32Array | undefined;
 
 /** Encodes 8-bit RGBA pixels with adaptive per-row filtering. */
-export function encodePNG({width, height, data}: PNGImage, level: number): Buffer {
+export function encodePNG({width, height, data}: RGBAImage, level: number): Buffer {
   const byteWidth = width * 4;
   const filtered = Buffer.alloc((byteWidth + 1) * height);
   for (let y = 0, position = 0; y < height; y++, position += byteWidth) {
@@ -61,7 +61,7 @@ export function encodePNG({width, height, data}: PNGImage, level: number): Buffe
 }
 
 /** Decodes any standard PNG into 8-bit RGBA pixels. */
-export function decodePNG(source: Buffer): PNGImage {
+export function decodePNG(source: Buffer): RGBAImage {
   if (source.toString('hex', 0, 8) !== SIGNATURE) throw new Error('Invalid PNG signature');
   let width = 0;
   let height = 0;

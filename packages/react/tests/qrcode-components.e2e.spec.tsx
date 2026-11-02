@@ -3,16 +3,23 @@ import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {createRef} from 'react';
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeCanvasOptions, QRCodePNGImageOptions} from '@qrcodesdk/browser';
 import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 import {canvasCenterImage} from '@qrcodesdk/browser';
 import {svgCenterImage} from '@qrcodesdk/core';
 
-import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '../src';
+import {
+  QRCodeCanvas,
+  type QRCodeDownloadHandle,
+  QRCodeGIF,
+  QRCodePNG,
+  QRCodeSVG,
+  QRCodeWebP,
+} from '../src';
 
 const svgOptions: QRCodeSVGOptions = {style: {moduleSize: 2, quietZone: 1}};
-const imageOptions: QRCodeImageOptions = {
+const imageOptions: QRCodePNGImageOptions = {
   style: {moduleSize: 2, quietZone: 1},
   accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
 };
@@ -46,7 +53,7 @@ describe('React QR code components', () => {
   });
 
   test('renders image QR code output with PNG data and accessibility attributes', async () => {
-    const {container} = render(<QRCodeImage payload="HELLO" options={imageOptions} />);
+    const {container} = render(<QRCodePNG payload="HELLO" options={imageOptions} />);
 
     await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
 
@@ -64,13 +71,39 @@ describe('React QR code components', () => {
     const imageQRCode = createRef<QRCodeDownloadHandle>();
     const downloads = captureDownloads(vi);
 
-    render(<QRCodeImage payload="HELLO" options={imageOptions} ref={imageQRCode} />);
+    render(<QRCodePNG payload="HELLO" options={imageOptions} ref={imageQRCode} />);
     imageQRCode.current?.download('qrcodesdk');
 
     expect(downloads).toEqual([
       {
         href: expect.stringMatching(/^data:image\/png;base64,/),
         filename: 'qrcodesdk.png',
+      },
+    ]);
+  });
+
+  test.each([
+    ['WebP', QRCodeWebP, 'webp'],
+    ['GIF', QRCodeGIF, 'gif'],
+  ] as const)('renders and downloads %s image output', async (_name, Component, extension) => {
+    const imageQRCode = createRef<QRCodeDownloadHandle>();
+    const downloads = captureDownloads(vi);
+    const {container} = render(
+      <Component payload="HELLO" options={imageOptions} ref={imageQRCode} />,
+    );
+
+    await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
+
+    const image = renderedElement<HTMLImageElement>(container, 'img');
+    expect(image.src.startsWith(`data:image/${extension};base64,`)).toBe(true);
+    expect(image.width).toBe(46);
+    expect(image.alt).toBe('QR alt');
+
+    imageQRCode.current?.download('qrcodesdk');
+    expect(downloads).toEqual([
+      {
+        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
+        filename: `qrcodesdk.${extension}`,
       },
     ]);
   });
@@ -128,7 +161,9 @@ describe('React QR code components', () => {
 
   test.each([
     ['svg', QRCodeSVG],
-    ['image', QRCodeImage],
+    ['PNG', QRCodePNG],
+    ['WebP', QRCodeWebP],
+    ['GIF', QRCodeGIF],
     ['canvas', QRCodeCanvas],
   ] as const)('forwards ordinary div props for %s output', async (_name, Component) => {
     const onClick = vi.fn();
@@ -170,7 +205,7 @@ describe('React QR code components', () => {
     const {container} = render(
       <>
         <QRCodeSVG payload="STYLED" options={styledOptions} />
-        <QRCodeImage payload="STYLED" options={styledOptions} />
+        <QRCodePNG payload="STYLED" options={styledOptions} />
         <QRCodeCanvas payload="STYLED" options={styledOptions} />
       </>,
     );
@@ -196,7 +231,7 @@ describe('React QR code components', () => {
           payload="CENTER IMAGE"
           options={{...svgOptions, centerImage: svgCenterImage(svgSource, {size: 0.2})}}
         />
-        <QRCodeImage
+        <QRCodePNG
           payload="CENTER IMAGE"
           options={{...imageOptions, centerImage: canvasCenterImage(source, {size: 0.2})}}
         />
@@ -225,7 +260,7 @@ describe('React QR code components', () => {
           payload="CENTER IMAGE"
           options={{...svgOptions, centerImage: svgCenterImage(svgSource, {size: 0.3})}}
         />
-        <QRCodeImage
+        <QRCodePNG
           payload="CENTER IMAGE"
           options={{...imageOptions, centerImage: canvasCenterImage(source, {size: 0.3})}}
         />
@@ -262,7 +297,7 @@ describe('React QR code components', () => {
             centerImage: svgCenterImage('data:image/png;base64,cHJlcGFyZWQ='),
           }}
         />
-        <QRCodeImage
+        <QRCodePNG
           ref={imageQRCode}
           payload="CENTER IMAGE"
           options={{...imageOptions, centerImage: canvasCenterImage(source)}}
@@ -285,14 +320,14 @@ describe('React QR code components', () => {
   });
 
   test('replaces existing rendered image when props change', async () => {
-    const {container, rerender} = render(<QRCodeImage payload="HELLO" options={imageOptions} />);
+    const {container, rerender} = render(<QRCodePNG payload="HELLO" options={imageOptions} />);
 
     await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
 
     const wrapper = renderedElement<HTMLDivElement>(container, 'div');
     const firstImage = renderedElement<HTMLImageElement>(container, 'img');
 
-    rerender(<QRCodeImage payload="HELLO" options={{style: {moduleSize: 3, quietZone: 1}}} />);
+    rerender(<QRCodePNG payload="HELLO" options={{style: {moduleSize: 3, quietZone: 1}}} />);
 
     await waitFor(() =>
       expect(renderedElement<HTMLImageElement>(container, 'img')).not.toBe(firstImage),

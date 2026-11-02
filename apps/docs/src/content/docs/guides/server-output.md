@@ -1,27 +1,35 @@
 ---
 title: Serve a QR code
-description: Return SVG strings or PNG Buffers from HTTP handlers with correct content types and response behavior.
+description: Return SVG strings or PNG, WebP, and GIF Buffers from HTTP handlers with correct content types and response behavior.
 docType: guide
 
 related:
   - ../reference/renderers/svg.md
   - ../reference/renderers/png.mdx
+  - ../reference/renderers/webp.md
+  - ../reference/renderers/gif.md
   - ../packages/core.mdx
   - ../packages/node.mdx
 ---
 
 Generate output inside an HTTP handler, set the matching media type, and return the renderer result
-without converting PNG bytes through a text encoding.
+without converting raster bytes through a text encoding.
 
 ## Choose the response format
 
-| Format | Renderer and package                       | Body     | `Content-Type`                 |
-| ------ | ------------------------------------------ | -------- | ------------------------------ |
-| SVG    | `QRCodeSVGRenderer` from `@qrcodesdk/core` | `string` | `image/svg+xml; charset=utf-8` |
-| PNG    | `QRCodePNGRenderer` from `@qrcodesdk/node` | `Buffer` | `image/png`                    |
+| Format | Renderer and package                        | Body     | `Content-Type`                 |
+| ------ | ------------------------------------------- | -------- | ------------------------------ |
+| SVG    | `QRCodeSVGRenderer` from `@qrcodesdk/core`  | `string` | `image/svg+xml; charset=utf-8` |
+| PNG    | `QRCodePNGRenderer` from `@qrcodesdk/node`  | `Buffer` | `image/png`                    |
+| WebP   | `QRCodeWebPRenderer` from `@qrcodesdk/node` | `Buffer` | `image/webp`                   |
+| GIF    | `QRCodeGIFRenderer` from `@qrcodesdk/node`  | `Buffer` | `image/gif`                    |
 
-Choose SVG for scalable, usually smaller text output. Choose PNG for clients that require raster
-image bytes or do not accept SVG.
+Choose SVG for scalable text output. Choose a raster format for clients that require image bytes or
+do not accept SVG: PNG is the most widely supported, lossless WebP is usually the smallest, and GIF
+serves clients that only accept GIF. GIF is limited to 256 colors and binary transparency.
+
+The examples below use PNG. For WebP or GIF, swap the renderer and the `Content-Type`; the `Buffer`
+is sent the same way.
 
 ## Return a platform-neutral response
 
@@ -55,19 +63,19 @@ return new Response(new Uint8Array(png), {
 });
 ```
 
-The `Uint8Array` view preserves the PNG bytes for Web `Response` implementations. Node.js HTTP
+The `Uint8Array` view preserves the raster bytes for Web `Response` implementations. Node.js HTTP
 frameworks that accept `Buffer` can send `png` directly.
 
 ## Express
 
-Set the media type before calling `send()`. Express accepts both the SVG string and PNG `Buffer`
-directly:
+Set the media type before calling `send()`. Express accepts both the SVG string and raster `Buffer`
+output directly:
 
 ```ts
 import express from 'express';
 
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
+import {QRCodePNGRenderer, QRCodeWebPRenderer} from '@qrcodesdk/node';
 
 const app = express();
 
@@ -81,6 +89,12 @@ app.get('/qrcode.png', (_request, response) => {
   const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());
 
   response.type('image/png').send(png);
+});
+
+app.get('/qrcode.webp', (_request, response) => {
+  const webp = qrcode('https://qrcodesdk.dev').render(QRCodeWebPRenderer());
+
+  response.type('image/webp').send(webp);
 });
 ```
 
@@ -139,8 +153,8 @@ export class QRCodeController {
 
 ## Hono
 
-Hono can return the SVG string through its Web API-based context on any supported runtime. The PNG
-renderer comes from `@qrcodesdk/node`, so use that route only with a Node.js-compatible Hono runtime:
+Hono can return the SVG string through its Web API-based context on any supported runtime. The raster
+renderers come from `@qrcodesdk/node`, so use that route only with a Node.js-compatible Hono runtime:
 
 ```ts
 import {Hono} from 'hono';
@@ -174,4 +188,4 @@ repeatable public output.
 
 Use `Content-Disposition: attachment; filename="qrcode.svg"` only when the response should download
 instead of display inline. When a framework calculates `Content-Length`, let it do so from the final
-string or Buffer; otherwise use the UTF-8 byte length for SVG and `png.length` for PNG.
+string or Buffer; otherwise use the UTF-8 byte length for SVG and the `Buffer` length for PNG, WebP, and GIF.

@@ -6,8 +6,8 @@ import {QRCodeError, type QRCodeFinderStyle, qrcode} from '@qrcodesdk/core';
 import type {ɵQRCodeStylePart as QRCodeStylePart} from '@qrcodesdk/core/internal';
 import {circle, customShape, finder, rounded} from '@qrcodesdk/core/style';
 
-import {QRCodePNGRenderer, pngCenterImage} from '../../src';
-import {readPng} from './png-helpers';
+import {QRCodePNGRenderer, rasterCenterImage} from '../../src';
+import {readRaster} from '../raster-helpers';
 
 // A prepared unit square, passed to internal layers in place of their path type.
 const square = customShape({module: 'm0 0h1v1h-1z'}).module as never;
@@ -27,14 +27,14 @@ describe('QRCodePNGRenderer', () => {
         background: '#ffffff80',
       },
     })(matrixFromRows([[1]]));
-    const png = await readPng(bytes);
+    const png = await readRaster(bytes);
     expect(png.width).toBe(12);
     expect(png.height).toBe(12);
     expect([...png.data.subarray(0, 4)]).toEqual([255, 255, 255, 128]);
   });
 
   test('rasterizes imported module shapes with antialiased edges', async () => {
-    const png = await readPng(
+    const png = await readRaster(
       QRCodePNGRenderer({style: {moduleSize: 8, quietZone: 0, modules: circle()}})(
         matrixFromRows([[1]]),
       ),
@@ -50,7 +50,7 @@ describe('QRCodePNGRenderer', () => {
   });
 
   test('draws finder parts with their own shapes and color', async () => {
-    const png = await readPng(
+    const png = await readRaster(
       QRCodePNGRenderer({
         style: {
           moduleSize: 4,
@@ -73,7 +73,7 @@ describe('QRCodePNGRenderer', () => {
     'preserves fractional rectangle and tile coverage at module size %i',
     async (moduleSize) => {
       const render = async (part: QRCodeStylePart) =>
-        readPng(
+        readRaster(
           QRCodePNGRenderer({
             style: {
               moduleSize,
@@ -110,13 +110,13 @@ describe('QRCodePNGRenderer', () => {
     const circleBytes = QRCodePNGRenderer({
       style: {moduleSize: 8, quietZone: 0, modules: circle()},
     })(matrixFromRows([[1]]));
-    expect((await readPng(bytes)).data).toEqual((await readPng(circleBytes)).data);
+    expect((await readRaster(bytes)).data).toEqual((await readRaster(circleBytes)).data);
   });
 
   test.each(['rectangles', 'tiles', 'mixed'] as const)(
     'fills adjacent fractional %s as one color layer',
     async (kind) => {
-      const png = await readPng(
+      const png = await readRaster(
         QRCodePNGRenderer({
           style: {
             moduleSize: 1,
@@ -144,7 +144,7 @@ describe('QRCodePNGRenderer', () => {
   );
 
   test('clips rectangles entirely outside the output without touching its pixels', async () => {
-    const png = await readPng(
+    const png = await readRaster(
       QRCodePNGRenderer({
         style: {
           moduleSize: 1,
@@ -165,10 +165,10 @@ describe('QRCodePNGRenderer', () => {
     })
       .png()
       .toBuffer();
-    const png = await readPng(
+    const png = await readRaster(
       QRCodePNGRenderer({
         style: {moduleSize: 4, quietZone: 0},
-        centerImage: pngCenterImage(logo, {size: 0.2, padding: 1}),
+        centerImage: rasterCenterImage(logo, {size: 0.2, padding: 1}),
       })(qrcode('png center image').errorCorrection('H').matrix()),
     );
     const pixel = (x: number, y: number) => {
@@ -192,7 +192,7 @@ describe('QRCodePNGRenderer', () => {
     const padded = new Uint8Array(logo.length + 3);
     padded.set(logo, 3);
     const render = (source: Uint8Array) =>
-      QRCodePNGRenderer({style: {moduleSize: 2}, centerImage: pngCenterImage(source)})(
+      QRCodePNGRenderer({style: {moduleSize: 2}, centerImage: rasterCenterImage(source)})(
         qrcode('byte view').matrix(),
       );
 
@@ -208,10 +208,10 @@ describe('QRCodePNGRenderer', () => {
     const matrix = matrixFromRows(
       Array.from({length: 10}, () => Array.from({length: 10}, () => 1)),
     );
-    const png = await readPng(
+    const png = await readRaster(
       QRCodePNGRenderer({
         style: {moduleSize: 4, quietZone: 0},
-        centerImage: pngCenterImage(logo, {size: 0.4, clearBackground: false}),
+        centerImage: rasterCenterImage(logo, {size: 0.4, clearBackground: false}),
       })(matrix),
     );
     const pixel = (x: number, y: number) => {
@@ -250,7 +250,7 @@ describe('QRCodePNGRenderer', () => {
     source.writeUInt32BE(10_000, 16);
     source.writeUInt32BE(10_000, 20);
 
-    expect(() => pngCenterImage(source)).toThrowError(
+    expect(() => rasterCenterImage(source)).toThrowError(
       expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}),
     );
   });

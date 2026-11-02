@@ -1,7 +1,7 @@
 import {StrictMode, version} from 'react';
 import {createRoot} from 'react-dom/client';
 
-import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/react';
+import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/react';
 
 const options = {style: {moduleSize: 2, quietZone: 1}};
 const imageOptions = {
@@ -20,7 +20,7 @@ createRoot(document.getElementById('root')!).render(
         <QRCodeSVG payload="HELLO" options={options} />
       </section>
       <section data-testid="qrcode-image">
-        <QRCodeImage payload="HELLO" options={imageOptions} />
+        <QRCodePNG payload="HELLO" options={imageOptions} />
       </section>
       <section data-testid="qrcode-canvas">
         <QRCodeCanvas payload="HELLO" options={options} />

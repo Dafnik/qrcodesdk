@@ -130,24 +130,30 @@ try {
     }
     check(hasDarkPixel && hasLightPixel, 'Expected rendered dark and light canvas pixels');
 
-    const image = builder.render(
-      browserPackage.QRCodeImageRenderer({
-        style,
-        accessibility: {alt: 'Runtime QR code'},
-      }),
-    );
-    globalThis.document.body.append(image);
-    await image.decode();
-    check(image instanceof globalThis.HTMLImageElement, 'Expected a browser image element');
-    check(image.src.startsWith('data:image/png;base64,'), 'Expected a PNG data URL');
-    check(image.naturalWidth === 62 && image.naturalHeight === 62, 'Expected a loaded 62×62 PNG');
-    check(image.alt === 'Runtime QR code', 'Expected image accessibility attributes');
+    for (const [renderer, mimeType] of [
+      [browserPackage.QRCodePNGImageRenderer, 'image/png'],
+      [browserPackage.QRCodeWebPImageRenderer, 'image/webp'],
+      [browserPackage.QRCodeGIFImageRenderer, 'image/gif'],
+    ]) {
+      const image = builder.render(renderer({style, accessibility: {alt: 'Runtime QR code'}}));
+      globalThis.document.body.append(image);
+      await image.decode();
+      check(image instanceof globalThis.HTMLImageElement, 'Expected a browser image element');
+      check(image.src.startsWith(`data:${mimeType};base64,`), `Expected a ${mimeType} data URL`);
+      check(
+        image.naturalWidth === 62 && image.naturalHeight === 62,
+        `Expected a loaded 62×62 ${mimeType} image`,
+      );
+      check(image.alt === 'Runtime QR code', 'Expected image accessibility attributes');
+    }
   });
 
   logSuccess('installed ESM bundles import in a real browser page');
   logSuccess('Core builder creates the expected matrix and SVG output');
   logSuccess('Canvas renderer creates a 62×62 canvas with dark and light pixels');
-  logSuccess('Image renderer creates a loaded 62×62 PNG with accessible alternative text');
+  logSuccess(
+    'PNG, WebP, and GIF image renderers create loaded 62×62 images with accessible alternative text',
+  );
   globalThis.console.log(
     `@qrcodesdk/browser installed-package smoke test passed in ${browserName}`,
   );

@@ -204,6 +204,8 @@ describe('runCli', () => {
     {name: 'text', args: ['--ansi', 'off']},
     {name: 'SVG', args: ['--output', 'code.svg']},
     {name: 'PNG', args: ['--output', 'code.png']},
+    {name: 'WebP', args: ['--output', 'code.webp']},
+    {name: 'GIF', args: ['--output', 'code.gif']},
   ])('defaults $name output to no ECI and supports explicit opt-in', async ({args}) => {
     const defaultRuntime = createRuntime();
     const explicitFalseRuntime = createRuntime();
@@ -352,6 +354,25 @@ describe('runCli', () => {
     const data = runtime.files[0]!.data;
     expect(Buffer.isBuffer(data)).toBe(true);
     expect(Buffer.from(data).subarray(1, 4).toString('utf8')).toBe('PNG');
+  });
+
+  test.each([
+    {format: 'webp', signature: 'RIFF', offset: 0},
+    {format: 'gif', signature: 'GIF89a', offset: 0},
+  ])('infers $format output from the output extension', async ({format, signature, offset}) => {
+    const runtime = createRuntime();
+
+    await expect(runCli(['HELLO WORLD', '--output', `code.${format}`], runtime)).resolves.toBe(0);
+
+    expect(runtime.files).toHaveLength(1);
+    const data = runtime.files[0]!.data;
+    expect(Buffer.isBuffer(data)).toBe(true);
+    expect(
+      Buffer.from(data)
+        .subarray(offset, offset + signature.length)
+        .toString('latin1'),
+    ).toBe(signature);
+    expect(runtime.stderrText()).toContain(`Wrote code.${format}`);
   });
 
   test('rejects invalid range options', async () => {

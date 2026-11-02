@@ -13,10 +13,22 @@ const components = [
     downloadSupport: 'SVG',
   },
   {
-    component: 'QRCodeImage',
-    selector: 'qrcode-image',
+    component: 'QRCodePNG',
+    selector: 'qrcode-png',
     output: 'PNG-backed <img>',
     downloadSupport: 'PNG',
+  },
+  {
+    component: 'QRCodeWebP',
+    selector: 'qrcode-webp',
+    output: 'WebP-backed <img>',
+    downloadSupport: 'WebP',
+  },
+  {
+    component: 'QRCodeGIF',
+    selector: 'qrcode-gif',
+    output: 'GIF-backed <img>',
+    downloadSupport: 'GIF',
   },
   {
     component: 'QRCodeCanvas',

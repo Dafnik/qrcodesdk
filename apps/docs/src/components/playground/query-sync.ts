@@ -31,7 +31,9 @@ const PLAYGROUND_PACKAGES = [
 
 const PLAYGROUND_OUTPUTS = [
   'svg',
-  'image',
+  'png',
+  'webp',
+  'gif',
   'canvas',
 ] as const satisfies readonly PlaygroundOutput[];
 const MODES = ['numeric', 'alphanumeric', 'octet'] as const;
@@ -83,7 +85,9 @@ const QUERY_FIELD_CODECS = [
     (currentOptions, output) => {
       currentOptions.output = output;
     },
-    (value, fallback) => parseStringUnion(value, PLAYGROUND_OUTPUTS, fallback),
+    // `image` was the PNG output before WebP and GIF were added.
+    (value, fallback) =>
+      parseStringUnion(value === 'image' ? 'png' : value, PLAYGROUND_OUTPUTS, fallback),
     serializeString,
   ),
   defineQueryField(

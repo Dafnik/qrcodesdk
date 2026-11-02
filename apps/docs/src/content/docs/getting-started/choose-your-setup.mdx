@@ -11,16 +11,16 @@ when SVG or terminal text is enough; renderer and framework packages build on it
 
 ## Choose a package
 
-| Package                                    | Choose it for                                    | Outputs                                                                 |
-| ------------------------------------------ | ------------------------------------------------ | ----------------------------------------------------------------------- |
-| [`@qrcodesdk/core`](/packages/core/)       | Runtime-neutral generation and raw matrix access | SVG `string`, terminal text `string`, `QRCodeMatrix`                    |
-| [`@qrcodesdk/browser`](/packages/browser/) | Direct DOM output and client-side downloads      | `HTMLCanvasElement`, PNG-backed `HTMLImageElement`, SVG or PNG download |
-| [`@qrcodesdk/node`](/packages/node/)       | Server-side raster output                        | PNG `Buffer`                                                            |
-| [`@qrcodesdk/react`](/packages/react/)     | React and Next.js components                     | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
-| [`@qrcodesdk/vue`](/packages/vue/)         | Vue components                                   | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
-| [`@qrcodesdk/svelte`](/packages/svelte/)   | Svelte components                                | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
-| [`@qrcodesdk/angular`](/packages/angular/) | Standalone Angular components                    | `QRCodeSVG`, `QRCodeImage`, `QRCodeCanvas`, SVG or PNG download         |
-| [`@qrcodesdk/cli`](/packages/cli/)         | Terminal, shell, and CI workflows                | Terminal text, SVG file, PNG file                                       |
+| Package                                    | Choose it for                                    | Outputs                                                                          |
+| ------------------------------------------ | ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| [`@qrcodesdk/core`](/packages/core/)       | Runtime-neutral generation and raw matrix access | SVG `string`, terminal text `string`, `QRCodeMatrix`                             |
+| [`@qrcodesdk/browser`](/packages/browser/) | Direct DOM output and client-side downloads      | `HTMLCanvasElement`, PNG, WebP, or GIF `HTMLImageElement`, SVG or image download |
+| [`@qrcodesdk/node`](/packages/node/)       | Server-side raster output                        | PNG, WebP, or GIF `Buffer`                                                       |
+| [`@qrcodesdk/react`](/packages/react/)     | React and Next.js components                     | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeCanvas`, downloads   |
+| [`@qrcodesdk/vue`](/packages/vue/)         | Vue components                                   | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeCanvas`, downloads   |
+| [`@qrcodesdk/svelte`](/packages/svelte/)   | Svelte components                                | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeCanvas`, downloads   |
+| [`@qrcodesdk/angular`](/packages/angular/) | Standalone Angular components                    | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeCanvas`, downloads   |
+| [`@qrcodesdk/cli`](/packages/cli/)         | Terminal, shell, and CI workflows                | Terminal text, SVG, PNG, WebP, or GIF file                                       |
 
 For an output-first comparison with exact return types, see [Renderer outputs](/reference/renderers/).
 
@@ -32,11 +32,11 @@ Use this default when you need SVG, terminal text, or raw matrix output.
 
 ## Install browser output
 
-Add Canvas elements, PNG-backed Image elements, and browser download helpers.
+Add Canvas elements, PNG, WebP, and GIF Image elements, and browser download helpers.
 
 <PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/browser']} mode="add" />
 
-## Install Node.js PNG output
+## Install Node.js PNG, WebP, and GIF output
 
 <PackageManagerTabs packages={['@qrcodesdk/core', '@qrcodesdk/node']} mode="add" />
 

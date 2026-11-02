@@ -1,5 +1,12 @@
 <script lang="ts">
-  import {QRCodeCanvas, QRCodeImage, QRCodeSVG, type QRCodeDownloadHandle} from '@qrcodesdk/svelte';
+  import {
+    QRCodeCanvas,
+    type QRCodeDownloadHandle,
+    QRCodeGIF,
+    QRCodePNG,
+    QRCodeSVG,
+    QRCodeWebP,
+  } from '@qrcodesdk/svelte';
 
   import {
     createPlaygroundCanvasOptions,
@@ -44,8 +51,8 @@
       onclick={() => svgQRCode?.download('qrcodesdk')}>
       Download SVG
     </button>
-  {:else if $playgroundOptions.output === 'image'}
-    <QRCodeImage
+  {:else if $playgroundOptions.output === 'png'}
+    <QRCodePNG
       bind:this={imageQRCode}
       payload={$playgroundOptions.payload}
       options={imageOptions} />
@@ -54,6 +61,28 @@
       type="button"
       onclick={() => imageQRCode?.download('qrcodesdk')}>
       Download PNG
+    </button>
+  {:else if $playgroundOptions.output === 'webp'}
+    <QRCodeWebP
+      bind:this={imageQRCode}
+      payload={$playgroundOptions.payload}
+      options={imageOptions} />
+    <button
+      class="btn-primary large min-w-64"
+      type="button"
+      onclick={() => imageQRCode?.download('qrcodesdk')}>
+      Download WebP
+    </button>
+  {:else if $playgroundOptions.output === 'gif'}
+    <QRCodeGIF
+      bind:this={imageQRCode}
+      payload={$playgroundOptions.payload}
+      options={imageOptions} />
+    <button
+      class="btn-primary large min-w-64"
+      type="button"
+      onclick={() => imageQRCode?.download('qrcodesdk')}>
+      Download GIF
     </button>
   {:else}
     <QRCodeCanvas payload={$playgroundOptions.payload} options={canvasOptions} />

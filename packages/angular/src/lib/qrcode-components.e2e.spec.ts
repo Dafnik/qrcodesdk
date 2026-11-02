@@ -4,15 +4,17 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {captureDownloads, mockCanvasRendering} from '@repo/core-testing';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 
-import type {QRCodeCanvasOptions, QRCodeImageOptions} from '@qrcodesdk/browser';
+import type {QRCodeCanvasOptions, QRCodePNGImageOptions} from '@qrcodesdk/browser';
 import {canvasCenterImage} from '@qrcodesdk/browser';
 import type {QRCodePayload, QRCodeSVGOptions} from '@qrcodesdk/core';
 import {svgCenterImage} from '@qrcodesdk/core';
 import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
 import {QRCodeCanvas} from './QRCodeCanvas';
-import {QRCodeImage} from './QRCodeImage';
+import {QRCodeGIF} from './QRCodeGIF';
+import {QRCodePNG} from './QRCodePNG';
 import {QRCodeSVG} from './QRCodeSVG';
+import {QRCodeWebP} from './QRCodeWebP';
 
 @Component({
   selector: 'qrcode-svg-host',
@@ -26,19 +28,41 @@ class QRCodeSVGHost {
   readonly svgQRCode = viewChild.required(QRCodeSVG);
 }
 
-@Component({
-  selector: 'qrcode-image-host',
-  imports: [QRCodeImage],
-  template: '<qrcode-image [payload]="payload()" [options]="options()" />',
-})
-class QRCodeImageHost {
-  readonly payload = input<QRCodePayload>('HELLO');
-  readonly options = input<QRCodeImageOptions>({
-    style: {moduleSize: 2, quietZone: 1},
-    accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
-  });
+const imageOptions: QRCodePNGImageOptions = {
+  style: {moduleSize: 2, quietZone: 1},
+  accessibility: {alt: 'QR alt', ariaLabel: 'QR aria', title: 'QR title'},
+};
 
-  readonly imageQRCode = viewChild.required(QRCodeImage);
+@Component({
+  selector: 'qrcode-png-host',
+  imports: [QRCodePNG],
+  template: '<qrcode-png [payload]="payload()" [options]="options()" />',
+})
+class QRCodePNGHost {
+  readonly payload = input<QRCodePayload>('HELLO');
+  readonly options = input<QRCodePNGImageOptions>(imageOptions);
+
+  readonly imageQRCode = viewChild.required(QRCodePNG);
+}
+
+@Component({
+  selector: 'qrcode-webp-host',
+  imports: [QRCodeWebP],
+  template: '<qrcode-webp payload="HELLO" [options]="options" />',
+})
+class QRCodeWebPHost {
+  readonly options = imageOptions;
+  readonly imageQRCode = viewChild.required(QRCodeWebP);
+}
+
+@Component({
+  selector: 'qrcode-gif-host',
+  imports: [QRCodeGIF],
+  template: '<qrcode-gif payload="HELLO" [options]="options" />',
+})
+class QRCodeGIFHost {
+  readonly options = imageOptions;
+  readonly imageQRCode = viewChild.required(QRCodeGIF);
 }
 
 @Component({
@@ -96,7 +120,7 @@ describe('Angular QR code components', () => {
   });
 
   test('renders image QR code output with PNG data and accessibility attributes', () => {
-    const fixture = TestBed.createComponent(QRCodeImageHost);
+    const fixture = TestBed.createComponent(QRCodePNGHost);
 
     fixture.detectChanges();
 
@@ -111,7 +135,7 @@ describe('Angular QR code components', () => {
   });
 
   test('downloads image QR code output as PNG', () => {
-    const fixture = TestBed.createComponent(QRCodeImageHost);
+    const fixture = TestBed.createComponent(QRCodePNGHost);
     const downloads = captureDownloads(vi);
 
     fixture.detectChanges();
@@ -121,6 +145,29 @@ describe('Angular QR code components', () => {
       {
         href: expect.stringMatching(/^data:image\/png;base64,/),
         filename: 'qrcodesdk.png',
+      },
+    ]);
+  });
+
+  test.each([
+    ['WebP', QRCodeWebPHost, 'webp'],
+    ['GIF', QRCodeGIFHost, 'gif'],
+  ] as const)('renders and downloads %s image output', (_name, Host, extension) => {
+    const fixture = TestBed.createComponent<QRCodeWebPHost | QRCodeGIFHost>(Host);
+    const downloads = captureDownloads(vi);
+
+    fixture.detectChanges();
+
+    const image = getRenderedElement<HTMLImageElement>(fixture, 'img');
+    expect(image.src.startsWith(`data:image/${extension};base64,`)).toBe(true);
+    expect(image.width).toBe(46);
+    expect(image.alt).toBe('QR alt');
+
+    fixture.componentInstance.imageQRCode().download('qrcodesdk');
+    expect(downloads).toEqual([
+      {
+        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
+        filename: `qrcodesdk.${extension}`,
       },
     ]);
   });
@@ -197,7 +244,7 @@ describe('Angular QR code components', () => {
       },
     };
     const svgFixture = TestBed.createComponent(QRCodeSVGHost);
-    const imageFixture = TestBed.createComponent(QRCodeImageHost);
+    const imageFixture = TestBed.createComponent(QRCodePNGHost);
     const canvasFixture = TestBed.createComponent(QRCodeCanvasHost);
 
     svgFixture.componentRef.setInput('options', styledOptions);
@@ -232,7 +279,7 @@ describe('Angular QR code components', () => {
     source.width = 4;
     source.height = 2;
     const svgFixture = TestBed.createComponent(QRCodeSVGHost);
-    const imageFixture = TestBed.createComponent(QRCodeImageHost);
+    const imageFixture = TestBed.createComponent(QRCodePNGHost);
     const canvasFixture = TestBed.createComponent(QRCodeCanvasHost);
 
     svgFixture.componentRef.setInput('options', {
@@ -279,7 +326,7 @@ describe('Angular QR code components', () => {
     source.width = 2;
     source.height = 1;
     const svgFixture = TestBed.createComponent(QRCodeSVGHost);
-    const imageFixture = TestBed.createComponent(QRCodeImageHost);
+    const imageFixture = TestBed.createComponent(QRCodePNGHost);
     const downloads = captureDownloads(vi);
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:qrcode-center-image-svg');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
@@ -309,11 +356,11 @@ describe('Angular QR code components', () => {
   });
 
   test('replaces existing rendered image when inputs change', () => {
-    const fixture = TestBed.createComponent(QRCodeImageHost);
+    const fixture = TestBed.createComponent(QRCodePNGHost);
 
     fixture.detectChanges();
 
-    const wrapper = getRenderedElement<HTMLElement>(fixture, 'qrcode-image');
+    const wrapper = getRenderedElement<HTMLElement>(fixture, 'qrcode-png');
     const firstImage = getRenderedElement<HTMLImageElement>(fixture, 'img');
 
     fixture.componentRef.setInput('options', {style: {moduleSize: 3, quietZone: 1}});

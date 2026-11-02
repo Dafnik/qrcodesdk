@@ -507,8 +507,14 @@ function createPackageComponentNodes(attributes, packageName) {
   const selectorHeader = selector ? ' Selector |' : '';
   const selectorDivider = selector ? ' --- |' : '';
   const selectorCells = selector
-    ? [' `qrcode-svg` |', ' `qrcode-image` |', ' `qrcode-canvas` |']
-    : ['', '', ''];
+    ? [
+        ' `qrcode-svg` |',
+        ' `qrcode-png` |',
+        ' `qrcode-webp` |',
+        ' `qrcode-gif` |',
+        ' `qrcode-canvas` |',
+      ]
+    : ['', '', '', '', ''];
   const frameworkPropRow =
     {
       '@qrcodesdk/react':
@@ -521,8 +527,10 @@ function createPackageComponentNodes(attributes, packageName) {
   const markdown = `| Component |${selectorHeader} Output | Download support |
 | --- |${selectorDivider} --- | --- |
 | \`QRCodeSVG\` |${selectorCells[0]} \`Inline SVG element\` | SVG |
-| \`QRCodeImage\` |${selectorCells[1]} \`PNG-backed <img>\` | PNG |
-| \`QRCodeCanvas\` |${selectorCells[2]} \`<canvas> element\` | None |
+| \`QRCodePNG\` |${selectorCells[1]} \`PNG-backed <img>\` | PNG |
+| \`QRCodeWebP\` |${selectorCells[2]} \`WebP-backed <img>\` | WebP |
+| \`QRCodeGIF\` |${selectorCells[3]} \`GIF-backed <img>\` | GIF |
+| \`QRCodeCanvas\` |${selectorCells[4]} \`<canvas> element\` | None |
 
 ### Options
 

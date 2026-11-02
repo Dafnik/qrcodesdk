@@ -50,8 +50,11 @@
   "exports": {
     ".": "./dist/index.mjs",
     "./canvas": "./dist/canvas.mjs",
+    "./gif": "./dist/gif.mjs",
     "./image": "./dist/image.mjs",
+    "./png": "./dist/png.mjs",
     "./svg": "./dist/svg.mjs",
+    "./webp": "./dist/webp.mjs",
     "./package.json": "./package.json"
   },
   "files": [

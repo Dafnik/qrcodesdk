@@ -9,7 +9,7 @@ import * as reactApi from '../src';
 type QRCodeDownloadHandle = import('../src').QRCodeDownloadHandle;
 type QRCodeSVGProps = import('../src/QRCodeSVG').QRCodeSVGProps;
 
-const {QRCodeCanvas, QRCodeImage, QRCodeSVG} = reactApi;
+const {QRCodeCanvas, QRCodePNG, QRCodeSVG} = reactApi;
 
 describe('React QR code component handles', () => {
   beforeEach(() => {
@@ -25,8 +25,10 @@ describe('React QR code component handles', () => {
     // An exact list keeps internal helpers out of the package root.
     expect(Object.keys(reactApi).sort()).toEqual([
       'QRCodeCanvas',
-      'QRCodeImage',
+      'QRCodeGIF',
+      'QRCodePNG',
       'QRCodeSVG',
+      'QRCodeWebP',
       'alignment',
       'canvasCenterImage',
       'circle',
@@ -50,7 +52,7 @@ describe('React QR code component handles', () => {
     render(
       <>
         <QRCodeSVG payload="HELLO" ref={svgQRCode} />
-        <QRCodeImage payload="HELLO" ref={imageQRCode} />
+        <QRCodePNG payload="HELLO" ref={imageQRCode} />
       </>,
     );
 
@@ -60,7 +62,7 @@ describe('React QR code component handles', () => {
 
   test('server-renders complete SVG markup and permanent browser-output wrappers', () => {
     const svg = renderToString(<QRCodeSVG payload="SSR" />);
-    const image = renderToString(<QRCodeImage payload="SSR" />);
+    const image = renderToString(<QRCodePNG payload="SSR" />);
     const canvas = renderToString(<QRCodeCanvas payload="SSR" />);
 
     expect(svg).toContain('<svg');

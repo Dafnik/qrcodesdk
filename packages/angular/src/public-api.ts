@@ -3,15 +3,19 @@
  */
 
 export {QRCodeCanvas} from './lib/QRCodeCanvas';
-export {QRCodeImage} from './lib/QRCodeImage';
+export {QRCodeGIF} from './lib/QRCodeGIF';
+export {QRCodePNG} from './lib/QRCodePNG';
 export {QRCodeSVG} from './lib/QRCodeSVG';
+export {QRCodeWebP} from './lib/QRCodeWebP';
 export type {QRCodeDownloadHandle} from './lib/types';
 export type {
   QRCodeCanvasAccessibilityOptions,
   QRCodeCanvasCenterImage,
   QRCodeCanvasOptions,
+  QRCodeGIFImageOptions,
   QRCodeImageAccessibilityOptions,
-  QRCodeImageOptions,
+  QRCodePNGImageOptions,
+  QRCodeWebPImageOptions,
 } from '@qrcodesdk/browser';
 export type {
   QRCodeDataImageURL,

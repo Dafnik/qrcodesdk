@@ -61,6 +61,22 @@ describe('playground ECI query synchronization', () => {
   });
 });
 
+describe('playground output query synchronization', () => {
+  test('parses every output and maps the former image output to PNG', () => {
+    for (const output of ['svg', 'png', 'webp', 'gif', 'canvas'] as const) {
+      assert.equal(
+        readQrOptionsFromSearchParams(new URLSearchParams(`output=${output}`)).output,
+        output,
+      );
+    }
+    assert.equal(readQrOptionsFromSearchParams(new URLSearchParams('output=image')).output, 'png');
+    assert.equal(
+      readQrOptionsFromSearchParams(new URLSearchParams('output=jpeg')).output,
+      defaultPlaygroundOptions.output,
+    );
+  });
+});
+
 test('live query synchronization restores both stores, debounces edits, and handles navigation', (context) => {
   context.mock.timers.enable({apis: ['setTimeout']});
   let url = new URL(

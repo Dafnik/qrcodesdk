@@ -8,7 +8,7 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground/?package=react)**
 
-React components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
+React components for rendering QR codes as inline SVG, PNG, WebP, and GIF Image elements, and Canvas elements.
 
 ## Install
 
@@ -54,13 +54,13 @@ yarn add @qrcodesdk/react
 Import the components directly where you need them:
 
 ```tsx
-import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/react';
+import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/react';
 
 export function App() {
   return (
     <>
       <QRCodeSVG payload="https://qrcodesdk.dev" />
-      <QRCodeImage payload="https://qrcodesdk.dev" />
+      <QRCodePNG payload="https://qrcodesdk.dev" />
       <QRCodeCanvas payload="https://qrcodesdk.dev" />
     </>
   );
@@ -78,7 +78,9 @@ export function App() {
 | Component      | Output               | Download support |
 | -------------- | -------------------- | ---------------- |
 | `QRCodeSVG`    | `Inline SVG element` | SVG              |
-| `QRCodeImage`  | `PNG-backed <img>`   | PNG              |
+| `QRCodePNG`    | `PNG-backed <img>`   | PNG              |
+| `QRCodeWebP`   | `WebP-backed <img>`  | WebP             |
+| `QRCodeGIF`    | `GIF-backed <img>`   | GIF              |
 | `QRCodeCanvas` | `<canvas> element`   | None             |
 
 ### Options
@@ -89,8 +91,15 @@ export function App() {
 | `options`   | `Component-specific options` | Optional matrix and renderer configuration.     |
 | `className` | `string`                     | CSS class applied to the component wrapper div. |
 
+Each image format has its own component, so your bundle only includes the encoders of the components
+you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
+usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
+is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
+and photographic center images. See the [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/)
+reference for details.
+
 React passes `className`, `style`, and other fallthrough attributes to the component's wrapper `<div>`.
-Use a React ref when you need a download handle; the rendered SVG, Image, or Canvas remains inside that wrapper.
+Use a React ref when you need a download handle; the rendered SVG, Image, or Canvas element remains inside that wrapper.
 
 ## Live examples
 
@@ -116,15 +125,15 @@ export default function QRCodeSVGExample() {
 }
 ```
 
-### Image component
+### PNG component
 
 ```tsx
 import {useMemo} from 'react';
 
-import {QRCodeImage, type QRCodeImageOptions} from '@qrcodesdk/react';
+import {QRCodePNG, type QRCodePNGImageOptions} from '@qrcodesdk/react';
 
-export default function QRCodeImageExample() {
-  const options = useMemo<QRCodeImageOptions>(
+export default function QRCodePNGExample() {
+  const options = useMemo<QRCodePNGImageOptions>(
     () => ({
       style: {moduleSize: 8, quietZone: 4},
       accessibility: {
@@ -135,7 +144,53 @@ export default function QRCodeImageExample() {
     [],
   );
 
-  return <QRCodeImage payload="https://qrcodesdk.dev" options={options} />;
+  return <QRCodePNG payload="https://qrcodesdk.dev" options={options} />;
+}
+```
+
+### WebP component
+
+```tsx
+import {useMemo} from 'react';
+
+import {QRCodeWebP, type QRCodeWebPImageOptions} from '@qrcodesdk/react';
+
+export default function QRCodeWebPExample() {
+  const options = useMemo<QRCodeWebPImageOptions>(
+    () => ({
+      style: {moduleSize: 8, quietZone: 4},
+      accessibility: {
+        alt: 'QR code for qrcodesdk.dev',
+        ariaLabel: 'Scan to open qrcodesdk.dev',
+      },
+    }),
+    [],
+  );
+
+  return <QRCodeWebP payload="https://qrcodesdk.dev" options={options} />;
+}
+```
+
+### GIF component
+
+```tsx
+import {useMemo} from 'react';
+
+import {QRCodeGIF, type QRCodeGIFImageOptions} from '@qrcodesdk/react';
+
+export default function QRCodeGIFExample() {
+  const options = useMemo<QRCodeGIFImageOptions>(
+    () => ({
+      style: {moduleSize: 8, quietZone: 4},
+      accessibility: {
+        alt: 'QR code for qrcodesdk.dev',
+        ariaLabel: 'Scan to open qrcodesdk.dev',
+      },
+    }),
+    [],
+  );
+
+  return <QRCodeGIF payload="https://qrcodesdk.dev" options={options} />;
 }
 ```
 
@@ -168,18 +223,18 @@ export default function QRCodeCanvasExample() {
 ```tsx
 import {useMemo, useRef} from 'react';
 
-import {QRCodeImage, type QRCodeDownloadHandle, type QRCodeImageOptions} from '@qrcodesdk/react';
+import {QRCodePNG, type QRCodeDownloadHandle, type QRCodePNGImageOptions} from '@qrcodesdk/react';
 
-export default function QRCodeDownloadImageExample() {
+export default function QRCodeDownloadPNGExample() {
   const qrcode = useRef<QRCodeDownloadHandle>(null);
-  const options = useMemo<QRCodeImageOptions>(
+  const options = useMemo<QRCodePNGImageOptions>(
     () => ({accessibility: {alt: 'QR code for qrcodesdk.dev'}}),
     [],
   );
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <QRCodeImage payload="https://qrcodesdk.dev" options={options} ref={qrcode} />
+      <QRCodePNG payload="https://qrcodesdk.dev" options={options} ref={qrcode} />
       <button
         className="btn-primary"
         onClick={() => qrcode.current?.download('qrcodesdk')}
@@ -201,8 +256,9 @@ React lifecycle.
 
 ## Download files
 
-`QRCodeSVG` and `QRCodeImage` expose `download(filename?)` for SVG and PNG files respectively.
-The method appends the file extension when needed. `QRCodeCanvas` has no download method.
+`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, and `QRCodeGIF` expose `download(filename?)` for SVG, PNG,
+WebP, and GIF files respectively. The method appends the matching file extension when needed.
+`QRCodeCanvas` has no download method.
 
 See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-react) for the complete
 React example, or its [Canvas export section](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually)
@@ -212,7 +268,7 @@ for manual downloads.
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
-`QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
 
 ### Next.js client boundary
 
@@ -263,8 +319,9 @@ const options: QRCodeSVGOptions = {
 };
 ```
 
-Pass this object through the component's `options` prop. Use `QRCodeImageOptions` or
-`QRCodeCanvasOptions` for the corresponding component.
+Pass this object through the component's `options` prop. Use `QRCodePNGImageOptions`,
+`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, or `QRCodeCanvasOptions` for the corresponding
+component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`.
 
 Import shape and pattern factories, and center-image factories from `@qrcodesdk/react` alongside the components.
 
@@ -296,15 +353,18 @@ import {
   type QRCodeFinderOptions,
   type QRCodeFinderRingShape,
   type QRCodeFinderStyle,
-  QRCodeImage,
+  QRCodeGIF,
+  type QRCodeGIFImageOptions,
+  type QRCodeGIFProps,
   type QRCodeImageAccessibilityOptions,
-  type QRCodeImageOptions,
-  type QRCodeImageProps,
   type QRCodeMask,
   type QRCodeMatrixOptions,
   type QRCodeMode,
   type QRCodeModulePattern,
   type QRCodeModuleShape,
+  QRCodePNG,
+  type QRCodePNGImageOptions,
+  type QRCodePNGProps,
   type QRCodePayload,
   type QRCodeRoundedShapeOptions,
   QRCodeSVG,
@@ -317,6 +377,9 @@ import {
   type QRCodeShapePiece,
   type QRCodeVersion,
   type QRCodeVisualStyle,
+  QRCodeWebP,
+  type QRCodeWebPImageOptions,
+  type QRCodeWebPProps,
   alignment,
   canvasCenterImage,
   circle,
@@ -333,7 +396,7 @@ import {
 - [@qrcodesdk/react](https://qrcodesdk.dev/packages/react/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)
 - [Add a center image](https://qrcodesdk.dev/guides/center-images/)
-- [Download or save a QR code as SVG or PNG](https://qrcodesdk.dev/guides/download-or-save/)
+- [Download or save a QR code as SVG, PNG, WebP, or GIF](https://qrcodesdk.dev/guides/download-or-save/)
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
-- [PNG-backed Image element renderer](https://qrcodesdk.dev/reference/renderers/image/)
+- [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/)
 - [Canvas element renderer](https://qrcodesdk.dev/reference/renderers/canvas/)

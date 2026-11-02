@@ -13,9 +13,9 @@ related:
   - ../reference/custom-renderers.md
 ---
 
-SVG, Canvas, browser Image, and Node.js PNG renderers accept the same `QRCodeVisualStyle`.
-Pass it to the renderer's `style` option. Styling changes the appearance without changing the encoded
-matrix.
+SVG, Canvas, browser Image, and Node.js PNG, WebP, and GIF renderers accept the same
+`QRCodeVisualStyle`. Pass it to the renderer's `style` option. Styling changes the appearance without
+changing the encoded matrix.
 
 ## Apply a visual theme
 
@@ -225,7 +225,7 @@ supply a single path for each piece.
 subpaths, or geometry outside the piece's box. `module` and `alignmentCenter` paths must stay within
 1 × 1 module, `finderRing` within 7 × 7, `finderCenter` within 3 × 3, and `alignmentRing` within
 5 × 5. Curves and arcs count with their full extent, so pieces never overlap and SVG, Canvas, and
-PNG fill them identically. Its result contains opaque `QRCodeShapePiece` values. Renderer factories reuse them
+raster output fill them identically. Its result contains opaque `QRCodeShapePiece` values. Renderer factories reuse them
 without parsing the paths again.
 
 ## Bundle size
@@ -233,7 +233,7 @@ without parsing the paths again.
 Import only the shape, pattern, and center-image factories you use. Bundlers with tree shaking can
 remove the others. Dimensions and colors need no import from `@qrcodesdk/core/style`.
 Built-in factories generate prepared geometry directly. The custom-path parser is included only
-when you import `customShape()` in SVG and Canvas consumers. PNG rasterization also uses the parser.
+when you import `customShape()` in SVG and Canvas consumers. Node.js raster output also uses the parser.
 
 ## Text styling
 
