@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@spartan-ng/brain/hlm-tailwind-preset.css';
+
+:root {
+  color-scheme: light;
+  --radius: 0.625rem;
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.16 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.16 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.16 0 0);
+  --primary: oklch(0.24 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.94 0 0);
+  --secondary-foreground: oklch(0.24 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.49 0 0);
+  --accent: oklch(0.91 0 0);
+  --accent-foreground: oklch(0.24 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.86 0 0);
+  --input: oklch(0.86 0 0);
+  --ring: oklch(0.52 0 0);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.94 0 0);
+  --card: oklch(0.17 0 0);
+  --card-foreground: oklch(0.94 0 0);
+  --popover: oklch(0.17 0 0);
+  --popover-foreground: oklch(0.94 0 0);
+  --primary: oklch(0.87 0 0);
+  --primary-foreground: oklch(0.17 0 0);
+  --secondary: oklch(0.23 0 0);
+  --secondary-foreground: oklch(0.94 0 0);
+  --muted: oklch(0.23 0 0);
+  --muted-foreground: oklch(0.7 0 0);
+  --accent: oklch(0.28 0 0);
+  --accent-foreground: oklch(0.94 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.62 0 0);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Makes transparent QR code backgrounds visible. */
+.checkerboard {
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #e5e7eb 25%, transparent 25%),
+    linear-gradient(-45deg, #e5e7eb 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e5e7eb 75%),
+    linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+  background-position:
+    0 0,
+    0 6px,
+    6px -6px,
+    -6px 0;
+  background-size: 12px 12px;
+}

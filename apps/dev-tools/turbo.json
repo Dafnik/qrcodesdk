@@ -1,0 +1,10 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "start": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "persistent": true
+    }
+  }
+}

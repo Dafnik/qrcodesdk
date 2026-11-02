@@ -1,0 +1,48 @@
+{
+  "name": "dev-tools",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "check-types": "ngc -p tsconfig.app.json --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "clean": "rm -rf .turbo dist .angular"
+  },
+  "dependencies": {
+    "@angular/cdk": "catalog:",
+    "@angular/common": "catalog:",
+    "@angular/core": "catalog:",
+    "@angular/forms": "catalog:",
+    "@angular/platform-browser": "catalog:",
+    "@ng-icons/core": "catalog:",
+    "@ng-icons/lucide": "catalog:",
+    "@qrcodesdk/angular": "workspace:*",
+    "@qrcodesdk/browser": "workspace:*",
+    "@qrcodesdk/core": "workspace:*",
+    "@repo/core-testing": "workspace:*",
+    "@spartan-ng/brain": "catalog:",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "jsqr": "catalog:",
+    "rxjs": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@angular/build": "catalog:",
+    "@angular/cli": "catalog:",
+    "@angular/compiler": "catalog:",
+    "@angular/compiler-cli": "catalog:",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@spartan-ng/cli": "catalog:",
+    "@tailwindcss/postcss": "4.3.3",
+    "angular-eslint": "22.6.0",
+    "tailwindcss": "catalog:",
+    "tw-animate-css": "catalog:",
+    "typescript": "catalog:angular-typescript"
+  }
+}
