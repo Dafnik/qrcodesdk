@@ -46,9 +46,12 @@ import {
           (ngModelChange)="applyPreset($event)">
           <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'preset'">
             <span class="flex items-center gap-2" *hlmSelectValueTemplate="let value">
-              <ng-container
-                [ngTemplateOutlet]="presetOption"
-                [ngTemplateOutletContext]="{$implicit: activePreset()}" />
+              <!-- Options that no longer match a preset have no active preset to show. -->
+              @if (activePreset(); as preset) {
+                <ng-container
+                  [ngTemplateOutlet]="presetOption"
+                  [ngTemplateOutletContext]="{$implicit: preset}" />
+              }
             </span>
             @if (!activePreset()) {
               <span class="text-muted-foreground">Custom preset</span>

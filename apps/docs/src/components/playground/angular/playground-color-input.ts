@@ -4,6 +4,8 @@ import {SimColorPickerImports} from '@sim/color-picker';
 import {HlmButtonImports} from '@spartan-ng/helm/button';
 import {HlmPopoverImports} from '@spartan-ng/helm/popover';
 
+import type {QRCodeColor} from '@qrcodesdk/core';
+
 export const DARK_COLOR_PRESETS = [
   '#0A0A0A',
   '#171717',
@@ -40,9 +42,10 @@ export const LIGHT_COLOR_PRESETS = ['#FFFFFF', '#F0F0F0', '#E0E0E0', '#D0D0D0', 
         *hlmPopoverPortal="let ctx">
         <sim-color-picker
           class="w-[380px] max-w-[calc(100vw-1rem)] gap-4 rounded-2xl p-5"
-          [(value)]="color"
+          [value]="color()"
           [format]="'hex'"
-          [presets]="presets()">
+          [presets]="presets()"
+          (valueChange)="setColor($event)">
           <sim-color-palette />
 
           <sim-color-value-editor class="gap-0 [&>label]:sr-only" [showFormat]="showFormat()" />
@@ -59,8 +62,13 @@ export const LIGHT_COLOR_PRESETS = ['#FFFFFF', '#F0F0F0', '#E0E0E0', '#D0D0D0', 
 })
 export class PlaygroundColorInput {
   buttonId = input.required<string>();
-  color = model<string>();
+  color = model.required<QRCodeColor>();
   presets = input.required<readonly string[]>();
   disabled = input<boolean>(false);
   showFormat = input(true);
+
+  /** The picker is set to hex output, so only hex colors reach the QR code options. */
+  protected setColor(value: string): void {
+    if (value.startsWith('#')) this.color.set(value as QRCodeColor);
+  }
 }

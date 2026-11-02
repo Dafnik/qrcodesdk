@@ -110,11 +110,13 @@ import {
         </div>
       </div>
 
-      @if (status().state === 'error') {
-        <hlm-alert variant="destructive">
-          <h4 hlmAlertTitle>Image preparation failed</h4>
-          <p hlmAlertDescription>{{ status().message }}</p>
-        </hlm-alert>
+      @if (status(); as status) {
+        @if (status.state === 'error') {
+          <hlm-alert variant="destructive">
+            <h4 hlmAlertTitle>Image preparation failed</h4>
+            <p hlmAlertDescription>{{ status.message }}</p>
+          </hlm-alert>
+        }
       }
 
       @if (preparedImage(); as image) {
