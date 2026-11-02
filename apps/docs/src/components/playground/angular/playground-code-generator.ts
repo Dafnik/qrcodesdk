@@ -53,7 +53,7 @@ const CENTER_IMAGE_FACTORIES: Record<PlaygroundOutput, string> = {
 const PRINT_WIDTH = 100;
 
 /** Center image layout defaults, omitted from generated factory calls. */
-const CENTER_IMAGE_DEFAULTS = {size: 0.4, padding: 1, clearBackground: true} as const;
+const CENTER_IMAGE_DEFAULTS = {size: 0.3, padding: 1, clearBackground: true} as const;
 
 /** Generate a framework component example; CLI commands use their separate generator. */
 export function generatePlaygroundCode(

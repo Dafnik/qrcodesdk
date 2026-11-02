@@ -30,7 +30,7 @@ The factories share these layout options:
 
 | Option            | Default | Accepted value                                 | Meaning                                                      |
 | ----------------- | ------: | ---------------------------------------------- | ------------------------------------------------------------ |
-| `size`            |   `0.4` | finite number greater than `0` and at most `1` | Image box relative to matrix width, excluding the quiet zone |
+| `size`            |   `0.3` | finite number greater than `0` and at most `1` | Image box relative to matrix width, excluding the quiet zone |
 | `padding`         |     `1` | non-negative finite number                     | Cleared space around the image, in modules                   |
 | `clearBackground` |  `true` | `boolean`                                      | Removes every module the image or its padding touches        |
 

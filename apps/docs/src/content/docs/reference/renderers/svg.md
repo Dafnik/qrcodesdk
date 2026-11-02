@@ -82,7 +82,7 @@ const svg = qrcode('https://qrcodesdk.dev')
 | Parameter                | Type                 | Default  | Effect                                                |
 | ------------------------ | -------------------- | -------- | ----------------------------------------------------- |
 | `source`                 | `QRCodeDataImageURL` | required | Embeds a prepared `data:image/...` URL                |
-| `layout.size`            | `number`             | `0.4`    | Image box as a fraction of matrix width               |
+| `layout.size`            | `number`             | `0.3`    | Image box as a fraction of matrix width               |
 | `layout.padding`         | `number`             | `1`      | Cleared border around the image, in modules           |
 | `layout.clearBackground` | `boolean`            | `true`   | Removes every module the image or its padding touches |
 

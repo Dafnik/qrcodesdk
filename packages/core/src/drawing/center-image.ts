@@ -17,7 +17,7 @@ export type QRCodeCenterImagePlacement = {
 export function createQRCodeCenterImagePlacement(
   layout?: QRCodeCenterImageLayout,
 ): QRCodeCenterImagePlacement {
-  const size = layout?.size ?? 0.4;
+  const size = layout?.size ?? 0.3;
   const padding = layout?.padding ?? 1;
   const clearBackground = layout?.clearBackground ?? true;
   if (!Number.isFinite(size) || size <= 0 || size > 1) {

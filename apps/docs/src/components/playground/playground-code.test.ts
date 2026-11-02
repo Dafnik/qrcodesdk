@@ -16,7 +16,7 @@ const preparedImage: PlaygroundPreparedImage = {
   dataUrl: 'data:image/png;base64,cHJlcGFyZWQ=' as QRCodeDataImageURL,
   element: {width: 4, height: 2} as HTMLImageElement,
   fileName: 'logo.png',
-  size: 0.4,
+  size: 0.3,
   padding: 1,
   clearBackground: true,
 };

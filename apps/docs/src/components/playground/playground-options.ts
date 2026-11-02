@@ -133,7 +133,7 @@ async function preparePlaygroundImageFile(file: File, preparationVersion: number
       dataUrl,
       element,
       fileName: file.name,
-      size: 0.4,
+      size: 0.3,
       padding: 1,
       clearBackground: true,
     });
