@@ -15,8 +15,10 @@ describe('Svelte QR code component API', () => {
     // An exact list keeps internal helpers out of the package root.
     expect(Object.keys(svelteApi).sort()).toEqual([
       'QRCodeCanvas',
-      'QRCodeImage',
+      'QRCodeGIF',
+      'QRCodePNG',
       'QRCodeSVG',
+      'QRCodeWebP',
       'alignment',
       'canvasCenterImage',
       'circle',
@@ -30,7 +32,7 @@ describe('Svelte QR code component API', () => {
 
   test('exposes SVG and image download handles', () => {
     const svg = render(svelteApi.QRCodeSVG, {payload: 'HELLO'});
-    const image = render(svelteApi.QRCodeImage, {payload: 'HELLO'});
+    const image = render(svelteApi.QRCodePNG, {payload: 'HELLO'});
 
     expect(svg.component.download).toBeTypeOf('function');
     expect(image.component.download).toBeTypeOf('function');

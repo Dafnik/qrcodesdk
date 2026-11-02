@@ -1,78 +1,28 @@
-import type {QRCodeMatrix, QRCodeMatrixOptions, QRCodeRenderer} from '@qrcodesdk/core';
-import {QRCodeError} from '@qrcodesdk/core/error';
+import type {QRCodeMatrix, QRCodeRenderer} from '@qrcodesdk/core';
 
-import {QRCodeCanvasRenderer, type QRCodeCanvasRendererOptions} from './canvas';
 import {downloadQRCode, ensureExtension, resolveDownloadOptions} from './download-helper';
 import type {QRCodeDownloadRendererOptions} from './types';
 
-export type QRCodeImageAccessibilityOptions = {
-  readonly alt?: string;
-  readonly ariaLabel?: string;
-  readonly title?: string;
-};
-export type QRCodeImageRendererOptions = Omit<QRCodeCanvasRendererOptions, 'accessibility'> & {
-  readonly accessibility?: QRCodeImageAccessibilityOptions;
-};
-export type QRCodeImageOptions = QRCodeImageRendererOptions & {
-  readonly matrix?: QRCodeMatrixOptions;
-};
+export type {QRCodeImageAccessibilityOptions, QRCodeImageRendererOptions} from './image-base';
 
 export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<HTMLImageElement>;
 
-export function QRCodeImageRenderer(
-  options?: QRCodeImageRendererOptions,
-): QRCodeRenderer<HTMLImageElement> {
-  const accessibility: Required<QRCodeImageAccessibilityOptions> = {
-    alt: options?.accessibility?.alt ?? '',
-    ariaLabel: options?.accessibility?.ariaLabel ?? '',
-    title: options?.accessibility?.title ?? '',
-  };
-  const canvasRenderer = QRCodeCanvasRenderer({
-    style: options?.style,
-    centerImage: options?.centerImage,
-    accessibility: {
-      ariaLabel: accessibility.ariaLabel,
-      title: accessibility.title,
-    },
-  });
+const EXTENSIONS: Readonly<Record<string, string>> = {
+  'image/gif': '.gif',
+  'image/png': '.png',
+  'image/webp': '.webp',
+};
 
-  return (matrix: QRCodeMatrix) => {
-    const canvas = canvasRenderer(matrix);
-    const image = document.createElement('img');
-
-    try {
-      image.src = canvas.toDataURL('image/png');
-    } catch (error) {
-      throw new QRCodeError(
-        'RENDER_FAILED',
-        'QR code image rendering requires an origin-clean canvas. Use same-origin or CORS-enabled center images.',
-        {cause: error},
-      );
-    }
-    image.width = canvas.width;
-    image.height = canvas.height;
-    applyAccessibilityAttributes(image, accessibility);
-
-    return image;
-  };
-}
-
+/** Downloads the output of a PNG, WebP, or GIF image renderer with the matching file extension. */
 export function QRCodeDownloadImageRenderer(
   options: QRCodeDownloadImageRendererOptions,
 ): QRCodeRenderer<void> {
   const {renderer, filename} = resolveDownloadOptions(options);
   return (matrix: QRCodeMatrix) => {
     const image = renderer(matrix);
+    const mimeType = /^data:([^;,]+)/u.exec(image.src)?.[1]?.toLowerCase() ?? '';
+    const extension = EXTENSIONS[mimeType];
 
-    downloadQRCode(image.src, ensureExtension(filename, '.png'));
+    downloadQRCode(image.src, extension ? ensureExtension(filename, extension) : filename);
   };
-}
-
-function applyAccessibilityAttributes(
-  image: HTMLImageElement,
-  options: Required<QRCodeImageAccessibilityOptions>,
-): void {
-  image.alt = options.alt;
-  if (options.ariaLabel) image.setAttribute('aria-label', options.ariaLabel);
-  if (options.title) image.title = options.title;
 }

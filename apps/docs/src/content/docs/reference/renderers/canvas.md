@@ -61,7 +61,7 @@ The renderer synchronously returns a new `HTMLCanvasElement`. Its pixel width an
 ## Center image
 
 `canvasCenterImage(source, layout?)` from `@qrcodesdk/browser` creates the `centerImage` value for
-Canvas and [Image](/reference/renderers/image/) output:
+Canvas and [Image element](/reference/renderers/image/) output in every format:
 
 ```ts
 import {QRCodeCanvasRenderer, canvasCenterImage} from '@qrcodesdk/browser';
@@ -98,7 +98,7 @@ renderer.
 - Pass a `centerImage` created with `canvasCenterImage()`; TypeScript checks the factory result type. `canvasCenterImage()` validates its layout when it is called.
 - A non-empty `ariaLabel`, or a non-empty `title` when `ariaLabel` is blank, sets `role="img"` and
   `aria-label` on the Canvas element. The Canvas is decorative only when both are blank. For more accessibility controls, use the
-  [PNG-backed Image renderer](/reference/renderers/image/) for native image attributes.
+  [Image element renderers](/reference/renderers/image/) for native image attributes.
 - Option values are copied when `QRCodeCanvasRenderer()` is called. The center image
   retains its source by identity and checks it when rendering.
 

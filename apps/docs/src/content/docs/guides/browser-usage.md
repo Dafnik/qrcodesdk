@@ -13,17 +13,17 @@ related:
   - ./download-or-save.md
 ---
 
-Browser applications can render a QR code as an SVG string, a PNG-backed Image element, or a
-Canvas element. Choose the output for what the page needs to do next, then insert or compose the
+Browser applications can render a QR code as an SVG string, an Image element backed by PNG, WebP,
+or GIF data, or a Canvas element. Choose the output for what the page needs to do next, then insert or compose the
 returned value with standard browser APIs.
 
 ## Choose a browser output
 
-| Choose | Package              | Return value        | Best fit                                                   |
-| ------ | -------------------- | ------------------- | ---------------------------------------------------------- |
-| SVG    | `@qrcodesdk/core`    | `string`            | Scalable inline markup and the recommended browser default |
-| Image  | `@qrcodesdk/browser` | `HTMLImageElement`  | A familiar, accessible DOM image backed by PNG data        |
-| Canvas | `@qrcodesdk/browser` | `HTMLCanvasElement` | Drawing, compositing, pixel access, or manual PNG export   |
+| Choose | Package              | Return value        | Best fit                                                     |
+| ------ | -------------------- | ------------------- | ------------------------------------------------------------ |
+| SVG    | `@qrcodesdk/core`    | `string`            | Scalable inline markup and the recommended browser default   |
+| Image  | `@qrcodesdk/browser` | `HTMLImageElement`  | A familiar, accessible DOM image backed by PNG, WebP, or GIF |
+| Canvas | `@qrcodesdk/browser` | `HTMLCanvasElement` | Drawing, compositing, pixel access, or manual PNG export     |
 
 Start with SVG unless the next browser API specifically needs an Image or Canvas element. SVG stays
 sharp when resized and does not require Canvas support. Image and Canvas output require both
@@ -102,8 +102,20 @@ Apply layout styles to the inserted root SVG through its container:
 
 ## Image element
 
-`QRCodeImageRenderer` synchronously returns a new `HTMLImageElement` whose `src` contains the
-rendered PNG as a data URL. Use it when the QR code should behave like an ordinary image in the DOM.
+The Image element renderers synchronously return a new `HTMLImageElement` whose `src` contains the
+rendered image as a data URL. Use them when the QR code should behave like an ordinary image in the
+DOM. Pick the renderer by the encoded format:
+
+| Renderer                  | Entry point               | Encoded format                              |
+| ------------------------- | ------------------------- | ------------------------------------------- |
+| `QRCodePNGImageRenderer`  | `@qrcodesdk/browser/png`  | PNG, encoded natively by the browser        |
+| `QRCodeWebPImageRenderer` | `@qrcodesdk/browser/webp` | Lossless WebP, usually the smallest file    |
+| `QRCodeGIFImageRenderer`  | `@qrcodesdk/browser/gif`  | GIF with 256 colors and binary transparency |
+
+Each format has its own entry point, so a bundle only includes the encoder it imports. WebP and GIF
+use encoders bundled in the SDK and produce the same bytes in every browser, including Safari, which
+cannot encode WebP natively. All three accept the same options; see the
+[Image element renderers reference](/reference/renderers/image/) for the format differences.
 
 ### Insert and style it
 
@@ -111,11 +123,11 @@ The returned value is already an `HTMLImageElement`, so it can be appended and s
 other image:
 
 ```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({
+  QRCodePNGImageRenderer({
     accessibility: {
       alt: 'QR code for qrcodesdk.dev',
       ariaLabel: 'Scan to open qrcodesdk.dev',
@@ -140,15 +152,15 @@ document.querySelector('#qrcode')?.append(image);
 }
 ```
 
-### Use the PNG data URL
+### Use the data URL
 
-Read `src` when another browser API needs the encoded PNG rather than the element:
+Read `src` when another browser API needs the encoded image rather than the element:
 
 ```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {qrcode} from '@qrcodesdk/core';
 
-const image = qrcode('https://qrcodesdk.dev').render(QRCodeImageRenderer());
+const image = qrcode('https://qrcodesdk.dev').render(QRCodePNGImageRenderer());
 const response = await fetch(image.src);
 const png = await response.blob();
 
@@ -159,7 +171,8 @@ await navigator.clipboard.write([
 ]);
 ```
 
-The Clipboard API requires a secure context and may require a user gesture or permission.
+The Clipboard API requires a secure context and may require a user gesture or permission. Browsers
+reliably accept only `image/png` on the clipboard, so use the PNG renderer here.
 
 ## Canvas element
 
@@ -212,14 +225,14 @@ Each render creates a new string or element. When the payload changes, render ag
 old output so the container does not accumulate QR codes:
 
 ```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {qrcode} from '@qrcodesdk/core';
 
 const container = document.querySelector('#qrcode');
 
 export function updateQRCode(payload: string) {
   const image = qrcode(payload).render(
-    QRCodeImageRenderer({accessibility: {alt: '', ariaLabel: `Scan to open ${payload}`}}),
+    QRCodePNGImageRenderer({accessibility: {alt: '', ariaLabel: `Scan to open ${payload}`}}),
   );
 
   container?.replaceChildren(image);

@@ -3,6 +3,7 @@ import {
   type PlaygroundOutput,
   type PlaygroundPackage,
   type PlaygroundPreparedImage,
+  isPlaygroundImageOutput,
 } from '../playground-options.ts';
 import {formatPlaygroundStyle} from '../playground-style.ts';
 
@@ -28,11 +29,25 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
     downloadLabel: 'Download SVG',
   },
 
-  image: {
-    componentName: 'QRCodeImage',
-    optionsType: 'QRCodeImageOptions',
-    selector: 'qrcode-image',
+  png: {
+    componentName: 'QRCodePNG',
+    optionsType: 'QRCodePNGImageOptions',
+    selector: 'qrcode-png',
     downloadLabel: 'Download PNG',
+  },
+
+  webp: {
+    componentName: 'QRCodeWebP',
+    optionsType: 'QRCodeWebPImageOptions',
+    selector: 'qrcode-webp',
+    downloadLabel: 'Download WebP',
+  },
+
+  gif: {
+    componentName: 'QRCodeGIF',
+    optionsType: 'QRCodeGIFImageOptions',
+    selector: 'qrcode-gif',
+    downloadLabel: 'Download GIF',
   },
 
   canvas: {
@@ -45,7 +60,9 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
 /** Center image factory per output. Every framework package exports both factories. */
 const CENTER_IMAGE_FACTORIES: Record<PlaygroundOutput, string> = {
   svg: 'svgCenterImage',
-  image: 'canvasCenterImage',
+  png: 'canvasCenterImage',
+  webp: 'canvasCenterImage',
+  gif: 'canvasCenterImage',
   canvas: 'canvasCenterImage',
 };
 
@@ -394,7 +411,7 @@ function formatOptions(
   if (matrixEntries.length > 0) entries.push(`matrix: ${formatObject(matrixEntries, depth + 1)}`);
 
   const accessibilityEntries: string[] = [];
-  if (playgroundOptionsValue.output === 'image') {
+  if (isPlaygroundImageOutput(playgroundOptionsValue.output)) {
     if (playgroundOptionsValue.alt) {
       accessibilityEntries.push(`alt: ${quote(playgroundOptionsValue.alt)}`);
     }

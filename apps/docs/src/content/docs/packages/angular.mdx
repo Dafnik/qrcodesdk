@@ -1,6 +1,6 @@
 ---
 title: '@qrcodesdk/angular'
-description: '@qrcodesdk/angular provides Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.'
+description: '@qrcodesdk/angular provides Angular components for rendering QR codes as inline SVG, PNG, WebP, and GIF Image elements, and Canvas elements.'
 docType: package
 packageName: '@qrcodesdk/angular'
 
@@ -20,13 +20,15 @@ related:
 ---
 
 import QRCodeCanvas from '../../../components/astro/angular-examples/qrcode-canvas.astro';
-import QRCodeDownloadImage from '../../../components/astro/angular-examples/qrcode-download-image.astro';
-import QRCodeImage from '../../../components/astro/angular-examples/qrcode-image.astro';
+import QRCodeDownloadPNG from '../../../components/astro/angular-examples/qrcode-download-png.astro';
+import QRCodeGIF from '../../../components/astro/angular-examples/qrcode-gif.astro';
+import QRCodePNG from '../../../components/astro/angular-examples/qrcode-png.astro';
 import QRCodeSVG from '../../../components/astro/angular-examples/qrcode-svg.astro';
+import QRCodeWebP from '../../../components/astro/angular-examples/qrcode-webp.astro';
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 import PackageComponents from '../../../components/packages/package-components.astro';
 
-Angular components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.
+Angular components for rendering QR codes as inline SVG, PNG, WebP, and GIF Image elements, and Canvas elements.
 
 ## Install
 
@@ -39,14 +41,14 @@ Import the components directly where you need them:
 ```ts
 import {Component} from '@angular/core';
 
-import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
+import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/angular';
 
 @Component({
   selector: 'app-root',
-  imports: [QRCodeSVG, QRCodeImage, QRCodeCanvas],
+  imports: [QRCodeSVG, QRCodePNG, QRCodeCanvas],
   template: `
     <qrcode-svg payload="https://qrcodesdk.dev" />
-    <qrcode-image payload="https://qrcodesdk.dev" />
+    <qrcode-png payload="https://qrcodesdk.dev" />
     <qrcode-canvas payload="https://qrcodesdk.dev" />
   `,
 })
@@ -63,7 +65,14 @@ export class App {}
 
 <PackageComponents selector={true} />
 
-All three components are standalone. Add the components you use to the host component's
+Each image format has its own component, so your bundle only includes the encoders of the components
+you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
+usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
+is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
+and photographic center images. See the [Image element renderers](/reference/renderers/image/)
+reference for details.
+
+All components are standalone. Add the components you use to the host component's
 `imports` array, then bind `payload` and `options` with normal Angular template syntax.
 
 ## Live examples
@@ -72,9 +81,17 @@ All three components are standalone. Add the components you use to the host comp
 
 <QRCodeSVG />
 
-### Image component
+### PNG component
 
-<QRCodeImage />
+<QRCodePNG />
+
+### WebP component
+
+<QRCodeWebP />
+
+### GIF component
+
+<QRCodeGIF />
 
 ### Canvas component
 
@@ -82,7 +99,7 @@ All three components are standalone. Add the components you use to the host comp
 
 ### PNG download
 
-<QRCodeDownloadImage />
+<QRCodeDownloadPNG />
 
 ## Center images
 
@@ -95,8 +112,9 @@ component and template.
 
 ## Download files
 
-`QRCodeSVG` and `QRCodeImage` expose `download(filename?)` for SVG and PNG files respectively.
-The method appends the file extension when needed. `QRCodeCanvas` has no download method.
+`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, and `QRCodeGIF` expose `download(filename?)` for SVG, PNG,
+WebP, and GIF files respectively. The method appends the matching file extension when needed.
+`QRCodeCanvas` has no download method.
 
 See [Download or save](/guides/download-or-save/#download-from-angular) for the complete
 Angular example, or its [Canvas export section](/guides/download-or-save/#export-a-canvas-manually)
@@ -106,7 +124,7 @@ for manual downloads.
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
-`QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
 
 ## Shared options
 
@@ -123,8 +141,9 @@ const options: QRCodeSVGOptions = {
 };
 ```
 
-Pass this object through the component's `options` input. Use `QRCodeImageOptions` or
-`QRCodeCanvasOptions` for the corresponding component.
+Pass this object through the component's `options` input. Use `QRCodePNGImageOptions`,
+`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, or `QRCodeCanvasOptions` for the corresponding
+component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`.
 
 Import shape and pattern factories, and center-image factories from `@qrcodesdk/angular` alongside the components.
 
@@ -154,14 +173,16 @@ import {
   type QRCodeFinderOptions,
   type QRCodeFinderRingShape,
   type QRCodeFinderStyle,
-  QRCodeImage,
+  QRCodeGIF,
+  type QRCodeGIFImageOptions,
   type QRCodeImageAccessibilityOptions,
-  type QRCodeImageOptions,
   type QRCodeMask,
   type QRCodeMatrixOptions,
   type QRCodeMode,
   type QRCodeModulePattern,
   type QRCodeModuleShape,
+  QRCodePNG,
+  type QRCodePNGImageOptions,
   type QRCodePayload,
   type QRCodeRoundedShapeOptions,
   QRCodeSVG,
@@ -173,6 +194,8 @@ import {
   type QRCodeShapePiece,
   type QRCodeVersion,
   type QRCodeVisualStyle,
+  QRCodeWebP,
+  type QRCodeWebPImageOptions,
   alignment,
   canvasCenterImage,
   circle,

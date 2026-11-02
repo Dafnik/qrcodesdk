@@ -9,7 +9,7 @@ import {expect, test} from 'vitest';
 const execFile = promisify(execFileCallback);
 const executable = fileURLToPath(new URL('../dist/bin.mjs', import.meta.url));
 
-test('built executable loads its text, SVG, and PNG renderers on demand', async () => {
+test('built executable loads its text, SVG, PNG, WebP, and GIF renderers on demand', async () => {
   const directory = await mkdtemp(path.join(tmpdir(), 'qrcodesdk-built-cli-'));
   const run = (args: string[]) =>
     execFile(process.execPath, [executable, ...args], {cwd: directory});
@@ -22,6 +22,14 @@ test('built executable loads its text, SVG, and PNG renderers on demand', async 
     await run(['HELLO', '--output', 'code.png']);
     const bytes = await readFile(path.join(directory, 'code.png'));
     expect(bytes.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
+    await run(['HELLO', '--output', 'code.webp']);
+    expect((await readFile(path.join(directory, 'code.webp'))).toString('latin1', 8, 16)).toBe(
+      'WEBPVP8L',
+    );
+    await run(['HELLO', '--output', 'code.gif']);
+    expect((await readFile(path.join(directory, 'code.gif'))).toString('latin1', 0, 6)).toBe(
+      'GIF89a',
+    );
   } finally {
     await rm(directory, {recursive: true, force: true});
   }

@@ -111,17 +111,21 @@ interface PlaygroundToolbarOption<T extends string> {
               {{ output.label }}
             </button>
           }
-          <button
-            class="text-muted-foreground"
-            title="PNG output requires Node APIs and is available when you run the CLI locally."
-            type="button"
-            hlmBtn
-            variant="outline"
-            size="sm"
-            disabled>
-            <ng-icon name="lucideImage" />
-            PNG
-          </button>
+          @for (output of cliRasterOutputs; track output) {
+            <button
+              class="text-muted-foreground"
+              [title]="
+                output + ' output requires Node APIs and is available when you run the CLI locally.'
+              "
+              type="button"
+              hlmBtn
+              variant="outline"
+              size="sm"
+              disabled>
+              <ng-icon name="lucideImage" />
+              {{ output }}
+            </button>
+          }
         </div>
 
         <label class="sr-only" for="toolbar-launcher">Command launcher</label>
@@ -209,13 +213,17 @@ export class PlaygroundToolbar {
   ) as Record<PlaygroundPackage, PlaygroundToolbarOption<PlaygroundPackage>>;
   protected readonly outputs: PlaygroundToolbarOption<PlaygroundOutput>[] = [
     {value: 'svg', label: 'SVG', icon: 'lucideCodeXml'},
-    {value: 'image', label: 'PNG', icon: 'lucideImage'},
+    {value: 'png', label: 'PNG', icon: 'lucideImage'},
+    {value: 'webp', label: 'WebP', icon: 'lucideImage'},
+    {value: 'gif', label: 'GIF', icon: 'lucideImage'},
     {value: 'canvas', label: 'Canvas', icon: 'lucideBrush'},
   ];
   protected readonly cliOutputs: PlaygroundToolbarOption<CliPlaygroundOptions['format']>[] = [
     {value: 'text', label: 'Text', icon: 'lucideText'},
     {value: 'svg', label: 'SVG', icon: 'lucideCodeXml'},
   ];
+  /** Raster formats the CLI writes locally but the browser preview cannot run. */
+  protected readonly cliRasterOutputs = ['PNG', 'WebP', 'GIF'] as const;
   protected readonly views: PlaygroundToolbarOption<PlaygroundView>[] = [
     {value: 'preview', label: 'Preview', icon: 'lucideScanQrCode'},
     {value: 'code', label: 'Code', icon: 'lucideCode'},

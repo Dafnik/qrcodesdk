@@ -6,8 +6,13 @@ import {
   type QRCodeCanvasCenterImage,
   type QRCodeCanvasOptions,
   type QRCodeCanvasRendererOptions,
-  type QRCodeImageOptions,
+  type QRCodeGIFImageOptions,
+  type QRCodeGIFImageRendererOptions,
   type QRCodeImageRendererOptions,
+  type QRCodePNGImageOptions,
+  type QRCodePNGImageRendererOptions,
+  type QRCodeWebPImageOptions,
+  type QRCodeWebPImageRendererOptions,
   canvasCenterImage,
 } from '../src';
 
@@ -16,8 +21,17 @@ describe('public API types', () => {
     expectTypeOf<QRCodeCanvasOptions>().toEqualTypeOf<
       QRCodeCanvasRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
     >();
-    expectTypeOf<QRCodeImageOptions>().toEqualTypeOf<
-      QRCodeImageRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
+    expectTypeOf<QRCodePNGImageOptions>().toEqualTypeOf<
+      QRCodePNGImageRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
+    >();
+    expectTypeOf<QRCodeWebPImageOptions>().toEqualTypeOf<
+      QRCodeWebPImageRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
+    >();
+    expectTypeOf<QRCodeGIFImageOptions>().toEqualTypeOf<
+      QRCodeGIFImageRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
+    >();
+    expectTypeOf<QRCodeGIFImageRendererOptions['transparency']>().toEqualTypeOf<
+      {readonly threshold?: number} | undefined
     >();
   });
 

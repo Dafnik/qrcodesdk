@@ -1,7 +1,13 @@
 import {captureDownloads, matrixFromRows} from '@repo/core-testing';
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 
-import {QRCodeDownloadImageRenderer, QRCodeDownloadSVGRenderer, QRCodeImageRenderer} from '../src';
+import {
+  QRCodeDownloadImageRenderer,
+  QRCodeDownloadSVGRenderer,
+  QRCodeGIFImageRenderer,
+  QRCodePNGImageRenderer,
+  QRCodeWebPImageRenderer,
+} from '../src';
 
 describe('download QR code renderers', () => {
   beforeEach(() => {
@@ -18,7 +24,7 @@ describe('download QR code renderers', () => {
     const downloads = captureDownloads(vi);
 
     QRCodeDownloadImageRenderer({
-      renderer: QRCodeImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
+      renderer: QRCodePNGImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
       filename: 'ticket',
     })(matrixFromRows([[1]]));
 
@@ -30,11 +36,41 @@ describe('download QR code renderers', () => {
     ]);
   });
 
+  test.each([
+    {format: 'WebP', createRenderer: QRCodeWebPImageRenderer, extension: 'webp'},
+    {format: 'GIF', createRenderer: QRCodeGIFImageRenderer, extension: 'gif'},
+  ])('downloads $format image output with its extension', ({createRenderer, extension}) => {
+    const downloads = captureDownloads(vi);
+
+    QRCodeDownloadImageRenderer({
+      renderer: createRenderer({style: {moduleSize: 1, quietZone: 0}}),
+      filename: 'ticket',
+    })(matrixFromRows([[1]]));
+
+    expect(downloads).toEqual([
+      {
+        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
+        filename: `ticket.${extension}`,
+      },
+    ]);
+  });
+
+  test('keeps the filename of image output with an unknown type', () => {
+    const downloads = captureDownloads(vi);
+
+    QRCodeDownloadImageRenderer({
+      renderer: () => ({src: 'blob:qrcode-image'}) as HTMLImageElement,
+      filename: 'ticket',
+    })(matrixFromRows([[1]]));
+
+    expect(downloads).toEqual([{href: 'blob:qrcode-image', filename: 'ticket'}]);
+  });
+
   test('does not duplicate an existing PNG extension', () => {
     const downloads = captureDownloads(vi);
 
     QRCodeDownloadImageRenderer({
-      renderer: QRCodeImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
+      renderer: QRCodePNGImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
       filename: 'ticket.png',
     })(matrixFromRows([[1]]));
 

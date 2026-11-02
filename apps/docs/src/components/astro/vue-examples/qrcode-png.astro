@@ -1,0 +1,8 @@
+---
+import QRCodePNGExample, {content} from '../../vue/qrcode-png-example.vue?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content} lang="vue">
+  <QRCodePNGExample client:load />
+</QRCodeExample>

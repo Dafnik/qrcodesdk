@@ -22,8 +22,10 @@ export function extractPaths(svg: string): SvgPath[] {
   }));
 }
 
+// Scans the code as displayed on a white page, so transparent backgrounds stay light.
 export async function decodeSvgQRCode(svg: string): Promise<string> {
   const {data, info} = await sharp(Buffer.from(svg))
+    .flatten({background: '#ffffff'})
     .ensureAlpha()
     .raw()
     .toBuffer({resolveWithObject: true});

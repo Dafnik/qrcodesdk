@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {Buffer} from 'node:buffer';
 
 import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer} from '@qrcodesdk/node';
+import {QRCodeGIFRenderer, QRCodePNGRenderer, QRCodeWebPRenderer} from '@qrcodesdk/node';
 
 function logSuccess(message) {
   globalThis.console.log(`  ✓ ${message}`);
@@ -25,5 +25,20 @@ logSuccess('rendered output has a valid PNG signature');
 assert.equal(png.readUInt32BE(16), 31);
 assert.equal(png.readUInt32BE(20), 31);
 logSuccess('rendered PNG has the expected 31×31 dimensions');
+
+const builder = qrcode('Runtime ✅ 你好').mode('octet').errorCorrection('H').mask(3);
+
+const webp = builder.render(QRCodeWebPRenderer({style: {moduleSize: 1, quietZone: 1}}));
+assert.equal(Buffer.isBuffer(webp), true);
+assert.equal(webp.toString('latin1', 0, 4), 'RIFF');
+assert.equal(webp.toString('latin1', 8, 16), 'WEBPVP8L');
+logSuccess('WebP renderer returns lossless WebP bytes');
+
+const gif = builder.render(QRCodeGIFRenderer({style: {moduleSize: 1, quietZone: 1}}));
+assert.equal(Buffer.isBuffer(gif), true);
+assert.equal(gif.toString('latin1', 0, 6), 'GIF89a');
+assert.equal(gif.readUInt16LE(6), 31);
+assert.equal(gif.readUInt16LE(8), 31);
+logSuccess('GIF renderer returns 31×31 GIF bytes');
 
 globalThis.console.log('@qrcodesdk/node installed-package smoke test passed');

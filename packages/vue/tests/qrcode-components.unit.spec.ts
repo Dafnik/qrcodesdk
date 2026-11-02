@@ -18,8 +18,10 @@ describe('Vue QR code component API', () => {
     // An exact list keeps internal helpers out of the package root.
     expect(Object.keys(vueApi).sort()).toEqual([
       'QRCodeCanvas',
-      'QRCodeImage',
+      'QRCodeGIF',
+      'QRCodePNG',
       'QRCodeSVG',
+      'QRCodeWebP',
       'alignment',
       'canvasCenterImage',
       'circle',
@@ -38,7 +40,7 @@ describe('Vue QR code component API', () => {
 
   test('exposes SVG and image download handles', () => {
     const svg = mount(vueApi.QRCodeSVG, {props: {payload: 'HELLO'}});
-    const image = mount(vueApi.QRCodeImage, {props: {payload: 'HELLO'}});
+    const image = mount(vueApi.QRCodePNG, {props: {payload: 'HELLO'}});
 
     expect((svg.vm as unknown as QRCodeDownloadHandle).download).toBeTypeOf('function');
     expect((image.vm as unknown as QRCodeDownloadHandle).download).toBeTypeOf('function');

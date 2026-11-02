@@ -12,7 +12,7 @@ import type {
 
 declare const __QRCODESDK_CLI_VERSION__: string;
 
-type OutputFormat = 'text' | 'svg' | 'png';
+type OutputFormat = 'text' | 'svg' | 'png' | 'webp' | 'gif';
 
 type RawCliOptions = {
   readonly payload?: string;
@@ -74,8 +74,8 @@ export type CliRuntime = {
 
 class CliError extends Error {}
 
-const outputFormats = ['text', 'svg', 'png'] as const;
-const fileOutputFormats = ['svg', 'png'] as const;
+const outputFormats = ['text', 'svg', 'png', 'webp', 'gif'] as const;
+const fileOutputFormats = ['svg', 'png', 'webp', 'gif'] as const;
 const modes = ['numeric', 'alphanumeric', 'octet'] as const;
 const errorCorrectionLevels = ['L', 'M', 'Q', 'H'] as const;
 const layouts = ['compact', 'full'] as const;
@@ -83,8 +83,12 @@ const ansiModes = ['off', 'blocks', 'background'] as const;
 
 const stringOptions = [
   ['payload', 'value', 'QR code payload, equivalent to positional [payload]'],
-  ['format', 'format', 'Output format. Inferred from `.svg` or `.png` output paths'],
-  ['output', 'path', 'Required output path for SVG and PNG'],
+  [
+    'format',
+    'format',
+    'Output format: text, svg, png, webp, or gif. Inferred from the output path extension',
+  ],
+  ['output', 'path', 'Required output path for SVG, PNG, WebP, and GIF'],
   ['mode', 'mode', 'QR code mode: numeric, alphanumeric, or octet'],
   ['error-correction', 'level', 'Error correction level: L, M, Q, or H'],
   ['version', 'version', 'Pin a QR code version from 1 to 40'],
@@ -190,7 +194,7 @@ function helpText(): string {
     ['-V', 'Print the installed CLI package version'],
     ['-h, --help', 'Show this help'],
   );
-  return `Usage: qrc [payload] [options]\n\nGenerate QR codes as terminal text, SVG files, or PNG files.\n\nOptions:\n${options.map(([flag, description]) => `  ${flag!.padEnd(30)} ${description}`).join('\n')}\n`;
+  return `Usage: qrc [payload] [options]\n\nGenerate QR codes as terminal text, SVG files, or PNG, WebP, and GIF files.\n\nOptions:\n${options.map(([flag, description]) => `  ${flag!.padEnd(30)} ${description}`).join('\n')}\n`;
 }
 
 async function resolveCliOptions(
@@ -280,7 +284,7 @@ async function resolveFormat(
 
   if (!interactive) {
     throw new CliError(
-      'Unable to infer output format from --output. Pass --format text, svg, or png.',
+      'Unable to infer output format from --output. Pass --format text, svg, png, webp, or gif.',
     );
   }
 
@@ -290,6 +294,8 @@ async function resolveFormat(
     options: [
       {value: 'svg', label: 'SVG file'},
       {value: 'png', label: 'PNG file'},
+      {value: 'webp', label: 'WebP file'},
+      {value: 'gif', label: 'GIF file'},
     ],
   });
 
@@ -304,7 +310,7 @@ async function resolveOutput(
 ): Promise<string | undefined> {
   if (format === 'text') {
     if (output !== undefined) {
-      throw new CliError('--output is only supported with svg or png output.');
+      throw new CliError('--output is only supported with svg, png, webp, or gif output.');
     }
 
     return undefined;
@@ -419,9 +425,15 @@ async function render(
     return;
   }
 
-  const {QRCodePNGRenderer} = await import('@qrcodesdk/node');
-  const png = builder.render(QRCodePNGRenderer({style: options.style}));
-  await writeFile(requiredOutput(options), png);
+  const {QRCodeGIFRenderer, QRCodePNGRenderer, QRCodeWebPRenderer} =
+    await import('@qrcodesdk/node');
+  const createRenderer =
+    options.format === 'webp'
+      ? QRCodeWebPRenderer
+      : options.format === 'gif'
+        ? QRCodeGIFRenderer
+        : QRCodePNGRenderer;
+  await writeFile(requiredOutput(options), builder.render(createRenderer({style: options.style})));
   stderr.write(`${styleText('green', 'Wrote')} ${requiredOutput(options)}\n`);
 }
 
@@ -435,6 +447,8 @@ function inferFormatFromOutput(output: string): OutputFormat | undefined {
   const normalized = output.toLowerCase();
   if (normalized.endsWith('.svg')) return 'svg';
   if (normalized.endsWith('.png')) return 'png';
+  if (normalized.endsWith('.webp')) return 'webp';
+  if (normalized.endsWith('.gif')) return 'gif';
   return undefined;
 }
 

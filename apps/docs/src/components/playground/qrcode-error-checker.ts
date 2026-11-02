@@ -1,4 +1,9 @@
-import {QRCodeCanvasRenderer, QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {
+  QRCodeCanvasRenderer,
+  QRCodeGIFImageRenderer,
+  QRCodePNGImageRenderer,
+  QRCodeWebPImageRenderer,
+} from '@qrcodesdk/browser';
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 import {
@@ -9,6 +14,12 @@ import {
   createPlaygroundSVGOptions,
   playgroundPreparedImage,
 } from './playground-options.ts';
+
+const IMAGE_RENDERERS = {
+  png: QRCodePNGImageRenderer,
+  webp: QRCodeWebPImageRenderer,
+  gif: QRCodeGIFImageRenderer,
+} as const;
 
 export function hasQRCodeError(
   options: PlaygroundOptions,
@@ -21,9 +32,13 @@ export function hasQRCodeError(
         qrcode(options.payload).options(matrix).render(QRCodeCanvasRenderer(rendererOptions));
         break;
       }
-      case 'image': {
+      case 'png':
+      case 'webp':
+      case 'gif': {
         const {matrix, ...rendererOptions} = createPlaygroundImageOptions(options, preparedImage);
-        qrcode(options.payload).options(matrix).render(QRCodeImageRenderer(rendererOptions));
+        qrcode(options.payload)
+          .options(matrix)
+          .render(IMAGE_RENDERERS[options.output](rendererOptions));
         break;
       }
       case 'svg': {

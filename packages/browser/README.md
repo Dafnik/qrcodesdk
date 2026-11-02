@@ -49,27 +49,46 @@ yarn add @qrcodesdk/core @qrcodesdk/browser
 
 </details>
 
-The renderers are also available from `@qrcodesdk/browser/canvas`,
-`@qrcodesdk/browser/image`, and `@qrcodesdk/browser/svg`. Use these entrypoints to
-load only the required output code when importing directly without an application bundler.
+## Entry points
+
+Each image format has its own entry point, so code that imports one renderer only loads that
+format's encoder. Use these entry points when importing directly without an application bundler.
+The root `@qrcodesdk/browser` entry point re-exports everything; bundlers with tree shaking drop the
+encoders you do not use.
+
+| Entry point                 | Exports                                                             |
+| --------------------------- | ------------------------------------------------------------------- |
+| `@qrcodesdk/browser/png`    | `QRCodePNGImageRenderer`                                            |
+| `@qrcodesdk/browser/webp`   | `QRCodeWebPImageRenderer`                                           |
+| `@qrcodesdk/browser/gif`    | `QRCodeGIFImageRenderer`                                            |
+| `@qrcodesdk/browser/image`  | `QRCodeDownloadImageRenderer` and shared Image element option types |
+| `@qrcodesdk/browser/canvas` | `QRCodeCanvasRenderer` and `canvasCenterImage()`                    |
+| `@qrcodesdk/browser/svg`    | `QRCodeDownloadSVGRenderer`                                         |
 
 ## Choose an output
 
-| Need                            | Renderer                      | Return value        |
-| ------------------------------- | ----------------------------- | ------------------- |
-| Insert a PNG-backed image       | `QRCodeImageRenderer`         | `HTMLImageElement`  |
-| Draw or export with Canvas APIs | `QRCodeCanvasRenderer`        | `HTMLCanvasElement` |
-| Trigger an SVG download         | `QRCodeDownloadSVGRenderer`   | `void`              |
-| Trigger a PNG download          | `QRCodeDownloadImageRenderer` | `void`              |
+| Need                                 | Renderer                      | Return value        |
+| ------------------------------------ | ----------------------------- | ------------------- |
+| Insert a PNG-backed image            | `QRCodePNGImageRenderer`      | `HTMLImageElement`  |
+| Insert a smaller WebP image          | `QRCodeWebPImageRenderer`     | `HTMLImageElement`  |
+| Insert a GIF image                   | `QRCodeGIFImageRenderer`      | `HTMLImageElement`  |
+| Draw or export with Canvas APIs      | `QRCodeCanvasRenderer`        | `HTMLCanvasElement` |
+| Trigger an SVG download              | `QRCodeDownloadSVGRenderer`   | `void`              |
+| Trigger a PNG, WebP, or GIF download | `QRCodeDownloadImageRenderer` | `void`              |
+
+PNG uses the browser's native encoder and is the default choice. WebP is lossless and usually the
+smallest file. Its encoder is bundled in the SDK, so output is the same in every browser, including
+Safari, which cannot encode WebP natively. GIF is limited to 256 colors and binary transparency,
+so prefer PNG or WebP for transparent backgrounds and photographic center images.
 
 ## Render an Image element
 
 ```ts
-import {QRCodeImageRenderer} from '@qrcodesdk/browser';
+import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodeImageRenderer({
+  QRCodePNGImageRenderer({
     accessibility: {
       alt: 'QR code for qrcodesdk.dev',
       ariaLabel: 'Scan to open qrcodesdk.dev',
@@ -80,7 +99,9 @@ const image = qrcode('https://qrcodesdk.dev').render(
 document.body.append(image);
 ```
 
-`QRCodeImageRenderer()` returns an `HTMLImageElement`. Its `src` is a PNG data URL, and its `width` and `height` match the rendered QR code size.
+`QRCodePNGImageRenderer()` returns an `HTMLImageElement`. Its `src` is a PNG data URL, and its
+`width` and `height` match the rendered QR code size. `QRCodeWebPImageRenderer()` and
+`QRCodeGIFImageRenderer()` take the same options and return WebP and GIF data URLs.
 
 See [Render QR codes in the browser](https://qrcodesdk.dev/guides/browser-usage/) for inserting and replacing browser output.
 
@@ -89,18 +110,18 @@ See [Render QR codes in the browser](https://qrcodesdk.dev/guides/browser-usage/
 Each output has a dedicated reference for its return value, options, and browser constraints:
 
 - [Canvas element](https://qrcodesdk.dev/reference/renderers/canvas/)
-- [PNG-backed Image element](https://qrcodesdk.dev/reference/renderers/image/)
-- [SVG and PNG download wrappers](https://qrcodesdk.dev/reference/renderers/browser-downloads/)
+- [PNG, WebP, and GIF Image elements](https://qrcodesdk.dev/reference/renderers/image/)
+- [SVG and image download wrappers](https://qrcodesdk.dev/reference/renderers/browser-downloads/)
 
-Canvas and Image output take an optional center image created with `canvasCenterImage()`. Follow
-[Add a center image](https://qrcodesdk.dev/guides/center-images/) to prepare a `CanvasImageSource`, and
+Canvas and Image element output take an optional center image created with `canvasCenterImage()`.
+Follow [Add a center image](https://qrcodesdk.dev/guides/center-images/) to prepare a `CanvasImageSource`, and
 [Download or save](https://qrcodesdk.dev/guides/download-or-save/) for browser helpers and manual Canvas export.
 
 ## Runtime constraints
 
 Create these renderers only where `document`, Canvas, and browser download APIs are available.
 For server rendering, defer them until hydration or use the runtime-neutral SVG renderer from
-`@qrcodesdk/core`. Use `@qrcodesdk/node` when you need PNG bytes without a DOM.
+`@qrcodesdk/core`. Use `@qrcodesdk/node` when you need PNG, WebP, or GIF bytes without a DOM.
 
 ## Public API
 
@@ -115,10 +136,17 @@ import {
   type QRCodeDownloadImageRendererOptions,
   QRCodeDownloadSVGRenderer,
   type QRCodeDownloadSVGRendererOptions,
+  type QRCodeGIFImageOptions,
+  QRCodeGIFImageRenderer,
+  type QRCodeGIFImageRendererOptions,
   type QRCodeImageAccessibilityOptions,
-  type QRCodeImageOptions,
-  QRCodeImageRenderer,
   type QRCodeImageRendererOptions,
+  type QRCodePNGImageOptions,
+  QRCodePNGImageRenderer,
+  type QRCodePNGImageRendererOptions,
+  type QRCodeWebPImageOptions,
+  QRCodeWebPImageRenderer,
+  type QRCodeWebPImageRendererOptions,
   canvasCenterImage,
 } from '@qrcodesdk/browser';
 ```
@@ -128,6 +156,6 @@ import {
 - [@qrcodesdk/browser](https://qrcodesdk.dev/packages/browser/)
 - [Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/)
 - [Canvas element renderer](https://qrcodesdk.dev/reference/renderers/canvas/)
-- [PNG-backed Image element renderer](https://qrcodesdk.dev/reference/renderers/image/)
+- [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/)
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)

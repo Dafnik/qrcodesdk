@@ -1,6 +1,6 @@
 ---
 title: '@qrcodesdk/svelte'
-description: '@qrcodesdk/svelte provides Svelte components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas elements.'
+description: '@qrcodesdk/svelte provides Svelte components for rendering QR codes as inline SVG, PNG, WebP, and GIF Image elements, and Canvas elements.'
 docType: package
 packageName: '@qrcodesdk/svelte'
 
@@ -20,14 +20,16 @@ related:
 ---
 
 import QRCodeCanvas from '../../../components/astro/svelte-examples/qrcode-canvas.astro';
-import QRCodeDownloadImage from '../../../components/astro/svelte-examples/qrcode-download-image.astro';
-import QRCodeImage from '../../../components/astro/svelte-examples/qrcode-image.astro';
+import QRCodeDownloadPNG from '../../../components/astro/svelte-examples/qrcode-download-png.astro';
+import QRCodeGIF from '../../../components/astro/svelte-examples/qrcode-gif.astro';
+import QRCodePNG from '../../../components/astro/svelte-examples/qrcode-png.astro';
 import QRCodeSVG from '../../../components/astro/svelte-examples/qrcode-svg.astro';
+import QRCodeWebP from '../../../components/astro/svelte-examples/qrcode-webp.astro';
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 import PackageComponents from '../../../components/packages/package-components.astro';
 
-Svelte components for rendering QR codes as inline SVG, PNG-backed Image elements, and Canvas
-elements.
+Svelte components for rendering QR codes as inline SVG, PNG, WebP, and GIF Image elements, and
+Canvas elements.
 
 ## Install
 
@@ -39,11 +41,11 @@ Import the components directly in a Svelte component:
 
 ```svelte
 <script lang="ts">
-  import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/svelte';
+  import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/svelte';
 </script>
 
 <QRCodeSVG payload="https://qrcodesdk.dev" />
-<QRCodeImage payload="https://qrcodesdk.dev" />
+<QRCodePNG payload="https://qrcodesdk.dev" />
 <QRCodeCanvas payload="https://qrcodesdk.dev" />
 ```
 
@@ -57,6 +59,13 @@ Import the components directly in a Svelte component:
 
 <PackageComponents />
 
+Each image format has its own component, so your bundle only includes the encoders of the components
+you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
+usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
+is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
+and photographic center images. See the [Image element renderers](/reference/renderers/image/)
+reference for details.
+
 The components forward `class`, `style`, and other native `<div>` attributes to their wrapper.
 Use `bind:this` when you need a download handle; the rendered SVG, Image, or Canvas remains inside
 that wrapper.
@@ -67,9 +76,17 @@ that wrapper.
 
 <QRCodeSVG />
 
-### Image component
+### PNG component
 
-<QRCodeImage />
+<QRCodePNG />
+
+### WebP component
+
+<QRCodeWebP />
+
+### GIF component
+
+<QRCodeGIF />
 
 ### Canvas component
 
@@ -77,20 +94,21 @@ that wrapper.
 
 ### PNG download
 
-<QRCodeDownloadImage />
+<QRCodeDownloadPNG />
 
 ## Center images
 
 Load and decode a browser image first, store it in rune-mode state, and pass
-`canvasCenterImage(image)` as `options.centerImage`. Render the Image or Canvas component only after
-the source is ready. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
+`canvasCenterImage(image)` as `options.centerImage`. Render the PNG, WebP, GIF, or Canvas component
+only after the source is ready. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
 [Add a center image](/guides/center-images/#svelte) for a complete
 Svelte example.
 
 ## Download files
 
-`QRCodeSVG` and `QRCodeImage` expose `download(filename?)` for SVG and PNG files respectively.
-The method appends the file extension when needed. `QRCodeCanvas` has no download method.
+`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, and `QRCodeGIF` expose `download(filename?)` for SVG, PNG,
+WebP, and GIF files respectively. The method appends the matching file extension when needed.
+`QRCodeCanvas` has no download method.
 
 See [Download or save](/guides/download-or-save/#download-from-svelte) for the complete
 Svelte example, or its [Canvas export section](/guides/download-or-save/#export-a-canvas-manually)
@@ -100,7 +118,7 @@ for manual downloads.
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
-`QRCodeImage` and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they render an empty wrapper
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they render an empty wrapper
 on the server and populate it after mounting in the browser. Their download methods also skip work
 outside the browser.
 
@@ -119,8 +137,9 @@ const options: QRCodeSVGOptions = {
 };
 ```
 
-Pass this object through the component's `options` prop. Use `QRCodeImageOptions` or
-`QRCodeCanvasOptions` for the corresponding component.
+Pass this object through the component's `options` prop. Use `QRCodePNGImageOptions`,
+`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, or `QRCodeCanvasOptions` for the corresponding
+component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`.
 
 Import shape and pattern factories, and center-image factories from `@qrcodesdk/svelte` alongside the components.
 
@@ -152,15 +171,18 @@ import {
   type QRCodeFinderOptions,
   type QRCodeFinderRingShape,
   type QRCodeFinderStyle,
-  QRCodeImage,
+  QRCodeGIF,
+  type QRCodeGIFImageOptions,
+  type QRCodeGIFProps,
   type QRCodeImageAccessibilityOptions,
-  type QRCodeImageOptions,
-  type QRCodeImageProps,
   type QRCodeMask,
   type QRCodeMatrixOptions,
   type QRCodeMode,
   type QRCodeModulePattern,
   type QRCodeModuleShape,
+  QRCodePNG,
+  type QRCodePNGImageOptions,
+  type QRCodePNGProps,
   type QRCodePayload,
   type QRCodeRoundedShapeOptions,
   QRCodeSVG,
@@ -173,6 +195,9 @@ import {
   type QRCodeShapePiece,
   type QRCodeVersion,
   type QRCodeVisualStyle,
+  QRCodeWebP,
+  type QRCodeWebPImageOptions,
+  type QRCodeWebPProps,
   alignment,
   canvasCenterImage,
   circle,

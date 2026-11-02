@@ -9,6 +9,8 @@ export default defineConfig({
     text: 'src/text.ts',
     error: 'src/error.ts',
     internal: 'src/internal.ts',
+    'internal/gif': 'src/internal-gif.ts',
+    'internal/webp': 'src/internal-webp.ts',
     payload: 'src/payload.ts',
   },
   dts: {

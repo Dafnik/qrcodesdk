@@ -2,15 +2,15 @@
   "extends": ["//"],
   "tasks": {
     "test": {
-      "env": ["UPDATE_PNG_SNAPSHOTS"]
+      "env": ["UPDATE_PNG_SNAPSHOTS", "UPDATE_WEBP_SNAPSHOTS", "UPDATE_GIF_SNAPSHOTS"]
     },
     "test:coverage:raw": {
-      "env": ["UPDATE_PNG_SNAPSHOTS"]
+      "env": ["UPDATE_PNG_SNAPSHOTS", "UPDATE_WEBP_SNAPSHOTS", "UPDATE_GIF_SNAPSHOTS"]
     },
     "test:snapshots": {
       "cache": false,
       "dependsOn": ["build"],
-      "env": ["UPDATE_PNG_SNAPSHOTS"]
+      "env": ["UPDATE_PNG_SNAPSHOTS", "UPDATE_WEBP_SNAPSHOTS", "UPDATE_GIF_SNAPSHOTS"]
     }
   }
 }

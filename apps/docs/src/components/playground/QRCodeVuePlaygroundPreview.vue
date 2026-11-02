@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import {useStore} from '@nanostores/vue';
-import {QRCodeCanvas, type QRCodeDownloadHandle, QRCodeImage, QRCodeSVG} from '@qrcodesdk/vue';
+import {
+  QRCodeCanvas,
+  type QRCodeDownloadHandle,
+  QRCodeGIF,
+  QRCodePNG,
+  QRCodeSVG,
+  QRCodeWebP,
+} from '@qrcodesdk/vue';
 import {computed, ref} from 'vue';
 
 import {
   createPlaygroundCanvasOptions,
   createPlaygroundImageOptions,
   createPlaygroundSVGOptions,
+  isPlaygroundImageOutput,
   playgroundOptions,
   playgroundPreparedImage,
 } from './playground-options.ts';
@@ -20,6 +28,16 @@ const error = computed(() => hasQRCodeError(options.value, preparedImage.value))
 const svgOptions = computed(() => createPlaygroundSVGOptions(options.value, preparedImage.value));
 const imageOptions = computed(() =>
   createPlaygroundImageOptions(options.value, preparedImage.value),
+);
+const IMAGE_COMPONENTS = {
+  png: {component: QRCodePNG, label: 'Download PNG'},
+  webp: {component: QRCodeWebP, label: 'Download WebP'},
+  gif: {component: QRCodeGIF, label: 'Download GIF'},
+} as const;
+const imageComponent = computed(() =>
+  isPlaygroundImageOutput(options.value.output)
+    ? IMAGE_COMPONENTS[options.value.output]
+    : undefined,
 );
 const canvasOptions = computed(() =>
   createPlaygroundCanvasOptions(options.value, preparedImage.value),
@@ -50,13 +68,18 @@ const canvasOptions = computed(() =>
       </button>
     </template>
 
-    <template v-else-if="options.output === 'image'">
-      <QRCodeImage ref="imageQRCode" :payload="options.payload" :options="imageOptions" />
+    <template v-else-if="imageComponent">
+      <component
+        :is="imageComponent.component"
+        :key="options.output"
+        ref="imageQRCode"
+        :payload="options.payload"
+        :options="imageOptions" />
       <button
         class="btn-primary large min-w-64"
         type="button"
         @click="imageQRCode?.download('qrcodesdk')">
-        Download PNG
+        {{ imageComponent.label }}
       </button>
     </template>
 

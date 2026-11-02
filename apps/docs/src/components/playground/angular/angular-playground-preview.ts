@@ -5,7 +5,7 @@ import {NanostoresService} from '@nanostores/angular';
 import {HlmAlertImports} from '@spartan-ng/helm/alert';
 import {HlmButtonImports} from '@spartan-ng/helm/button';
 
-import {QRCodeCanvas, QRCodeImage, QRCodeSVG} from '@qrcodesdk/angular';
+import {QRCodeCanvas, QRCodeGIF, QRCodePNG, QRCodeSVG, QRCodeWebP} from '@qrcodesdk/angular';
 
 import {suppressInitialTransitions} from '../../angular/suppress-initial-transitions.ts';
 import {
@@ -19,7 +19,15 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
 
 @Component({
   selector: 'qrcode-angular-playground-preview',
-  imports: [QRCodeCanvas, QRCodeImage, QRCodeSVG, HlmButtonImports, HlmAlertImports],
+  imports: [
+    QRCodeCanvas,
+    QRCodeGIF,
+    QRCodePNG,
+    QRCodeSVG,
+    QRCodeWebP,
+    HlmButtonImports,
+    HlmAlertImports,
+  ],
   template: `
     <div class="flex flex-col items-center justify-center gap-4">
       @if (hasError(); as error) {
@@ -40,8 +48,8 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
             type="button">
             Download SVG
           </button>
-        } @else if (options().output === 'image') {
-          <qrcode-image #qrcode [payload]="options().payload" [options]="imageOptions()" />
+        } @else if (options().output === 'png') {
+          <qrcode-png #qrcode [payload]="options().payload" [options]="imageOptions()" />
           <button
             class="min-w-64"
             (click)="qrcode.download('qrcodesdk')"
@@ -49,6 +57,26 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
             hlmBtn
             type="button">
             Download PNG
+          </button>
+        } @else if (options().output === 'webp') {
+          <qrcode-webp #qrcode [payload]="options().payload" [options]="imageOptions()" />
+          <button
+            class="min-w-64"
+            (click)="qrcode.download('qrcodesdk')"
+            size="lg"
+            hlmBtn
+            type="button">
+            Download WebP
+          </button>
+        } @else if (options().output === 'gif') {
+          <qrcode-gif #qrcode [payload]="options().payload" [options]="imageOptions()" />
+          <button
+            class="min-w-64"
+            (click)="qrcode.download('qrcodesdk')"
+            size="lg"
+            hlmBtn
+            type="button">
+            Download GIF
           </button>
         } @else {
           <qrcode-canvas [payload]="options().payload" [options]="canvasOptions()" />

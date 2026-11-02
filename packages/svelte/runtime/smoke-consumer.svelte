@@ -3,7 +3,7 @@
 
   import {
     QRCodeCanvas,
-    QRCodeImage,
+    QRCodePNG,
     QRCodeSVG,
     type QRCodeSVGOptions,
     svgCenterImage,
@@ -31,7 +31,7 @@
     <QRCodeSVG payload="HELLO" {options} />
   </section>
   <section data-testid="qrcode-image">
-    <QRCodeImage payload="HELLO" options={imageOptions} />
+    <QRCodePNG payload="HELLO" options={imageOptions} />
   </section>
   <section data-testid="qrcode-canvas">
     <QRCodeCanvas payload="HELLO" {options} />

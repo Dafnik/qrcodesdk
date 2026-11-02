@@ -37,3 +37,10 @@ rasterizes
 ɵresolve
 unstub
 librsvg
+ɵencode
+webp
+xsize
+bitstream
+libwebp
+giflib
+WEBPVP

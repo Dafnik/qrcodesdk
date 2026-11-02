@@ -1,0 +1,8 @@
+---
+import QRCodeWebPExample, {content} from '../../angular/qrcode-webp-example.ts?includeContent';
+import QRCodeExample from '../../qrcode-example.astro';
+---
+
+<QRCodeExample code={content}>
+  <QRCodeWebPExample client:load />
+</QRCodeExample>

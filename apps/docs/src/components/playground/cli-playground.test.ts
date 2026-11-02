@@ -241,6 +241,8 @@ describe('CLI commands and real CLI output', () => {
     {payload: 'HELLO', mode: 'numeric'},
     {moduleSize: 1000},
     {format: 'png'},
+    {format: 'webp'},
+    {format: 'gif'},
   ]) {
     test(`rejects invalid configuration ${JSON.stringify(patch)}`, () => {
       assert.equal(

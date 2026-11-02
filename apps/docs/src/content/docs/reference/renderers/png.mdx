@@ -5,6 +5,8 @@ docType: reference
 
 related:
   - ../../packages/node.mdx
+  - ./webp.md
+  - ./gif.md
   - ../../guides/center-images.md
   - ../../guides/download-or-save.md
   - ../../guides/server-output.md
@@ -13,7 +15,9 @@ related:
 ## When to use
 
 Use `QRCodePNGRenderer` when Node.js-compatible code needs PNG bytes for a file, HTTP response,
-attachment, object store, or another binary API.
+attachment, object store, or another binary API. PNG is the most widely supported raster format.
+For smaller files, use the [WebP Buffer renderer](/reference/renderers/webp/); for destinations that
+only accept GIF, use the [GIF Buffer renderer](/reference/renderers/gif/).
 
 ## Minimal example
 
@@ -56,50 +60,54 @@ throws `QRCodeError` with code `INVALID_OPTIONS` before any pixels are allocated
 `QRCodePNGRendererOptions` accepts `style`, `centerImage`, and `compression`. TypeScript rejects
 every other key; the renderer does not repeat that check at runtime.
 
-| Option              | Type                   | Default         | Effect                                           |
-| ------------------- | ---------------------- | --------------- | ------------------------------------------------ |
-| `style`             | `QRCodeVisualStyle`    | shared defaults | Applies graphical dimensions, colors, and shapes |
-| `compression.level` | integer `0`–`9`        | `9`             | Sets the PNG DEFLATE compression level           |
-| `centerImage`       | `QRCodePNGCenterImage` | `undefined`     | Draws a center image from `pngCenterImage()`     |
+| Option              | Type                      | Default         | Effect                                           |
+| ------------------- | ------------------------- | --------------- | ------------------------------------------------ |
+| `style`             | `QRCodeVisualStyle`       | shared defaults | Applies graphical dimensions, colors, and shapes |
+| `compression.level` | integer `0`–`9`           | `9`             | Sets the PNG DEFLATE compression level           |
+| `centerImage`       | `QRCodeRasterCenterImage` | `undefined`     | Draws a center image from `rasterCenterImage()`  |
+
+`style` and `centerImage` form `QRCodeRasterRendererOptions`, which the PNG, WebP, and GIF renderers
+share.
 
 Compression changes encoding effort and file size, not the rendered QR modules. A level of `0`
 disables DEFLATE compression; `9` requests the highest level.
 
 ## Center image
 
-`pngCenterImage(source, layout?)` from `@qrcodesdk/node` creates the `centerImage` value. It
-validates and decodes the PNG bytes once, so one center image can be reused for many renders:
+`rasterCenterImage(source, layout?)` from `@qrcodesdk/node` creates the `centerImage` value for the
+PNG, WebP, and GIF renderers. It validates and decodes the PNG bytes once, so one center image can be
+reused for many renders and formats:
 
 ```ts
 import {readFile} from 'node:fs/promises';
 
 import {qrcode} from '@qrcodesdk/core';
-import {QRCodePNGRenderer, pngCenterImage} from '@qrcodesdk/node';
+import {QRCodePNGRenderer, rasterCenterImage} from '@qrcodesdk/node';
 
-const centerImage = pngCenterImage(await readFile('./logo.png'), {size: 0.3});
+const centerImage = rasterCenterImage(await readFile('./logo.png'), {size: 0.3});
 const png = qrcode('https://qrcodesdk.dev')
   .errorCorrection('H')
   .render(QRCodePNGRenderer({centerImage}));
 ```
 
-| Parameter                | Type      | Default  | Effect                                                |
-| ------------------------ | --------- | -------- | ----------------------------------------------------- |
-| `source`                 | `Buffer`  | required | PNG bytes                                             |
-| `layout.size`            | `number`  | `0.3`    | Image box as a fraction of matrix width               |
-| `layout.padding`         | `number`  | `1`      | Cleared border around the image, in modules           |
-| `layout.clearBackground` | `boolean` | `true`   | Removes every module the image or its padding touches |
+| Parameter                | Type         | Default  | Effect                                                |
+| ------------------------ | ------------ | -------- | ----------------------------------------------------- |
+| `source`                 | `Uint8Array` | required | PNG bytes, such as a Node.js `Buffer`                 |
+| `layout.size`            | `number`     | `0.3`    | Image box as a fraction of matrix width               |
+| `layout.padding`         | `number`     | `1`      | Cleared border around the image, in modules           |
+| `layout.clearBackground` | `boolean`    | `true`   | Removes every module the image or its padding touches |
 
 ## Renderer-specific constraints
 
 - `compression.level` must be a safe integer from `0` through `9`.
 - The center-image source must be a `Uint8Array`, such as a Node.js `Buffer`, containing valid PNG bytes, at most 16 MiB and
-  16,777,216 pixels. Other formats, paths, and URLs are not decoded. `pngCenterImage()` throws
+  16,777,216 pixels. Other formats, paths, and URLs are not decoded. `rasterCenterImage()` throws
   `INVALID_IMAGE_SOURCE` for invalid sources and `INVALID_OPTIONS` for an invalid layout.
-- Pass a `centerImage` created with `pngCenterImage()`; TypeScript checks the factory result type.
+- Pass a `centerImage` created with `rasterCenterImage()`; TypeScript checks the factory result type.
 - Center images preserve aspect ratio, are composited with alpha, and are contained within the
   configured square without cropping.
 - Option values are copied when `QRCodePNGRenderer()` is called. The center image is
-  decoded when `pngCenterImage()` is called, so later changes to the source bytes have no effect.
+  decoded when `rasterCenterImage()` is called, so later changes to the source bytes have no effect.
 
 ## Related guides
 
