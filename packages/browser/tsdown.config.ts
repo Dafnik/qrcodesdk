@@ -6,6 +6,7 @@ export default defineConfig({
     'src/canvas.ts',
     'src/gif.ts',
     'src/image.ts',
+    'src/jpeg.ts',
     'src/png.ts',
     'src/svg.ts',
     'src/webp.ts',

@@ -63,7 +63,7 @@ describe('playground ECI query synchronization', () => {
 
 describe('playground output query synchronization', () => {
   test('parses every output and maps the former image output to PNG', () => {
-    for (const output of ['svg', 'png', 'webp', 'gif', 'canvas'] as const) {
+    for (const output of ['svg', 'png', 'webp', 'gif', 'jpeg', 'canvas'] as const) {
       assert.equal(
         readQrOptionsFromSearchParams(new URLSearchParams(`output=${output}`)).output,
         output,
@@ -71,9 +71,26 @@ describe('playground output query synchronization', () => {
     }
     assert.equal(readQrOptionsFromSearchParams(new URLSearchParams('output=image')).output, 'png');
     assert.equal(
-      readQrOptionsFromSearchParams(new URLSearchParams('output=jpeg')).output,
+      readQrOptionsFromSearchParams(new URLSearchParams('output=jpg')).output,
       defaultPlaygroundOptions.output,
     );
+  });
+
+  test('parses JPEG quality from 1 to 100 and ignores other values', () => {
+    for (const [value, quality] of [
+      ['1', 1],
+      ['75', 75],
+      ['100', 100],
+      ['0', undefined],
+      ['101', undefined],
+      ['50.5', undefined],
+      ['high', undefined],
+    ] as const) {
+      assert.equal(
+        readQrOptionsFromSearchParams(new URLSearchParams(`output=jpeg&quality=${value}`)).quality,
+        quality,
+      );
+    }
   });
 });
 

@@ -6,7 +6,7 @@ import {type QRCodeRasterCenterImage, centerImages} from './center-image';
 import {type Color, type RGBAImage, blendPixel} from './pixels';
 import {type Coverage, rasterizeShapePath} from './raster';
 
-/** Options shared by the PNG, WebP, and GIF renderers. */
+/** Options shared by the PNG, WebP, GIF, and JPEG renderers. */
 export type QRCodeRasterRendererOptions = {
   readonly style?: QRCodeVisualStyle;
   readonly centerImage?: QRCodeRasterCenterImage;

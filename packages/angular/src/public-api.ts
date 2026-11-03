@@ -4,6 +4,7 @@
 
 export {QRCodeCanvas} from './lib/QRCodeCanvas';
 export {QRCodeGIF} from './lib/QRCodeGIF';
+export {QRCodeJPEG} from './lib/QRCodeJPEG';
 export {QRCodePNG} from './lib/QRCodePNG';
 export {QRCodeSVG} from './lib/QRCodeSVG';
 export {QRCodeWebP} from './lib/QRCodeWebP';
@@ -14,6 +15,7 @@ export type {
   QRCodeCanvasOptions,
   QRCodeGIFImageOptions,
   QRCodeImageAccessibilityOptions,
+  QRCodeJPEGImageOptions,
   QRCodePNGImageOptions,
   QRCodeWebPImageOptions,
 } from '@qrcodesdk/browser';

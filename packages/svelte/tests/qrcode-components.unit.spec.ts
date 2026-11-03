@@ -16,6 +16,7 @@ describe('Svelte QR code component API', () => {
     expect(Object.keys(svelteApi).sort()).toEqual([
       'QRCodeCanvas',
       'QRCodeGIF',
+      'QRCodeJPEG',
       'QRCodePNG',
       'QRCodeSVG',
       'QRCodeWebP',

@@ -5,15 +5,17 @@ import {renderApplication} from '@angular/platform-server';
 import {describe, expect, test} from 'vitest';
 
 import {QRCodeCanvas} from './QRCodeCanvas';
+import {QRCodeJPEG} from './QRCodeJPEG';
 import {QRCodePNG} from './QRCodePNG';
 import {QRCodeSVG} from './QRCodeSVG';
 
 @Component({
   selector: 'qrcode-ssr-host',
-  imports: [QRCodeCanvas, QRCodePNG, QRCodeSVG],
+  imports: [QRCodeCanvas, QRCodeJPEG, QRCodePNG, QRCodeSVG],
   template: `
     <qrcode-svg payload="SSR" />
     <qrcode-png payload="SSR" />
+    <qrcode-jpeg payload="SSR" />
     <qrcode-canvas payload="SSR" />
   `,
 })
@@ -33,6 +35,7 @@ describe('Angular QR code server rendering', () => {
     expect(html).toContain('<svg');
     expect(html).toContain('<path');
     expect(html).toMatch(/<qrcode-png[^>]*><\/qrcode-png>/);
+    expect(html).toMatch(/<qrcode-jpeg[^>]*><\/qrcode-jpeg>/);
     expect(html).toMatch(/<qrcode-canvas[^>]*><\/qrcode-canvas>/);
     expect(html).not.toContain('<img');
     expect(html).not.toContain('<canvas');

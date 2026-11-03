@@ -61,7 +61,7 @@ export function mockCanvasRendering(mockApi: MockApi): void {
       fill: mockApi.fn(),
       fillStyle: '#000000',
       fillRect: mockApi.fn(),
-      // Opaque white pixels let the WebP and GIF encoders run without canvas support.
+      // Opaque white pixels let the WebP, GIF, and JPEG encoders run without canvas support.
       getImageData: (_x: number, _y: number, width: number, height: number) => ({
         data: new Uint8ClampedArray(width * height * 4).fill(255),
       }),

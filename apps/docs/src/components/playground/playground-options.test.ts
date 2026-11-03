@@ -76,6 +76,17 @@ describe('playground prepared image options', () => {
     assert.equal(hasQRCodeError(options, undefined), undefined);
   });
 
+  test('passes the JPEG quality only to JPEG output', () => {
+    const options = {...defaultPlaygroundOptions, quality: 40};
+
+    assert.equal(createPlaygroundImageOptions({...options, output: 'jpeg'}).quality, 40);
+    assert.equal('quality' in createPlaygroundImageOptions({...options, output: 'png'}), false);
+    assert.equal(
+      'quality' in createPlaygroundImageOptions({...defaultPlaygroundOptions, output: 'jpeg'}),
+      false,
+    );
+  });
+
   test('updates options without replacing prepared sources', () => {
     playgroundPreparedImage.set(preparedImage);
 

@@ -1,5 +1,6 @@
 export {QRCodeCanvas, type QRCodeCanvasProps} from './QRCodeCanvas';
 export {QRCodeGIF, type QRCodeGIFProps} from './QRCodeGIF';
+export {QRCodeJPEG, type QRCodeJPEGProps} from './QRCodeJPEG';
 export {QRCodePNG, type QRCodePNGProps} from './QRCodePNG';
 export {QRCodeSVG, type QRCodeSVGProps} from './QRCodeSVG';
 export {QRCodeWebP, type QRCodeWebPProps} from './QRCodeWebP';
@@ -10,6 +11,7 @@ export type {
   QRCodeCanvasOptions,
   QRCodeGIFImageOptions,
   QRCodeImageAccessibilityOptions,
+  QRCodeJPEGImageOptions,
   QRCodePNGImageOptions,
   QRCodeWebPImageOptions,
 } from '@qrcodesdk/browser';

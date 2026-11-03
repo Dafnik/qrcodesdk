@@ -57,16 +57,16 @@ for its options and return value.
 
 ## Choose by runtime and output
 
-| Where will it run?               | Output you need                                   | Start here                                                      |
-| -------------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
-| Any supported JavaScript runtime | SVG or terminal text strings                      | [`@qrcodesdk/core`](https://qrcodesdk.dev/packages/core/)       |
-| Browser DOM                      | Canvas, PNG/WebP/GIF Image element, or download   | [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) |
-| Node.js-compatible runtime       | PNG, WebP, or GIF `Buffer` for files or responses | [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       |
-| React or Next.js                 | SVG, PNG, WebP, GIF, or Canvas component          | [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)     |
-| Vue                              | SVG, PNG, WebP, GIF, or Canvas component          | [`@qrcodesdk/vue`](https://qrcodesdk.dev/packages/vue/)         |
-| Svelte                           | SVG, PNG, WebP, GIF, or Canvas component          | [`@qrcodesdk/svelte`](https://qrcodesdk.dev/packages/svelte/)   |
-| Angular                          | SVG, PNG, WebP, GIF, or Canvas component          | [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) |
-| Terminal, shell script, or CI    | Terminal text, or SVG, PNG, WebP, or GIF file     | [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         |
+| Where will it run?               | Output you need                                         | Start here                                                      |
+| -------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------- |
+| Any supported JavaScript runtime | SVG or terminal text strings                            | [`@qrcodesdk/core`](https://qrcodesdk.dev/packages/core/)       |
+| Browser DOM                      | Canvas, PNG/WebP/GIF/JPEG Image element, or download    | [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) |
+| Node.js-compatible runtime       | PNG, WebP, GIF, or JPEG `Buffer` for files or responses | [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       |
+| React or Next.js                 | SVG, PNG, WebP, GIF, JPEG, or Canvas component          | [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)     |
+| Vue                              | SVG, PNG, WebP, GIF, JPEG, or Canvas component          | [`@qrcodesdk/vue`](https://qrcodesdk.dev/packages/vue/)         |
+| Svelte                           | SVG, PNG, WebP, GIF, JPEG, or Canvas component          | [`@qrcodesdk/svelte`](https://qrcodesdk.dev/packages/svelte/)   |
+| Angular                          | SVG, PNG, WebP, GIF, JPEG, or Canvas component          | [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) |
+| Terminal, shell script, or CI    | Terminal text, or SVG, PNG, WebP, GIF, or JPEG file     | [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         |
 
 [Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/) for the matching install command, or compare
 every built-in return type in [Renderer outputs](https://qrcodesdk.dev/reference/renderers/).

@@ -221,6 +221,7 @@ export class PlaygroundToolbar {
     {value: 'png', label: 'PNG', icon: 'lucideImage'},
     {value: 'webp', label: 'WebP', icon: 'lucideImage'},
     {value: 'gif', label: 'GIF', icon: 'lucideImage'},
+    {value: 'jpeg', label: 'JPEG', icon: 'lucideImage'},
     {value: 'canvas', label: 'Canvas', icon: 'lucideBrush'},
   ];
   protected readonly cliOutputs: PlaygroundToolbarOption<CliPlaygroundOptions['format']>[] = [
@@ -228,7 +229,7 @@ export class PlaygroundToolbar {
     {value: 'svg', label: 'SVG', icon: 'lucideCodeXml'},
   ];
   /** Raster formats the CLI writes locally but the browser preview cannot run. */
-  protected readonly cliRasterOutputs = ['PNG', 'WebP', 'GIF'] as const;
+  protected readonly cliRasterOutputs = ['PNG', 'WebP', 'GIF', 'JPEG'] as const;
   protected readonly views: PlaygroundToolbarOption<PlaygroundView>[] = [
     {value: 'preview', label: 'Preview', icon: 'lucideScanQrCode'},
     {value: 'code', label: 'Code', icon: 'lucideCode'},

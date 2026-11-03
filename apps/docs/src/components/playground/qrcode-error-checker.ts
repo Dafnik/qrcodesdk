@@ -1,6 +1,7 @@
 import {
   QRCodeCanvasRenderer,
   QRCodeGIFImageRenderer,
+  QRCodeJPEGImageRenderer,
   QRCodePNGImageRenderer,
   QRCodeWebPImageRenderer,
 } from '@qrcodesdk/browser';
@@ -19,6 +20,7 @@ const IMAGE_RENDERERS = {
   png: QRCodePNGImageRenderer,
   webp: QRCodeWebPImageRenderer,
   gif: QRCodeGIFImageRenderer,
+  jpeg: QRCodeJPEGImageRenderer,
 } as const;
 
 export function hasQRCodeError(
@@ -34,7 +36,8 @@ export function hasQRCodeError(
       }
       case 'png':
       case 'webp':
-      case 'gif': {
+      case 'gif':
+      case 'jpeg': {
         const {matrix, ...rendererOptions} = createPlaygroundImageOptions(options, preparedImage);
         qrcode(options.payload)
           .options(matrix)

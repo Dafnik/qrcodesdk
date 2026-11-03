@@ -94,15 +94,15 @@ the package's ESM entry points and subpaths.
 
 For runtime-specific output, add the package for your runtime or framework:
 
-| Package                                    | Use it for                                                           | Return value                                    |
-| ------------------------------------------ | -------------------------------------------------------------------- | ----------------------------------------------- |
-| [`@qrcodesdk/browser`](/packages/browser/) | Canvas element, PNG, WebP, and GIF Image elements, browser downloads | `HTMLCanvasElement`, `HTMLImageElement`, `void` |
-| [`@qrcodesdk/node`](/packages/node/)       | PNG, WebP, and GIF bytes                                             | `Buffer`                                        |
-| [`@qrcodesdk/cli`](/packages/cli/)         | Command line generation from terminals and scripts                   | Terminal text, SVG, PNG, WebP, and GIF files    |
-| [`@qrcodesdk/react`](/packages/react/)     | React SVG, PNG, WebP, GIF, and Canvas components                     | React element                                   |
-| [`@qrcodesdk/vue`](/packages/vue/)         | Vue SVG, PNG, WebP, GIF, and Canvas components                       | Vue component                                   |
-| [`@qrcodesdk/svelte`](/packages/svelte/)   | Svelte SVG, PNG, WebP, GIF, and Canvas components                    | Svelte component                                |
-| [`@qrcodesdk/angular`](/packages/angular/) | Angular SVG, PNG, WebP, GIF, and Canvas components                   | Angular component                               |
+| Package                                    | Use it for                                                                 | Return value                                       |
+| ------------------------------------------ | -------------------------------------------------------------------------- | -------------------------------------------------- |
+| [`@qrcodesdk/browser`](/packages/browser/) | Canvas element, PNG, WebP, GIF, and JPEG Image elements, browser downloads | `HTMLCanvasElement`, `HTMLImageElement`, `void`    |
+| [`@qrcodesdk/node`](/packages/node/)       | PNG, WebP, GIF, and JPEG bytes                                             | `Buffer`                                           |
+| [`@qrcodesdk/cli`](/packages/cli/)         | Command line generation from terminals and scripts                         | Terminal text, SVG, PNG, WebP, GIF, and JPEG files |
+| [`@qrcodesdk/react`](/packages/react/)     | React SVG, PNG, WebP, GIF, JPEG, and Canvas components                     | React element                                      |
+| [`@qrcodesdk/vue`](/packages/vue/)         | Vue SVG, PNG, WebP, GIF, JPEG, and Canvas components                       | Vue component                                      |
+| [`@qrcodesdk/svelte`](/packages/svelte/)   | Svelte SVG, PNG, WebP, GIF, JPEG, and Canvas components                    | Svelte component                                   |
+| [`@qrcodesdk/angular`](/packages/angular/) | Angular SVG, PNG, WebP, GIF, JPEG, and Canvas components                   | Angular component                                  |
 
 Compare every built-in output in [Renderer outputs](/reference/renderers/).
 
@@ -195,5 +195,5 @@ import {
 ## Generated output stability
 
 Output is deterministic for one installed implementation, but matrix modules, SVG markup, and PNG,
-WebP, and GIF bytes may change between QRCodeSDK releases. Pin exact package versions and keep fixtures when exact
+WebP, GIF, and JPEG bytes may change between QRCodeSDK releases. Pin exact package versions and keep fixtures when exact
 artifacts matter. See the [version and output policy](/project/release-policy/).

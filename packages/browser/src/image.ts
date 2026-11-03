@@ -9,11 +9,12 @@ export type QRCodeDownloadImageRendererOptions = QRCodeDownloadRendererOptions<H
 
 const EXTENSIONS: Readonly<Record<string, string>> = {
   'image/gif': '.gif',
+  'image/jpeg': '.jpg',
   'image/png': '.png',
   'image/webp': '.webp',
 };
 
-/** Downloads the output of a PNG, WebP, or GIF image renderer with the matching file extension. */
+/** Downloads the output of a PNG, WebP, GIF, or JPEG image renderer with the matching file extension. */
 export function QRCodeDownloadImageRenderer(
   options: QRCodeDownloadImageRendererOptions,
 ): QRCodeRenderer<void> {

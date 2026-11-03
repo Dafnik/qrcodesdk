@@ -14,16 +14,16 @@ related:
 ---
 
 Browser applications can render a QR code as an SVG string, an Image element backed by PNG, WebP,
-or GIF data, or a Canvas element. Choose the output for what the page needs to do next, then insert or compose the
+GIF, or JPEG data, or a Canvas element. Choose the output for what the page needs to do next, then insert or compose the
 returned value with standard browser APIs.
 
 ## Choose a browser output
 
-| Choose | Package              | Return value        | Best fit                                                     |
-| ------ | -------------------- | ------------------- | ------------------------------------------------------------ |
-| SVG    | `@qrcodesdk/core`    | `string`            | Scalable inline markup and the recommended browser default   |
-| Image  | `@qrcodesdk/browser` | `HTMLImageElement`  | A familiar, accessible DOM image backed by PNG, WebP, or GIF |
-| Canvas | `@qrcodesdk/browser` | `HTMLCanvasElement` | Drawing, compositing, pixel access, or manual PNG export     |
+| Choose | Package              | Return value        | Best fit                                                           |
+| ------ | -------------------- | ------------------- | ------------------------------------------------------------------ |
+| SVG    | `@qrcodesdk/core`    | `string`            | Scalable inline markup and the recommended browser default         |
+| Image  | `@qrcodesdk/browser` | `HTMLImageElement`  | A familiar, accessible DOM image backed by PNG, WebP, GIF, or JPEG |
+| Canvas | `@qrcodesdk/browser` | `HTMLCanvasElement` | Drawing, compositing, pixel access, or manual PNG export           |
 
 Start with SVG unless the next browser API specifically needs an Image or Canvas element. SVG stays
 sharp when resized and does not require Canvas support. Image and Canvas output require both
@@ -106,15 +106,18 @@ The Image element renderers synchronously return a new `HTMLImageElement` whose 
 rendered image as a data URL. Use them when the QR code should behave like an ordinary image in the
 DOM. Pick the renderer by the encoded format:
 
-| Renderer                  | Entry point               | Encoded format                              |
-| ------------------------- | ------------------------- | ------------------------------------------- |
-| `QRCodePNGImageRenderer`  | `@qrcodesdk/browser/png`  | PNG, encoded natively by the browser        |
-| `QRCodeWebPImageRenderer` | `@qrcodesdk/browser/webp` | Lossless WebP, usually the smallest file    |
-| `QRCodeGIFImageRenderer`  | `@qrcodesdk/browser/gif`  | GIF with 256 colors and binary transparency |
+| Renderer                  | Entry point               | Encoded format                                                        |
+| ------------------------- | ------------------------- | --------------------------------------------------------------------- |
+| `QRCodePNGImageRenderer`  | `@qrcodesdk/browser/png`  | PNG, encoded natively by the browser                                  |
+| `QRCodeWebPImageRenderer` | `@qrcodesdk/browser/webp` | Lossless WebP, usually the smallest file                              |
+| `QRCodeGIFImageRenderer`  | `@qrcodesdk/browser/gif`  | GIF with 256 colors and binary transparency                           |
+| `QRCodeJPEGImageRenderer` | `@qrcodesdk/browser/jpeg` | Lossy JPEG on a solid matte color, for destinations that require JPEG |
 
-Each format has its own entry point, so a bundle only includes the encoder it imports. WebP and GIF
-use encoders bundled in the SDK and produce the same bytes in every browser, including Safari, which
-cannot encode WebP natively. All three accept the same options; see the
+Each format has its own entry point, so a bundle only includes the encoder it imports. WebP, GIF,
+and JPEG use encoders bundled in the SDK and produce the same bytes in every browser, including
+Safari, which cannot encode WebP natively. The bundled JPEG encoder also blends transparent pixels
+onto a white matte, where the browser's own JPEG encoding would turn them black. All four accept the
+same options; see the
 [Image element renderers reference](/reference/renderers/image/) for the format differences.
 
 ### Insert and style it

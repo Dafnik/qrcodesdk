@@ -8,7 +8,7 @@ export type QRCodeImageAccessibilityOptions = {
   readonly ariaLabel?: string;
   readonly title?: string;
 };
-/** Options shared by the PNG, WebP, and GIF image renderers. */
+/** Options shared by the PNG, WebP, GIF, and JPEG image renderers. */
 export type QRCodeImageRendererOptions = Omit<QRCodeCanvasRendererOptions, 'accessibility'> & {
   readonly accessibility?: QRCodeImageAccessibilityOptions;
 };

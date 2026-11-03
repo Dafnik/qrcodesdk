@@ -19,6 +19,7 @@ describe('Vue QR code component API', () => {
     expect(Object.keys(vueApi).sort()).toEqual([
       'QRCodeCanvas',
       'QRCodeGIF',
+      'QRCodeJPEG',
       'QRCodePNG',
       'QRCodeSVG',
       'QRCodeWebP',

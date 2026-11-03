@@ -17,6 +17,7 @@ import {
   QRCodeCanvas,
   type QRCodeDownloadHandle,
   QRCodeGIF,
+  QRCodeJPEG,
   QRCodePNG,
   QRCodeSVG,
   QRCodeWebP,
@@ -37,6 +38,7 @@ import {DecodeBadge} from './decode-badge';
     QRCodePNG,
     QRCodeWebP,
     QRCodeGIF,
+    QRCodeJPEG,
     QRCodeCanvas,
     HlmButton,
     NgIcon,
@@ -67,6 +69,13 @@ import {DecodeBadge} from './decode-badge';
         }
         @case ('gif') {
           <qrcode-gif class="contents" #qrcode [payload]="fixture().payload" [options]="canvas()" />
+        }
+        @case ('jpeg') {
+          <qrcode-jpeg
+            class="contents"
+            #qrcode
+            [payload]="fixture().payload"
+            [options]="canvas()" />
         }
         @case ('canvas') {
           <qrcode-canvas class="contents" [payload]="fixture().payload" [options]="canvas()" />

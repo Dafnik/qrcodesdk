@@ -34,6 +34,7 @@ const PLAYGROUND_OUTPUTS = [
   'png',
   'webp',
   'gif',
+  'jpeg',
   'canvas',
 ] as const satisfies readonly PlaygroundOutput[];
 const MODES = ['numeric', 'alphanumeric', 'octet'] as const;
@@ -204,6 +205,13 @@ const QUERY_FIELD_CODECS = [
     (currentOptions, color) => setOptionalProperty(currentOptions, 'alignmentColor', color),
     parseOptionalColor,
     serializeColor,
+  ),
+  defineQueryField(
+    'quality',
+    (currentOptions) => currentOptions.quality,
+    (currentOptions, quality) => setOptionalProperty(currentOptions, 'quality', quality),
+    (value, fallback) => parseOptionalNumber(value, isJPEGQuality, fallback),
+    serializeNumber,
   ),
   defineQueryField(
     'alt',
@@ -621,7 +629,8 @@ type OptionalPlaygroundOptionsKey =
   | 'alignmentColor'
   | 'alt'
   | 'ariaLabel'
-  | 'title';
+  | 'title'
+  | 'quality';
 
 function setOptionalProperty<K extends OptionalPlaygroundOptionsKey>(
   currentOptions: PlaygroundOptions,
@@ -637,6 +646,10 @@ function setOptionalProperty<K extends OptionalPlaygroundOptionsKey>(
 
 function isPositiveInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
+}
+
+function isJPEGQuality(value: unknown): value is number {
+  return isPositiveInteger(value) && value <= 100;
 }
 
 function isNonNegativeInteger(value: unknown): value is number {

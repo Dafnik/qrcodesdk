@@ -11,6 +11,7 @@ import {qrcode} from '@qrcodesdk/core';
 
 import {
   QRCodeGIFImageRenderer,
+  QRCodeJPEGImageRenderer,
   QRCodePNGImageRenderer,
   QRCodeWebPImageRenderer,
   canvasCenterImage,
@@ -42,6 +43,7 @@ describe.each([
   {format: 'PNG', createRenderer: QRCodePNGImageRenderer},
   {format: 'WebP', createRenderer: QRCodeWebPImageRenderer},
   {format: 'GIF', createRenderer: QRCodeGIFImageRenderer},
+  {format: 'JPEG', createRenderer: QRCodeJPEGImageRenderer},
 ])('$format image renderer roundtrips', ({format, createRenderer}) => {
   const defaultRenderer = createRenderer({style: {moduleSize: 4, quietZone: 4}});
 

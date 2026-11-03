@@ -52,6 +52,7 @@
     "./canvas": "./dist/canvas.mjs",
     "./gif": "./dist/gif.mjs",
     "./image": "./dist/image.mjs",
+    "./jpeg": "./dist/jpeg.mjs",
     "./png": "./dist/png.mjs",
     "./svg": "./dist/svg.mjs",
     "./webp": "./dist/webp.mjs",

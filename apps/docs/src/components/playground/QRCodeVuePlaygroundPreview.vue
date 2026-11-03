@@ -4,6 +4,7 @@ import {
   QRCodeCanvas,
   type QRCodeDownloadHandle,
   QRCodeGIF,
+  QRCodeJPEG,
   QRCodePNG,
   QRCodeSVG,
   QRCodeWebP,
@@ -33,6 +34,7 @@ const IMAGE_COMPONENTS = {
   png: {component: QRCodePNG, label: 'Download PNG'},
   webp: {component: QRCodeWebP, label: 'Download WebP'},
   gif: {component: QRCodeGIF, label: 'Download GIF'},
+  jpeg: {component: QRCodeJPEG, label: 'Download JPEG'},
 } as const;
 const imageComponent = computed(() =>
   isPlaygroundImageOutput(options.value.output)

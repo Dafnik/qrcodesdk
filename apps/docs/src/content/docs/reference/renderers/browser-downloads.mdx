@@ -14,7 +14,7 @@ related:
 
 Use the download renderers inside a browser user action when the SDK should create and click a
 temporary download link. Use the SVG wrapper for scalable files and the Image wrapper for PNG, WebP,
-or GIF files.
+GIF, or JPEG files.
 
 ## Minimal example
 
@@ -52,17 +52,18 @@ string or Image element.
 
 ## Renderer-specific options
 
-| Wrapper                       | `renderer` requirement                                                | `filename` default | Added extension            |
-| ----------------------------- | --------------------------------------------------------------------- | ------------------ | -------------------------- |
-| `QRCodeDownloadSVGRenderer`   | `QRCodeRenderer<string>` such as `QRCodeSVGRenderer()`                | `'qrcode'`         | `.svg`                     |
-| `QRCodeDownloadImageRenderer` | `QRCodeRenderer<HTMLImageElement>` such as `QRCodePNGImageRenderer()` | `'qrcode'`         | `.png`, `.webp`, or `.gif` |
+| Wrapper                       | `renderer` requirement                                                | `filename` default | Added extension                    |
+| ----------------------------- | --------------------------------------------------------------------- | ------------------ | ---------------------------------- |
+| `QRCodeDownloadSVGRenderer`   | `QRCodeRenderer<string>` such as `QRCodeSVGRenderer()`                | `'qrcode'`         | `.svg`                             |
+| `QRCodeDownloadImageRenderer` | `QRCodeRenderer<HTMLImageElement>` such as `QRCodePNGImageRenderer()` | `'qrcode'`         | `.png`, `.webp`, `.gif`, or `.jpg` |
 
-The Image wrapper accepts the PNG, WebP, and GIF Image element renderers. It picks the extension
+The Image wrapper accepts the PNG, WebP, GIF, and JPEG Image element renderers. It picks the extension
 from the MIME type of the image's data URL. For any other data URL type, it uses the filename
 unchanged.
 
 `renderer` is required. `filename` is optional; the wrapper appends its extension when the supplied
-name does not already end with that extension, using a case-insensitive check.
+name does not already end with that extension, using a case-insensitive check. A JPEG filename
+that already ends with `.jpeg` keeps that extension.
 Surrounding whitespace is trimmed, and empty or whitespace-only filenames use `qrcode`. Both factories copy their options
 when called; changing the original object later does not change the download.
 

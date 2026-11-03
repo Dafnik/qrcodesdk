@@ -51,11 +51,11 @@ with rendering callbacks are unsupported.
 
 ## Choose and prepare a source
 
-| Output                                      | Factory                                         | Source type                 | Preparation                                                          |
-| ------------------------------------------- | ----------------------------------------------- | --------------------------- | -------------------------------------------------------------------- |
-| Core SVG                                    | `svgCenterImage()` from `@qrcodesdk/core`       | `QRCodeDataImageURL`        | Convert bytes or a Blob to an embedded `data:image/...` URL          |
-| Browser Canvas or PNG, WebP, and GIF Images | `canvasCenterImage()` from `@qrcodesdk/browser` | loaded `CanvasImageSource`  | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
-| Node.js PNG, WebP, and GIF Buffers          | `rasterCenterImage()` from `@qrcodesdk/node`    | PNG bytes in a `Uint8Array` | Read or download valid PNG bytes before rendering                    |
+| Output                                            | Factory                                         | Source type                 | Preparation                                                          |
+| ------------------------------------------------- | ----------------------------------------------- | --------------------------- | -------------------------------------------------------------------- |
+| Core SVG                                          | `svgCenterImage()` from `@qrcodesdk/core`       | `QRCodeDataImageURL`        | Convert bytes or a Blob to an embedded `data:image/...` URL          |
+| Browser Canvas or PNG, WebP, GIF, and JPEG Images | `canvasCenterImage()` from `@qrcodesdk/browser` | loaded `CanvasImageSource`  | Decode an Image element, canvas, video frame, or `ImageBitmap` first |
+| Node.js PNG, WebP, GIF, and JPEG Buffers          | `rasterCenterImage()` from `@qrcodesdk/node`    | PNG bytes in a `Uint8Array` | Read or download valid PNG bytes before rendering                    |
 
 Load files and URLs in your application before calling a factory.
 
@@ -118,14 +118,17 @@ const webp = builder.render(QRCodeWebPRenderer({centerImage}));
 ```
 
 `rasterCenterImage()` accepts PNG bytes and decodes them once. Reuse its result across renders and
-across the PNG, WebP, and GIF renderers. GIF output reduces the image to at most 256 colors and
-binary transparency, so prefer PNG or WebP for photographic logos or soft transparent edges.
+across the PNG, WebP, GIF, and JPEG renderers. GIF output reduces the image to at most 256 colors and
+binary transparency, so prefer PNG or WebP for logos with soft transparent edges. For a photographic
+center image, JPEG keeps the file small: its lossy compression suits photos, and its default quality
+of 92 keeps the modules around the image sharp. JPEG has no transparency, so transparent parts of the
+image are blended onto `transparency.matte`, white by default.
 
 ## Use prepared sources in framework components
 
 React, Vue, Svelte, and Angular do not load image sources inside their QR components. Prepare
-browser sources in application state, then pass stable options after decoding. PNG, WebP, GIF, and
-Canvas components take `canvasCenterImage()`, and SVG components take `svgCenterImage()`. Every framework
+browser sources in application state, then pass stable options after decoding. PNG, WebP, GIF, JPEG,
+and Canvas components take `canvasCenterImage()`, and SVG components take `svgCenterImage()`. Every framework
 package exports both factories, so import them from the same package as the component.
 
 ### React

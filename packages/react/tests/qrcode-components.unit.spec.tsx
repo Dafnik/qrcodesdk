@@ -26,6 +26,7 @@ describe('React QR code component handles', () => {
     expect(Object.keys(reactApi).sort()).toEqual([
       'QRCodeCanvas',
       'QRCodeGIF',
+      'QRCodeJPEG',
       'QRCodePNG',
       'QRCodeSVG',
       'QRCodeWebP',

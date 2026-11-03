@@ -9,7 +9,7 @@ import {
 
 import type {DevFixture} from '../fixtures/fixture-catalog';
 
-export type RendererId = 'svg' | 'png' | 'webp' | 'gif' | 'canvas';
+export type RendererId = 'svg' | 'png' | 'webp' | 'gif' | 'jpeg' | 'canvas';
 
 export const RENDERERS: readonly {
   readonly id: RendererId;
@@ -20,6 +20,7 @@ export const RENDERERS: readonly {
   {id: 'png', label: 'PNG', component: 'QRCodePNG'},
   {id: 'webp', label: 'WebP', component: 'QRCodeWebP'},
   {id: 'gif', label: 'GIF', component: 'QRCodeGIF'},
+  {id: 'jpeg', label: 'JPEG', component: 'QRCodeJPEG'},
   {id: 'canvas', label: 'Canvas', component: 'QRCodeCanvas'},
 ];
 
@@ -77,7 +78,7 @@ export function svgOptions(fixture: DevFixture): QRCodeSVGOptions {
   return options;
 }
 
-/** Options for `QRCodeCanvas`, `QRCodePNG`, `QRCodeWebP`, and `QRCodeGIF`. */
+/** Options for `QRCodeCanvas`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG`. */
 export function canvasOptions(fixture: DevFixture): QRCodeCanvasOptions {
   let options = canvasOptionsCache.get(fixture);
   if (!options) {

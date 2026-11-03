@@ -1,5 +1,6 @@
 export {default as QRCodeCanvas} from './QRCodeCanvas.svelte';
 export {default as QRCodeGIF} from './QRCodeGIF.svelte';
+export {default as QRCodeJPEG} from './QRCodeJPEG.svelte';
 export {default as QRCodePNG} from './QRCodePNG.svelte';
 export {default as QRCodeSVG} from './QRCodeSVG.svelte';
 export {default as QRCodeWebP} from './QRCodeWebP.svelte';
@@ -8,6 +9,7 @@ export type {
   QRCodeCanvasProps,
   QRCodeDownloadHandle,
   QRCodeGIFProps,
+  QRCodeJPEGProps,
   QRCodePNGProps,
   QRCodeSVGProps,
   QRCodeWebPProps,
@@ -18,6 +20,7 @@ export type {
   QRCodeCanvasOptions,
   QRCodeGIFImageOptions,
   QRCodeImageAccessibilityOptions,
+  QRCodeJPEGImageOptions,
   QRCodePNGImageOptions,
   QRCodeWebPImageOptions,
 } from '@qrcodesdk/browser';

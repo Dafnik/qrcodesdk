@@ -1,10 +1,12 @@
 import {describe, expect, expectTypeOf, test} from 'vitest';
 
-import type {QRCodeCenterImageLayout} from '@qrcodesdk/core';
+import type {QRCodeCenterImageLayout, QRCodeColor} from '@qrcodesdk/core';
 
 import {
   QRCodeGIFRenderer,
   type QRCodeGIFRendererOptions,
+  QRCodeJPEGRenderer,
+  type QRCodeJPEGRendererOptions,
   QRCodePNGRenderer,
   type QRCodePNGRendererOptions,
   type QRCodeRasterCenterImage,
@@ -28,16 +30,24 @@ describe('public API types', () => {
     expectTypeOf<QRCodeGIFRendererOptions['centerImage']>().toEqualTypeOf<
       QRCodeRasterCenterImage | undefined
     >();
+    expectTypeOf<QRCodeJPEGRendererOptions['centerImage']>().toEqualTypeOf<
+      QRCodeRasterCenterImage | undefined
+    >();
     expectTypeOf<QRCodePNGRendererOptions['compression']>().toEqualTypeOf<
       {readonly level?: number} | undefined
     >();
     expectTypeOf<QRCodeGIFRendererOptions['transparency']>().toEqualTypeOf<
       {readonly threshold?: number} | undefined
     >();
+    expectTypeOf<QRCodeJPEGRendererOptions['quality']>().toEqualTypeOf<number | undefined>();
+    expectTypeOf<QRCodeJPEGRendererOptions['transparency']>().toEqualTypeOf<
+      {readonly matte?: QRCodeColor} | undefined
+    >();
   });
 
   test('exports one Buffer renderer per raster format', () => {
     expectTypeOf(QRCodePNGRenderer).returns.toEqualTypeOf(QRCodeWebPRenderer({}));
     expectTypeOf(QRCodeGIFRenderer).returns.toEqualTypeOf(QRCodeWebPRenderer({}));
+    expectTypeOf(QRCodeJPEGRenderer).returns.toEqualTypeOf(QRCodeWebPRenderer({}));
   });
 });

@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import {Buffer} from 'node:buffer';
 
 import {qrcode} from '@qrcodesdk/core';
-import {QRCodeGIFRenderer, QRCodePNGRenderer, QRCodeWebPRenderer} from '@qrcodesdk/node';
+import {
+  QRCodeGIFRenderer,
+  QRCodeJPEGRenderer,
+  QRCodePNGRenderer,
+  QRCodeWebPRenderer,
+} from '@qrcodesdk/node';
 
 function logSuccess(message) {
   globalThis.console.log(`  ✓ ${message}`);
@@ -40,5 +45,14 @@ assert.equal(gif.toString('latin1', 0, 6), 'GIF89a');
 assert.equal(gif.readUInt16LE(6), 31);
 assert.equal(gif.readUInt16LE(8), 31);
 logSuccess('GIF renderer returns 31×31 GIF bytes');
+
+const jpeg = builder.render(QRCodeJPEGRenderer({style: {moduleSize: 1, quietZone: 1}}));
+assert.equal(Buffer.isBuffer(jpeg), true);
+assert.deepEqual([...jpeg.subarray(0, 2)], [0xff, 0xd8]);
+assert.equal(jpeg.toString('latin1', 6, 11), 'JFIF\0');
+const jpegFrame = jpeg.indexOf(Buffer.from([0xff, 0xc0]));
+assert.equal(jpeg.readUInt16BE(jpegFrame + 5), 31);
+assert.equal(jpeg.readUInt16BE(jpegFrame + 7), 31);
+logSuccess('JPEG renderer returns 31×31 JPEG bytes');
 
 globalThis.console.log('@qrcodesdk/node installed-package smoke test passed');

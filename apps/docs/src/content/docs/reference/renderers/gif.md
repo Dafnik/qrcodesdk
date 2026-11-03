@@ -7,6 +7,7 @@ related:
   - ../../packages/node.mdx
   - ./png.mdx
   - ./webp.md
+  - ./jpeg.md
   - ../../guides/download-or-save.md
   - ../../guides/server-output.md
 ---
@@ -80,7 +81,7 @@ Prefer PNG or WebP for transparent backgrounds and photographic center images.
 
 Create the center image with `rasterCenterImage()` from PNG bytes, as for the
 [PNG renderer](/reference/renderers/png/#center-image). One center image can be reused across the
-PNG, WebP, and GIF renderers:
+PNG, WebP, GIF, and JPEG renderers:
 
 ```ts
 import {readFile} from 'node:fs/promises';

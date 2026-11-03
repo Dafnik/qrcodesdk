@@ -10,6 +10,7 @@ export default defineConfig({
     error: 'src/error.ts',
     internal: 'src/internal.ts',
     'internal/gif': 'src/internal-gif.ts',
+    'internal/jpeg': 'src/internal-jpeg.ts',
     'internal/webp': 'src/internal-webp.ts',
     payload: 'src/payload.ts',
   },

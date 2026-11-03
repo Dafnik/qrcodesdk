@@ -1,6 +1,6 @@
 import {describe, expect, expectTypeOf, test} from 'vitest';
 
-import type {QRCodeCenterImageLayout, QRCodeMatrixOptions} from '@qrcodesdk/core';
+import type {QRCodeCenterImageLayout, QRCodeColor, QRCodeMatrixOptions} from '@qrcodesdk/core';
 
 import {
   type QRCodeCanvasCenterImage,
@@ -9,6 +9,8 @@ import {
   type QRCodeGIFImageOptions,
   type QRCodeGIFImageRendererOptions,
   type QRCodeImageRendererOptions,
+  type QRCodeJPEGImageOptions,
+  type QRCodeJPEGImageRendererOptions,
   type QRCodePNGImageOptions,
   type QRCodePNGImageRendererOptions,
   type QRCodeWebPImageOptions,
@@ -32,6 +34,13 @@ describe('public API types', () => {
     >();
     expectTypeOf<QRCodeGIFImageRendererOptions['transparency']>().toEqualTypeOf<
       {readonly threshold?: number} | undefined
+    >();
+    expectTypeOf<QRCodeJPEGImageOptions>().toEqualTypeOf<
+      QRCodeJPEGImageRendererOptions & {readonly matrix?: QRCodeMatrixOptions}
+    >();
+    expectTypeOf<QRCodeJPEGImageRendererOptions['quality']>().toEqualTypeOf<number | undefined>();
+    expectTypeOf<QRCodeJPEGImageRendererOptions['transparency']>().toEqualTypeOf<
+      {readonly matte?: QRCodeColor} | undefined
     >();
   });
 

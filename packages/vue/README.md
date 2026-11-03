@@ -8,7 +8,7 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground/?package=vue)**
 
-Vue components for rendering QR codes as inline SVG, PNG, WebP, and GIF Image elements, and Canvas elements.
+Vue components for rendering QR codes as inline SVG, PNG, WebP, GIF, and JPEG Image elements, and Canvas elements.
 
 ## Install
 
@@ -79,6 +79,7 @@ import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/vue';
 | `QRCodePNG`    | `PNG-backed <img>`   | PNG              |
 | `QRCodeWebP`   | `WebP-backed <img>`  | WebP             |
 | `QRCodeGIF`    | `GIF-backed <img>`   | GIF              |
+| `QRCodeJPEG`   | `JPEG-backed <img>`  | JPEG             |
 | `QRCodeCanvas` | `<canvas> element`   | None             |
 
 ### Options
@@ -93,8 +94,10 @@ Each image format has its own component, so your bundle only includes the encode
 you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
 usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
 is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
-and photographic center images. See the [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/)
-reference for details.
+and photographic center images. `QRCodeJPEG` is lossy and has no transparency: it blends
+transparent pixels onto a white matte by default, and `quality` (1 to 100, default 92) trades file
+size for detail. Use it when a destination requires JPEG. See the
+[Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) reference for details.
 
 Vue applies `class`, `style`, and other fallthrough attributes to the component's wrapper `<div>`.
 Use a template ref when you need a download handle; the rendered SVG, Image, or Canvas remains
@@ -181,6 +184,27 @@ const options: QRCodeGIFImageOptions = {
 </template>
 ```
 
+### JPEG component
+
+```vue
+<script setup lang="ts">
+import {QRCodeJPEG, type QRCodeJPEGImageOptions} from '@qrcodesdk/vue';
+
+const options: QRCodeJPEGImageOptions = {
+  style: {moduleSize: 8, quietZone: 4},
+  quality: 90,
+  accessibility: {
+    alt: 'QR code for qrcodesdk.dev',
+    ariaLabel: 'Scan to open qrcodesdk.dev',
+  },
+};
+</script>
+
+<template>
+  <QRCodeJPEG payload="https://qrcodesdk.dev" :options="options" />
+</template>
+```
+
 ### Canvas component
 
 ```vue
@@ -227,15 +251,15 @@ const options: QRCodePNGImageOptions = {accessibility: {alt: 'QR code for qrcode
 ## Center images
 
 Load and decode a browser image first, store it in a `shallowRef`, and pass
-`canvasCenterImage(image)` as `options.centerImage`. Render the PNG, WebP, GIF, or Canvas component
+`canvasCenterImage(image)` as `options.centerImage`. Render the PNG, WebP, GIF, JPEG, or Canvas component
 only after the source is ready. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
 [Add a center image](https://qrcodesdk.dev/guides/center-images/#vue) for a complete
 Vue example.
 
 ## Download files
 
-`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, and `QRCodeGIF` expose `download(filename?)` for SVG, PNG,
-WebP, and GIF files respectively. The method appends the matching file extension when needed.
+`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG` expose `download(filename?)`
+for SVG, PNG, WebP, GIF, and JPEG files respectively. The method appends the matching file extension when needed.
 `QRCodeCanvas` has no download method.
 
 See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-vue) for the complete
@@ -246,7 +270,7 @@ for manual downloads.
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they render an empty wrapper
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they render an empty wrapper
 on the server and populate it after mounting in the browser. Their download methods also skip work
 outside the browser.
 
@@ -266,8 +290,9 @@ const options: QRCodeSVGOptions = {
 ```
 
 Pass this object through the component's `options` prop. Use `QRCodePNGImageOptions`,
-`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, or `QRCodeCanvasOptions` for the corresponding
-component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`.
+`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, `QRCodeJPEGImageOptions`, or `QRCodeCanvasOptions`
+for the corresponding component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`, and
+`QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
 
 Import shape and pattern factories, and center-image factories from `@qrcodesdk/vue` alongside the components.
 
@@ -303,6 +328,9 @@ import {
   type QRCodeGIFImageOptions,
   type QRCodeGIFProps,
   type QRCodeImageAccessibilityOptions,
+  QRCodeJPEG,
+  type QRCodeJPEGImageOptions,
+  type QRCodeJPEGProps,
   type QRCodeMask,
   type QRCodeMatrixOptions,
   type QRCodeMode,
@@ -342,7 +370,7 @@ import {
 - [@qrcodesdk/vue](https://qrcodesdk.dev/packages/vue/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)
 - [Add a center image](https://qrcodesdk.dev/guides/center-images/)
-- [Download or save a QR code as SVG, PNG, WebP, or GIF](https://qrcodesdk.dev/guides/download-or-save/)
+- [Download or save a QR code as SVG, PNG, WebP, GIF, or JPEG](https://qrcodesdk.dev/guides/download-or-save/)
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
 - [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/)
 - [Canvas element renderer](https://qrcodesdk.dev/reference/renderers/canvas/)

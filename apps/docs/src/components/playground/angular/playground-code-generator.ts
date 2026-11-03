@@ -1,4 +1,5 @@
 import {
+  DEFAULT_JPEG_QUALITY,
   type PlaygroundOptions,
   type PlaygroundOutput,
   type PlaygroundPackage,
@@ -50,6 +51,13 @@ const META_BY_OUTPUT: Record<PlaygroundOutput, ComponentMeta> = {
     downloadLabel: 'Download GIF',
   },
 
+  jpeg: {
+    componentName: 'QRCodeJPEG',
+    optionsType: 'QRCodeJPEGImageOptions',
+    selector: 'qrcode-jpeg',
+    downloadLabel: 'Download JPEG',
+  },
+
   canvas: {
     componentName: 'QRCodeCanvas',
     optionsType: 'QRCodeCanvasOptions',
@@ -63,6 +71,7 @@ const CENTER_IMAGE_FACTORIES: Record<PlaygroundOutput, string> = {
   png: 'canvasCenterImage',
   webp: 'canvasCenterImage',
   gif: 'canvasCenterImage',
+  jpeg: 'canvasCenterImage',
   canvas: 'canvasCenterImage',
 };
 
@@ -409,6 +418,14 @@ function formatOptions(
     matrixEntries.push('eci: true');
   }
   if (matrixEntries.length > 0) entries.push(`matrix: ${formatObject(matrixEntries, depth + 1)}`);
+
+  if (
+    playgroundOptionsValue.output === 'jpeg' &&
+    playgroundOptionsValue.quality !== undefined &&
+    playgroundOptionsValue.quality !== DEFAULT_JPEG_QUALITY
+  ) {
+    entries.push(`quality: ${playgroundOptionsValue.quality}`);
+  }
 
   const accessibilityEntries: string[] = [];
   if (isPlaygroundImageOutput(playgroundOptionsValue.output)) {

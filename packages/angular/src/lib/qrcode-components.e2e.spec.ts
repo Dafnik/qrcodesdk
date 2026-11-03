@@ -12,6 +12,7 @@ import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
 import {QRCodeCanvas} from './QRCodeCanvas';
 import {QRCodeGIF} from './QRCodeGIF';
+import {QRCodeJPEG} from './QRCodeJPEG';
 import {QRCodePNG} from './QRCodePNG';
 import {QRCodeSVG} from './QRCodeSVG';
 import {QRCodeWebP} from './QRCodeWebP';
@@ -63,6 +64,30 @@ class QRCodeWebPHost {
 class QRCodeGIFHost {
   readonly options = imageOptions;
   readonly imageQRCode = viewChild.required(QRCodeGIF);
+}
+
+@Component({
+  selector: 'qrcode-jpeg-host',
+  imports: [QRCodeJPEG],
+  template: '<qrcode-jpeg payload="HELLO" [options]="options" />',
+})
+class QRCodeJPEGHost {
+  readonly options = imageOptions;
+  readonly imageQRCode = viewChild.required(QRCodeJPEG);
+}
+
+@Component({
+  selector: 'qrcode-jpeg-options-host',
+  imports: [QRCodeJPEG],
+  template: `
+    <qrcode-jpeg id="low" [options]="low" payload="HELLO" />
+    <qrcode-jpeg id="high" [options]="high" payload="HELLO" />
+  `,
+})
+class QRCodeJPEGOptionsHost {
+  private readonly options = {matrix: {version: 2}, style: {moduleSize: 2, quietZone: 1}} as const;
+  readonly low = {...this.options, quality: 10};
+  readonly high = {...this.options, quality: 100, transparency: {matte: '#112233'}} as const;
 }
 
 @Component({
@@ -150,26 +175,39 @@ describe('Angular QR code components', () => {
   });
 
   test.each([
-    ['WebP', QRCodeWebPHost, 'webp'],
-    ['GIF', QRCodeGIFHost, 'gif'],
-  ] as const)('renders and downloads %s image output', (_name, Host, extension) => {
-    const fixture = TestBed.createComponent<QRCodeWebPHost | QRCodeGIFHost>(Host);
+    ['WebP', QRCodeWebPHost, 'webp', 'webp'],
+    ['GIF', QRCodeGIFHost, 'gif', 'gif'],
+    ['JPEG', QRCodeJPEGHost, 'jpeg', 'jpg'],
+  ] as const)('renders and downloads %s image output', (_name, Host, type, extension) => {
+    const fixture = TestBed.createComponent<QRCodeWebPHost | QRCodeGIFHost | QRCodeJPEGHost>(Host);
     const downloads = captureDownloads(vi);
 
     fixture.detectChanges();
 
     const image = getRenderedElement<HTMLImageElement>(fixture, 'img');
-    expect(image.src.startsWith(`data:image/${extension};base64,`)).toBe(true);
+    expect(image.src.startsWith(`data:image/${type};base64,`)).toBe(true);
     expect(image.width).toBe(46);
     expect(image.alt).toBe('QR alt');
 
     fixture.componentInstance.imageQRCode().download('qrcodesdk');
     expect(downloads).toEqual([
       {
-        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
+        href: expect.stringMatching(new RegExp(`^data:image/${type};base64,`)),
         filename: `qrcodesdk.${extension}`,
       },
     ]);
+  });
+
+  test('passes matrix options and JPEG options to their renderers', () => {
+    const fixture = TestBed.createComponent(QRCodeJPEGOptionsHost);
+
+    fixture.detectChanges();
+
+    const low = getRenderedElement<HTMLImageElement>(fixture, '#low img');
+    const high = getRenderedElement<HTMLImageElement>(fixture, '#high img');
+    expect(low.width).toBe(54);
+    expect(high.width).toBe(54);
+    expect(low.src).not.toBe(high.src);
   });
 
   test('downloads SVG QR code output as SVG', async () => {

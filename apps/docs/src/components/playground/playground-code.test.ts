@@ -74,7 +74,7 @@ describe('generated playground image snippets', () => {
       assert.match(code, conditionalRender);
     });
 
-    for (const output of ['png', 'webp', 'gif', 'canvas'] as const) {
+    for (const output of ['png', 'webp', 'gif', 'jpeg', 'canvas'] as const) {
       test(`${packageName} ${output} passes a decoded image element after preparation`, () => {
         const {code} = generatePlaygroundCode(createOptions(packageName, output), preparedImage);
 
@@ -126,7 +126,7 @@ describe('generated playground languages', () => {
     assert.doesNotMatch(html, /<img/);
   });
   for (const packageName of ['react', 'vue', 'svelte', 'angular'] as const) {
-    for (const output of ['svg', 'png', 'webp', 'gif', 'canvas'] as const) {
+    for (const output of ['svg', 'png', 'webp', 'gif', 'jpeg', 'canvas'] as const) {
       test(`${packageName} ${output} imports its option type from the adapter`, () => {
         const {code} = generatePlaygroundCode(createOptions(packageName, output));
         const type = {
@@ -134,6 +134,7 @@ describe('generated playground languages', () => {
           png: 'QRCodePNGImageOptions',
           webp: 'QRCodeWebPImageOptions',
           gif: 'QRCodeGIFImageOptions',
+          jpeg: 'QRCodeJPEGImageOptions',
           canvas: 'QRCodeCanvasOptions',
         }[output];
 
@@ -145,6 +146,7 @@ describe('generated playground languages', () => {
       ['png', 'QRCodePNG', 'qrcode-png', 'Download PNG'],
       ['webp', 'QRCodeWebP', 'qrcode-webp', 'Download WebP'],
       ['gif', 'QRCodeGIF', 'qrcode-gif', 'Download GIF'],
+      ['jpeg', 'QRCodeJPEG', 'qrcode-jpeg', 'Download JPEG'],
     ] as const) {
       test(`${packageName} ${output} renders ${componentName} with a matching download`, () => {
         const {code} = generatePlaygroundCode({
@@ -163,6 +165,19 @@ describe('generated playground languages', () => {
         assert.match(code, /alt: 'QR code'/);
       });
     }
+  }
+
+  for (const packageName of ['react', 'vue', 'svelte', 'angular'] as const) {
+    test(`${packageName} jpeg includes quality only when it differs from the default`, () => {
+      const options = createOptions(packageName, 'jpeg');
+      assert.doesNotMatch(generatePlaygroundCode(options).code, /quality:/);
+      assert.doesNotMatch(generatePlaygroundCode({...options, quality: 92}).code, /quality:/);
+      assert.match(generatePlaygroundCode({...options, quality: 75}).code, /quality: 75/);
+      assert.doesNotMatch(
+        generatePlaygroundCode({...createOptions(packageName, 'png'), quality: 75}).code,
+        /quality:/,
+      );
+    });
   }
 
   test('generates an idiomatic Vue single-file component', () => {
