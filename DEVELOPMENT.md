@@ -107,6 +107,7 @@ Run the full benchmark suite or a focused matrix or styling benchmark:
 
 ```sh
 pnpm turbo run benchmark --filter=@repo/benchmarks
+pnpm turbo run benchmark:jpeg --filter=@repo/benchmarks
 pnpm turbo run benchmark:matrix --filter=@qrcodesdk/core
 pnpm turbo run benchmark:styler --filter=@qrcodesdk/core
 ```

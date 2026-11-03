@@ -41,3 +41,19 @@ After reviewing a benchmark run, update the performance guide from the workspace
 ```sh
 pnpm turbo run generate-performance --filter=docs
 ```
+
+Run the focused JPEG encoder benchmark from the workspace root:
+
+```sh
+pnpm turbo run benchmark:jpeg --filter=@repo/benchmarks
+```
+
+It measures quality 92 encoding of grayscale and color QR codes at versions 1, 10, and 40, with
+four pixels per module and a four-module quiet zone. Matrix generation and RGBA pixel preparation
+finish before timing. Each workload receives two warm-up encodes followed by three samples of
+five encodes. The timed operation includes matte blending, grayscale detection, both integer DCT
+passes, optimized Huffman table construction, and JPEG serialization. Results use the suite's
+median, minimum, maximum, and throughput statistics, and output byte lengths form a consumption
+checksum. The console table and ignored `benchmark-results/latest-jpeg.json` are separate from the
+comparison report used by the performance guide. Run it without other builds or tests competing
+for CPU time.
