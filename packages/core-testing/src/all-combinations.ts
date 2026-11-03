@@ -5,6 +5,8 @@ import {
   type QRCodeVersion,
 } from '@qrcodesdk/core';
 
+import {fixtureCapacity} from './capacity';
+import {createFixturePayload, fixtureSeed} from './fixture-payloads';
 import type {QRCodeTestFixture} from './fixtures';
 
 const ERROR_CORRECTION_LEVELS = [
@@ -17,11 +19,24 @@ const ERROR_CORRECTION_LEVELS = [
 const MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const satisfies readonly QRCodeMask[];
 const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
 
-const PAYLOAD_BY_MODE = {
-  numeric: '1',
-  alphanumeric: 'A',
-  octet: 'A',
-} as const satisfies Record<QRCodeMode, string>;
+/**
+ * Creates a seeded payload that fills the symbol's data capacity exactly, so no pad codewords
+ * (and their repeating `0xEC 0x11` pattern) end up in the matrix.
+ */
+function combinationPayload(
+  name: string,
+  version: QRCodeVersion,
+  errorCorrectionLevel: QRCodeErrorCorrectionLevel,
+  mode: QRCodeMode,
+  eci: boolean,
+): string {
+  return createFixturePayload(
+    mode,
+    fixtureCapacity(version, errorCorrectionLevel, mode, eci),
+    fixtureSeed(name),
+    {utf8: eci},
+  );
+}
 
 export type QRCodeAutoMaskCombination = Required<Omit<QRCodeTestFixture, 'mask'>>;
 
@@ -35,14 +50,21 @@ export function* getAllQRCodeCombinations(): Generator<Required<QRCodeTestFixtur
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
       for (const mask of MASKS) {
         for (const mode of MODES) {
+          const name = [
+            `version-${String(version).padStart(2, '0')}`,
+            `ecc-${errorCorrectionLevel}`,
+            `mask-${mask}`,
+            `mode-${mode}`,
+          ].join('_');
           yield {
-            name: [
-              `version-${String(version).padStart(2, '0')}`,
-              `ecc-${errorCorrectionLevel}`,
-              `mask-${mask}`,
-              `mode-${mode}`,
-            ].join('_'),
-            payload: PAYLOAD_BY_MODE[mode].repeat(version),
+            name,
+            payload: combinationPayload(
+              name,
+              version as QRCodeVersion,
+              errorCorrectionLevel,
+              mode,
+              false,
+            ),
             mode,
             version: version as QRCodeVersion,
             mask,
@@ -60,14 +82,21 @@ export function* getAllQRCodeECICombinations(): Generator<Required<QRCodeTestFix
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
       for (const mask of MASKS) {
         const mode = 'octet';
+        const name = [
+          `version-${String(version).padStart(2, '0')}`,
+          `ecc-${errorCorrectionLevel}`,
+          `mask-${mask}`,
+          `mode-${mode}`,
+        ].join('_');
         yield {
-          name: [
-            `version-${String(version).padStart(2, '0')}`,
-            `ecc-${errorCorrectionLevel}`,
-            `mask-${mask}`,
-            `mode-${mode}`,
-          ].join('_'),
-          payload: PAYLOAD_BY_MODE[mode].repeat(version),
+          name,
+          payload: combinationPayload(
+            name,
+            version as QRCodeVersion,
+            errorCorrectionLevel,
+            mode,
+            true,
+          ),
           mode,
           version: version as QRCodeVersion,
           mask,
@@ -83,14 +112,21 @@ export function* getAllQRCodeAutoMaskCombinations(): Generator<QRCodeAutoMaskCom
   for (let version = 1; version <= 40; version += 1) {
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
       for (const mode of MODES) {
+        const name = [
+          `version-${String(version).padStart(2, '0')}`,
+          `ecc-${errorCorrectionLevel}`,
+          'mask-auto',
+          `mode-${mode}`,
+        ].join('_');
         yield {
-          name: [
-            `version-${String(version).padStart(2, '0')}`,
-            `ecc-${errorCorrectionLevel}`,
-            'mask-auto',
-            `mode-${mode}`,
-          ].join('_'),
-          payload: PAYLOAD_BY_MODE[mode].repeat(version),
+          name,
+          payload: combinationPayload(
+            name,
+            version as QRCodeVersion,
+            errorCorrectionLevel,
+            mode,
+            false,
+          ),
           mode,
           version: version as QRCodeVersion,
           errorCorrectionLevel,

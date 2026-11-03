@@ -18,6 +18,7 @@ import {
 import {needsVersionInfo} from '../../src/matrix/needs-version-info';
 import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
 import {createSingleSegment, getSegmentsBitLength} from '../../src/matrix/segments';
+import {fixturePayload} from '../helpers';
 
 describe('capacity helpers', () => {
   test('returns QR sizes and version-info boundaries', () => {
@@ -53,7 +54,7 @@ describe('capacity helpers', () => {
   test('calculates maximum data length by mode and ECC level', () => {
     expect(
       segmentsFitVersion(
-        [createSingleSegment(MODE_NUMERIC, '1'.repeat(41))!],
+        [createSingleSegment(MODE_NUMERIC, fixturePayload('numeric', 41))!],
         1,
         ECC_LEVEL_L,
         false,
@@ -61,7 +62,7 @@ describe('capacity helpers', () => {
     ).toBe(true);
     expect(
       segmentsFitVersion(
-        [createSingleSegment(MODE_NUMERIC, '1'.repeat(42))!],
+        [createSingleSegment(MODE_NUMERIC, fixturePayload('numeric', 42))!],
         1,
         ECC_LEVEL_L,
         false,
@@ -69,7 +70,7 @@ describe('capacity helpers', () => {
     ).toBe(false);
     expect(
       segmentsFitVersion(
-        [createSingleSegment(MODE_ALPHANUMERIC, 'A'.repeat(25))!],
+        [createSingleSegment(MODE_ALPHANUMERIC, fixturePayload('alphanumeric', 25))!],
         1,
         ECC_LEVEL_L,
         false,
@@ -77,35 +78,55 @@ describe('capacity helpers', () => {
     ).toBe(true);
     expect(
       segmentsFitVersion(
-        [createSingleSegment(MODE_ALPHANUMERIC, 'A'.repeat(26))!],
+        [createSingleSegment(MODE_ALPHANUMERIC, fixturePayload('alphanumeric', 26))!],
         1,
         ECC_LEVEL_L,
         false,
       ),
     ).toBe(false);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(17))!], 1, ECC_LEVEL_L, false),
+      segmentsFitVersion(
+        [createSingleSegment(MODE_OCTET, fixturePayload('octet', 17))!],
+        1,
+        ECC_LEVEL_L,
+        false,
+      ),
     ).toBe(true);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(18))!], 1, ECC_LEVEL_L, false),
+      segmentsFitVersion(
+        [createSingleSegment(MODE_OCTET, fixturePayload('octet', 18))!],
+        1,
+        ECC_LEVEL_L,
+        false,
+      ),
     ).toBe(false);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(14))!], 1, ECC_LEVEL_M, false),
+      segmentsFitVersion(
+        [createSingleSegment(MODE_OCTET, fixturePayload('octet', 14))!],
+        1,
+        ECC_LEVEL_M,
+        false,
+      ),
     ).toBe(true);
     expect(
-      segmentsFitVersion([createSingleSegment(MODE_OCTET, 'A'.repeat(15))!], 1, ECC_LEVEL_M, false),
+      segmentsFitVersion(
+        [createSingleSegment(MODE_OCTET, fixturePayload('octet', 15))!],
+        1,
+        ECC_LEVEL_M,
+        false,
+      ),
     ).toBe(false);
     expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!], false)).toBe(20);
     expect(getSegmentsBitLength(1, [createSingleSegment(MODE_OCTET, 'A')!], true)).toBe(32);
   });
 
   test('charges the ECI header only for enabled octet segments', () => {
-    const octetLWithECI = createSingleSegment(MODE_OCTET, 'A'.repeat(16))!;
-    const octetL = createSingleSegment(MODE_OCTET, 'A'.repeat(17))!;
-    const octetMWithECI = createSingleSegment(MODE_OCTET, 'A'.repeat(13))!;
-    const octetM = createSingleSegment(MODE_OCTET, 'A'.repeat(14))!;
-    const octetMaxWithECI = createSingleSegment(MODE_OCTET, 'A'.repeat(2_952))!;
-    const octetMax = createSingleSegment(MODE_OCTET, 'A'.repeat(2_953))!;
+    const octetLWithECI = createSingleSegment(MODE_OCTET, fixturePayload('octet', 16))!;
+    const octetL = createSingleSegment(MODE_OCTET, fixturePayload('octet', 17))!;
+    const octetMWithECI = createSingleSegment(MODE_OCTET, fixturePayload('octet', 13))!;
+    const octetM = createSingleSegment(MODE_OCTET, fixturePayload('octet', 14))!;
+    const octetMaxWithECI = createSingleSegment(MODE_OCTET, fixturePayload('octet', 2_952))!;
+    const octetMax = createSingleSegment(MODE_OCTET, fixturePayload('octet', 2_953))!;
 
     expect(segmentsFitVersion([octetLWithECI], 1, ECC_LEVEL_L, true)).toBe(true);
     expect(segmentsFitVersion([octetL], 1, ECC_LEVEL_L, false)).toBe(true);

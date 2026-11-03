@@ -11,7 +11,7 @@ import {getNumberOfAvailableBitsForData} from '../../src/matrix/get-number-of-av
 import {MODES_MAP} from '../../src/matrix/mode';
 import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
 import {createSingleSegment} from '../../src/matrix/segments';
-import {toRows} from '../helpers';
+import {fixturePayload, toRows} from '../helpers';
 import {expectSquareMatrix} from './helpers';
 
 const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
@@ -22,11 +22,6 @@ const ERROR_CORRECTION_LEVELS = [
   'Q',
   'H',
 ] as const satisfies readonly QRCodeErrorCorrectionLevel[];
-const DATA_BY_MODE = {
-  numeric: '1',
-  alphanumeric: 'A',
-  octet: 'A',
-} as const satisfies Record<QRCodeMode, string>;
 
 const CAPACITY_CASES = Array.from({length: 40}, (_, index) => (index + 1) as QRCodeVersion).flatMap(
   (version) =>
@@ -97,7 +92,7 @@ describe('qrcode().matrix()', () => {
     expect(qrcode('hello world').mask(1).matrix()).toEqual(
       qrcode('hello world').mode('octet').mask(1).matrix(),
     );
-    expect(qrcode('1'.repeat(42)).mask(1).matrix().size).toBe(25);
+    expect(qrcode(fixturePayload('numeric', 42)).mask(1).matrix().size).toBe(25);
   });
 
   test('uses mixed modes automatically while explicit modes remain forced', () => {
@@ -194,8 +189,8 @@ describe('qrcode().matrix()', () => {
   test.each(CAPACITY_CASES)(
     'enforces exact capacity for version $version, ECC $errorCorrectionLevel, mode $mode',
     ({version, errorCorrectionLevel, mode, capacity}) => {
-      const exactData = DATA_BY_MODE[mode].repeat(capacity);
-      const oversizedData = `${exactData}${DATA_BY_MODE[mode]}`;
+      const oversizedData = fixturePayload(mode, capacity + 1, version);
+      const exactData = oversizedData.slice(0, capacity);
 
       expectSquareMatrix(
         qrcode(exactData)
@@ -222,7 +217,7 @@ describe('qrcode().matrix()', () => {
     expect(() => qrcode('abc').mode('alphanumeric').matrix()).toThrow(
       'QRCode: Invalid payload format',
     );
-    expect(() => qrcode('1'.repeat(7_090)).mode('numeric').matrix()).toThrow(
+    expect(() => qrcode(fixturePayload('numeric', 7_090)).mode('numeric').matrix()).toThrow(
       'QRCode: Payload too large',
     );
     for (const invalidNumber of [
@@ -254,14 +249,13 @@ function getSingleSegmentCapacity(
   errorCorrectionLevel: QRCodeErrorCorrectionLevel,
 ): number {
   const modeIndicator = MODES_MAP[mode];
-  const dataCharacter = DATA_BY_MODE[mode];
   const eccLevel = ECC_LEVELS_MAP[errorCorrectionLevel];
   let minimum = 0;
   let maximum = getNumberOfAvailableBitsForData(version, eccLevel);
 
   while (minimum < maximum) {
     const candidate = Math.ceil((minimum + maximum) / 2);
-    const segment = createSingleSegment(modeIndicator, dataCharacter.repeat(candidate))!;
+    const segment = createSingleSegment(modeIndicator, fixturePayload(mode, candidate))!;
     if (segmentsFitVersion([segment], version, eccLevel, false)) minimum = candidate;
     else maximum = candidate - 1;
   }

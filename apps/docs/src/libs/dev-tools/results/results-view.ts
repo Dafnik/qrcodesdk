@@ -18,6 +18,11 @@ type StatusFilter = 'all' | 'fail' | 'known-fail' | 'pass' | 'unchecked';
 
 /** Row padding (py-3) plus the tile footer and gap. */
 const ROW_CHROME = 24 + 30;
+/**
+ * Characters kept on each side of the ellipsis in long payload previews. Sized so the preview,
+ * including the character count, fits the three clamped lines of the 18rem fixture column.
+ */
+const PAYLOAD_PREVIEW_EDGE_LENGTH = 44;
 
 @Component({
   selector: 'app-results-view',
@@ -215,6 +220,11 @@ export class ResultsView {
   protected payloadPreview(fixture: DevFixture): string {
     const {payload} = fixture;
     if (payload === '') return '(empty payload)';
-    return payload.length > 120 ? `${payload.slice(0, 120)}… (${payload.length} chars)` : payload;
+    // Code points, so multi-byte characters such as emoji are never split.
+    const characters = Array.from(payload);
+    if (characters.length <= PAYLOAD_PREVIEW_EDGE_LENGTH * 2 + 1) return payload;
+    const start = characters.slice(0, PAYLOAD_PREVIEW_EDGE_LENGTH).join('');
+    const end = characters.slice(-PAYLOAD_PREVIEW_EDGE_LENGTH).join('');
+    return `${start}…${end} (${characters.length} chars)`;
   }
 }

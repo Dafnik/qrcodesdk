@@ -5,7 +5,7 @@ import {describe, expect, test} from 'vitest';
 import {qrcode} from '@qrcodesdk/core';
 import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeRenderer} from '@qrcodesdk/core';
 
-import {fixtureMatrixOptions} from '../src';
+import {fixtureCapacity, fixtureMatrixOptions} from '../src';
 import {
   type QRCodeTestFixture,
   QR_CODE_ECI_TEST_FIXTURE,
@@ -19,6 +19,10 @@ import {
 
 type Rows = number[][];
 
+function payloadLength(payload: string, mode: string): number {
+  return mode === 'octet' ? new TextEncoder().encode(payload).length : payload.length;
+}
+
 const ECC_LEVELS: QRCodeErrorCorrectionLevel[] = ['L', 'M', 'Q', 'H'];
 // Reference libraries produce rows of light and dark modules.
 const binaryMatrix: QRCodeRenderer<Rows> = matrixToRows;
@@ -29,38 +33,42 @@ const ALL_QR_CODE_AUTO_MASK_COMBINATIONS = [...getAllQRCodeAutoMaskCombinations(
 const REFERENCE_QR_CODE_COMBINATIONS = ALL_QR_CODE_COMBINATIONS;
 const REFERENCE_QR_CODE_AUTO_MASK_COMBINATIONS = ALL_QR_CODE_AUTO_MASK_COMBINATIONS;
 
-// `qrcode` uses an asymmetric ceiling calculation for N4 density penalties. QRCodeSDK keeps
-// its symmetric N4 calculation, so these inputs intentionally choose a different best mask.
-const AUTOMATIC_MASK_N4_DIVERGENCES = new Map<
-  string,
-  {qrcodeSdk: QRCodeMask; reference: QRCodeMask}
->([
-  ['version-01_ecc-Q_mask-auto_mode-alphanumeric', {qrcodeSdk: 4, reference: 2}],
-  ['version-07_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 4, reference: 2}],
-  ['version-10_ecc-L_mask-auto_mode-numeric', {qrcodeSdk: 4, reference: 2}],
-  ['version-16_ecc-H_mask-auto_mode-alphanumeric', {qrcodeSdk: 0, reference: 2}],
-]);
-
-// `qrcode` counts both 11-module windows around a finder-like core flanked by four light
-// modules on each side. QRCodeSDK counts the core once, so these inputs choose a different mask.
-const AUTOMATIC_MASK_N3_DIVERGENCES = new Map<
-  string,
-  {qrcodeSdk: QRCodeMask; reference: QRCodeMask}
->([
-  ['version-16_ecc-Q_mask-auto_mode-numeric', {qrcodeSdk: 4, reference: 2}],
-  ['version-37_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 4, reference: 2}],
-]);
-
-// The same reference mask-scoring differences affect these newly comparable octet fixtures.
-const AUTOMATIC_MASK_OCTET_DIVERGENCES = new Map<
-  string,
-  {qrcodeSdk: QRCodeMask; reference: QRCodeMask}
->([
-  ['version-01_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 0}],
-  ['version-06_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 0, reference: 4}],
-  ['version-18_ecc-M_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 0}],
-  ['version-18_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 0, reference: 4}],
-  ['version-37_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 2}],
+// The `qrcode` reference scores masks differently in two documented ways, so these inputs
+// intentionally choose a different best mask:
+// - N3: it counts both 11-module windows around a finder-like core flanked by four light modules
+//   on each side. QRCodeSDK counts the core once.
+// - N4: it uses an asymmetric ceiling calculation for density penalties. QRCodeSDK keeps its
+//   symmetric calculation.
+const AUTOMATIC_MASK_DIVERGENCES = new Map<string, {qrcodeSdk: QRCodeMask; reference: QRCodeMask}>([
+  ['version-01_ecc-H_mask-auto_mode-alphanumeric', {qrcodeSdk: 1, reference: 2}],
+  ['version-03_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 5, reference: 1}],
+  ['version-07_ecc-Q_mask-auto_mode-numeric', {qrcodeSdk: 0, reference: 2}],
+  ['version-09_ecc-H_mask-auto_mode-alphanumeric', {qrcodeSdk: 7, reference: 5}],
+  ['version-12_ecc-M_mask-auto_mode-alphanumeric', {qrcodeSdk: 6, reference: 7}],
+  ['version-12_ecc-H_mask-auto_mode-numeric', {qrcodeSdk: 3, reference: 2}],
+  ['version-14_ecc-M_mask-auto_mode-numeric', {qrcodeSdk: 4, reference: 0}],
+  ['version-15_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 2, reference: 6}],
+  ['version-16_ecc-M_mask-auto_mode-octet', {qrcodeSdk: 2, reference: 6}],
+  ['version-17_ecc-M_mask-auto_mode-numeric', {qrcodeSdk: 5, reference: 2}],
+  ['version-18_ecc-Q_mask-auto_mode-numeric', {qrcodeSdk: 2, reference: 0}],
+  ['version-19_ecc-M_mask-auto_mode-numeric', {qrcodeSdk: 0, reference: 2}],
+  ['version-20_ecc-M_mask-auto_mode-numeric', {qrcodeSdk: 1, reference: 2}],
+  ['version-20_ecc-M_mask-auto_mode-octet', {qrcodeSdk: 3, reference: 1}],
+  ['version-20_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 0, reference: 4}],
+  ['version-23_ecc-M_mask-auto_mode-alphanumeric', {qrcodeSdk: 1, reference: 5}],
+  ['version-23_ecc-Q_mask-auto_mode-alphanumeric', {qrcodeSdk: 6, reference: 1}],
+  ['version-24_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 6, reference: 3}],
+  ['version-24_ecc-M_mask-auto_mode-numeric', {qrcodeSdk: 2, reference: 1}],
+  ['version-25_ecc-M_mask-auto_mode-numeric', {qrcodeSdk: 7, reference: 2}],
+  ['version-26_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 3, reference: 7}],
+  ['version-26_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 5, reference: 4}],
+  ['version-30_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 2, reference: 4}],
+  ['version-30_ecc-H_mask-auto_mode-octet', {qrcodeSdk: 4, reference: 3}],
+  ['version-32_ecc-L_mask-auto_mode-numeric', {qrcodeSdk: 1, reference: 5}],
+  ['version-32_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 5, reference: 2}],
+  ['version-32_ecc-M_mask-auto_mode-alphanumeric', {qrcodeSdk: 5, reference: 2}],
+  ['version-37_ecc-Q_mask-auto_mode-octet', {qrcodeSdk: 2, reference: 5}],
+  ['version-38_ecc-L_mask-auto_mode-alphanumeric', {qrcodeSdk: 5, reference: 2}],
 ]);
 
 function referenceMatrixQRCodePackage(fixture: QRCodeTestFixture): Rows {
@@ -117,8 +125,10 @@ describe('qrcode().render(binaryMatrix)', () => {
     expect(new Set(ALL_QR_CODE_COMBINATIONS.map(({name}) => name)).size).toBe(
       TOTAL_QR_CODE_COMBINATIONS,
     );
-    for (const {payload, version} of ALL_QR_CODE_COMBINATIONS) {
-      expect(payload).toHaveLength(version);
+    for (const {payload, version, errorCorrectionLevel, mode} of ALL_QR_CODE_COMBINATIONS) {
+      expect(payloadLength(payload, mode)).toBe(
+        fixtureCapacity(version, errorCorrectionLevel, mode),
+      );
     }
   });
 
@@ -233,10 +243,7 @@ describe('qrcode().render(binaryMatrix)', () => {
         .options(fixtureMatrixOptions(fixture))
         .render(binaryMatrix);
       const referenceMatrix = referenceMatrixQRCodePackage(fixture);
-      const knownDivergence =
-        AUTOMATIC_MASK_N3_DIVERGENCES.get(fixture.name) ??
-        AUTOMATIC_MASK_N4_DIVERGENCES.get(fixture.name) ??
-        AUTOMATIC_MASK_OCTET_DIVERGENCES.get(fixture.name);
+      const knownDivergence = AUTOMATIC_MASK_DIVERGENCES.get(fixture.name);
 
       if (!knownDivergence) {
         expect(matrix).toEqual(referenceMatrix);

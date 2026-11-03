@@ -54,3 +54,4 @@ grayscale
 quantizer
 psnr
 rrggbbff
+äöüßéñçøå

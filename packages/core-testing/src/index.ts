@@ -6,6 +6,7 @@ export {
   TOTAL_QR_CODE_COMBINATIONS,
 } from './all-combinations';
 export type {QRCodeAutoMaskCombination} from './all-combinations';
+export {fixtureCapacity} from './capacity';
 export {QR_CODE_CENTER_IMAGE_FIXTURES} from './center-image-fixtures';
 export type {QRCodeCenterImageFixture} from './center-image-fixtures';
 export {captureDownloads, mockCanvasRendering} from './dom';
@@ -21,6 +22,8 @@ export {
   WIDE_IMAGE,
 } from './fixture-images';
 export type {QRCodeFixtureImage} from './fixture-images';
+export {createFixturePayload, createFixtureRandom, fixtureSeed} from './fixture-payloads';
+export type {QRCodeFixturePayloadOptions} from './fixture-payloads';
 export {matrixFromRows, matrixToRows} from './matrix';
 export type {QRCodeTestFixture} from './fixtures';
 export {

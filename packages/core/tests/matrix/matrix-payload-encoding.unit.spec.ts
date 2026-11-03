@@ -2,7 +2,12 @@ import {describe, expect, test} from 'vitest';
 
 import {encode} from '../../src/matrix/encode';
 import {MODE_ALPHANUMERIC, MODE_NUMERIC, MODE_OCTET, validatePayload} from '../../src/matrix/mode';
+import {fixturePayload} from '../helpers';
 import {bitsToBytes} from './helpers';
+
+function fixtureBytes(length: number): number[] {
+  return Array.from(new TextEncoder().encode(fixturePayload('octet', length)));
+}
 
 describe('data validation and encoding', () => {
   test('validates numeric, alphanumeric, and octet data', () => {
@@ -120,22 +125,27 @@ describe('data validation and encoding', () => {
 
   test('fits maximum-capacity payloads into the available data codewords', () => {
     expect(
-      encode(40, [{mode: MODE_NUMERIC, payload: '1'.repeat(7_089)}], 2_956, false),
+      encode(40, [{mode: MODE_NUMERIC, payload: fixturePayload('numeric', 7_089)}], 2_956, false),
     ).toHaveLength(2_956);
     expect(
-      encode(40, [{mode: MODE_ALPHANUMERIC, payload: 'A'.repeat(4_296)}], 2_956, false),
+      encode(
+        40,
+        [{mode: MODE_ALPHANUMERIC, payload: fixturePayload('alphanumeric', 4_296)}],
+        2_956,
+        false,
+      ),
     ).toHaveLength(2_956);
     expect(
-      encode(40, [{mode: MODE_OCTET, payload: Array(2_953).fill(0x41)}], 2_956, false),
+      encode(40, [{mode: MODE_OCTET, payload: fixtureBytes(2_953)}], 2_956, false),
     ).toHaveLength(2_956);
     expect(
-      encode(40, [{mode: MODE_OCTET, payload: Array(2_952).fill(0x41)}], 2_956, true),
+      encode(40, [{mode: MODE_OCTET, payload: fixtureBytes(2_952)}], 2_956, true),
     ).toHaveLength(2_956);
   });
 
   test('rejects payload bits that exceed the data codeword buffer', () => {
-    expect(() => encode(1, [{mode: MODE_NUMERIC, payload: '1'.repeat(35)}], 16, false)).toThrow(
-      'QRCode: Payload too large',
-    );
+    expect(() =>
+      encode(1, [{mode: MODE_NUMERIC, payload: fixturePayload('numeric', 35)}], 16, false),
+    ).toThrow('QRCode: Payload too large');
   });
 });

@@ -1,5 +1,8 @@
 import type {QRCodeMatrixOptions} from '@qrcodesdk/core';
 
+import {fixtureCapacity} from './capacity';
+import {createFixturePayload, fixtureSeed} from './fixture-payloads';
+
 export type QRCodeTestFixture = Readonly<
   QRCodeMatrixOptions & {
     readonly name: string;
@@ -117,7 +120,11 @@ export const QR_CODE_TEST_FIXTURES = [
   QR_CODE_ECI_TEST_FIXTURE,
   {
     name: 'numeric-max-capacity',
-    payload: '1'.repeat(7_089),
+    payload: createFixturePayload(
+      'numeric',
+      fixtureCapacity(40, 'L', 'numeric'),
+      fixtureSeed('numeric-max-capacity'),
+    ),
     mode: 'numeric',
     version: 40,
     mask: 0,
@@ -125,7 +132,11 @@ export const QR_CODE_TEST_FIXTURES = [
   },
   {
     name: 'alphanumeric-max-capacity',
-    payload: 'A'.repeat(4_296),
+    payload: createFixturePayload(
+      'alphanumeric',
+      fixtureCapacity(40, 'L', 'alphanumeric'),
+      fixtureSeed('alphanumeric-max-capacity'),
+    ),
     mode: 'alphanumeric',
     version: 40,
     mask: 1,
@@ -133,7 +144,11 @@ export const QR_CODE_TEST_FIXTURES = [
   },
   {
     name: 'bytes-max-capacity',
-    payload: 'A'.repeat(2_953),
+    payload: createFixturePayload(
+      'octet',
+      fixtureCapacity(40, 'L', 'octet'),
+      fixtureSeed('bytes-max-capacity'),
+    ),
     mode: 'octet',
     version: 40,
     mask: 2,

@@ -144,10 +144,10 @@ UPDATE_SVG_SNAPSHOTS=1 UPDATE_TEXT_SNAPSHOTS=1 \
 pnpm turbo run test:snapshots --filter=@repo/core-testing
 ```
 
-For PNG, WebP, and GIF snapshots:
+For PNG, WebP, GIF, and JPEG snapshots:
 
 ```sh
-UPDATE_PNG_SNAPSHOTS=1 UPDATE_WEBP_SNAPSHOTS=1 UPDATE_GIF_SNAPSHOTS=1 \
+UPDATE_PNG_SNAPSHOTS=1 UPDATE_WEBP_SNAPSHOTS=1 UPDATE_GIF_SNAPSHOTS=1 UPDATE_JPEG_SNAPSHOTS=1 \
 pnpm turbo run test:snapshots --filter=@qrcodesdk/node
 ```
 
