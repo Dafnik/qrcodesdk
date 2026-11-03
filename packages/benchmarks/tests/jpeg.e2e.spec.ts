@@ -43,19 +43,25 @@ describe('JPEG benchmark', () => {
       expect([...image.data.subarray(0, image.width * 4)]).toEqual(
         Array.from({length: image.width * 4}, () => 255),
       );
+      const modulePixels = Buffer.alloc(matrix.size * matrix.size * 4);
+      const expectedPixels = Buffer.alloc(modulePixels.length);
+      const foreground = color === 'grayscale' ? [0, 0, 0, 255] : [16, 48, 128, 255];
+      const background = [255, 255, 255, 255];
       for (let y = 0; y < matrix.size; y += 1) {
         for (let x = 0; x < matrix.size; x += 1) {
           const pixelX = (x + JPEG_QUIET_ZONE_MODULES) * JPEG_PIXELS_PER_MODULE;
           const pixelY = (y + JPEG_QUIET_ZONE_MODULES) * JPEG_PIXELS_PER_MODULE;
           const offset = (pixelY * image.width + pixelX) * 4;
-          const expected = matrix.modules[y * matrix.size + x]
-            ? color === 'grayscale'
-              ? [0, 0, 0, 255]
-              : [16, 48, 128, 255]
-            : [255, 255, 255, 255];
-          expect([...image.data.subarray(offset, offset + 4)]).toEqual(expected);
+          const moduleOffset = (y * matrix.size + x) * 4;
+          modulePixels.set(image.data.subarray(offset, offset + 4), moduleOffset);
+          expectedPixels.set(
+            matrix.modules[y * matrix.size + x] ? foreground : background,
+            moduleOffset,
+          );
         }
       }
+      // Compare every sampled module in one assertion to avoid per-module matcher overhead in CI.
+      expect(modulePixels.equals(expectedPixels), workload.label).toBe(true);
     }
   });
 
