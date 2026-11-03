@@ -29,6 +29,11 @@ describe('QRCodeCanvasRenderer', () => {
     expectPixel(canvas, 6, 3, {red: 255, green: 255, blue: 255, alpha: 128});
   });
 
+  test('draws on a software-backed context so output does not depend on the GPU', () => {
+    const canvas = QRCodeCanvasRenderer()(matrixFromRows([[1]]));
+    expect(canvas.getContext('2d')?.getContextAttributes().willReadFrequently).toBe(true);
+  });
+
   test('applies nested accessibility options', () => {
     const canvas = QRCodeCanvasRenderer({
       accessibility: {ariaLabel: 'Scan this', title: 'QR code'},

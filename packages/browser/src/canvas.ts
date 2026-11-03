@@ -52,7 +52,9 @@ export function QRCodeCanvasRenderer(
     canvas.width = canvas.height = drawing.outputSize;
     applyAccessibility(canvas, accessibility);
 
-    const context = canvas.getContext('2d');
+    // A software-backed context rasterizes the same pixels with or without GPU acceleration, so
+    // Canvas, PNG, WebP, and GIF output matches across machines. Image renderers read it back.
+    const context = canvas.getContext('2d', {willReadFrequently: true});
     if (!context) {
       throw new QRCodeError(
         'RENDER_FAILED',
