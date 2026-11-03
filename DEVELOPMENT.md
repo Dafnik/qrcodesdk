@@ -75,7 +75,7 @@ pnpm turbo run start --filter=docs
 
 The docs also serve the dev tools at `/devtools`, a standalone page outside Starlight. They render
 the shared `@repo/core-testing` fixtures with the `@qrcodesdk/angular` components (SVG, PNG, WebP,
-GIF, and Canvas), and can scan each output with jsQR. Nothing renders until you pick fixtures and
+GIF, JPEG, and Canvas), and can scan each output with jsQR. Nothing renders until you pick fixtures and
 renderers and press Run. Large selections, such as all combinations, render lazily in a virtual
 list. The code lives in `apps/docs/src/libs/dev-tools`.
 
@@ -107,6 +107,7 @@ Run the full benchmark suite or a focused matrix or styling benchmark:
 
 ```sh
 pnpm turbo run benchmark --filter=@repo/benchmarks
+pnpm turbo run benchmark:jpeg --filter=@repo/benchmarks
 pnpm turbo run benchmark:matrix --filter=@qrcodesdk/core
 pnpm turbo run benchmark:styler --filter=@qrcodesdk/core
 ```

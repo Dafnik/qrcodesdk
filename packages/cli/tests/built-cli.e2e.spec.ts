@@ -9,7 +9,7 @@ import {expect, test} from 'vitest';
 const execFile = promisify(execFileCallback);
 const executable = fileURLToPath(new URL('../dist/bin.mjs', import.meta.url));
 
-test('built executable loads its text, SVG, PNG, WebP, and GIF renderers on demand', async () => {
+test('built executable loads its text, SVG, PNG, WebP, GIF, and JPEG renderers on demand', async () => {
   const directory = await mkdtemp(path.join(tmpdir(), 'qrcodesdk-built-cli-'));
   const run = (args: string[]) =>
     execFile(process.execPath, [executable, ...args], {cwd: directory});
@@ -29,6 +29,10 @@ test('built executable loads its text, SVG, PNG, WebP, and GIF renderers on dema
     await run(['HELLO', '--output', 'code.gif']);
     expect((await readFile(path.join(directory, 'code.gif'))).toString('latin1', 0, 6)).toBe(
       'GIF89a',
+    );
+    await run(['HELLO', '--output', 'code.jpg', '--quality', '80', '--matte', '#336699']);
+    expect((await readFile(path.join(directory, 'code.jpg'))).toString('latin1', 6, 11)).toBe(
+      'JFIF\0',
     );
   } finally {
     await rm(directory, {recursive: true, force: true});

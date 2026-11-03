@@ -14,6 +14,7 @@ import {
   QRCodeCanvas,
   type QRCodeDownloadHandle,
   QRCodeGIF,
+  QRCodeJPEG,
   QRCodePNG,
   QRCodeSVG,
   QRCodeWebP,
@@ -64,24 +65,42 @@ describe('Vue QR code components', () => {
   });
 
   test.each([
-    ['WebP', QRCodeWebP, 'webp'],
-    ['GIF', QRCodeGIF, 'gif'],
-  ] as const)('renders and downloads %s image output', (_name, Component, extension) => {
+    ['WebP', QRCodeWebP, 'webp', 'webp'],
+    ['GIF', QRCodeGIF, 'gif', 'gif'],
+    ['JPEG', QRCodeJPEG, 'jpeg', 'jpg'],
+  ] as const)('renders and downloads %s image output', (_name, Component, type, extension) => {
     const downloads = captureDownloads(vi);
     const wrapper = mount(Component, {props: {payload: 'HELLO', options: imageOptions}});
     const image = wrapper.get('img');
 
-    expect(image.attributes('src')?.startsWith(`data:image/${extension};base64,`)).toBe(true);
+    expect(image.attributes('src')?.startsWith(`data:image/${type};base64,`)).toBe(true);
     expect(image.element.width).toBe(46);
     expect(image.attributes('alt')).toBe('QR alt');
 
     (wrapper.vm as unknown as QRCodeDownloadHandle).download('qrcodesdk');
     expect(downloads).toEqual([
       {
-        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
+        href: expect.stringMatching(new RegExp(`^data:image/${type};base64,`)),
         filename: `qrcodesdk.${extension}`,
       },
     ]);
+  });
+
+  test('passes matrix options and JPEG options to their renderers', () => {
+    const options = {matrix: {version: 2}, style: {moduleSize: 2, quietZone: 1}} as const;
+    const low = mount(QRCodeJPEG, {
+      props: {payload: 'HELLO', options: {...options, quality: 10}},
+    }).get('img');
+    const high = mount(QRCodeJPEG, {
+      props: {
+        payload: 'HELLO',
+        options: {...options, quality: 100, transparency: {matte: '#112233'}},
+      },
+    }).get('img');
+
+    expect(low.element.width).toBe(54);
+    expect(high.element.width).toBe(54);
+    expect(low.attributes('src')).not.toBe(high.attributes('src'));
   });
 
   test('downloads image and SVG QR code output', async () => {

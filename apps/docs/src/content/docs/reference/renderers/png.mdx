@@ -7,6 +7,7 @@ related:
   - ../../packages/node.mdx
   - ./webp.md
   - ./gif.md
+  - ./jpeg.md
   - ../../guides/center-images.md
   - ../../guides/download-or-save.md
   - ../../guides/server-output.md
@@ -17,7 +18,8 @@ related:
 Use `QRCodePNGRenderer` when Node.js-compatible code needs PNG bytes for a file, HTTP response,
 attachment, object store, or another binary API. PNG is the most widely supported raster format.
 For smaller files, use the [WebP Buffer renderer](/reference/renderers/webp/); for destinations that
-only accept GIF, use the [GIF Buffer renderer](/reference/renderers/gif/).
+only accept GIF or JPEG, use the [GIF](/reference/renderers/gif/) or
+[JPEG](/reference/renderers/jpeg/) Buffer renderer.
 
 ## Minimal example
 
@@ -66,8 +68,8 @@ every other key; the renderer does not repeat that check at runtime.
 | `compression.level` | integer `0`–`9`           | `9`             | Sets the PNG DEFLATE compression level           |
 | `centerImage`       | `QRCodeRasterCenterImage` | `undefined`     | Draws a center image from `rasterCenterImage()`  |
 
-`style` and `centerImage` form `QRCodeRasterRendererOptions`, which the PNG, WebP, and GIF renderers
-share.
+`style` and `centerImage` form `QRCodeRasterRendererOptions`, which the PNG, WebP, GIF, and JPEG
+renderers share.
 
 Compression changes encoding effort and file size, not the rendered QR modules. A level of `0`
 disables DEFLATE compression; `9` requests the highest level.
@@ -75,7 +77,7 @@ disables DEFLATE compression; `9` requests the highest level.
 ## Center image
 
 `rasterCenterImage(source, layout?)` from `@qrcodesdk/node` creates the `centerImage` value for the
-PNG, WebP, and GIF renderers. It validates and decodes the PNG bytes once, so one center image can be
+PNG, WebP, GIF, and JPEG renderers. It validates and decodes the PNG bytes once, so one center image can be
 reused for many renders and formats:
 
 ```ts

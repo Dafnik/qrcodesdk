@@ -5,6 +5,7 @@ import {
   QRCodeDownloadImageRenderer,
   QRCodeDownloadSVGRenderer,
   QRCodeGIFImageRenderer,
+  QRCodeJPEGImageRenderer,
   QRCodePNGImageRenderer,
   QRCodeWebPImageRenderer,
 } from '../src';
@@ -37,23 +38,27 @@ describe('download QR code renderers', () => {
   });
 
   test.each([
-    {format: 'WebP', createRenderer: QRCodeWebPImageRenderer, extension: 'webp'},
-    {format: 'GIF', createRenderer: QRCodeGIFImageRenderer, extension: 'gif'},
-  ])('downloads $format image output with its extension', ({createRenderer, extension}) => {
-    const downloads = captureDownloads(vi);
+    {format: 'WebP', createRenderer: QRCodeWebPImageRenderer, mimeType: 'webp', extension: 'webp'},
+    {format: 'GIF', createRenderer: QRCodeGIFImageRenderer, mimeType: 'gif', extension: 'gif'},
+    {format: 'JPEG', createRenderer: QRCodeJPEGImageRenderer, mimeType: 'jpeg', extension: 'jpg'},
+  ])(
+    'downloads $format image output with its extension',
+    ({createRenderer, mimeType, extension}) => {
+      const downloads = captureDownloads(vi);
 
-    QRCodeDownloadImageRenderer({
-      renderer: createRenderer({style: {moduleSize: 1, quietZone: 0}}),
-      filename: 'ticket',
-    })(matrixFromRows([[1]]));
+      QRCodeDownloadImageRenderer({
+        renderer: createRenderer({style: {moduleSize: 1, quietZone: 0}}),
+        filename: 'ticket',
+      })(matrixFromRows([[1]]));
 
-    expect(downloads).toEqual([
-      {
-        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
-        filename: `ticket.${extension}`,
-      },
-    ]);
-  });
+      expect(downloads).toEqual([
+        {
+          href: expect.stringMatching(new RegExp(`^data:image/${mimeType};base64,`)),
+          filename: `ticket.${extension}`,
+        },
+      ]);
+    },
+  );
 
   test('keeps the filename of image output with an unknown type', () => {
     const downloads = captureDownloads(vi);
@@ -76,6 +81,20 @@ describe('download QR code renderers', () => {
 
     expect(downloads[0]?.filename).toBe('ticket.png');
   });
+
+  test.each(['ticket.jpg', 'ticket.jpeg', 'ticket.JPEG'])(
+    'does not add a JPEG extension to %s',
+    (filename) => {
+      const downloads = captureDownloads(vi);
+
+      QRCodeDownloadImageRenderer({
+        renderer: QRCodeJPEGImageRenderer({style: {moduleSize: 1, quietZone: 0}}),
+        filename,
+      })(matrixFromRows([[1]]));
+
+      expect(downloads[0]?.filename).toBe(filename);
+    },
+  );
 
   test('downloads SVG QR output before revoking its object URL after a delay', () => {
     const downloads = captureDownloads(vi);

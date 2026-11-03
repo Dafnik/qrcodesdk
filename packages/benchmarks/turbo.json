@@ -4,6 +4,10 @@
     "benchmark": {
       "cache": false,
       "dependsOn": ["build"]
+    },
+    "benchmark:jpeg": {
+      "cache": false,
+      "dependsOn": ["build"]
     }
   }
 }

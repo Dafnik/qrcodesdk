@@ -12,7 +12,7 @@ import type {
 
 declare const __QRCODESDK_CLI_VERSION__: string;
 
-type OutputFormat = 'text' | 'svg' | 'png' | 'webp' | 'gif';
+type OutputFormat = 'text' | 'svg' | 'png' | 'webp' | 'gif' | 'jpeg';
 
 type RawCliOptions = {
   readonly payload?: string;
@@ -29,6 +29,8 @@ type RawCliOptions = {
   readonly ansi?: string;
   readonly foreground?: string;
   readonly background?: string;
+  readonly quality?: string;
+  readonly matte?: string;
   readonly ariaLabel?: string;
   readonly title?: string;
 };
@@ -43,6 +45,8 @@ type ResolvedCliOptions = Readonly<
     readonly layout: 'compact' | 'full';
     readonly ansi: false | 'blocks' | 'background';
     readonly style: QRCodeVisualStyle;
+    readonly quality?: number;
+    readonly matte?: `#${string}`;
   }
 >;
 
@@ -74,8 +78,8 @@ export type CliRuntime = {
 
 class CliError extends Error {}
 
-const outputFormats = ['text', 'svg', 'png', 'webp', 'gif'] as const;
-const fileOutputFormats = ['svg', 'png', 'webp', 'gif'] as const;
+const outputFormats = ['text', 'svg', 'png', 'webp', 'gif', 'jpeg'] as const;
+const fileOutputFormats = ['svg', 'png', 'webp', 'gif', 'jpeg'] as const;
 const modes = ['numeric', 'alphanumeric', 'octet'] as const;
 const errorCorrectionLevels = ['L', 'M', 'Q', 'H'] as const;
 const layouts = ['compact', 'full'] as const;
@@ -86,9 +90,9 @@ const stringOptions = [
   [
     'format',
     'format',
-    'Output format: text, svg, png, webp, or gif. Inferred from the output path extension',
+    'Output format: text, svg, png, webp, gif, or jpeg. Inferred from the output path extension',
   ],
-  ['output', 'path', 'Required output path for SVG, PNG, WebP, and GIF'],
+  ['output', 'path', 'Required output path for SVG, PNG, WebP, GIF, and JPEG'],
   ['mode', 'mode', 'QR code mode: numeric, alphanumeric, or octet'],
   ['error-correction', 'level', 'Error correction level: L, M, Q, or H'],
   ['version', 'version', 'Pin a QR code version from 1 to 40'],
@@ -99,6 +103,8 @@ const stringOptions = [
   ['ansi', 'mode', 'ANSI mode: off, blocks, or background'],
   ['foreground', 'hex', 'Foreground color as #rrggbb or #rrggbbaa'],
   ['background', 'hex', 'Background color as #rrggbb or #rrggbbaa'],
+  ['quality', 'quality', 'JPEG quality from 1 to 100. Defaults to 92'],
+  ['matte', 'hex', 'Opaque JPEG color for transparent pixels as #rrggbb. Defaults to #ffffff'],
   ['aria-label', 'text', 'SVG aria-label'],
   ['title', 'text', 'SVG title'],
 ] as const;
@@ -194,7 +200,7 @@ function helpText(): string {
     ['-V', 'Print the installed CLI package version'],
     ['-h, --help', 'Show this help'],
   );
-  return `Usage: qrc [payload] [options]\n\nGenerate QR codes as terminal text, SVG files, or PNG, WebP, and GIF files.\n\nOptions:\n${options.map(([flag, description]) => `  ${flag!.padEnd(30)} ${description}`).join('\n')}\n`;
+  return `Usage: qrc [payload] [options]\n\nGenerate QR codes as terminal text, SVG files, or PNG, WebP, GIF, and JPEG files.\n\nOptions:\n${options.map(([flag, description]) => `  ${flag!.padEnd(30)} ${description}`).join('\n')}\n`;
 }
 
 async function resolveCliOptions(
@@ -217,6 +223,11 @@ async function resolveCliOptions(
   if (ansi === 'background' && rawOptions.layout !== undefined) {
     throw new CliError('--layout cannot be combined with --ansi background.');
   }
+  for (const name of ['quality', 'matte'] as const) {
+    if (format !== 'jpeg' && rawOptions[name] !== undefined) {
+      throw new CliError(`--${name} is only supported with jpeg output.`);
+    }
+  }
 
   return {
     payload,
@@ -234,6 +245,8 @@ async function resolveCliOptions(
     mask: optionalIntegerInRange(rawOptions.mask, 'mask', 0, 7) as QRCodeMask | undefined,
     eci: rawOptions.eci ?? false,
     style,
+    quality: optionalIntegerInRange(rawOptions.quality, 'quality', 1, 100),
+    matte: optionalOpaqueHexColor(rawOptions.matte, 'matte'),
     ariaLabel: rawOptions.ariaLabel,
     title: rawOptions.title,
   };
@@ -284,7 +297,7 @@ async function resolveFormat(
 
   if (!interactive) {
     throw new CliError(
-      'Unable to infer output format from --output. Pass --format text, svg, png, webp, or gif.',
+      'Unable to infer output format from --output. Pass --format text, svg, png, webp, gif, or jpeg.',
     );
   }
 
@@ -296,6 +309,7 @@ async function resolveFormat(
       {value: 'png', label: 'PNG file'},
       {value: 'webp', label: 'WebP file'},
       {value: 'gif', label: 'GIF file'},
+      {value: 'jpeg', label: 'JPEG file'},
     ],
   });
 
@@ -310,7 +324,7 @@ async function resolveOutput(
 ): Promise<string | undefined> {
   if (format === 'text') {
     if (output !== undefined) {
-      throw new CliError('--output is only supported with svg, png, webp, or gif output.');
+      throw new CliError('--output is only supported with svg, png, webp, gif, or jpeg output.');
     }
 
     return undefined;
@@ -425,8 +439,18 @@ async function render(
     return;
   }
 
-  const {QRCodeGIFRenderer, QRCodePNGRenderer, QRCodeWebPRenderer} =
+  const {QRCodeGIFRenderer, QRCodeJPEGRenderer, QRCodePNGRenderer, QRCodeWebPRenderer} =
     await import('@qrcodesdk/node');
+  if (options.format === 'jpeg') {
+    const renderer = QRCodeJPEGRenderer({
+      style: options.style,
+      quality: options.quality,
+      transparency: {matte: options.matte},
+    });
+    await writeFile(requiredOutput(options), builder.render(renderer));
+    stderr.write(`${styleText('green', 'Wrote')} ${requiredOutput(options)}\n`);
+    return;
+  }
   const createRenderer =
     options.format === 'webp'
       ? QRCodeWebPRenderer
@@ -449,6 +473,7 @@ function inferFormatFromOutput(output: string): OutputFormat | undefined {
   if (normalized.endsWith('.png')) return 'png';
   if (normalized.endsWith('.webp')) return 'webp';
   if (normalized.endsWith('.gif')) return 'gif';
+  if (normalized.endsWith('.jpg') || normalized.endsWith('.jpeg')) return 'jpeg';
   return undefined;
 }
 
@@ -518,6 +543,15 @@ function optionalHexColor(value: string | undefined, name: string): `#${string}`
   if (value === undefined) return undefined;
   if (!/^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i.test(value)) {
     throw new CliError(`Invalid ${name}. Expected an RGB or RGBA hex color like #111111.`);
+  }
+
+  return value as `#${string}`;
+}
+
+function optionalOpaqueHexColor(value: string | undefined, name: string): `#${string}` | undefined {
+  if (value === undefined) return undefined;
+  if (!/^#[0-9a-f]{6}(?:ff)?$/i.test(value)) {
+    throw new CliError(`Invalid ${name}. Expected an opaque RGB hex color like #ffffff.`);
   }
 
   return value as `#${string}`;

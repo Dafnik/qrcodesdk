@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "benchmark": "node dist/index.mjs",
+    "benchmark:jpeg": "node dist/jpeg-index.mjs",
     "build": "tsdown",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "clean": "rm -rf .turbo dist",

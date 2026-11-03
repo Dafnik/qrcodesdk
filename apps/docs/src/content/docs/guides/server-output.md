@@ -1,6 +1,6 @@
 ---
 title: Serve a QR code
-description: Return SVG strings or PNG, WebP, and GIF Buffers from HTTP handlers with correct content types and response behavior.
+description: Return SVG strings or PNG, WebP, GIF, and JPEG Buffers from HTTP handlers with correct content types and response behavior.
 docType: guide
 
 related:
@@ -8,6 +8,7 @@ related:
   - ../reference/renderers/png.mdx
   - ../reference/renderers/webp.md
   - ../reference/renderers/gif.md
+  - ../reference/renderers/jpeg.md
   - ../packages/core.mdx
   - ../packages/node.mdx
 ---
@@ -23,12 +24,15 @@ without converting raster bytes through a text encoding.
 | PNG    | `QRCodePNGRenderer` from `@qrcodesdk/node`  | `Buffer` | `image/png`                    |
 | WebP   | `QRCodeWebPRenderer` from `@qrcodesdk/node` | `Buffer` | `image/webp`                   |
 | GIF    | `QRCodeGIFRenderer` from `@qrcodesdk/node`  | `Buffer` | `image/gif`                    |
+| JPEG   | `QRCodeJPEGRenderer` from `@qrcodesdk/node` | `Buffer` | `image/jpeg`                   |
 
 Choose SVG for scalable text output. Choose a raster format for clients that require image bytes or
 do not accept SVG: PNG is the most widely supported, lossless WebP is usually the smallest, and GIF
-serves clients that only accept GIF. GIF is limited to 256 colors and binary transparency.
+and JPEG serve clients that only accept those formats. GIF is limited to 256 colors and binary
+transparency. JPEG is lossy, larger for plain QR codes, and blends transparent pixels onto a solid
+matte color.
 
-The examples below use PNG. For WebP or GIF, swap the renderer and the `Content-Type`; the `Buffer`
+The examples below use PNG. For WebP, GIF, or JPEG, swap the renderer and the `Content-Type`; the `Buffer`
 is sent the same way.
 
 ## Return a platform-neutral response
@@ -188,4 +192,4 @@ repeatable public output.
 
 Use `Content-Disposition: attachment; filename="qrcode.svg"` only when the response should download
 instead of display inline. When a framework calculates `Content-Length`, let it do so from the final
-string or Buffer; otherwise use the UTF-8 byte length for SVG and the `Buffer` length for PNG, WebP, and GIF.
+string or Buffer; otherwise use the UTF-8 byte length for SVG and the `Buffer` length for PNG, WebP, GIF, and JPEG.

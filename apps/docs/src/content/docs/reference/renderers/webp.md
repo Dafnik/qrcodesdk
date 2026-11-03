@@ -7,6 +7,7 @@ related:
   - ../../packages/node.mdx
   - ./png.mdx
   - ./gif.md
+  - ./jpeg.md
   - ../../guides/download-or-save.md
   - ../../guides/server-output.md
 ---
@@ -72,7 +73,7 @@ The encoder has no quality or effort setting. Output is always lossless.
 
 Create the center image with `rasterCenterImage()` from PNG bytes, as for the
 [PNG renderer](/reference/renderers/png/#center-image). One center image can be reused across the
-PNG, WebP, and GIF renderers:
+PNG, WebP, GIF, and JPEG renderers:
 
 ```ts
 import {readFile} from 'node:fs/promises';

@@ -8,7 +8,14 @@ import type {QRCodeSVGOptions} from '@qrcodesdk/core';
 import {svgCenterImage} from '@qrcodesdk/core';
 import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
-import {QRCodeCanvas, QRCodeGIF, QRCodePNG, QRCodeSVG, QRCodeWebP} from '../src/lib/index.js';
+import {
+  QRCodeCanvas,
+  QRCodeGIF,
+  QRCodeJPEG,
+  QRCodePNG,
+  QRCodeSVG,
+  QRCodeWebP,
+} from '../src/lib/index.js';
 
 const svgOptions: QRCodeSVGOptions = {style: {moduleSize: 2, quietZone: 1}};
 const imageOptions: QRCodePNGImageOptions = {
@@ -61,29 +68,55 @@ describe('Svelte QR code components', () => {
   });
 
   test.each([
-    ['WebP', QRCodeWebP, 'webp'],
-    ['GIF', QRCodeGIF, 'gif'],
-  ] as const)('renders and downloads %s image output', async (_name, Component, extension) => {
-    const downloads = captureDownloads(vi);
-    const {container, component} = renderComponent(Component, {
+    ['WebP', QRCodeWebP, 'webp', 'webp'],
+    ['GIF', QRCodeGIF, 'gif', 'gif'],
+    ['JPEG', QRCodeJPEG, 'jpeg', 'jpg'],
+  ] as const)(
+    'renders and downloads %s image output',
+    async (_name, Component, type, extension) => {
+      const downloads = captureDownloads(vi);
+      // The format-specific options differ, so the union of components is narrowed to the
+      // options they share.
+      const {container, component} = renderComponent(Component as typeof QRCodeWebP, {
+        payload: 'HELLO',
+        options: imageOptions,
+      });
+
+      await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
+
+      const image = renderedElement<HTMLImageElement>(container, 'img');
+      expect(image.src.startsWith(`data:image/${type};base64,`)).toBe(true);
+      expect(image.width).toBe(46);
+      expect(image.alt).toBe('QR alt');
+
+      component.download('qrcodesdk');
+      expect(downloads).toEqual([
+        {
+          href: expect.stringMatching(new RegExp(`^data:image/${type};base64,`)),
+          filename: `qrcodesdk.${extension}`,
+        },
+      ]);
+    },
+  );
+
+  test('passes matrix options and JPEG options to their renderers', async () => {
+    const options = {matrix: {version: 2}, style: {moduleSize: 2, quietZone: 1}} as const;
+    const low = renderComponent(QRCodeJPEG, {
       payload: 'HELLO',
-      options: imageOptions,
+      options: {...options, quality: 10},
+    });
+    const high = renderComponent(QRCodeJPEG, {
+      payload: 'HELLO',
+      options: {...options, quality: 100, transparency: {matte: '#112233'}},
     });
 
-    await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
+    await waitFor(() => expect(high.container.querySelector('img')).not.toBeNull());
 
-    const image = renderedElement<HTMLImageElement>(container, 'img');
-    expect(image.src.startsWith(`data:image/${extension};base64,`)).toBe(true);
-    expect(image.width).toBe(46);
-    expect(image.alt).toBe('QR alt');
-
-    component.download('qrcodesdk');
-    expect(downloads).toEqual([
-      {
-        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
-        filename: `qrcodesdk.${extension}`,
-      },
-    ]);
+    const lowImage = renderedElement<HTMLImageElement>(low.container, 'img');
+    const highImage = renderedElement<HTMLImageElement>(high.container, 'img');
+    expect(lowImage.width).toBe(54);
+    expect(highImage.width).toBe(54);
+    expect(lowImage.src).not.toBe(highImage.src);
   });
 
   test('downloads image and SVG QR code output', async () => {

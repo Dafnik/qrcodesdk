@@ -134,6 +134,7 @@ try {
       [browserPackage.QRCodePNGImageRenderer, 'image/png'],
       [browserPackage.QRCodeWebPImageRenderer, 'image/webp'],
       [browserPackage.QRCodeGIFImageRenderer, 'image/gif'],
+      [browserPackage.QRCodeJPEGImageRenderer, 'image/jpeg'],
     ]) {
       const image = builder.render(renderer({style, accessibility: {alt: 'Runtime QR code'}}));
       globalThis.document.body.append(image);
@@ -152,7 +153,7 @@ try {
   logSuccess('Core builder creates the expected matrix and SVG output');
   logSuccess('Canvas renderer creates a 62×62 canvas with dark and light pixels');
   logSuccess(
-    'PNG, WebP, and GIF image renderers create loaded 62×62 images with accessible alternative text',
+    'PNG, WebP, GIF, and JPEG image renderers create loaded 62×62 images with accessible alternative text',
   );
   globalThis.console.log(
     `@qrcodesdk/browser installed-package smoke test passed in ${browserName}`,

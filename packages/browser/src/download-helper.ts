@@ -16,6 +16,14 @@ export function downloadQRCode(url: string, filename: string): void {
   link.click();
 }
 
+// Other spellings of an extension that a filename may already end with.
+const EXTENSION_ALIASES: Readonly<Record<string, readonly string[]>> = {'.jpg': ['.jpeg']};
+
 export function ensureExtension(filename: string, extension: string): string {
-  return filename.toLowerCase().endsWith(extension) ? filename : `${filename}${extension}`;
+  const lowercase = filename.toLowerCase();
+  return [extension, ...(EXTENSION_ALIASES[extension] ?? [])].some((candidate) =>
+    lowercase.endsWith(candidate),
+  )
+    ? filename
+    : `${filename}${extension}`;
 }

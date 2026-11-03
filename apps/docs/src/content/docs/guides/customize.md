@@ -13,7 +13,7 @@ related:
   - ../reference/custom-renderers.md
 ---
 
-SVG, Canvas, browser Image, and Node.js PNG, WebP, and GIF renderers accept the same
+SVG, Canvas, browser Image, and Node.js PNG, WebP, GIF, and JPEG renderers accept the same
 `QRCodeVisualStyle`. Pass it to the renderer's `style` option. Styling changes the appearance without
 changing the encoded matrix.
 

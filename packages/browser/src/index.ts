@@ -18,6 +18,11 @@ export {
   type QRCodeImageRendererOptions,
 } from './image';
 export {
+  type QRCodeJPEGImageOptions,
+  QRCodeJPEGImageRenderer,
+  type QRCodeJPEGImageRendererOptions,
+} from './jpeg';
+export {
   type QRCodePNGImageOptions,
   QRCodePNGImageRenderer,
   type QRCodePNGImageRendererOptions,

@@ -55,6 +55,7 @@
     "./error": "./dist/error.mjs",
     "./internal": "./dist/internal.mjs",
     "./internal/gif": "./dist/internal/gif.mjs",
+    "./internal/jpeg": "./dist/internal/jpeg.mjs",
     "./internal/webp": "./dist/internal/webp.mjs",
     "./matrix": "./dist/matrix.mjs",
     "./payload": "./dist/payload.mjs",

@@ -8,7 +8,7 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
-Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG, WebP, or GIF `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
+Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG, WebP, GIF, or JPEG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
 
 ## Install
 
@@ -63,33 +63,38 @@ colors are preserved, including transparent backgrounds.
 
 ## Choose a format
 
-| Format | Renderer             | `Content-Type` | Choose it when                                                |
-| ------ | -------------------- | -------------- | ------------------------------------------------------------- |
-| PNG    | `QRCodePNGRenderer`  | `image/png`    | The destination needs the most widely supported raster format |
-| WebP   | `QRCodeWebPRenderer` | `image/webp`   | The destination accepts WebP and file size matters            |
-| GIF    | `QRCodeGIFRenderer`  | `image/gif`    | The destination only accepts GIF                              |
+| Format | Renderer             | `Content-Type` | Choose it when                                                    |
+| ------ | -------------------- | -------------- | ----------------------------------------------------------------- |
+| PNG    | `QRCodePNGRenderer`  | `image/png`    | The destination needs the most widely supported raster format     |
+| WebP   | `QRCodeWebPRenderer` | `image/webp`   | The destination accepts WebP and file size matters                |
+| GIF    | `QRCodeGIFRenderer`  | `image/gif`    | The destination only accepts GIF                                  |
+| JPEG   | `QRCodeJPEGRenderer` | `image/jpeg`   | The destination only accepts JPEG, or the center image is a photo |
 
-All three renderers draw the same pixels from the same `style` and `centerImage` options and return
+All four renderers draw the same pixels from the same `style` and `centerImage` options and return
 a `Buffer`. WebP output is lossless and usually much smaller than PNG; a default QR code for
 `https://qrcodesdk.dev` is about 310 bytes as WebP and 1.1 KB as PNG. GIF output is a single frame
 with at most 256 colors and binary transparency: pixels below `transparency.threshold` alpha become
-transparent and all others opaque. Prefer PNG or WebP for transparent backgrounds and photographic
-center images.
+transparent and all others opaque. JPEG output is lossy and has no transparency: transparent pixels
+are blended onto `transparency.matte`, white by default. It is about 9.7 KB for the same QR code, or
+870 bytes with a [module size of 8](https://qrcodesdk.dev/reference/renderers/jpeg/#smaller-files), so use it only when
+the destination requires JPEG or a photographic center image benefits from it.
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
-import {QRCodeGIFRenderer, QRCodeWebPRenderer} from '@qrcodesdk/node';
+import {QRCodeGIFRenderer, QRCodeJPEGRenderer, QRCodeWebPRenderer} from '@qrcodesdk/node';
 
 const builder = qrcode('https://qrcodesdk.dev');
 const webp = builder.render(QRCodeWebPRenderer());
 const gif = builder.render(QRCodeGIFRenderer());
+const jpeg = builder.render(QRCodeJPEGRenderer({quality: 90}));
 ```
 
 ## Work with raster output
 
-See the [PNG](https://qrcodesdk.dev/reference/renderers/png/), [WebP](https://qrcodesdk.dev/reference/renderers/webp/), and
-[GIF](https://qrcodesdk.dev/reference/renderers/gif/) Buffer renderers for their options and exact constraints. Center
-images created with `rasterCenterImage()` from PNG bytes work with all three renderers. Follow
+See the [PNG](https://qrcodesdk.dev/reference/renderers/png/), [WebP](https://qrcodesdk.dev/reference/renderers/webp/),
+[GIF](https://qrcodesdk.dev/reference/renderers/gif/), and [JPEG](https://qrcodesdk.dev/reference/renderers/jpeg/) Buffer renderers for their
+options and exact constraints. Center images created with `rasterCenterImage()` from PNG bytes work
+with all four renderers. Follow
 [Download or save](https://qrcodesdk.dev/guides/download-or-save/) to write a Buffer to disk or
 [Serve a QR code](https://qrcodesdk.dev/guides/server-output/) to return it with its media type.
 
@@ -108,6 +113,8 @@ options.
 import {
   QRCodeGIFRenderer,
   type QRCodeGIFRendererOptions,
+  QRCodeJPEGRenderer,
+  type QRCodeJPEGRendererOptions,
   QRCodePNGRenderer,
   type QRCodePNGRendererOptions,
   type QRCodeRasterCenterImage,
@@ -126,5 +133,6 @@ import {
 - [PNG Buffer renderer](https://qrcodesdk.dev/reference/renderers/png/)
 - [WebP Buffer renderer](https://qrcodesdk.dev/reference/renderers/webp/)
 - [GIF Buffer renderer](https://qrcodesdk.dev/reference/renderers/gif/)
-- [Download or save a QR code as SVG, PNG, WebP, or GIF](https://qrcodesdk.dev/guides/download-or-save/)
+- [JPEG Buffer renderer](https://qrcodesdk.dev/reference/renderers/jpeg/)
+- [Download or save a QR code as SVG, PNG, WebP, GIF, or JPEG](https://qrcodesdk.dev/guides/download-or-save/)
 - [Serve a QR code](https://qrcodesdk.dev/guides/server-output/)

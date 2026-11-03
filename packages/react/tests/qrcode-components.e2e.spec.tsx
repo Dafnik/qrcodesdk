@@ -13,6 +13,7 @@ import {
   QRCodeCanvas,
   type QRCodeDownloadHandle,
   QRCodeGIF,
+  QRCodeJPEG,
   QRCodePNG,
   QRCodeSVG,
   QRCodeWebP,
@@ -83,29 +84,55 @@ describe('React QR code components', () => {
   });
 
   test.each([
-    ['WebP', QRCodeWebP, 'webp'],
-    ['GIF', QRCodeGIF, 'gif'],
-  ] as const)('renders and downloads %s image output', async (_name, Component, extension) => {
-    const imageQRCode = createRef<QRCodeDownloadHandle>();
-    const downloads = captureDownloads(vi);
+    ['WebP', QRCodeWebP, 'webp', 'webp'],
+    ['GIF', QRCodeGIF, 'gif', 'gif'],
+    ['JPEG', QRCodeJPEG, 'jpeg', 'jpg'],
+  ] as const)(
+    'renders and downloads %s image output',
+    async (_name, Component, type, extension) => {
+      const imageQRCode = createRef<QRCodeDownloadHandle>();
+      const downloads = captureDownloads(vi);
+      const {container} = render(
+        <Component payload="HELLO" options={imageOptions} ref={imageQRCode} />,
+      );
+
+      await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
+
+      const image = renderedElement<HTMLImageElement>(container, 'img');
+      expect(image.src.startsWith(`data:image/${type};base64,`)).toBe(true);
+      expect(image.width).toBe(46);
+      expect(image.alt).toBe('QR alt');
+
+      imageQRCode.current?.download('qrcodesdk');
+      expect(downloads).toEqual([
+        {
+          href: expect.stringMatching(new RegExp(`^data:image/${type};base64,`)),
+          filename: `qrcodesdk.${extension}`,
+        },
+      ]);
+    },
+  );
+
+  test('passes matrix options and JPEG options to their renderers', async () => {
+    const options = {matrix: {version: 2}, style: {moduleSize: 2, quietZone: 1}} as const;
     const {container} = render(
-      <Component payload="HELLO" options={imageOptions} ref={imageQRCode} />,
+      <>
+        <QRCodeJPEG payload="HELLO" options={{...options, quality: 10}} id="low" />
+        <QRCodeJPEG
+          payload="HELLO"
+          options={{...options, quality: 100, transparency: {matte: '#112233'}}}
+          id="high"
+        />
+      </>,
     );
 
-    await waitFor(() => expect(container.querySelector('img')).not.toBeNull());
+    await waitFor(() => expect(container.querySelectorAll('img')).toHaveLength(2));
 
-    const image = renderedElement<HTMLImageElement>(container, 'img');
-    expect(image.src.startsWith(`data:image/${extension};base64,`)).toBe(true);
-    expect(image.width).toBe(46);
-    expect(image.alt).toBe('QR alt');
-
-    imageQRCode.current?.download('qrcodesdk');
-    expect(downloads).toEqual([
-      {
-        href: expect.stringMatching(new RegExp(`^data:image/${extension};base64,`)),
-        filename: `qrcodesdk.${extension}`,
-      },
-    ]);
+    const low = renderedElement<HTMLImageElement>(container, '#low img');
+    const high = renderedElement<HTMLImageElement>(container, '#high img');
+    expect(low.width).toBe(54);
+    expect(high.width).toBe(54);
+    expect(low.src).not.toBe(high.src);
   });
 
   test('downloads SVG QR code output as SVG', async () => {
@@ -164,6 +191,7 @@ describe('React QR code components', () => {
     ['PNG', QRCodePNG],
     ['WebP', QRCodeWebP],
     ['GIF', QRCodeGIF],
+    ['JPEG', QRCodeJPEG],
     ['canvas', QRCodeCanvas],
   ] as const)('forwards ordinary div props for %s output', async (_name, Component) => {
     const onClick = vi.fn();

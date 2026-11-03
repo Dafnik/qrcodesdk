@@ -16,6 +16,7 @@ import {HlmSwitchImports} from '@spartan-ng/helm/switch';
 import {suppressInitialTransitions} from '../../angular/suppress-initial-transitions.ts';
 import {resetCliOptions} from '../cli-playground.ts';
 import {
+  DEFAULT_JPEG_QUALITY,
   type PlaygroundOptions,
   playgroundOpenSections,
   playgroundOptions,
@@ -48,6 +49,27 @@ import {titleCase} from './title-case.ts';
         <cli-playground-controls />
       } @else {
         <qr-matrix-controls />
+        @if (currentOptions().output === 'jpeg') {
+          <div hlmField>
+            <div class="flex items-center justify-between gap-4">
+              <label hlmFieldLabel for="jpegQuality">JPEG quality</label>
+              <output class="text-sm tabular-nums" for="jpegQuality">{{ jpegQuality() }}</output>
+            </div>
+            <input
+              class="accent-primary w-full"
+              id="jpegQuality"
+              [ngModel]="jpegQuality()"
+              (ngModelChange)="updateQrOptions({quality: $event})"
+              type="range"
+              min="1"
+              max="100"
+              step="1" />
+            <p hlmFieldDescription>
+              Lower quality makes smaller files but blurs module edges. Defaults to
+              {{ DEFAULT_JPEG_QUALITY }}.
+            </p>
+          </div>
+        }
         <div class="grid gap-4 md:grid-cols-2">
           <div hlmField>
             <label hlmFieldLabel for="darkColor">Dark Color</label>
@@ -385,6 +407,10 @@ export class PlaygroundControls {
     hasAlignmentOptions(this.currentOptions()),
   );
 
+  protected readonly jpegQuality = computed(
+    () => this.currentOptions().quality ?? DEFAULT_JPEG_QUALITY,
+  );
+  protected readonly DEFAULT_JPEG_QUALITY = DEFAULT_JPEG_QUALITY;
   protected readonly DARK_COLOR_PRESETS = DARK_COLOR_PRESETS;
   protected readonly LIGHT_COLOR_PRESETS = LIGHT_COLOR_PRESETS;
 

@@ -23,6 +23,11 @@ export class ByteBuffer {
     this.push((value >>> 8) & 0xff);
   }
 
+  pushUint16BE(value: number): void {
+    this.push((value >>> 8) & 0xff);
+    this.push(value & 0xff);
+  }
+
   pushUint32LE(value: number): void {
     this.pushUint16LE(value & 0xffff);
     this.pushUint16LE(value >>> 16);

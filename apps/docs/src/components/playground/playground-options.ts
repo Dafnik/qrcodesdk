@@ -17,10 +17,12 @@ import {
 import {type PlaygroundStyleState, createPlaygroundStyle} from './playground-style.ts';
 
 export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue' | 'cli';
-export type PlaygroundImageOutput = 'png' | 'webp' | 'gif';
+export type PlaygroundImageOutput = 'png' | 'webp' | 'gif' | 'jpeg';
 export type PlaygroundOutput = 'svg' | PlaygroundImageOutput | 'canvas';
-/** Options shared by the PNG, WebP, and GIF components. */
-export type PlaygroundImageOptions = QRCodePNGImageOptions;
+/** Options shared by the PNG, WebP, GIF, and JPEG components, plus the JPEG quality. */
+export type PlaygroundImageOptions = QRCodePNGImageOptions & {readonly quality?: number};
+/** The JPEG renderer's default quality, which generated code leaves out. */
+export const DEFAULT_JPEG_QUALITY = 92;
 export type PlaygroundView = 'preview' | 'code';
 export const PLAYGROUND_VIEWS = ['preview', 'code'] as const satisfies readonly PlaygroundView[];
 export type PlaygroundSection = 'image' | 'styling' | 'accessibility';
@@ -42,6 +44,8 @@ export interface PlaygroundOptions extends QRCodeMatrixOptions, PlaygroundStyleS
   alt?: string;
   ariaLabel?: string;
   title?: string;
+  /** JPEG quality from 1 to 100. Only JPEG output uses it. */
+  quality?: number;
 }
 
 export interface PlaygroundPreparedImage {
@@ -260,12 +264,14 @@ function visualOptions(playgroundOptionsValue: PlaygroundOptions) {
 }
 
 export function isPlaygroundImageOutput(output: PlaygroundOutput): output is PlaygroundImageOutput {
-  return output === 'png' || output === 'webp' || output === 'gif';
+  return output === 'png' || output === 'webp' || output === 'gif' || output === 'jpeg';
 }
 
 function imageOptions(playgroundOptionsValue: PlaygroundOptions): PlaygroundImageOptions {
+  const {output, quality} = playgroundOptionsValue;
   return {
     ...baseOptions(playgroundOptionsValue),
+    ...(output === 'jpeg' && quality !== undefined ? {quality} : {}),
     accessibility: {
       alt: playgroundOptionsValue.alt,
       ariaLabel: playgroundOptionsValue.ariaLabel,

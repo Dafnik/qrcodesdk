@@ -3,6 +3,7 @@
     QRCodeCanvas,
     type QRCodeDownloadHandle,
     QRCodeGIF,
+    QRCodeJPEG,
     QRCodePNG,
     QRCodeSVG,
     QRCodeWebP,
@@ -83,6 +84,17 @@
       type="button"
       onclick={() => imageQRCode?.download('qrcodesdk')}>
       Download GIF
+    </button>
+  {:else if $playgroundOptions.output === 'jpeg'}
+    <QRCodeJPEG
+      bind:this={imageQRCode}
+      payload={$playgroundOptions.payload}
+      options={imageOptions} />
+    <button
+      class="btn-primary large min-w-64"
+      type="button"
+      onclick={() => imageQRCode?.download('qrcodesdk')}>
+      Download JPEG
     </button>
   {:else}
     <QRCodeCanvas payload={$playgroundOptions.payload} options={canvasOptions} />

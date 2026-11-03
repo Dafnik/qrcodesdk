@@ -7,7 +7,7 @@ docType: reference
 ## Generated artifacts
 
 Identical payload and options produce deterministic output within one installed QRCodeSDK
-implementation. Matrix modules, SVG markup, and PNG, WebP, and GIF bytes may change between releases as encoding,
+implementation. Matrix modules, SVG markup, and PNG, WebP, GIF, and JPEG bytes may change between releases as encoding,
 mask selection, markup, or rasterization changes.
 
 If exact artifacts matter, pin every QRCodeSDK package to an exact version and retain your own matrix,

@@ -512,9 +512,10 @@ function createPackageComponentNodes(attributes, packageName) {
         ' `qrcode-png` |',
         ' `qrcode-webp` |',
         ' `qrcode-gif` |',
+        ' `qrcode-jpeg` |',
         ' `qrcode-canvas` |',
       ]
-    : ['', '', '', '', ''];
+    : ['', '', '', '', '', ''];
   const frameworkPropRow =
     {
       '@qrcodesdk/react':
@@ -530,7 +531,8 @@ function createPackageComponentNodes(attributes, packageName) {
 | \`QRCodePNG\` |${selectorCells[1]} \`PNG-backed <img>\` | PNG |
 | \`QRCodeWebP\` |${selectorCells[2]} \`WebP-backed <img>\` | WebP |
 | \`QRCodeGIF\` |${selectorCells[3]} \`GIF-backed <img>\` | GIF |
-| \`QRCodeCanvas\` |${selectorCells[4]} \`<canvas> element\` | None |
+| \`QRCodeJPEG\` |${selectorCells[4]} \`JPEG-backed <img>\` | JPEG |
+| \`QRCodeCanvas\` |${selectorCells[5]} \`<canvas> element\` | None |
 
 ### Options
 

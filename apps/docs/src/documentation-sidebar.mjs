@@ -47,6 +47,7 @@ export const DOCUMENTATION_SIDEBAR = [
           {label: 'PNG Buffer', slug: 'reference/renderers/png'},
           {label: 'WebP Buffer', slug: 'reference/renderers/webp'},
           {label: 'GIF Buffer', slug: 'reference/renderers/gif'},
+          {label: 'JPEG Buffer', slug: 'reference/renderers/jpeg'},
         ],
       },
       {label: 'Custom renderers', slug: 'reference/custom-renderers'},

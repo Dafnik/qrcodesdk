@@ -7,7 +7,7 @@ import {expect} from 'vitest';
 
 export type DecodedRaster = {width: number; height: number; data: Buffer};
 
-// Decodes PNG, WebP, and GIF with libvips so output is verified independently of the encoders.
+// Decodes PNG, WebP, GIF, and JPEG with libvips so output is verified independently of the encoders.
 export async function readRaster(input: Buffer): Promise<DecodedRaster> {
   const {data, info} = await sharp(input)
     .toColourspace('srgb')
@@ -32,7 +32,7 @@ export async function decodeRasterQRCode(input: Buffer): Promise<string> {
   return result.data;
 }
 
-export type RasterFormat = 'PNG' | 'WebP' | 'GIF';
+export type RasterFormat = 'PNG' | 'WebP' | 'GIF' | 'JPEG';
 
 /** Compares bytes with a tracked file, which `UPDATE_<FORMAT>_SNAPSHOTS=1` rewrites. */
 export function expectRasterToMatchFileSnapshot(

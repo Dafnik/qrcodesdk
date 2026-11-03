@@ -206,6 +206,7 @@ describe('runCli', () => {
     {name: 'PNG', args: ['--output', 'code.png']},
     {name: 'WebP', args: ['--output', 'code.webp']},
     {name: 'GIF', args: ['--output', 'code.gif']},
+    {name: 'JPEG', args: ['--output', 'code.jpg']},
   ])('defaults $name output to no ECI and supports explicit opt-in', async ({args}) => {
     const defaultRuntime = createRuntime();
     const explicitFalseRuntime = createRuntime();
@@ -373,6 +374,67 @@ describe('runCli', () => {
         .toString('latin1'),
     ).toBe(signature);
     expect(runtime.stderrText()).toContain(`Wrote code.${format}`);
+  });
+
+  test.each(['code.jpg', 'code.jpeg', 'CODE.JPG'])('infers JPEG output from %s', async (output) => {
+    const runtime = createRuntime();
+
+    await expect(runCli(['HELLO WORLD', '--output', output], runtime)).resolves.toBe(0);
+
+    const data = Buffer.from(runtime.files[0]!.data);
+    expect([...data.subarray(0, 2)]).toEqual([0xff, 0xd8]);
+    expect(data.toString('latin1', 6, 11)).toBe('JFIF\0');
+    expect(runtime.stderrText()).toContain(`Wrote ${output}`);
+  });
+
+  test('applies JPEG quality and matte', async () => {
+    const render = async (...args: string[]) => {
+      const runtime = createRuntime();
+      await expect(
+        runCli(['HELLO WORLD', '--format', 'jpeg', '-o', 'code', ...args], runtime),
+      ).resolves.toBe(0);
+      return Buffer.from(runtime.files[0]!.data);
+    };
+    const transparent = ['--background', '#ffffff00', '--module-size', '8'];
+
+    const defaults = await render(...transparent);
+    expect(await render(...transparent, '--quality', '92', '--matte', '#ffffff')).toEqual(defaults);
+    expect((await render(...transparent, '--quality', '20')).length).toBeLessThan(defaults.length);
+    expect(await render(...transparent, '--matte', '#336699')).not.toEqual(defaults);
+  });
+
+  test.each([
+    {args: ['--quality', '0'], message: 'Invalid quality. Expected an integer from 1 to 100.'},
+    {args: ['--quality', '101'], message: 'Invalid quality. Expected an integer from 1 to 100.'},
+    {args: ['--quality', 'high'], message: 'Invalid quality. Expected an integer.'},
+    {
+      args: ['--matte', '#ffffff80'],
+      message: 'Invalid matte. Expected an opaque RGB hex color like #ffffff.',
+    },
+    {
+      args: ['--matte', '#fff'],
+      message: 'Invalid matte. Expected an opaque RGB hex color like #ffffff.',
+    },
+  ])('rejects invalid JPEG options: $args', async ({args, message}) => {
+    const runtime = createRuntime();
+
+    await expect(runCli(['HELLO WORLD', '-o', 'code.jpg', ...args], runtime)).resolves.toBe(1);
+
+    expect(runtime.stderrText()).toContain(message);
+    expect(runtime.files).toHaveLength(0);
+  });
+
+  test.each([
+    {args: ['--quality', '80'], flag: 'quality'},
+    {args: ['--matte', '#000000'], flag: 'matte'},
+    {args: ['--output', 'code.png', '--quality', '80'], flag: 'quality'},
+    {args: ['--output', 'code.svg', '--matte', '#000000'], flag: 'matte'},
+  ])('rejects $flag for output other than JPEG', async ({args, flag}) => {
+    const runtime = createRuntime();
+
+    await expect(runCli(['HELLO WORLD', ...args], runtime)).resolves.toBe(1);
+
+    expect(runtime.stderrText()).toContain(`--${flag} is only supported with jpeg output.`);
   });
 
   test('rejects invalid range options', async () => {

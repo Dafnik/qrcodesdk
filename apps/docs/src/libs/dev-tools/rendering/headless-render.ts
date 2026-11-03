@@ -1,5 +1,6 @@
 import {QRCodeCanvasRenderer} from '@qrcodesdk/browser';
 import {QRCodeGIFImageRenderer} from '@qrcodesdk/browser/gif';
+import {QRCodeJPEGImageRenderer} from '@qrcodesdk/browser/jpeg';
 import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {QRCodeWebPImageRenderer} from '@qrcodesdk/browser/webp';
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -31,5 +32,7 @@ export function renderHeadless(fixture: DevFixture, renderer: RendererId): Rende
       return {kind: 'image', image: builder.render(QRCodeWebPImageRenderer(options))};
     case 'gif':
       return {kind: 'image', image: builder.render(QRCodeGIFImageRenderer(options))};
+    case 'jpeg':
+      return {kind: 'image', image: builder.render(QRCodeJPEGImageRenderer(options))};
   }
 }

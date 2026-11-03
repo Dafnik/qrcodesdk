@@ -5,7 +5,14 @@ import {NanostoresService} from '@nanostores/angular';
 import {HlmAlertImports} from '@spartan-ng/helm/alert';
 import {HlmButtonImports} from '@spartan-ng/helm/button';
 
-import {QRCodeCanvas, QRCodeGIF, QRCodePNG, QRCodeSVG, QRCodeWebP} from '@qrcodesdk/angular';
+import {
+  QRCodeCanvas,
+  QRCodeGIF,
+  QRCodeJPEG,
+  QRCodePNG,
+  QRCodeSVG,
+  QRCodeWebP,
+} from '@qrcodesdk/angular';
 
 import {suppressInitialTransitions} from '../../angular/suppress-initial-transitions.ts';
 import {
@@ -22,6 +29,7 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
   imports: [
     QRCodeCanvas,
     QRCodeGIF,
+    QRCodeJPEG,
     QRCodePNG,
     QRCodeSVG,
     QRCodeWebP,
@@ -77,6 +85,16 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
             hlmBtn
             type="button">
             Download GIF
+          </button>
+        } @else if (options().output === 'jpeg') {
+          <qrcode-jpeg #qrcode [payload]="options().payload" [options]="imageOptions()" />
+          <button
+            class="min-w-64"
+            (click)="qrcode.download('qrcodesdk')"
+            size="lg"
+            hlmBtn
+            type="button">
+            Download JPEG
           </button>
         } @else {
           <qrcode-canvas [payload]="options().payload" [options]="canvasOptions()" />

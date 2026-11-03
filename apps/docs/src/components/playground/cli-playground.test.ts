@@ -243,6 +243,7 @@ describe('CLI commands and real CLI output', () => {
     {format: 'png'},
     {format: 'webp'},
     {format: 'gif'},
+    {format: 'jpeg'},
   ]) {
     test(`rejects invalid configuration ${JSON.stringify(patch)}`, () => {
       assert.equal(

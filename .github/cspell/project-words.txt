@@ -44,3 +44,13 @@ bitstream
 libwebp
 giflib
 WEBPVP
+JFIF
+libjpeg
+islow
+fdct
+subsampling
+subsampled
+grayscale
+quantizer
+psnr
+rrggbbff

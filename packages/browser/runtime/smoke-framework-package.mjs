@@ -137,6 +137,7 @@ try {
     assert.match(initialHTML, /data-testid="qrcode-styled-svg"[^]*<svg/);
     assert.match(initialHTML, /<image href="data:image\/svg\+xml/);
     assert.doesNotMatch(initialHTML, /data-testid="qrcode-image"[^]*<img/);
+    assert.doesNotMatch(initialHTML, /data-testid="qrcode-jpeg"[^]*<img/);
     assert.doesNotMatch(initialHTML, /data-testid="qrcode-canvas"[^]*<canvas/);
     logSuccess('Next.js initial HTML contains SVG markup and permanent image and canvas wrappers');
   }
@@ -145,6 +146,7 @@ try {
   await page.locator('[data-testid="qrcode-svg"] svg').waitFor();
   await page.locator('[data-testid="qrcode-canvas"] canvas').waitFor();
   await page.locator('[data-testid="qrcode-image"] img').waitFor();
+  await page.locator('[data-testid="qrcode-jpeg"] img').waitFor();
   if (framework === 'next') {
     await page.locator('[data-testid="qrcode-server-svg"] svg').waitFor();
     await page.locator('[data-testid="qrcode-styled-svg"] svg image').waitFor();
@@ -187,7 +189,13 @@ try {
       'Expected an Image QR code',
     );
 
+    const jpeg = check(
+      globalThis.document.querySelector('[data-testid="qrcode-jpeg"] img'),
+      'Expected a JPEG QR code',
+    );
+
     await image.decode();
+    await jpeg.decode();
 
     const context = check(canvas.getContext('2d'), 'Expected a 2D canvas context');
     const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -219,6 +227,9 @@ try {
       imageHeight: image.naturalHeight,
       imageAlt: image.alt,
       imageAriaLabel: image.getAttribute('aria-label'),
+      jpegSource: jpeg.src,
+      jpegWidth: jpeg.naturalWidth,
+      jpegHeight: jpeg.naturalHeight,
     };
   });
 
@@ -248,6 +259,11 @@ try {
   assert.equal(result.imageAlt, 'Framework runtime QR code');
   assert.equal(result.imageAriaLabel, 'Framework runtime QR code');
   logSuccess('Image component renders a loaded PNG with accessible text');
+
+  assert.match(result.jpegSource, /^data:image\/jpeg;base64,/);
+  assert.equal(result.jpegWidth, 46);
+  assert.equal(result.jpegHeight, 46);
+  logSuccess('JPEG component renders a loaded 46×46 JPEG');
 
   assert.deepEqual(browserErrors, [], `Unexpected browser errors:\n${browserErrors.join('\n')}`);
   logSuccess('browser reports no page or console errors');

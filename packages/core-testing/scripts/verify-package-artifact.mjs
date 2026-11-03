@@ -53,6 +53,7 @@ test('runtime subpaths share the root exports', async () => {
             './canvas': ['QRCodeCanvasRenderer', 'canvasCenterImage'],
             './gif': ['QRCodeGIFImageRenderer'],
             './image': ['QRCodeDownloadImageRenderer'],
+            './jpeg': ['QRCodeJPEGImageRenderer'],
             './png': ['QRCodePNGImageRenderer'],
             './svg': ['QRCodeDownloadSVGRenderer'],
             './webp': ['QRCodeWebPImageRenderer'],
@@ -94,9 +95,12 @@ test('core exports style factories, internal drawing helpers, and encoders', asy
     assert.equal(typeof internal[name], 'function');
   }
   const gif = await importTarget(packageJson.exports['./internal/gif']);
+  const jpeg = await importTarget(packageJson.exports['./internal/jpeg']);
   const webp = await importTarget(packageJson.exports['./internal/webp']);
   assert.equal(typeof gif.ɵencodeGIF, 'function');
   assert.equal(typeof gif.ɵresolveGIFTransparencyThreshold, 'function');
+  assert.equal(typeof jpeg.ɵencodeJPEG, 'function');
+  assert.equal(typeof jpeg.ɵresolveJPEGOptions, 'function');
   assert.equal(typeof webp.ɵencodeWebP, 'function');
 });
 

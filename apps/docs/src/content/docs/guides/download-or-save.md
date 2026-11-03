@@ -1,6 +1,6 @@
 ---
-title: Download or save a QR code as SVG, PNG, WebP, or GIF
-description: Choose SVG, PNG, WebP, or GIF, trigger browser and framework downloads, export Canvas, or write files in Node.js.
+title: Download or save a QR code as SVG, PNG, WebP, GIF, or JPEG
+description: Choose SVG, PNG, WebP, GIF, or JPEG, trigger browser and framework downloads, export Canvas, or write files in Node.js.
 docType: guide
 
 related:
@@ -24,10 +24,13 @@ Choose the file format first, then follow the instructions for your runtime or f
 | PNG    | The destination requires raster bytes or the most widely supported image | Browser Image/Canvas, Node.js `Buffer`, or CLI PNG output |
 | WebP   | The destination accepts WebP and a small lossless raster file matters    | Browser Image, Node.js `Buffer`, or CLI WebP output       |
 | GIF    | The destination only accepts GIF                                         | Browser Image, Node.js `Buffer`, or CLI GIF output        |
+| JPEG   | The destination only accepts JPEG, or the center image is a photo        | Browser Image, Node.js `Buffer`, or CLI JPEG output       |
 
 All formats support the same styling options. WebP is lossless and usually much smaller than PNG.
 GIF is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent
-backgrounds and photographic center images.
+backgrounds and photographic center images. JPEG is lossy and has no transparency: transparent
+pixels are blended onto a matte color, white by default. Plain QR codes are much larger as JPEG than
+as PNG or WebP.
 
 Raster formats have a fixed pixel size. Set `style.moduleSize` to provide enough pixels for the
 largest display or print size you need. The image width and height are
@@ -64,14 +67,16 @@ qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-Pass `QRCodeWebPImageRenderer()` or `QRCodeGIFImageRenderer()` instead for WebP or GIF files. Each
-helper appends `.svg`, `.png`, `.webp`, or `.gif` when needed, triggers a temporary link click, and
+Pass `QRCodeWebPImageRenderer()`, `QRCodeGIFImageRenderer()`, or `QRCodeJPEGImageRenderer()` instead
+for WebP, GIF, or JPEG files. Each helper appends `.svg`, `.png`, `.webp`, `.gif`, or `.jpg` when
+needed (a filename that already ends with `.jpeg` keeps it), triggers a temporary link click, and
 returns `void`. Call it from a user action when required by the browser. See the
 [browser download reference](/reference/renderers/browser-downloads/) for options and filename handling.
 
 ## Download from React
 
-`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, and `QRCodeGIF` expose `download(filename?)` through a ref:
+`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG` expose `download(filename?)`
+through a ref:
 
 ```tsx
 import {useRef} from 'react';
@@ -94,7 +99,7 @@ export function DownloadQRCode() {
 
 ## Download from Vue
 
-Call `download(filename?)` through an SVG, PNG, WebP, or GIF component template ref:
+Call `download(filename?)` through an SVG, PNG, WebP, GIF, or JPEG component template ref:
 
 ```vue
 <script setup lang="ts">
@@ -113,7 +118,8 @@ const qrcode = ref<QRCodeDownloadHandle | null>(null);
 
 ## Download from Svelte
 
-Call `download(filename?)` through an SVG, PNG, WebP, or GIF component bound with `bind:this`:
+Call `download(filename?)` through an SVG, PNG, WebP, GIF, or JPEG component bound with
+`bind:this`:
 
 ```svelte
 <script lang="ts">
@@ -128,7 +134,7 @@ Call `download(filename?)` through an SVG, PNG, WebP, or GIF component bound wit
 
 ## Download from Angular
 
-Call `download(filename?)` on an SVG, PNG, WebP, or GIF component template reference:
+Call `download(filename?)` on an SVG, PNG, WebP, GIF, or JPEG component template reference:
 
 ```angular-html
 <qrcode-svg #qrcodeSvg payload="https://qrcodesdk.dev" />
@@ -165,18 +171,24 @@ canvas.toBlob((blob) => {
 
 ## Save from Node.js
 
-Write SVG text as UTF-8 or write a PNG, WebP, or GIF `Buffer` directly:
+Write SVG text as UTF-8 or write a PNG, WebP, GIF, or JPEG `Buffer` directly:
 
 ```ts
 import {writeFile} from 'node:fs/promises';
 
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
-import {QRCodeGIFRenderer, QRCodePNGRenderer, QRCodeWebPRenderer} from '@qrcodesdk/node';
+import {
+  QRCodeGIFRenderer,
+  QRCodeJPEGRenderer,
+  QRCodePNGRenderer,
+  QRCodeWebPRenderer,
+} from '@qrcodesdk/node';
 
 await writeFile('qrcode.svg', qrcode('SVG').render(QRCodeSVGRenderer()), 'utf8');
 await writeFile('qrcode.png', qrcode('PNG').render(QRCodePNGRenderer()));
 await writeFile('qrcode.webp', qrcode('WebP').render(QRCodeWebPRenderer()));
 await writeFile('qrcode.gif', qrcode('GIF').render(QRCodeGIFRenderer()));
+await writeFile('qrcode.jpg', qrcode('JPEG').render(QRCodeJPEGRenderer()));
 ```
 
 For shell scripts or CI, the [CLI](/packages/cli/) writes any of these formats from `--output`
