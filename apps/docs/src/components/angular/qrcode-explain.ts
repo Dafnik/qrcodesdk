@@ -25,7 +25,7 @@ import {
   QR_CODE_EXPLAIN_ROLE_ORDER,
   explainQRCode,
 } from '../explain/qrcode-analyzer.ts';
-import {QrMatrixControls} from '../playground/angular/qr-matrix-controls.ts';
+import {QrEncodingControls, QrMatrixControls} from '../playground/angular/qr-matrix-controls.ts';
 import {playgroundOptions, resetQrOptions} from '../playground/playground-options.ts';
 import {suppressInitialTransitions} from './suppress-initial-transitions.ts';
 
@@ -53,7 +53,7 @@ type LegendItem = {
 
 @Component({
   selector: 'qrcode-explain-controls',
-  imports: [HlmButtonImports, NgIcon, QrMatrixControls],
+  imports: [HlmButtonImports, NgIcon, QrEncodingControls, QrMatrixControls],
   providers: [provideIcons({lucideRotateCcw})],
   template: `
     <div class="grid gap-4">
@@ -66,6 +66,7 @@ type LegendItem = {
       </div>
 
       <qr-matrix-controls />
+      <qr-encoding-controls />
     </div>
   `,
 })

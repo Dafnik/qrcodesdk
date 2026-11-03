@@ -33,7 +33,7 @@ import {
   PlaygroundColorInput,
 } from './playground-color-input.ts';
 import {PlaygroundPresetControls} from './preset-controls.ts';
-import {QrMatrixControls} from './qr-matrix-controls.ts';
+import {QrEncodingControls, QrMatrixControls} from './qr-matrix-controls.ts';
 import {titleCase} from './title-case.ts';
 
 @Component({
@@ -294,6 +294,17 @@ import {titleCase} from './title-case.ts';
           </hlm-accordion-item>
           <hlm-accordion-item
             class="border-b-muted-foreground"
+            [isOpened]="openSections().includes('encoding')"
+            (openedChange)="setPlaygroundSectionOpen('encoding', $event)">
+            <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
+              Advanced Encoding
+            </hlm-accordion-trigger>
+            <hlm-accordion-content>
+              <qr-encoding-controls class="block py-2" />
+            </hlm-accordion-content>
+          </hlm-accordion-item>
+          <hlm-accordion-item
+            class="border-b-muted-foreground"
             [isOpened]="openSections().includes('accessibility')"
             (openedChange)="setPlaygroundSectionOpen('accessibility', $event)">
             <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
@@ -347,6 +358,7 @@ import {titleCase} from './title-case.ts';
     PlaygroundColorInput,
     PlaygroundImageControls,
     QrMatrixControls,
+    QrEncodingControls,
     CliPlaygroundControls,
     PlaygroundPresetControls,
   ],

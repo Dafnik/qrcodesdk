@@ -78,7 +78,7 @@ interface PlaygroundToolbarOption<T extends string> {
         <hlm-select-trigger size="sm" buttonId="toolbar-package">
           <span class="flex items-center gap-1.5" *hlmSelectValueTemplate="let value">
             <ng-container
-              [ngTemplateOutlet]="packageOption"
+              [ngTemplateOutlet]="toolbarOption"
               [ngTemplateOutletContext]="{$implicit: packageFor(value)}" />
           </span>
         </hlm-select-trigger>
@@ -88,7 +88,7 @@ interface PlaygroundToolbarOption<T extends string> {
             @for (package of packages; track package.value) {
               <hlm-select-item [value]="package.value">
                 <ng-container
-                  [ngTemplateOutlet]="packageOption"
+                  [ngTemplateOutlet]="toolbarOption"
                   [ngTemplateOutletContext]="{$implicit: package}" />
               </hlm-select-item>
             }
@@ -97,36 +97,39 @@ interface PlaygroundToolbarOption<T extends string> {
       </hlm-select>
 
       @if (options().packageName === 'cli') {
-        <div hlmButtonGroup aria-label="Output">
-          @for (output of cliOutputs; track output.value) {
-            <button
-              class="text-muted-foreground aria-pressed:bg-muted aria-pressed:text-foreground dark:aria-pressed:bg-input/80"
-              [attr.aria-pressed]="cliOptions().format === output.value"
-              (click)="updateCliOptions({format: output.value})"
-              type="button"
-              hlmBtn
-              variant="outline"
-              size="sm">
-              <ng-icon [name]="output.icon" />
-              {{ output.label }}
-            </button>
-          }
-          @for (output of cliRasterOutputs; track output) {
-            <button
-              class="text-muted-foreground"
-              [title]="
-                output + ' output requires Node APIs and is available when you run the CLI locally.'
-              "
-              type="button"
-              hlmBtn
-              variant="outline"
-              size="sm"
-              disabled>
-              <ng-icon name="lucideImage" />
-              {{ output }}
-            </button>
-          }
-        </div>
+        <label class="sr-only" for="toolbar-output">Output</label>
+        <hlm-select
+          [ngModel]="cliOptions().format"
+          (ngModelChange)="updateCliOptions({format: $event})">
+          <hlm-select-trigger size="sm" buttonId="toolbar-output">
+            <span class="flex items-center gap-1.5" *hlmSelectValueTemplate="let value">
+              <ng-container
+                [ngTemplateOutlet]="toolbarOption"
+                [ngTemplateOutletContext]="{$implicit: cliOutputFor(value)}" />
+            </span>
+          </hlm-select-trigger>
+          <hlm-select-content *hlmSelectPortal>
+            <hlm-select-group>
+              <hlm-select-label>Output</hlm-select-label>
+              @for (output of cliOutputs; track output.value) {
+                <hlm-select-item [value]="output.value">
+                  <ng-container
+                    [ngTemplateOutlet]="toolbarOption"
+                    [ngTemplateOutletContext]="{$implicit: output}" />
+                </hlm-select-item>
+              }
+            </hlm-select-group>
+            <hlm-select-group>
+              <hlm-select-label>Requires Node, run the CLI locally</hlm-select-label>
+              @for (output of cliRasterOutputs; track output) {
+                <hlm-select-item [value]="output" disabled>
+                  <ng-icon name="lucideImage" size="14px" aria-hidden="true" />
+                  {{ output }}
+                </hlm-select-item>
+              }
+            </hlm-select-group>
+          </hlm-select-content>
+        </hlm-select>
 
         <label class="sr-only" for="toolbar-launcher">Command launcher</label>
         <hlm-select
@@ -146,21 +149,30 @@ interface PlaygroundToolbarOption<T extends string> {
           </hlm-select-content>
         </hlm-select>
       } @else {
-        <div hlmButtonGroup aria-label="Output">
-          @for (output of outputs; track output.value) {
-            <button
-              class="text-muted-foreground aria-pressed:bg-muted aria-pressed:text-foreground dark:aria-pressed:bg-input/80"
-              [attr.aria-pressed]="options().output === output.value"
-              (click)="updateQrOptions({output: output.value})"
-              type="button"
-              hlmBtn
-              variant="outline"
-              size="sm">
-              <ng-icon [name]="output.icon" />
-              {{ output.label }}
-            </button>
-          }
-        </div>
+        <label class="sr-only" for="toolbar-output">Output</label>
+        <hlm-select
+          [ngModel]="options().output"
+          (ngModelChange)="updateQrOptions({output: $event})">
+          <hlm-select-trigger size="sm" buttonId="toolbar-output">
+            <span class="flex items-center gap-1.5" *hlmSelectValueTemplate="let value">
+              <ng-container
+                [ngTemplateOutlet]="toolbarOption"
+                [ngTemplateOutletContext]="{$implicit: outputFor(value)}" />
+            </span>
+          </hlm-select-trigger>
+          <hlm-select-content *hlmSelectPortal>
+            <hlm-select-group>
+              <hlm-select-label>Output</hlm-select-label>
+              @for (output of outputs; track output.value) {
+                <hlm-select-item [value]="output.value">
+                  <ng-container
+                    [ngTemplateOutlet]="toolbarOption"
+                    [ngTemplateOutletContext]="{$implicit: output}" />
+                </hlm-select-item>
+              }
+            </hlm-select-group>
+          </hlm-select-content>
+        </hlm-select>
       }
 
       <div class="ms-auto" hlmButtonGroup aria-label="View">
@@ -180,9 +192,9 @@ interface PlaygroundToolbarOption<T extends string> {
       </div>
     </div>
 
-    <ng-template #packageOption let-package>
-      <ng-icon [name]="package.icon" [color]="package.color" size="14px" aria-hidden="true" />
-      {{ package.label }}
+    <ng-template #toolbarOption let-option>
+      <ng-icon [name]="option.icon" [color]="option.color" size="14px" aria-hidden="true" />
+      {{ option.label }}
     </ng-template>
   `,
 })
@@ -228,6 +240,16 @@ export class PlaygroundToolbar {
     {value: 'text', label: 'Text', icon: 'lucideText'},
     {value: 'svg', label: 'SVG', icon: 'lucideCodeXml'},
   ];
+
+  /** Looks up the selected output; the select value template's context is untyped. */
+  protected outputFor(value: PlaygroundOutput): PlaygroundToolbarOption<PlaygroundOutput> {
+    return this.outputs.find((option) => option.value === value)!;
+  }
+  protected cliOutputFor(
+    value: CliPlaygroundOptions['format'],
+  ): PlaygroundToolbarOption<CliPlaygroundOptions['format']> {
+    return this.cliOutputs.find((option) => option.value === value)!;
+  }
   /** Raster formats the CLI writes locally but the browser preview cannot run. */
   protected readonly cliRasterOutputs = ['PNG', 'WebP', 'GIF', 'JPEG'] as const;
   protected readonly views: PlaygroundToolbarOption<PlaygroundView>[] = [

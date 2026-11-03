@@ -25,11 +25,12 @@ export type PlaygroundImageOptions = QRCodePNGImageOptions & {readonly quality?:
 export const DEFAULT_JPEG_QUALITY = 92;
 export type PlaygroundView = 'preview' | 'code';
 export const PLAYGROUND_VIEWS = ['preview', 'code'] as const satisfies readonly PlaygroundView[];
-export type PlaygroundSection = 'image' | 'styling' | 'accessibility';
+export type PlaygroundSection = 'image' | 'styling' | 'encoding' | 'accessibility';
 
 export const PLAYGROUND_SECTIONS = [
   'image',
   'styling',
+  'encoding',
   'accessibility',
 ] as const satisfies readonly PlaygroundSection[];
 

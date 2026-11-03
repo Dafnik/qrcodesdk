@@ -3,28 +3,32 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 
 import {NanostoresService} from '@nanostores/angular';
+import {HlmAccordionImports} from '@spartan-ng/helm/accordion';
 import {HlmFieldImports} from '@spartan-ng/helm/field';
 import {HlmInputImports} from '@spartan-ng/helm/input';
 import {HlmNativeSelectImports} from '@spartan-ng/helm/native-select';
 
 import {cliPlaygroundOptions, updateCliOptions} from '../cli-playground.ts';
+import {playgroundOpenSections, setPlaygroundSectionOpen} from '../playground-options.ts';
 import {
   DARK_COLOR_PRESETS,
   LIGHT_COLOR_PRESETS,
   PlaygroundColorInput,
 } from './playground-color-input.ts';
 import {PlaygroundPresetControls} from './preset-controls.ts';
-import {QrMatrixControls} from './qr-matrix-controls.ts';
+import {QrEncodingControls, QrMatrixControls} from './qr-matrix-controls.ts';
 
 @Component({
   selector: 'cli-playground-controls',
   imports: [
     FormsModule,
+    HlmAccordionImports,
     HlmFieldImports,
     HlmInputImports,
     HlmNativeSelectImports,
     PlaygroundColorInput,
     PlaygroundPresetControls,
+    QrEncodingControls,
     QrMatrixControls,
   ],
   template: `
@@ -126,6 +130,23 @@ import {QrMatrixControls} from './qr-matrix-controls.ts';
           </div>
         </div>
       }
+      <hlm-accordion type="multiple">
+        <hlm-accordion-item
+          class="border-b-muted-foreground"
+          [isOpened]="openSections().includes('encoding')"
+          (openedChange)="setPlaygroundSectionOpen('encoding', $event)">
+          <hlm-accordion-trigger class="w-full text-nowrap" triggerClass="w-full">
+            Advanced Encoding
+          </hlm-accordion-trigger>
+          <hlm-accordion-content>
+            <qr-encoding-controls
+              class="block py-2"
+              [options]="matrixOptions()"
+              [update]="update"
+              idPrefix="cli-" />
+          </hlm-accordion-content>
+        </hlm-accordion-item>
+      </hlm-accordion>
     </div>
   `,
 })
@@ -135,6 +156,10 @@ export class CliPlaygroundControls {
     requireSync: true,
   });
   protected readonly update = updateCliOptions;
+  protected readonly openSections = toSignal(this.nanostores.useStore(playgroundOpenSections), {
+    requireSync: true,
+  });
+  protected readonly setPlaygroundSectionOpen = setPlaygroundSectionOpen;
   protected readonly DARK_COLOR_PRESETS = DARK_COLOR_PRESETS;
   protected readonly LIGHT_COLOR_PRESETS = LIGHT_COLOR_PRESETS;
   protected readonly matrixOptions = computed(() => ({
