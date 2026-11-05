@@ -1,5 +1,24 @@
 # @qrcodesdk/node
 
+## 0.0.5
+
+### Patch Changes
+
+- 21107ab: Add `QRCodeWebPRenderer`, `QRCodeGIFRenderer`, and `QRCodeJPEGRenderer`, which render lossless WebP, single-frame GIF, and baseline JPEG bytes as a `Buffer`. They accept the same style and `rasterCenterImage()` options as `QRCodePNGRenderer`, exported as `QRCodeRasterRendererOptions`, and share its 67,108,864-pixel output limit.
+
+  GIF output supports 256 colors and binary transparency. Pixels with an alpha value below `transparency.threshold` (default `128`) become transparent. JPEG output takes a `quality` from 1 to 100 (default `92`) and blends transparent pixels onto `transparency.matte` (default `#ffffff`).
+
+- 2fd183e: Update PNG rendering for the flat role-aware matrix and composable styles, including custom paths and independent alignment patterns. Cache rasterized shape paths across renders and combine coverage by color layer to reduce repeated work and avoid seams between adjacent pieces.
+
+  Create center images with `rasterCenterImage(source, layout)` and pass the result as `centerImage`, replacing inline source and layout objects. The factory accepts PNG bytes as a `Uint8Array` and validates and decodes the image once for reuse by every raster renderer. Replace `QRCodePNGCenterImageOptions` with `QRCodeRasterCenterImage`.
+
+  Reject PNG output larger than 67,108,864 pixels before allocating its pixel buffers. Rely on declared option types instead of rejecting unknown option keys at runtime.
+
+- Updated dependencies [15fe5c3]
+- Updated dependencies [2fd183e]
+- Updated dependencies [21107ab]
+  - @qrcodesdk/core@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes

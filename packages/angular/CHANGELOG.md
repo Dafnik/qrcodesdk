@@ -1,5 +1,26 @@
 # @qrcodesdk/angular
 
+## 0.0.5
+
+### Patch Changes
+
+- 2fd183e: Expose `rounded`, `diagonal`, `circle`, `finder`, `alignment`, `customShape`, `svgCenterImage`, and `canvasCenterImage`, together with their public option and shape types, directly from each framework package.
+
+  Update component options to use composable styles and prepared center image values. Replace string-based shapes and inline center image objects with the exported factories. Add the `QRCodeDownloadHandle` type to the Angular exports.
+
+- 21107ab: Add `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG` components, which render WebP, GIF, and JPEG images, together with the `QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, and `QRCodeJPEGImageOptions` types. React, Svelte, and Vue also export `QRCodeWebPProps`, `QRCodeGIFProps`, and `QRCodeJPEGProps`.
+
+  Rename the `QRCodeImage` component to `QRCodePNG` and `QRCodeImageOptions` to `QRCodePNGImageOptions`. React, Svelte, and Vue rename `QRCodeImageProps` to `QRCodePNGProps`. The `download()` method is available on every image component and saves the file with the matching extension.
+
+- Updated dependencies [2fd183e]
+- Updated dependencies [21107ab]
+- Updated dependencies [21107ab]
+- Updated dependencies [15fe5c3]
+- Updated dependencies [2fd183e]
+- Updated dependencies [21107ab]
+  - @qrcodesdk/browser@0.0.5
+  - @qrcodesdk/core@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes

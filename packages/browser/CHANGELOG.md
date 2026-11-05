@@ -1,5 +1,29 @@
 # @qrcodesdk/browser
 
+## 0.0.5
+
+### Patch Changes
+
+- 2fd183e: Update Canvas, Image, and download renderers for the flat role-aware matrix and composable styles from `@qrcodesdk/core/style`. Reuse prepared paths and group drawing by color to reduce repeated rendering work.
+
+  Create Canvas and Image center images with `canvasCenterImage(source, layout)` and pass the result as `centerImage`, replacing inline source and layout objects. Replace `QRCodeCanvasCenterImageOptions` with `QRCodeCanvasCenterImage`.
+
+  Keep SVG download URLs alive for 40 seconds so browsers can start asynchronous downloads. Snapshot download options when creating the renderer, trim filenames, and use `qrcode` when the filename is empty or whitespace.
+
+  Rely on declared option types instead of rejecting unknown keys and incorrectly typed accessibility values at runtime.
+
+- 21107ab: Create Canvas contexts with `willReadFrequently` so they are software-backed. Canvas output and the PNG, WebP, GIF, and JPEG images read back from it now have the same pixels with or without GPU acceleration.
+- 21107ab: Add `QRCodeWebPImageRenderer`, `QRCodeGIFImageRenderer`, and `QRCodeJPEGImageRenderer`, which render an image element backed by a lossless WebP, single-frame GIF, or baseline JPEG data URL. Each renderer is also available from its own `@qrcodesdk/browser/webp`, `@qrcodesdk/browser/gif`, and `@qrcodesdk/browser/jpeg` entry point.
+
+  GIF output supports 256 colors and binary transparency. Pixels with an alpha value below `transparency.threshold` (default `128`) become transparent. JPEG output takes a `quality` from 1 to 100 (default `92`) and blends transparent pixels onto `transparency.matte` (default `#ffffff`).
+
+  Rename `QRCodeImageRenderer` to `QRCodePNGImageRenderer` and `QRCodeImageOptions` to `QRCodePNGImageOptions`, and add the `@qrcodesdk/browser/png` entry point. `QRCodeDownloadImageRenderer` now downloads the output of any image renderer and picks the `.png`, `.webp`, `.gif`, or `.jpg` extension from the image's data URL.
+
+- Updated dependencies [15fe5c3]
+- Updated dependencies [2fd183e]
+- Updated dependencies [21107ab]
+  - @qrcodesdk/core@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes

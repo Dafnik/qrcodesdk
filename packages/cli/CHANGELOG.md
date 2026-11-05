@@ -1,5 +1,19 @@
 # @qrcodesdk/cli
 
+## 0.0.5
+
+### Patch Changes
+
+- 2fd183e: Use the optimized matrix generation and SVG and PNG rendering implementations from the updated core and Node packages. Existing CLI flags remain supported.
+- 21107ab: Add `webp`, `gif`, and `jpeg` output formats. `--format` is inferred from `.webp`, `.gif`, `.jpg`, and `.jpeg` output paths, and the interactive format prompt lists the new formats. JPEG output accepts `--quality` from 1 to 100 (default `92`) and `--matte` as an opaque `#rrggbb` color for transparent pixels (default `#ffffff`).
+- Updated dependencies [15fe5c3]
+- Updated dependencies [2fd183e]
+- Updated dependencies [21107ab]
+- Updated dependencies [2fd183e]
+- Updated dependencies [21107ab]
+  - @qrcodesdk/core@0.0.5
+  - @qrcodesdk/node@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes
