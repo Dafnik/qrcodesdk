@@ -162,14 +162,22 @@ function drawModules(
   offset: number,
 ): void {
   const {rects} = layer;
-  const modules = arrayStorage.get(publicModules) ?? publicModules;
+  const modules = arrayStorage.get(publicModules);
   const roles = arrayStorage.get(publicRoles) ?? publicRoles;
   const stride = n + 2;
   const shapedRoles = neighbors || constant ? SHAPED_ROLES : 0;
   // 0 not drawn, 1 filled, 2 shaped. A light border keeps neighbor reads in bounds.
   const cells = new Uint8Array(stride * stride);
-  for (let y = 0; y < n; y++) {
-    cells.set(modules.slice(y * n, (y + 1) * n), (y + 1) * stride + 1);
+  if (modules) {
+    for (let y = 0; y < n; y++) {
+      cells.set(modules.subarray(y * n, (y + 1) * n), (y + 1) * stride + 1);
+    }
+  } else {
+    for (let y = 0; y < n; y++) {
+      for (let x = 0, source = y * n, target = (y + 1) * stride + 1; x < n; x++) {
+        cells[target + x] = publicModules[source + x]!;
+      }
+    }
   }
   if (claimedRoles || shapedRoles) {
     for (let y = 0; y < n; y++) {

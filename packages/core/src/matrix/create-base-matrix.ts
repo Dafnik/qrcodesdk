@@ -36,6 +36,7 @@ export function createBaseMatrix(version: QRCodeVersion): QRCodeBaseMatrix {
   return base;
 }
 
+/** Builds the version-specific function patterns and role grid, leaving data modules empty. */
 function buildBaseMatrix(version: QRCodeVersion): QRCodeBaseMatrix {
   const n = getSizeByVersion(version);
   const modules = new Uint8Array(n * n);

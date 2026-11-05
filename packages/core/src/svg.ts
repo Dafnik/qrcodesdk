@@ -38,6 +38,7 @@ export type QRCodeSVGOptions = QRCodeSVGRendererOptions & {
   readonly matrix?: QRCodeMatrixOptions;
 };
 
+/** Prepares styling and accessibility options and returns a renderer that serializes a matrix as SVG. */
 export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRenderer<string> {
   const {ariaLabel, title} = options?.accessibility ?? {};
   validateOptionalXMLText(ariaLabel, 'accessibility.ariaLabel');

@@ -7,6 +7,7 @@ import {fillFormatInformationInMatrix} from './fill-format-information-in-matrix
 import {toPublicArray} from './public-array';
 import type {QRCodeCodewords, QRCodeErrorCorrectionLevelValue} from './types';
 
+/** Places codewords, applies a requested or lowest-penalty mask, and freezes the public matrix arrays. */
 export function assembleQRCodeMatrix(
   version: QRCodeVersion,
   errorCorrectionLevel: QRCodeErrorCorrectionLevelValue,
