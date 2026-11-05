@@ -1,3 +1,4 @@
+import {arrayStorage} from '../matrix/public-array';
 import {throwInvalid} from '../options';
 import type {PreparedShapePath} from '../shape-path';
 import {calculateQRCodeOutputSize, resolveColor, resolveQRCodeTextStyle} from '../styling';
@@ -14,6 +15,7 @@ type ModuleTiles = PreparedShapePath | readonly (PreparedShapePath | undefined)[
 
 // Roles that take the module shape. Finder modules stay square unless a finder part draws them.
 const SHAPED_ROLES = 0b111111001;
+export const fractionalRects = new WeakSet<readonly number[]>();
 
 /**
  * Creates a styler for a style. Renderer parts, such as a center image, run before finder and
@@ -45,7 +47,7 @@ export function createQRCodeStyler(
       },
       claimArea(x, y, width, height) {
         validateRectangle('claimArea', x, y, width, height);
-        if (width === 0 || height === 0) return;
+        if (!width || !height) return;
         const startX = Math.floor(x);
         const startY = Math.floor(y);
         areas.push(startX, startY, Math.ceil(x + width) - startX, Math.ceil(y + height) - startY);
@@ -117,7 +119,10 @@ function createLayer(color: QRCodeColor, offset: number): Layer {
     tiles,
     rect(x, y, width, height) {
       if (width === 0 || height === 0) return;
-      rects.push(x + offset, y + offset, width, height);
+      x += offset;
+      y += offset;
+      if (![x, y, width, height].every(Number.isInteger)) fractionalRects.add(rects);
+      rects.push(x, y, width, height);
     },
     tile(path, x, y) {
       let tile = tiles.get(path.data);
@@ -148,7 +153,7 @@ function validateRectangle(
  * and equal runs in consecutive rows are merged into one rectangle.
  */
 function drawModules(
-  {size: n, modules, roles}: QRCodeMatrix,
+  {size: n, modules: publicModules, roles: publicRoles}: QRCodeMatrix,
   claimedRoles: number,
   areas: readonly number[],
   neighbors: readonly (PreparedShapePath | undefined)[] | undefined,
@@ -157,16 +162,22 @@ function drawModules(
   offset: number,
 ): void {
   const {rects} = layer;
+  const modules = arrayStorage.get(publicModules) ?? publicModules;
+  const roles = arrayStorage.get(publicRoles) ?? publicRoles;
   const stride = n + 2;
   const shapedRoles = neighbors || constant ? SHAPED_ROLES : 0;
-  // How each module is drawn, with a light border so neighbor reads stay in bounds:
-  // 0 not drawn, 1 filled, 2 shaped.
+  // 0 not drawn, 1 filled, 2 shaped. A light border keeps neighbor reads in bounds.
   const cells = new Uint8Array(stride * stride);
   for (let y = 0; y < n; y++) {
-    for (let x = 0, index = y * n, cell = (y + 1) * stride + 1; x < n; x++, index++, cell++) {
-      const role = roles[index]!;
-      cells[cell] =
-        modules[index]! * (1 - ((claimedRoles >> role) & 1)) * (1 + ((shapedRoles >> role) & 1));
+    cells.set(modules.slice(y * n, (y + 1) * n), (y + 1) * stride + 1);
+  }
+  if (claimedRoles || shapedRoles) {
+    for (let y = 0; y < n; y++) {
+      for (let x = 0, index = y * n, cell = (y + 1) * stride + 1; x < n; x++, index++, cell++) {
+        const role = roles[index]!;
+        cells[cell] =
+          cells[cell]! * (1 - ((claimedRoles >> role) & 1)) * (1 + ((shapedRoles >> role) & 1));
+      }
     }
   }
   for (let index = 0; index < areas.length; index += 4) {
@@ -180,41 +191,44 @@ function drawModules(
       if (endX > startX) cells.fill(0, (y + 1) * stride + 1 + startX, (y + 1) * stride + 1 + endX);
     }
   }
-  const runRow = new Int32Array(stride).fill(-2);
-  const runWidth = new Int32Array(stride);
-  const runIndex = new Int32Array(stride);
-
-  for (let y = 0; y < n; y++) {
-    let start = -1;
-    // The border cell after each row ends the last run.
-    for (let x = 0, index = (y + 1) * stride + 1; x <= n; x++, index++) {
-      const cell = cells[index]!;
-      let fill = cell === 1;
-      if (cell === 2) {
-        const path = neighbors
-          ? neighbors[
-              +(cells[index - 1] !== 0) |
-                (+(cells[index + 1] !== 0) << 1) |
-                (+(cells[index - stride] !== 0) << 2) |
-                (+(cells[index + stride] !== 0) << 3)
-            ]
-          : constant;
-        if (path === undefined) fill = true;
-        else layer.tile(path, x, y);
+  if (shapedRoles) {
+    for (let y = 0; y < n; y++) {
+      for (let x = 0, index = (y + 1) * stride + 1; x < n; x++, index++) {
+        if (cells[index] === 2) {
+          const path = neighbors
+            ? neighbors[
+                +(cells[index - 1] !== 0) |
+                  (+(cells[index + 1] !== 0) << 1) |
+                  (+(cells[index - stride] !== 0) << 2) |
+                  (+(cells[index + stride] !== 0) << 3)
+              ]
+            : constant;
+          if (path === undefined) cells[index] = 1;
+          else layer.tile(path, x, y);
+        }
       }
-      if (fill) {
-        if (start < 0) start = x;
-      } else if (start >= 0) {
+    }
+  }
+  // Last row, width, and rectangle index for each starting column.
+  const runs = new Array<number>(n * 3);
+  for (let y = 0; y < n; y++) {
+    for (let x = 0, index = (y + 1) * stride + 1; x < n; x++, index++) {
+      if (cells[index] === 1) {
+        const start = x;
+        do {
+          x++;
+          index++;
+        } while (cells[index] === 1);
         const runLength = x - start;
-        if (runRow[start] === y - 1 && runWidth[start] === runLength) {
-          rects[runIndex[start]! + 3]!++;
+        const run = start * 3;
+        if (runs[run] === y - 1 && runs[run + 1] === runLength) {
+          rects[runs[run + 2]! + 3]!++;
         } else {
-          runIndex[start] = rects.length;
-          runWidth[start] = runLength;
+          runs[run + 1] = runLength;
+          runs[run + 2] = rects.length;
           rects.push(start + offset, y + offset, runLength, 1);
         }
-        runRow[start] = y;
-        start = -1;
+        runs[run] = y;
       }
     }
   }

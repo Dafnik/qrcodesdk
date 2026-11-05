@@ -1,5 +1,10 @@
 import type {QRCodeDrawingLayer} from './types';
 
+// Bound shared fragments to QR module dimensions, independently of caller-supplied geometry.
+type Move = {data: string; rectangles?: string[][]};
+const moves: Record<number, Move>[] = [{}, {}];
+let commandCount = 0;
+
 /**
  * Serializes one drawing layer into compact SVG path data, which SVG and `Path2D` both accept.
  * Fill it with the even-odd rule.
@@ -13,7 +18,34 @@ export function toQRCodePathData({rects, tiles}: QRCodeDrawingLayer): string {
     const x = rects[index]!;
     const y = rects[index + 1]!;
     const width = rects[index + 2]!;
-    path += `m${x - currentX} ${y - currentY}h${width}v${rects[index + 3]}h-${width}z`;
+    const height = rects[index + 3]!;
+    const dx = x - currentX;
+    const dy = y - currentY;
+    const row = moves[dy];
+    let move = row?.[dx];
+    if (move === undefined) {
+      move = {data: `m${dx} ${dy}`};
+      if (row && Math.abs(dx) <= 177 && Number.isInteger(dx)) {
+        move.rectangles = [];
+        row[dx] = move;
+      }
+    }
+    let command = move.rectangles?.[height]?.[width];
+    if (command === undefined) {
+      command = `${move.data}h${width}v${height}h-${width}z`;
+      if (
+        move.rectangles &&
+        commandCount < 1024 &&
+        width >>> 0 === width &&
+        height >>> 0 === height &&
+        width <= 177 &&
+        height <= 177
+      ) {
+        (move.rectangles[height] ??= [])[width] = command;
+        commandCount++;
+      }
+    }
+    path += command;
     currentX = x;
     currentY = y;
   }

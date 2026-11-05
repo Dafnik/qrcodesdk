@@ -57,3 +57,16 @@ median, minimum, maximum, and throughput statistics, and output byte lengths for
 checksum. The console table and ignored `benchmark-results/latest-jpeg.json` are separate from the
 comparison report used by the performance guide. Run it without other builds or tests competing
 for CPU time.
+
+Measure SVG rendering separately from matrix generation:
+
+```sh
+pnpm turbo run benchmark:svg --filter=@repo/benchmarks
+```
+
+This compares the production SVG renderers at versions 1, 10, and 40, with four pixels per module,
+a four-module quiet zone, error correction M, and mask 0. QRCodeSDK measurements include both a
+reused renderer and a fresh renderer per operation. Matrices are prepared before timing. The
+`qrcode` comparison calls its production `lib/renderer/svg-tag.js` module because its public SVG
+API always generates a matrix. The full suite above continues to measure the public APIs with
+matrix generation included. Both benchmarks retain their output so the runtime cannot discard it.

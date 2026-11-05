@@ -1,9 +1,15 @@
 import {describe, expect, test} from 'vitest';
 
-import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode, svgCenterImage} from '../src';
+import {
+  type QRCodeDataImageURL,
+  QRCodeSVGRenderer,
+  type QRCodeSVGRendererOptions,
+  qrcode,
+  svgCenterImage,
+} from '../src';
 import {ɵtoQRCodePathData as toQRCodePathData} from '../src/internal';
 import type {PreparedShapePath} from '../src/shape-path';
-import {circle, customShape, finder, rounded} from '../src/style';
+import {alignment, circle, customShape, finder, rounded} from '../src/style';
 import {fromRows} from './helpers';
 
 function paths(svg: string): string[] {
@@ -11,6 +17,29 @@ function paths(svg: string): string[] {
 }
 
 describe('SVG path data', () => {
+  test.each([1, 10, 40] as const)(
+    'renders generated and caller-supplied matrices identically at version %i',
+    (version) => {
+      const matrix = qrcode('A').options({version, mask: 0}).matrix();
+      const copy = {...matrix, modules: [...matrix.modules], roles: [...matrix.roles]};
+      const options: QRCodeSVGRendererOptions[] = [
+        {},
+        {style: {quietZone: 0, moduleSize: 3, foreground: '#12345680'}},
+        {style: {modules: rounded(), finder: finder(), alignment: alignment()}},
+        {style: {modules: circle()}},
+        {centerImage: svgCenterImage('data:image/png;base64,a')},
+      ];
+      for (const option of options) {
+        const render = QRCodeSVGRenderer(option);
+        const expected = render(copy);
+        expect(render(matrix)).toBe(expected);
+        expect(render(copy)).toBe(expected);
+      }
+      expect(Object.isFrozen(matrix.modules)).toBe(true);
+      expect(Object.isFrozen(matrix.roles)).toBe(true);
+    },
+  );
+
   test('chains rectangles with relative moves', () => {
     const svg = QRCodeSVGRenderer({style: {quietZone: 0}})(
       fromRows([
@@ -21,6 +50,18 @@ describe('SVG path data', () => {
 
     expect(paths(svg)[1]).toBe('m0 0h1v1h-1zm1 1h1v1h-1z');
     expect(svg).toContain('shape-rendering="crispEdges"');
+  });
+
+  test('keeps fractional and large rectangles distinct from cached module commands', () => {
+    const layer = {
+      color: '#000000' as const,
+      tiles: [],
+      rects: [0, 0, 1, 1, 1.5, 2.5, 0.25, 0.75, 1000, 2, 1000, 1000, -2.5, -3, 2, 2],
+    };
+    const expected =
+      'm0 0h1v1h-1zm1.5 2.5h0.25v0.75h-0.25zm998.5 -0.5h1000v1000h-1000zm-1002.5 -5h2v2h-2z';
+    expect(toQRCodePathData(layer)).toBe(expected);
+    expect(toQRCodePathData(layer)).toBe(expected);
   });
 
   test('merges equal runs in consecutive rows into one rectangle', () => {

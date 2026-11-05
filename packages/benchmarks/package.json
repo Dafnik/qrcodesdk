@@ -6,10 +6,11 @@
   "scripts": {
     "benchmark": "node dist/index.mjs",
     "benchmark:jpeg": "node dist/jpeg-index.mjs",
+    "benchmark:svg": "vitest bench --run benchmarks/svg.bench.mjs",
     "build": "tsdown",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "clean": "rm -rf .turbo dist",
-    "lint": "eslint src tests --max-warnings 0",
+    "lint": "eslint benchmarks src tests --max-warnings 0",
     "test": "vitest --watch false"
   },
   "dependencies": {

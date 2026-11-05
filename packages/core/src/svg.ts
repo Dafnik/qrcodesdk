@@ -1,7 +1,7 @@
 import {createCenterImageStore} from './center-image-store';
 import {createQRCodeCenterImagePlacement} from './drawing/center-image';
 import {toQRCodePathData} from './drawing/path-data';
-import {createQRCodeStyler} from './drawing/styler';
+import {createQRCodeStyler, fractionalRects} from './drawing/styler';
 import type {QRCodeStylePart} from './drawing/types';
 import type {QRCodeDrawing} from './drawing/types';
 import {QRCodeError} from './error';
@@ -52,19 +52,14 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
     let layers = '';
     let needsAntialiasing = false;
     for (const layer of drawing.layers) {
-      needsAntialiasing ||=
-        layer.tiles.length > 0 || layer.rects.some((value) => !Number.isInteger(value));
+      needsAntialiasing ||= layer.tiles.length > 0 || fractionalRects.has(layer.rects);
       layers += `<path${fill(layer.color)} fill-rule="evenodd" d="${toQRCodePathData(layer)}"/>`;
     }
-    const background = `<path${fill(drawing.background)} d="M0 0h${viewSize}v${viewSize}H0z"/>`;
-
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${outputSize}" height="${outputSize}" viewBox="0 0 ${viewSize} ${viewSize}"${accessibleName || title?.trim() ? ' role="img"' : ' aria-hidden="true"'}${needsAntialiasing ? '' : ' shape-rendering="crispEdges"'}`;
     if (accessibleName) svg += ` aria-label="${escapeXML(accessibleName, true)}"`;
     svg += '>';
     if (title) svg += `<title>${escapeXML(title)}</title>`;
-    svg += background;
-
-    return `${svg}${layers}${centerImage?.markup(drawing) ?? ''}</svg>`;
+    return `${svg}<path${fill(drawing.background)} d="M0 0h${viewSize}v${viewSize}H0z"/>${layers}${centerImage?.markup(drawing) ?? ''}</svg>`;
   };
 }
 
@@ -116,12 +111,8 @@ function fill(color: QRCodeColor): string {
   }`;
 }
 
-function roundNumber(value: number): number {
-  return Math.round(value * 1_000_000) / 1_000_000;
-}
-
 function formatNumber(value: number): string {
-  return String(roundNumber(value));
+  return String(Math.round(value * 1_000_000) / 1_000_000);
 }
 
 function escapeXML(value: string, attribute?: boolean): string {
