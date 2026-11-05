@@ -54,6 +54,23 @@ function createRuntime(): CliRuntime & {
   };
 }
 
+test('auto is selectable with optional optimization and concrete modes bypass it', async () => {
+  const payload = 'ABCD12345678901234567890abcd';
+  const render = async (...flags: string[]) => {
+    const runtime = createRuntime();
+    await expect(runCli([payload, '--ansi', 'off', ...flags], runtime)).resolves.toBe(0);
+    return runtime.stdoutText();
+  };
+  const defaultOutput = await render();
+  const optimized = await render('--mode', 'auto', '--optimize-segments');
+  expect(await render('--mode', 'auto')).toBe(defaultOutput);
+  expect(await render('--optimize-segments')).toBe(optimized);
+  expect(optimized).not.toBe(defaultOutput);
+  expect(await render('--optimize-segments', '--no-optimize-segments')).toBe(defaultOutput);
+  expect(await render('--no-optimize-segments', '--optimize-segments')).toBe(optimized);
+  expect(await render('--mode', 'octet', '--optimize-segments')).toBe(defaultOutput);
+});
+
 describe('runCli', () => {
   beforeAll(() => {
     vi.stubGlobal('__QRCODESDK_CLI_VERSION__', packageJson.version);

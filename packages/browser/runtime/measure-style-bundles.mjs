@@ -12,6 +12,9 @@ const svg = "import {QRCodeSVGRenderer} from '@qrcodesdk/core/svg';";
 const styles = "import {rounded, finder, alignment, circle} from '@qrcodesdk/core/style';";
 const cases = {
   matrix: `${generation} export default qrcode('bundle').matrix();`,
+  matrixAuto: `${generation} export default qrcode('bundle').mode('auto').matrix();`,
+  matrixRoot: `import {qrcode} from '@qrcodesdk/core'; export default qrcode('bundle').matrix();`,
+  matrixOptimized: `${generation} import {automaticSegmenter} from '@qrcodesdk/core/segmenter'; export default qrcode('bundle').mode('auto').segmenter(automaticSegmenter).matrix();`,
   text: `${generation} import {QRCodeTextRenderer} from '@qrcodesdk/core/text'; export default qrcode('bundle').render(QRCodeTextRenderer());`,
   svg: `${generation} ${svg} export default qrcode('bundle').render(QRCodeSVGRenderer());`,
   rounded: `${generation} ${svg} ${styles} export default qrcode('bundle').render(QRCodeSVGRenderer({style:{modules:rounded()}}));`,
@@ -36,14 +39,23 @@ for (const [name, source] of Object.entries(cases)) {
     exports: false,
     deps: {alwaysBundle: [/^@qrcodesdk\//]},
     minify: true,
+    sourcemap: 'hidden',
     platform: 'browser',
     target: 'es2020',
     logLevel: 'silent',
   });
-  const chunks = result.bundles.flatMap((bundle) => bundle.chunks);
+  const chunks = result.bundles
+    .flatMap((bundle) => bundle.chunks)
+    .filter((chunk) => chunk.type === 'chunk');
   assert.equal(chunks.length, 1, `${name} must be a standalone consumer bundle`);
-  const [{code}] = chunks;
+  const [{code, map, imports}] = chunks;
+  assert.deepEqual(imports, [], `${name} must bundle all imports`);
+  const includesOptimizer = map.sources.some((source) =>
+    /(?:^|\/)segmenter\.(?:ts|mjs)$/.test(source),
+  );
+  assert.equal(includesOptimizer, name === 'matrixOptimized', `${name}: optimizer inclusion`);
   assert.ok(code.length > 0, `${name} must contain bundled consumer code`);
+  await writeFile(path.join(directory, `${name}.bundle.mjs`), code);
   measurements[name] = {
     bytes: Buffer.byteLength(code),
     gzip: gzipSync(code).byteLength,

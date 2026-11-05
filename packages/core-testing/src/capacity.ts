@@ -1,4 +1,4 @@
-import type {QRCodeErrorCorrectionLevel, QRCodeMode, QRCodeVersion} from '@qrcodesdk/core';
+import type {QRCodeEncodingMode, QRCodeErrorCorrectionLevel, QRCodeVersion} from '@qrcodesdk/core';
 
 /**
  * Data codewords per version and ECC level (L, M, Q, H), from ISO/IEC 18004 table 7.
@@ -57,7 +57,7 @@ const CHARACTER_COUNT_BITS = {
   numeric: [10, 12, 14],
   alphanumeric: [9, 11, 13],
   octet: [8, 16, 16],
-} as const satisfies Record<QRCodeMode, readonly [number, number, number]>;
+} as const satisfies Record<QRCodeEncodingMode, readonly [number, number, number]>;
 
 const MODE_INDICATOR_BITS = 4;
 const UTF8_ECI_HEADER_BITS = 12;
@@ -71,7 +71,7 @@ const UTF8_ECI_HEADER_BITS = 12;
 export function fixtureCapacity(
   version: QRCodeVersion,
   errorCorrectionLevel: QRCodeErrorCorrectionLevel,
-  mode: QRCodeMode,
+  mode: QRCodeEncodingMode,
   eci = false,
 ): number {
   const versionGroup = version <= 9 ? 0 : version <= 26 ? 1 : 2;

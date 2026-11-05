@@ -62,7 +62,7 @@ abstract class QrOptionsControls {
         <div hlmField>
           <label [for]="idPrefix() + 'mode'" hlmFieldLabel>Mode</label>
           <hlm-select
-            [ngModel]="currentOptions().mode"
+            [ngModel]="currentOptions().mode ?? 'auto'"
             [itemToString]="titleCase"
             (ngModelChange)="updateQrOptions({mode: $event})">
             <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'mode'">
@@ -71,7 +71,7 @@ abstract class QrOptionsControls {
             <hlm-select-content *hlmSelectPortal>
               <hlm-select-group>
                 <hlm-select-label>Modes</hlm-select-label>
-                <hlm-select-item [value]="undefined">Auto</hlm-select-item>
+                <hlm-select-item value="auto">Auto</hlm-select-item>
                 <hlm-select-item value="numeric">Numeric</hlm-select-item>
                 <hlm-select-item value="alphanumeric">Alphanumeric</hlm-select-item>
                 <hlm-select-item value="octet">Octet</hlm-select-item>
@@ -198,6 +198,25 @@ export class QrMatrixControls extends QrOptionsControls {
           </hlm-select>
         </div>
       </div>
+
+      <label
+        class="border-input rounded-md border p-4"
+        [for]="idPrefix() + 'optimize-segments'"
+        hlmField>
+        <div class="flex items-center justify-between gap-4">
+          <div class="grid gap-1">
+            <span hlmFieldLabel>Optimize mixed-mode segments</span>
+            <p hlmFieldDescription>
+              Auto mode can combine encoding modes to fit more data. Uses additional processing
+              time. Explicit numeric, alphanumeric, and octet modes bypass this option.
+            </p>
+          </div>
+          <hlm-switch
+            [checked]="currentOptions().optimizeSegments ?? false"
+            [inputId]="idPrefix() + 'optimize-segments'"
+            (checkedChange)="updateQrOptions({optimizeSegments: $event})" />
+        </div>
+      </label>
 
       <label class="border-input rounded-md border p-4" [for]="idPrefix() + 'eci'" hlmField>
         <div class="flex items-center justify-between gap-4">

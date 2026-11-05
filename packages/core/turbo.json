@@ -4,6 +4,10 @@
     "benchmark:matrix": {
       "cache": false
     },
+    "benchmark:segmenter": {
+      "cache": false,
+      "dependsOn": ["build"]
+    },
     "benchmark:styler": {
       "cache": false,
       "dependsOn": ["build"],

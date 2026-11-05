@@ -1,9 +1,9 @@
 import {QRCodeError} from '../error';
-import type {QRCodeMatrixOptions, QRCodePayload, QRCodeVersion} from '../types';
+import type {QRCodeMatrixOptions, QRCodePayload, QRCodeSegmenter, QRCodeVersion} from '../types';
 import {ECC_LEVELS_MAP} from './error-correction';
 import {getNumberOfAvailableBitsForData} from './get-number-of-available-bits-for-data';
 import {resolveMode} from './mode';
-import {createSingleSegment, getSegmentsBitLength, optimizeSegments} from './segments';
+import {createSingleSegment, getSegmentsBitLength} from './segments';
 import type {QRCodeErrorCorrectionLevelValue, QRCodeResolvedMatrixOptions} from './types';
 
 export function resolveQRCodeMatrixOptions(
@@ -16,7 +16,7 @@ export function resolveQRCodeMatrixOptions(
   const {eci = false, mask, version: requestedVersion} = options;
 
   let forcedSegments: QRCodeResolvedMatrixOptions['segments'] | undefined;
-  if (options.mode !== undefined) {
+  if (!options.segmenter || (options.mode !== undefined && options.mode !== 'auto')) {
     const segment = createSingleSegment(resolveMode(payload, options.mode), payload);
     if (!segment) throw invalidPayload({payload, mode: options.mode});
     forcedSegments = [segment];
@@ -27,7 +27,8 @@ export function resolveQRCodeMatrixOptions(
 
   let resolved: Pick<QRCodeResolvedMatrixOptions, 'segments' | 'version'> | undefined;
   if (requestedVersion !== undefined) {
-    const segments = forcedSegments ?? optimizeSegments(payload, requestedVersion, eci);
+    const segments =
+      forcedSegments ?? createSegments(options.segmenter!, payload, requestedVersion, eci);
     if (!segmentsFitVersion(segments, requestedVersion, errorCorrectionLevel, eci)) {
       throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large', {
         details: {version: requestedVersion},
@@ -41,7 +42,7 @@ export function resolveQRCodeMatrixOptions(
       [10, 26],
       [27, 40],
     ] as const) {
-      const segments = forcedSegments ?? optimizeSegments(payload, start, eci);
+      const segments = forcedSegments ?? createSegments(options.segmenter!, payload, start, eci);
       for (let version = start; version <= end; version++) {
         if (segmentsFitVersion(segments, version as QRCodeVersion, errorCorrectionLevel, eci)) {
           resolved = {segments, version: version as QRCodeVersion};
@@ -69,4 +70,27 @@ export function segmentsFitVersion(
     getSegmentsBitLength(version, segments, eci) <=
     getNumberOfAvailableBitsForData(version, errorCorrectionLevel)
   );
+}
+
+function createSegments(
+  segmenter: QRCodeSegmenter,
+  payload: QRCodePayload,
+  version: QRCodeVersion,
+  eci: boolean,
+): QRCodeResolvedMatrixOptions['segments'] {
+  const segments = segmenter(payload, {version, eci});
+  if (
+    segments.length === 0 ||
+    segments.map((segment) => segment.payload).join('') !== String(payload)
+  ) {
+    throw invalidPayload({payload});
+  }
+  return segments.map(({mode, payload: text}) => {
+    if (mode !== 'numeric' && mode !== 'alphanumeric' && mode !== 'octet') {
+      throw invalidPayload({payload: text, mode});
+    }
+    const segment = createSingleSegment(resolveMode(text, mode), text);
+    if (!segment) throw invalidPayload({payload: text, mode});
+    return segment;
+  });
 }

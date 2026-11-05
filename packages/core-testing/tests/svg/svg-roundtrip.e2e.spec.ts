@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {fixtureImageDataURL, fixtureMatrixOptions} from '../../src';
 import {
@@ -40,10 +41,25 @@ describe('SVG QR roundtrips', () => {
 
   const testSVGRenderer = QRCodeSVGRenderer({style: {moduleSize: 4, quietZone: 4}});
 
-  test.each(['ABCDE12345678?A1A', 'ABé12345678901234567890', 'AB✅🚀12345678901234567890'])(
-    'decodes automatic mixed-mode SVG output for %s',
-    async (payload) => {
-      await expect(decodeSvgQRCode(qrcode(payload).render(testSVGRenderer))).resolves.toBe(payload);
+  test.each(
+    ['ABCDE12345678?A1A', 'ABé12345678901234567890', 'AB✅🚀12345678901234567890', '00123'].flatMap(
+      (payload) =>
+        [false, true].flatMap((optimized) =>
+          [false, true].map((eci) => ({payload, optimized, eci})),
+        ),
+    ),
+  )(
+    'decodes auto SVG output for $payload, optimized $optimized, ECI $eci',
+    async ({payload, optimized, eci}) => {
+      await expect(
+        decodeSvgQRCode(
+          qrcode(payload)
+            .mode('auto')
+            .eci(eci)
+            .segmenter(optimized ? automaticSegmenter : undefined)
+            .render(testSVGRenderer),
+        ),
+      ).resolves.toBe(payload);
     },
   );
 

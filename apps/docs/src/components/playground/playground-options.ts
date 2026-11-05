@@ -13,6 +13,7 @@ import {
   type QRCodeVisualStyle,
   svgCenterImage,
 } from '@qrcodesdk/core';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {type PlaygroundStyleState, createPlaygroundStyle} from './playground-style.ts';
 
@@ -35,6 +36,7 @@ export const PLAYGROUND_SECTIONS = [
 ] as const satisfies readonly PlaygroundSection[];
 
 export interface PlaygroundOptions extends QRCodeMatrixOptions, PlaygroundStyleState {
+  optimizeSegments?: boolean;
   payload: string;
   packageName: PlaygroundPackage;
   output: PlaygroundOutput;
@@ -240,6 +242,7 @@ function baseOptions(playgroundOptionsValue: PlaygroundOptions) {
     matrix: {
       version: playgroundOptionsValue.version,
       mode: playgroundOptionsValue.mode,
+      segmenter: playgroundOptionsValue.optimizeSegments ? automaticSegmenter : undefined,
       errorCorrectionLevel: playgroundOptionsValue.errorCorrectionLevel,
       mask: playgroundOptionsValue.mask,
       eci: playgroundOptionsValue.eci,

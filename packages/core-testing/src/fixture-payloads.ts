@@ -1,4 +1,4 @@
-import type {QRCodeMode} from '@qrcodesdk/core';
+import type {QRCodeEncodingMode} from '@qrcodesdk/core';
 
 const NUMERIC_CHARACTERS = '0123456789';
 const ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
@@ -49,7 +49,7 @@ export function createFixtureRandom(seed: number): () => number {
  * `length` counts characters for numeric and alphanumeric payloads and bytes for octet payloads.
  */
 export function createFixturePayload(
-  mode: QRCodeMode,
+  mode: QRCodeEncodingMode,
   length: number,
   seed: number,
   options: QRCodeFixturePayloadOptions = {},

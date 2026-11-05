@@ -111,7 +111,11 @@ pnpm turbo run benchmark:jpeg --filter=@repo/benchmarks
 pnpm turbo run benchmark:svg --filter=@repo/benchmarks
 pnpm turbo run benchmark:matrix --filter=@qrcodesdk/core
 pnpm turbo run benchmark:styler --filter=@qrcodesdk/core
+pnpm turbo run benchmark:segmenter --filter=@qrcodesdk/core
 ```
+
+The segmenter benchmark loads built modules natively. It measures segmentation alone and compares
+full matrix generation with single-mode auto detection and optional mixed-mode optimization.
 
 Measure minified, gzip, and Brotli sizes of standalone consumer bundles:
 

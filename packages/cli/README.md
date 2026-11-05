@@ -269,6 +269,10 @@ qrc "https://qrcodesdk.dev" \
   --aria-label 'Scan to open qrcodesdk.dev'
 ```
 
+Auto mode is always available through `--mode auto`. It detects one encoding mode by default.
+Pass `--optimize-segments` to combine modes when that reduces the symbol size. Concrete modes
+bypass optimization. Use `--no-optimize-segments` to disable it again.
+
 The CLI exposes matrix and visual options as flags. Leave mode, version, and mask on automatic
 selection unless you need a compatibility target or deterministic fixture:
 
@@ -292,29 +296,30 @@ see [Customize appearance](https://qrcodesdk.dev/guides/customize/).
 
 ## Options
 
-| Option                                       | Description                                             | Default     |
-| -------------------------------------------- | ------------------------------------------------------- | :---------- |
-| `[payload]`                                  | Positional QR code payload.                             | -           |
-| `--payload <value>`                          | QR code payload, equivalent to positional `[payload]`.  | -           |
-| `-V`                                         | Print the installed CLI package version.                | -           |
-| `--format <text\|svg\|png\|webp\|gif\|jpeg>` | Output format. Inferred from the output path extension. | -           |
-| `-o, --output <path>`                        | Required output path for SVG, PNG, WebP, GIF, and JPEG. | -           |
-| `--mode <numeric\|alphanumeric\|octet>`      | QR code mode.                                           | `Auto`      |
-| `--error-correction <L\|M\|Q\|H>`            | Error correction level.                                 | `M`         |
-| `--version <1-40>`                           | Pin a QR code version.                                  | `Auto`      |
-| `--mask <0-7>`                               | Pin a QR code mask.                                     | `Auto`      |
-| `--eci`                                      | Emit UTF-8 ECI assignment 26 for octet segments.        | `false`     |
-| `--no-eci`                                   | Do not emit UTF-8 ECI assignment 26.                    | `false`     |
-| `--module-size <number>`                     | Module size as a positive integer.                      | `1`         |
-| `--quiet-zone <number>`                      | Quiet zone as a non-negative integer.                   | `2`         |
-| `--layout <compact\|full>`                   | Text block layout.                                      | `compact`   |
-| `--ansi <off\|blocks\|background>`           | Explicit ANSI output mode.                              | Environment |
-| `--foreground <#rrggbb[aa]>`                 | Dark module color.                                      | `#000000`   |
-| `--background <#rrggbb[aa]>`                 | Light module color.                                     | `#ffffff`   |
-| `--quality <1-100>`                          | JPEG quality. JPEG output only.                         | `92`        |
-| `--matte <#rrggbb>`                          | Opaque color for transparent pixels. JPEG output only.  | `#ffffff`   |
-| `--aria-label <text>`                        | SVG `aria-label` accessible name.                       | `undefined` |
-| `--title <text>`                             | SVG child `<title>` text.                               | `undefined` |
+| Option                                        | Description                                             | Default     |
+| --------------------------------------------- | ------------------------------------------------------- | :---------- |
+| `[payload]`                                   | Positional QR code payload.                             | -           |
+| `--payload <value>`                           | QR code payload, equivalent to positional `[payload]`.  | -           |
+| `-V`                                          | Print the installed CLI package version.                | -           |
+| `--format <text\|svg\|png\|webp\|gif\|jpeg>`  | Output format. Inferred from the output path extension. | -           |
+| `-o, --output <path>`                         | Required output path for SVG, PNG, WebP, GIF, and JPEG. | -           |
+| `--mode <auto\|numeric\|alphanumeric\|octet>` | QR code mode.                                           | `Auto`      |
+| `--error-correction <L\|M\|Q\|H>`             | Error correction level.                                 | `M`         |
+| `--version <1-40>`                            | Pin a QR code version.                                  | `Auto`      |
+| `--mask <0-7>`                                | Pin a QR code mask.                                     | `Auto`      |
+| `--optimize-segments`                         | Optimize mixed-mode segments in auto mode.              | `false`     |
+| `--eci`                                       | Emit UTF-8 ECI assignment 26 for octet segments.        | `false`     |
+| `--no-eci`                                    | Do not emit UTF-8 ECI assignment 26.                    | `false`     |
+| `--module-size <number>`                      | Module size as a positive integer.                      | `1`         |
+| `--quiet-zone <number>`                       | Quiet zone as a non-negative integer.                   | `2`         |
+| `--layout <compact\|full>`                    | Text block layout.                                      | `compact`   |
+| `--ansi <off\|blocks\|background>`            | Explicit ANSI output mode.                              | Environment |
+| `--foreground <#rrggbb[aa]>`                  | Dark module color.                                      | `#000000`   |
+| `--background <#rrggbb[aa]>`                  | Light module color.                                     | `#ffffff`   |
+| `--quality <1-100>`                           | JPEG quality. JPEG output only.                         | `92`        |
+| `--matte <#rrggbb>`                           | Opaque color for transparent pixels. JPEG output only.  | `#ffffff`   |
+| `--aria-label <text>`                         | SVG `aria-label` accessible name.                       | `undefined` |
+| `--title <text>`                              | SVG child `<title>` text.                               | `undefined` |
 
 Colors must be RGB or RGBA hex values. `--module-size` must be positive and `--quiet-zone` must be non-negative.
 For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI

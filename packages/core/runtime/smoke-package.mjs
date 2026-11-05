@@ -1,6 +1,7 @@
 import * as core from '@qrcodesdk/core';
 import * as matrixApi from '@qrcodesdk/core/matrix';
 import * as payload from '@qrcodesdk/core/payload';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 import * as style from '@qrcodesdk/core/style';
 
 const EXPECTED_MATRIX_SIZE = 29;
@@ -124,3 +125,14 @@ assert(
 logSuccess('custom renderer receives the unchanged QR matrix');
 
 globalThis.console.log('@qrcodesdk/core installed-package smoke test passed');
+
+const mixedPayload = 'ABCD12345678901234567890abcd';
+assert(
+  core.qrcode(mixedPayload).mode('auto').matrix().size === 29,
+  'Expected single-mode auto detection',
+);
+assert(
+  core.qrcode(mixedPayload).mode('auto').segmenter(automaticSegmenter).matrix().size === 25,
+  'Expected opt-in mixed-mode optimization',
+);
+logSuccess('auto mode works with and without the optional segmenter');

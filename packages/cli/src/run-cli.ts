@@ -23,6 +23,7 @@ type RawCliOptions = {
   readonly version?: string;
   readonly mask?: string;
   readonly eci?: boolean;
+  readonly optimizeSegments?: boolean;
   readonly moduleSize?: string;
   readonly quietZone?: string;
   readonly layout?: string;
@@ -37,6 +38,7 @@ type RawCliOptions = {
 
 type ResolvedCliOptions = Readonly<
   QRCodeMatrixOptions & {
+    readonly optimizeSegments: boolean;
     readonly ariaLabel?: string;
     readonly title?: string;
     readonly payload: string;
@@ -80,7 +82,7 @@ class CliError extends Error {}
 
 const outputFormats = ['text', 'svg', 'png', 'webp', 'gif', 'jpeg'] as const;
 const fileOutputFormats = ['svg', 'png', 'webp', 'gif', 'jpeg'] as const;
-const modes = ['numeric', 'alphanumeric', 'octet'] as const;
+const modes = ['auto', 'numeric', 'alphanumeric', 'octet'] as const;
 const errorCorrectionLevels = ['L', 'M', 'Q', 'H'] as const;
 const layouts = ['compact', 'full'] as const;
 const ansiModes = ['off', 'blocks', 'background'] as const;
@@ -93,7 +95,7 @@ const stringOptions = [
     'Output format: text, svg, png, webp, gif, or jpeg. Inferred from the output path extension',
   ],
   ['output', 'path', 'Required output path for SVG, PNG, WebP, GIF, and JPEG'],
-  ['mode', 'mode', 'QR code mode: numeric, alphanumeric, or octet'],
+  ['mode', 'mode', 'QR code mode: auto, numeric, alphanumeric, or octet'],
   ['error-correction', 'level', 'Error correction level: L, M, Q, or H'],
   ['version', 'version', 'Pin a QR code version from 1 to 40'],
   ['mask', 'mask', 'Pin a QR code mask from 0 to 7'],
@@ -176,6 +178,7 @@ function parseCommandLine(argv: readonly string[]) {
         ...Object.fromEntries(stringOptions.map(([name]) => [name, {type: 'string' as const}])),
         output: {type: 'string', short: 'o'},
         eci: {type: 'boolean'},
+        'optimize-segments': {type: 'boolean'},
         help: {type: 'boolean', short: 'h'},
       },
     });
@@ -195,6 +198,8 @@ function helpText(): string {
     description,
   ]);
   options.push(
+    ['    --optimize-segments', 'Optimize mixed-mode segments in auto mode'],
+    ['    --no-optimize-segments', 'Use single-mode detection in auto mode (default)'],
     ['    --eci', 'Emit UTF-8 ECI assignment 26 for octet segments'],
     ['    --no-eci', 'Do not emit UTF-8 ECI assignment 26'],
     ['-V', 'Print the installed CLI package version'],
@@ -244,6 +249,7 @@ async function resolveCliOptions(
       QRCodeVersion | undefined,
     mask: optionalIntegerInRange(rawOptions.mask, 'mask', 0, 7) as QRCodeMask | undefined,
     eci: rawOptions.eci ?? false,
+    optimizeSegments: rawOptions.optimizeSegments ?? false,
     style,
     quality: optionalIntegerInRange(rawOptions.quality, 'quality', 1, 100),
     matte: optionalOpaqueHexColor(rawOptions.matte, 'matte'),
@@ -383,7 +389,12 @@ async function render(
   stderr: WritableTarget,
 ): Promise<void> {
   const {qrcode} = await import('@qrcodesdk/core/matrix');
+  const segmenter =
+    options.optimizeSegments && (options.mode === undefined || options.mode === 'auto')
+      ? (await import('@qrcodesdk/core/segmenter')).automaticSegmenter
+      : undefined;
   const builder = qrcode(options.payload).options({
+    segmenter,
     mode: options.mode,
     errorCorrectionLevel: options.errorCorrectionLevel,
     version: options.version,

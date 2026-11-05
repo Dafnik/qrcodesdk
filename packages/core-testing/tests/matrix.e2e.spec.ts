@@ -4,6 +4,7 @@ import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeRenderer} from '@qrcodesdk/core';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {fixtureCapacity, fixtureMatrixOptions} from '../src';
 import {
@@ -171,7 +172,10 @@ describe('qrcode().render(binaryMatrix)', () => {
     };
 
     expect(
-      qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(binaryMatrix),
+      qrcode(fixture.payload)
+        .segmenter(automaticSegmenter)
+        .options(fixtureMatrixOptions(fixture))
+        .render(binaryMatrix),
     ).toEqual(referenceMatrixQRCodePackage(fixture));
   });
 

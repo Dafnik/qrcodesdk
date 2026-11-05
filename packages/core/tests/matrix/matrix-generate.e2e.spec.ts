@@ -1,8 +1,8 @@
 import {describe, expect, test} from 'vitest';
 
 import {
+  type QRCodeEncodingMode,
   type QRCodeErrorCorrectionLevel,
-  type QRCodeMode,
   type QRCodeVersion,
   qrcode,
 } from '../../src';
@@ -11,10 +11,11 @@ import {getNumberOfAvailableBitsForData} from '../../src/matrix/get-number-of-av
 import {MODES_MAP} from '../../src/matrix/mode';
 import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
 import {createSingleSegment} from '../../src/matrix/segments';
+import {automaticSegmenter} from '../../src/segmenter';
 import {fixturePayload, toRows} from '../helpers';
 import {expectSquareMatrix} from './helpers';
 
-const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
+const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeEncodingMode[];
 
 const ERROR_CORRECTION_LEVELS = [
   'L',
@@ -95,23 +96,40 @@ describe('qrcode().matrix()', () => {
     expect(qrcode(fixturePayload('numeric', 42)).mask(1).matrix().size).toBe(25);
   });
 
-  test('uses mixed modes automatically while explicit modes remain forced', () => {
+  test('uses mixed modes when opted in while explicit modes remain forced', () => {
     const payload = 'ABCD12345678901234567890abcd';
-    const automatic = qrcode(payload).mask(1).matrix();
-    const forcedOctet = qrcode(payload).mode('octet').mask(1).matrix();
+    const automatic = qrcode(payload).segmenter(automaticSegmenter).mask(1).matrix();
+    const forcedOctet = qrcode(payload)
+      .segmenter(automaticSegmenter)
+      .mode('octet')
+      .mask(1)
+      .matrix();
 
     expect(automatic.size).toBe(25);
     expect(forcedOctet.size).toBe(29);
-    expect(qrcode(payload).version(2).mask(1).matrix()).toEqual(automatic);
-    expect(qrcode(payload).mode('octet').mode(undefined).mask(1).matrix()).toEqual(automatic);
-    expect(
-      qrcode(payload).options({mode: 'octet'}).options({mode: undefined}).mask(1).matrix(),
-    ).toEqual(automatic);
-    expect(qrcode('ABCDE12345678?A1A').version(1).matrix().size).toBe(21);
-    expect(qrcode('ABCDE12345678?A1A').eci(true).matrix().size).toBe(25);
-    expect(() => qrcode('ABCDE12345678?A1A').eci(true).version(1).matrix()).toThrow(
-      'QRCode: Payload too large',
+    expect(qrcode(payload).segmenter(automaticSegmenter).version(2).mask(1).matrix()).toEqual(
+      automatic,
     );
+    expect(
+      qrcode(payload).segmenter(automaticSegmenter).mode('octet').mode(undefined).mask(1).matrix(),
+    ).toEqual(automatic);
+    expect(
+      qrcode(payload)
+        .segmenter(automaticSegmenter)
+        .options({mode: 'octet'})
+        .options({mode: undefined})
+        .mask(1)
+        .matrix(),
+    ).toEqual(automatic);
+    expect(qrcode('ABCDE12345678?A1A').segmenter(automaticSegmenter).version(1).matrix().size).toBe(
+      21,
+    );
+    expect(qrcode('ABCDE12345678?A1A').segmenter(automaticSegmenter).eci(true).matrix().size).toBe(
+      25,
+    );
+    expect(() =>
+      qrcode('ABCDE12345678?A1A').segmenter(automaticSegmenter).eci(true).version(1).matrix(),
+    ).toThrow('QRCode: Payload too large');
   });
 
   test('keeps ECI opt-in, immutable, and resettable', () => {
@@ -245,7 +263,7 @@ describe('qrcode().matrix()', () => {
 
 function getSingleSegmentCapacity(
   version: QRCodeVersion,
-  mode: QRCodeMode,
+  mode: QRCodeEncodingMode,
   errorCorrectionLevel: QRCodeErrorCorrectionLevel,
 ): number {
   const modeIndicator = MODES_MAP[mode];

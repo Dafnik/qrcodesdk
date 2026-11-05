@@ -18,6 +18,7 @@ const fields = {
   version: 'version',
   mask: 'mask',
   eci: 'eci',
+  'optimize-segments': 'optimizeSegments',
 } as const satisfies Record<string, keyof CliPlaygroundOptions>;
 
 const enums = {
@@ -25,7 +26,7 @@ const enums = {
   format: ['text', 'svg'],
   layout: ['compact', 'full'],
   ansi: ['off', 'blocks', 'background'],
-  mode: ['numeric', 'alphanumeric', 'octet'],
+  mode: ['auto', 'numeric', 'alphanumeric', 'octet'],
   errorCorrectionLevel: ['L', 'M', 'Q', 'H'],
 } as const;
 
@@ -38,8 +39,8 @@ export function readCliOptionsFromSearchParams(params: URLSearchParams): CliPlay
     if (field in enums) {
       const allowed: readonly string[] = enums[field as keyof typeof enums];
       if (allowed.includes(raw)) Object.assign(options, {[field]: raw});
-    } else if (field === 'eci') {
-      if (raw === 'true' || raw === 'false') options.eci = raw === 'true';
+    } else if (field === 'eci' || field === 'optimizeSegments') {
+      if (raw === 'true' || raw === 'false') options[field] = raw === 'true';
     } else if (['moduleSize', 'quietZone', 'version', 'mask'].includes(field)) {
       const number = Number(raw);
       const minimum = field === 'mask' || field === 'quietZone' ? 0 : 1;

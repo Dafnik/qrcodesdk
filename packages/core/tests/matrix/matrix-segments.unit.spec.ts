@@ -8,9 +8,17 @@ import {
   encodeUTF8,
   validatePayload,
 } from '../../src/matrix/mode';
-import {getSegmentsBitLength, optimizeSegments} from '../../src/matrix/segments';
+import {MODES_MAP} from '../../src/matrix/mode';
+import {createSingleSegment, getSegmentsBitLength} from '../../src/matrix/segments';
 import type {QRCodeEncodedSegment} from '../../src/matrix/types';
-import type {QRCodeVersion} from '../../src/types';
+import {automaticSegmenter} from '../../src/segmenter';
+import type {QRCodePayload, QRCodeVersion} from '../../src/types';
+
+function optimizeSegments(payload: QRCodePayload, version: QRCodeVersion, eci: boolean) {
+  return automaticSegmenter(payload, {version, eci}).map(({mode, payload}) =>
+    createSingleSegment(MODES_MAP[mode], payload)!,
+  );
+}
 
 const MODES = [MODE_NUMERIC, MODE_ALPHANUMERIC, MODE_OCTET] as const;
 
