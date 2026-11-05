@@ -250,17 +250,15 @@ while ([...status.values()].some(({state}) => state !== 'ready')) {
       status.get(release.name).state === 'waiting' &&
       batchParents(release).every((parent) => status.get(parent).state === 'ready'),
   );
-  if (readyToPush.length > 0) {
-    const tags = readyToPush.map((release) => release.tag);
-    log(`Pushing ${tags.join(', ')}`);
+  // GitHub does not create push events when more than three tags are pushed at once.
+  for (const release of readyToPush) {
+    log(`Pushing ${release.tag}`);
     try {
-      await run('git', ['push', REMOTE, ...tags.map((tag) => `refs/tags/${tag}`)]);
+      await run('git', ['-c', 'push.followTags=false', 'push', REMOTE, `refs/tags/${release.tag}`]);
     } catch (error) {
-      abort(`Pushing tags failed: ${error.stderr?.trim() || error.message}`);
+      abort(`Pushing ${release.tag} failed: ${error.stderr?.trim() || error.message}`);
     }
-    for (const release of readyToPush) {
-      Object.assign(status.get(release.name), {state: 'pushed', pushedAt: Date.now()});
-    }
+    Object.assign(status.get(release.name), {state: 'pushed', pushedAt: Date.now()});
   }
 
   await sleep(POLL_INTERVAL_MS);
