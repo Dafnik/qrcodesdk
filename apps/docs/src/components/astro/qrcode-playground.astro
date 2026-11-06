@@ -37,7 +37,7 @@ import QRCodeVuePlaygroundPreview from '../playground/QRCodeVuePlaygroundPreview
       <div class="grid min-w-0 grid-cols-1 gap-2">
         <PlaygroundToolbar client:load />
         <div class="min-w-0" data-playground-view="preview">
-          <div class="grid min-h-104 content-center place-items-center overflow-auto rounded-[0.5rem] border border-dashed border-(--sl-color-gray-5) bg-[linear-gradient(45deg,rgb(255_255_255_/_0.04)_25%,transparent_25%),linear-gradient(-45deg,rgb(255_255_255_/_0.04)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgb(255_255_255_/_0.04)_75%),linear-gradient(-45deg,transparent_75%,rgb(255_255_255_/_0.04)_75%)] bg-size-[1.2rem_1.2rem] bg-position-[0_0,0_0.6rem,0.6rem_-0.6rem,-0.6rem_0] p-4">
+          <div class="qr-preview-surface grid min-h-104 content-center place-items-center overflow-auto rounded-[0.5rem] border border-dashed border-(--sl-color-gray-5) p-4">
             <div class="min-w-0" data-playground-package="react" hidden>
               <QRCodeReactPlaygroundPreview client:only="react" />
             </div>

@@ -53,6 +53,15 @@ body {
 }
 
 @layer components {
+  .qr-preview-surface {
+    --qr-preview-grid: color-mix(in srgb, var(--foreground) 9%, transparent);
+    background:
+      linear-gradient(var(--qr-preview-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--qr-preview-grid) 1px, transparent 1px),
+      color-mix(in srgb, var(--muted) 38%, var(--background));
+    background-size: 1rem 1rem;
+  }
+
   html[data-theme='dark'] .shiki,
   html[data-theme='dark'] .shiki span {
     color: var(--shiki-dark) !important;

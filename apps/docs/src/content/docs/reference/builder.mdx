@@ -37,9 +37,8 @@ with optional automatic mixed-mode segmentation.
 | `octet`           | UTF-8 bytes                   | URLs, JSON, emoji, lowercase, and general text          |
 | `auto` or omitted | Any supported payload         | Single-mode detection; optional mixed-mode optimization |
 
-`auto` is always available. Without a segmenter, the builder selects numeric for digits,
-alphanumeric for the QR alphanumeric character set, and octet for other text. It encodes the
-complete payload as one segment. A concrete mode forces the entire payload into that mode.
+Without a segmenter, `auto` selects numeric for digits, alphanumeric for the QR alphanumeric
+character set, and octet for other text. It encodes the complete payload as one segment. A concrete mode forces the entire payload into that mode.
 
 ### Optional mixed-mode optimization
 
@@ -62,19 +61,23 @@ Explicit `numeric`, `alphanumeric`, and `octet` modes bypass the supplied segmen
 `.options({segmenter: undefined})` to clear the segmenter.
 
 Single-mode detection can produce a larger symbol than mixed-mode optimization, and a payload that
-fits an optimized symbol can exceed the same pinned version without optimization. To retain the
-previous automatic mixed-mode behavior, supply `automaticSegmenter`.
+fits an optimized symbol can exceed the same pinned version without optimization.
 
 Framework components accept the same callback through `options.matrix.segmenter`. The React, Vue,
 Svelte, and Angular packages re-export `automaticSegmenter`, so applications import it from the
 framework package.
 
-A custom `QRCodeSegmenter` receives the original payload and `{version, eci}`. Return a nonempty
+A custom `QRCodeSegmenter` receives the original payload and `{version, eci}`. Return a non-empty
 array of `QRCodeSegment` values with concrete modes and unencoded string payloads. Their text must
-concatenate to the original payload. Segments must not be empty, unless a single segment encodes an
-empty payload, and a boundary must not split a surrogate pair. Core validates and UTF-8 encodes each segment. With automatic
-version selection, the callback runs once per searched character-count group, starting at versions
-1, 10, and 27. With a pinned version, it runs once for that version. The callback should be deterministic.
+concatenate to the original payload.
+
+Segments must not be empty, unless a single segment encodes an empty payload. A segment boundary
+must not split a surrogate pair. Core validates each segment, UTF-8 encodes octet segments, and
+packs numeric and alphanumeric segments in their respective QR modes.
+
+With automatic version selection, the callback runs once per searched character-count group,
+starting at versions 1, 10, and 27. With a pinned version, it runs once for that version. The
+callback should be deterministic.
 
 ## Matrix options
 

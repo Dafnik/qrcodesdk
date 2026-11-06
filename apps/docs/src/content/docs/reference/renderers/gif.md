@@ -14,10 +14,9 @@ related:
 
 ## When to use
 
-Use `QRCodeGIFRenderer` when Node.js-compatible code must deliver a GIF file, for example to a
-destination that only accepts GIF images. Prefer the [PNG](/reference/renderers/png/) or
-[WebP](/reference/renderers/webp/) renderer otherwise: GIF is limited to 256 colors and binary
-transparency.
+Use `QRCodeGIFRenderer` when Node.js-compatible code must deliver a GIF file to a destination that
+only accepts GIF. Otherwise, prefer the [PNG](/reference/renderers/png/) or
+[WebP](/reference/renderers/webp/) renderer. GIF is limited to 256 colors and binary transparency.
 
 ## Minimal example
 
@@ -74,8 +73,6 @@ to drop more of the faint antialiased edge pixels; lower it to keep them.
   pixels at or above the threshold become opaque, so antialiased edges over a transparent background
   look rough.
 - **Single frame.** The renderer does not produce animations.
-
-Prefer PNG or WebP for transparent backgrounds and photographic center images.
 
 ## Center image
 

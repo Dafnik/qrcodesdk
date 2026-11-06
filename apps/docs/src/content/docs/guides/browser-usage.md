@@ -13,17 +13,13 @@ related:
   - ./download-or-save.md
 ---
 
-Browser applications can render a QR code as an SVG string, an Image element backed by PNG, WebP,
-GIF, or JPEG data, or a Canvas element. Choose the output for what the page needs to do next, then insert or compose the
-returned value with standard browser APIs.
-
 ## Choose a browser output
 
-| Choose | Package              | Return value        | Best fit                                                           |
-| ------ | -------------------- | ------------------- | ------------------------------------------------------------------ |
-| SVG    | `@qrcodesdk/core`    | `string`            | Scalable inline markup and the recommended browser default         |
-| Image  | `@qrcodesdk/browser` | `HTMLImageElement`  | A familiar, accessible DOM image backed by PNG, WebP, GIF, or JPEG |
-| Canvas | `@qrcodesdk/browser` | `HTMLCanvasElement` | Drawing, compositing, pixel access, or manual PNG export           |
+| Choose | Package              | Return value        | Best fit                                                       |
+| ------ | -------------------- | ------------------- | -------------------------------------------------------------- |
+| SVG    | `@qrcodesdk/core`    | `string`            | Scalable inline markup and the recommended browser default     |
+| Image  | `@qrcodesdk/browser` | `HTMLImageElement`  | A DOM image with `alt` text, backed by PNG, WebP, GIF, or JPEG |
+| Canvas | `@qrcodesdk/browser` | `HTMLCanvasElement` | Drawing, compositing, pixel access, or manual PNG export       |
 
 Start with SVG unless the next browser API specifically needs an Image or Canvas element. SVG stays
 sharp when resized and does not require Canvas support. Image and Canvas output require both
@@ -37,11 +33,11 @@ application, run them after hydration or use the runtime-neutral SVG renderer on
 ## SVG string
 
 `QRCodeSVGRenderer` returns complete SVG markup. It is not a DOM node, so insert it into an existing
-element or pass it to the browser-side template system that owns the page.
+element or pass it to your browser-side template.
 
 ### Insert it into the DOM
 
-Render into a container when the SVG should participate in the page as inline markup:
+Insert the SVG into a container as inline markup:
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -63,7 +59,7 @@ if (container) {
 <div id="qrcode"></div>
 ```
 
-Insert the SVG string returned by `QRCodeSVGRenderer()` directly. The renderer escapes label text
+The renderer escapes label text
 and image URL attributes; it encodes the payload as modules rather than inserting it as text.
 Do not concatenate unescaped user input into the SVG or its surrounding HTML. For center images,
 validate uploaded image content before converting it to a data URL; `svgCenterImage()` checks the
@@ -117,13 +113,9 @@ Each format has its own entry point, so a bundle only includes the encoder it im
 and JPEG use encoders bundled in the SDK and produce the same bytes in every browser, including
 Safari, which cannot encode WebP natively. The bundled JPEG encoder also blends transparent pixels
 onto a white matte, where the browser's own JPEG encoding would turn them black. All four accept the
-same options; see the
-[Image element renderers reference](/reference/renderers/image/) for the format differences.
+same options. See the [Image element renderers reference](/reference/renderers/image/) for the format differences.
 
 ### Insert and style it
-
-The returned value is already an `HTMLImageElement`, so it can be appended and styled like any
-other image:
 
 ```ts
 import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
@@ -242,9 +234,8 @@ export function updateQRCode(payload: string) {
 }
 ```
 
-If application state changes frequently, avoid recreating output for unrelated updates. Framework
-users can instead use the React, Vue, Svelte, or Angular components, which integrate rendering with
-their normal component lifecycle.
+If application state changes frequently, render again only when the payload or options change. In
+React, Vue, Svelte, or Angular, you can use the framework components instead.
 
 ## Keep browser output reliable
 

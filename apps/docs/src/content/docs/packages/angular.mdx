@@ -67,16 +67,19 @@ export class App {}
 <PackageComponents selector={true} />
 
 Each image format has its own component, so your bundle only includes the encoders of the components
-you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
-usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
-is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
-and photographic center images. `QRCodeJPEG` is lossy and has no transparency: it blends
-transparent pixels onto a white matte by default, and `quality` (1 to 100, default 92) trades file
-size for detail. Use it when a destination requires JPEG. See the
+you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` uses a lossless encoder
+bundled in the SDK, which also works in Safari, and usually produces the smallest file.
+
+`QRCodeGIF` is limited to 256 colors and binary transparency. Prefer PNG or WebP for transparent
+backgrounds and photographic center images.
+
+`QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
+default. Its `quality` option ranges from 1 to 100, defaults to 92, and trades file size for detail.
+Use it when a destination requires JPEG. See the
 [Image element renderers](/reference/renderers/image/) reference for details.
 
-All components are standalone. Add the components you use to the host component's
-`imports` array, then bind `payload` and `options` with normal Angular template syntax.
+All components are standalone. Add the ones you use to the host component's `imports` array, then
+bind their `payload` and `options` inputs.
 
 ## Live examples
 
@@ -119,9 +122,8 @@ component and template.
 
 ## Download files
 
-`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG` expose `download(filename?)`
-for SVG, PNG, WebP, GIF, and JPEG files respectively. The method appends the matching file extension when needed.
-`QRCodeCanvas` has no download method.
+All components except `QRCodeCanvas` expose `download(filename?)`. The method appends the
+component's file extension when needed.
 
 See [Download or save](/guides/download-or-save/#download-from-angular) for the complete
 Angular example, or its [Canvas export section](/guides/download-or-save/#export-a-canvas-manually)
@@ -131,7 +133,9 @@ for manual downloads.
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and
+Canvas APIs. Outside the browser, they skip element creation and downloads. They populate their host
+after hydration.
 
 ## Shared options
 
@@ -152,8 +156,6 @@ Pass this object through the component's `options` input. Use `QRCodePNGImageOpt
 `QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, `QRCodeJPEGImageOptions`, or `QRCodeCanvasOptions`
 for the corresponding component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`, and
 `QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
-
-Import shape and pattern factories, and center-image factories from `@qrcodesdk/angular` alongside the components.
 
 Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/angular` and pass it
 as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:

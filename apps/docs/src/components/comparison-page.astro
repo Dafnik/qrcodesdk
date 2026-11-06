@@ -41,7 +41,7 @@ const libraries = [
 const rows: readonly ComparisonRow[] = [
   {
     group: 'Foundation',
-    feature: 'TypeScript story',
+    feature: 'TypeScript support',
     values: [
       {status: 'yes', title: 'Native', detail: 'TypeScript source and bundled declarations'},
       {status: 'partial', title: 'Community types', detail: 'Install @types/qrcode separately'},
@@ -61,8 +61,8 @@ const rows: readonly ComparisonRow[] = [
       {status: 'yes', title: 'All in one', detail: 'Node.js API plus a browser build'},
       {
         status: 'yes',
-        title: 'Runtime-light',
-        detail: 'ESM and CommonJS builds with no package dependencies',
+        title: 'No package dependencies',
+        detail: 'ESM and CommonJS builds',
       },
       {
         status: 'partial',
@@ -81,7 +81,7 @@ const rows: readonly ComparisonRow[] = [
       {
         status: 'partial',
         title: 'Examples',
-        detail: 'Examples, but no dedicated component packages',
+        detail: 'No dedicated component packages',
       },
     ],
   },
@@ -111,7 +111,11 @@ const rows: readonly ComparisonRow[] = [
     values: [
       {status: 'yes', title: 'Browser renderer', detail: 'Returns HTMLCanvasElement'},
       {status: 'yes', title: 'Built in', detail: 'Browser canvas or supplied Node canvas'},
-      {status: 'partial', title: 'Bring a context', detail: 'Draws into CanvasRenderingContext2D'},
+      {
+        status: 'partial',
+        title: 'Requires a 2D context',
+        detail: 'Draws into CanvasRenderingContext2D',
+      },
       {status: 'yes', title: 'Primary output', detail: 'Canvas is the default render type'},
     ],
   },
@@ -141,12 +145,24 @@ const rows: readonly ComparisonRow[] = [
     values: [
       {
         status: 'yes',
-        title: 'Strong',
+        title: 'Shapes and center images',
         detail: 'Module, finder, alignment, and custom path shapes, colors, and center images',
       },
-      {status: 'partial', title: 'Basic', detail: 'Colors, module size, width, and quiet zone'},
-      {status: 'partial', title: 'Minimal', detail: 'Module size and quiet-zone helpers'},
-      {status: 'yes', title: 'Deepest', detail: 'Shapes, gradients, logos, and SVG extensions'},
+      {
+        status: 'partial',
+        title: 'Colors and dimensions',
+        detail: 'Colors, module size, width, and quiet zone',
+      },
+      {
+        status: 'partial',
+        title: 'Module size and quiet zone',
+        detail: 'Module size and quiet-zone helpers',
+      },
+      {
+        status: 'yes',
+        title: 'Gradients and extensions',
+        detail: 'Shapes, gradients, logos, and SVG extensions',
+      },
     ],
   },
   {

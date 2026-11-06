@@ -11,7 +11,7 @@ implementation. Matrix modules, SVG markup, and PNG, WebP, GIF, and JPEG bytes m
 mask selection, markup, or rasterization changes.
 
 If exact artifacts matter, pin every QRCodeSDK package to an exact version and retain your own matrix,
-SVG, or raster fixtures. A version upgrade should be treated as an explicit fixture update even when the
+SVG, or raster fixtures. Treat every version upgrade as an explicit fixture update, even when the
 decoded payload and documented options behave the same.
 
 ## Framework versions

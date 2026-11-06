@@ -5,7 +5,7 @@ const {code, lang = 'angular-ts'} = Astro.props;
 ---
 
 <div class="live-code-layout not-content">
-  <div class="example-container">
+  <div class="qr-preview-surface example-container">
     <div>
       <slot />
     </div>
@@ -24,7 +24,6 @@ const {code, lang = 'angular-ts'} = Astro.props;
     justify-content: center;
     align-items: center;
     padding: 2.5rem;
-    background: var(--ec-frm-edBg, var(--astro-code-color-background));
     border-style: solid;
     border-width: var(--ec-brdWd, 1px);
     border-color: var(--ec-brdCol, var(--sl-color-gray-5));

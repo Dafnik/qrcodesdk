@@ -19,10 +19,6 @@ const matrix = qrcode(
 ).matrix();
 ```
 
-`wifiPayload` defaults to `WPA` when a password is present and `nopass` when it is absent. Set
-`encryption: 'WEP'` for a WEP network or `hidden: true` for a hidden network. The serializer escapes
-Wi-Fi delimiter characters in the SSID and password.
-
 ## Available helpers
 
 | Helper         | Input type           | Output convention |
@@ -119,5 +115,3 @@ the SSID and password.
 
 All helpers return a `string`. Text fields reject NUL, carriage returns, and newlines. Invalid
 structured values throw `QRCodeError` with code `INVALID_PAYLOAD`.
-
-The helpers serialize only. Pass their result to `qrcode()` to generate a matrix or rendered output.
