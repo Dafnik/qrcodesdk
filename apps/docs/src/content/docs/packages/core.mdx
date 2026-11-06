@@ -139,6 +139,7 @@ import {
 } from '@qrcodesdk/core';
 import {
   QRCodeBuilder,
+  type QRCodeEncodingMode,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
   type QRCodeMatrix,
@@ -147,6 +148,9 @@ import {
   type QRCodeModuleRole,
   type QRCodePayload,
   type QRCodeRenderer,
+  type QRCodeSegment,
+  type QRCodeSegmenter,
+  type QRCodeSegmenterOptions,
   type QRCodeVersion,
   QR_CODE_MODULE_ROLES,
   qrcode,
@@ -197,3 +201,19 @@ import {
 Output is deterministic for one installed implementation, but matrix modules, SVG markup, and PNG,
 WebP, GIF, and JPEG bytes may change between QRCodeSDK releases. Pin exact package versions and keep fixtures when exact
 artifacts matter. See the [version and output policy](/project/release-policy/).
+
+## Optional mixed-mode segmentation
+
+Auto mode detects one encoding mode by default. Import the optimizer separately to combine modes
+when that reduces the symbol size:
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
+
+qrcode('ABCD12345678901234567890abcd').mode('auto').segmenter(automaticSegmenter).matrix();
+```
+
+`mode: 'auto'` works with or without the segmenter. Concrete modes bypass it. See
+[Builder and matrix](/reference/builder/#optional-mixed-mode-optimization) for the callback contract
+and version-selection behavior.

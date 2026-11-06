@@ -26,32 +26,68 @@ qrcode().payload('payload supplied later');
 ```
 
 QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, and UTF-8 octet payloads,
-including automatic mixed-mode segmentation.
+with optional automatic mixed-mode segmentation.
 
 ## Encoding modes
 
-| Mode           | Accepted payload              | Use it for                                     |
-| -------------- | ----------------------------- | ---------------------------------------------- |
-| `numeric`      | Digits only                   | Numeric identifiers and digit-only payloads    |
-| `alphanumeric` | QR alphanumeric character set | Uppercase text such as `HELLO WORLD`           |
-| `octet`        | UTF-8 bytes                   | URLs, JSON, emoji, lowercase, and general text |
-| omitted        | Any supported payload         | Automatic shortest-bit segmentation; default   |
+| Mode              | Accepted payload              | Use it for                                              |
+| ----------------- | ----------------------------- | ------------------------------------------------------- |
+| `numeric`         | Digits only                   | Numeric identifiers and digit-only payloads             |
+| `alphanumeric`    | QR alphanumeric character set | Uppercase text such as `HELLO WORLD`                    |
+| `octet`           | UTF-8 bytes                   | URLs, JSON, emoji, lowercase, and general text          |
+| `auto` or omitted | Any supported payload         | Single-mode detection; optional mixed-mode optimization |
 
-Setting a mode forces the complete payload into that mode. When mode is omitted, the builder splits
-the payload into the shortest-bit combination of numeric, alphanumeric, and octet segments. Manual
-segment arrays are not accepted.
+`auto` is always available. Without a segmenter, the builder selects numeric for digits,
+alphanumeric for the QR alphanumeric character set, and octet for other text. It encodes the
+complete payload as one segment. A concrete mode forces the entire payload into that mode.
+
+### Optional mixed-mode optimization
+
+Import `automaticSegmenter` to find the shortest-bit combination of numeric, alphanumeric, and
+octet segments. The default generation path does not import the optimizer, so applications that
+omit it avoid its bundle size and processing cost.
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
+
+const payload = 'ABCD12345678901234567890abcd';
+qrcode(payload).mode('auto').matrix(); // Single segment, version 3.
+qrcode(payload).mode('auto').segmenter(automaticSegmenter).matrix(); // Mixed segments, version 2.
+qrcode(payload).options({segmenter: automaticSegmenter}).matrix(); // Auto is the default.
+```
+
+Explicit `numeric`, `alphanumeric`, and `octet` modes bypass the supplied segmenter. Use
+`.mode('auto')` or `.mode()` to return to auto selection. Use `.segmenter()` or
+`.options({segmenter: undefined})` to clear the segmenter.
+
+Single-mode detection can produce a larger symbol than mixed-mode optimization, and a payload that
+fits an optimized symbol can exceed the same pinned version without optimization. To retain the
+previous automatic mixed-mode behavior, supply `automaticSegmenter`.
+
+Framework components accept the same callback through `options.matrix.segmenter`. The React, Vue,
+Svelte, and Angular packages re-export `automaticSegmenter`, so applications import it from the
+framework package.
+
+A custom `QRCodeSegmenter` receives the original payload and `{version, eci}`. Return a nonempty
+array of `QRCodeSegment` values with concrete modes and unencoded string payloads. Their text must
+concatenate to the original payload. Segments must not be empty, unless a single segment encodes an
+empty payload, and a boundary must not split a surrogate pair. Core validates and UTF-8 encodes each segment. With automatic
+version selection, the callback runs once per searched character-count group, starting at versions
+1, 10, and 27. With a pinned version, it runs once for that version. The callback should be deterministic.
 
 ## Matrix options
 
 `QRCodeMatrixOptions` contains only options that affect the encoded matrix:
 
-| Option                 | Type                                     | Default   | Constraint                                            |
-| ---------------------- | ---------------------------------------- | --------- | ----------------------------------------------------- |
-| `mode`                 | `'numeric' \| 'alphanumeric' \| 'octet'` | automatic | Forced mode must accept the entire payload            |
-| `eci`                  | `boolean`                                | `false`   | Only affects symbols containing octet segments        |
-| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`               | `'M'`     | Higher redundancy reduces payload capacity            |
-| `version`              | integer `1`–`40`                         | automatic | Pinned version must fit the encoded payload           |
-| `mask`                 | integer `0`–`7`                          | automatic | Pin only when deterministic matrix output is required |
+| Option                 | Type                                               | Default   | Constraint                                            |
+| ---------------------- | -------------------------------------------------- | --------- | ----------------------------------------------------- |
+| `mode`                 | `'auto' \| 'numeric' \| 'alphanumeric' \| 'octet'` | `'auto'`  | Forced mode must accept the entire payload            |
+| `segmenter`            | `QRCodeSegmenter`                                  | omitted   | Used only in auto mode                                |
+| `eci`                  | `boolean`                                          | `false`   | Only affects symbols containing octet segments        |
+| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`                         | `'M'`     | Higher redundancy reduces payload capacity            |
+| `version`              | integer `1`–`40`                                   | automatic | Pinned version must fit the encoded payload           |
+| `mask`                 | integer `0`–`7`                                    | automatic | Pin only when deterministic matrix output is required |
 
 Set options individually or together:
 
@@ -101,6 +137,7 @@ fails, shorten or change the payload.
 | `.payload(value)`          | a builder with a payload  | Sets or replaces the payload                                   |
 | `.options(options?)`       | a configured builder      | Merges all supplied matrix options                             |
 | `.mode(mode?)`             | a configured builder      | Forces or clears the encoding mode                             |
+| `.segmenter(segmenter?)`   | a configured builder      | Sets or clears optional mixed-mode segmentation                |
 | `.eci(enabled?)`           | a configured builder      | Enables or clears the UTF-8 ECI declaration                    |
 | `.errorCorrection(level?)` | a configured builder      | Sets or clears the error correction level                      |
 | `.version(version?)`       | a configured builder      | Pins or clears the version                                     |

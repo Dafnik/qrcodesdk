@@ -1,7 +1,7 @@
 import {
+  type QRCodeEncodingMode,
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
-  type QRCodeMode,
   type QRCodeVersion,
 } from '@qrcodesdk/core';
 
@@ -17,7 +17,7 @@ const ERROR_CORRECTION_LEVELS = [
 ] as const satisfies readonly QRCodeErrorCorrectionLevel[];
 
 const MASKS = [0, 1, 2, 3, 4, 5, 6, 7] as const satisfies readonly QRCodeMask[];
-const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
+const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeEncodingMode[];
 
 /**
  * Creates a seeded payload that fills the symbol's data capacity exactly, so no pad codewords
@@ -27,7 +27,7 @@ function combinationPayload(
   name: string,
   version: QRCodeVersion,
   errorCorrectionLevel: QRCodeErrorCorrectionLevel,
-  mode: QRCodeMode,
+  mode: QRCodeEncodingMode,
   eci: boolean,
 ): string {
   return createFixturePayload(

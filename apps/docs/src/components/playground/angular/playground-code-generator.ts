@@ -414,6 +414,10 @@ function formatOptions(
     matrixEntries.push(`mask: ${playgroundOptionsValue.mask}`);
   }
 
+  if (playgroundOptionsValue.optimizeSegments) {
+    matrixEntries.push('segmenter: automaticSegmenter');
+  }
+
   if (playgroundOptionsValue.eci === true) {
     matrixEntries.push('eci: true');
   }
@@ -595,6 +599,7 @@ function qrcodesdkImports(
     ...(hasImage ? [CENTER_IMAGE_FACTORIES[output]] : []),
     ...(hasImage && output === 'svg' ? ['type QRCodeDataImageURL'] : []),
     ...factories,
+    ...(playgroundOptionsValue.optimizeSegments ? ['automaticSegmenter'] : []),
   ];
   return formatImport(specifiers, `@qrcodesdk/${packageName}`, indentation);
 }

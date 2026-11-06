@@ -37,7 +37,7 @@ const PLAYGROUND_OUTPUTS = [
   'jpeg',
   'canvas',
 ] as const satisfies readonly PlaygroundOutput[];
-const MODES = ['numeric', 'alphanumeric', 'octet'] as const;
+const MODES = ['auto', 'numeric', 'alphanumeric', 'octet'] as const;
 const ERROR_CORRECTION_LEVELS = ['L', 'M', 'Q', 'H'] as const;
 /** Parameters of removed styling options. They are ignored on read and dropped on write. */
 const REMOVED_QUERY_KEYS = [
@@ -119,6 +119,15 @@ const QUERY_FIELD_CODECS = [
     (currentOptions, mask) => setOptionalProperty(currentOptions, 'mask', mask),
     (value, fallback) => parseOptionalNumber(value, isQRCodeMask, fallback),
     serializeNumber,
+  ),
+  defineQueryField(
+    'optimize-segments',
+    (currentOptions) => currentOptions.optimizeSegments ?? false,
+    (currentOptions, enabled) => {
+      currentOptions.optimizeSegments = enabled;
+    },
+    parseBoolean,
+    serializeBoolean,
   ),
   defineQueryField(
     'eci',

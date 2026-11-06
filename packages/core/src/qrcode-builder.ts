@@ -8,6 +8,7 @@ import type {
   QRCodeMode,
   QRCodePayload,
   QRCodeRenderer,
+  QRCodeSegmenter,
   QRCodeVersion,
 } from './types';
 
@@ -61,6 +62,10 @@ export class QRCodeBuilder<
 
   mode(mode?: QRCodeMode): QRCodeBuilder<P, R> {
     return this.withOptions({mode});
+  }
+
+  segmenter(segmenter?: QRCodeSegmenter): QRCodeBuilder<P, R> {
+    return this.withOptions({segmenter});
   }
 
   options(options?: QRCodeMatrixOptions): QRCodeBuilder<P, R> {

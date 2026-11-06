@@ -61,7 +61,28 @@ export type QRCodeVersion =
   | 40;
 
 export type QRCodeErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
-export type QRCodeMode = 'numeric' | 'alphanumeric' | 'octet';
+export type QRCodeEncodingMode = 'numeric' | 'alphanumeric' | 'octet';
+export type QRCodeMode = 'auto' | QRCodeEncodingMode;
+
+/** One unencoded text segment in an explicit QR encoding mode. */
+export type QRCodeSegment = {
+  readonly mode: QRCodeEncodingMode;
+  readonly payload: string;
+};
+
+export type QRCodeSegmenterOptions = {
+  readonly version: QRCodeVersion;
+  readonly eci: boolean;
+};
+
+/**
+ * Splits the payload into nonempty segments without changing its text or splitting surrogate pairs.
+ * Called once per searched version group.
+ */
+export type QRCodeSegmenter = (
+  payload: QRCodePayload,
+  options: QRCodeSegmenterOptions,
+) => readonly QRCodeSegment[];
 export type QRCodeMask = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type QRCodeColor = `#${string}`;
@@ -121,7 +142,10 @@ export type QRCodeRenderer<TOutput> = (matrix: QRCodeMatrix) => TOutput;
 
 export type QRCodeMatrixOptions = {
   version?: QRCodeVersion;
+  /** `auto` detects a single mode unless a segmenter is supplied. Defaults to `auto`. */
   mode?: QRCodeMode;
+  /** Optional mixed-mode segmentation. Explicit numeric, alphanumeric, or octet modes bypass it. */
+  segmenter?: QRCodeSegmenter;
   errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
   mask?: QRCodeMask;
   eci?: boolean;

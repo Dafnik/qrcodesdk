@@ -2,6 +2,7 @@ import type {QRCodeModuleRole, QRCodeVersion} from '../types';
 import {augmentBCH} from './augment-bch';
 import {getSizeByVersion} from './get-size-by-version';
 import {needsVersionInfo} from './needs-version-info';
+import {toPublicArray} from './public-array';
 import {getAlignmentPatternPositions} from './version-config';
 
 // Role numbers match QR_CODE_MODULE_ROLES; literals keep the public object out of the hot path.
@@ -35,6 +36,7 @@ export function createBaseMatrix(version: QRCodeVersion): QRCodeBaseMatrix {
   return base;
 }
 
+/** Builds the version-specific function patterns and role grid, leaving data modules empty. */
 function buildBaseMatrix(version: QRCodeVersion): QRCodeBaseMatrix {
   const n = getSizeByVersion(version);
   const modules = new Uint8Array(n * n);
@@ -117,6 +119,6 @@ function buildBaseMatrix(version: QRCodeVersion): QRCodeBaseMatrix {
     size: n,
     modules,
     roles,
-    publicRoles: Object.freeze(Array.from(roles) as QRCodeModuleRole[]),
+    publicRoles: toPublicArray(roles),
   };
 }

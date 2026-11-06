@@ -104,6 +104,37 @@ test('core exports style factories, internal drawing helpers, and encoders', asy
   assert.equal(typeof webp.ɵencodeWebP, 'function');
 });
 
+test('core publishes the automatic segmenter independently of default generation', async () => {
+  const packageJson = JSON.parse(
+    await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
+  );
+  if (packageJson.name !== '@qrcodesdk/core') return;
+
+  const importTarget = (target) => import(pathToFileURL(path.join(packageDirectory, target)).href);
+  const root = await importTarget(packageJson.exports['.']);
+  const {automaticSegmenter} = await importTarget(packageJson.exports['./segmenter']);
+  assert.equal(typeof automaticSegmenter, 'function');
+  assert.equal(root.automaticSegmenter, undefined);
+  const payload = 'ABCD12345678901234567890abcd';
+  assert.equal(root.qrcode(payload).mode('auto').matrix().size, 29);
+  assert.equal(root.qrcode(payload).mode('auto').segmenter(automaticSegmenter).matrix().size, 25);
+
+  const optimizer = path.resolve(packageDirectory, packageJson.exports['./segmenter']);
+  const visited = new Set();
+  async function visit(file) {
+    if (visited.has(file)) return;
+    visited.add(file);
+    const source = await readFile(file, 'utf8');
+    for (const match of source.matchAll(/(?:from\s*|import\s*)['"]([^'"]+\.mjs)['"]/g)) {
+      if (match[1].startsWith('.')) await visit(path.resolve(path.dirname(file), match[1]));
+    }
+  }
+  for (const entry of ['.', './matrix']) {
+    await visit(path.resolve(packageDirectory, packageJson.exports[entry]));
+  }
+  assert.equal(visited.has(optimizer), false, 'default entries must not load the optimizer');
+});
+
 test('React publishes a client entry', async () => {
   const packageJson = JSON.parse(
     await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),

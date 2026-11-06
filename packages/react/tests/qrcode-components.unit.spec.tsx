@@ -31,6 +31,7 @@ describe('React QR code component handles', () => {
       'QRCodeSVG',
       'QRCodeWebP',
       'alignment',
+      'automaticSegmenter',
       'canvasCenterImage',
       'circle',
       'customShape',

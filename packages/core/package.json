@@ -59,6 +59,7 @@
     "./internal/webp": "./dist/internal/webp.mjs",
     "./matrix": "./dist/matrix.mjs",
     "./payload": "./dist/payload.mjs",
+    "./segmenter": "./dist/segmenter.mjs",
     "./style": "./dist/style.mjs",
     "./svg": "./dist/svg.mjs",
     "./text": "./dist/text.mjs",
@@ -71,6 +72,7 @@
   ],
   "scripts": {
     "benchmark:matrix": "vitest bench --run benchmarks/matrix-hot-path.bench.ts",
+    "benchmark:segmenter": "vitest bench --run benchmarks/segmenter.bench.mjs",
     "benchmark:styler": "vitest bench --run benchmarks/styler-hot-path.bench.mjs",
     "build": "tsdown",
     "postbuild": "cp ../../LICENSE .",

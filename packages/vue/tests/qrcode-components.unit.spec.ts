@@ -24,6 +24,7 @@ describe('Vue QR code component API', () => {
       'QRCodeSVG',
       'QRCodeWebP',
       'alignment',
+      'automaticSegmenter',
       'canvasCenterImage',
       'circle',
       'customShape',

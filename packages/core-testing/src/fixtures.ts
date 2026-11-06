@@ -1,10 +1,11 @@
-import type {QRCodeMatrixOptions} from '@qrcodesdk/core';
+import type {QRCodeEncodingMode, QRCodeMatrixOptions} from '@qrcodesdk/core';
 
 import {fixtureCapacity} from './capacity';
 import {createFixturePayload, fixtureSeed} from './fixture-payloads';
 
 export type QRCodeTestFixture = Readonly<
-  QRCodeMatrixOptions & {
+  Omit<QRCodeMatrixOptions, 'mode' | 'segmenter'> & {
+    readonly mode?: QRCodeEncodingMode;
     readonly name: string;
     readonly payload: string;
   }

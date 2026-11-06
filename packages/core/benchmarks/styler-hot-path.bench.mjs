@@ -30,6 +30,8 @@ describe('styler hot paths', () => {
     test(`version ${String(version)}`, async ({bench}) => {
       const matrix = qrcode('A').options({mode: 'alphanumeric', version, mask: 0}).matrix();
       const plain = createQRCodeStyler();
+      const plainDrawing = plain(matrix);
+      const plainSVG = QRCodeSVGRenderer();
       const styled = createQRCodeStyler(STYLE);
       const circular = createQRCodeStyler({modules: circle()});
       const circleSVG = QRCodeSVGRenderer({style: {modules: circle()}});
@@ -71,6 +73,12 @@ describe('styler hot paths', () => {
         }),
         bench('draw plain', () => {
           globalThis.__qrcodesdkBenchmarkResult = plain(matrix);
+        }),
+        bench('render plain SVG', () => {
+          globalThis.__qrcodesdkBenchmarkResult = plainSVG(matrix);
+        }),
+        bench('serialize plain path data', () => {
+          globalThis.__qrcodesdkBenchmarkResult = toQRCodePathData(plainDrawing.layers[0]);
         }),
         bench('draw styled', () => {
           globalThis.__qrcodesdkBenchmarkResult = styled(matrix);

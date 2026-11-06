@@ -10,6 +10,7 @@ import {
   qrcode,
 } from '@qrcodesdk/core';
 import {QR_CODE_MODULE_ROLES} from '@qrcodesdk/core/matrix';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 /** `1` for a dark module and `0` for a light module. */
 export type QRCodeExplainModuleValue = 0 | 1;
@@ -18,6 +19,7 @@ export type QRCodeExplainRole = 'functional' | 'encoded' | 'remainder';
 
 export interface QRCodeExplainOptions extends QRCodeMatrixOptions, QRCodeTextStyle {
   payload: string;
+  optimizeSegments?: boolean;
 }
 
 export interface QRCodeExplainModule {
@@ -46,7 +48,7 @@ export interface QRCodeExplanation {
   readonly moduleGrid: readonly (readonly QRCodeExplainModule[])[];
   readonly groups: ReadonlyMap<string, QRCodeExplainGroup>;
   readonly version: QRCodeVersion;
-  readonly mode: QRCodeMode | 'mixed';
+  readonly mode: Exclude<QRCodeMode, 'auto'> | 'mixed';
   readonly errorCorrectionLevel: QRCodeErrorCorrectionLevel;
   readonly mask: QRCodeMask;
   readonly moduleSize: number;
@@ -94,6 +96,7 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
     errorCorrectionLevel: options.errorCorrectionLevel,
     mask: options.mask,
     eci: options.eci,
+    segmenter: options.optimizeSegments ? automaticSegmenter : options.segmenter,
   };
   const matrix = qrcode(options.payload).options(matrixOptions).matrix();
   const {size} = matrix;
@@ -135,7 +138,7 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
     moduleGrid,
     groups: createGroups(modules),
     version,
-    mode: resolveMode(options),
+    mode: resolveMode(options, matrixOptions, version),
     errorCorrectionLevel: options.errorCorrectionLevel ?? 'M',
     mask,
     moduleSize,
@@ -193,11 +196,20 @@ function resolveMask(
   throw new Error('QRCode explain: Unable to resolve mask');
 }
 
-function resolveMode(options: QRCodeExplainOptions): QRCodeMode | 'mixed' {
-  if (options.mode) return options.mode;
-  if (/^\d+$/.test(options.payload)) return 'numeric';
-  if (/^[0-9A-Z $%*+\-./:]+$/.test(options.payload)) return 'alphanumeric';
-  return /[0-9A-Z]{4,}/.test(options.payload) ? 'mixed' : 'octet';
+function resolveMode(
+  options: QRCodeExplainOptions,
+  matrixOptions: QRCodeMatrixOptions,
+  version: QRCodeVersion,
+): Exclude<QRCodeMode, 'auto'> | 'mixed' {
+  if (options.mode !== undefined && options.mode !== 'auto') return options.mode;
+  if (matrixOptions.segmenter) {
+    const segments = matrixOptions.segmenter(options.payload, {version, eci: options.eci ?? false});
+    const modes = new Set(segments.map(({mode}) => mode));
+    return modes.size > 1 ? 'mixed' : segments[0]!.mode;
+  }
+  if (/^\d*$/.test(options.payload)) return 'numeric';
+  if (/^[0-9A-Z $%*+\-./:]*$/.test(options.payload)) return 'alphanumeric';
+  return 'octet';
 }
 
 function createGroups(

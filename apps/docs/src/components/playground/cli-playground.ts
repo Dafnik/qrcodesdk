@@ -9,12 +9,14 @@ import {
   type QRCodeTextRendererOptions,
   qrcode,
 } from '@qrcodesdk/core';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {createPackageManagerCommands} from '../../utils/package-manager-commands.mjs';
 import {playgroundOptions} from './playground-options.ts';
 
 export type CliLauncher = 'npm' | 'installed' | 'pnpm' | 'viteplus' | 'bun' | 'yarn';
 export interface CliPlaygroundOptions extends QRCodeMatrixOptions {
+  optimizeSegments?: boolean;
   payload: string;
   launcher: CliLauncher;
   format: 'text' | 'svg';
@@ -117,6 +119,7 @@ export function createCliSVGOptions(options: CliPlaygroundOptions): QRCodeSVGOpt
   return {
     matrix: {
       mode: options.mode,
+      segmenter: options.optimizeSegments ? automaticSegmenter : undefined,
       errorCorrectionLevel: options.errorCorrectionLevel,
       version: options.version,
       mask: options.mask,
@@ -164,6 +167,7 @@ export function generateCliCommand(options: CliPlaygroundOptions): string {
   if (options.format === 'svg')
     args.push('--format', 'svg', '--output', quoteShellArgument(options.outputPath));
   if (options.mode !== undefined) args.push('--mode', options.mode);
+  if (options.optimizeSegments) args.push('--optimize-segments');
   if (options.errorCorrectionLevel !== undefined && options.errorCorrectionLevel !== 'M')
     args.push('--error-correction', options.errorCorrectionLevel);
   if (options.version !== undefined) args.push('--version', String(options.version));

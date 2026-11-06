@@ -1,4 +1,4 @@
-import type {QRCodeMode, QRCodePayload, QRCodeVersion} from '../types';
+import type {QRCodeEncodingMode, QRCodeMode, QRCodePayload, QRCodeVersion} from '../types';
 import type {QRCodeEncodedPayload, QRCodeSupportedModeIndicator} from './types';
 
 export const MODE_NUMERIC = 1,
@@ -9,7 +9,7 @@ export const MODE_ECI = 7;
 export const ECI_UTF8_ASSIGNMENT = 26;
 export const ECI_UTF8_BIT_LENGTH = 12;
 
-export const MODES_MAP: Record<QRCodeMode, QRCodeSupportedModeIndicator> = {
+export const MODES_MAP: Record<QRCodeEncodingMode, QRCodeSupportedModeIndicator> = {
   numeric: MODE_NUMERIC,
   alphanumeric: MODE_ALPHANUMERIC,
   octet: MODE_OCTET,
@@ -70,7 +70,7 @@ export function resolveMode(
   payload: QRCodePayload,
   requestedMode: QRCodeMode | undefined,
 ): QRCodeSupportedModeIndicator {
-  if (requestedMode !== undefined) {
+  if (requestedMode !== undefined && requestedMode !== 'auto') {
     return MODES_MAP[requestedMode];
   }
 

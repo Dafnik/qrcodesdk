@@ -262,6 +262,15 @@ for the corresponding component. `QRCodeGIFImageOptions` also accepts `transpare
 
 Import shape and pattern factories, and center-image factories from `@qrcodesdk/svelte` alongside the components.
 
+Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/svelte` and pass it
+as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:
+
+```ts
+import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/svelte';
+
+const options: QRCodeSVGOptions = {matrix: {mode: 'auto', segmenter: automaticSegmenter}};
+```
+
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
 [Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
 [Renderer outputs](https://qrcodesdk.dev/reference/renderers/) for output-specific options.
@@ -285,6 +294,7 @@ import {
   type QRCodeColor,
   type QRCodeDataImageURL,
   type QRCodeDownloadHandle,
+  type QRCodeEncodingMode,
   type QRCodeErrorCorrectionLevel,
   type QRCodeFinderCenterShape,
   type QRCodeFinderOptions,
@@ -312,6 +322,9 @@ import {
   type QRCodeSVGCenterImage,
   type QRCodeSVGOptions,
   type QRCodeSVGProps,
+  type QRCodeSegment,
+  type QRCodeSegmenter,
+  type QRCodeSegmenterOptions,
   type QRCodeShape,
   type QRCodeShapePath,
   type QRCodeShapePiece,
@@ -321,6 +334,7 @@ import {
   type QRCodeWebPImageOptions,
   type QRCodeWebPProps,
   alignment,
+  automaticSegmenter,
   canvasCenterImage,
   circle,
   customShape,

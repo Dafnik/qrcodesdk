@@ -8,6 +8,10 @@
     "benchmark:jpeg": {
       "cache": false,
       "dependsOn": ["build"]
+    },
+    "benchmark:svg": {
+      "cache": false,
+      "dependsOn": ["build"]
     }
   }
 }

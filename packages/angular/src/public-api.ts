@@ -25,6 +25,10 @@ export type {
   QRCodeMask,
   QRCodeMatrixOptions,
   QRCodeMode,
+  QRCodeEncodingMode,
+  QRCodeSegment,
+  QRCodeSegmenter,
+  QRCodeSegmenterOptions,
   QRCodePayload,
   QRCodeVersion,
   QRCodeSVGAccessibilityOptions,
@@ -34,6 +38,7 @@ export type {
 export {canvasCenterImage} from '@qrcodesdk/browser';
 export {svgCenterImage} from '@qrcodesdk/core';
 export {alignment, circle, customShape, diagonal, finder, rounded} from '@qrcodesdk/core/style';
+export {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 export type {
   QRCodeAlignmentCenterShape,
   QRCodeAlignmentOptions,
