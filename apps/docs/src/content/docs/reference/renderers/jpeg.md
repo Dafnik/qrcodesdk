@@ -20,8 +20,7 @@ photographic [center image](/guides/center-images/), where lossy compression kee
 Prefer the [PNG](/reference/renderers/png/) or [WebP](/reference/renderers/webp/) renderer
 otherwise:
 
-- **Lossy.** JPEG blurs sharp edges slightly. QR codes still scan, but pixels near module edges
-  shift a little.
+- **Lossy.** JPEG slightly blurs module edges. Test the output with the scanners you target.
 - **No transparency.** Transparent pixels are blended onto a solid matte color.
 - **Larger files.** For a plain QR code with a few flat colors, PNG and lossless WebP are much
   smaller. A default QR code for `https://qrcodesdk.dev` is about 9.7 KB as JPEG, 1.1 KB as PNG,
@@ -72,9 +71,8 @@ TypeScript rejects every other key; the renderer does not repeat that check at r
 | `transparency.matte` | opaque `QRCodeColor`      | `'#ffffff'`     | Color that transparent pixels are blended onto   |
 | `centerImage`        | `QRCodeRasterCenterImage` | `undefined`     | Draws a center image from `rasterCenterImage()`  |
 
-The default quality of `92` keeps module edges sharp enough for reliable scanning. Lower values make
-smaller files with blurrier edges; test the result with the scanners you target before going below
-about `75`.
+Lower values make smaller files with blurrier edges. Test the result with the scanners you target
+before going below about `75`.
 
 ## Format details
 
@@ -113,7 +111,7 @@ const jpeg = qrcode('https://qrcodesdk.dev').render(QRCodeJPEGRenderer({style: {
 
 Sizes are for `https://qrcodesdk.dev` at the default quality and quiet zone. A module size of `8`,
 `16`, or `24` gives the smallest files and keeps square module edges exact. Sizes that divide 8,
-such as `4` or `2`, also align modules with the blocks and help less. Rounded or circular module
+such as `4` or `2`, also align modules with the blocks but save less. Rounded or circular module
 shapes, center images, and antialiased edges still add detail within blocks.
 
 ## Center image

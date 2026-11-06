@@ -34,7 +34,7 @@ import {
   providers: [provideIcons({lucideImage, lucideImagePlus, lucideQrCode, lucideTrash2})],
   template: `
     <fieldset hlmFieldSet>
-      <p hlmFieldDescription>Upload and decode an image before it is passed to the QR renderer.</p>
+      <p hlmFieldDescription>Choose an image to place in the center of the QR code.</p>
 
       <div class="border-border bg-muted/30 grid min-w-0 gap-3 rounded-lg border p-3">
         <div class="flex min-w-0 items-center gap-3">

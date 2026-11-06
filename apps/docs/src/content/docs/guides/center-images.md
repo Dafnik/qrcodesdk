@@ -43,7 +43,7 @@ the image is drawn over the modules and patterns. Start with `size: 0.2` to `0.3
 only after testing.
 
 Factories check numeric layout constraints when they are called and throw `INVALID_OPTIONS` for
-invalid values. TypeScript checks option types and requires the matching factory result.
+invalid values.
 
 Center-image values are opaque and belong to the factory that created them. Pass the original value
 to the matching renderer. Copying it with object spread or JSON does not preserve it. Custom objects
@@ -120,8 +120,8 @@ const webp = builder.render(QRCodeWebPRenderer({centerImage}));
 `rasterCenterImage()` accepts PNG bytes and decodes them once. Reuse its result across renders and
 across the PNG, WebP, GIF, and JPEG renderers. GIF output reduces the image to at most 256 colors and
 binary transparency, so prefer PNG or WebP for logos with soft transparent edges. For a photographic
-center image, JPEG keeps the file small: its lossy compression suits photos, and its default quality
-of 92 keeps the modules around the image sharp. JPEG has no transparency, so transparent parts of the
+center image, JPEG keeps the file small because its lossy compression suits photos. Its default
+quality is 92. JPEG has no transparency, so transparent parts of the
 image are blended onto `transparency.matte`, white by default.
 
 ## Use prepared sources in framework components

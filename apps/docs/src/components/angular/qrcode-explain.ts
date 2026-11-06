@@ -363,8 +363,7 @@ export class QRCodeExplainControls {
             <div class="grid gap-1">
               <h3 class="text-base font-semibold">Inspect a module</h3>
               <p class="text-muted-foreground text-sm leading-relaxed">
-                Hover any square to reveal its job. Click, tap, or press Enter to keep a selection
-                pinned while you explore.
+                Hover a module to see its role. Click, tap, or press Enter to pin it.
               </p>
             </div>
           }

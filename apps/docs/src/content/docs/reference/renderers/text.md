@@ -43,7 +43,7 @@ callers such as the CLI choose that policy before creating it.
 
 Terminals have no alpha channel. RGBA background colors are composited over white, then RGBA
 foreground colors are composited over that resolved background before 24-bit ANSI sequences are
-written. Alpha is therefore deterministic and never silently discarded.
+written.
 
 For `S = (matrix width + 2 × quietZone) × moduleSize`, compact output is `S` cells wide and
 `ceil(S / 2)` lines high. Full and ANSI-background output are `2 × S` cells wide and `S` lines high.

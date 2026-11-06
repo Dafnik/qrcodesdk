@@ -93,15 +93,18 @@ export function App() {
 | `className` | `string`                     | CSS class applied to the component wrapper div. |
 
 Each image format has its own component, so your bundle only includes the encoders of the components
-you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
-usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
-is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
-and photographic center images. `QRCodeJPEG` is lossy and has no transparency: it blends
-transparent pixels onto a white matte by default, and `quality` (1 to 100, default 92) trades file
-size for detail. Use it when a destination requires JPEG. See the
+you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` uses a lossless encoder
+bundled in the SDK, which also works in Safari, and usually produces the smallest file.
+
+`QRCodeGIF` is limited to 256 colors and binary transparency. Prefer PNG or WebP for transparent
+backgrounds and photographic center images.
+
+`QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
+default. Its `quality` option ranges from 1 to 100, defaults to 92, and trades file size for detail.
+Use it when a destination requires JPEG. See the
 [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) reference for details.
 
-React passes `className`, `style`, and other fallthrough attributes to the component's wrapper `<div>`.
+The components pass `className`, `style`, and other `<div>` props to their wrapper `<div>`.
 Use a React ref when you need a download handle; the rendered SVG, Image, or Canvas element remains inside that wrapper.
 
 ## Live examples
@@ -276,16 +279,14 @@ export default function QRCodeDownloadPNGExample() {
 ## Center images
 
 Load and decode a browser image first, then store options with
-`centerImage: canvasCenterImage(image)` in state. Updating that state rerenders the component with
-the prepared image. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
-[Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete
-React lifecycle.
+`centerImage: canvasCenterImage(image)` in state. `QRCodeSVG` takes `svgCenterImage()` with an
+embedded data URL instead. See [Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete
+React example.
 
 ## Download files
 
-`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG` expose `download(filename?)`
-for SVG, PNG, WebP, GIF, and JPEG files respectively. The method appends the matching file extension when needed.
-`QRCodeCanvas` has no download method.
+All components except `QRCodeCanvas` expose `download(filename?)`. The method appends the
+component's file extension when needed.
 
 See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-react) for the complete
 React example, or its [Canvas export section](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually)
@@ -295,7 +296,9 @@ for manual downloads.
 
 `QRCodeSVG` produces runtime-neutral SVG and can render on the server.
 
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and
+Canvas APIs. Outside the browser, they skip element creation and downloads. They populate their host
+after hydration.
 
 ### Next.js client boundary
 
@@ -350,8 +353,6 @@ Pass this object through the component's `options` prop. Use `QRCodePNGImageOpti
 `QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, `QRCodeJPEGImageOptions`, or `QRCodeCanvasOptions`
 for the corresponding component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`, and
 `QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
-
-Import shape and pattern factories, and center-image factories from `@qrcodesdk/react` alongside the components.
 
 Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/react` and pass it
 as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:

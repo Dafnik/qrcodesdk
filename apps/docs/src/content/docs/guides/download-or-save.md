@@ -28,8 +28,8 @@ Choose the file format first, then follow the instructions for your runtime or f
 
 All formats support the same styling options. WebP is lossless and usually much smaller than PNG.
 GIF is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent
-backgrounds and photographic center images. JPEG is lossy and has no transparency: transparent
-pixels are blended onto a matte color, white by default. Plain QR codes are much larger as JPEG than
+backgrounds and photographic center images. JPEG is lossy and has no transparency. It blends
+transparent pixels onto a matte color, white by default. Plain QR codes are much larger as JPEG than
 as PNG or WebP.
 
 Raster formats have a fixed pixel size. Set `style.moduleSize` to provide enough pixels for the
@@ -69,8 +69,9 @@ qrcode('https://qrcodesdk.dev').render(
 
 Pass `QRCodeWebPImageRenderer()`, `QRCodeGIFImageRenderer()`, or `QRCodeJPEGImageRenderer()` instead
 for WebP, GIF, or JPEG files. Each helper appends `.svg`, `.png`, `.webp`, `.gif`, or `.jpg` when
-needed (a filename that already ends with `.jpeg` keeps it), triggers a temporary link click, and
-returns `void`. Call it from a user action when required by the browser. See the
+needed. A JPEG filename that already ends with `.jpeg` keeps that extension. The helper triggers a
+temporary link click and returns `void`. Call it from a user action when the browser requires one.
+See the
 [browser download reference](/reference/renderers/browser-downloads/) for options and filename handling.
 
 ## Download from React

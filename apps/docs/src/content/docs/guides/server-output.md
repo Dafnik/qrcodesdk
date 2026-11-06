@@ -27,7 +27,7 @@ without converting raster bytes through a text encoding.
 | JPEG   | `QRCodeJPEGRenderer` from `@qrcodesdk/node` | `Buffer` | `image/jpeg`                   |
 
 Choose SVG for scalable text output. Choose a raster format for clients that require image bytes or
-do not accept SVG: PNG is the most widely supported, lossless WebP is usually the smallest, and GIF
+do not accept SVG. PNG is the most widely supported, lossless WebP is usually the smallest, and GIF
 and JPEG serve clients that only accept those formats. GIF is limited to 256 colors and binary
 transparency. JPEG is lossy, larger for plain QR codes, and blends transparent pixels onto a solid
 matte color.
@@ -37,7 +37,7 @@ is sent the same way.
 
 ## Return a platform-neutral response
 
-The Web `Response` API works in modern server and edge frameworks. SVG requires only Core:
+Use a Web `Response` where your server or edge framework supports it. SVG requires only Core:
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -186,9 +186,8 @@ app.get('/qrcode.png', (context) => {
 ## Handle dynamic input safely
 
 Validate and bound user-controlled payloads before generation. Long payloads can require larger
-matrices and more rendering work; rejected capacity throws `QRCode: Payload too large`. Decide whether
-the endpoint should cache by payload, disable caching for private payload, or set a stable ETag for
-repeatable public output.
+matrices and more rendering work; rejected capacity throws `QRCode: Payload too large`. Cache public
+output by payload or with a stable ETag, and disable caching for private payloads.
 
 Use `Content-Disposition: attachment; filename="qrcode.svg"` only when the response should download
 instead of display inline. When a framework calculates `Content-Length`, let it do so from the final

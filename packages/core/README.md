@@ -99,8 +99,8 @@ Typed helpers serialize common application values before generation. See
 
 ## Runtime compatibility
 
-> `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
-> It has no Node.js, DOM, filesystem, or framework dependency.
+`@qrcodesdk/core` runs in any JavaScript runtime with native ESM, ES2020, and a global `TextEncoder`.
+It has no Node.js, DOM, filesystem, or framework dependency.
 
 TypeScript projects should use `moduleResolution: 'bundler'`, `'node16'`, or `'nodenext'` to resolve
 the package's ESM entry points and subpaths.

@@ -96,7 +96,7 @@ function PreviewError({message}: {message?: unknown}) {
         QR code generation failed
       </h4>
       <p className="text-destructive/90 [&_a]:hover:text-foreground text-sm text-balance md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_p:not(:last-child)]:mb-4">
-        {message ? String(message) : 'This QR code options is invalid.'}
+        {message ? String(message) : 'These QR code options are invalid.'}
       </p>
     </div>
   );

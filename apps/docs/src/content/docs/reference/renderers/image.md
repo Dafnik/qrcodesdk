@@ -11,8 +11,8 @@ related:
 
 ## When to use
 
-Use an Image element renderer when browser code needs a CSS-customizable, accessible
-`HTMLImageElement` rather than a drawing surface. Choose the renderer by the encoded format:
+Use an Image element renderer when browser code needs an `HTMLImageElement` with native `alt` text
+rather than a drawing surface. Choose the renderer by the encoded format:
 
 | Renderer                  | Entry point               | Data URL type | Encoder                            |
 | ------------------------- | ------------------------- | ------------- | ---------------------------------- |
@@ -114,8 +114,8 @@ own `canvas.toDataURL('image/jpeg')` is not used, because it turns transparent p
 encodes differently in each browser. The bundled encoder produces the same bytes as the Node.js
 [JPEG renderer](/reference/renderers/jpeg/) for the same pixels.
 
-- **Lossy.** Pixels near module edges shift slightly. The default quality of `92` keeps edges sharp
-  enough for reliable scanning.
+- **Lossy.** Pixels near module edges shift slightly. The default quality is `92`; test the output
+  with the scanners you target.
 - **No transparency.** Every pixel is blended onto `transparency.matte`, which defaults to white.
 - **Larger files.** For a plain QR code, PNG and WebP are usually smaller. JPEG pays off for
   photographic center images and destinations that require it.

@@ -44,10 +44,9 @@ React, Vue, Svelte, and Angular users import them from their framework package, 
 `import {finder, rounded} from '@qrcodesdk/react'`, and pass the style through the component's
 `options`.
 
-Renderer factories check style value constraints when called and copy their values. TypeScript
-checks option names and types. Replacing a `style`
-property later does not change the renderer. `finder()` and `alignment()` return opaque style
-values. Pass those values to the matching style property; they expose no drawing methods.
+Renderer factories check style value constraints and copy their values when called, so replacing a
+`style` property later does not change the renderer. `finder()` and `alignment()` return opaque
+style values for the matching style property. They expose no drawing methods.
 
 ## Shared visual style
 
@@ -202,10 +201,12 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 
 Path data must use only the relative `m`, `l`, `h`, `v`, `c`, `a`, and `z` commands, and every
 subpath must be closed. Pieces are filled with the even-odd rule, so a second subpath inside the
-first one cuts a hole, like the 5 × 5 hole of the finder ring above. `modules` only reads `module`,
-`finder()` only reads `finderRing` from its `ring` and `finderCenter` from its `center`, and
-`alignment()` only reads `alignmentRing` and `alignmentCenter` the same way. A shape used in one
-place may omit the other properties.
+first one cuts a hole, like the 5 × 5 hole of the finder ring above.
+
+`modules` reads only `module`. `finder()` reads `finderRing` from its `ring` shape and
+`finderCenter` from its `center` shape. `alignment()` reads `alignmentRing` from its `ring` shape
+and `alignmentCenter` from its `center` shape. A shape used in one place may omit the other
+properties.
 
 For example, this module shape draws a hexagon:
 
@@ -231,9 +232,8 @@ without parsing the paths again.
 ## Bundle size
 
 Import only the shape, pattern, and center-image factories you use. Bundlers with tree shaking can
-remove the others. Dimensions and colors need no import from `@qrcodesdk/core/style`.
-Built-in factories generate prepared geometry directly. The custom-path parser is included only
-when you import `customShape()` in SVG and Canvas consumers. Node.js raster output also uses the parser.
+remove the others. Dimensions need no import from `@qrcodesdk/core/style`. SVG and Canvas
+consumers include the custom-path parser only when they import `customShape()`. Node.js raster output also uses the parser.
 
 ## Text styling
 
@@ -252,8 +252,8 @@ QRCodeTextRenderer({
 
 ## Accessibility and center images
 
-Accessibility is output-specific and lives under `accessibility`. SVG accepts `ariaLabel` and
-`title`; Canvas accepts `ariaLabel` and `title`; Image accepts `alt`, `ariaLabel`, and `title`.
+Accessibility is output-specific and lives under `accessibility`. SVG and Canvas accept `ariaLabel`
+and `title`. Image accepts `alt`, `ariaLabel`, and `title`.
 
 Center images are also renderer options because their source types differ by runtime. Each renderer
 takes a center image created by its own factory, such as `svgCenterImage()`. See
@@ -262,7 +262,6 @@ takes a center image created by its own factory, such as `svgCenterImage()`. See
 ## Scan reliability
 
 The API accepts transparent colors, low contrast, a zero quiet zone, every shape, custom path data,
-and the full image-size range. Those values are structurally valid, but not necessarily easy to
-scan. Small `circle()` sizes and custom shapes that leave little of each module dark are harder to
-read. Test the final displayed or printed QR code on the devices and at the sizes used in
-production.
+and the full image-size range. Those values are structurally valid but can be hard to scan. Small
+`circle()` sizes and custom shapes that leave little of each module dark are harder to read. Test
+the final displayed or printed QR code on the devices and at the sizes used in production.

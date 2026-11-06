@@ -22,7 +22,7 @@ related:
 
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 
-Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG, WebP, GIF, or JPEG `Buffer` for files, HTTP responses, downloads, email attachments, or other server-side integrations.
+Node.js renderers for QRCodeSDK. Use this package with `@qrcodesdk/core` when you need a PNG, WebP, GIF, or JPEG `Buffer` for files, HTTP responses, downloads, or email attachments.
 
 ## Install
 
@@ -50,13 +50,18 @@ colors are preserved, including transparent backgrounds.
 | JPEG   | `QRCodeJPEGRenderer` | `image/jpeg`   | The destination only accepts JPEG, or the center image is a photo |
 
 All four renderers draw the same pixels from the same `style` and `centerImage` options and return
-a `Buffer`. WebP output is lossless and usually much smaller than PNG; a default QR code for
-`https://qrcodesdk.dev` is about 310 bytes as WebP and 1.1 KB as PNG. GIF output is a single frame
-with at most 256 colors and binary transparency: pixels below `transparency.threshold` alpha become
-transparent and all others opaque. JPEG output is lossy and has no transparency: transparent pixels
-are blended onto `transparency.matte`, white by default. It is about 9.7 KB for the same QR code, or
-870 bytes with a [module size of 8](/reference/renderers/jpeg/#smaller-files), so use it only when
-the destination requires JPEG or a photographic center image benefits from it.
+a `Buffer`.
+
+WebP output is lossless and usually much smaller than PNG. A default QR code for
+`https://qrcodesdk.dev` is about 310 bytes as WebP and 1.1 KB as PNG.
+
+GIF output is a single frame with at most 256 colors and binary transparency. Pixels below
+`transparency.threshold` alpha become transparent, and all others become opaque.
+
+JPEG output is lossy and has no transparency. It blends transparent pixels onto
+`transparency.matte`, white by default. The same QR code is about 9.7 KB as JPEG, or 870 bytes with
+a [module size of 8](/reference/renderers/jpeg/#smaller-files). Use JPEG only when the destination
+requires it or a photographic center image benefits from it.
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';

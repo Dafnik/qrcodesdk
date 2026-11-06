@@ -8,7 +8,7 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
-`@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` when your output should be an element created in the browser or a browser-triggered download.
+`@qrcodesdk/browser` adds renderers that depend on browser DOM APIs. Use it with `@qrcodesdk/core` to create Canvas or Image elements and trigger file downloads in the browser.
 
 ## Install
 
@@ -78,13 +78,14 @@ encoders you do not use.
 | Trigger an SVG download                    | `QRCodeDownloadSVGRenderer`   | `void`              |
 | Trigger a PNG, WebP, GIF, or JPEG download | `QRCodeDownloadImageRenderer` | `void`              |
 
-PNG uses the browser's native encoder and is the default choice. WebP is lossless and usually the
-smallest file. Its encoder is bundled in the SDK, so output is the same in every browser, including
-Safari, which cannot encode WebP natively. GIF is limited to 256 colors and binary transparency,
-so prefer PNG or WebP for transparent backgrounds and photographic center images. JPEG is lossy, has
-no transparency, and is larger for plain QR codes; its bundled encoder blends transparent pixels onto
-a white matte instead of the black that browsers' native JPEG encoding produces. Use it when a
-destination requires JPEG.
+- PNG uses the browser's native encoder and is the default choice.
+- WebP is lossless and usually the smallest file. Its encoder is bundled in the SDK, so output is the
+  same in every browser, including Safari, which cannot encode WebP natively.
+- GIF is limited to 256 colors and binary transparency. Prefer PNG or WebP for transparent
+  backgrounds and photographic center images.
+- JPEG is lossy, has no transparency, and is larger for plain QR codes. Its bundled encoder blends
+  transparent pixels onto a white matte instead of the black that browsers' native JPEG encoding
+  produces. Use it when a destination requires JPEG.
 
 ## Render an Image element
 

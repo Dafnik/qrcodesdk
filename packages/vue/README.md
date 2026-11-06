@@ -91,12 +91,15 @@ import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/vue';
 | `class`   | `string \| object \| array`  | Vue class binding applied to the component wrapper div. |
 
 Each image format has its own component, so your bundle only includes the encoders of the components
-you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
-usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
-is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
-and photographic center images. `QRCodeJPEG` is lossy and has no transparency: it blends
-transparent pixels onto a white matte by default, and `quality` (1 to 100, default 92) trades file
-size for detail. Use it when a destination requires JPEG. See the
+you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` uses a lossless encoder
+bundled in the SDK, which also works in Safari, and usually produces the smallest file.
+
+`QRCodeGIF` is limited to 256 colors and binary transparency. Prefer PNG or WebP for transparent
+backgrounds and photographic center images.
+
+`QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
+default. Its `quality` option ranges from 1 to 100, defaults to 92, and trades file size for detail.
+Use it when a destination requires JPEG. See the
 [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) reference for details.
 
 Vue applies `class`, `style`, and other fallthrough attributes to the component's wrapper `<div>`.
@@ -258,9 +261,8 @@ Vue example.
 
 ## Download files
 
-`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG` expose `download(filename?)`
-for SVG, PNG, WebP, GIF, and JPEG files respectively. The method appends the matching file extension when needed.
-`QRCodeCanvas` has no download method.
+All components except `QRCodeCanvas` expose `download(filename?)`. The method appends the
+component's file extension when needed.
 
 See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-vue) for the complete
 Vue example, or its [Canvas export section](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually)
@@ -293,8 +295,6 @@ Pass this object through the component's `options` prop. Use `QRCodePNGImageOpti
 `QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, `QRCodeJPEGImageOptions`, or `QRCodeCanvasOptions`
 for the corresponding component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`, and
 `QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
-
-Import shape and pattern factories, and center-image factories from `@qrcodesdk/vue` alongside the components.
 
 Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/vue` and pass it
 as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:

@@ -181,14 +181,14 @@ Without an output file, `qrc` packs two QR rows into each terminal line and appl
 qrc "https://qrcodesdk.dev"
 ```
 
-Use full-height, double-width `██` modules when preferred:
+For full-height, double-width `██` modules, use the `full` layout:
 
 ```sh
 qrc "https://qrcodesdk.dev" --layout full
 ```
 
-ANSI styling is disabled automatically when standard output is redirected or `NO_COLOR` is present.
-You can also disable it explicitly:
+`qrc` disables ANSI styling automatically when standard output is redirected or `NO_COLOR` is
+present. To disable it explicitly:
 
 ```sh
 qrc "https://qrcodesdk.dev" --ansi off
@@ -220,7 +220,7 @@ qrc "https://qrcodesdk.dev" --format svg --output qrcode.svg
 
 ## Write PNG files
 
-An `.png` output path selects PNG automatically:
+A `.png` output path selects PNG automatically:
 
 ```sh
 qrc "https://qrcodesdk.dev" --output qrcode.png
@@ -269,12 +269,12 @@ qrc "https://qrcodesdk.dev" \
   --aria-label 'Scan to open qrcodesdk.dev'
 ```
 
-Auto mode is always available through `--mode auto`. It detects one encoding mode by default.
-Pass `--optimize-segments` to combine modes when that reduces the symbol size. Concrete modes
-bypass optimization. Use `--no-optimize-segments` to disable it again.
+`--mode auto`, the default, detects one encoding mode. Pass `--optimize-segments` to combine modes
+when that reduces the symbol size. Concrete modes bypass optimization, and `--no-optimize-segments`
+disables it again.
 
-The CLI exposes matrix and visual options as flags. Leave mode, version, and mask on automatic
-selection unless you need a compatibility target or deterministic fixture:
+Leave mode, version, and mask on automatic selection unless you need a compatibility target or
+deterministic fixture:
 
 ```sh
 qrc "HELLO WORLD" \
@@ -321,7 +321,7 @@ see [Customize appearance](https://qrcodesdk.dev/guides/customize/).
 | `--aria-label <text>`                         | SVG `aria-label` accessible name.                       | `undefined` |
 | `--title <text>`                              | SVG child `<title>` text.                               | `undefined` |
 
-Colors must be RGB or RGBA hex values. `--module-size` must be positive and `--quiet-zone` must be non-negative.
+Colors must be RGB or RGBA hex values.
 For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI
 background. With `--ansi background`, both become module background colors.
 
@@ -330,7 +330,7 @@ background. With `--ansi background`, both become module background colors.
 In an interactive terminal, `qrc` prompts only for missing required values such as payload, an ambiguous format, or a file output path.
 Choose the output format with the arrow keys, `j`/`k`, or a number key, then press Enter. Press Escape or Ctrl+C to cancel a prompt.
 
-In a non-interactive shell or CI job, missing required values fail with a clear error instead of opening a prompt. Pass every required value explicitly:
+In a non-interactive shell or CI job, missing required values fail with an error instead of opening a prompt. Pass every required value explicitly:
 
 ```sh
 qrc \
@@ -339,7 +339,7 @@ qrc \
   --output artifacts/qrcode.png
 ```
 
-Successful file output writes a confirmation to standard error, leaving standard output available for terminal QR code content and pipeline use.
+Successful file output writes a confirmation to standard error, so standard output stays free for terminal QR code text and pipelines.
 
 ## Documentation
 

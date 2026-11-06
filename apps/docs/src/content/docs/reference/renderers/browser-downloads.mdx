@@ -61,11 +61,11 @@ The Image wrapper accepts the PNG, WebP, GIF, and JPEG Image element renderers. 
 from the MIME type of the image's data URL. For any other data URL type, it uses the filename
 unchanged.
 
-`renderer` is required. `filename` is optional; the wrapper appends its extension when the supplied
-name does not already end with that extension, using a case-insensitive check. A JPEG filename
-that already ends with `.jpeg` keeps that extension.
-Surrounding whitespace is trimmed, and empty or whitespace-only filenames use `qrcode`. Both factories copy their options
-when called; changing the original object later does not change the download.
+`renderer` is required. `filename` is optional. The wrapper appends its extension unless the name
+already ends with it, compared case-insensitively. A JPEG filename that already ends with `.jpeg`
+keeps that extension. Surrounding whitespace is trimmed, and empty or whitespace-only filenames use
+`qrcode`. Both factories copy their options when called; changing the original object later does
+not change the download.
 
 ## Renderer-specific constraints
 
@@ -74,8 +74,7 @@ when called; changing the original object later does not change the download.
 - The SVG wrapper creates an `image/svg+xml;charset=utf-8` Blob and revokes its object URL 40 seconds
   after triggering the download, so browsers that start downloads asynchronously can finish reading it.
 - The Image wrapper downloads the wrapped Image element's existing `src`; it does not re-encode it.
-- Wrapped renderer options, output validity, and runtime requirements remain the responsibility of
-  the wrapped renderer.
+- The wrappers do not validate the wrapped renderer's options, output, or runtime requirements.
 
 ## Related guides
 
