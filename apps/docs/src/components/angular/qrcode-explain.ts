@@ -90,12 +90,6 @@ export class QRCodeExplainControls {
     .explain-surface {
       --explain-accent: var(--sl-color-accent-high);
       --explain-accent-soft: color-mix(in srgb, var(--sl-color-accent-high) 32%, transparent);
-      --explain-grid: color-mix(in srgb, var(--foreground) 9%, transparent);
-      background:
-        linear-gradient(var(--explain-grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--explain-grid) 1px, transparent 1px),
-        color-mix(in srgb, var(--muted) 38%, var(--background));
-      background-size: 1rem 1rem;
     }
 
     .qr-base {
@@ -188,7 +182,7 @@ export class QRCodeExplainControls {
         </div>
 
         <div
-          class="explain-surface relative grid min-h-96 place-items-center overflow-hidden rounded-xl border p-4 sm:p-6"
+          class="qr-preview-surface explain-surface relative grid min-h-96 place-items-center overflow-hidden rounded-xl border p-4 sm:p-6"
           #surface>
           <svg
             class="focus-visible:ring-ring/50 block h-auto max-h-[70vh] max-w-full touch-none outline-none focus-visible:ring-3"
