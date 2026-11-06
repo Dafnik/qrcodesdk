@@ -86,8 +86,51 @@ describe('optional segmentation', () => {
     {segments: [{mode: 'numeric', payload: MIXED}]},
     {segments: [{mode: 'auto', payload: MIXED}]},
     {segments: [{mode: 'octet', payload: 'changed payload'}]},
+    {segments: undefined},
+    {segments: {length: 1, 0: {mode: 'octet', payload: MIXED}}},
+    {segments: [null]},
+    {
+      segments: [
+        {mode: 'octet', payload: MIXED},
+        {mode: 'numeric', payload: ''},
+      ],
+    },
+    {segments: [{mode: 'octet', payload: [MIXED]}]},
   ])('rejects invalid or payload-changing segmenter results: %j', ({segments}) => {
     const segmenter = (() => segments) as unknown as QRCodeSegmenter;
     expect(() => qrcode(MIXED).segmenter(segmenter).matrix()).toThrow('Invalid payload');
+  });
+
+  test('rejects segments that split a surrogate pair', () => {
+    const payload = 'A🚀B';
+    const split = (() => [
+      {mode: 'octet', payload: 'A\ud83d'},
+      {mode: 'octet', payload: '\ude80B'},
+    ]) as QRCodeSegmenter;
+    expect(() => qrcode(payload).segmenter(split).matrix()).toThrow('Invalid payload');
+    const whole = (() => [
+      {mode: 'octet', payload: 'A'},
+      {mode: 'octet', payload: '🚀B'},
+    ]) as QRCodeSegmenter;
+    expect(qrcode(payload).segmenter(whole).matrix().size).toBe(21);
+  });
+
+  test('accepts a single empty segment for an empty payload', () => {
+    const segmenter = (() => [{mode: 'numeric', payload: ''}]) as QRCodeSegmenter;
+    expect(qrcode('').segmenter(segmenter).matrix()).toEqual(qrcode('').matrix());
+  });
+
+  test.each([true, 'automatic', null, {}])('rejects a non-function segmenter: %j', (segmenter) => {
+    expect(() =>
+      qrcode(MIXED)
+        .options({segmenter: segmenter as unknown as QRCodeSegmenter})
+        .matrix(),
+    ).toThrow(expect.objectContaining({code: 'INVALID_OPTIONS'}));
+    expect(() =>
+      qrcode(MIXED)
+        .mode('octet')
+        .options({segmenter: segmenter as unknown as QRCodeSegmenter})
+        .matrix(),
+    ).toThrow('QR code segmenter must be a function');
   });
 });

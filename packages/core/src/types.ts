@@ -75,7 +75,10 @@ export type QRCodeSegmenterOptions = {
   readonly eci: boolean;
 };
 
-/** Split the payload without changing its text. Called once per searched version group. */
+/**
+ * Splits the payload into nonempty segments without changing its text or splitting surrogate pairs.
+ * Called once per searched version group.
+ */
 export type QRCodeSegmenter = (
   payload: QRCodePayload,
   options: QRCodeSegmenterOptions,

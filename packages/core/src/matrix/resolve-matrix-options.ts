@@ -1,5 +1,12 @@
 import {QRCodeError} from '../error';
-import type {QRCodeMatrixOptions, QRCodePayload, QRCodeSegmenter, QRCodeVersion} from '../types';
+import {throwInvalid} from '../options';
+import type {
+  QRCodeMatrixOptions,
+  QRCodePayload,
+  QRCodeSegment,
+  QRCodeSegmenter,
+  QRCodeVersion,
+} from '../types';
 import {ECC_LEVELS_MAP} from './error-correction';
 import {getNumberOfAvailableBitsForData} from './get-number-of-available-bits-for-data';
 import {resolveMode} from './mode';
@@ -14,6 +21,9 @@ export function resolveQRCodeMatrixOptions(
     throw invalidPayload({payload});
   }
   const {eci = false, mask, version: requestedVersion} = options;
+  if (options.segmenter !== undefined && typeof options.segmenter !== 'function') {
+    throwInvalid('segmenter', 'a function', options.segmenter);
+  }
 
   let forcedSegments: QRCodeResolvedMatrixOptions['segments'] | undefined;
   if (!options.segmenter || (options.mode !== undefined && options.mode !== 'auto')) {
@@ -78,19 +88,35 @@ function createSegments(
   version: QRCodeVersion,
   eci: boolean,
 ): QRCodeResolvedMatrixOptions['segments'] {
-  const segments = segmenter(payload, {version, eci});
-  if (
-    segments.length === 0 ||
-    segments.map((segment) => segment.payload).join('') !== String(payload)
-  ) {
-    throw invalidPayload({payload});
-  }
-  return segments.map(({mode, payload: text}) => {
-    if (mode !== 'numeric' && mode !== 'alphanumeric' && mode !== 'octet') {
-      throw invalidPayload({payload: text, mode});
+  const segments: unknown = segmenter(payload, {version, eci});
+  if (!Array.isArray(segments) || segments.length === 0) throw invalidPayload({payload});
+  const value = String(payload);
+  let text = '';
+  const encoded = segments.map((segment: unknown) => {
+    const {mode, payload: segmentText} = (segment ?? {}) as Partial<QRCodeSegment>;
+    if (
+      typeof segmentText !== 'string' ||
+      (segmentText === '' && segments.length > 1) ||
+      (mode !== 'numeric' && mode !== 'alphanumeric' && mode !== 'octet') ||
+      // UTF-8 encoding would replace each half of a split surrogate pair.
+      (isHighSurrogate(text.charCodeAt(text.length - 1)) &&
+        isLowSurrogate(segmentText.charCodeAt(0)))
+    ) {
+      throw invalidPayload({payload: segmentText, mode});
     }
-    const segment = createSingleSegment(resolveMode(text, mode), text);
-    if (!segment) throw invalidPayload({payload: text, mode});
-    return segment;
+    text += segmentText;
+    const encodedSegment = createSingleSegment(resolveMode(segmentText, mode), segmentText);
+    if (!encodedSegment) throw invalidPayload({payload: segmentText, mode});
+    return encodedSegment;
   });
+  if (text !== value) throw invalidPayload({payload});
+  return encoded;
+}
+
+function isHighSurrogate(code: number): boolean {
+  return code >= 0xd800 && code <= 0xdbff;
+}
+
+function isLowSurrogate(code: number): boolean {
+  return code >= 0xdc00 && code <= 0xdfff;
 }
