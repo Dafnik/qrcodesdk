@@ -89,6 +89,7 @@ function DownloadButton({label, onClick}: {label: string; onClick(): void}) {
   );
 }
 
+/** Displays a generation error, with a fallback when no message is available. */
 function PreviewError({message}: {message?: unknown}) {
   return (
     <div className="group/alert text-destructive bg-card *:data-[slot=alert-description]:text-destructive/90 relative grid w-full max-w-md gap-0.5 rounded-lg border px-2.5 py-2 text-start text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pe-18">

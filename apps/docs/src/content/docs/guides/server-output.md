@@ -186,8 +186,9 @@ app.get('/qrcode.png', (context) => {
 ## Handle dynamic input safely
 
 Validate and bound user-controlled payloads before generation. Long payloads can require larger
-matrices and more rendering work; rejected capacity throws `QRCode: Payload too large`. Cache public
-output by payload or with a stable ETag, and disable caching for private payloads.
+matrices and more rendering work; rejected capacity throws `QRCode: Payload too large`. Include the
+payload and every output-affecting option, including the renderer, style, and matrix options, in
+public output cache keys. A stable ETag must identify that output. Disable caching for private payloads.
 
 Use `Content-Disposition: attachment; filename="qrcode.svg"` only when the response should download
 instead of display inline. When a framework calculates `Content-Length`, let it do so from the final

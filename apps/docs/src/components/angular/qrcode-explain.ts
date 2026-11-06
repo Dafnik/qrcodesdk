@@ -197,7 +197,7 @@ export class QRCodeExplainControls {
             [attr.viewBox]="'0 0 ' + qr.viewSize + ' ' + qr.viewSize"
             [attr.width]="renderedPixelSize()"
             (blur)="onBlur()"
-            (click)="onSvgClick()"
+            (click)="onSvgClick($event)"
             (focus)="onSvgFocus()"
             (keydown)="onSvgKeydown($event)"
             (pointerleave)="onPointerLeave()"
@@ -397,7 +397,6 @@ export class QRCodeExplain {
     this.explanation();
     return undefined;
   });
-  private readonly pointerSelection = signal<ExplainSelection | undefined>(undefined);
   private readonly keyboardPosition = linkedSignal(() => {
     this.explanation();
     return {row: 0, column: 0};
@@ -460,6 +459,7 @@ export class QRCodeExplain {
     return `${this.selectionLabel(selection)}. ${this.moduleSummary(selection.module)}`;
   });
 
+  /** Previews the hovered module without replacing a pinned selection. */
   protected onPointerMove(event: PointerEvent): void {
     const target = event.target;
     if (!(target instanceof SVGElement)) return;
@@ -468,7 +468,6 @@ export class QRCodeExplain {
 
     const selection = this.selectionFromElement(interactive);
     if (selection === undefined) return;
-    this.pointerSelection.set(selection);
     if (this.pinnedSelection() === undefined) {
       if (
         this.previewSelection()?.groupId !== selection.groupId ||
@@ -481,20 +480,19 @@ export class QRCodeExplain {
     this.updateTooltipPosition(event.clientX, event.clientY);
   }
 
+  /** Clears hover details while retaining any pinned selection. */
   protected onPointerLeave(): void {
-    this.pointerSelection.set(undefined);
     this.tooltipSelection.set(undefined);
     if (this.pinnedSelection() === undefined) this.previewSelection.set(undefined);
   }
 
-  protected onSvgClick(): void {
-    const selection = this.pointerSelection() ?? this.previewSelection();
-    if (selection === undefined) return;
-    if (this.pinnedSelection()?.groupId === selection.groupId) {
-      this.pinnedSelection.set(undefined);
-    } else {
-      this.pinnedSelection.set(selection);
-    }
+  /** Pins the clicked module or quiet zone without requiring a preceding hover event. */
+  protected onSvgClick(event: MouseEvent): void {
+    const target = event.target;
+    if (!(target instanceof SVGElement)) return;
+    const interactive = target.closest<SVGElement>('[data-group]');
+    if (interactive === null) return;
+    this.togglePinnedSelection(this.selectionFromElement(interactive));
   }
 
   protected onSvgFocus(): void {
