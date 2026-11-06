@@ -65,7 +65,9 @@ Single-mode detection can produce a larger symbol than mixed-mode optimization, 
 fits an optimized symbol can exceed the same pinned version without optimization. To retain the
 previous automatic mixed-mode behavior, supply `automaticSegmenter`.
 
-Framework components accept the same callback through `options.matrix.segmenter`.
+Framework components accept the same callback through `options.matrix.segmenter`. The React, Vue,
+Svelte, and Angular packages re-export `automaticSegmenter`, so applications import it from the
+framework package.
 
 A custom `QRCodeSegmenter` receives the original payload and `{version, eci}`. Return a nonempty
 array of `QRCodeSegment` values with concrete modes and unencoded string payloads. Their text must

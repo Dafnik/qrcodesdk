@@ -57,7 +57,13 @@ test('all framework examples import the optional optimizer only when selected', 
     const optimized = generatePlaygroundCode({...options, optimizeSegments: true}).code;
     assert.match(plain, /mode: 'auto'/);
     assert.doesNotMatch(plain, /automaticSegmenter/);
-    assert.match(optimized, /import \{automaticSegmenter\} from '@qrcodesdk\/core\/segmenter'/);
+    assert.match(
+      optimized,
+      new RegExp(
+        `import \\{[^}]*\\bautomaticSegmenter\\b[^}]*\\} from '@qrcodesdk/${packageName}'`,
+      ),
+    );
+    assert.doesNotMatch(optimized, /@qrcodesdk\/core/);
     assert.match(optimized, /segmenter: automaticSegmenter/);
   }
 });

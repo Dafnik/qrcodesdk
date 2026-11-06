@@ -599,12 +599,9 @@ function qrcodesdkImports(
     ...(hasImage ? [CENTER_IMAGE_FACTORIES[output]] : []),
     ...(hasImage && output === 'svg' ? ['type QRCodeDataImageURL'] : []),
     ...factories,
+    ...(playgroundOptionsValue.optimizeSegments ? ['automaticSegmenter'] : []),
   ];
-  const imports = [formatImport(specifiers, `@qrcodesdk/${packageName}`, indentation)];
-  if (playgroundOptionsValue.optimizeSegments) {
-    imports.push(formatImport(['automaticSegmenter'], '@qrcodesdk/core/segmenter', indentation));
-  }
-  return imports.join('\n');
+  return formatImport(specifiers, `@qrcodesdk/${packageName}`, indentation);
 }
 
 function formatImport(specifiers: string[], moduleName: string, indentation: number): string {

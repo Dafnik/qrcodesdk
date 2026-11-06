@@ -296,6 +296,15 @@ for the corresponding component. `QRCodeGIFImageOptions` also accepts `transpare
 
 Import shape and pattern factories, and center-image factories from `@qrcodesdk/vue` alongside the components.
 
+Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/vue` and pass it
+as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:
+
+```ts
+import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/vue';
+
+const options: QRCodeSVGOptions = {matrix: {mode: 'auto', segmenter: automaticSegmenter}};
+```
+
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
 [Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
 [Renderer outputs](https://qrcodesdk.dev/reference/renderers/) for output-specific options.
@@ -359,6 +368,7 @@ import {
   type QRCodeWebPImageOptions,
   type QRCodeWebPProps,
   alignment,
+  automaticSegmenter,
   canvasCenterImage,
   circle,
   customShape,
