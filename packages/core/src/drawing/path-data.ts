@@ -1,6 +1,11 @@
 import type {QRCodeDrawingLayer} from './types';
 
-// Bound shared fragments to QR module dimensions, independently of caller-supplied geometry.
+// Serialized moves and rectangle commands are shared across calls. Only integer values up to the
+// largest QR symbol are cached, so caller-supplied geometry cannot grow the cache. Rows cover
+// `dy` 0 and 1, the steps between consecutive module rectangles.
+const MAX_CACHED_DIMENSION = 177;
+// Process-wide limit. Once reached, further commands are serialized without caching.
+const MAX_CACHED_COMMANDS = 1024;
 type Move = {data: string; rectangles?: string[][]};
 const moves: Record<number, Move>[] = [{}, {}];
 let commandCount = 0;
@@ -25,7 +30,7 @@ export function toQRCodePathData({rects, tiles}: QRCodeDrawingLayer): string {
     let move = row?.[dx];
     if (move === undefined) {
       move = {data: `m${dx} ${dy}`};
-      if (row && Math.abs(dx) <= 177 && Number.isInteger(dx)) {
+      if (row && Math.abs(dx) <= MAX_CACHED_DIMENSION && Number.isInteger(dx)) {
         move.rectangles = [];
         row[dx] = move;
       }
@@ -35,11 +40,11 @@ export function toQRCodePathData({rects, tiles}: QRCodeDrawingLayer): string {
       command = `${move.data}h${width}v${height}h-${width}z`;
       if (
         move.rectangles &&
-        commandCount < 1024 &&
+        commandCount < MAX_CACHED_COMMANDS &&
         width >>> 0 === width &&
         height >>> 0 === height &&
-        width <= 177 &&
-        height <= 177
+        width <= MAX_CACHED_DIMENSION &&
+        height <= MAX_CACHED_DIMENSION
       ) {
         (move.rectangles[height] ??= [])[width] = command;
         commandCount++;

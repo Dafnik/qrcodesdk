@@ -47,7 +47,7 @@ export function createQRCodeStyler(
       },
       claimArea(x, y, width, height) {
         validateRectangle('claimArea', x, y, width, height);
-        if (!width || !height) return;
+        if (width === 0 || height === 0) return;
         const startX = Math.floor(x);
         const startY = Math.floor(y);
         areas.push(startX, startY, Math.ceil(x + width) - startX, Math.ceil(y + height) - startY);
@@ -217,8 +217,8 @@ function drawModules(
       }
     }
   }
-  // Last row, width, and rectangle index for each starting column.
-  const runs = new Array<number>(n * 3);
+  // Last row, width, and rectangle index for each starting column. -2 marks no previous run.
+  const runs = new Int32Array(n * 3).fill(-2);
   for (let y = 0; y < n; y++) {
     for (let x = 0, index = (y + 1) * stride + 1; x < n; x++, index++) {
       if (cells[index] === 1) {
