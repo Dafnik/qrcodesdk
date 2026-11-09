@@ -151,8 +151,10 @@ const webp = builder.render(QRCodeWebPRenderer({centerImage}));
 across the PNG, WebP, GIF, and JPEG renderers. GIF output reduces the image to at most 256 colors and
 binary transparency, so prefer PNG or WebP for logos with soft transparent edges. For a photographic
 center image, JPEG keeps the file small because its lossy compression suits photos. Its default
-quality is 92. JPEG has no transparency, so transparent parts of the
-image are blended onto `transparency.matte`, white by default.
+quality is 92. The center image is drawn over the QR background before JPEG encoding, so its
+transparent pixels show that background. With the default opaque white background, they stay white
+whatever `transparency.matte` is. The matte, white by default, fills only transparency that remains
+after compositing, such as a transparent background color.
 
 ## Use prepared sources in framework components
 
@@ -302,8 +304,9 @@ four-module quiet zone, increase module size, simplify curved styling, or shorte
 
 ## Caveats
 
-- GIF output reduces the image to at most 256 colors and binary transparency. JPEG output blends
-  transparent image pixels onto its matte color.
+- GIF output reduces the image to at most 256 colors and binary transparency. JPEG output shows
+  the QR background through transparent image pixels; `transparency.matte` applies only where the
+  background is also transparent.
 - `rasterCenterImage()` accepts only PNG bytes, up to 16 MiB and 16,777,216 pixels.
 - `svgCenterImage()` checks the data URL format but does not inspect the embedded image. Validate
   uploaded images before embedding them.

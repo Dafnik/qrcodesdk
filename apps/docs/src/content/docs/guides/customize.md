@@ -20,7 +20,9 @@ changing the encoded matrix.
 
 ## Before you start
 
-- Install `@qrcodesdk/core`, or the framework package you render with. See
+- Install the package for your output: `@qrcodesdk/core` for SVG and text,
+  `@qrcodesdk/browser` for Canvas and browser Images, `@qrcodesdk/node` for Node.js PNG, WebP,
+  GIF, and JPEG Buffers, or the framework package you render with. See
   [Choose your setup](/getting-started/choose-your-setup/).
 - Render one unstyled QR code first, so you can compare styled output against it.
 - Have the scanner apps and devices that your users will scan with. Styling can make a code harder

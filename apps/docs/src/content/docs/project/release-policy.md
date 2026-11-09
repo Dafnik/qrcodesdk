@@ -28,13 +28,13 @@ package manager installs a single copy.
 
 ## Runtime versions
 
-| Package              | Declared runtime requirement                                            |
-| -------------------- | ----------------------------------------------------------------------- |
-| `@qrcodesdk/core`    | Native ESM, ES2020, and a global `TextEncoder`; no `engines` field      |
-| `@qrcodesdk/browser` | Current evergreen browsers with DOM and Canvas 2D APIs                  |
-| `@qrcodesdk/node`    | Node.js 22.0.0 or newer (`engines.node: ">=22.0.0"`)                    |
-| `@qrcodesdk/cli`     | Node.js 22.12.0 or newer (`engines.node: ">=22.12.0"`)                  |
-| Framework packages   | The browser requirements above plus the framework versions listed below |
+| Package              | Declared runtime requirement                                                                                                                   |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@qrcodesdk/core`    | Native ESM, ES2020, and a global `TextEncoder`; no `engines` field                                                                             |
+| `@qrcodesdk/browser` | Current evergreen browsers with DOM and Canvas 2D APIs                                                                                         |
+| `@qrcodesdk/node`    | Node.js 22.0.0 or newer (`engines.node: ">=22.0.0"`)                                                                                           |
+| `@qrcodesdk/cli`     | Node.js 22.12.0 or newer (`engines.node: ">=22.12.0"`)                                                                                         |
+| Framework packages   | The framework versions below; Image and Canvas components also need the browser requirements above, while `QRCodeSVG` can render on the server |
 
 See [Runtime compatibility](/packages/core/#runtime-compatibility) for Core's Node.js, Deno, Bun,
 and browser support policy.

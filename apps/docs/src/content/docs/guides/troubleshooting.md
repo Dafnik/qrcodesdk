@@ -22,14 +22,16 @@ some problems, such as a missing center image, produce output without an error.
 
 ## Find the error code
 
-Log the code and details instead of the message:
+Log the code instead of the message or the whole error. `details` can contain user input: for
+`INVALID_PAYLOAD`, `details.payload` holds the rejected payload. Add a `details` key to your logs only
+after you check that it holds no sensitive values.
 
 ```ts
 try {
   // Render the QR code.
 } catch (error) {
   if (error instanceof Error && error.name === 'QRCodeError') {
-    console.error((error as Error & {code: string}).code, error);
+    console.error('QR code error:', (error as Error & {code: string}).code);
   }
   throw error;
 }

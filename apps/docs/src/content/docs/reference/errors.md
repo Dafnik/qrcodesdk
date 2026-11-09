@@ -32,7 +32,8 @@ import {QRCodeError, type QRCodeErrorCode, QR_CODE_ERROR_CODES} from '@qrcodesdk
 
 TypeScript types `name` as `string`, as inherited from `Error`, so it does not narrow the error type.
 `QR_CODE_ERROR_CODES` lists every code as a readonly array. `details` contains plain values for
-logging and diagnostics. Its keys are listed per code below; treat any other key as informal.
+diagnostics. Its keys are listed per code below; treat any other key as informal. Some keys, such as
+`payload` and `value`, can hold user input, so check them before you write them to logs.
 
 ## Error codes
 

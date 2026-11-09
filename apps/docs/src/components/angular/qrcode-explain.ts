@@ -486,7 +486,18 @@ export class QRCodeExplain {
     if (!(target instanceof SVGElement)) return;
     const interactive = target.closest<SVGElement>('[data-group]');
     if (interactive === null) return;
-    this.togglePinnedSelection(this.selectionFromElement(interactive));
+    const selection = this.selectionFromElement(interactive);
+    const unpinning =
+      selection !== undefined && this.pinnedSelection()?.groupId === selection.groupId;
+    this.togglePinnedSelection(selection);
+    // Touch and pen fire `pointerleave` before `click`, so no later event clears the preview.
+    if (
+      unpinning &&
+      event instanceof PointerEvent &&
+      (event.pointerType === 'touch' || event.pointerType === 'pen')
+    ) {
+      this.previewSelection.set(undefined);
+    }
   }
 
   protected onSvgFocus(): void {
