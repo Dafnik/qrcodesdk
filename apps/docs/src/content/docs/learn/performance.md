@@ -6,11 +6,11 @@ docType: concept
 
 <!-- Generated from benchmark-results/latest.json. Run `pnpm turbo run generate-performance --filter=docs` to update. -->
 
-The matrix, automatic matrix, and SVG benchmarks compare QRCodeSDK with **qrcode** and **qrcode-generator** using its stock text encoder. Styled SVG generation compares QRCodeSDK with **qr-code-styling**. Benchmarks are environment-specific and should be read as relative comparisons, not universal guarantees.
+The matrix, automatic matrix, and SVG benchmarks compare QRCodeSDK with `qrcode` and with `qrcode-generator` using its stock text encoder. Styled SVG generation compares QRCodeSDK with `qr-code-styling`. Results depend on the machine and runtime, so compare the libraries with each other rather than reading the numbers as absolute speeds.
 
-The matrix and SVG fixtures supply explicit versions and masks. The **qrcode-generator** rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them.
+The matrix and SVG fixtures supply explicit versions and masks. The `qrcode-generator` rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them.
 
-Styled SVG generation uses all 60 shared styling fixtures at 1, 10, 50 repetitions. Both libraries select the mask automatically because **qr-code-styling** has no public mask option. Fixture module size and margin determine the matching pixel dimensions passed to **qr-code-styling**, which renders SVG through a shared JSDOM environment initialized before measurement.
+Styled SVG generation uses all 60 shared styling fixtures at 1, 10, and 50 repetitions. Both libraries select the mask automatically because `qr-code-styling` has no public mask option. Fixture module size and margin determine the matching pixel dimensions passed to `qr-code-styling`, which renders SVG through a shared JSDOM environment initialized before measurement.
 
 ## Benchmark environment
 
@@ -34,9 +34,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Matrix generation: Static fixtures ×1 — 17 QR codes/sample
+  accTitle: Matrix generation, Static fixtures ×1, 17 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 12,353 QR codes per second, qrcode 6,032 QR codes per second, qrcode-generator 1,808 QR codes per second. Higher is better.
-  title "Static fixtures ×1 — 17 QR codes/sample"
+  title "Static fixtures ×1, 17 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 15000
   bar [12353, 6032, 1808]
@@ -50,9 +50,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Matrix generation: Static fixtures ×10 — 170 QR codes/sample
+  accTitle: Matrix generation, Static fixtures ×10, 170 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 12,774 QR codes per second, qrcode 6,093 QR codes per second, qrcode-generator 1,821 QR codes per second. Higher is better.
-  title "Static fixtures ×10 — 170 QR codes/sample"
+  title "Static fixtures ×10, 170 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 15000
   bar [12774, 6093, 1821]
@@ -66,9 +66,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Matrix generation: Static fixtures ×100 — 1,700 QR codes/sample
+  accTitle: Matrix generation, Static fixtures ×100, 1,700 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 12,509 QR codes per second, qrcode 6,125 QR codes per second, qrcode-generator 1,777 QR codes per second. Higher is better.
-  title "Static fixtures ×100 — 1,700 QR codes/sample"
+  title "Static fixtures ×100, 1,700 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 15000
   bar [12509, 6125, 1777]
@@ -82,9 +82,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Matrix generation: All combinations ×1 — 3,840 QR codes/sample
+  accTitle: Matrix generation, All combinations ×1, 3,840 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 7,193 QR codes per second, qrcode 4,451 QR codes per second, qrcode-generator 1,145 QR codes per second. Higher is better.
-  title "All combinations ×1 — 3,840 QR codes/sample"
+  title "All combinations ×1, 3,840 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 8000
   bar [7193, 4451, 1145]
@@ -120,9 +120,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Automatic matrix generation: Static fixtures ×1 — 17 QR codes/sample
+  accTitle: Automatic matrix generation, Static fixtures ×1, 17 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 1,511 QR codes per second, qrcode 839 QR codes per second, qrcode-generator 141 QR codes per second. Higher is better.
-  title "Static fixtures ×1 — 17 QR codes/sample"
+  title "Static fixtures ×1, 17 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 2000
   bar [1511, 839, 141]
@@ -136,9 +136,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Automatic matrix generation: Static fixtures ×10 — 170 QR codes/sample
+  accTitle: Automatic matrix generation, Static fixtures ×10, 170 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 1,521 QR codes per second, qrcode 831 QR codes per second, qrcode-generator 141 QR codes per second. Higher is better.
-  title "Static fixtures ×10 — 170 QR codes/sample"
+  title "Static fixtures ×10, 170 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 2000
   bar [1521, 831, 141]
@@ -152,9 +152,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Automatic matrix generation: Static fixtures ×100 — 1,700 QR codes/sample
+  accTitle: Automatic matrix generation, Static fixtures ×100, 1,700 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 1,517 QR codes per second, qrcode 834 QR codes per second, qrcode-generator 140 QR codes per second. Higher is better.
-  title "Static fixtures ×100 — 1,700 QR codes/sample"
+  title "Static fixtures ×100, 1,700 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 2000
   bar [1517, 834, 140]
@@ -187,9 +187,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: SVG generation: Static fixtures ×1 — 17 QR codes/sample
+  accTitle: SVG generation, Static fixtures ×1, 17 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 7,144 QR codes per second, qrcode 4,329 QR codes per second, qrcode-generator 1,309 QR codes per second. Higher is better.
-  title "Static fixtures ×1 — 17 QR codes/sample"
+  title "Static fixtures ×1, 17 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 8000
   bar [7144, 4329, 1309]
@@ -203,9 +203,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: SVG generation: Static fixtures ×10 — 170 QR codes/sample
+  accTitle: SVG generation, Static fixtures ×10, 170 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 7,352 QR codes per second, qrcode 4,327 QR codes per second, qrcode-generator 1,485 QR codes per second. Higher is better.
-  title "Static fixtures ×10 — 170 QR codes/sample"
+  title "Static fixtures ×10, 170 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 8500
   bar [7352, 4327, 1485]
@@ -219,9 +219,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: SVG generation: Static fixtures ×100 — 1,700 QR codes/sample
+  accTitle: SVG generation, Static fixtures ×100, 1,700 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 7,466 QR codes per second, qrcode 4,283 QR codes per second, qrcode-generator 1,510 QR codes per second. Higher is better.
-  title "Static fixtures ×100 — 1,700 QR codes/sample"
+  title "Static fixtures ×100, 1,700 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 8500
   bar [7466, 4283, 1510]
@@ -235,9 +235,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: SVG generation: All combinations ×1 — 3,840 QR codes/sample
+  accTitle: SVG generation, All combinations ×1, 3,840 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 3,946 QR codes per second, qrcode 2,816 QR codes per second, qrcode-generator 916 QR codes per second. Higher is better.
-  title "All combinations ×1 — 3,840 QR codes/sample"
+  title "All combinations ×1, 3,840 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qrcode", "qrcode-generator"]
   y-axis "QR codes/second" 0 --> 4500
   bar [3946, 2816, 916]
@@ -273,9 +273,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Styled SVG generation: Styled fixtures ×1 — 60 QR codes/sample
+  accTitle: Styled SVG generation, Styled fixtures ×1, 60 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 5,826 QR codes per second, qr-code-styling 130 QR codes per second. Higher is better.
-  title "Styled fixtures ×1 — 60 QR codes/sample"
+  title "Styled fixtures ×1, 60 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qr-code-styling"]
   y-axis "QR codes/second" 0 --> 6500
   bar [5826, 130]
@@ -289,9 +289,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Styled SVG generation: Styled fixtures ×10 — 600 QR codes/sample
+  accTitle: Styled SVG generation, Styled fixtures ×10, 600 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 6,246 QR codes per second, qr-code-styling 130 QR codes per second. Higher is better.
-  title "Styled fixtures ×10 — 600 QR codes/sample"
+  title "Styled fixtures ×10, 600 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qr-code-styling"]
   y-axis "QR codes/second" 0 --> 7000
   bar [6246, 130]
@@ -305,9 +305,9 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: Styled SVG generation: Styled fixtures ×50 — 3,000 QR codes/sample
+  accTitle: Styled SVG generation, Styled fixtures ×50, 3,000 QR codes/sample
   accDescr: Throughput calculated from median time. QRCodeSDK 6,382 QR codes per second, qr-code-styling 130 QR codes per second. Higher is better.
-  title "Styled fixtures ×50 — 3,000 QR codes/sample"
+  title "Styled fixtures ×50, 3,000 QR codes/sample"
   x-axis "Library" ["QRCodeSDK", "qr-code-styling"]
   y-axis "QR codes/second" 0 --> 7500
   bar [6382, 130]

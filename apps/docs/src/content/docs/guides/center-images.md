@@ -11,21 +11,41 @@ related:
   - ../reference/renderers/png.mdx
   - ../reference/renderers/webp.md
   - ../reference/renderers/gif.md
+  - ../reference/errors.md
+  - ./troubleshooting.md
 ---
 
 A center image covers encoded modules. Use high error correction with `.errorCorrection('H')` or
 `errorCorrectionLevel: 'H'`, start with a small image, and test the result with scanners.
 
+## Before you start
+
+- Install the package for your output: `@qrcodesdk/core` for SVG, `@qrcodesdk/browser` for Canvas and
+  Image elements, `@qrcodesdk/node` for PNG, WebP, GIF, and JPEG Buffers, or your framework package.
+- Have the image available to your application: a file or bytes for SVG and Node.js output, or a
+  same-origin or CORS-enabled URL for browser output. QRCodeSDK does not fetch URLs or read files.
+- Prefer a simple logo with a transparent or solid background. Photos and fine detail are hard to
+  recognize at center-image sizes.
+
 ## Configure the center image
 
-Create the center image with the factory for your output:
+Create the center image with the factory for your output. This example embeds a small SVG logo as a
+data URL; the next section shows how to prepare sources from files and URLs:
 
 ```ts
-import {QRCodeSVGRenderer, svgCenterImage} from '@qrcodesdk/core';
+import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
 
-QRCodeSVGRenderer({
-  centerImage: svgCenterImage(preparedSource, {size: 0.3, padding: 1, clearBackground: true}),
-});
+const logo: QRCodeDataImageURL = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#e11d48"/></svg>',
+)}`;
+
+const svg = qrcode('https://qrcodesdk.dev')
+  .errorCorrection('H')
+  .render(
+    QRCodeSVGRenderer({
+      centerImage: svgCenterImage(logo, {size: 0.3, padding: 1, clearBackground: true}),
+    }),
+  );
 ```
 
 The factories share these layout options:
@@ -37,17 +57,23 @@ The factories share these layout options:
 | `clearBackground` |  `true` | `boolean`                                      | Removes every module the image or its padding touches        |
 
 The image fits inside the centered square without cropping. Clearing removes whole modules, so the
-cleared area can be slightly larger than the image box plus padding. When clearing is enabled,
-`finder()` and `alignment()` omit any whole pattern that overlaps the cleared area. Without clearing,
-the image is drawn over the modules and patterns. Start with `size: 0.2` to `0.3` and increase it
-only after testing.
+cleared area can be slightly larger than the image box plus padding.
+
+Patterns styled with `finder()` or `alignment()` are cleared as a unit. A pattern is omitted only
+when the cleared area covers every one of its modules. A partially covered pattern is drawn in full,
+and the image is drawn over the part it overlaps. Alignment patterns without an `alignment()` style
+are ordinary modules, so clearing removes the covered modules individually.
+
+Without clearing, the image is drawn over the modules and patterns. Start with `size: 0.2` to `0.3`
+and increase it only after testing.
 
 Factories check numeric layout constraints when they are called and throw `INVALID_OPTIONS` for
 invalid values.
 
 Center-image values are opaque and belong to the factory that created them. Pass the original value
 to the matching renderer. Copying it with object spread or JSON does not preserve it. Custom objects
-with rendering callbacks are unsupported.
+with rendering callbacks are unsupported. A renderer ignores a value it does not recognize without
+throwing; see [The center image is missing](/guides/troubleshooting/#the-center-image-is-missing).
 
 ## Choose and prepare a source
 
@@ -97,10 +123,14 @@ const canvas = qrcode('https://qrcodesdk.dev')
   .render(QRCodeCanvasRenderer({centerImage: canvasCenterImage(source, {size: 0.3})}));
 ```
 
-The source is checked when rendering: unloaded or zero-sized sources throw synchronously. When you
-render an Image element, export a Canvas, or create a data URL, the browser must also keep the
-Canvas origin-clean. Use a same-origin image or a cross-origin image served with CORS permission and
-loaded with the matching `crossOrigin` setting.
+The source is checked when rendering: unloaded or zero-sized sources throw `INVALID_IMAGE_SOURCE`
+synchronously. When you render an Image element, export a Canvas, or create a data URL, the browser
+must also keep the Canvas origin-clean. Use a same-origin image or a cross-origin image served with
+CORS permission and loaded with the matching `crossOrigin` setting. Otherwise Image element
+rendering throws `RENDER_FAILED`; see [The canvas is tainted](/guides/troubleshooting/#the-canvas-is-tainted).
+
+`image.decode()` rejects when the image cannot be loaded. Show the failure and offer a retry, as in
+[The center image fails to load](/guides/troubleshooting/#the-center-image-fails-to-load).
 
 ### PNG bytes for Node.js raster output
 
@@ -129,7 +159,11 @@ image are blended onto `transparency.matte`, white by default.
 React, Vue, Svelte, and Angular do not load image sources inside their QR components. Prepare
 browser sources in application state, then pass stable options after decoding. PNG, WebP, GIF, JPEG,
 and Canvas components take `canvasCenterImage()`, and SVG components take `svgCenterImage()`. Every framework
-package exports both factories, so import them from the same package as the component.
+package exports both factories. Import them from the same package as the component, so the component
+recognizes the value.
+
+The examples below render after a button press and omit error handling for brevity. In production,
+catch a failed `image.decode()`, keep showing the QR code without the image, and tell the user.
 
 ### React
 
@@ -266,6 +300,20 @@ after taking screenshots, optimizing images, printing, or compressing. Use sever
 and representative devices. If scanning is unreliable, reduce the image, restore padding and the
 four-module quiet zone, increase module size, simplify curved styling, or shorten the payload.
 
+## Caveats
+
+- GIF output reduces the image to at most 256 colors and binary transparency. JPEG output blends
+  transparent image pixels onto its matte color.
+- `rasterCenterImage()` accepts only PNG bytes, up to 16 MiB and 16,777,216 pixels.
+- `svgCenterImage()` checks the data URL format but does not inspect the embedded image. Validate
+  uploaded images before embedding them.
+- Next.js cannot pass center-image values from a Server Component to a Client Component.
+
 For exact source constraints, see the [SVG](/reference/renderers/svg/),
 [Canvas](/reference/renderers/canvas/), [Image element](/reference/renderers/image/), or
 [PNG Buffer](/reference/renderers/png/#center-image) reference.
+
+## Next step
+
+Offer the result as a file with [Download or save](/guides/download-or-save/), or return it from a
+server with [Serve a QR code](/guides/server-output/).

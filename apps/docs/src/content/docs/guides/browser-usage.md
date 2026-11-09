@@ -11,7 +11,20 @@ related:
   - ../reference/renderers/image.md
   - ./customize.md
   - ./download-or-save.md
+  - ./troubleshooting.md
 ---
+
+Render a QR code in browser code, insert it into the page, and keep it accessible and sharp.
+
+## Before you start
+
+- Install `@qrcodesdk/core`. Image and Canvas output also need `@qrcodesdk/browser`; see
+  [Choose your setup](/getting-started/choose-your-setup/).
+- Run the code in the browser, after the DOM exists. React, Vue, Svelte, and Angular applications
+  can use their [framework components](/getting-started/choose-your-setup/#choose-a-package)
+  instead.
+- Decide what the QR code opens, and write a short label for it, such as "Scan to open
+  qrcodesdk.dev".
 
 ## Choose a browser output
 
@@ -110,10 +123,12 @@ DOM. Pick the renderer by the encoded format:
 | `QRCodeJPEGImageRenderer` | `@qrcodesdk/browser/jpeg` | Lossy JPEG on a solid matte color, for destinations that require JPEG |
 
 Each format has its own entry point, so a bundle only includes the encoder it imports. WebP, GIF,
-and JPEG use encoders bundled in the SDK and produce the same bytes in every browser, including
-Safari, which cannot encode WebP natively. The bundled JPEG encoder also blends transparent pixels
-onto a white matte, where the browser's own JPEG encoding would turn them black. All four accept the
-same options. See the [Image element renderers reference](/reference/renderers/image/) for the format differences.
+and JPEG use encoders bundled in the SDK, so they also work in Safari, which cannot encode WebP
+natively. Each browser still draws the Canvas that feeds the encoder, and anti-aliasing of shaped
+modules and center images can differ between browsers. The bundled encoders produce identical bytes
+only from identical pixels. The bundled JPEG encoder also blends transparent pixels onto a white
+matte, where the browser's own JPEG encoding would turn them black. All four accept the same
+options. See the [Image element renderers reference](/reference/renderers/image/) for the format differences.
 
 ### Insert and style it
 
@@ -124,9 +139,8 @@ import {qrcode} from '@qrcodesdk/core';
 const image = qrcode('https://qrcodesdk.dev').render(
   QRCodePNGImageRenderer({
     accessibility: {
-      alt: 'QR code for qrcodesdk.dev',
-      ariaLabel: 'Scan to open qrcodesdk.dev',
-      title: 'QR code for qrcodesdk.dev',
+      alt: 'QR code: scan to open qrcodesdk.dev',
+      title: 'Scan to open qrcodesdk.dev',
     },
   }),
 );
@@ -149,25 +163,43 @@ document.querySelector('#qrcode')?.append(image);
 
 ### Use the data URL
 
-Read `src` when another browser API needs the encoded image rather than the element:
+Read `src` when another browser API needs the encoded image rather than the element. This example
+copies the QR code to the clipboard from a button:
+
+```html
+<button id="copy-qrcode" type="button">Copy QR code</button>
+<p id="copy-status" role="status"></p>
+```
 
 ```ts
 import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {qrcode} from '@qrcodesdk/core';
 
-const image = qrcode('https://qrcodesdk.dev').render(QRCodePNGImageRenderer());
-const response = await fetch(image.src);
-const png = await response.blob();
+const renderer = QRCodePNGImageRenderer();
+const status = document.querySelector('#copy-status');
 
-await navigator.clipboard.write([
-  new ClipboardItem({
-    'image/png': png,
-  }),
-]);
+document.querySelector('#copy-qrcode')?.addEventListener('click', async () => {
+  const image = qrcode('https://qrcodesdk.dev').render(renderer);
+
+  try {
+    // Call write() synchronously in the click handler and pass the Blob as a promise.
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'image/png': fetch(image.src).then((response) => response.blob()),
+      }),
+    ]);
+    if (status) status.textContent = 'QR code copied.';
+  } catch {
+    if (status) status.textContent = 'Copying failed. Download the QR code instead.';
+  }
+});
 ```
 
-The Clipboard API requires a secure context and may require a user gesture or permission. Browsers
-reliably accept only `image/png` on the clipboard, so use the PNG renderer here.
+The Clipboard API requires a secure context and a user action, such as a click. Safari rejects
+`clipboard.write()` when the handler awaits other work first, such as `fetch()`, because the user
+action no longer counts by then. Passing a promise to `ClipboardItem` keeps the `write()` call
+inside the click. Browsers reliably accept only `image/png` on the clipboard, so use the PNG
+renderer here.
 
 ## Canvas element
 
@@ -227,7 +259,7 @@ const container = document.querySelector('#qrcode');
 
 export function updateQRCode(payload: string) {
   const image = qrcode(payload).render(
-    QRCodePNGImageRenderer({accessibility: {alt: '', ariaLabel: `Scan to open ${payload}`}}),
+    QRCodePNGImageRenderer({accessibility: {alt: `QR code: scan to open ${payload}`}}),
   );
 
   container?.replaceChildren(image);
@@ -237,11 +269,56 @@ export function updateQRCode(payload: string) {
 If application state changes frequently, render again only when the payload or options change. In
 React, Vue, Svelte, or Angular, you can use the framework components instead.
 
-## Keep browser output reliable
+Use `alt` as the Image element's text alternative. An empty `alt` marks the image as decorative, so
+use it only when nearby content, such as a visible link to the same destination, already gives the
+QR code's meaning. Do not combine an empty `alt` with `ariaLabel`.
+
+## Size it responsively
+
+Each renderer sets a fixed `width` and `height` on its output. Let CSS shrink it to the available
+space instead, and keep the square aspect ratio:
+
+```css
+.qrcode-container {
+  display: block;
+  width: min(100%, 20rem);
+}
+
+.qrcode-container > :is(svg, img, canvas) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+```
+
+The same CSS works with framework components. Pass `qrcode-container` as the `className` prop in
+React or the `class` attribute in Vue, Svelte, and Angular. React, Vue, and Svelte components apply
+it to their wrapper `<div>`. Angular components apply it to their host element, such as
+`<qrcode-svg>`; see the component props on each framework package page, for example
+[React](/packages/react/#components) or [Angular](/packages/angular/#components).
+
+Raster output (Image and Canvas) stays sharp only up to its rendered pixel size. Set
+`style.moduleSize` so the rendered width is at least the largest CSS width multiplied by the
+device pixel ratio, which is 2 or 3 on most phones. SVG stays sharp at every size.
+
+## Verify the result
+
+Open the page, check that exactly one QR code appears in the container, and scan it. Check the
+accessible name with your browser's accessibility inspector or a screen reader.
+
+## Caveats
 
 - Keep the default four-module quiet zone clear of nearby text, borders, and other UI.
-- Give meaningful SVG, Image or Canvas output an accessible label.
+- Give meaningful SVG, Image, or Canvas output an accessible label. Unlabeled SVG and Canvas output
+  gets `aria-hidden="true"`, and unlabeled Image output gets an empty `alt`.
 - Use CSS to shrink output responsively, but do not enlarge Image or Canvas output beyond its
   rendered pixel dimensions. Increase `style.moduleSize` when more raster resolution is needed.
+- Renderers throw `QRCodeError` for payloads that do not fit and for invalid options. See the
+  [errors reference](/reference/errors/).
 - Scan-test the final page at its smallest supported viewport and after any CSS transforms, browser
   zoom, screenshots, or image compression.
+
+## Next step
+
+Let users save the QR code with [Download or save](/guides/download-or-save/), or style it with
+[Customize appearance](/guides/customize/).

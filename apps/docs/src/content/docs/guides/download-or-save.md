@@ -16,6 +16,15 @@ related:
 
 Choose the file format first, then follow the instructions for your runtime or framework.
 
+## Before you start
+
+- Install the package for your runtime: `@qrcodesdk/browser` for browser downloads,
+  `@qrcodesdk/node` for raster files in Node.js, or your framework package. SVG needs only
+  `@qrcodesdk/core`.
+- Browser downloads must run from a user action, such as a button click, when the browser requires
+  one. If a download does nothing, see
+  [A download does nothing](/guides/troubleshooting/#a-download-does-nothing).
+
 ## Choose a file format
 
 | Choose | When                                                                     | Source output                                             |
@@ -34,7 +43,7 @@ as PNG or WebP.
 
 Raster formats have a fixed pixel size. Set `style.moduleSize` to provide enough pixels for the
 largest display or print size you need. The image width and height are
-`moduleSize × (matrix width + 2 × quietZone)`.
+`moduleSize × (matrix width + 2 × quietZone)`. See [Size a file for print](#size-a-file-for-print).
 
 ## Download in the browser
 
@@ -166,9 +175,14 @@ canvas.toBlob((blob) => {
   link.href = url;
   link.download = 'qrcodesdk.png';
   link.click();
-  URL.revokeObjectURL(url);
+  // Some browsers start the download asynchronously; revoking at once can cancel it.
+  setTimeout(() => URL.revokeObjectURL(url), 40_000);
 }, 'image/png');
 ```
+
+The 40-second delay matches the SDK's own SVG download helper. `toBlob()` throws a `SecurityError`
+when a cross-origin center image tainted the Canvas; see
+[The canvas is tainted](/guides/troubleshooting/#the-canvas-is-tainted).
 
 ## Save from Node.js
 
@@ -192,8 +206,45 @@ await writeFile('qrcode.gif', qrcode('GIF').render(QRCodeGIFRenderer()));
 await writeFile('qrcode.jpg', qrcode('JPEG').render(QRCodeJPEGRenderer()));
 ```
 
+`writeFile()` overwrites an existing file and fails when the parent directory does not exist.
+
 For shell scripts or CI, the [CLI](/packages/cli/) writes any of these formats from `--output`
-without application code.
+without application code. Pass `--module-size 8 --quiet-zone 4` for raster files, because the CLI
+defaults to one pixel per module.
+
+## Size a file for print
+
+Prefer SVG for print. It has no pixel size, so set the printed width in your layout tool. For a
+raster file, calculate `style.moduleSize` from the printed width and the printer's resolution:
+
+1. Generate the matrix with the same payload and matrix options, and read its width:
+   `qrcode('https://qrcodesdk.dev').matrix().size` is `25` modules.
+2. Add the quiet zone on both sides: `25 + 2 × 4 = 33` modules across.
+3. Convert the printed width, including the quiet zone, to pixels: 30 mm at 300 DPI is
+   `30 ÷ 25.4 × 300 ≈ 354` pixels.
+4. Divide and round up, so every module covers whole pixels: `354 ÷ 33 ≈ 10.7`, so use
+   `moduleSize: 11`.
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {QRCodePNGRenderer} from '@qrcodesdk/node';
+
+const png = qrcode('https://qrcodesdk.dev').render(
+  QRCodePNGRenderer({style: {moduleSize: 11, quietZone: 4}}),
+);
+```
+
+The file is `11 × 33 = 363` pixels wide. Place it at 30 mm in the layout, which prints it at about
+307 DPI, and each module is about 0.9 mm wide. Rounding down instead would print below 300 DPI.
+
+Longer payloads have more modules, so the same printed width gives smaller modules. Print a test copy
+at the final size and scan it with several phones from the distance your readers will use. If it
+scans slowly, print it larger, shorten the payload, or remove a center image.
+
+## Verify the result
+
+Open the saved file in an image viewer and scan it at the size you will display or print it. Check
+that the file extension matches the format.
 
 ## Next step
 

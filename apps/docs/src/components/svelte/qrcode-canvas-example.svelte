@@ -1,7 +1,10 @@
 <script lang="ts">
   import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/svelte';
 
-  const options: QRCodeCanvasOptions = {style: {moduleSize: 8, quietZone: 2}};
+  const options: QRCodeCanvasOptions = {
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+  };
 </script>
 
-<QRCodeCanvas class="mx-auto" payload="https://qrcodesdk.dev" {options} />
+<QRCodeCanvas payload="https://qrcodesdk.dev" {options} />

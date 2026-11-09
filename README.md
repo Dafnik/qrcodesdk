@@ -26,7 +26,7 @@ vp add @qrcodesdk/core
 **deno**
 
 ```sh
-deno add @qrcodesdk/core
+deno add npm:@qrcodesdk/core
 ```
 
 **bun**

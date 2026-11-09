@@ -32,7 +32,7 @@ vp add @qrcodesdk/core @qrcodesdk/node
 **deno**
 
 ```sh
-deno add @qrcodesdk/core @qrcodesdk/node
+deno add npm:@qrcodesdk/core npm:@qrcodesdk/node
 ```
 
 **bun**

@@ -2,9 +2,9 @@
   import {QRCodePNG, type QRCodePNGImageOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodePNGImageOptions = {
-    style: {moduleSize: 8, quietZone: 2},
-    accessibility: {alt: 'QR code for qrcodesdk.dev'},
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
   };
 </script>
 
-<QRCodePNG class="mx-auto" payload="https://qrcodesdk.dev" {options} />
+<QRCodePNG payload="https://qrcodesdk.dev" {options} />

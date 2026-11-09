@@ -7,6 +7,7 @@ related:
   - ../../packages/node.mdx
   - ./png.mdx
   - ./webp.md
+  - ./gif.md
   - ../../guides/download-or-save.md
   - ../../guides/server-output.md
 ---

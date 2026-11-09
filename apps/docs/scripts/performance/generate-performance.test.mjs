@@ -121,10 +121,11 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
   assert.match(markdown, /pnpm turbo run generate-performance --filter=docs/);
   assert.match(markdown, /skips automatic mask evaluation/);
   assert.match(markdown, /automatic matrix fixtures omit both options/);
-  assert.match(markdown, /qrcode-generator\*\* using its stock text encoder/);
+  assert.match(markdown, /`qrcode-generator` using its stock text encoder/);
+  assert.doesNotMatch(markdown, /\*\*|—/);
   assert.doesNotMatch(markdown, /TextEncoder|bundled UTF-8/);
-  assert.match(markdown, /all 60 shared styling fixtures at 1, 10, 50 repetitions/);
-  assert.match(markdown, /qr-code-styling\*\* has no public mask option/);
+  assert.match(markdown, /all 60 shared styling fixtures at 1, 10, and 50 repetitions/);
+  assert.match(markdown, /`qr-code-styling` has no public mask option/);
   assert.match(
     markdown,
     /3 timed samples after 5 static warm-up passes and 1 exhaustive warm-up pass/,
@@ -137,10 +138,11 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
   assert.match(markdown, /xychart horizontal/);
   assert.match(markdown, /showDataLabel: true/);
   assert.match(markdown, /showDataLabelOutsideBar: true/);
-  assert.match(markdown, /accTitle: Matrix generation: Static fixtures ×1 — 17 QR codes\/sample/);
+  assert.match(markdown, /accTitle: Matrix generation, Static fixtures ×1, 17 QR codes\/sample/);
+  assert.match(markdown, /title "Static fixtures ×1, 17 QR codes\/sample"/);
   assert.match(
     markdown,
-    /accTitle: Automatic matrix generation: Static fixtures ×1 — 17 QR codes\/sample/,
+    /accTitle: Automatic matrix generation, Static fixtures ×1, 17 QR codes\/sample/,
   );
   assert.match(markdown, /accDescr: Throughput calculated from median time\./);
   assert.match(markdown, /Higher is better\./);
@@ -163,7 +165,7 @@ test('generates accessible Mermaid charts and collapsible exact benchmark tables
 test('rejects unsupported or incomplete benchmark reports', () => {
   assert.throws(
     () => validateBenchmarkReport({...REPORT, schemaVersion: 5}),
-    /Unsupported benchmark schema version: 5/,
+    /Unsupported benchmark schema version: 5\. Expected 6\. Run `pnpm turbo run benchmark --filter=@repo\/benchmarks`/,
   );
   assert.throws(() => validateBenchmarkReport({...REPORT, results: []}), /non-empty array/);
   assert.throws(

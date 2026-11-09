@@ -11,11 +11,22 @@ related:
   - ../reference/renderers/image.md
   - ./center-images.md
   - ../reference/custom-renderers.md
+  - ./troubleshooting.md
 ---
 
 SVG, Canvas, browser Image, and Node.js PNG, WebP, GIF, and JPEG renderers accept the same
 `QRCodeVisualStyle`. Pass it to the renderer's `style` option. Styling changes the appearance without
 changing the encoded matrix.
+
+## Before you start
+
+- Install `@qrcodesdk/core`, or the framework package you render with. See
+  [Choose your setup](/getting-started/choose-your-setup/).
+- Render one unstyled QR code first, so you can compare styled output against it.
+- Have the scanner apps and devices that your users will scan with. Styling can make a code harder
+  to read, so you test the result in the last step.
+
+To try options visually before writing code, use the [Playground](/playground/).
 
 ## Apply a visual theme
 
@@ -60,8 +71,15 @@ style values for the matching style property. They expose no drawing methods.
 | `finder`     | square      | `QRCodeFinderStyle`, created with `finder({ring, center, color})` |
 | `alignment`  | `modules`   | `QRCodeAlignmentStyle`, created with `alignment({ring, center})`  |
 
-Colors must be exactly `#RRGGBB` or `#RRGGBBAA`, with case-insensitive hexadecimal digits. Alpha is
-preserved by all graphical renderers.
+Colors must be exactly `#RRGGBB` or `#RRGGBBAA`, with case-insensitive hexadecimal digits. How the
+alpha channel survives depends on the output format:
+
+| Output                     | Alpha behavior                                                                               |
+| -------------------------- | -------------------------------------------------------------------------------------------- |
+| SVG, Canvas, PNG, and WebP | Kept for every pixel                                                                         |
+| GIF                        | Each pixel becomes fully transparent or opaque at `transparency.threshold`, `128` by default |
+| JPEG                       | Blended onto the opaque `transparency.matte` color, `'#ffffff'` by default                   |
+| Terminal text              | Composited over white, because terminals have no alpha channel                               |
 
 The output width and height are `moduleSize × (matrix width + 2 × quietZone)`.
 
@@ -84,14 +102,14 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 Import a shape from `@qrcodesdk/core/style` and pass it as `modules`. To keep square modules, omit
 `modules`.
 
-| Shape                | Option   | Default | Effect                                                                 |
-| -------------------- | -------- | ------- | ---------------------------------------------------------------------- |
-| `rounded({radius})`  | `radius` | `0.5`   | Rounds module corners that face no dark neighbor; `0` to `1` modules   |
-| `diagonal({radius})` | `radius` | `0.5`   | Rounds only the top-left and bottom-right corners for a leaf-like look |
-| `circle({size})`     | `size`   | `1`     | Draws each module as a dot; diameter from `0.001` to `1`               |
+| Shape                | Option   | Default | Effect on modules                                                        |
+| -------------------- | -------- | ------- | ------------------------------------------------------------------------ |
+| `rounded({radius})`  | `radius` | `0.5`   | Rounds corners that face no dark neighbor; radius from `0` to `1` module |
+| `diagonal({radius})` | `radius` | `0.5`   | Like `rounded()`, but only top-left and bottom-right corners round       |
+| `circle({size})`     | `size`   | `1`     | Draws each module as a dot; diameter from `0.001` to `1` module          |
 
 Connected dark modules keep straight shared edges with `rounded()` and `diagonal()`. Modules drawn
-by finder/alignment styles or cleared for center images count as light neighbors, so the remaining modules round against
+by finder or alignment styles or cleared for center images count as light neighbors, so the remaining modules round against
 those boundaries. A `radius` of `1` gives the roundest result. Alignment patterns take the module
 shape unless you style them with [`alignment()`](#alignment-patterns).
 
@@ -105,7 +123,8 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer({style: {mo
 ## Finder patterns
 
 The three finder patterns in the corners stay square in the foreground color, even when `modules`
-has a shape. Pass `finder()` to shape or color them:
+has a shape. Scanners use them to find the code, as
+[How QR codes work](/learn/how-qr-codes-work/#function-patterns) explains. Pass `finder()` to shape or color them:
 
 ```ts
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -127,9 +146,14 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 | `center` | square     | Shape of the 3 × 3 finder center, such as `circle()`         |
 | `color`  | foreground | One RGB or RGBA hexadecimal color for both rings and centers |
 
-The ring and the center take any shape, independently of the module shape and of each other.
-`rounded()` and `diagonal()` scale their radius to the size of each finder piece. `circle()` always
-draws full circles for finder pieces; its `size` option only applies to modules.
+The ring and the center take any shape, independently of the module shape and of each other. Each
+shape draws a pattern piece as one closed outline, without looking at neighboring modules:
+
+| Shape        | Finder ring (7 × 7)                     | Finder center (3 × 3)                   |
+| ------------ | --------------------------------------- | --------------------------------------- |
+| `rounded()`  | All four corners, radius × 2.8          | All four corners, radius × 1.2          |
+| `diagonal()` | Top-left and bottom-right, radius × 2.8 | Top-left and bottom-right, radius × 1.2 |
+| `circle()`   | Full circular ring; ignores `size`      | Full circle; ignores `size`             |
 
 ## Alignment patterns
 
@@ -158,9 +182,19 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 | `center` | square     | Shape of the 1 × 1 alignment center, such as `circle()`      |
 | `color`  | foreground | One RGB or RGBA hexadecimal color for both rings and centers |
 
-As with `finder()`, `rounded()` and `diagonal()` scale their radius to each piece, and `circle()`
-draws full circles. `alignment()` without a `ring` or `center` draws square pieces, even when
-`modules` has a shape.
+Alignment pieces follow the same rules as finder pieces, with one difference for `circle()`. The
+1 × 1 alignment center is drawn like a module, so `circle({size})` shrinks it to the same dot as the
+modules:
+
+| Shape        | Alignment ring (5 × 5)                | Alignment center (1 × 1)                 |
+| ------------ | ------------------------------------- | ---------------------------------------- |
+| `rounded()`  | All four corners, radius × 2          | All four corners, radius capped at `0.5` |
+| `diagonal()` | Top-left and bottom-right, radius × 2 | Top-left and bottom-right, radius        |
+| `circle()`   | Full circular ring; ignores `size`    | Dot with diameter `size`                 |
+
+`alignment()` without a `ring` or `center` draws square pieces, even when `modules` has a shape.
+Without any `alignment` style, alignment modules are drawn as ordinary modules and round against
+their neighbors like data modules.
 
 ## Custom shapes
 
@@ -250,18 +284,43 @@ QRCodeTextRenderer({
 });
 ```
 
+Text output defaults to the graphical dimensions, `moduleSize: 5` and `quietZone: 4`, which print a
+version 1 code 145 columns wide. Use `moduleSize: 1` for terminals, as above and as the CLI does.
+
 ## Accessibility and center images
 
 Accessibility is output-specific and lives under `accessibility`. SVG and Canvas accept `ariaLabel`
-and `title`. Image accepts `alt`, `ariaLabel`, and `title`.
+and `title`. Image accepts `alt`, `ariaLabel`, and `title`. Unlabeled output is decorative: SVG and
+Canvas get `aria-hidden="true"`, and Image elements get an empty `alt`. Label every QR code whose
+meaning nearby content does not already give.
 
 Center images are also renderer options because their source types differ by runtime. Each renderer
 takes a center image created by its own factory, such as `svgCenterImage()`. See
 [Add a center image](/guides/center-images/) for preparation and sizing.
 
-## Scan reliability
+## Verify the result
+
+Render the styled code in its final format and size, then scan it with each app and device from
+[Before you start](#before-you-start). The code should open the same payload as the unstyled
+version.
+
+### Scan reliability
 
 The API accepts transparent colors, low contrast, a zero quiet zone, every shape, custom path data,
 and the full image-size range. Those values are structurally valid but can be hard to scan. Small
 `circle()` sizes and custom shapes that leave little of each module dark are harder to read. Test
 the final displayed or printed QR code on the devices and at the sizes used in production.
+
+## Caveats
+
+- Factories validate options when you call them and throw `QRCodeError` with code `INVALID_OPTIONS`
+  for values out of range. See the [errors reference](/reference/errors/#invalid_options).
+- Styles from `finder()` and `alignment()` cannot cross a React Server Component boundary. See
+  [Next.js client boundary](/packages/react/#nextjs-client-boundary).
+- Terminal text accepts only `moduleSize` and `quietZone` in `style`. Set its colors through `ansi`;
+  shapes and pattern styles do not apply.
+
+## Next step
+
+Add a logo with [Add a center image](/guides/center-images/), or compare output formats in
+[Renderer outputs](/reference/renderers/).

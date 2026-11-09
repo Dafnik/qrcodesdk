@@ -134,8 +134,19 @@ It loads built artifacts natively to avoid Vitest's module-export tracking overh
 against a previous build, set `QRCODESDK_BENCHMARK_CORE` to an absolute directory containing that
 build's `index.mjs`, `style.mjs`, `internal.mjs`, and their shared chunks.
 
-See [PUBLIC_API.md](./PUBLIC_API.md) for supported consumer entry points, the internal export
-boundary, and the breaking styling API changes.
+### Public API and internal exports
+
+- Supported consumer entry points are documented in the **Public API** section of each package page,
+  for example [`packages/core.mdx`](apps/docs/src/content/docs/packages/core.mdx#public-api). The
+  `exports` field of each package's `package.json` lists every published subpath.
+- Exports that exist only for other `@qrcodesdk` packages live in `@qrcodesdk/core/internal`,
+  `@qrcodesdk/core/internal/gif`, `@qrcodesdk/core/internal/jpeg`, and
+  `@qrcodesdk/core/internal/webp`. Their names start with `ɵ`, as [AGENTS.md](./AGENTS.md) requires.
+  [`verify-package-artifact.mjs`](packages/core-testing/scripts/verify-package-artifact.mjs) checks
+  the published entry points and the dependency policy between packages.
+- The breaking styling API changes, including the move to `@qrcodesdk/core/style` factories and
+  the removal of `@qrcodesdk/core/drawing`, are recorded under 0.0.5 in the
+  [core changelog](packages/core/CHANGELOG.md).
 
 ### Updating snapshots
 

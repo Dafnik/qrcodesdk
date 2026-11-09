@@ -33,7 +33,7 @@ import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
-  QRCodePNGImageRenderer({accessibility: {alt: 'Scan to open qrcodesdk.dev'}}),
+  QRCodePNGImageRenderer({accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'}}),
 );
 ```
 
@@ -45,7 +45,9 @@ for insertion and data URL examples.
 
 Each renderer synchronously returns a new `HTMLImageElement`. Its `src` is a data URL encoded from
 an intermediate Canvas element, and its width and height match that Canvas backing size. `alt` is
-always set and defaults to an empty string.
+always set and defaults to an empty string, which marks the image as decorative. Set a meaningful
+`alt` unless nearby content already gives the QR code's meaning. Prefer `alt` over `ariaLabel`;
+when both are set, assistive technology announces `ariaLabel`.
 
 ## Renderer-specific options
 
@@ -53,11 +55,11 @@ All four renderers accept the [shared visual style](/guides/customize/#shared-vi
 `centerImage` created with [`canvasCenterImage()`](/reference/renderers/canvas/#center-image) as for
 the Canvas renderer, and these DOM attributes:
 
-| Option                    | Type     | Default     | Effect                                           |
-| ------------------------- | -------- | ----------- | ------------------------------------------------ |
-| `accessibility.alt`       | `string` | `''`        | Sets the Image element's `alt` property          |
-| `accessibility.ariaLabel` | `string` | `undefined` | Sets `aria-label` and meaningful image semantics |
-| `accessibility.title`     | `string` | `undefined` | Sets the Image element's `title` property        |
+| Option                    | Type     | Default     | Effect                                    |
+| ------------------------- | -------- | ----------- | ----------------------------------------- |
+| `accessibility.alt`       | `string` | `''`        | Sets the Image element's `alt` property   |
+| `accessibility.ariaLabel` | `string` | `undefined` | Sets `aria-label`, which overrides `alt`  |
+| `accessibility.title`     | `string` | `undefined` | Sets the Image element's `title` property |
 
 `QRCodeImageRendererOptions` from `@qrcodesdk/browser/image` describes these shared options. Each
 format also exports its own type: `QRCodePNGImageRendererOptions`, `QRCodeWebPImageRendererOptions`,
@@ -88,8 +90,10 @@ backgrounds.
 
 ## WebP
 
-`QRCodeWebPImageRenderer` encodes lossless WebP with an encoder bundled in the SDK, so output is the
-same in every browser, including Safari, which cannot encode WebP natively. WebP keeps the full alpha
+`QRCodeWebPImageRenderer` encodes lossless WebP with an encoder bundled in the SDK, so it also works
+in Safari, which cannot encode WebP natively. The encoder produces identical bytes from identical
+RGBA pixels. Each browser draws the intermediate Canvas itself, and anti-aliasing of shaped modules
+and center images can differ, so bytes can differ between browsers. WebP keeps the full alpha
 channel. QR codes have few colors and long runs of equal pixels, so lossless WebP is usually much
 smaller than PNG.
 
@@ -112,7 +116,9 @@ Prefer PNG or WebP for transparent backgrounds and photographic center images.
 `QRCodeJPEGImageRenderer` encodes a baseline JPEG with an encoder bundled in the SDK. The browser's
 own `canvas.toDataURL('image/jpeg')` is not used, because it turns transparent pixels black and
 encodes differently in each browser. The bundled encoder produces the same bytes as the Node.js
-[JPEG renderer](/reference/renderers/jpeg/) for the same pixels.
+[JPEG renderer](/reference/renderers/jpeg/) for the same RGBA pixels. Browser Canvas and Node.js
+rasterization can anti-alias shaped modules and center images differently, so identical options do
+not guarantee identical pixels.
 
 - **Lossy.** Pixels near module edges shift slightly. The default quality is `92`; test the output
   with the scanners you target.

@@ -16,7 +16,8 @@ related:
 ## When to use
 
 Use `QRCodePNGRenderer` when Node.js-compatible code needs PNG bytes for a file, HTTP response,
-attachment, object store, or another binary API. PNG is the most widely supported raster format.
+attachment, object store, or another binary API. PNG is the most widely supported raster format,
+and the safer choice for email, where SVG support varies between clients.
 For smaller files, use the [WebP Buffer renderer](/reference/renderers/webp/); for destinations that
 only accept GIF or JPEG, use the [GIF](/reference/renderers/gif/) or
 [JPEG](/reference/renderers/jpeg/) Buffer renderer.

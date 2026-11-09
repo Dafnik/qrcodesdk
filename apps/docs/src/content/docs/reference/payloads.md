@@ -2,10 +2,17 @@
 title: Payload helpers
 description: Serialize typed email, phone, SMS, geographic, and Wi-Fi values for qrcode().
 docType: reference
+
+related:
+  - ./builder.mdx
+  - ./errors.md
+  - ../packages/core.mdx
+  - ../getting-started/choose-your-setup.mdx
 ---
 
 Core exports small serializers for payload formats that scanners commonly understand. Each helper
-returns the string passed to `qrcode()`.
+returns the string passed to `qrcode()`. Helpers only build the payload text; set encoding options
+on the [builder](/reference/builder/#payload).
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -18,6 +25,26 @@ const matrix = qrcode(
   }),
 ).matrix();
 ```
+
+Framework packages do not re-export the payload helpers.
+[Add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project), then
+pass the helper's result as the component's `payload`:
+
+```tsx
+import {wifiPayload} from '@qrcodesdk/core/payload';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/react';
+
+const payload = wifiPayload({ssid: 'Office Wi-Fi', password: 'correct horse battery staple'});
+const options: QRCodeSVGOptions = {accessibility: {ariaLabel: 'Scan to join Office Wi-Fi'}};
+
+export function WiFiQRCode() {
+  return <QRCodeSVG payload={payload} options={options} />;
+}
+```
+
+Helpers throw `INVALID_PAYLOAD` when you call them, outside the component. For values that users
+enter, call the helper in a `try`/`catch` before rendering, as
+[Validate before rendering](/reference/errors/#validate-before-rendering) shows.
 
 ## Available helpers
 
@@ -57,7 +84,8 @@ addresses and query values while preserving the `@` in recipient addresses.
 | `body`    | `string`                      | No       | Message body; may be empty      |
 
 Recipient lists must contain at least one non-empty string. The helper does not check email-address
-syntax. Omitted optional fields do not appear in the output.
+syntax. Omitted optional fields do not appear in the output. `subject` and `body` reject line breaks,
+so a multi-line `body` throws `INVALID_PAYLOAD`. Pass the body as a single line.
 
 ## Phone fields
 
@@ -114,4 +142,6 @@ the SSID and password.
 ## Validation and return values
 
 All helpers return a `string`. Text fields reject NUL, carriage returns, and newlines. Invalid
-structured values throw `QRCodeError` with code `INVALID_PAYLOAD`.
+structured values throw `QRCodeError` with code `INVALID_PAYLOAD` when you call the helper. Its
+`details` name the `field`, the rejected `value`, and the `reason`; a rejected Wi-Fi password is
+replaced with `'[REDACTED]'`. See the [errors reference](/reference/errors/#invalid_payload).

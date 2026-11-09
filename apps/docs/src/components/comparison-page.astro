@@ -1,6 +1,8 @@
 ---
+import corePackage from '@qrcodesdk/core/package.json';
+
 type ComparisonValue = {
-  status: 'yes' | 'partial' | 'no' | 'note';
+  status: 'yes' | 'partial' | 'no';
   title: string;
   detail: string;
 };
@@ -14,7 +16,8 @@ type ComparisonRow = {
 const libraries = [
   {
     name: 'QRCodeSDK',
-    version: '0.0.1',
+    // The documented version, read from the Core package in this repository.
+    version: corePackage.version,
     href: 'https://github.com/Dafnik/qrcodesdk',
     recommended: true,
   },
@@ -195,7 +198,15 @@ const statusSymbol = {
   yes: '+',
   partial: '~',
   no: '−',
-  note: '·',
+} as const;
+
+const versionNote = `QRCodeSDK v${corePackage.version} as documented here; other libraries checked in August 2026`;
+
+// Screen readers announce the same words as the visible legend.
+const statusLabel = {
+  yes: 'Built in:',
+  partial: 'Partial or conditional:',
+  no: 'Absent:',
 } as const;
 ---
 
@@ -206,16 +217,25 @@ const statusSymbol = {
   tabindex="0">
   <table>
     <caption>
-      <span>Version snapshot: August 2026</span>
-      <span class="legend" aria-label="Status legend">
+      <span>{versionNote}</span>
+      <span class="legend" role="group" aria-label="Status legend">
         <span>
-          <i class="status yes">+</i>built in
+          <i class="status yes" aria-hidden="true">
+            +
+          </i>
+          built in
         </span>
         <span>
-          <i class="status partial">~</i>conditional
+          <i class="status partial" aria-hidden="true">
+            ~
+          </i>
+          partial or conditional
         </span>
         <span>
-          <i class="status no">−</i>absent
+          <i class="status no" aria-hidden="true">
+            −
+          </i>
+          absent
         </span>
       </span>
     </caption>
@@ -242,7 +262,7 @@ const statusSymbol = {
           {row.values.map((value, valueIndex) => (
             <td class:list={{recommended: valueIndex === 0}}>
               <div class="cell-title">
-                <span class="sr-only">{value.status}</span>
+                <span class="sr-only">{statusLabel[value.status]}</span>
                 <span class:list={['status', value.status]} aria-hidden="true">
                   {statusSymbol[value.status]}
                 </span>
@@ -463,8 +483,7 @@ const statusSymbol = {
     color: #e9a847;
   }
 
-  .status.no,
-  .status.note {
+  .status.no {
     color: var(--sl-color-gray-3);
   }
 

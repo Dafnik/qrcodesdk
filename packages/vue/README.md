@@ -32,7 +32,7 @@ vp add @qrcodesdk/vue
 **deno**
 
 ```sh
-deno add @qrcodesdk/vue
+deno add npm:@qrcodesdk/vue
 ```
 
 **bun**
@@ -55,15 +55,31 @@ Import the components directly in a Vue single-file component:
 
 ```vue
 <script setup lang="ts">
-import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/vue';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/vue';
+
+const options: QRCodeSVGOptions = {
+  accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+};
 </script>
 
 <template>
-  <QRCodeSVG payload="https://qrcodesdk.dev" />
-  <QRCodePNG payload="https://qrcodesdk.dev" />
-  <QRCodeCanvas payload="https://qrcodesdk.dev" />
+  <figure>
+    <QRCodeSVG payload="https://qrcodesdk.dev" :options="options" />
+    <figcaption>
+      Scan the code or open
+      <a href="https://qrcodesdk.dev">qrcodesdk.dev</a>
+    </figcaption>
+  </figure>
 </template>
 ```
+
+The label names the QR code for screen readers, and the link gives everyone another way to reach the
+destination. Without `accessibility` options, the output is decorative and hidden from assistive
+technology. Leave a QR code unlabeled only when nearby content, such as this link, already gives its
+meaning.
+
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload` and
+`options` props. Image components also accept `accessibility.alt`.
 
 ## Version compatibility
 
@@ -82,13 +98,14 @@ import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/vue';
 | `QRCodeJPEG`   | `JPEG-backed <img>`  | JPEG             |
 | `QRCodeCanvas` | `<canvas> element`   | None             |
 
-### Options
+### Component props
 
-| Prop      | Type                         | Description                                             |
-| --------- | ---------------------------- | ------------------------------------------------------- |
-| `payload` | `string \| number`           | Required QR code payload.                               |
-| `options` | `Component-specific options` | Optional matrix and renderer configuration.             |
-| `class`   | `string \| object \| array`  | Vue class binding applied to the component wrapper div. |
+| Prop                                             | Type                       | Description                                                                                                               |
+| ------------------------------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `payload`                                        | `string \| number`         | Required QR code payload.                                                                                                 |
+| `options`                                        | Component-specific options | Optional `matrix` options and renderer options, such as `QRCodeSVGOptions` for `QRCodeSVG`.                               |
+| `class`, `style`, other attributes and listeners | Fallthrough attributes     | Applied to the wrapper `<div>` that contains the output element. `innerHTML`, `innerText`, and `textContent` are dropped. |
+| Template `ref`                                   | `QRCodeDownloadHandle`     | Exposes `download(filename?)` on every component except `QRCodeCanvas`, which exposes nothing.                            |
 
 Each image format has its own component, so your bundle only includes the encoders of the components
 you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` uses a lossless encoder
@@ -136,8 +153,7 @@ import {QRCodePNG, type QRCodePNGImageOptions} from '@qrcodesdk/vue';
 const options: QRCodePNGImageOptions = {
   style: {moduleSize: 8, quietZone: 4},
   accessibility: {
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    alt: 'QR code: scan to open qrcodesdk.dev',
   },
 };
 </script>
@@ -156,8 +172,7 @@ import {QRCodeWebP, type QRCodeWebPImageOptions} from '@qrcodesdk/vue';
 const options: QRCodeWebPImageOptions = {
   style: {moduleSize: 8, quietZone: 4},
   accessibility: {
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    alt: 'QR code: scan to open qrcodesdk.dev',
   },
 };
 </script>
@@ -176,8 +191,7 @@ import {QRCodeGIF, type QRCodeGIFImageOptions} from '@qrcodesdk/vue';
 const options: QRCodeGIFImageOptions = {
   style: {moduleSize: 8, quietZone: 4},
   accessibility: {
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    alt: 'QR code: scan to open qrcodesdk.dev',
   },
 };
 </script>
@@ -197,8 +211,7 @@ const options: QRCodeJPEGImageOptions = {
   style: {moduleSize: 8, quietZone: 4},
   quality: 90,
   accessibility: {
-    alt: 'QR code for qrcodesdk.dev',
-    ariaLabel: 'Scan to open qrcodesdk.dev',
+    alt: 'QR code: scan to open qrcodesdk.dev',
   },
 };
 </script>
@@ -221,6 +234,7 @@ const options: QRCodeCanvasOptions = {
     foreground: '#111827',
     background: '#ffffff',
   },
+  accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
 };
 </script>
 
@@ -238,16 +252,14 @@ import {ref} from 'vue';
 import {type QRCodeDownloadHandle, QRCodePNG, type QRCodePNGImageOptions} from '@qrcodesdk/vue';
 
 const qrcode = ref<QRCodeDownloadHandle | null>(null);
-const options: QRCodePNGImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};
+const options: QRCodePNGImageOptions = {
+  accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
+};
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-2">
-    <QRCodePNG ref="qrcode" payload="https://qrcodesdk.dev" :options="options" />
-    <button class="btn-primary" type="button" @click="qrcode?.download('qrcodesdk')">
-      Download PNG
-    </button>
-  </div>
+  <QRCodePNG ref="qrcode" payload="https://qrcodesdk.dev" :options="options" />
+  <button type="button" @click="qrcode?.download('qrcodesdk')">Download PNG</button>
 </template>
 ```
 
@@ -297,7 +309,7 @@ for the corresponding component. `QRCodeGIFImageOptions` also accepts `transpare
 `QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
 
 Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/vue` and pass it
-as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:
+as `matrix.segmenter`:
 
 ```ts
 import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/vue';
@@ -305,9 +317,32 @@ import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/vue';
 const options: QRCodeSVGOptions = {matrix: {mode: 'auto', segmenter: automaticSegmenter}};
 ```
 
+To build payloads with [payload helpers](https://qrcodesdk.dev/reference/payloads/) or check `instanceof QRCodeError`,
+import them from `@qrcodesdk/core` after you
+[add Core to the project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
 [Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
 [Renderer outputs](https://qrcodesdk.dev/reference/renderers/) for output-specific options.
+
+### Keep options stable
+
+Vue tracks `options` reactively. Replacing the object renders the QR code again, and so does changing
+a property of a reactive object. Changing a property of a plain, non-reactive object has no effect.
+An object literal in the template, such as `:options="{style: {moduleSize: 8}}"`, is a new object on
+every parent render, so the QR code renders again each time. Define options in `<script setup>`, or
+derive them with `computed()`.
+
+## Errors
+
+Components throw `QRCodeError` for invalid payloads and options. `QRCodeSVG` creates its renderer
+and QR code in `computed` values that it reads while rendering, so it throws during rendering. The
+Image and Canvas components create both in a watcher after mounting, so they throw there.
+
+Catch both with `onErrorCaptured()` in a parent component or with `app.config.errorHandler`. For
+server-side rendering, validate user-controlled payloads before rendering. Downloads called from an
+event handler need their own `try`/`catch`. See
+[Check errors from framework packages](https://qrcodesdk.dev/reference/errors/#check-errors-from-framework-packages).
 
 ## Public API
 
@@ -383,6 +418,7 @@ import {
 
 - [@qrcodesdk/vue](https://qrcodesdk.dev/packages/vue/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [Errors](https://qrcodesdk.dev/reference/errors/)
 - [Add a center image](https://qrcodesdk.dev/guides/center-images/)
 - [Download or save a QR code as SVG, PNG, WebP, GIF, or JPEG](https://qrcodesdk.dev/guides/download-or-save/)
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)

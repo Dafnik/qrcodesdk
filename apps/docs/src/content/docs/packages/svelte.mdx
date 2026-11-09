@@ -11,6 +11,7 @@ worksWith:
 
 related:
   - ../guides/customize.md
+  - ../reference/errors.md
   - ../guides/center-images.md
   - ../guides/download-or-save.md
   - ../reference/renderers/svg.md
@@ -42,13 +43,28 @@ Import the components directly in a Svelte component:
 
 ```svelte
 <script lang="ts">
-  import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/svelte';
+  import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/svelte';
+
+  const options: QRCodeSVGOptions = {
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+  };
 </script>
 
-<QRCodeSVG payload="https://qrcodesdk.dev" />
-<QRCodePNG payload="https://qrcodesdk.dev" />
-<QRCodeCanvas payload="https://qrcodesdk.dev" />
+<figure>
+  <QRCodeSVG payload="https://qrcodesdk.dev" {options} />
+  <figcaption>
+    Scan the code or open <a href="https://qrcodesdk.dev">qrcodesdk.dev</a>
+  </figcaption>
+</figure>
 ```
+
+The label names the QR code for screen readers, and the link gives everyone another way to reach the
+destination. Without `accessibility` options, the output is decorative and hidden from assistive
+technology. Leave a QR code unlabeled only when nearby content, such as this link, already gives its
+meaning.
+
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload` and
+`options` props. Image components also accept `accessibility.alt`.
 
 ## Version compatibility
 
@@ -152,7 +168,7 @@ for the corresponding component. `QRCodeGIFImageOptions` also accepts `transpare
 `QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
 
 Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/svelte` and pass it
-as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:
+as `matrix.segmenter`:
 
 ```ts
 import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/svelte';
@@ -160,9 +176,32 @@ import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/svelte';
 const options: QRCodeSVGOptions = {matrix: {mode: 'auto', segmenter: automaticSegmenter}};
 ```
 
+To build payloads with [payload helpers](/reference/payloads/) or check `instanceof QRCodeError`,
+import them from `@qrcodesdk/core` after you
+[add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+
 See [Builder and matrix](/reference/builder/) for the fields inside `matrix`,
 [Customize appearance](/guides/customize/) for `style`, and
 [Renderer outputs](/reference/renderers/) for output-specific options.
+
+### Keep options stable
+
+Components derive their renderer from `options`. They render the QR code again when `options` is
+reassigned, or when state read by the options changes, such as a property of a `$state` object or a
+value used in an inline `options={{...}}` expression. Unrelated parent updates do not render it
+again. Changing a property of a plain object that is not `$state` has no effect.
+
+## Errors
+
+Components throw `QRCodeError` for invalid payloads and options. `QRCodeSVG` throws during
+rendering. The Image and Canvas components throw in an `$effect`.
+
+With Svelte 5.3 or newer, catch them in the browser with a `<svelte:boundary>` around the component.
+Svelte 5.0 to 5.2 have no `<svelte:boundary>`. Boundaries also have no effect during server-side
+rendering by default, so a throwing `QRCodeSVG` fails the whole server render. In both cases,
+validate user-controlled payloads before rendering. Downloads called from an event handler need
+their own `try`/`catch`. See
+[Check errors from framework packages](/reference/errors/#check-errors-from-framework-packages).
 
 ## Public API
 

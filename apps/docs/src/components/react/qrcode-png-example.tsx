@@ -7,8 +7,7 @@ export default function QRCodePNGExample() {
     () => ({
       style: {moduleSize: 8, quietZone: 4},
       accessibility: {
-        alt: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
+        alt: 'QR code: scan to open qrcodesdk.dev',
       },
     }),
     [],

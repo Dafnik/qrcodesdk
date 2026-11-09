@@ -10,9 +10,11 @@ import {unified} from 'unified';
 import {parse as parseYaml} from 'yaml';
 
 import {
+  PACKAGE_COMPONENTS,
   createExampleContent,
   createPackageBadges,
   createPackageManagerCommands,
+  getPackageComponentProps,
 } from '../../src/utils/index.js';
 import {README_MAPPINGS} from './readme-mappings.mjs';
 
@@ -504,43 +506,29 @@ function createPackageComponentNodes(attributes, packageName) {
   }
 
   const selector = optionalBoolean(attributes.selector, 'PackageComponents selector') ?? false;
-  const selectorHeader = selector ? ' Selector |' : '';
-  const selectorDivider = selector ? ' --- |' : '';
-  const selectorCells = selector
-    ? [
-        ' `qrcode-svg` |',
-        ' `qrcode-png` |',
-        ' `qrcode-webp` |',
-        ' `qrcode-gif` |',
-        ' `qrcode-jpeg` |',
-        ' `qrcode-canvas` |',
-      ]
-    : ['', '', '', '', '', ''];
-  const frameworkPropRow =
-    {
-      '@qrcodesdk/react':
-        '\n| `className` | `string` | CSS class applied to the component wrapper div. |',
-      '@qrcodesdk/vue':
-        '\n| `class` | `string \\| object \\| array` | Vue class binding applied to the component wrapper div. |',
-      '@qrcodesdk/svelte':
-        '\n| `class` | `string` | CSS class applied to the component wrapper div. |',
-    }[packageName] ?? '';
-  const markdown = `| Component |${selectorHeader} Output | Download support |
-| --- |${selectorDivider} --- | --- |
-| \`QRCodeSVG\` |${selectorCells[0]} \`Inline SVG element\` | SVG |
-| \`QRCodePNG\` |${selectorCells[1]} \`PNG-backed <img>\` | PNG |
-| \`QRCodeWebP\` |${selectorCells[2]} \`WebP-backed <img>\` | WebP |
-| \`QRCodeGIF\` |${selectorCells[3]} \`GIF-backed <img>\` | GIF |
-| \`QRCodeJPEG\` |${selectorCells[4]} \`JPEG-backed <img>\` | JPEG |
-| \`QRCodeCanvas\` |${selectorCells[5]} \`<canvas> element\` | None |
-
-### Options
-
-| Prop | Type | Description |
-| --- | --- | --- |
-| \`payload\` | \`string \\| number\` | Required QR code payload. |
-| \`options\` | \`Component-specific options\` | Optional matrix and renderer configuration. |${frameworkPropRow}
-`;
+  const cell = (/** @type {string} */ value) => value.replaceAll('|', '\\|');
+  const row = (/** @type {string[]} */ cells) => `| ${cells.join(' | ')} |`;
+  const markdown = [
+    row(['Component', ...(selector ? ['Selector'] : []), 'Output', 'Download support']),
+    row(['---', ...(selector ? ['---'] : []), '---', '---']),
+    ...PACKAGE_COMPONENTS.map((item) =>
+      row([
+        `\`${item.component}\``,
+        ...(selector ? [`\`${item.selector}\``] : []),
+        `\`${item.output}\``,
+        item.download,
+      ]),
+    ),
+    '',
+    '### Component props',
+    '',
+    row(['Prop', 'Type', 'Description']),
+    row(['---', '---', '---']),
+    ...getPackageComponentProps(packageName).map((item) =>
+      row([cell(item.prop), cell(item.type), cell(item.description)]),
+    ),
+    '',
+  ].join('\n');
 
   return markdownProcessor.parse(markdown).children;
 }

@@ -33,7 +33,7 @@ vp add @qrcodesdk/core
 **deno**
 
 ```sh
-deno add @qrcodesdk/core
+deno add npm:@qrcodesdk/core
 ```
 
 **bun**
@@ -102,6 +102,8 @@ Typed helpers serialize common application values before generation. See
 `@qrcodesdk/core` runs in any JavaScript runtime with native ESM, ES2020, and a global `TextEncoder`.
 It has no Node.js, DOM, filesystem, or framework dependency.
 
+The package is ES modules only. CommonJS code needs Node.js 22.12 or newer for `require()`, or a
+dynamic `import()`; see [Module format](https://qrcodesdk.dev/getting-started/choose-your-setup/#module-format).
 TypeScript projects should use `moduleResolution: 'bundler'`, `'node16'`, or `'nodenext'` to resolve
 the package's ESM entry points and subpaths.
 
@@ -129,15 +131,17 @@ Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/refere
 
 ## Public API
 
-The root exports the builder, renderers, errors, and shared types. For direct ESM imports without a
-bundler, use `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/text`, or
-`@qrcodesdk/core/error` to avoid loading unrelated renderers. Bundled applications can use root
-imports with tree shaking.
+The root exports the builder, renderers, errors, and shared types. Bundlers with tree shaking drop
+the parts you do not use. When code runs without tree shaking, for example directly in Node.js, use
+`@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/text`, or `@qrcodesdk/core/error`
+to avoid loading unrelated renderers.
 
 Import shape and pattern factories and custom path types from `@qrcodesdk/core/style`. Matrix
 types and role names belong to `@qrcodesdk/core/matrix`; payload serializers belong to
-`@qrcodesdk/core/payload`. See [Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for matrix-based
-custom renderer examples.
+`@qrcodesdk/core/payload`. The optional mixed-mode optimizer is only available from
+`@qrcodesdk/core/segmenter`, so applications that do not import it never load it. See
+[Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for matrix-based custom renderer examples and the
+[errors reference](https://qrcodesdk.dev/reference/errors/) for `QRCodeError` codes.
 
 ```ts
 import {
@@ -189,6 +193,7 @@ import {
   smsPayload,
   wifiPayload,
 } from '@qrcodesdk/core/payload';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 import {
   type QRCodeAlignmentCenterShape,
   type QRCodeAlignmentOptions,
@@ -247,3 +252,4 @@ and version-selection behavior.
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
 - [Terminal text renderer](https://qrcodesdk.dev/reference/renderers/text/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [Errors](https://qrcodesdk.dev/reference/errors/)

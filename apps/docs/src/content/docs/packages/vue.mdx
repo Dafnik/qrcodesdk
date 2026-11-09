@@ -11,6 +11,7 @@ worksWith:
 
 related:
   - ../guides/customize.md
+  - ../reference/errors.md
   - ../guides/center-images.md
   - ../guides/download-or-save.md
   - ../reference/renderers/svg.md
@@ -41,15 +42,31 @@ Import the components directly in a Vue single-file component:
 
 ```vue
 <script setup lang="ts">
-import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/vue';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/vue';
+
+const options: QRCodeSVGOptions = {
+  accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+};
 </script>
 
 <template>
-  <QRCodeSVG payload="https://qrcodesdk.dev" />
-  <QRCodePNG payload="https://qrcodesdk.dev" />
-  <QRCodeCanvas payload="https://qrcodesdk.dev" />
+  <figure>
+    <QRCodeSVG payload="https://qrcodesdk.dev" :options="options" />
+    <figcaption>
+      Scan the code or open
+      <a href="https://qrcodesdk.dev">qrcodesdk.dev</a>
+    </figcaption>
+  </figure>
 </template>
 ```
+
+The label names the QR code for screen readers, and the link gives everyone another way to reach the
+destination. Without `accessibility` options, the output is decorative and hidden from assistive
+technology. Leave a QR code unlabeled only when nearby content, such as this link, already gives its
+meaning.
+
+`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload` and
+`options` props. Image components also accept `accessibility.alt`.
 
 ## Version compatibility
 
@@ -153,7 +170,7 @@ for the corresponding component. `QRCodeGIFImageOptions` also accepts `transpare
 `QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
 
 Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/vue` and pass it
-as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:
+as `matrix.segmenter`:
 
 ```ts
 import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/vue';
@@ -161,9 +178,32 @@ import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/vue';
 const options: QRCodeSVGOptions = {matrix: {mode: 'auto', segmenter: automaticSegmenter}};
 ```
 
+To build payloads with [payload helpers](/reference/payloads/) or check `instanceof QRCodeError`,
+import them from `@qrcodesdk/core` after you
+[add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+
 See [Builder and matrix](/reference/builder/) for the fields inside `matrix`,
 [Customize appearance](/guides/customize/) for `style`, and
 [Renderer outputs](/reference/renderers/) for output-specific options.
+
+### Keep options stable
+
+Vue tracks `options` reactively. Replacing the object renders the QR code again, and so does changing
+a property of a reactive object. Changing a property of a plain, non-reactive object has no effect.
+An object literal in the template, such as `:options="{style: {moduleSize: 8}}"`, is a new object on
+every parent render, so the QR code renders again each time. Define options in `<script setup>`, or
+derive them with `computed()`.
+
+## Errors
+
+Components throw `QRCodeError` for invalid payloads and options. `QRCodeSVG` creates its renderer
+and QR code in `computed` values that it reads while rendering, so it throws during rendering. The
+Image and Canvas components create both in a watcher after mounting, so they throw there.
+
+Catch both with `onErrorCaptured()` in a parent component or with `app.config.errorHandler`. For
+server-side rendering, validate user-controlled payloads before rendering. Downloads called from an
+event handler need their own `try`/`catch`. See
+[Check errors from framework packages](/reference/errors/#check-errors-from-framework-packages).
 
 ## Public API
 

@@ -32,7 +32,7 @@ vp add @qrcodesdk/core @qrcodesdk/browser
 **deno**
 
 ```sh
-deno add @qrcodesdk/core @qrcodesdk/browser
+deno add npm:@qrcodesdk/core npm:@qrcodesdk/browser
 ```
 
 **bun**
@@ -52,9 +52,10 @@ yarn add @qrcodesdk/core @qrcodesdk/browser
 ## Entry points
 
 Each image format has its own entry point, so code that imports one renderer only loads that
-format's encoder. Use these entry points when importing directly without an application bundler.
-The root `@qrcodesdk/browser` entry point re-exports everything; bundlers with tree shaking drop the
-encoders you do not use.
+format's encoder. The root `@qrcodesdk/browser` entry point re-exports everything; bundlers with
+tree shaking drop the encoders you do not use. Import from the format entry points when your build
+does not tree-shake. The package is ES modules that import `@qrcodesdk/core` by its package name, so
+browsers load it through a bundler or another tool that resolves package names.
 
 | Entry point                 | Exports                                                             |
 | --------------------------- | ------------------------------------------------------------------- |
@@ -79,8 +80,9 @@ encoders you do not use.
 | Trigger a PNG, WebP, GIF, or JPEG download | `QRCodeDownloadImageRenderer` | `void`              |
 
 - PNG uses the browser's native encoder and is the default choice.
-- WebP is lossless and usually the smallest file. Its encoder is bundled in the SDK, so output is the
-  same in every browser, including Safari, which cannot encode WebP natively.
+- WebP is lossless and usually the smallest file. Its encoder is bundled in the SDK, so it also works
+  in Safari, which cannot encode WebP natively. The browser still draws the Canvas that the encoder
+  reads, so bytes match across browsers only when their Canvas pixels match.
 - GIF is limited to 256 colors and binary transparency. Prefer PNG or WebP for transparent
   backgrounds and photographic center images.
 - JPEG is lossy, has no transparency, and is larger for plain QR codes. Its bundled encoder blends
@@ -95,10 +97,7 @@ import {qrcode} from '@qrcodesdk/core';
 
 const image = qrcode('https://qrcodesdk.dev').render(
   QRCodePNGImageRenderer({
-    accessibility: {
-      alt: 'QR code for qrcodesdk.dev',
-      ariaLabel: 'Scan to open qrcodesdk.dev',
-    },
+    accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
   }),
 );
 

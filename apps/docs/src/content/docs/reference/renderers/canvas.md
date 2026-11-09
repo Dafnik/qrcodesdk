@@ -97,7 +97,8 @@ renderer.
   another canvas, or an `ImageBitmap`.
 - Pass a `centerImage` created with `canvasCenterImage()`; TypeScript checks the factory result type. `canvasCenterImage()` validates its layout when it is called.
 - A non-empty `ariaLabel`, or a non-empty `title` when `ariaLabel` is blank, sets `role="img"` and
-  `aria-label` on the Canvas element. The Canvas is decorative only when both are blank. For `alt` and other native image attributes,
+  `aria-label` on the Canvas element. When both are blank, the Canvas is decorative and gets
+  `aria-hidden="true"`. For `alt` and other native image attributes,
   use the [Image element renderers](/reference/renderers/image/).
 - Option values are copied when `QRCodeCanvasRenderer()` is called. The center image
   retains its source by identity and checks it when rendering.
