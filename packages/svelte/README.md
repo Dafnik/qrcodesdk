@@ -328,12 +328,23 @@ Components throw `QRCodeError` for invalid payloads and options.
 To handle them:
 
 - With Svelte 5.3 or newer, wrap the component in a `<svelte:boundary>` to catch errors in the
-  browser. Svelte 5.0 to 5.2 have no `<svelte:boundary>`.
+  browser. Give it a `failed` snippet or an `onerror` handler. Without one, Svelte rethrows the
+  error. Svelte 5.0 to 5.2 have no `<svelte:boundary>`.
 - Boundaries have no effect during server-side rendering by default. A throwing `QRCodeSVG` fails
   the whole server render.
 - Without a boundary, and for server-side rendering, validate user-controlled payloads before
   rendering.
 - Wrap downloads called from an event handler in your own `try`/`catch`.
+
+```svelte
+<svelte:boundary onerror={(error) => console.error(error)}>
+  <QRCodeSVG payload="https://qrcodesdk.dev" />
+
+  {#snippet failed()}
+    <p>This QR code could not be rendered.</p>
+  {/snippet}
+</svelte:boundary>
+```
 
 See [Check errors from framework packages](https://qrcodesdk.dev/reference/errors/#check-errors-from-framework-packages).
 

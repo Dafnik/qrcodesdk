@@ -25,7 +25,8 @@ A center image covers some of the encoded modules. To keep the code readable:
 
 - Install the package for your output. See [Choose your setup](/getting-started/choose-your-setup/).
 - Load the image yourself. QRCodeSDK does not fetch URLs or read files.
-  - SVG and Node.js output take a file or bytes.
+  - SVG output takes an embedded `data:image/...` URL.
+  - Node.js output takes PNG bytes as a `Uint8Array` or `Buffer`.
   - Browser output takes a same-origin or CORS-enabled image.
 - Prefer a simple logo with a transparent or solid background. Photos and fine detail are hard to
   recognize at this size.

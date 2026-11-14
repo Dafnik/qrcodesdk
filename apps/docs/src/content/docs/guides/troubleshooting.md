@@ -370,4 +370,7 @@ See [Scan reliability](/guides/customize/#scan-reliability).
 ## Next step
 
 If none of these fixes apply, search the [GitHub issues](https://github.com/Dafnik/qrcodesdk/issues).
-Open a new issue with the error code, `details`, package versions, and a minimal payload.
+Open a new issue with the error code, package versions, and a minimal reproduction.
+
+Use a made-up payload that shows the same error. `details` can contain your original payload, so
+remove passwords, tokens, and personal data before you post it.

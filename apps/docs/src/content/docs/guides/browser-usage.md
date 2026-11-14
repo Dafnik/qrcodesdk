@@ -122,7 +122,9 @@ Pick a renderer by file format:
 | `QRCodeGIFImageRenderer`  | `@qrcodesdk/browser/gif`  | GIF, 256 colors, on/off transparency            |
 | `QRCodeJPEGImageRenderer` | `@qrcodesdk/browser/jpeg` | Lossy JPEG on a solid matte, for JPEG-only uses |
 
-All four take the same options. Each format has its own entry point, so your bundle only includes
+All four share the base options, such as `style`, `centerImage`, and `accessibility`. GIF adds
+`transparency.threshold`, and JPEG adds `quality` and `transparency.matte`. Each format has its own
+entry point, so your bundle only includes
 the encoder you import. WebP, GIF, and JPEG use encoders bundled in the SDK, so they work in Safari
 too. See the [Image element renderers reference](/reference/renderers/image/) for format details.
 

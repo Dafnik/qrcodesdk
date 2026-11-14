@@ -61,7 +61,8 @@ The payload cannot be encoded as configured.
 
 - A numeric payload is negative, fractional, or not a safe integer.
 - A concrete `mode` does not accept the payload, such as `mode: 'numeric'` with letters.
-- A `mode` from untyped input is not one of the four documented values.
+- A `mode` from untyped input is not one of the four documented values. If the payload uses only
+  [alphanumeric-mode characters](#payload_too_large), Core throws `PAYLOAD_TOO_LARGE` instead.
 - A custom segmenter returns invalid segments. See the table below.
 - A payload helper rejects one of its fields.
 
@@ -130,6 +131,10 @@ the pinned `version`.
 
 **Details:** `details.version` when a version is pinned; otherwise usually `{}`.
 
+**Short payload, same error?** Check `mode`. An unknown `mode` from untyped input throws this error
+when the payload uses only alphanumeric-mode characters: digits, uppercase `A`–`Z`, space, and
+`$%*+-./:`. Pass one of the four documented modes, or omit `mode`.
+
 **Fix:** Any of these can make the payload fit:
 
 - Remove the `version` pin.
@@ -186,13 +191,13 @@ The builder does not check them again at runtime.
 Values that bypass the types, for example from JavaScript, JSON configuration, or a type assertion,
 do not throw `INVALID_OPTIONS`:
 
-| Invalid value                                                                          | Result                                                            |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `mask` that is not an integer from `0` to `7`                                          | A matrix without a valid mask pattern, which scanners cannot read |
-| `version` that is fractional or above `40`                                             | A matrix with an invalid size, which scanners cannot read         |
-| `version` below `1`, or `NaN`                                                          | `PAYLOAD_TOO_LARGE`, although the payload may be small            |
-| `mode` other than the four documented values                                           | `INVALID_PAYLOAD` with that `mode` in `details`                   |
-| Other types, such as a string `version` or `eci`, or an unknown `errorCorrectionLevel` | Unspecified output and no error                                   |
+| Invalid value                                                                          | Result                                                                                                                                                         |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mask` that is not an integer from `0` to `7`                                          | A matrix without a valid mask pattern, which scanners cannot read                                                                                              |
+| `version` that is fractional or above `40`                                             | A matrix with an invalid size, which scanners cannot read                                                                                                      |
+| `version` below `1`, or `NaN`                                                          | `PAYLOAD_TOO_LARGE`, although the payload may be small                                                                                                         |
+| `mode` other than the four documented values                                           | `INVALID_PAYLOAD` with that `mode` in `details`. `PAYLOAD_TOO_LARGE` instead if the payload uses only alphanumeric-mode characters, such as `'HELLO'` or `123` |
+| Other types, such as a string `version` or `eci`, or an unknown `errorCorrectionLevel` | Unspecified output and no error                                                                                                                                |
 
 Validate matrix options from untyped sources before you pass them to the builder:
 
@@ -335,18 +340,19 @@ export function isQRCodeError(error: unknown): error is QRCodeErrorLike {
 
 ### Where components throw
 
-| Framework | SVG component throws during | Image and Canvas components throw during                                                | Catch it in the browser with                                  |
-| --------- | --------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| React     | Rendering                   | Rendering for invalid renderer options; a `useEffect` after commit for payload problems | An error boundary above the component                         |
-| Vue       | Rendering, in a `computed`  | A watcher after mounting                                                                | `onErrorCaptured()` in a parent or `app.config.errorHandler`  |
-| Svelte    | Rendering, in a `$derived`  | An `$effect`                                                                            | `<svelte:boundary>` around the component, Svelte 5.3 or newer |
-| Angular   | An `effect()`               | An `effect()`                                                                           | Angular's `ErrorHandler`; there is no component boundary      |
+| Framework | SVG component throws during | Image and Canvas components throw during                                                | Catch it in the browser with                                                  |
+| --------- | --------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| React     | Rendering                   | Rendering for invalid renderer options; a `useEffect` after commit for payload problems | An error boundary above the component                                         |
+| Vue       | Rendering, in a `computed`  | A watcher after mounting                                                                | `onErrorCaptured()` in a parent or `app.config.errorHandler`                  |
+| Svelte    | Rendering, in a `$derived`  | An `$effect`                                                                            | `<svelte:boundary>` with a `failed` snippet or `onerror`, Svelte 5.3 or newer |
+| Angular   | An `effect()`               | An `effect()`                                                                           | Angular's `ErrorHandler`; there is no component boundary                      |
 
 - **React:** components create their renderer with `useMemo()`. Invalid renderer options, such as
   `style.moduleSize: 0`, throw during render. Payload problems throw later, in the effect that
   generates the image. Error boundaries catch both in the browser.
-- **Svelte:** `@qrcodesdk/svelte` supports Svelte 5.0 and newer, but `<svelte:boundary>` needs
-  5.3.0. On 5.0 to 5.2, [validate before rendering](#validate-before-rendering).
+- **Svelte:** `<svelte:boundary>` needs Svelte 5.3.0 and a `failed` snippet or an `onerror`
+  handler. Without one, Svelte rethrows the error. `@qrcodesdk/svelte` supports Svelte 5.0 and
+  newer. On 5.0 to 5.2, [validate before rendering](#validate-before-rendering).
 - **All frameworks:** these mechanisms catch only errors from the component's own rendering and
   effects. Wrap `download()` calls in event handlers and your own async code, such as loading a
   center image, in `try`/`catch`.
