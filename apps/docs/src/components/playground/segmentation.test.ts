@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 
 import {qrcode} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {explainQRCode} from '../explain/qrcode-analyzer.ts';
@@ -75,4 +76,68 @@ test('the explainer reports actual modes for default, optimized, and forced enco
   assert.equal(optimized.matrix.size, 25);
   assert.equal(explainQRCode({payload, mode: 'octet', optimizeSegments: true}).mode, 'octet');
   assert.equal(explainQRCode({payload: '', mode: 'auto'}).mode, 'numeric');
+});
+
+test('playground shares the Kanji switch through URLs and renderers', () => {
+  const options = {...defaultPlaygroundOptions, payload: '東京タワー', kanji: true};
+  const params = writeQrOptionsToSearchParams(
+    new URLSearchParams(),
+    options,
+    defaultPlaygroundOptions,
+  );
+  assert.equal(params.get('kanji'), 'true');
+  const restored = readQrOptionsFromSearchParams(params);
+  assert.equal(restored.kanji, true);
+  const matrixOptions = createPlaygroundSVGOptions(restored).matrix;
+  assert.equal(matrixOptions?.kanji, kanji);
+  assert.equal(qrcode('東京タワー').options(matrixOptions).matrix().size, 21);
+  assert.equal(
+    qrcode('東京タワー')
+      .options(createPlaygroundSVGOptions({...restored, kanji: false}).matrix)
+      .matrix().size,
+    25,
+  );
+});
+
+test('playground forced Kanji mode loads the Kanji table', () => {
+  const params = new URLSearchParams({mode: 'kanji'});
+  const restored = readQrOptionsFromSearchParams(params);
+  assert.equal(restored.mode, 'kanji');
+  const matrixOptions = createPlaygroundSVGOptions({...restored, payload: '漢字'}).matrix;
+  assert.equal(matrixOptions?.kanji, kanji);
+  assert.equal(qrcode('漢字').options(matrixOptions).matrix().size, 21);
+});
+
+test('all framework examples import the Kanji table only when it is used', () => {
+  for (const packageName of ['angular', 'react', 'svelte', 'vue'] as const) {
+    const options = {...defaultPlaygroundOptions, packageName};
+    assert.doesNotMatch(generatePlaygroundCode(options).code, /\bkanji\b/);
+    for (const code of [
+      generatePlaygroundCode({...options, kanji: true}).code,
+      generatePlaygroundCode({...options, mode: 'kanji'}).code,
+    ]) {
+      assert.match(
+        code,
+        new RegExp(`import \\{[^}]*\\bkanji\\b[^}]*\\} from '@qrcodesdk/${packageName}'`),
+      );
+      assert.match(code, /matrix: \{[^}]*\bkanji\b/);
+      assert.doesNotMatch(code, /@qrcodesdk\/core/);
+    }
+  }
+});
+
+test('CLI URL, generated command, and preview agree on Kanji mode', () => {
+  const options = {...defaultCliOptions, payload: '東京タワー123', kanji: true};
+  const params = new URLSearchParams();
+  writeCliOptionsToSearchParams(params, options);
+  const restored = readCliOptionsFromSearchParams(params);
+  assert.equal(restored.kanji, true);
+  assert.match(generateCliCommand(restored), / --kanji\b/);
+  assert.equal(createCliSVGOptions(restored).matrix?.kanji, kanji);
+
+  const forced = {...defaultCliOptions, payload: '漢字', mode: 'kanji' as const, kanji: true};
+  assert.match(generateCliCommand(forced), /--mode kanji/);
+  assert.doesNotMatch(generateCliCommand(forced), / --kanji\b/);
+  assert.equal(createCliSVGOptions(forced).matrix?.kanji, kanji);
+  assert.equal(createCliSVGOptions(defaultCliOptions).matrix?.kanji, undefined);
 });

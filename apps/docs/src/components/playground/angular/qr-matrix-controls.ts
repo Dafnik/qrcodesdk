@@ -75,6 +75,7 @@ abstract class QrOptionsControls {
                 <hlm-select-item value="numeric">Numeric</hlm-select-item>
                 <hlm-select-item value="alphanumeric">Alphanumeric</hlm-select-item>
                 <hlm-select-item value="octet">Octet</hlm-select-item>
+                <hlm-select-item value="kanji">Kanji</hlm-select-item>
               </hlm-select-group>
             </hlm-select-content>
           </hlm-select>
@@ -208,13 +209,30 @@ export class QrMatrixControls extends QrOptionsControls {
             <span hlmFieldLabel>Optimize mixed-mode segments</span>
             <p hlmFieldDescription>
               Auto mode can combine encoding modes to fit more data. Uses additional processing
-              time. Explicit numeric, alphanumeric, and octet modes bypass this option.
+              time. Explicit modes bypass this option.
             </p>
           </div>
           <hlm-switch
             [checked]="currentOptions().optimizeSegments ?? false"
             [inputId]="idPrefix() + 'optimize-segments'"
             (checkedChange)="updateQrOptions({optimizeSegments: $event})" />
+        </div>
+      </label>
+
+      <label class="border-input rounded-md border p-4" [for]="idPrefix() + 'kanji'" hlmField>
+        <div class="flex items-center justify-between gap-4">
+          <div class="grid gap-1">
+            <span hlmFieldLabel>Kanji mode</span>
+            <p hlmFieldDescription>
+              Auto mode and optimized segments encode Japanese text in 13 bits per character instead
+              of UTF-8 bytes. Adds a Shift JIS table of about 13 kB gzipped. The Kanji mode always
+              loads the table.
+            </p>
+          </div>
+          <hlm-switch
+            [checked]="currentOptions().kanji ?? false"
+            [inputId]="idPrefix() + 'kanji'"
+            (checkedChange)="updateQrOptions({kanji: $event})" />
         </div>
       </label>
 

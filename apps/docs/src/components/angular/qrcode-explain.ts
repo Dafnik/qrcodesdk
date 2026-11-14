@@ -17,6 +17,8 @@ import {HlmAlertImports} from '@spartan-ng/helm/alert';
 import {HlmButtonImports} from '@spartan-ng/helm/button';
 import {HlmSeparatorImports} from '@spartan-ng/helm/separator';
 
+import {kanji} from '@qrcodesdk/core/kanji';
+
 import {
   type QRCodeExplainModule,
   type QRCodeExplainRole,
@@ -26,7 +28,11 @@ import {
   explainQRCode,
 } from '../explain/qrcode-analyzer.ts';
 import {QrEncodingControls, QrMatrixControls} from '../playground/angular/qr-matrix-controls.ts';
-import {playgroundOptions, resetQrOptions} from '../playground/playground-options.ts';
+import {
+  playgroundOptions,
+  playgroundUsesKanji,
+  resetQrOptions,
+} from '../playground/playground-options.ts';
 import {suppressInitialTransitions} from './suppress-initial-transitions.ts';
 
 type ExplainSelection = {
@@ -377,7 +383,13 @@ export class QRCodeExplain {
 
   protected readonly state = computed<ExplainState>(() => {
     try {
-      return {explanation: explainQRCode(this.options())};
+      const options = this.options();
+      return {
+        explanation: explainQRCode({
+          ...options,
+          kanji: playgroundUsesKanji(options) ? kanji : undefined,
+        }),
+      };
     } catch (error) {
       return {error: error instanceof Error ? error.message : String(error)};
     }

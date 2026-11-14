@@ -9,10 +9,12 @@ import {
   type QRCodeCenterImageLayout,
   type QRCodeDataImageURL,
   type QRCodeMatrixOptions,
+  type QRCodeMode,
   type QRCodeSVGOptions,
   type QRCodeVisualStyle,
   svgCenterImage,
 } from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {type PlaygroundStyleState, createPlaygroundStyle} from './playground-style.ts';
@@ -35,8 +37,11 @@ export const PLAYGROUND_SECTIONS = [
   'accessibility',
 ] as const satisfies readonly PlaygroundSection[];
 
-export interface PlaygroundOptions extends QRCodeMatrixOptions, PlaygroundStyleState {
+export interface PlaygroundOptions
+  extends Omit<QRCodeMatrixOptions, 'kanji'>, PlaygroundStyleState {
   optimizeSegments?: boolean;
+  /** Passes the Kanji table so auto mode and optimized segments can use Kanji mode. */
+  kanji?: boolean;
   payload: string;
   packageName: PlaygroundPackage;
   output: PlaygroundOutput;
@@ -237,12 +242,24 @@ export function createPlaygroundCanvasOptions(
     : rendererOptions;
 }
 
+/**
+ * Whether the matrix needs the Kanji table: the Kanji switch is on, or Kanji mode is forced, which
+ * the CLI also loads the table for.
+ */
+export function playgroundUsesKanji(options: {
+  readonly kanji?: boolean;
+  readonly mode?: QRCodeMode;
+}): boolean {
+  return options.kanji === true || options.mode === 'kanji';
+}
+
 function baseOptions(playgroundOptionsValue: PlaygroundOptions) {
   return {
     matrix: {
       version: playgroundOptionsValue.version,
       mode: playgroundOptionsValue.mode,
       segmenter: playgroundOptionsValue.optimizeSegments ? automaticSegmenter : undefined,
+      kanji: playgroundUsesKanji(playgroundOptionsValue) ? kanji : undefined,
       errorCorrectionLevel: playgroundOptionsValue.errorCorrectionLevel,
       mask: playgroundOptionsValue.mask,
       eci: playgroundOptionsValue.eci,
