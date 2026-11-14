@@ -3,14 +3,14 @@ import {type ReadResult, readBarcodes} from 'zxing-wasm/reader';
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
 /**
- * Decodes QR codes and Micro QR codes with ZXing-C++. Prepare the WebAssembly binary first: Node.js
+ * Decodes QR codes, Micro QR codes, and rMQR codes with ZXing-C++. Prepare the WebAssembly binary first: Node.js
  * tests import `@repo/core-testing/decoder/node`, and browser tests call `prepareZXingModule()` with
  * the URL of `zxing-wasm/reader/zxing_reader.wasm`.
  */
 export type QRCodeScan = Pick<ReadResult, 'text' | 'version' | 'ecLevel' | 'isMirrored' | 'format'>;
 
 /** ZXing's `QRCode` format includes every QR symbology, so standard scans ask for Model 2. */
-export type QRCodeScanFormat = 'QRCodeModel2' | 'MicroQRCode';
+export type QRCodeScanFormat = 'QRCodeModel2' | 'MicroQRCode' | 'RMQRCode';
 
 /**
  * Scans RGBA pixels for one symbol of the given format and throws when none is found. Dark
@@ -52,6 +52,21 @@ export function decodeMicroQRCode(
 export function decodeMicroQRCodeMatrix(matrix: QRCodeMatrix): Promise<QRCodeScan> {
   const {data, width, height} = rasterizeMatrix(matrix, 2);
   return decodeMicroQRCode(data, width, height);
+}
+
+/** Scans RGBA pixels for one rMQR code and throws when none is found. */
+export function decodeRMQRCode(
+  data: Uint8ClampedArray<ArrayBuffer>,
+  width: number,
+  height: number,
+): Promise<QRCodeScan> {
+  return decodeQRCode(data, width, height, 'RMQRCode');
+}
+
+/** Scans an rMQR matrix drawn with 4-pixel modules and a quiet zone of 2 modules. */
+export function decodeRMQRCodeMatrix(matrix: QRCodeMatrix): Promise<QRCodeScan> {
+  const {data, width, height} = rasterizeMatrix(matrix, 2);
+  return decodeRMQRCode(data, width, height);
 }
 
 /** Draws a matrix as RGBA pixels with 4-pixel modules and the given quiet zone in modules. */

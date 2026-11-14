@@ -543,6 +543,27 @@ describe('rMQR rendering', () => {
     }
   });
 
+  test('keeps the finder sub-pattern square unless an alignment style draws it', () => {
+    const matrix = rmqr('1', {version: 'R11x43'});
+    const {layers} = createQRCodeStyler({quietZone: 0, modules: rounded()})(matrix);
+    const tiles = layers.flatMap(({tiles}) => tiles.flatMap(([, positions]) => positions));
+    const inSubFinder = (x: number, y: number) => x >= matrix.width - 5 && y >= matrix.height - 5;
+    const shaped: number[][] = [];
+    for (let index = 0; index < tiles.length; index += 2) {
+      if (inSubFinder(tiles[index]!, tiles[index + 1]!))
+        shaped.push([tiles[index]!, tiles[index + 1]!]);
+    }
+    expect(shaped).toEqual([]);
+    // Other modules, such as the timing patterns, take the module shape.
+    expect(tiles.length).toBeGreaterThan(0);
+    // Standard QR codes keep shaping their alignment patterns.
+    const standard = qrcode('alignment').version(2).matrix();
+    const standardTiles = createQRCodeStyler({quietZone: 0, modules: rounded()})(
+      standard,
+    ).layers.flatMap(({tiles}) => tiles.flatMap(([, positions]) => positions));
+    expect(standardTiles.some((value, index) => index % 2 === 0 && value === 16)).toBe(true);
+  });
+
   test('centers a square center image sized from the height', () => {
     const matrix = rmqr('1', {version: 'R11x43'});
     const {part, place} = createQRCodeCenterImagePlacement({size: 0.5, padding: 0});

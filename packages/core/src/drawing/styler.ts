@@ -20,6 +20,9 @@ type ModuleTiles = PreparedShapePath | readonly (PreparedShapePath | undefined)[
 
 // Roles that take the module shape. Finder modules stay square unless a finder part draws them.
 const SHAPED_ROLES = 0b111111001;
+// rMQR codes are located by the finder sub-pattern, which has the alignment roles, so it also stays
+// square unless an alignment part draws it. Scanners do not find it with shaped modules.
+const RECTANGULAR_SHAPED_ROLES = 0b111001001;
 export const fractionalRects = new WeakSet<readonly number[]>();
 
 /**
@@ -174,7 +177,8 @@ function drawModules(
   const modules = arrayStorage.get(publicModules);
   const roles = arrayStorage.get(publicRoles) ?? publicRoles;
   const stride = w + 2;
-  const shapedRoles = neighbors || constant ? SHAPED_ROLES : 0;
+  const shapedRoles =
+    !neighbors && !constant ? 0 : w === h ? SHAPED_ROLES : RECTANGULAR_SHAPED_ROLES;
   // 0 not drawn, 1 filled, 2 shaped. A light border keeps neighbor reads in bounds.
   const cells = new Uint8Array(stride * (h + 2));
   if (modules) {
