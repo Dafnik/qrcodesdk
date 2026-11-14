@@ -35,7 +35,10 @@ export async function decodeRasterQRCode(input: Buffer): Promise<string> {
 
 /** Scans a Micro QR code with ZXing, because jsQR cannot read Micro QR codes. */
 export async function decodeRasterMicroQRCode(input: Buffer): Promise<MicroQRCodeScan> {
-  const raster = await readRaster(await sharp(input).flatten({background: '#ffffff'}).toBuffer());
+  // PNG keeps a second lossy encoding of JPEG and WebP input out of the scan, as above.
+  const raster = await readRaster(
+    await sharp(input).flatten({background: '#ffffff'}).png().toBuffer(),
+  );
   return decodeMicroQRCode(new Uint8ClampedArray(raster.data), raster.width, raster.height);
 }
 

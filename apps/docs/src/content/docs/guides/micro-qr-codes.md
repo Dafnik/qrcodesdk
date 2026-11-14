@@ -19,8 +19,9 @@ Micro QR codes hold little data: at most 35 digits, 21 alphanumeric characters, 
 
 :::caution[Check your scanners first]
 Many phone camera apps cannot read Micro QR codes. Industrial scanners and libraries such as ZXing
-can. Use Micro QR codes only when you know which scanners read them, or let
-[`fallback`](#fall-back-to-a-standard-qr-code) switch to a standard QR code.
+can. Use Micro QR codes only when you know which scanners read them, and use standard QR codes when
+you don't. [`fallback`](#fall-back-to-a-standard-qr-code) does not help here: it switches to a
+standard QR code only when the payload or error-correction level does not fit a Micro QR code.
 :::
 
 ## Create a Micro QR code
