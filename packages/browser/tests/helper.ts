@@ -3,25 +3,26 @@ import {
   type RGBAPixel,
   getAllQRCodeCombinations,
 } from '@repo/core-testing';
-import jsQR from 'jsqr';
+import {type QRCodeScan, type QRCodeScanFormat, decodeQRCode} from '@repo/core-testing/decoder';
 import {expect} from 'vitest';
+import {prepareZXingModule} from 'zxing-wasm/reader';
+import wasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url';
+
+// Vite serves the local WebAssembly binary, so ZXing does not fetch it from a CDN.
+prepareZXingModule({
+  overrides: {
+    locateFile: (path: string, prefix: string) =>
+      path.endsWith('.wasm') ? wasmUrl : prefix + path,
+  },
+});
 
 export const BLACK = {red: 0, green: 0, blue: 0, alpha: 255};
 export const WHITE = {red: 255, green: 255, blue: 255, alpha: 255};
 
-/**
- * Version 23 QR codes always fail to decode
- * https://github.com/cozmo/jsQR/issues/251
- */
-const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
-  ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
-);
-export const JSQR_ROUNDTRIP_COMBINATIONS_ONE = JSQR_ROUNDTRIP_COMBINATIONS.filter(
-  (_, i) => i % 2 === 0,
-);
-export const JSQR_ROUNDTRIP_COMBINATIONS_TWO = JSQR_ROUNDTRIP_COMBINATIONS.filter(
-  (_, i) => i % 2 !== 0,
-);
+/** All combinations, split in two halves so the canvas and the image roundtrips share them. */
+const ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()];
+export const ROUNDTRIP_COMBINATIONS_ONE = ROUNDTRIP_COMBINATIONS.filter((_, i) => i % 2 === 0);
+export const ROUNDTRIP_COMBINATIONS_TWO = ROUNDTRIP_COMBINATIONS.filter((_, i) => i % 2 !== 0);
 
 export async function imageToCanvas(image: HTMLImageElement): Promise<HTMLCanvasElement> {
   await waitForImage(image);
@@ -58,8 +59,11 @@ export function fixtureImageCanvas({width, height, data}: QRCodeFixtureImage): H
   return canvas;
 }
 
-// Scans the code as displayed on a white page, so transparent backgrounds stay light.
-export function decodeCanvasQRCode(source: HTMLCanvasElement): string {
+/** Scans the code as displayed on a white page, so transparent backgrounds stay light. */
+export function scanCanvasQRCode(
+  source: HTMLCanvasElement,
+  format: QRCodeScanFormat = 'QRCodeModel2',
+): Promise<QRCodeScan> {
   const canvas = document.createElement('canvas');
   canvas.width = source.width;
   canvas.height = source.height;
@@ -67,16 +71,18 @@ export function decodeCanvasQRCode(source: HTMLCanvasElement): string {
   context.fillStyle = '#ffffff';
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.drawImage(source, 0, 0);
-  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-  const result = jsQR(imageData.data, canvas.width, canvas.height, {
-    inversionAttempts: 'dontInvert',
-  });
+  const {data} = context.getImageData(0, 0, canvas.width, canvas.height);
+  return decodeQRCode(data, canvas.width, canvas.height, format);
+}
 
-  if (!result) {
-    throw new Error(`Unable to decode ${canvas.width}x${canvas.height} canvas QR code`);
-  }
+/** Scans a QR code and returns its text. */
+export async function decodeCanvasQRCode(source: HTMLCanvasElement): Promise<string> {
+  return (await scanCanvasQRCode(source)).text;
+}
 
-  return result.data;
+/** Scans a Micro QR code. */
+export function decodeCanvasMicroQRCode(source: HTMLCanvasElement): Promise<QRCodeScan> {
+  return scanCanvasQRCode(source, 'MicroQRCode');
 }
 
 function waitForImage(image: HTMLImageElement): Promise<void> {

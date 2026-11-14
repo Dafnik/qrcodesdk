@@ -3,7 +3,7 @@ import {describe, expect, test} from 'vitest';
 import {qrcode} from '@qrcodesdk/core';
 import {ɵcreateQRCodeStyler as createQRCodeStyler} from '@qrcodesdk/core/internal';
 
-import {QR_CODE_STYLING_FIXTURES, QR_CODE_STYLING_ROUNDTRIP_FIXTURES} from '../src';
+import {QR_CODE_STYLING_FIXTURES} from '../src';
 
 describe('QR_CODE_STYLING_FIXTURES', () => {
   test('provides 60 distinct style fixtures', () => {
@@ -49,14 +49,5 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
         expect(coveredPalettes).toEqual(palettes);
       }
     }
-  });
-
-  test('keeps scanner-sensitive combinations out of the roundtrip contract', () => {
-    expect(QR_CODE_STYLING_ROUNDTRIP_FIXTURES).toHaveLength(58);
-    expect(
-      QR_CODE_STYLING_ROUNDTRIP_FIXTURES.every((fixture) =>
-        QR_CODE_STYLING_FIXTURES.includes(fixture),
-      ),
-    ).toBe(true);
   });
 });

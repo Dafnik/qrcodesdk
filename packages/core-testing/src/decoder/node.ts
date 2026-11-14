@@ -17,4 +17,10 @@ prepareZXingModule({
   },
 });
 
-export {decodeMicroQRCode, decodeMicroQRCodeMatrix, type MicroQRCodeScan} from './index';
+export {
+  decodeMicroQRCode,
+  decodeMicroQRCodeMatrix,
+  decodeQRCode,
+  type QRCodeScan,
+  type QRCodeScanFormat,
+} from './index';

@@ -81,7 +81,6 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
-    "jsqr": "catalog:",
     "sharp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:",

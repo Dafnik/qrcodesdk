@@ -1,4 +1,4 @@
-import {QR_CODE_STYLING_ROUNDTRIP_FIXTURES} from '@repo/core-testing';
+import {QR_CODE_STYLING_FIXTURES} from '@repo/core-testing';
 import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
 
@@ -18,7 +18,7 @@ describe('QRCodeGIFRenderer', () => {
     expect(gif[gif.length - 1]).toBe(0x3b);
   });
 
-  test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES.slice(0, 6))(
+  test.each(QR_CODE_STYLING_FIXTURES.slice(0, 6))(
     'matches the PNG pixels of the opaque $name styling fixture',
     async ({payload, matrixOptions, styling}) => {
       const builder = qrcode(payload).options(matrixOptions);

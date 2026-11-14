@@ -1,11 +1,11 @@
 import sharp from 'sharp';
 
-import {type MicroQRCodeScan, decodeMicroQRCode} from '../../src/micro-decoder/node';
+import {type QRCodeScan, decodeMicroQRCode} from '../../src/decoder/node';
 
-export {decodeMicroQRCodeMatrix} from '../../src/micro-decoder/node';
+export {decodeMicroQRCodeMatrix} from '../../src/decoder/node';
 
 /** Scans an SVG as displayed on a white page. */
-export async function decodeMicroQRCodeSvg(svg: string): Promise<MicroQRCodeScan> {
+export async function decodeMicroQRCodeSvg(svg: string): Promise<QRCodeScan> {
   const {data, info} = await sharp(Buffer.from(svg))
     .flatten({background: '#ffffff'})
     .ensureAlpha()

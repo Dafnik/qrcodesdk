@@ -188,3 +188,10 @@ export const QR_CODE_TEST_FIXTURES = [
     errorCorrectionLevel: 'L',
   },
 ] as const satisfies readonly QRCodeTestFixture[];
+
+/**
+ * The fixtures that decode roundtrips scan. ZXing drops symbols without content, so the empty
+ * payload is left out; the matrix tests compare it with reference generators instead.
+ */
+export const QR_CODE_ROUNDTRIP_TEST_FIXTURES: readonly QRCodeTestFixture[] =
+  QR_CODE_TEST_FIXTURES.filter(({payload}) => payload !== '');

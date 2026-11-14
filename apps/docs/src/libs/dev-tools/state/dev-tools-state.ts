@@ -118,7 +118,11 @@ function loadSettings(): PersistedSettings {
         RENDERERS.map(({id}) => id),
         DEFAULT_SETTINGS.renderers,
       ),
-      decoders: storedDecoders(parsed as Record<string, unknown>),
+      decoders: known(
+        parsed.decoders,
+        DECODERS.map(({id}) => id),
+        DEFAULT_SETTINGS.decoders,
+      ),
       tileSize:
         typeof parsed.tileSize === 'string' && parsed.tileSize in TILE_SIZES
           ? (parsed.tileSize as TileSize)
@@ -127,16 +131,6 @@ function loadSettings(): PersistedSettings {
   } catch {
     return DEFAULT_SETTINGS;
   }
-}
-
-/** Reads the stored decoders. Settings from before ZXing stored `decode: true` for jsQR. */
-function storedDecoders(parsed: Record<string, unknown>): DecoderId[] {
-  if (parsed['decoders'] === undefined) return parsed['decode'] === true ? ['jsqr'] : [];
-  return known(
-    parsed['decoders'],
-    DECODERS.map(({id}) => id),
-    DEFAULT_SETTINGS.decoders,
-  );
 }
 
 /** The draft selection in the sidebar and the run it starts. Nothing renders until `run()`. */

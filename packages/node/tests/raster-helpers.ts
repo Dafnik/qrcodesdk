@@ -1,6 +1,9 @@
 import type {RGBAPixel} from '@repo/core-testing';
-import {type MicroQRCodeScan, decodeMicroQRCode} from '@repo/core-testing/micro-decoder/node';
-import jsQR from 'jsqr';
+import {
+  type QRCodeScan,
+  type QRCodeScanFormat,
+  decodeQRCode,
+} from '@repo/core-testing/decoder/node';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname} from 'node:path';
 import sharp from 'sharp';
@@ -18,28 +21,26 @@ export async function readRaster(input: Buffer): Promise<DecodedRaster> {
   return {width: info.width, height: info.height, data};
 }
 
-// Scans the code as displayed on a white page, so transparent backgrounds stay light.
-export async function decodeRasterQRCode(input: Buffer): Promise<string> {
-  const png = await readRaster(
-    await sharp(input).flatten({background: '#ffffff'}).png().toBuffer(),
-  );
-  const imageData = new Uint8ClampedArray(png.data.buffer, png.data.byteOffset, png.data.length);
-  const result = jsQR(imageData, png.width, png.height, {inversionAttempts: 'dontInvert'});
-
-  if (!result) {
-    throw new Error(`Unable to decode ${png.width}x${png.height} image`);
-  }
-
-  return result.data;
-}
-
-/** Scans a Micro QR code with ZXing, because jsQR cannot read Micro QR codes. */
-export async function decodeRasterMicroQRCode(input: Buffer): Promise<MicroQRCodeScan> {
-  // PNG keeps a second lossy encoding of JPEG and WebP input out of the scan, as above.
+/** Scans the code as displayed on a white page, so transparent backgrounds stay light. */
+export async function scanRasterQRCode(
+  input: Buffer,
+  format: QRCodeScanFormat = 'QRCodeModel2',
+): Promise<QRCodeScan> {
+  // PNG keeps a second lossy encoding of JPEG and WebP input out of the scan.
   const raster = await readRaster(
     await sharp(input).flatten({background: '#ffffff'}).png().toBuffer(),
   );
-  return decodeMicroQRCode(new Uint8ClampedArray(raster.data), raster.width, raster.height);
+  return decodeQRCode(new Uint8ClampedArray(raster.data), raster.width, raster.height, format);
+}
+
+/** Scans a QR code and returns its text. */
+export async function decodeRasterQRCode(input: Buffer): Promise<string> {
+  return (await scanRasterQRCode(input)).text;
+}
+
+/** Scans a Micro QR code. */
+export function decodeRasterMicroQRCode(input: Buffer): Promise<QRCodeScan> {
+  return scanRasterQRCode(input, 'MicroQRCode');
 }
 
 export type RasterFormat = 'PNG' | 'WebP' | 'GIF' | 'JPEG';

@@ -8,7 +8,6 @@ import {
   QR_CODE_MICRO_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
   QR_CODE_STYLING_FIXTURES,
-  QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
   QR_CODE_TEST_FIXTURES,
   TALL_IMAGE,
   TRANSLUCENT_IMAGE,
@@ -64,10 +63,10 @@ export type FixtureCategory = {
 /** The style the roundtrip tests use for fixtures without their own style. */
 export const PLAIN_STYLE: QRCodeVisualStyle = {moduleSize: 4, quietZone: 4};
 
-/** jsQR reads only standard QR codes. ZXing reads Micro QR codes too. */
-const MICRO_DECODE_ISSUES: KnownDecodeIssues = {jsqr: 'jsQR cannot read Micro QR codes.'};
-
-const STYLING_ROUNDTRIP_NAMES = new Set(QR_CODE_STYLING_ROUNDTRIP_FIXTURES.map(({name}) => name));
+/** ZXing drops symbols without content. The matrix tests compare the empty payload instead. */
+const EMPTY_PAYLOAD_DECODE_ISSUES: KnownDecodeIssues = {
+  zxing: 'ZXing ignores QR codes without content.',
+};
 
 export const FIXTURE_IMAGES: readonly QRCodeFixtureImage[] = [
   LOGO_IMAGE,
@@ -89,6 +88,7 @@ export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = [
       payload: fixture.payload,
       matrix: fixtureMatrixOptions(fixture),
       style: PLAIN_STYLE,
+      knownDecodeIssues: fixture.payload === '' ? EMPTY_PAYLOAD_DECODE_ISSUES : undefined,
     })),
   },
   {
@@ -104,7 +104,6 @@ export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = [
       matrixDescription: describeMicroSymbol(fixture),
       // Micro QR codes take the default quiet zone of 2 modules.
       style: {moduleSize: 4},
-      knownDecodeIssues: MICRO_DECODE_ISSUES,
     })),
   },
   {
@@ -118,9 +117,6 @@ export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = [
       payload: fixture.payload,
       matrix: fixture.matrixOptions,
       style: fixture.styling,
-      knownDecodeIssues: STYLING_ROUNDTRIP_NAMES.has(fixture.name)
-        ? undefined
-        : {jsqr: 'jsQR misses circle finder centers between dot modules in this palette.'},
     })),
   },
   {
@@ -148,7 +144,6 @@ export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = [
       matrix: fixture.matrixOptions,
       matrixDescription: describeMicroSymbol(fixture.symbol),
       style: fixture.styling,
-      knownDecodeIssues: MICRO_DECODE_ISSUES,
     })),
   },
   {

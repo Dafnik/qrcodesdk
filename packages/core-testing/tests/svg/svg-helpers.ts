@@ -1,8 +1,9 @@
-import jsQR from 'jsqr';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname} from 'node:path';
 import sharp from 'sharp';
 import {expect} from 'vitest';
+
+import {decodeQRCode} from '../../src/decoder/node';
 
 export type SvgPath = {
   tag: string;
@@ -29,14 +30,8 @@ export async function decodeSvgQRCode(svg: string): Promise<string> {
     .ensureAlpha()
     .raw()
     .toBuffer({resolveWithObject: true});
-  const imageData = new Uint8ClampedArray(data.buffer, data.byteOffset, data.length);
-  const result = jsQR(imageData, info.width, info.height, {inversionAttempts: 'dontInvert'});
-
-  if (!result) {
-    throw new Error(`Unable to decode SVG QR code rendered to ${info.width}x${info.height} PNG`);
-  }
-
-  return result.data;
+  const {text} = await decodeQRCode(new Uint8ClampedArray(data), info.width, info.height);
+  return text;
 }
 
 export function expectSvgToMatchFileSnapshot(svg: string, snapshotPath: string): void {

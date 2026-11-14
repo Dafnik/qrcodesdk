@@ -1,4 +1,3 @@
-import jsQR from 'jsqr';
 import zxingWasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url';
 
 import type {RendererId} from './renderers';
@@ -9,10 +8,9 @@ export type RenderedOutput =
   | {readonly kind: 'image'; readonly image: HTMLImageElement}
   | {readonly kind: 'canvas'; readonly canvas: HTMLCanvasElement};
 
-export type DecoderId = 'jsqr' | 'zxing';
+export type DecoderId = 'zxing';
 
 export const DECODERS: readonly {readonly id: DecoderId; readonly label: string}[] = [
-  {id: 'jsqr', label: 'jsQR'},
   {id: 'zxing', label: 'ZXing'},
 ];
 
@@ -132,14 +130,17 @@ export async function decodeOutput(
 }
 
 const DECODE: Readonly<Record<DecoderId, (pixels: Pixels) => Promise<string | undefined>>> = {
-  jsqr: ({data, width, height}) =>
-    Promise.resolve(jsQR(data, width, height, {inversionAttempts: 'dontInvert'})?.data),
   async zxing(pixels) {
     const {readBarcodes} = await loadZXing();
     const [code] = await readBarcodes(
       {...pixels, colorSpace: 'srgb'},
-      // jsQR reads only standard QR codes. ZXing also reads Micro QR codes.
-      {formats: ['QRCode', 'MicroQRCode'], tryHarder: true, maxNumberOfSymbols: 1},
+      // The same options as the roundtrip tests in `@repo/core-testing/decoder`.
+      {
+        formats: ['QRCodeModel2', 'MicroQRCode'],
+        tryHarder: true,
+        tryInvert: false,
+        maxNumberOfSymbols: 1,
+      },
     );
     return code?.isValid ? code.text : undefined;
   },

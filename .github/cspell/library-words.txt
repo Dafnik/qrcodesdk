@@ -1,6 +1,5 @@
 zxing
 serviceworker
-jsqr
 dontInvert
 packagr
 trivago

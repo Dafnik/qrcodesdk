@@ -2,7 +2,7 @@ import type {QRCodeEncodingMode} from '@qrcodesdk/core';
 
 const NUMERIC_CHARACTERS = '0123456789';
 const ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
-/** Kanji mode characters that every Shift JIS table, including jsQR's, decodes identically. */
+/** Kanji mode characters that every Shift JIS table decodes identically. */
 const KANJI_CHARACTERS = [
   ...'あいうえおかきくけこさしすせそアイウエオカキクケコサシスセソ漢字日本語東京点茗中文ＱＲ０１',
 ];

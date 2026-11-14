@@ -32,8 +32,7 @@ export function fixtureMicroMatrixOptions({
 
 /**
  * Micro QR fixtures across every symbol (M1, M2-L/M, M3-L/M, M4-L/M/Q), mode, and mask, including
- * the ISO/IEC 18004 examples and the maximum capacity of each mode. jsQR cannot read Micro QR
- * codes, so roundtrips decode them with ZXing.
+ * the ISO/IEC 18004 examples and the maximum capacity of each mode.
  */
 export const QR_CODE_MICRO_TEST_FIXTURES = [
   {

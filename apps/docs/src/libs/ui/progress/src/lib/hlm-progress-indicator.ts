@@ -17,10 +17,14 @@ import {classes} from '@spartan-ng/helm/utils';
 export class HlmProgressIndicator {
   private readonly _progress = injectBrnProgress();
   private readonly _dir = inject(Directionality);
-  // Offset the indicator by the unfilled remainder. In RTL the bar fills from the inline-start
-  // (visually the right), so translate the opposite way to keep the fill on the correct side.
+  // Offset the indicator by the unfilled remainder, as a percentage of `max`. In RTL the bar fills
+  // from the inline-start (visually the right), so translate the opposite way to keep the fill on
+  // the correct side.
   protected readonly _transform = computed(() => {
-    const offset = 100 - (this._progress.value() ?? 100);
+    const value = this._progress.value();
+    const max = this._progress.max();
+    const percent = value === undefined || value === null || max <= 0 ? 100 : (value / max) * 100;
+    const offset = 100 - Math.min(100, Math.max(0, percent));
     return `translateX(${this._dir.valueSignal() === 'rtl' ? '' : '-'}${offset}%)`;
   });
   protected readonly _indeterminate = computed(
