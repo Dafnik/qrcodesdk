@@ -13,7 +13,8 @@
     "preview": "astro preview",
     "check-types": "astro check && ngc -p tsconfig.app.json --noEmit",
     "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
-    "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/explain/*.test.ts src/components/playground/*.test.ts src/utils/*.test.mjs",
+    "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/playground/*.test.ts src/utils/*.test.mjs && vitest run",
+    "benchmark:explain": "vitest bench --run --reporter=verbose",
     "astro": "astro",
     "clean": "rm -rf .turbo dist .astro"
   },
@@ -94,6 +95,7 @@
     "typescript": "catalog:angular-typescript",
     "unified": "11.0.5",
     "vite": "catalog:",
+    "vitest": "catalog:",
     "yaml": "2.9.1"
   }
 }

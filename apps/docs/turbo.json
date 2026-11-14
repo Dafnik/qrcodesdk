@@ -1,6 +1,13 @@
 {
   "extends": ["//"],
   "tasks": {
+    "benchmark:explain": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "build": {
+      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/packages/core/src/**"]
+    },
     "check-performance": {
       "cache": false
     },
@@ -8,7 +15,8 @@
       "cache": false
     },
     "check-types": {
-      "dependsOn": ["$TURBO_EXTENDS$", "build"]
+      "dependsOn": ["$TURBO_EXTENDS$", "build"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/core/src/**"]
     },
     "generate-performance": {
       "cache": false
@@ -30,7 +38,8 @@
       "persistent": true
     },
     "test": {
-      "dependsOn": ["$TURBO_EXTENDS$", "@qrcodesdk/cli#build"]
+      "dependsOn": ["$TURBO_EXTENDS$", "@qrcodesdk/cli#build"],
+      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/packages/core/src/**"]
     }
   }
 }

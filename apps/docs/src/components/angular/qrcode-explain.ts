@@ -1,4 +1,4 @@
-import {NgClass} from '@angular/common';
+import {NgClass, NgComponentOutlet} from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -15,7 +15,9 @@ import {NgIcon, provideIcons} from '@ng-icons/core';
 import {lucideRotateCcw} from '@ng-icons/lucide';
 import {HlmAlertImports} from '@spartan-ng/helm/alert';
 import {HlmButtonImports} from '@spartan-ng/helm/button';
+import {HlmFieldImports} from '@spartan-ng/helm/field';
 import {HlmSeparatorImports} from '@spartan-ng/helm/separator';
+import {HlmSwitchImports} from '@spartan-ng/helm/switch';
 
 import {
   type QRCodeExplainModule,
@@ -25,6 +27,11 @@ import {
   QR_CODE_EXPLAIN_ROLE_ORDER,
   explainQRCode,
 } from '../explain/qrcode-analyzer.ts';
+import {
+  createTraceLoader,
+  describeModuleProvenance,
+  resolveTraceState,
+} from '../explain/qrcode-trace-view.ts';
 import {QrEncodingControls, QrMatrixControls} from '../playground/angular/qr-matrix-controls.ts';
 import {
   assertPlaygroundKanjiAvailable,
@@ -36,6 +43,13 @@ import {
   resetQrOptions,
 } from '../playground/playground-options.ts';
 import {suppressInitialTransitions} from './suppress-initial-transitions.ts';
+
+type QRCodeTraceChunk = typeof import('./qrcode-explain-trace-chunk.ts');
+
+/** Loads the trace analysis and its presentation in their own chunk when the trace is shown. */
+const loadTraceChunk = createTraceLoader<QRCodeTraceChunk>(
+  () => import('./qrcode-explain-trace-chunk.ts'),
+);
 
 type ExplainSelection = {
   groupId: string;
@@ -74,8 +88,7 @@ type LegendItem = {
       </div>
 
       <qr-matrix-controls />
-      <!-- The explanation covers standard QR codes only, so Micro QR codes stay hidden. -->
-      <qr-encoding-controls [allowMicro]="false" />
+      <qr-encoding-controls />
     </div>
   `,
 })
@@ -89,7 +102,15 @@ export class QRCodeExplainControls {
 
 @Component({
   selector: 'qrcode-explain',
-  imports: [HlmAlertImports, HlmButtonImports, HlmSeparatorImports, NgClass],
+  imports: [
+    HlmAlertImports,
+    HlmButtonImports,
+    HlmFieldImports,
+    HlmSeparatorImports,
+    HlmSwitchImports,
+    NgClass,
+    NgComponentOutlet,
+  ],
   providers: [{provide: NANOSTORES, useClass: NanostoresService}],
   styles: `
     :host {
@@ -168,9 +189,21 @@ export class QRCodeExplainControls {
     } @else if (explanation(); as qr) {
       <div class="grid gap-5">
         <div class="flex flex-wrap gap-2" aria-label="Resolved QR code options">
+          @if (qr.symbol === 'micro') {
+            <span
+              class="bg-secondary text-secondary-foreground rounded-md px-2.5 py-1 font-mono text-xs">
+              Micro QR
+            </span>
+          }
+          @if (qr.microFallback) {
+            <span
+              class="bg-secondary text-secondary-foreground rounded-md px-2.5 py-1 font-mono text-xs">
+              Standard QR fallback
+            </span>
+          }
           <span
             class="bg-secondary text-secondary-foreground rounded-md px-2.5 py-1 font-mono text-xs">
-            V{{ qr.version }}
+            {{ versionLabel(qr) }}
           </span>
           <span
             class="bg-secondary text-secondary-foreground rounded-md px-2.5 py-1 font-mono text-xs">
@@ -178,7 +211,11 @@ export class QRCodeExplainControls {
           </span>
           <span
             class="bg-secondary text-secondary-foreground rounded-md px-2.5 py-1 font-mono text-xs">
-            ECC {{ qr.errorCorrectionLevel }}
+            {{
+              qr.errorCorrectionLevel === undefined
+                ? 'Error detection only'
+                : 'ECC ' + qr.errorCorrectionLevel
+            }}
           </span>
           <span
             class="bg-secondary text-secondary-foreground rounded-md px-2.5 py-1 font-mono text-xs">
@@ -373,6 +410,44 @@ export class QRCodeExplainControls {
         </section>
 
         <p class="sr-only" aria-live="polite">{{ liveAnnouncement() }}</p>
+
+        <hlm-separator />
+
+        <div class="grid gap-4" [attr.data-trace-open]="traceEnabled() ? '' : null">
+          <label class="border-input rounded-md border p-4" for="qr-encoding-trace" hlmField>
+            <div class="flex items-center justify-between gap-4">
+              <div class="grid gap-1">
+                <span hlmFieldLabel>Show encoding trace</span>
+                <p hlmFieldDescription>
+                  Lists the segments, padding, error correction blocks, codeword placement, and mask
+                  scores behind this symbol.
+                </p>
+              </div>
+              <hlm-switch
+                [checked]="traceEnabled()"
+                (checkedChange)="setTraceEnabled($event)"
+                inputId="qr-encoding-trace" />
+            </div>
+          </label>
+
+          @switch (traceState().status) {
+            @case ('loading') {
+              <p class="text-muted-foreground text-sm">Loading the encoding trace…</p>
+            }
+            @case ('error') {
+              <hlm-alert variant="destructive">
+                <h3 hlmAlertTitle>Encoding trace unavailable</h3>
+                <p hlmAlertDescription>{{ traceError() }}</p>
+              </hlm-alert>
+            }
+          }
+          @if (trace(); as trace) {
+            @if (traceChunk(); as chunk) {
+              <ng-container *ngComponentOutlet="chunk.QRCodeExplainTrace; inputs: {trace: trace}" />
+            }
+          }
+          <p class="sr-only" aria-live="polite">{{ traceAnnouncement() }}</p>
+        </div>
       </div>
     }
   `,
@@ -399,6 +474,39 @@ export class QRCodeExplain {
     }
   });
   protected readonly explanation = computed(() => this.state().explanation);
+  /** Local to this page: the trace is not part of the shared options or the URL. */
+  protected readonly traceEnabled = signal(false);
+  protected readonly traceChunk = signal<QRCodeTraceChunk | undefined>(undefined);
+  private readonly traceLoadError = signal<unknown>(undefined);
+  protected readonly traceState = computed(() =>
+    resolveTraceState({
+      enabled: this.traceEnabled(),
+      explanation: this.explanation(),
+      analyzer: this.traceChunk()?.analyzeQRCodeEncoding,
+      loadError: this.traceLoadError(),
+    }),
+  );
+  protected readonly trace = computed(() => {
+    const state = this.traceState();
+    return state.status === 'ready' ? state.trace : undefined;
+  });
+  protected readonly traceError = computed(() => {
+    const state = this.traceState();
+    return state.status === 'error' ? state.message : undefined;
+  });
+  /** Announces status changes only, not every recalculation while the payload changes. */
+  protected readonly traceAnnouncement = computed(() => {
+    switch (this.traceState().status) {
+      case 'loading':
+        return 'Loading the encoding trace.';
+      case 'ready':
+        return 'Encoding trace shown below.';
+      case 'error':
+        return 'The encoding trace is unavailable.';
+      default:
+        return '';
+    }
+  });
   protected readonly pinnedSelection = linkedSignal<ExplainSelection | undefined>(() => {
     this.explanation();
     return undefined;
@@ -468,6 +576,23 @@ export class QRCodeExplain {
     if (selection === undefined) return '';
     return `${this.selectionLabel(selection)}. ${this.moduleSummary(selection.module)}`;
   });
+
+  protected setTraceEnabled(enabled: boolean): void {
+    this.traceEnabled.set(enabled);
+    if (!enabled || this.traceChunk() !== undefined) return;
+    // A failed download is retried the next time the trace is shown.
+    this.traceLoadError.set(undefined);
+    loadTraceChunk().then(
+      (chunk) => this.traceChunk.set(chunk),
+      (error: unknown) => this.traceLoadError.set(error ?? new Error('Unknown error')),
+    );
+  }
+
+  protected versionLabel(explanation: QRCodeExplanation): string {
+    return typeof explanation.version === 'number'
+      ? `V${String(explanation.version)}`
+      : explanation.version;
+  }
 
   /** Previews the hovered module without replacing a pinned selection. */
   protected onPointerMove(event: PointerEvent): void {
@@ -618,6 +743,9 @@ export class QRCodeExplain {
       parts.push(`placement bit ${module.placementBitIndex + 1}`);
     }
     if (module.codewordIndex !== undefined) parts.push(`codeword ${module.codewordIndex}`);
+    const trace = this.trace();
+    const provenance = trace && describeModuleProvenance(module, trace);
+    if (provenance) parts.push(provenance);
     return parts.join(' · ');
   }
 

@@ -85,6 +85,37 @@ To build and preview the site:
 pnpm turbo run preview --filter=docs
 ```
 
+#### QR code explanation and encoding trace
+
+The "How QR codes work" page explains a generated matrix. When **Show encoding trace** is on, it
+imports `apps/docs/src/components/angular/qrcode-explain-trace-chunk.ts`, which loads the trace
+analysis (`explain/qrcode-trace.ts`) and its presentation in their own chunk. The trace reads the
+encoded result from the matrix and checks it with the encoder's own stateless helpers, so it is
+coupled to private core source:
+
+- `qrcode-core-source.ts` is the only docs module that imports `packages/core/src`. Keep it to
+  stateless helpers such as tables, bit lengths, error correction, masks, and mask scores. Do not
+  import the option resolver or the Kanji registry; matrices still come from the public builder.
+- Renaming or changing those core helpers can break the docs. The docs `build`, `check-types`, and
+  `test` tasks list `packages/core/src` as an input, so Turbo reruns them after core source changes.
+- The Angular type check in `apps/docs/tsconfig.app.json` also checks that core source. Its
+  `rootDir` is the workspace root, and its `lib` leaves out `es2022.error`: core targets ES2020,
+  and under the ES2022 `Error` type, `noImplicitOverride` rejects `QRCodeError.cause`.
+- The explanation tests run in Vitest, because the core source imports modules without file
+  extensions, which the Node test runner cannot resolve. The docs `test` task runs them after the
+  Node test suites.
+- The trace is a docs inspector, not a published API. Its types stay in the docs and need no `ɵ`
+  prefix.
+
+Measure the explanation with the trace off and on, separately from other tasks:
+
+```sh
+pnpm turbo run benchmark:explain --filter=docs
+```
+
+Vitest's module runner adds overhead to every access of an exported binding, which inflates hot
+loops in core source. Compare results between runs rather than reading them as browser timings.
+
 Generate or check package READMEs:
 
 ```sh
