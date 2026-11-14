@@ -9,14 +9,17 @@ import {
   type QRCodeCenterImageLayout,
   type QRCodeDataImageURL,
   type QRCodeMatrixOptions,
-  type QRCodeMode,
   type QRCodeSVGOptions,
   type QRCodeVisualStyle,
   svgCenterImage,
 } from '@qrcodesdk/core';
-import {kanji} from '@qrcodesdk/core/kanji';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
+import {
+  applyWithPlaygroundKanji,
+  playgroundKanjiTable,
+  playgroundUsesKanji,
+} from './playground-kanji.ts';
 import {type PlaygroundStyleState, createPlaygroundStyle} from './playground-style.ts';
 
 export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue' | 'cli';
@@ -92,8 +95,17 @@ let imagePreparationVersion = 0;
 const playgroundLogoPath = '/logo-square.png';
 const playgroundLogoFileName = 'QRCodeSDK logo.png';
 
+export {playgroundUsesKanji} from './playground-kanji.ts';
+
 export function updateQrOptions(patch: Partial<PlaygroundOptions>): void {
-  playgroundOptions.set({...playgroundOptions.get(), ...patch});
+  applyWithPlaygroundKanji(playgroundUsesKanji({...playgroundOptions.get(), ...patch}), () =>
+    playgroundOptions.set({...playgroundOptions.get(), ...patch}),
+  );
+}
+
+/** Replaces the playground options, after loading the Kanji table if they need it. */
+export function setQrOptions(options: PlaygroundOptions): void {
+  applyWithPlaygroundKanji(playgroundUsesKanji(options), () => playgroundOptions.set(options));
 }
 
 export function setPlaygroundSectionOpen(section: PlaygroundSection, open: boolean): void {
@@ -108,7 +120,7 @@ export function setPlaygroundSectionOpen(section: PlaygroundSection, open: boole
 }
 
 export function resetQrOptions(): void {
-  playgroundOptions.set({...defaultPlaygroundOptions});
+  setQrOptions({...defaultPlaygroundOptions});
   clearPlaygroundImage();
 }
 
@@ -242,24 +254,13 @@ export function createPlaygroundCanvasOptions(
     : rendererOptions;
 }
 
-/**
- * Whether the matrix needs the Kanji table: the Kanji switch is on, or Kanji mode is forced, which
- * the CLI also loads the table for.
- */
-export function playgroundUsesKanji(options: {
-  readonly kanji?: boolean;
-  readonly mode?: QRCodeMode;
-}): boolean {
-  return options.kanji === true || options.mode === 'kanji';
-}
-
 function baseOptions(playgroundOptionsValue: PlaygroundOptions) {
   return {
     matrix: {
       version: playgroundOptionsValue.version,
       mode: playgroundOptionsValue.mode,
       segmenter: playgroundOptionsValue.optimizeSegments ? automaticSegmenter : undefined,
-      kanji: playgroundUsesKanji(playgroundOptionsValue) ? kanji : undefined,
+      kanji: playgroundUsesKanji(playgroundOptionsValue) ? playgroundKanjiTable() : undefined,
       errorCorrectionLevel: playgroundOptionsValue.errorCorrectionLevel,
       mask: playgroundOptionsValue.mask,
       eci: playgroundOptionsValue.eci,

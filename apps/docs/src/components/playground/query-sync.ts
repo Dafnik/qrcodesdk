@@ -1,6 +1,6 @@
 import type {QRCodeColor, QRCodeMask, QRCodeVersion} from '@qrcodesdk/core';
 
-import {cliPlaygroundOptions} from './cli-playground.ts';
+import {cliPlaygroundOptions, setCliOptions} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
 import {
   PLAYGROUND_SECTIONS,
@@ -14,6 +14,7 @@ import {
   playgroundOpenSections,
   playgroundOptions,
   playgroundView,
+  setQrOptions,
 } from './playground-options.ts';
 import {PLAYGROUND_SHAPES} from './playground-style.ts';
 
@@ -293,10 +294,8 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   let applyingUrlState = true;
   let updateTimer: ReturnType<typeof setTimeout> | undefined;
 
-  playgroundOptions.set(readQrOptionsFromUrl());
-  cliPlaygroundOptions.set(
-    readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)),
-  );
+  setQrOptions(readQrOptionsFromUrl());
+  setCliOptions(readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)));
   playgroundOpenSections.set(
     readOpenSectionsFromSearchParams(new URLSearchParams(window.location.search)),
   );
@@ -327,10 +326,8 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
     applyingUrlState = true;
 
     try {
-      playgroundOptions.set(readQrOptionsFromUrl());
-      cliPlaygroundOptions.set(
-        readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)),
-      );
+      setQrOptions(readQrOptionsFromUrl());
+      setCliOptions(readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)));
       playgroundOpenSections.set(
         readOpenSectionsFromSearchParams(new URLSearchParams(window.location.search)),
       );

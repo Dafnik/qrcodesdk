@@ -9,11 +9,15 @@ import {
   type QRCodeTextRendererOptions,
   qrcode,
 } from '@qrcodesdk/core';
-import {kanji} from '@qrcodesdk/core/kanji';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {createPackageManagerCommands} from '../../utils/package-manager-commands.mjs';
-import {playgroundOptions, playgroundUsesKanji} from './playground-options.ts';
+import {
+  applyWithPlaygroundKanji,
+  playgroundKanjiTable,
+  playgroundUsesKanji,
+} from './playground-kanji.ts';
+import {playgroundOptions} from './playground-options.ts';
 
 export type CliLauncher = 'npm' | 'installed' | 'pnpm' | 'viteplus' | 'bun' | 'yarn';
 export interface CliPlaygroundOptions extends Omit<QRCodeMatrixOptions, 'kanji'> {
@@ -48,11 +52,17 @@ export const defaultCliOptions: CliPlaygroundOptions = {
 export const cliPlaygroundOptions = atom<CliPlaygroundOptions>({...defaultCliOptions});
 /** Merge edited CLI settings without changing the framework configuration. */
 export function updateCliOptions(patch: Partial<CliPlaygroundOptions>): void {
-  cliPlaygroundOptions.set({...cliPlaygroundOptions.get(), ...patch});
+  applyWithPlaygroundKanji(playgroundUsesKanji({...cliPlaygroundOptions.get(), ...patch}), () =>
+    cliPlaygroundOptions.set({...cliPlaygroundOptions.get(), ...patch}),
+  );
+}
+/** Replace the CLI settings, after loading the Kanji table if they need it. */
+export function setCliOptions(options: CliPlaygroundOptions): void {
+  applyWithPlaygroundKanji(playgroundUsesKanji(options), () => cliPlaygroundOptions.set(options));
 }
 /** Restore CLI defaults while leaving the selected package and framework settings intact. */
 export function resetCliOptions(): void {
-  cliPlaygroundOptions.set({...defaultCliOptions});
+  setCliOptions({...defaultCliOptions});
 }
 
 export interface TerminalRun {
@@ -123,7 +133,7 @@ export function createCliSVGOptions(options: CliPlaygroundOptions): QRCodeSVGOpt
     matrix: {
       mode: options.mode,
       segmenter: options.optimizeSegments ? automaticSegmenter : undefined,
-      kanji: playgroundUsesKanji(options) ? kanji : undefined,
+      kanji: playgroundUsesKanji(options) ? playgroundKanjiTable() : undefined,
       errorCorrectionLevel: options.errorCorrectionLevel,
       version: options.version,
       mask: options.mask,

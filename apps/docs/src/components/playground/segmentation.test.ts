@@ -9,7 +9,17 @@ import {explainQRCode} from '../explain/qrcode-analyzer.ts';
 import {generatePlaygroundCode} from './angular/playground-code-generator.ts';
 import {createCliSVGOptions, defaultCliOptions, generateCliCommand} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
-import {createPlaygroundSVGOptions, defaultPlaygroundOptions} from './playground-options.ts';
+import {
+  loadPlaygroundKanji,
+  playgroundKanjiSettled,
+  playgroundKanjiTable,
+} from './playground-kanji.ts';
+import {
+  createPlaygroundSVGOptions,
+  defaultPlaygroundOptions,
+  playgroundOptions,
+  updateQrOptions,
+} from './playground-options.ts';
 import {readQrOptionsFromSearchParams, writeQrOptionsToSearchParams} from './query-sync.ts';
 
 const payload = 'ABCD12345678901234567890abcd';
@@ -78,7 +88,33 @@ test('the explainer reports actual modes for default, optimized, and forced enco
   assert.equal(explainQRCode({payload: '', mode: 'auto'}).mode, 'numeric');
 });
 
-test('playground shares the Kanji switch through URLs and renderers', () => {
+test('playground loads the Kanji table before it applies updates that need it', async () => {
+  assert.equal(playgroundKanjiTable(), undefined);
+  assert.equal(
+    createPlaygroundSVGOptions({...defaultPlaygroundOptions, kanji: true}).matrix?.kanji,
+    undefined,
+  );
+
+  updateQrOptions({kanji: true});
+  updateQrOptions({payload: '東京タワー'});
+  // Both updates wait for the table and keep their order.
+  assert.notEqual(playgroundOptions.get().kanji, true);
+  assert.notEqual(playgroundOptions.get().payload, '東京タワー');
+
+  await playgroundKanjiSettled();
+  assert.equal(playgroundKanjiTable(), kanji);
+  assert.equal(playgroundOptions.get().kanji, true);
+  assert.equal(playgroundOptions.get().payload, '東京タワー');
+  assert.equal(createPlaygroundSVGOptions(playgroundOptions.get()).matrix?.kanji, kanji);
+
+  // Once the table has loaded, updates apply immediately.
+  updateQrOptions({payload: '漢字', kanji: false});
+  assert.equal(playgroundOptions.get().payload, '漢字');
+  assert.equal(playgroundOptions.get().kanji, false);
+});
+
+test('playground shares the Kanji switch through URLs and renderers', async () => {
+  await loadPlaygroundKanji();
   const options = {...defaultPlaygroundOptions, payload: '東京タワー', kanji: true};
   const params = writeQrOptionsToSearchParams(
     new URLSearchParams(),
@@ -99,7 +135,8 @@ test('playground shares the Kanji switch through URLs and renderers', () => {
   );
 });
 
-test('playground forced Kanji mode loads the Kanji table', () => {
+test('playground forced Kanji mode uses the Kanji table', async () => {
+  await loadPlaygroundKanji();
   const params = new URLSearchParams({mode: 'kanji'});
   const restored = readQrOptionsFromSearchParams(params);
   assert.equal(restored.mode, 'kanji');
@@ -126,7 +163,8 @@ test('all framework examples import the Kanji table only when it is used', () =>
   }
 });
 
-test('CLI URL, generated command, and preview agree on Kanji mode', () => {
+test('CLI URL, generated command, and preview agree on Kanji mode', async () => {
+  await loadPlaygroundKanji();
   const options = {...defaultCliOptions, payload: '東京タワー123', kanji: true};
   const params = new URLSearchParams();
   writeCliOptionsToSearchParams(params, options);
