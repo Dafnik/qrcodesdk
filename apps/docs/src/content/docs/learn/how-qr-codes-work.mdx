@@ -74,12 +74,14 @@ The payload is split into segments. Each segment holds:
 | Numeric      | Digits `0`–`9`                                   | About 3.33 per digit |
 | Alphanumeric | Digits, uppercase `A`–`Z`, space, and `$%*+-./:` | 5.5 per character    |
 | Octet        | Any bytes; QRCodeSDK encodes text as UTF-8       | 8 per UTF-8 byte     |
+| Kanji        | Double-byte Shift JIS characters, such as `漢字` | 13 per character     |
 
 In octet mode, one character can take several bytes. `é` takes 2 UTF-8 bytes, `✅` takes 3, and most
 emoji take 4. So one character costs 8 to 32 bits.
 
 Numeric and alphanumeric modes pack text more densely, so the same payload can fit a smaller
-version. By default, QRCodeSDK picks one mode for the whole payload. Two options change the bit
+version. Kanji mode does the same for Japanese text, which takes 24 bits per character in UTF-8. It
+needs the opt-in [Kanji table](/reference/builder/#kanji-mode). By default, QRCodeSDK picks one mode for the whole payload. Two options change the bit
 stream:
 
 - The optional [mixed-mode segmenter](/reference/builder/#optional-mixed-mode-optimization) combines

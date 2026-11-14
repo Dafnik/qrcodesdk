@@ -424,6 +424,7 @@ import {
   type QRCodeImageAccessibilityOptions,
   QRCodeJPEG,
   type QRCodeJPEGImageOptions,
+  type QRCodeKanji,
   type QRCodeMask,
   type QRCodeMatrixOptions,
   type QRCodeMode,
@@ -454,6 +455,7 @@ import {
   customShape,
   diagonal,
   finder,
+  kanji,
   rounded,
   svgCenterImage,
 } from '@qrcodesdk/angular';

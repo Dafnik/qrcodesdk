@@ -1,8 +1,10 @@
 import {createApp, h, version} from 'vue';
 
-import {QRCodeCanvas, QRCodeJPEG, QRCodePNG, QRCodeSVG} from '@qrcodesdk/vue';
+import {QRCodeCanvas, QRCodeJPEG, QRCodePNG, QRCodeSVG, kanji} from '@qrcodesdk/vue';
 
 const options = {style: {moduleSize: 2, quietZone: 1}};
+// Kanji mode fits this payload into version 1; UTF-8 octets would need version 2.
+const kanjiOptions = {...options, matrix: {kanji}};
 const imageOptions = {
   ...options,
   accessibility: {
@@ -24,6 +26,9 @@ createApp({
       ]),
       h('section', {'data-testid': 'qrcode-canvas'}, [
         h(QRCodeCanvas, {payload: 'HELLO', options}),
+      ]),
+      h('section', {'data-testid': 'qrcode-kanji-svg'}, [
+        h(QRCodeSVG, {payload: '東京タワー', options: kanjiOptions}),
       ]),
     ]),
 }).mount('#app');

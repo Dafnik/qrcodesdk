@@ -7,10 +7,13 @@
     QRCodePNG,
     QRCodeSVG,
     type QRCodeSVGOptions,
+    kanji,
     svgCenterImage,
   } from '@qrcodesdk/svelte';
 
   const options = {style: {moduleSize: 2, quietZone: 1}};
+  // Kanji mode fits this payload into version 1; UTF-8 octets would need version 2.
+  const kanjiOptions = {...options, matrix: {kanji}};
   const imageOptions = {
     ...options,
     accessibility: {
@@ -39,6 +42,9 @@
   </section>
   <section data-testid="qrcode-canvas">
     <QRCodeCanvas payload="HELLO" {options} />
+  </section>
+  <section data-testid="qrcode-kanji-svg">
+    <QRCodeSVG payload="東京タワー" options={kanjiOptions} />
   </section>
   <section data-testid="qrcode-reactive-svg">
     <QRCodeSVG payload="REACTIVE" options={styledOptions} />

@@ -21,11 +21,12 @@ const FIXTURE_ALPHABETS = {
   octet: Array.from({length: 0x7f - 0x20}, (_, index) => String.fromCharCode(0x20 + index)).join(
     '',
   ),
+  kanji: 'あいうえおアイウエオ漢字日本語東京点茗中文ＱＲ',
 } as const;
 
 /**
  * Creates a deterministic, non-repeating payload from the mode's alphabet (printable ASCII for
- * octet mode, so `length` is also the byte length). Mirrors `@repo/core-testing`, which core
+ * octet mode, so `length` is also the byte length, and Kanji mode characters for Kanji mode). Mirrors `@repo/core-testing`, which core
  * cannot depend on.
  */
 export function fixturePayload(
@@ -46,4 +47,36 @@ export function fixturePayload(
       alphabet[Math.floor((((value ^ (value >>> 14)) >>> 0) / 4_294_967_296) * alphabet.length)];
   }
   return payload;
+}
+
+let shiftJISValues: Map<string, number> | undefined;
+
+/**
+ * Returns the 13-bit Kanji mode value of every character, derived from the platform's WHATWG
+ * Shift_JIS decoder independently of the bundled table. The lowest value wins for duplicates.
+ */
+export function shiftJISKanjiValues(): ReadonlyMap<string, number> {
+  if (shiftJISValues) return shiftJISValues;
+  const decoder = new TextDecoder('shift_jis', {fatal: true});
+  shiftJISValues = new Map();
+  for (let code = 0x8140; code <= 0xebbf; code++) {
+    const trail = code & 0xff;
+    if ((code > 0x9ffc && code < 0xe040) || trail < 0x40 || trail === 0x7f || trail > 0xfc) {
+      continue;
+    }
+    let character: string;
+    try {
+      character = decoder.decode(new Uint8Array([code >> 8, trail]));
+    } catch {
+      continue;
+    }
+    if (character.length !== 1 || character === '�' || shiftJISValues.has(character)) continue;
+    const difference = code - (code < 0xe040 ? 0x8140 : 0xc140);
+    shiftJISValues.set(character, (difference >> 8) * 0xc0 + (difference & 0xff));
+  }
+  return shiftJISValues;
+}
+
+export function kanjiModeValues(text: string): number[] {
+  return Array.from(text, (character) => shiftJISKanjiValues().get(character)!);
 }

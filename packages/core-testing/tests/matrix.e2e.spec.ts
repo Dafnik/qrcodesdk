@@ -4,6 +4,7 @@ import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 import type {QRCodeErrorCorrectionLevel, QRCodeMask, QRCodeRenderer} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {fixtureCapacity, fixtureMatrixOptions} from '../src';
@@ -13,10 +14,13 @@ import {
   QR_CODE_TEST_FIXTURES,
   TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS,
   TOTAL_QR_CODE_COMBINATIONS,
+  TOTAL_QR_CODE_KANJI_COMBINATIONS,
   getAllQRCodeAutoMaskCombinations,
   getAllQRCodeCombinations,
+  getAllQRCodeKanjiCombinations,
   matrixToRows,
 } from '../src';
+import {shiftJISBytes, shiftJISCode} from './shift-jis';
 
 type Rows = number[][];
 
@@ -30,6 +34,7 @@ const binaryMatrix: QRCodeRenderer<Rows> = matrixToRows;
 const MASKS: QRCodeMask[] = [0, 1, 2, 3, 4, 5, 6, 7];
 const ALL_QR_CODE_COMBINATIONS = [...getAllQRCodeCombinations()];
 const ALL_QR_CODE_AUTO_MASK_COMBINATIONS = [...getAllQRCodeAutoMaskCombinations()];
+const ALL_QR_CODE_KANJI_COMBINATIONS = [...getAllQRCodeKanjiCombinations()];
 
 const REFERENCE_QR_CODE_COMBINATIONS = ALL_QR_CODE_COMBINATIONS;
 const REFERENCE_QR_CODE_AUTO_MASK_COMBINATIONS = ALL_QR_CODE_AUTO_MASK_COMBINATIONS;
@@ -80,12 +85,15 @@ function referenceMatrixQRCodePackage(fixture: QRCodeTestFixture): Rows {
         ? [{mode: 'alphanumeric' as const, data: fixture.payload}]
         : fixture.mode === 'octet'
           ? [{mode: 'byte' as const, data: new TextEncoder().encode(fixture.payload)}]
-          : fixture.payload;
+          : fixture.mode === 'kanji'
+            ? [{mode: 'kanji' as const, data: fixture.payload}]
+            : fixture.payload;
 
   const qr = create(encodedData, {
     errorCorrectionLevel: fixture.errorCorrectionLevel ?? 'M',
     maskPattern: fixture.mask,
     version: fixture.version,
+    toSJISFunc: shiftJISCode,
   });
 
   return Array.from({length: qr.modules.size}, (_, row) =>
@@ -94,7 +102,11 @@ function referenceMatrixQRCodePackage(fixture: QRCodeTestFixture): Rows {
 }
 
 function referenceMatrixQRCodeGeneratorPackage(fixture: QRCodeTestFixture): Rows {
-  qrcodeGenerator.stringToBytes = (value) => Array.from(new TextEncoder().encode(value));
+  // The ESM build converts Kanji mode data with the same function as byte mode data.
+  qrcodeGenerator.stringToBytes =
+    fixture.mode === 'kanji'
+      ? shiftJISBytes
+      : (value) => Array.from(new TextEncoder().encode(value));
 
   const qr = qrcodeGenerator(fixture.version ?? 0, fixture.errorCorrectionLevel ?? 'M');
   qr.addData(
@@ -103,8 +115,8 @@ function referenceMatrixQRCodeGeneratorPackage(fixture: QRCodeTestFixture): Rows
       ? 'Numeric'
       : fixture.mode === 'alphanumeric'
         ? 'Alphanumeric'
-        : fixture.mode === 'octet'
-          ? 'Byte'
+        : fixture.mode === 'kanji'
+          ? 'Kanji'
           : 'Byte',
   );
   qr.make(fixture.mask);
@@ -130,6 +142,16 @@ describe('qrcode().render(binaryMatrix)', () => {
       expect(payloadLength(payload, mode)).toBe(
         fixtureCapacity(version, errorCorrectionLevel, mode),
       );
+    }
+  });
+
+  test('provides every unique Kanji version, ECC level, and mask combination', () => {
+    expect(ALL_QR_CODE_KANJI_COMBINATIONS).toHaveLength(TOTAL_QR_CODE_KANJI_COMBINATIONS);
+    expect(new Set(ALL_QR_CODE_KANJI_COMBINATIONS.map(({name}) => name)).size).toBe(
+      TOTAL_QR_CODE_KANJI_COMBINATIONS,
+    );
+    for (const {payload, version, errorCorrectionLevel} of ALL_QR_CODE_KANJI_COMBINATIONS) {
+      expect(payload.length).toBe(fixtureCapacity(version, errorCorrectionLevel, 'kanji'));
     }
   });
 
@@ -239,6 +261,48 @@ describe('qrcode().render(binaryMatrix)', () => {
       expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
     },
   );
+
+  test.each(ALL_QR_CODE_KANJI_COMBINATIONS)(
+    'matches Kanji reference matrices for $name',
+    (fixture) => {
+      const matrix = qrcode(fixture.payload)
+        .options(fixtureMatrixOptions(fixture))
+        .render(binaryMatrix);
+
+      expect(matrix).toEqual(referenceMatrixQRCodePackage(fixture));
+      expect(matrix).toEqual(referenceMatrixQRCodeGeneratorPackage(fixture));
+    },
+  );
+
+  test('matches the reference generator for automatic mixed-mode encoding with Kanji', () => {
+    const fixture = {
+      name: 'mixed-mode-kanji',
+      payload: '東京タワー333',
+      kanji,
+      version: 1 as const,
+      mask: 0 as const,
+    };
+    const reference = create(
+      [
+        {mode: 'kanji', data: '東京タワー'},
+        {mode: 'numeric', data: '333'},
+      ],
+      {version: 1, maskPattern: 0, errorCorrectionLevel: 'M', toSJISFunc: shiftJISCode},
+    );
+
+    expect(
+      qrcode(fixture.payload)
+        .segmenter(automaticSegmenter)
+        .options(fixtureMatrixOptions(fixture))
+        .render(binaryMatrix),
+    ).toEqual(
+      Array.from({length: reference.modules.size}, (_, row) =>
+        Array.from({length: reference.modules.size}, (_, column) =>
+          Number(reference.modules.get(row, column)),
+        ),
+      ),
+    );
+  });
 
   test.each(REFERENCE_QR_CODE_AUTO_MASK_COMBINATIONS)(
     'matches automatic-mask reference matrix for $name',

@@ -1,13 +1,10 @@
-import {
-  QR_CODE_STYLING_FIXTURES,
-  QR_CODE_TEST_FIXTURES,
-  TOTAL_QR_CODE_COMBINATIONS,
-} from '@repo/core-testing';
+import {QR_CODE_STYLING_FIXTURES, TOTAL_QR_CODE_COMBINATIONS} from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {
   AUTOMATIC_QR_CODE_TEST_FIXTURES,
   BENCHMARK_SAMPLE_COUNT,
+  BENCHMARK_TEST_FIXTURES,
   STATIC_MULTIPLIERS,
   STYLED_MULTIPLIERS,
   WARMUP_EXHAUSTIVE_PASSES,
@@ -23,9 +20,9 @@ import {
 
 describe('benchmark workloads', () => {
   test('preserves source names and payloads in automatic static fixtures', () => {
-    expect(AUTOMATIC_QR_CODE_TEST_FIXTURES).toHaveLength(QR_CODE_TEST_FIXTURES.length);
+    expect(AUTOMATIC_QR_CODE_TEST_FIXTURES).toHaveLength(BENCHMARK_TEST_FIXTURES.length);
     for (const [index, fixture] of AUTOMATIC_QR_CODE_TEST_FIXTURES.entries()) {
-      const source = QR_CODE_TEST_FIXTURES[index]!;
+      const source = BENCHMARK_TEST_FIXTURES[index]!;
       expect(fixture).toMatchObject({name: source.name, payload: source.payload});
     }
   });
@@ -43,11 +40,11 @@ describe('benchmark workloads', () => {
   });
 
   test('expands every static multiplier to the expected QR count', () => {
-    const workloads = createStaticWorkloads(QR_CODE_TEST_FIXTURES);
+    const workloads = createStaticWorkloads(BENCHMARK_TEST_FIXTURES);
 
     expect(workloads).toHaveLength(STATIC_MULTIPLIERS.length);
     for (const workload of workloads) {
-      expect(workload.qrCodesPerSample).toBe(QR_CODE_TEST_FIXTURES.length * workload.repetitions);
+      expect(workload.qrCodesPerSample).toBe(BENCHMARK_TEST_FIXTURES.length * workload.repetitions);
     }
   });
 
@@ -81,7 +78,7 @@ describe('benchmark workloads', () => {
     expect(staticWarmup).toMatchObject({
       id: 'warmup-static',
       repetitions: WARMUP_STATIC_PASSES,
-      qrCodesPerSample: QR_CODE_TEST_FIXTURES.length * WARMUP_STATIC_PASSES,
+      qrCodesPerSample: BENCHMARK_TEST_FIXTURES.length * WARMUP_STATIC_PASSES,
     });
     expect(exhaustiveWarmup).toMatchObject({
       id: 'warmup-all-combinations',
@@ -98,7 +95,7 @@ describe('benchmark workloads', () => {
     expect(workloads[0]).toMatchObject({
       id: 'warmup-automatic-static',
       repetitions: WARMUP_STATIC_PASSES,
-      qrCodesPerSample: QR_CODE_TEST_FIXTURES.length * WARMUP_STATIC_PASSES,
+      qrCodesPerSample: BENCHMARK_TEST_FIXTURES.length * WARMUP_STATIC_PASSES,
     });
   });
 

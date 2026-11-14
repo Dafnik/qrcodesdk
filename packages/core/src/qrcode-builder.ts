@@ -2,6 +2,7 @@ import {QRCodeError} from './error';
 import {generateQRCodeMatrix} from './matrix/generate-qrcode-matrix';
 import type {
   QRCodeErrorCorrectionLevel,
+  QRCodeKanji,
   QRCodeMask,
   QRCodeMatrix,
   QRCodeMatrixOptions,
@@ -66,6 +67,11 @@ export class QRCodeBuilder<
 
   segmenter(segmenter?: QRCodeSegmenter): QRCodeBuilder<P, R> {
     return this.withOptions({segmenter});
+  }
+
+  /** Enables Kanji mode with the table from `@qrcodesdk/core/kanji`. Omit it to disable. */
+  kanji(kanji?: QRCodeKanji): QRCodeBuilder<P, R> {
+    return this.withOptions({kanji});
   }
 
   options(options?: QRCodeMatrixOptions): QRCodeBuilder<P, R> {

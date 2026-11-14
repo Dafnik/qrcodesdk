@@ -61,7 +61,7 @@ export type QRCodeVersion =
   | 40;
 
 export type QRCodeErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
-export type QRCodeEncodingMode = 'numeric' | 'alphanumeric' | 'octet';
+export type QRCodeEncodingMode = 'numeric' | 'alphanumeric' | 'octet' | 'kanji';
 export type QRCodeMode = 'auto' | QRCodeEncodingMode;
 
 /** One unencoded text segment in an explicit QR encoding mode. */
@@ -73,7 +73,14 @@ export type QRCodeSegment = {
 export type QRCodeSegmenterOptions = {
   readonly version: QRCodeVersion;
   readonly eci: boolean;
+  /** The Kanji table from the matrix options. Kanji segments are only valid when it is present. */
+  readonly kanji?: QRCodeKanji;
 };
+
+declare const kanjiValue: unique symbol;
+
+/** The Shift JIS table exported as `kanji` from `@qrcodesdk/core/kanji`. */
+export type QRCodeKanji = {readonly [kanjiValue]: 'kanji'};
 
 /**
  * Splits the payload into nonempty segments without changing its text or splitting surrogate pairs.
@@ -144,8 +151,13 @@ export type QRCodeMatrixOptions = {
   version?: QRCodeVersion;
   /** `auto` detects a single mode unless a segmenter is supplied. Defaults to `auto`. */
   mode?: QRCodeMode;
-  /** Optional mixed-mode segmentation. Explicit numeric, alphanumeric, or octet modes bypass it. */
+  /** Optional mixed-mode segmentation. Explicit modes bypass it. */
   segmenter?: QRCodeSegmenter;
+  /**
+   * Enables Kanji mode with the Shift JIS table from `@qrcodesdk/core/kanji`. Required by the
+   * `kanji` mode and Kanji segments, and used by `auto` and `automaticSegmenter` when present.
+   */
+  kanji?: QRCodeKanji;
   errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
   mask?: QRCodeMask;
   eci?: boolean;

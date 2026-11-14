@@ -15,6 +15,7 @@ import {
   ALPHANUMERIC_CHARACTERS,
   MODES_MAP,
   MODE_ALPHANUMERIC,
+  MODE_KANJI,
   MODE_NUMERIC,
   MODE_OCTET,
   resolveMode,
@@ -115,6 +116,7 @@ describe('matrix constants', () => {
       numeric: MODE_NUMERIC,
       alphanumeric: MODE_ALPHANUMERIC,
       octet: MODE_OCTET,
+      kanji: MODE_KANJI,
     });
     expect(ECC_LEVELS_MAP).toEqual({
       L: ECC_LEVEL_L,
@@ -139,6 +141,7 @@ describe('matrix constants', () => {
       MODE_NUMERIC,
       MODE_ALPHANUMERIC,
       MODE_OCTET,
+      MODE_KANJI,
     ]);
   });
 

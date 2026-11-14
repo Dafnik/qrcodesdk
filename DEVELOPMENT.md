@@ -167,6 +167,18 @@ UPDATE_PNG_SNAPSHOTS=1 UPDATE_WEBP_SNAPSHOTS=1 UPDATE_GIF_SNAPSHOTS=1 UPDATE_JPE
 pnpm turbo run test:snapshots --filter=@qrcodesdk/node
 ```
 
+### Kanji table
+
+`packages/core/src/kanji/table.ts` is generated from the WHATWG Shift_JIS decoder built into
+Node.js. Do not edit it by hand. Regenerate it with:
+
+```sh
+pnpm turbo run generate:kanji-table --filter=@qrcodesdk/core
+```
+
+The core Kanji tests compare the table with the platform decoder for every UTF-16 code unit, so a
+stale or edited table fails `pnpm turbo run test --filter=@qrcodesdk/core`.
+
 ## Releasing
 
 Each package is published by its own release workflow when its `@qrcodesdk/<package>@<version>`

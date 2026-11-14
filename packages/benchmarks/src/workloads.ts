@@ -17,8 +17,15 @@ export const BENCHMARK_SAMPLE_COUNT = 3;
 export const STATIC_MULTIPLIERS = [1, 10, 100];
 export const STYLED_MULTIPLIERS = [1, 10, 50];
 export const ALL_QR_CODE_COMBINATIONS = [...getAllQRCodeCombinations()];
+/**
+ * Static fixtures that every compared library encodes natively. Kanji fixtures are left out because
+ * the reference libraries need a caller-supplied Shift JIS converter.
+ */
+export const BENCHMARK_TEST_FIXTURES: readonly QRCodeTestFixture[] = QR_CODE_TEST_FIXTURES.filter(
+  ({mode}) => mode !== 'kanji',
+);
 export const AUTOMATIC_QR_CODE_TEST_FIXTURES: readonly AutomaticQRCodeTestFixture[] =
-  QR_CODE_TEST_FIXTURES.map((fixture) => {
+  BENCHMARK_TEST_FIXTURES.map((fixture) => {
     const automaticFixture: Record<string, unknown> = {...fixture};
     delete automaticFixture['mask'];
     delete automaticFixture['version'];
@@ -28,7 +35,7 @@ export const WARMUP_STATIC_PASSES = 5;
 export const WARMUP_EXHAUSTIVE_PASSES = 1;
 
 export function createBenchmarkWarmupWorkloads(
-  staticFixtures: readonly QRCodeTestFixture[] = QR_CODE_TEST_FIXTURES,
+  staticFixtures: readonly QRCodeTestFixture[] = BENCHMARK_TEST_FIXTURES,
   exhaustiveFixtures: readonly QRCodeTestFixture[] = ALL_QR_CODE_COMBINATIONS,
 ): BenchmarkWorkload[] {
   return [
@@ -103,7 +110,7 @@ export function createStyledBenchmarkWorkloads(
 }
 
 export function createBenchmarkWorkloads(
-  staticFixtures: readonly QRCodeTestFixture[] = QR_CODE_TEST_FIXTURES,
+  staticFixtures: readonly QRCodeTestFixture[] = BENCHMARK_TEST_FIXTURES,
   exhaustiveFixtures: readonly QRCodeTestFixture[] = ALL_QR_CODE_COMBINATIONS,
 ): BenchmarkWorkload[] {
   return [

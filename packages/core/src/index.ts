@@ -1,6 +1,7 @@
 export type {
   QRCodeColor,
   QRCodeErrorCorrectionLevel,
+  QRCodeKanji,
   QRCodeAlignmentCenterShape,
   QRCodeAlignmentRingShape,
   QRCodeCenterImageLayout,

@@ -41,14 +41,14 @@ import {QRCodeError, type QRCodeErrorCode, QR_CODE_ERROR_CODES} from '@qrcodesdk
 
 ## Error codes
 
-| Code                   | Thrown when                                                                                                   | `details`                                                                           | `cause`                   |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------- |
-| `INVALID_PAYLOAD`      | The payload cannot be encoded as configured, or a payload helper rejects a field                              | `payload` and optional `mode`; from payload helpers, `field`, `value`, and `reason` | `undefined`               |
-| `PAYLOAD_TOO_LARGE`    | No version from 1 to 40 fits the payload, or the pinned version is too small                                  | `version` for a pinned version; otherwise usually `{}`                              | `undefined`               |
-| `INVALID_OPTIONS`      | A renderer, shape, pattern, or center-image option is outside its range, or the `segmenter` is not a function | `field` and `value`                                                                 | `undefined`               |
-| `RENDERER_MISSING`     | `.render()` runs without a stored or supplied renderer                                                        | `{}`                                                                                | `undefined`               |
-| `INVALID_IMAGE_SOURCE` | A center-image source is not usable                                                                           | `source` for `svgCenterImage()`; otherwise `{}`                                     | PNG decoder error, if any |
-| `RENDER_FAILED`        | The runtime cannot produce the output                                                                         | `{}`                                                                                | Browser error, if any     |
+| Code                   | Thrown when                                                                                                                                     | `details`                                                                           | `cause`                   |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------- |
+| `INVALID_PAYLOAD`      | The payload cannot be encoded as configured, or a payload helper rejects a field                                                                | `payload` and optional `mode`; from payload helpers, `field`, `value`, and `reason` | `undefined`               |
+| `PAYLOAD_TOO_LARGE`    | No version from 1 to 40 fits the payload, or the pinned version is too small                                                                    | `version` for a pinned version; otherwise usually `{}`                              | `undefined`               |
+| `INVALID_OPTIONS`      | A renderer, shape, pattern, or center-image option is outside its range, the `segmenter` is not a function, or Kanji mode lacks the Kanji table | `field` and `value`                                                                 | `undefined`               |
+| `RENDERER_MISSING`     | `.render()` runs without a stored or supplied renderer                                                                                          | `{}`                                                                                | `undefined`               |
+| `INVALID_IMAGE_SOURCE` | A center-image source is not usable                                                                                                             | `source` for `svgCenterImage()`; otherwise `{}`                                     | PNG decoder error, if any |
+| `RENDER_FAILED`        | The runtime cannot produce the output                                                                                                           | `{}`                                                                                | Browser error, if any     |
 
 ### INVALID_PAYLOAD
 
@@ -149,7 +149,7 @@ See [Version and mask](/reference/builder/#version-and-mask).
 An option is outside its accepted range.
 
 **Thrown by:** renderer, shape, pattern, and center-image factories when you call them. `.matrix()`
-and `.render()` throw it for `segmenter`, and `.render()` for `dimensions`.
+and `.render()` throw it for `segmenter` and `kanji`, and `.render()` for `dimensions`.
 
 **Details:** `details.field` names the option and `details.value` holds the rejected value. Built-in
 factories and renderers report these fields:
@@ -173,6 +173,7 @@ factories and renderers report these fields:
 | `customShape.<piece>`, such as `customShape.module` | `customShape()`                                                   | Closed relative path data with `m`, `l`, `h`, `v`, `c`, `a`, and `z` that stays within the piece's box |
 | `finder.color`, `alignment.color`                   | `finder()`, `alignment()`                                         | `#RRGGBB` or `#RRGGBBAA`                                                                               |
 | `segmenter`                                         | `.matrix()` or `.render()`                                        | A function                                                                                             |
+| `kanji`                                             | `.matrix()`, `.render()`, or `automaticSegmenter`                 | The `kanji` export of `@qrcodesdk/core/kanji`. Required by the `kanji` mode and Kanji segments         |
 | `dimensions`                                        | `.render()` with any built-in renderer                            | See below                                                                                              |
 
 `dimensions` is the output side length: `moduleSize × (matrix width + 2 × quietZone)`.
@@ -196,7 +197,7 @@ do not throw `INVALID_OPTIONS`:
 | `mask` that is not an integer from `0` to `7`                                          | A matrix without a valid mask pattern, which scanners cannot read                                                                                              |
 | `version` that is fractional or above `40`                                             | A matrix with an invalid size, which scanners cannot read                                                                                                      |
 | `version` below `1`, or `NaN`                                                          | `PAYLOAD_TOO_LARGE`, although the payload may be small                                                                                                         |
-| `mode` other than the four documented values                                           | `INVALID_PAYLOAD` with that `mode` in `details`. `PAYLOAD_TOO_LARGE` instead if the payload uses only alphanumeric-mode characters, such as `'HELLO'` or `123` |
+| `mode` other than the five documented values                                           | `INVALID_PAYLOAD` with that `mode` in `details`. `PAYLOAD_TOO_LARGE` instead if the payload uses only alphanumeric-mode characters, such as `'HELLO'` or `123` |
 | Other types, such as a string `version` or `eci`, or an unknown `errorCorrectionLevel` | Unspecified output and no error                                                                                                                                |
 
 Validate matrix options from untyped sources before you pass them to the builder:
@@ -207,7 +208,8 @@ import type {QRCodeMatrixOptions} from '@qrcodesdk/core';
 export function isValidMatrixOptions(options: Record<string, unknown>): boolean {
   const {mode, eci, errorCorrectionLevel, version, mask} = options;
   return (
-    (mode === undefined || ['auto', 'numeric', 'alphanumeric', 'octet'].includes(mode as string)) &&
+    (mode === undefined ||
+      ['auto', 'numeric', 'alphanumeric', 'octet', 'kanji'].includes(mode as string)) &&
     (eci === undefined || typeof eci === 'boolean') &&
     (errorCorrectionLevel === undefined ||
       ['L', 'M', 'Q', 'H'].includes(errorCorrectionLevel as string)) &&
@@ -283,7 +285,7 @@ points:
 | -------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | When you call a renderer, shape, or center-image factory | `INVALID_OPTIONS`, `INVALID_IMAGE_SOURCE` from `svgCenterImage()` or `rasterCenterImage()`    |
 | When you call a payload helper                           | `INVALID_PAYLOAD`                                                                             |
-| When `.matrix()` or `.render()` generates the matrix     | `INVALID_PAYLOAD`, `PAYLOAD_TOO_LARGE`, `INVALID_OPTIONS` for `segmenter`                     |
+| When `.matrix()` or `.render()` generates the matrix     | `INVALID_PAYLOAD`, `PAYLOAD_TOO_LARGE`, `INVALID_OPTIONS` for `segmenter` and `kanji`         |
 | When `.render()` runs the renderer                       | `RENDERER_MISSING`, `INVALID_OPTIONS` for dimensions, `INVALID_IMAGE_SOURCE`, `RENDER_FAILED` |
 
 - Create renderers and center images once, at module level or when options change, so invalid

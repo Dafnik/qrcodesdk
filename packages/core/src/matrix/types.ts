@@ -10,7 +10,7 @@ export type QRCodeEncodedSegment = {
   readonly payload: QRCodeEncodedPayload;
 };
 
-export type QRCodeSupportedModeIndicator = 1 | 2 | 4;
+export type QRCodeSupportedModeIndicator = 1 | 2 | 4 | 8;
 export type QRCodeErrorCorrectionLevelValue = 0 | 1 | 2 | 3;
 
 export type QRCodeResolvedMatrixOptions = {

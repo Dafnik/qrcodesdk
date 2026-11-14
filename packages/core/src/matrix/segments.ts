@@ -1,4 +1,5 @@
 import type {QRCodePayload, QRCodeVersion} from '../types';
+import type {QRCodeKanjiLookup} from './kanji';
 import {
   ECI_UTF8_BIT_LENGTH,
   MODE_OCTET,
@@ -11,8 +12,9 @@ import type {QRCodeEncodedSegment, QRCodeSupportedModeIndicator} from './types';
 export function createSingleSegment(
   mode: QRCodeSupportedModeIndicator,
   payload: QRCodePayload,
+  kanji?: QRCodeKanjiLookup,
 ): QRCodeEncodedSegment | undefined {
-  const encoded = validatePayload(mode, payload);
+  const encoded = validatePayload(mode, payload, kanji);
   return encoded === undefined ? undefined : {mode, payload: encoded};
 }
 

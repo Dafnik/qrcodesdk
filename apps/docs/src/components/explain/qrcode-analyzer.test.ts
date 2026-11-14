@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import {describe, test} from 'node:test';
 
 import {type QRCodeMask, qrcode} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 import {QR_CODE_MODULE_ROLES} from '@qrcodesdk/core/matrix';
 
 import {QR_CODE_EXPLAIN_ROLE_ORDER, explainQRCode} from './qrcode-analyzer.ts';
@@ -97,6 +98,19 @@ describe('explainQRCode', () => {
     assert.deepEqual(
       automatic.matrix,
       qrcode('AUTOMATIC MASK').version(automatic.version).mask(automatic.mask).matrix(),
+    );
+  });
+
+  test('reports Kanji mode when the Kanji table is supplied', () => {
+    assert.equal(explainQRCode({payload: '漢字テスト'}).mode, 'octet');
+    assert.equal(explainQRCode({payload: '漢字テスト', kanji}).mode, 'kanji');
+    assert.equal(explainQRCode({payload: '漢字 test', kanji}).mode, 'octet');
+    assert.equal(explainQRCode({payload: '漢字123', kanji, optimizeSegments: true}).mode, 'mixed');
+    assert.equal(explainQRCode({payload: '漢字テスト', kanji, version: 5, mask: 2}).mode, 'kanji');
+    assert.equal(explainQRCode({payload: '漢字 test', kanji, version: 5}).mode, 'octet');
+    assert.deepEqual(
+      explainQRCode({payload: '漢字テスト', kanji}).matrix,
+      qrcode('漢字テスト').mode('kanji').kanji(kanji).matrix(),
     );
   });
 

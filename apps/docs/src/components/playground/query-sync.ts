@@ -1,7 +1,8 @@
 import type {QRCodeColor, QRCodeMask, QRCodeVersion} from '@qrcodesdk/core';
 
-import {cliPlaygroundOptions} from './cli-playground.ts';
+import {cliPlaygroundOptions, setCliOptions} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
+import {playgroundKanjiPending, playgroundKanjiSettled} from './playground-kanji.ts';
 import {
   PLAYGROUND_SECTIONS,
   PLAYGROUND_VIEWS,
@@ -14,6 +15,7 @@ import {
   playgroundOpenSections,
   playgroundOptions,
   playgroundView,
+  setQrOptions,
 } from './playground-options.ts';
 import {PLAYGROUND_SHAPES} from './playground-style.ts';
 
@@ -37,7 +39,7 @@ const PLAYGROUND_OUTPUTS = [
   'jpeg',
   'canvas',
 ] as const satisfies readonly PlaygroundOutput[];
-const MODES = ['auto', 'numeric', 'alphanumeric', 'octet'] as const;
+const MODES = ['auto', 'numeric', 'alphanumeric', 'octet', 'kanji'] as const;
 const ERROR_CORRECTION_LEVELS = ['L', 'M', 'Q', 'H'] as const;
 /** Parameters of removed styling options. They are ignored on read and dropped on write. */
 const REMOVED_QUERY_KEYS = [
@@ -125,6 +127,15 @@ const QUERY_FIELD_CODECS = [
     (currentOptions) => currentOptions.optimizeSegments ?? false,
     (currentOptions, enabled) => {
       currentOptions.optimizeSegments = enabled;
+    },
+    parseBoolean,
+    serializeBoolean,
+  ),
+  defineQueryField(
+    'kanji',
+    (currentOptions) => currentOptions.kanji ?? false,
+    (currentOptions, enabled) => {
+      currentOptions.kanji = enabled;
     },
     parseBoolean,
     serializeBoolean,
@@ -283,11 +294,15 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
 
   let applyingUrlState = true;
   let updateTimer: ReturnType<typeof setTimeout> | undefined;
+  // Incremented to cancel a write that is still waiting for the Kanji table.
+  let writeVersion = 0;
+  const cancelWrite = (): void => {
+    clearTimeout(updateTimer);
+    writeVersion++;
+  };
 
-  playgroundOptions.set(readQrOptionsFromUrl());
-  cliPlaygroundOptions.set(
-    readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)),
-  );
+  setQrOptions(readQrOptionsFromUrl());
+  setCliOptions(readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)));
   playgroundOpenSections.set(
     readOpenSectionsFromSearchParams(new URLSearchParams(window.location.search)),
   );
@@ -300,11 +315,19 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
       return;
     }
 
-    clearTimeout(updateTimer);
+    cancelWrite();
 
     updateTimer = setTimeout(() => {
-      writeQrOptionsToUrl(playgroundOptions.get(), {
-        omitDefaults,
+      const write = () => writeQrOptionsToUrl(playgroundOptions.get(), {omitDefaults});
+      if (!playgroundKanjiPending()) {
+        write();
+        return;
+      }
+      // A restored Kanji URL is applied once the table loads. Writing earlier would replace the
+      // URL with the options it is about to restore over.
+      const version = writeVersion;
+      void playgroundKanjiSettled().then(() => {
+        if (version === writeVersion) write();
       });
     }, debounceMs);
   };
@@ -314,14 +337,12 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   const unsubscribeView = playgroundView.subscribe(scheduleWrite);
 
   const handlePopState = (): void => {
-    clearTimeout(updateTimer);
+    cancelWrite();
     applyingUrlState = true;
 
     try {
-      playgroundOptions.set(readQrOptionsFromUrl());
-      cliPlaygroundOptions.set(
-        readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)),
-      );
+      setQrOptions(readQrOptionsFromUrl());
+      setCliOptions(readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)));
       playgroundOpenSections.set(
         readOpenSectionsFromSearchParams(new URLSearchParams(window.location.search)),
       );
@@ -334,7 +355,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   window.addEventListener('popstate', handlePopState);
 
   activeCleanup = () => {
-    clearTimeout(updateTimer);
+    cancelWrite();
     unsubscribe();
     unsubscribeCli();
     unsubscribeSections();

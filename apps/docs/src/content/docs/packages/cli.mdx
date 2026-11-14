@@ -219,32 +219,34 @@ qrc --payload "-42" --output negative.png
 
 ## Options
 
-| Option                                        | Description                                                                 | Default     |
-| --------------------------------------------- | --------------------------------------------------------------------------- | :---------- |
-| `[payload]`                                   | Positional QR code payload. If it starts with `-`, end with `-- <payload>`. | -           |
-| `--payload <value>`                           | QR code payload, equivalent to positional `[payload]`.                      | -           |
-| `-h, --help`                                  | Print usage and every option, then exit with status 0.                      | -           |
-| `-V`                                          | Print the installed CLI package version.                                    | -           |
-| `--format <text\|svg\|png\|webp\|gif\|jpeg>`  | Output format, in lowercase. Inferred from the output path.                 | `text`      |
-| `-o, --output <path>`                         | Required output path for SVG, PNG, WebP, GIF, and JPEG.                     | -           |
-| `--mode <auto\|numeric\|alphanumeric\|octet>` | QR code mode, in lowercase.                                                 | `auto`      |
-| `--error-correction <L\|M\|Q\|H>`             | Error correction level. Lowercase letters are accepted.                     | `M`         |
-| `--version <1-40>`                            | Pin a QR code version.                                                      | Automatic   |
-| `--mask <0-7>`                                | Pin a QR code mask.                                                         | Automatic   |
-| `--optimize-segments`                         | Optimize mixed-mode segments in auto mode.                                  | off         |
-| `--no-optimize-segments`                      | Use single-mode detection in auto mode.                                     | -           |
-| `--eci`                                       | Emit UTF-8 ECI assignment 26 for octet segments.                            | off         |
-| `--no-eci`                                    | Do not emit UTF-8 ECI assignment 26.                                        | -           |
-| `--module-size <number>`                      | Module size as a positive integer.                                          | `1`         |
-| `--quiet-zone <number>`                       | Quiet zone as a non-negative integer.                                       | `2`         |
-| `--layout <compact\|full>`                    | Text block layout. Validated, then ignored by file formats.                 | `compact`   |
-| `--ansi <off\|blocks\|background>`            | Explicit ANSI output mode. Validated, then ignored by file formats.         | Environment |
-| `--foreground <#rrggbb[aa]>`                  | Color of every dark module.                                                 | `#000000`   |
-| `--background <#rrggbb[aa]>`                  | Color behind the code, including the quiet zone.                            | `#ffffff`   |
-| `--quality <1-100>`                           | JPEG quality. Other formats reject it.                                      | `92`        |
-| `--matte <#rrggbb>`                           | Opaque color for transparent pixels. Other formats reject it.               | `#ffffff`   |
-| `--aria-label <text>`                         | SVG `aria-label` accessible name. Ignored by other formats.                 | -           |
-| `--title <text>`                              | SVG child `<title>` text. Ignored by other formats.                         | -           |
+| Option                                               | Description                                                                 | Default     |
+| ---------------------------------------------------- | --------------------------------------------------------------------------- | :---------- |
+| `[payload]`                                          | Positional QR code payload. If it starts with `-`, end with `-- <payload>`. | -           |
+| `--payload <value>`                                  | QR code payload, equivalent to positional `[payload]`.                      | -           |
+| `-h, --help`                                         | Print usage and every option, then exit with status 0.                      | -           |
+| `-V`                                                 | Print the installed CLI package version.                                    | -           |
+| `--format <text\|svg\|png\|webp\|gif\|jpeg>`         | Output format, in lowercase. Inferred from the output path.                 | `text`      |
+| `-o, --output <path>`                                | Required output path for SVG, PNG, WebP, GIF, and JPEG.                     | -           |
+| `--mode <auto\|numeric\|alphanumeric\|octet\|kanji>` | QR code mode, in lowercase. `kanji` loads the Kanji table.                  | `auto`      |
+| `--error-correction <L\|M\|Q\|H>`                    | Error correction level. Lowercase letters are accepted.                     | `M`         |
+| `--version <1-40>`                                   | Pin a QR code version.                                                      | Automatic   |
+| `--mask <0-7>`                                       | Pin a QR code mask.                                                         | Automatic   |
+| `--optimize-segments`                                | Optimize mixed-mode segments in auto mode.                                  | off         |
+| `--no-optimize-segments`                             | Use single-mode detection in auto mode.                                     | -           |
+| `--kanji`                                            | Encode Shift JIS characters in Kanji mode in auto mode.                     | off         |
+| `--no-kanji`                                         | Encode Japanese text as UTF-8 octets in auto mode.                          | -           |
+| `--eci`                                              | Emit UTF-8 ECI assignment 26 for octet segments.                            | off         |
+| `--no-eci`                                           | Do not emit UTF-8 ECI assignment 26.                                        | -           |
+| `--module-size <number>`                             | Module size as a positive integer.                                          | `1`         |
+| `--quiet-zone <number>`                              | Quiet zone as a non-negative integer.                                       | `2`         |
+| `--layout <compact\|full>`                           | Text block layout. Validated, then ignored by file formats.                 | `compact`   |
+| `--ansi <off\|blocks\|background>`                   | Explicit ANSI output mode. Validated, then ignored by file formats.         | Environment |
+| `--foreground <#rrggbb[aa]>`                         | Color of every dark module.                                                 | `#000000`   |
+| `--background <#rrggbb[aa]>`                         | Color behind the code, including the quiet zone.                            | `#ffffff`   |
+| `--quality <1-100>`                                  | JPEG quality. Other formats reject it.                                      | `92`        |
+| `--matte <#rrggbb>`                                  | Opaque color for transparent pixels. Other formats reject it.               | `#ffffff`   |
+| `--aria-label <text>`                                | SVG `aria-label` accessible name. Ignored by other formats.                 | -           |
+| `--title <text>`                                     | SVG child `<title>` text. Ignored by other formats.                         | -           |
 
 Colors must be RGB or RGBA hex values. In terminal text:
 

@@ -145,6 +145,7 @@ Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/refere
 | `@qrcodesdk/core/style`     | Shape and pattern factories and custom path types                |
 | `@qrcodesdk/core/payload`   | Payload helpers                                                  |
 | `@qrcodesdk/core/segmenter` | The optional mixed-mode optimizer, available only from this path |
+| `@qrcodesdk/core/kanji`     | The optional Kanji mode table, available only from this path     |
 
 Bundlers with tree shaking drop the parts you do not use. Without tree shaking, for example directly
 in Node.js, import from a subpath to avoid loading unrelated renderers.
@@ -171,10 +172,12 @@ import {
   QR_CODE_ERROR_CODES,
   svgCenterImage,
 } from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 import {
   QRCodeBuilder,
   type QRCodeEncodingMode,
   type QRCodeErrorCorrectionLevel,
+  type QRCodeKanji,
   type QRCodeMask,
   type QRCodeMatrix,
   type QRCodeMatrixOptions,
@@ -254,6 +257,22 @@ qrcode('ABCD12345678901234567890abcd').mode('auto').segmenter(automaticSegmenter
 
 See [Builder and matrix](https://qrcodesdk.dev/reference/builder/#optional-mixed-mode-optimization) for the callback
 contract and version selection.
+
+## Optional Kanji mode
+
+Kanji mode encodes Japanese text in 13 bits per character instead of UTF-8 bytes. Its Shift JIS
+table adds about 13 kB gzipped, so it is opt-in:
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
+
+qrcode('漢字テスト').kanji(kanji).matrix();
+qrcode('東京タワー 333m').segmenter(automaticSegmenter).kanji(kanji).matrix();
+```
+
+See [Kanji mode](https://qrcodesdk.dev/reference/builder/#kanji-mode) for the covered characters and scanner support.
 
 ## Documentation
 

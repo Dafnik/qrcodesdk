@@ -12,11 +12,19 @@ import {
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {createPackageManagerCommands} from '../../utils/package-manager-commands.mjs';
+import {
+  applyWithPlaygroundKanji,
+  assertPlaygroundKanjiAvailable,
+  playgroundKanjiTable,
+  playgroundUsesKanji,
+} from './playground-kanji.ts';
 import {playgroundOptions} from './playground-options.ts';
 
 export type CliLauncher = 'npm' | 'installed' | 'pnpm' | 'viteplus' | 'bun' | 'yarn';
-export interface CliPlaygroundOptions extends QRCodeMatrixOptions {
+export interface CliPlaygroundOptions extends Omit<QRCodeMatrixOptions, 'kanji'> {
   optimizeSegments?: boolean;
+  /** Adds `--kanji`, so auto mode and optimized segments can use Kanji mode. */
+  kanji?: boolean;
   payload: string;
   launcher: CliLauncher;
   format: 'text' | 'svg';
@@ -45,11 +53,17 @@ export const defaultCliOptions: CliPlaygroundOptions = {
 export const cliPlaygroundOptions = atom<CliPlaygroundOptions>({...defaultCliOptions});
 /** Merge edited CLI settings without changing the framework configuration. */
 export function updateCliOptions(patch: Partial<CliPlaygroundOptions>): void {
-  cliPlaygroundOptions.set({...cliPlaygroundOptions.get(), ...patch});
+  applyWithPlaygroundKanji(playgroundUsesKanji({...cliPlaygroundOptions.get(), ...patch}), () =>
+    cliPlaygroundOptions.set({...cliPlaygroundOptions.get(), ...patch}),
+  );
+}
+/** Replace the CLI settings, after loading the Kanji table if they need it. */
+export function setCliOptions(options: CliPlaygroundOptions): void {
+  applyWithPlaygroundKanji(playgroundUsesKanji(options), () => cliPlaygroundOptions.set(options));
 }
 /** Restore CLI defaults while leaving the selected package and framework settings intact. */
 export function resetCliOptions(): void {
-  cliPlaygroundOptions.set({...defaultCliOptions});
+  setCliOptions({...defaultCliOptions});
 }
 
 export interface TerminalRun {
@@ -120,6 +134,7 @@ export function createCliSVGOptions(options: CliPlaygroundOptions): QRCodeSVGOpt
     matrix: {
       mode: options.mode,
       segmenter: options.optimizeSegments ? automaticSegmenter : undefined,
+      kanji: playgroundUsesKanji(options) ? playgroundKanjiTable() : undefined,
       errorCorrectionLevel: options.errorCorrectionLevel,
       version: options.version,
       mask: options.mask,
@@ -168,6 +183,8 @@ export function generateCliCommand(options: CliPlaygroundOptions): string {
     args.push('--format', 'svg', '--output', quoteShellArgument(options.outputPath));
   if (options.mode !== undefined) args.push('--mode', options.mode);
   if (options.optimizeSegments) args.push('--optimize-segments');
+  // `--mode kanji` loads the Kanji table on its own.
+  if (options.kanji && options.mode !== 'kanji') args.push('--kanji');
   if (options.errorCorrectionLevel !== undefined && options.errorCorrectionLevel !== 'M')
     args.push('--error-correction', options.errorCorrectionLevel);
   if (options.version !== undefined) args.push('--version', String(options.version));
@@ -236,6 +253,7 @@ export function createCliPreview(options: CliPlaygroundOptions): CliPreview {
     }
     if (options.format === 'svg' && !options.outputPath.trim())
       throw new Error('Enter an SVG output path.');
+    assertPlaygroundKanjiAvailable(options);
     const command = generateCliCommand(options);
     const svgOptions = createCliSVGOptions(options);
     const builder = qrcode(options.payload).options(svgOptions.matrix);

@@ -1,8 +1,11 @@
 import {describe, expect, test} from 'vitest';
 
+import {kanji} from '../../src/kanji';
+import {type QRCodeKanjiLookup, resolveKanjiLookup} from '../../src/matrix/kanji';
 import {
   ECI_UTF8_BIT_LENGTH,
   MODE_ALPHANUMERIC,
+  MODE_KANJI,
   MODE_NUMERIC,
   MODE_OCTET,
   encodeUTF8,
@@ -13,14 +16,22 @@ import {createSingleSegment, getSegmentsBitLength} from '../../src/matrix/segmen
 import type {QRCodeEncodedSegment} from '../../src/matrix/types';
 import {automaticSegmenter} from '../../src/segmenter';
 import type {QRCodePayload, QRCodeVersion} from '../../src/types';
+import {kanjiModeValues} from '../helpers';
 
-function optimizeSegments(payload: QRCodePayload, version: QRCodeVersion, eci: boolean) {
-  return automaticSegmenter(payload, {version, eci}).map(({mode, payload}) =>
-    createSingleSegment(MODES_MAP[mode], payload)!,
+const KANJI_LOOKUP = resolveKanjiLookup(kanji)!;
+
+function optimizeSegments(
+  payload: QRCodePayload,
+  version: QRCodeVersion,
+  eci: boolean,
+  withKanji = false,
+) {
+  return automaticSegmenter(payload, withKanji ? {version, eci, kanji} : {version, eci}).map(
+    ({mode, payload}) => createSingleSegment(MODES_MAP[mode], payload, KANJI_LOOKUP)!,
   );
 }
 
-const MODES = [MODE_NUMERIC, MODE_ALPHANUMERIC, MODE_OCTET] as const;
+const MODES = [MODE_NUMERIC, MODE_ALPHANUMERIC, MODE_OCTET, MODE_KANJI] as const;
 
 describe('mixed-mode segmentation', () => {
   test.each([1, 9, 10, 26, 27, 40] as const)(
@@ -86,6 +97,40 @@ describe('mixed-mode segmentation', () => {
     ]);
   });
 
+  test('uses Kanji segments only with the Kanji table', () => {
+    expect(optimizeSegments('東京タワー', 1, false)).toEqual([
+      {mode: MODE_OCTET, payload: encodeUTF8('東京タワー')},
+    ]);
+    expect(optimizeSegments('東京タワー', 1, false, true)).toEqual([
+      {mode: MODE_KANJI, payload: kanjiModeValues('東京タワー')},
+    ]);
+    expect(optimizeSegments('東京タワー 333m 🗼', 1, true, true)).toEqual([
+      {mode: MODE_KANJI, payload: kanjiModeValues('東京タワー')},
+      {mode: MODE_OCTET, payload: encodeUTF8(' 333m 🗼')},
+    ]);
+    expect(optimizeSegments('ABC東京12345678', 1, false, true)).toEqual([
+      {mode: MODE_ALPHANUMERIC, payload: 'ABC'},
+      {mode: MODE_KANJI, payload: kanjiModeValues('東京')},
+      {mode: MODE_NUMERIC, payload: '12345678'},
+    ]);
+  });
+
+  test('matches a brute-force minimum with Kanji characters', () => {
+    const alphabet = ['1', 'A', 'a', '漢', '✅'];
+    for (const eci of [false, true]) {
+      for (const version of [1, 10, 27] as const) {
+        for (let length = 1; length <= 4; length++) {
+          for (const input of stringsOfLength(alphabet, length)) {
+            expect(
+              getSegmentsBitLength(version, optimizeSegments(input, version, eci, true), eci),
+              `${eci}:${version}: ${input}`,
+            ).toBe(bruteForceMinimumBitLength(input, version, eci, KANJI_LOOKUP));
+          }
+        }
+      }
+    }
+  });
+
   test('matches a brute-force minimum for short inputs', () => {
     const alphabet = ['1', 'A', 'a'];
     for (const eci of [false, true]) {
@@ -104,7 +149,12 @@ describe('mixed-mode segmentation', () => {
   });
 });
 
-function bruteForceMinimumBitLength(input: string, version: QRCodeVersion, eci: boolean): number {
+function bruteForceMinimumBitLength(
+  input: string,
+  version: QRCodeVersion,
+  eci: boolean,
+  kanjiLookup?: QRCodeKanjiLookup,
+): number {
   const characters = Array.from(input);
   const cache = new Map<string, number>();
 
@@ -118,7 +168,8 @@ function bruteForceMinimumBitLength(input: string, version: QRCodeVersion, eci: 
     for (let end = start + 1; end <= characters.length; end++) {
       const text = characters.slice(start, end).join('');
       for (const mode of MODES) {
-        const encoded = validatePayload(mode, text);
+        if (mode === MODE_KANJI && !kanjiLookup) continue;
+        const encoded = validatePayload(mode, text, kanjiLookup);
         if (encoded === undefined) continue;
         const segment = {mode, payload: encoded} satisfies QRCodeEncodedSegment;
         const introducesUTF8ECI = mode === MODE_OCTET && !hasUTF8ECI;

@@ -26,7 +26,15 @@ import {
   explainQRCode,
 } from '../explain/qrcode-analyzer.ts';
 import {QrEncodingControls, QrMatrixControls} from '../playground/angular/qr-matrix-controls.ts';
-import {playgroundOptions, resetQrOptions} from '../playground/playground-options.ts';
+import {
+  assertPlaygroundKanjiAvailable,
+  playgroundKanjiTable,
+} from '../playground/playground-kanji.ts';
+import {
+  playgroundOptions,
+  playgroundUsesKanji,
+  resetQrOptions,
+} from '../playground/playground-options.ts';
 import {suppressInitialTransitions} from './suppress-initial-transitions.ts';
 
 type ExplainSelection = {
@@ -377,7 +385,14 @@ export class QRCodeExplain {
 
   protected readonly state = computed<ExplainState>(() => {
     try {
-      return {explanation: explainQRCode(this.options())};
+      const options = this.options();
+      assertPlaygroundKanjiAvailable(options);
+      return {
+        explanation: explainQRCode({
+          ...options,
+          kanji: playgroundUsesKanji(options) ? playgroundKanjiTable() : undefined,
+        }),
+      };
     } catch (error) {
       return {error: error instanceof Error ? error.message : String(error)};
     }

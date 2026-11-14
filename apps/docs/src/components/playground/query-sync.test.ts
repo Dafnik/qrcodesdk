@@ -7,6 +7,7 @@ import {
   resetCliOptions,
   updateCliOptions,
 } from './cli-playground.ts';
+import {playgroundKanjiSettled, playgroundKanjiTable} from './playground-kanji.ts';
 import {
   createPlaygroundSVGOptions,
   defaultPlaygroundOptions,
@@ -183,6 +184,60 @@ test('live query synchronization restores both stores, debounces edits, and hand
     playgroundOpenSections.set([]);
     playgroundView.set('preview');
     resetCliOptions();
+  }
+});
+
+test('live query synchronization keeps a restored Kanji URL while the table loads', async (context) => {
+  context.mock.timers.enable({apis: ['setTimeout']});
+  let url = new URL('https://qrcodesdk.dev/playground/?payload=%E6%9D%B1%E4%BA%AC&kanji=true');
+  let writes = 0;
+  const events = new EventTarget();
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+  const fakeWindow = {
+    get location() {
+      return {href: url.href, search: url.search};
+    },
+    history: {
+      state: null,
+      replaceState(_state: unknown, _title: string, next: URL) {
+        url = new URL(next);
+        writes++;
+      },
+    },
+    addEventListener: events.addEventListener.bind(events),
+    removeEventListener: events.removeEventListener.bind(events),
+  };
+  Object.defineProperty(globalThis, 'window', {value: fakeWindow, configurable: true});
+  let cleanup: (() => void) | undefined;
+  try {
+    assert.equal(playgroundKanjiTable(), undefined);
+    cleanup = startQrQuerySync({debounceMs: 150});
+    // The restore waits for the table, so the store still holds the previous options.
+    assert.notEqual(playgroundOptions.get().kanji, true);
+
+    // A view change during the download must not write the options that predate the restore.
+    playgroundView.set('code');
+    context.mock.timers.tick(150);
+    assert.equal(writes, 0);
+    assert.equal(url.searchParams.get('kanji'), 'true');
+
+    await playgroundKanjiSettled();
+    await Promise.resolve();
+    assert.equal(playgroundOptions.get().kanji, true);
+    assert.equal(playgroundOptions.get().payload, '東京');
+    assert.equal(writes, 0);
+
+    context.mock.timers.tick(150);
+    assert.equal(writes, 1);
+    assert.equal(url.searchParams.get('kanji'), 'true');
+    assert.equal(url.searchParams.get('payload'), '東京');
+    assert.equal(url.searchParams.get('view'), 'code');
+  } finally {
+    cleanup?.();
+    if (previousWindow) Object.defineProperty(globalThis, 'window', previousWindow);
+    else Reflect.deleteProperty(globalThis, 'window');
+    playgroundOptions.set({...defaultPlaygroundOptions});
+    playgroundView.set('preview');
   }
 });
 

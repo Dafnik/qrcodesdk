@@ -159,6 +159,7 @@ values inside a client component instead:
 - `finder()` and `alignment()` results, which are functions;
 - center images from `svgCenterImage()` and `canvasCenterImage()`;
 - `matrix.segmenter`, including `automaticSegmenter`, which is a function.
+- `matrix.kanji`, the Kanji table, which loses its identity when it is serialized.
 
 In a Server Component, import shape factories from `@qrcodesdk/core/style`, not from
 `@qrcodesdk/react`. On the server, every export of a `'use client'` module is a client reference
@@ -316,6 +317,7 @@ import {
   QRCodeJPEG,
   type QRCodeJPEGImageOptions,
   type QRCodeJPEGProps,
+  type QRCodeKanji,
   type QRCodeMask,
   type QRCodeMatrixOptions,
   type QRCodeMode,
@@ -349,6 +351,7 @@ import {
   customShape,
   diagonal,
   finder,
+  kanji,
   rounded,
   svgCenterImage,
 } from '@qrcodesdk/react';

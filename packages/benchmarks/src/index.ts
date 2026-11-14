@@ -1,8 +1,4 @@
-import {
-  QR_CODE_STYLING_FIXTURES,
-  QR_CODE_TEST_FIXTURES,
-  TOTAL_QR_CODE_COMBINATIONS,
-} from '@repo/core-testing';
+import {QR_CODE_STYLING_FIXTURES, TOTAL_QR_CODE_COMBINATIONS} from '@repo/core-testing';
 import {fileURLToPath} from 'node:url';
 
 import {BENCHMARK_ADAPTERS, SVG_PIXELS_PER_MODULE, SVG_QUIET_ZONE_MODULES} from './adapters';
@@ -25,6 +21,7 @@ import type {
 } from './types';
 import {
   BENCHMARK_SAMPLE_COUNT,
+  BENCHMARK_TEST_FIXTURES,
   STATIC_MULTIPLIERS,
   STYLED_MULTIPLIERS,
   WARMUP_EXHAUSTIVE_PASSES,
@@ -196,7 +193,7 @@ async function main(): Promise<void> {
     samples: BENCHMARK_SAMPLE_COUNT,
     warmupStaticPasses: WARMUP_STATIC_PASSES,
     warmupExhaustivePasses: WARMUP_EXHAUSTIVE_PASSES,
-    staticFixtureCount: QR_CODE_TEST_FIXTURES.length,
+    staticFixtureCount: BENCHMARK_TEST_FIXTURES.length,
     staticMultipliers: STATIC_MULTIPLIERS,
     exhaustiveFixtureCount: TOTAL_QR_CODE_COMBINATIONS,
     svgPixelsPerModule: SVG_PIXELS_PER_MODULE,

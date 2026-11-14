@@ -5,6 +5,7 @@ import {
   type PlaygroundPackage,
   type PlaygroundPreparedImage,
   isPlaygroundImageOutput,
+  playgroundUsesKanji,
 } from '../playground-options.ts';
 import {formatPlaygroundStyle} from '../playground-style.ts';
 
@@ -418,6 +419,10 @@ function formatOptions(
     matrixEntries.push('segmenter: automaticSegmenter');
   }
 
+  if (playgroundUsesKanji(playgroundOptionsValue)) {
+    matrixEntries.push('kanji');
+  }
+
   if (playgroundOptionsValue.eci === true) {
     matrixEntries.push('eci: true');
   }
@@ -600,6 +605,7 @@ function qrcodesdkImports(
     ...(hasImage && output === 'svg' ? ['type QRCodeDataImageURL'] : []),
     ...factories,
     ...(playgroundOptionsValue.optimizeSegments ? ['automaticSegmenter'] : []),
+    ...(playgroundUsesKanji(playgroundOptionsValue) ? ['kanji'] : []),
   ];
   return formatImport(specifiers, `@qrcodesdk/${packageName}`, indentation);
 }

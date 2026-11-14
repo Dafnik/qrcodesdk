@@ -18,6 +18,7 @@
     "pnpm-workspace.yaml",
     "pnpm-lock.yaml",
     "fixtures.ts",
+    "packages/core/src/kanji/table.ts",
     "PLAN.md",
     "CHANGELOG.md",
     "*.svg",

@@ -4,6 +4,7 @@ import {
   type QRCodeMask,
   type QRCodeVersion,
 } from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 
 import {fixtureCapacity} from './capacity';
 import {createFixturePayload, fixtureSeed} from './fixture-payloads';
@@ -38,14 +39,18 @@ function combinationPayload(
   );
 }
 
-export type QRCodeAutoMaskCombination = Required<Omit<QRCodeTestFixture, 'mask'>>;
+/** A fixture with every matrix option set, except the Kanji table outside Kanji mode. */
+export type QRCodeCombination = Required<Omit<QRCodeTestFixture, 'kanji'>> &
+  Pick<QRCodeTestFixture, 'kanji'>;
+export type QRCodeAutoMaskCombination = Omit<QRCodeCombination, 'mask'>;
 
 export const TOTAL_QR_CODE_COMBINATIONS =
   40 * ERROR_CORRECTION_LEVELS.length * MASKS.length * MODES.length;
 export const TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS =
   40 * ERROR_CORRECTION_LEVELS.length * MODES.length;
+export const TOTAL_QR_CODE_KANJI_COMBINATIONS = 40 * ERROR_CORRECTION_LEVELS.length * MASKS.length;
 
-export function* getAllQRCodeCombinations(): Generator<Required<QRCodeTestFixture>> {
+export function* getAllQRCodeCombinations(): Generator<QRCodeCombination> {
   for (let version = 1; version <= 40; version += 1) {
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
       for (const mask of MASKS) {
@@ -77,7 +82,7 @@ export function* getAllQRCodeCombinations(): Generator<Required<QRCodeTestFixtur
   }
 }
 
-export function* getAllQRCodeECICombinations(): Generator<Required<QRCodeTestFixture>> {
+export function* getAllQRCodeECICombinations(): Generator<QRCodeCombination> {
   for (let version = 1; version <= 40; version += 1) {
     for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
       for (const mask of MASKS) {
@@ -102,6 +107,39 @@ export function* getAllQRCodeECICombinations(): Generator<Required<QRCodeTestFix
           mask,
           errorCorrectionLevel,
           eci: true,
+        };
+      }
+    }
+  }
+}
+
+/** Yields one exactly full Kanji mode fixture per version, ECC level, and mask. */
+export function* getAllQRCodeKanjiCombinations(): Generator<QRCodeCombination> {
+  for (let version = 1; version <= 40; version += 1) {
+    for (const errorCorrectionLevel of ERROR_CORRECTION_LEVELS) {
+      for (const mask of MASKS) {
+        const mode = 'kanji';
+        const name = [
+          `version-${String(version).padStart(2, '0')}`,
+          `ecc-${errorCorrectionLevel}`,
+          `mask-${mask}`,
+          `mode-${mode}`,
+        ].join('_');
+        yield {
+          name,
+          payload: combinationPayload(
+            name,
+            version as QRCodeVersion,
+            errorCorrectionLevel,
+            mode,
+            false,
+          ),
+          mode,
+          kanji,
+          version: version as QRCodeVersion,
+          mask,
+          errorCorrectionLevel,
+          eci: false,
         };
       }
     }

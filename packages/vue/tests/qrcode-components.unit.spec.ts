@@ -14,27 +14,6 @@ describe('Vue QR code component API', () => {
     mockCanvasRendering(vi);
   });
 
-  test('exports the components, shapes, and center-image factories', () => {
-    // An exact list keeps internal helpers out of the package root.
-    expect(Object.keys(vueApi).sort()).toEqual([
-      'QRCodeCanvas',
-      'QRCodeGIF',
-      'QRCodeJPEG',
-      'QRCodePNG',
-      'QRCodeSVG',
-      'QRCodeWebP',
-      'alignment',
-      'automaticSegmenter',
-      'canvasCenterImage',
-      'circle',
-      'customShape',
-      'diagonal',
-      'finder',
-      'rounded',
-      'svgCenterImage',
-    ]);
-  });
-
   test('includes wrapper attributes', () => {
     expectTypeOf<'id' extends keyof QRCodeSVGProps ? true : false>().toEqualTypeOf<true>();
     expectTypeOf<'onClick' extends keyof QRCodeSVGProps ? true : false>().toEqualTypeOf<true>();

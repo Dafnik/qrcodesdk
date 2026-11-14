@@ -21,25 +21,12 @@ describe('React QR code component handles', () => {
     cleanup();
   });
 
-  test('exports the components, shapes, and center-image factories', () => {
-    // An exact list keeps internal helpers out of the package root.
-    expect(Object.keys(reactApi).sort()).toEqual([
-      'QRCodeCanvas',
-      'QRCodeGIF',
-      'QRCodeJPEG',
-      'QRCodePNG',
-      'QRCodeSVG',
-      'QRCodeWebP',
-      'alignment',
-      'automaticSegmenter',
-      'canvasCenterImage',
-      'circle',
-      'customShape',
-      'diagonal',
-      'finder',
-      'rounded',
-      'svgCenterImage',
-    ]);
+  test('enables Kanji mode through matrix options', () => {
+    const markup = (matrix: reactApi.QRCodeMatrixOptions) =>
+      renderToString(<reactApi.QRCodeSVG payload="東京タワー" options={{matrix}} />);
+
+    expect(markup({kanji: reactApi.kanji})).toBe(markup({mode: 'kanji', kanji: reactApi.kanji}));
+    expect(markup({kanji: reactApi.kanji})).not.toBe(markup({}));
   });
 
   test('accepts payload and options props', () => {

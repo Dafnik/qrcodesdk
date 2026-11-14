@@ -1,6 +1,6 @@
 ---
 title: Builder and matrix
-description: Reference for QRCodeSDK payload, modes, ECI, matrix options, builder methods, and matrix output.
+description: Reference for QRCodeSDK payload, modes, Kanji mode, ECI, matrix options, builder methods, and matrix output.
 docType: reference
 
 related:
@@ -46,11 +46,10 @@ describes.
 
 ### Unsupported QR features
 
-QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, and UTF-8 octet
-payloads, with optional mixed-mode segmentation. It targets common application payloads in a single
-symbol and does not support:
+QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, UTF-8 octet, and
+opt-in [Kanji](#kanji-mode) payloads, with optional mixed-mode segmentation. It targets payloads in a
+single symbol and does not support:
 
-- Kanji mode. Japanese text is encoded as UTF-8 octets instead;
 - structured append, which splits one payload across several symbols;
 - Micro QR symbols;
 - GS1 data;
@@ -60,21 +59,23 @@ If your scanner or industry standard requires one of these, use a library that i
 
 ## Encoding modes
 
-| Mode              | Accepted payload              | Use it for                                              |
-| ----------------- | ----------------------------- | ------------------------------------------------------- |
-| `numeric`         | Digits only                   | Numeric identifiers and digit-only payloads             |
-| `alphanumeric`    | QR alphanumeric character set | Uppercase text such as `HELLO WORLD`                    |
-| `octet`           | UTF-8 bytes                   | URLs, JSON, emoji, lowercase, and general text          |
-| `auto` or omitted | Any supported payload         | Single-mode detection; optional mixed-mode optimization |
+| Mode              | Accepted payload                 | Use it for                                              |
+| ----------------- | -------------------------------- | ------------------------------------------------------- |
+| `numeric`         | Digits only                      | Numeric identifiers and digit-only payloads             |
+| `alphanumeric`    | QR alphanumeric character set    | Uppercase text such as `HELLO WORLD`                    |
+| `octet`           | UTF-8 bytes                      | URLs, JSON, emoji, lowercase, and general text          |
+| `kanji`           | Double-byte Shift JIS characters | Japanese text, with the [Kanji table](#kanji-mode)      |
+| `auto` or omitted | Any supported payload            | Single-mode detection; optional mixed-mode optimization |
 
 - `auto` encodes the whole payload as one segment. It picks numeric for digits, alphanumeric for the
-  QR alphanumeric character set, and octet for everything else.
+  QR alphanumeric character set, Kanji for Kanji mode characters when the Kanji table is supplied,
+  and octet for everything else.
 - A concrete mode forces the whole payload into that mode.
 
 ### Optional mixed-mode optimization
 
 Import `automaticSegmenter` to split the payload into the shortest combination of numeric,
-alphanumeric, and octet segments:
+alphanumeric, and octet segments, plus Kanji segments when the Kanji table is supplied:
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -90,25 +91,63 @@ qrcode(payload).options({segmenter: automaticSegmenter}).matrix(); // Auto is th
   cost.
 - Single-mode detection can produce a larger symbol. A payload that fits a pinned version with
   optimization can exceed it without.
-- Explicit `numeric`, `alphanumeric`, and `octet` modes ignore the segmenter.
+- Explicit modes, such as `numeric` or `kanji`, ignore the segmenter.
 - `.mode('auto')` or `.mode()` returns to auto selection.
 - `.segmenter()` or `.options({segmenter: undefined})` clears the segmenter.
 
 Framework components take the same callback as `options.matrix.segmenter`. The React, Vue, Svelte,
 and Angular packages re-export `automaticSegmenter`, so import it from the framework package.
 
+### Kanji mode
+
+Kanji mode packs each double-byte Shift JIS character into 13 bits. UTF-8 needs 24 bits for most
+Japanese characters, so Japanese text fits a smaller symbol. Kanji mode needs the Shift JIS table
+from `@qrcodesdk/core/kanji`, which adds about 13 kB gzipped. Applications that don't import it
+don't load the table.
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
+
+qrcode('漢字テスト').mode('kanji').kanji(kanji).matrix(); // Forced Kanji mode.
+qrcode('漢字テスト').kanji(kanji).matrix(); // Auto mode picks Kanji for the whole payload.
+qrcode('東京タワー 333m').segmenter(automaticSegmenter).kanji(kanji).matrix(); // Kanji and octet.
+```
+
+- The table covers every character that Kanji mode can encode, as the WHATWG Shift_JIS decoder maps
+  them: kanji, hiragana, katakana, full-width Latin letters and digits, Greek, Cyrillic, box
+  drawing, and symbols. ASCII and half-width katakana are single-byte Shift JIS and use other modes.
+- Kanji mode accepts only characters that decode back unchanged. For example, it rejects `−`
+  (U+2212), which some Shift JIS encoders replace with `－` (U+FF0D).
+- Without the table, `mode: 'kanji'` and Kanji segments throw `QRCodeError` with code
+  `INVALID_OPTIONS`. Auto mode and `automaticSegmenter` then encode Japanese text as UTF-8 octets.
+- Kanji segments never get an ECI header. Scanners decode them as Shift JIS.
+- `.kanji()` or `.options({kanji: undefined})` removes the table.
+
+Framework components take the table as `options.matrix.kanji`. The React, Vue, Svelte, and Angular
+packages re-export `kanji`.
+
+:::caution[Scanners use their own Shift JIS tables]
+Kanji, kana, and full-width letters decode the same in every scanner. A few symbols, such as the
+wave dash and NEC special characters, map to different Unicode characters in some scanners. Use
+octet mode when exact symbols matter more than symbol size.
+:::
+
 ### Custom segmenter
 
-A custom `QRCodeSegmenter` receives the original payload and `{version, eci}`. It returns a
-non-empty array of `QRCodeSegment` values. The segments must follow these rules:
+A custom `QRCodeSegmenter` receives the original payload and `{version, eci, kanji}`. `kanji` is
+present only when the matrix options contain the Kanji table. It returns a non-empty array of
+`QRCodeSegment` values. The segments must follow these rules:
 
 - Each segment has a concrete mode and an unencoded string payload.
 - The segment texts concatenate to the original payload.
 - No segment is empty, unless a single segment encodes an empty payload.
 - No boundary splits a surrogate pair.
 
-Core validates each segment, UTF-8 encodes octet segments, and packs numeric and alphanumeric
-segments in their QR modes.
+Core validates each segment, UTF-8 encodes octet segments, converts Kanji segments with the Kanji
+table, and packs numeric and alphanumeric segments in their QR modes. Kanji segments require the
+`kanji` matrix option.
 
 The callback should be deterministic. With automatic version selection, it runs once per searched
 character-count group, starting at versions 1, 10, and 27. With a pinned version, it runs once.
@@ -117,14 +156,15 @@ character-count group, starting at versions 1, 10, and 27. With a pinned version
 
 `QRCodeMatrixOptions` contains only options that affect the encoded matrix:
 
-| Option                 | Type                                               | Default   | Constraint                                     |
-| ---------------------- | -------------------------------------------------- | --------- | ---------------------------------------------- |
-| `mode`                 | `'auto' \| 'numeric' \| 'alphanumeric' \| 'octet'` | `'auto'`  | Forced mode must accept the entire payload     |
-| `segmenter`            | `QRCodeSegmenter`                                  | omitted   | Used only in auto mode                         |
-| `eci`                  | `boolean`                                          | `false`   | Only affects symbols containing octet segments |
-| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`                         | `'M'`     | Higher redundancy reduces payload capacity     |
-| `version`              | integer `1`–`40`                                   | automatic | Pinned version must fit the encoded payload    |
-| `mask`                 | integer `0`–`7`                                    | automatic | Pinned mask replaces penalty-based selection   |
+| Option                 | Type                                                          | Default   | Constraint                                     |
+| ---------------------- | ------------------------------------------------------------- | --------- | ---------------------------------------------- |
+| `mode`                 | `'auto' \| 'numeric' \| 'alphanumeric' \| 'octet' \| 'kanji'` | `'auto'`  | Forced mode must accept the entire payload     |
+| `segmenter`            | `QRCodeSegmenter`                                             | omitted   | Used only in auto mode                         |
+| `kanji`                | `QRCodeKanji`                                                 | omitted   | Required by Kanji mode and Kanji segments      |
+| `eci`                  | `boolean`                                                     | `false`   | Only affects symbols containing octet segments |
+| `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`                                    | `'M'`     | Higher redundancy reduces payload capacity     |
+| `version`              | integer `1`–`40`                                              | automatic | Pinned version must fit the encoded payload    |
+| `mask`                 | integer `0`–`7`                                               | automatic | Pinned mask replaces penalty-based selection   |
 
 Set options one by one or together:
 
@@ -194,6 +234,7 @@ change the payload.
 | `.options(options?)`       | a configured builder      | Merges all supplied matrix options                             |
 | `.mode(mode?)`             | a configured builder      | Forces or clears the encoding mode                             |
 | `.segmenter(segmenter?)`   | a configured builder      | Sets or clears optional mixed-mode segmentation                |
+| `.kanji(kanji?)`           | a configured builder      | Sets or clears the Kanji table                                 |
 | `.eci(enabled?)`           | a configured builder      | Enables or clears the UTF-8 ECI declaration                    |
 | `.errorCorrection(level?)` | a configured builder      | Sets or clears the error correction level                      |
 | `.version(version?)`       | a configured builder      | Pins or clears the version                                     |

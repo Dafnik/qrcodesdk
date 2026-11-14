@@ -60,6 +60,7 @@
     "./internal/gif": "./dist/internal/gif.mjs",
     "./internal/jpeg": "./dist/internal/jpeg.mjs",
     "./internal/webp": "./dist/internal/webp.mjs",
+    "./kanji": "./dist/kanji.mjs",
     "./matrix": "./dist/matrix.mjs",
     "./payload": "./dist/payload.mjs",
     "./segmenter": "./dist/segmenter.mjs",
@@ -83,7 +84,8 @@
     "test": "vitest --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
     "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
-    "lint": "eslint benchmarks src tests runtime --max-warnings 0",
+    "lint": "eslint benchmarks scripts src tests runtime --max-warnings 0",
+    "generate:kanji-table": "node scripts/generate-kanji-table.mjs",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"
   },

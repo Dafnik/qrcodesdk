@@ -1,10 +1,10 @@
 import type {QRCodeColor} from '@qrcodesdk/core';
 
-import {cliPlaygroundOptions} from './cli-playground.ts';
+import {updateCliOptions} from './cli-playground.ts';
 import {
   type PlaygroundOptions,
-  playgroundOptions,
   setPlaygroundSectionOpen,
+  updateQrOptions,
 } from './playground-options.ts';
 import type {PlaygroundShape, PlaygroundStyleState} from './playground-style.ts';
 
@@ -138,8 +138,7 @@ export function applyQrPreset(id: string): void {
   const preset = playgroundPresets.find((candidate) => candidate.id === id);
   if (!preset) return;
 
-  playgroundOptions.set({
-    ...playgroundOptions.get(),
+  updateQrOptions({
     foreground: preset.foreground,
     background: preset.background,
     moduleShape: preset.moduleShape,
@@ -158,8 +157,7 @@ export function applyCliPreset(id: string): void {
   const preset = cliPlaygroundPresets.find((candidate) => candidate.id === id);
   if (!preset) return;
 
-  cliPlaygroundOptions.set({
-    ...cliPlaygroundOptions.get(),
+  updateCliOptions({
     foreground: preset.foreground,
     background: preset.background,
   });

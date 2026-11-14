@@ -135,6 +135,44 @@ test('core publishes the automatic segmenter independently of default generation
   assert.equal(visited.has(optimizer), false, 'default entries must not load the optimizer');
 });
 
+test('core publishes the Kanji table independently of every other entry', async () => {
+  const packageJson = JSON.parse(
+    await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
+  );
+  if (packageJson.name !== '@qrcodesdk/core') return;
+
+  const importTarget = (target) => import(pathToFileURL(path.join(packageDirectory, target)).href);
+  const root = await importTarget(packageJson.exports['.']);
+  const {automaticSegmenter} = await importTarget(packageJson.exports['./segmenter']);
+  const {kanji} = await importTarget(packageJson.exports['./kanji']);
+  assert.equal(root.kanji, undefined);
+  assert.equal(root.qrcode('点茗').mode('kanji').kanji(kanji).matrix().size, 21);
+  assert.equal(root.qrcode('東京タワー123').segmenter(automaticSegmenter).matrix().size, 25);
+  assert.equal(
+    root.qrcode('東京タワー123').segmenter(automaticSegmenter).kanji(kanji).matrix().size,
+    21,
+  );
+
+  // The first characters of the generated table identify the chunk that contains it.
+  const tableSource = await readFile(path.join(packageDirectory, 'src/kanji/table.ts'), 'utf8');
+  const tablePrefix = /'(.{32})/u.exec(tableSource)[1];
+  const visited = new Set();
+  async function visit(file) {
+    if (visited.has(file)) return;
+    visited.add(file);
+    const source = await readFile(file, 'utf8');
+    assert.equal(source.includes(tablePrefix), false, `${file} must not contain the Kanji table`);
+    for (const match of source.matchAll(/(?:from\s*|import\s*)['"]([^'"]+\.mjs)['"]/g)) {
+      if (match[1].startsWith('.')) await visit(path.resolve(path.dirname(file), match[1]));
+    }
+  }
+  for (const [entry, target] of Object.entries(packageJson.exports)) {
+    if (entry !== './kanji' && target.endsWith('.mjs')) {
+      await visit(path.resolve(packageDirectory, target));
+    }
+  }
+});
+
 test('React publishes a client entry', async () => {
   const packageJson = JSON.parse(
     await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),

@@ -20,8 +20,14 @@ or text that follows a recognized payload format.
 
 **Common application payload**:
 Text or a safe integer intended for one QR code symbol, including URLs and supported payload-format
-output. Raw binary segments, Kanji-specific encoding, structured append, and GS1 data are outside
-this category.
+output. Raw binary segments, structured append, and GS1 data are outside this category.
+
+**Kanji mode**:
+The QR encoding mode that packs double-byte Shift JIS characters into 13 bits each. It is opt-in:
+the Shift JIS table lives in `@qrcodesdk/core/kanji` and is passed as the `kanji` matrix option, so
+applications that do not use it do not load it. It only accepts characters that decode back
+unchanged.
+_Avoid_: Shift JIS mode, Japanese mode
 
 **Supported payload format**:
 An open, widely implemented payload format with either a stable formal specification or a
