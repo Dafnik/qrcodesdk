@@ -6,7 +6,7 @@ import {QRCodeWebPImageRenderer} from '@qrcodesdk/browser/webp';
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 import type {DevFixture} from '../fixtures/fixture-catalog';
-import type {RenderedOutput} from './decode';
+import type {RenderedOutput} from './rasterize';
 import {type RendererId, canvasOptions, svgOptions} from './renderers';
 
 /**
