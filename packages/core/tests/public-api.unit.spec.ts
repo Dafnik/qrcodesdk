@@ -14,6 +14,7 @@ import type {
   QRCodeTextStyle,
   QRCodeVisualStyle,
 } from '../src';
+import * as kanjiEntry from '../src/kanji';
 import * as matrix from '../src/matrix';
 import * as payload from '../src/payload';
 import type {
@@ -96,6 +97,17 @@ describe('public API', () => {
     expect(() => plain.render()).toThrowError(
       expect.objectContaining({name: 'QRCodeError', code: 'RENDERER_MISSING'}),
     );
+  });
+
+  test('exposes the Kanji table only through the Kanji subpath', () => {
+    expect(Object.keys(kanjiEntry)).toEqual(['kanji']);
+    expect(Object.keys(core)).not.toContain('kanji');
+    expectTypeOf(kanjiEntry.kanji).toEqualTypeOf<core.QRCodeKanji>();
+    expectTypeOf<kanjiEntry.QRCodeKanji>().toEqualTypeOf<core.QRCodeKanji>();
+    expectTypeOf<core.QRCodeMatrixOptions['kanji']>().toEqualTypeOf<core.QRCodeKanji | undefined>();
+    expectTypeOf<core.QRCodeEncodingMode>().toEqualTypeOf<
+      'numeric' | 'alphanumeric' | 'octet' | 'kanji'
+    >();
   });
 
   test('creates SVG center images through the exported factory', () => {

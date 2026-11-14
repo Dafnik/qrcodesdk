@@ -71,6 +71,26 @@ test('auto is selectable with optional optimization and concrete modes bypass it
   expect(await render('--mode', 'octet', '--optimize-segments')).toBe(defaultOutput);
 });
 
+test('Kanji mode is opt-in and combines with segment optimization', async () => {
+  const render = async (payload: string, ...flags: string[]) => {
+    const runtime = createRuntime();
+    await expect(runCli([payload, '--ansi', 'off', ...flags], runtime)).resolves.toBe(0);
+    return runtime.stdoutText();
+  };
+  const octet = await render('東京タワー');
+  const kanji = await render('東京タワー', '--kanji');
+  expect(kanji).not.toBe(octet);
+  expect(await render('東京タワー', '--mode', 'kanji')).toBe(kanji);
+  expect(await render('東京タワー', '--kanji', '--no-kanji')).toBe(octet);
+  expect(await render('東京タワー', '--mode', 'octet', '--kanji')).toBe(octet);
+  expect(await render('東京タワー123', '--kanji', '--optimize-segments')).not.toBe(
+    await render('東京タワー123', '--optimize-segments'),
+  );
+
+  const runtime = createRuntime();
+  await expect(runCli(['abc', '--mode', 'kanji'], runtime)).resolves.toBe(1);
+});
+
 describe('runCli', () => {
   beforeAll(() => {
     vi.stubGlobal('__QRCODESDK_CLI_VERSION__', packageJson.version);

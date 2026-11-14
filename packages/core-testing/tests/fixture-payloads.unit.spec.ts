@@ -2,6 +2,7 @@ import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 import type {QRCodeErrorCorrectionLevel, QRCodeMode, QRCodeVersion} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 
 import {
   QR_CODE_TEST_FIXTURES,
@@ -13,7 +14,12 @@ import {
 } from '../src';
 
 const ECC_LEVELS = ['L', 'M', 'Q', 'H'] as const satisfies readonly QRCodeErrorCorrectionLevel[];
-const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeMode[];
+const MODES = [
+  'numeric',
+  'alphanumeric',
+  'octet',
+  'kanji',
+] as const satisfies readonly QRCodeMode[];
 
 const CAPACITY_CASES = Array.from({length: 40}, (_, index) => (index + 1) as QRCodeVersion).flatMap(
   (version) =>
@@ -42,6 +48,7 @@ describe('createFixturePayload()', () => {
       numeric: /^[0-9]+$/,
       alphanumeric: /^[0-9A-Z $%*+\-./:]+$/,
       octet: /^[\x20-\x7e]+$/,
+      kanji: /^[\u3000-\u30ff\u4e00-\u9fff\uff00-\uffef]+$/,
     } as const;
 
     for (const mode of MODES) {
@@ -50,6 +57,10 @@ describe('createFixturePayload()', () => {
       expect(payload).toMatch(patterns[mode]);
       expect(payload).not.toMatch(/(.)\1{7}/);
       expect(new Set(payload).size).toBeGreaterThan(mode === 'numeric' ? 9 : 40);
+      if (mode === 'kanji') {
+        const chunk = payload.slice(0, 1_000);
+        expect(qrcode(chunk).mode('kanji').kanji(kanji).matrix().size).toBeGreaterThan(21);
+      }
     }
   });
 
@@ -70,6 +81,8 @@ describe('fixtureCapacity()', () => {
     expect(fixtureCapacity(40, 'L', 'octet')).toBe(2_953);
     expect(fixtureCapacity(40, 'L', 'octet', true)).toBe(2_952);
     expect(fixtureCapacity(1, 'H', 'numeric')).toBe(17);
+    expect(fixtureCapacity(40, 'L', 'kanji')).toBe(1_817);
+    expect(fixtureCapacity(1, 'H', 'kanji')).toBe(4);
   });
 
   test.each(CAPACITY_CASES)(
@@ -79,7 +92,7 @@ describe('fixtureCapacity()', () => {
       const fitting = createFixturePayload(mode, capacity, version, {utf8: eci});
       const oversized = `${fitting}${createFixturePayload(mode, 1, version)}`;
       const build = (value: string) =>
-        qrcode(value).options({mode, version, errorCorrectionLevel, eci, mask: 0}).matrix();
+        qrcode(value).options({mode, version, errorCorrectionLevel, eci, mask: 0, kanji}).matrix();
 
       expect(build(fitting).size).toBe(17 + 4 * version);
       expect(() => build(oversized)).toThrow('QRCode: Payload too large');
@@ -101,7 +114,9 @@ describe('fixture payloads', () => {
 
   test('fill the static max-capacity fixtures exactly', () => {
     for (const fixture of QR_CODE_TEST_FIXTURES.filter(({name}) => name.endsWith('max-capacity'))) {
-      expect(utf8Length(fixture.payload)).toBe(fixtureCapacity(40, 'L', fixture.mode));
+      expect(fixture.mode === 'kanji' ? fixture.payload.length : utf8Length(fixture.payload)).toBe(
+        fixtureCapacity(40, 'L', fixture.mode),
+      );
     }
   });
 });

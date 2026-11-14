@@ -56,3 +56,5 @@ psnr
 rrggbbff
 äöüßéñçøå
 ENOENT
+varint
+varints

@@ -81,13 +81,14 @@ Even when a large payload fits, its modules are small and harder to scan. Prefer
 
 **Error:** `INVALID_PAYLOAD`
 
-| Cause                                                                                       | Fix                                                                                                            |
-| ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| A concrete `mode`, such as `'numeric'`, doesn't accept the whole payload                    | Remove `mode`, or use `'auto'`                                                                                 |
-| A numeric payload is negative, fractional, or above `Number.MAX_SAFE_INTEGER`               | Pass it as a string. Do the same for identifiers with leading zeroes                                           |
-| A custom segmenter returns segments that don't join to the original payload                 | Fix the segmenter                                                                                              |
-| `mode` from JavaScript or JSON is not `'auto'`, `'numeric'`, `'alphanumeric'`, or `'octet'` | Use one of those values. `details.mode` shows the rejected value                                               |
-| A payload helper such as `wifiPayload()` rejects a field                                    | Fix the field named in `details.field`. Text fields, including email and SMS `body`, can't contain line breaks |
+| Cause                                                                                                  | Fix                                                                                                            |
+| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| A concrete `mode`, such as `'numeric'`, doesn't accept the whole payload                               | Remove `mode`, or use `'auto'`                                                                                 |
+| A numeric payload is negative, fractional, or above `Number.MAX_SAFE_INTEGER`                          | Pass it as a string. Do the same for identifiers with leading zeroes                                           |
+| A custom segmenter returns segments that don't join to the original payload                            | Fix the segmenter                                                                                              |
+| `mode: 'kanji'` gets ASCII, half-width katakana, emoji, or another character outside Shift JIS         | Use auto mode with `automaticSegmenter` and `kanji`, which puts those characters in other segments             |
+| `mode` from JavaScript or JSON is not `'auto'`, `'numeric'`, `'alphanumeric'`, `'octet'`, or `'kanji'` | Use one of those values. `details.mode` shows the rejected value                                               |
+| A payload helper such as `wifiPayload()` rejects a field                                               | Fix the field named in `details.field`. Text fields, including email and SMS `body`, can't contain line breaks |
 
 Payload helpers throw when you call them, not when you render.
 

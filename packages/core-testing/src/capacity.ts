@@ -57,6 +57,7 @@ const CHARACTER_COUNT_BITS = {
   numeric: [10, 12, 14],
   alphanumeric: [9, 11, 13],
   octet: [8, 16, 16],
+  kanji: [8, 10, 12],
 } as const satisfies Record<QRCodeEncodingMode, readonly [number, number, number]>;
 
 const MODE_INDICATOR_BITS = 4;
@@ -65,7 +66,7 @@ const UTF8_ECI_HEADER_BITS = 12;
 /**
  * Returns the largest single-segment payload that fits the given symbol.
  *
- * The result counts characters for numeric and alphanumeric mode and bytes for octet mode.
+ * The result counts characters for numeric, alphanumeric, and Kanji mode and bytes for octet mode.
  * With `eci`, octet payloads reserve room for the UTF-8 ECI header.
  */
 export function fixtureCapacity(
@@ -92,5 +93,7 @@ export function fixtureCapacity(
       return Math.floor(dataBits / 11) * 2 + (dataBits % 11 >= 6 ? 1 : 0);
     case 'octet':
       return Math.floor(dataBits / 8);
+    case 'kanji':
+      return Math.floor(dataBits / 13);
   }
 }

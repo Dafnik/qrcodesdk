@@ -96,6 +96,7 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
     errorCorrectionLevel: options.errorCorrectionLevel,
     mask: options.mask,
     eci: options.eci,
+    kanji: options.kanji,
     segmenter: options.optimizeSegments ? automaticSegmenter : options.segmenter,
   };
   const matrix = qrcode(options.payload).options(matrixOptions).matrix();
@@ -203,13 +204,29 @@ function resolveMode(
 ): Exclude<QRCodeMode, 'auto'> | 'mixed' {
   if (options.mode !== undefined && options.mode !== 'auto') return options.mode;
   if (matrixOptions.segmenter) {
-    const segments = matrixOptions.segmenter(options.payload, {version, eci: options.eci ?? false});
+    const segments = matrixOptions.segmenter(options.payload, {
+      version,
+      eci: options.eci ?? false,
+      ...(matrixOptions.kanji ? {kanji: matrixOptions.kanji} : {}),
+    });
     const modes = new Set(segments.map(({mode}) => mode));
     return modes.size > 1 ? 'mixed' : segments[0]!.mode;
   }
   if (/^\d*$/.test(options.payload)) return 'numeric';
   if (/^[0-9A-Z $%*+\-./:]*$/.test(options.payload)) return 'alphanumeric';
-  return 'octet';
+  return matrixOptions.kanji && fitsKanjiMode(options.payload, matrixOptions) ? 'kanji' : 'octet';
+}
+
+/** Auto mode picks Kanji mode when the Kanji table encodes every character. */
+function fitsKanjiMode(payload: string, matrixOptions: QRCodeMatrixOptions): boolean {
+  try {
+    qrcode(payload)
+      .options({...matrixOptions, mode: 'kanji', segmenter: undefined, version: 40})
+      .matrix();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function createGroups(

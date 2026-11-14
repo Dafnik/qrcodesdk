@@ -1,12 +1,13 @@
+import {resolveKanjiLookup} from './matrix/kanji';
 import {
   ECI_UTF8_BIT_LENGTH,
   MODE_ALPHANUMERIC,
+  MODE_KANJI,
   MODE_NUMERIC,
   MODE_OCTET,
   getCharacterCountBits,
   isNumericPayload,
 } from './matrix/mode';
-import type {QRCodeSupportedModeIndicator} from './matrix/types';
 import type {QRCodeSegment, QRCodeSegmenter} from './types';
 
 export type {
@@ -16,20 +17,27 @@ export type {
   QRCodeSegmenterOptions,
 } from './types';
 
-// State keys are mode * 6 + remainder * 2 + hasUTF8ECI, so 26 slots cover every state.
-const STATE_COUNT = 26;
-const MODE_ORDER = [MODE_NUMERIC, MODE_ALPHANUMERIC, MODE_OCTET] as const;
-const MODE_NAMES = {1: 'numeric', 2: 'alphanumeric', 4: 'octet'} as const;
+// Modes by index, in tie-breaking order.
+const MODES = [MODE_NUMERIC, MODE_ALPHANUMERIC, MODE_OCTET, MODE_KANJI] as const;
+const MODE_NAMES = ['numeric', 'alphanumeric', 'octet', 'kanji'] as const;
+const NUMERIC = 0;
+const ALPHANUMERIC = 1;
+const OCTET = 2;
+const KANJI = 3;
+// State keys are modeIndex * 6 + remainder * 2 + hasUTF8ECI, so 24 slots cover every state.
+const STATE_COUNT = 24;
 
 /**
  * Finds the shortest mixed-mode segmentation with a dynamic program over
- * (mode, partial character group, UTF-8 ECI emitted) states.
+ * (mode, partial character group, UTF-8 ECI emitted) states. Kanji segments are
+ * only considered when the options contain the Kanji table.
  *
  * Numeric and alphanumeric states track the characters in the current group
  * (mod 3 and mod 2). State data lives in fixed-size typed arrays, and each step
  * records the order in which keys first appear, so ties resolve in that order.
  */
-export const automaticSegmenter: QRCodeSegmenter = (payload, {version, eci}) => {
+export const automaticSegmenter: QRCodeSegmenter = (payload, {version, eci, kanji}) => {
+  const kanjiLookup = resolveKanjiLookup(kanji);
   const value = String(payload);
   // Keep numeric and canonical empty payloads out of the mixed-mode optimizer.
   if (isNumericPayload(value)) return [{mode: 'numeric', payload: value}];
@@ -69,27 +77,37 @@ export const automaticSegmenter: QRCodeSegmenter = (payload, {version, eci}) => 
       codePoint === 58;
     const octetBits =
       (codePoint < 0x80 ? 1 : codePoint < 0x800 ? 2 : codePoint < 0x10000 ? 3 : 4) * 8;
+    const isKanji = !!kanjiLookup && codePoint < 0x10000 && kanjiLookup(codePoint) >= 0;
     const order: number[] = [];
     bitLengths.fill(Infinity);
 
-    for (const mode of MODE_ORDER) {
-      if (mode === MODE_NUMERIC ? !isNumeric : mode === MODE_ALPHANUMERIC && !isAlphanumeric) {
+    for (let mode = NUMERIC; mode <= KANJI; mode++) {
+      if (
+        mode === NUMERIC
+          ? !isNumeric
+          : mode === ALPHANUMERIC
+            ? !isAlphanumeric
+            : mode === KANJI && !isKanji
+      ) {
         continue;
       }
-      const countBits = getCharacterCountBits(mode, version);
+      const countBits = getCharacterCountBits(MODES[mode]!, version);
+      const grouped = mode < OCTET;
 
       for (const previousKey of previousOrder) {
         const hasPrevious = previousKey >= 0;
         const previousRemainder = (previousKey % 6) >> 1;
         const previousHasUTF8ECI = hasPrevious && (previousKey & 1) === 1;
         const appending = hasPrevious && ((previousKey / 6) | 0) === mode;
-        const remainder =
-          mode === MODE_OCTET ? 0 : appending ? (previousRemainder + 1) % (4 - mode) : 1;
-        const hasUTF8ECI = previousHasUTF8ECI || mode === MODE_OCTET;
+        // Numeric groups hold 3 characters and alphanumeric groups 2.
+        const remainder = !grouped ? 0 : appending ? (previousRemainder + 1) % (3 - mode) : 1;
+        const hasUTF8ECI = previousHasUTF8ECI || mode === OCTET;
         const characterBits =
-          mode === MODE_OCTET
+          mode === OCTET
             ? octetBits
-            : (mode === MODE_NUMERIC ? 4 : 6) - (appending && previousRemainder ? 1 : 0);
+            : mode === KANJI
+              ? 13
+              : (mode === NUMERIC ? 4 : 6) - (appending && previousRemainder ? 1 : 0);
         const bitLength =
           (hasPrevious ? previousBitLengths[previousKey]! : 0) +
           characterBits +
@@ -97,7 +115,7 @@ export const automaticSegmenter: QRCodeSegmenter = (payload, {version, eci}) => 
             ? 0
             : 4 +
               countBits +
-              (eci && mode === MODE_OCTET && !previousHasUTF8ECI ? ECI_UTF8_BIT_LENGTH : 0));
+              (eci && mode === OCTET && !previousHasUTF8ECI ? ECI_UTF8_BIT_LENGTH : 0));
         const segmentCount =
           (hasPrevious ? previousSegmentCounts[previousKey]! : 0) + (appending ? 0 : 1);
         const key = mode * 6 + remainder * 2 + +hasUTF8ECI;
@@ -133,10 +151,10 @@ export const automaticSegmenter: QRCodeSegmenter = (payload, {version, eci}) => 
   const result: QRCodeSegment[] = [];
   for (let index = length - 1, segmentEnd = length; index >= 0; index--) {
     const previousKey = previousKeys[index * STATE_COUNT + key]!;
-    const mode = ((key / 6) | 0) as QRCodeSupportedModeIndicator;
+    const mode = (key / 6) | 0;
     if (previousKey < 0 || ((previousKey / 6) | 0) !== mode) {
       result.unshift({
-        mode: MODE_NAMES[mode],
+        mode: MODE_NAMES[mode]!,
         payload: value.slice(offsets[index], offsets[segmentEnd]),
       });
       segmentEnd = index;

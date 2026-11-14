@@ -2,6 +2,10 @@ import type {QRCodeEncodingMode} from '@qrcodesdk/core';
 
 const NUMERIC_CHARACTERS = '0123456789';
 const ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
+/** Kanji mode characters that every Shift JIS table, including jsQR's, decodes identically. */
+const KANJI_CHARACTERS = [
+  ...'あいうえおかきくけこさしすせそアイウエオカキクケコサシスセソ漢字日本語東京点茗中文ＱＲ０１',
+];
 const PRINTABLE_ASCII_CHARACTERS = Array.from({length: 0x7f - 0x20}, (_, index) =>
   String.fromCharCode(0x20 + index),
 ).join('');
@@ -16,7 +20,7 @@ const UTF8_CHARACTERS_BY_BYTE_LENGTH = {
 export type QRCodeFixturePayloadOptions = {
   /**
    * Mixes multi-byte UTF-8 characters into octet payloads. `length` then counts UTF-8 bytes,
-   * not characters. Ignored by numeric and alphanumeric payloads.
+   * not characters. Ignored by numeric, alphanumeric, and Kanji payloads.
    */
   readonly utf8?: boolean;
 };
@@ -46,7 +50,8 @@ export function createFixtureRandom(seed: number): () => number {
 /**
  * Creates a deterministic, non-repeating payload for `mode`.
  *
- * `length` counts characters for numeric and alphanumeric payloads and bytes for octet payloads.
+ * `length` counts characters for numeric, alphanumeric, and Kanji payloads and bytes for octet
+ * payloads.
  */
 export function createFixturePayload(
   mode: QRCodeEncodingMode,
@@ -57,8 +62,13 @@ export function createFixturePayload(
   const random = createFixtureRandom(seed);
   const pick = <T>(values: ArrayLike<T>): T => values[Math.floor(random() * values.length)]!;
 
-  if (mode === 'numeric' || mode === 'alphanumeric') {
-    const characters = mode === 'numeric' ? NUMERIC_CHARACTERS : ALPHANUMERIC_CHARACTERS;
+  if (mode !== 'octet') {
+    const characters =
+      mode === 'numeric'
+        ? NUMERIC_CHARACTERS
+        : mode === 'alphanumeric'
+          ? ALPHANUMERIC_CHARACTERS
+          : KANJI_CHARACTERS;
     return Array.from({length}, () => pick(characters)).join('');
   }
 

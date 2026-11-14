@@ -2,10 +2,12 @@ export {
   getAllQRCodeAutoMaskCombinations,
   getAllQRCodeCombinations,
   getAllQRCodeECICombinations,
+  getAllQRCodeKanjiCombinations,
   TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS,
   TOTAL_QR_CODE_COMBINATIONS,
+  TOTAL_QR_CODE_KANJI_COMBINATIONS,
 } from './all-combinations';
-export type {QRCodeAutoMaskCombination} from './all-combinations';
+export type {QRCodeAutoMaskCombination, QRCodeCombination} from './all-combinations';
 export {fixtureCapacity} from './capacity';
 export {QR_CODE_CENTER_IMAGE_FIXTURES} from './center-image-fixtures';
 export type {QRCodeCenterImageFixture} from './center-image-fixtures';

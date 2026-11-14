@@ -30,6 +30,7 @@ describe('Vue QR code component API', () => {
       'customShape',
       'diagonal',
       'finder',
+      'kanji',
       'rounded',
       'svgCenterImage',
     ]);

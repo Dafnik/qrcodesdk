@@ -1,4 +1,5 @@
 import * as core from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 import * as matrixApi from '@qrcodesdk/core/matrix';
 import * as payload from '@qrcodesdk/core/payload';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
@@ -136,3 +137,13 @@ assert(
   'Expected opt-in mixed-mode optimization',
 );
 logSuccess('auto mode works with and without the optional segmenter');
+
+assert(
+  core.qrcode('点茗').mode('kanji').kanji(kanji).matrix().size === 21,
+  'Expected Kanji mode with the Kanji table',
+);
+assert(
+  core.qrcode('東京タワー123').segmenter(automaticSegmenter).kanji(kanji).matrix().size === 21,
+  'Expected Kanji segments from the automatic segmenter',
+);
+logSuccess('Kanji mode works with the opt-in Kanji table');

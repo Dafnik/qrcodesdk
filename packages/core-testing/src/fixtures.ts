@@ -1,4 +1,5 @@
 import type {QRCodeEncodingMode, QRCodeMatrixOptions} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 
 import {fixtureCapacity} from './capacity';
 import {createFixturePayload, fixtureSeed} from './fixture-payloads';
@@ -13,8 +14,8 @@ export type QRCodeTestFixture = Readonly<
 
 /** Extracts encoding options without fixture names or payloads. */
 export function fixtureMatrixOptions(fixture: QRCodeMatrixOptions): QRCodeMatrixOptions {
-  const {mode, version, mask, eci, errorCorrectionLevel} = fixture;
-  return {mode, version, mask, eci, errorCorrectionLevel};
+  const {mode, version, mask, eci, errorCorrectionLevel, kanji} = fixture;
+  return {mode, version, mask, eci, errorCorrectionLevel, kanji};
 }
 
 export const QR_CODE_ECI_TEST_FIXTURE = {
@@ -120,6 +121,22 @@ export const QR_CODE_TEST_FIXTURES = [
   },
   QR_CODE_ECI_TEST_FIXTURE,
   {
+    name: 'kanji',
+    payload: '点茗\u3000漢字テスト',
+    mode: 'kanji',
+    kanji,
+    version: 1,
+    mask: 3,
+  },
+  {
+    name: 'kanji-version-3',
+    payload: 'ＱＲコードは日本語の文章を効率よく格納できます',
+    mode: 'kanji',
+    kanji,
+    version: 3,
+    mask: 6,
+  },
+  {
     name: 'numeric-max-capacity',
     payload: createFixturePayload(
       'numeric',
@@ -153,6 +170,19 @@ export const QR_CODE_TEST_FIXTURES = [
     mode: 'octet',
     version: 40,
     mask: 2,
+    errorCorrectionLevel: 'L',
+  },
+  {
+    name: 'kanji-max-capacity',
+    payload: createFixturePayload(
+      'kanji',
+      fixtureCapacity(40, 'L', 'kanji'),
+      fixtureSeed('kanji-max-capacity'),
+    ),
+    mode: 'kanji',
+    kanji,
+    version: 40,
+    mask: 3,
     errorCorrectionLevel: 'L',
   },
 ] as const satisfies readonly QRCodeTestFixture[];

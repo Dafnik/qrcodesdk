@@ -12,6 +12,9 @@
       "cache": false,
       "dependsOn": ["build"],
       "env": ["QRCODESDK_BENCHMARK_CORE"]
+    },
+    "generate:kanji-table": {
+      "cache": false
     }
   }
 }

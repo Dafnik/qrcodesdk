@@ -478,6 +478,7 @@ import {
   QRCodeJPEG,
   type QRCodeJPEGImageOptions,
   type QRCodeJPEGProps,
+  type QRCodeKanji,
   type QRCodeMask,
   type QRCodeMatrixOptions,
   type QRCodeMode,
@@ -511,6 +512,7 @@ import {
   customShape,
   diagonal,
   finder,
+  kanji,
   rounded,
   svgCenterImage,
 } from '@qrcodesdk/react';

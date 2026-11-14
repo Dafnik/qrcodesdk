@@ -2,6 +2,7 @@ export {qrcode, QRCodeBuilder} from './qrcode-builder';
 export {QR_CODE_MODULE_ROLES} from './matrix/module-roles';
 export type {
   QRCodeErrorCorrectionLevel,
+  QRCodeKanji,
   QRCodeMask,
   QRCodeMatrix,
   QRCodeMatrixOptions,

@@ -6,8 +6,10 @@ import {
   type QRCodeVersion,
   qrcode,
 } from '../../src';
+import {kanji} from '../../src/kanji';
 import {ECC_LEVELS_MAP} from '../../src/matrix/error-correction';
 import {getNumberOfAvailableBitsForData} from '../../src/matrix/get-number-of-available-bits-for-data';
+import {resolveKanjiLookup} from '../../src/matrix/kanji';
 import {MODES_MAP} from '../../src/matrix/mode';
 import {segmentsFitVersion} from '../../src/matrix/resolve-matrix-options';
 import {createSingleSegment} from '../../src/matrix/segments';
@@ -15,7 +17,12 @@ import {automaticSegmenter} from '../../src/segmenter';
 import {fixturePayload, toRows} from '../helpers';
 import {expectSquareMatrix} from './helpers';
 
-const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies readonly QRCodeEncodingMode[];
+const MODES = [
+  'numeric',
+  'alphanumeric',
+  'octet',
+  'kanji',
+] as const satisfies readonly QRCodeEncodingMode[];
 
 const ERROR_CORRECTION_LEVELS = [
   'L',
@@ -213,6 +220,7 @@ describe('qrcode().matrix()', () => {
       expectSquareMatrix(
         qrcode(exactData)
           .mode(mode)
+          .kanji(kanji)
           .version(version)
           .errorCorrection(errorCorrectionLevel)
           .mask(0)
@@ -222,6 +230,7 @@ describe('qrcode().matrix()', () => {
       expect(() =>
         qrcode(oversizedData)
           .mode(mode)
+          .kanji(kanji)
           .version(version)
           .errorCorrection(errorCorrectionLevel)
           .mask(0)
@@ -263,7 +272,7 @@ describe('qrcode().matrix()', () => {
 
 function getSingleSegmentCapacity(
   version: QRCodeVersion,
-  mode: QRCodeEncodingMode,
+  mode: (typeof MODES)[number],
   errorCorrectionLevel: QRCodeErrorCorrectionLevel,
 ): number {
   const modeIndicator = MODES_MAP[mode];
@@ -273,7 +282,11 @@ function getSingleSegmentCapacity(
 
   while (minimum < maximum) {
     const candidate = Math.ceil((minimum + maximum) / 2);
-    const segment = createSingleSegment(modeIndicator, fixturePayload(mode, candidate))!;
+    const segment = createSingleSegment(
+      modeIndicator,
+      fixturePayload(mode, candidate),
+      resolveKanjiLookup(kanji),
+    )!;
     if (segmentsFitVersion([segment], version, eccLevel, false)) minimum = candidate;
     else maximum = candidate - 1;
   }

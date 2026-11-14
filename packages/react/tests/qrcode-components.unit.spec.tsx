@@ -37,9 +37,18 @@ describe('React QR code component handles', () => {
       'customShape',
       'diagonal',
       'finder',
+      'kanji',
       'rounded',
       'svgCenterImage',
     ]);
+  });
+
+  test('enables Kanji mode through matrix options', () => {
+    const markup = (matrix: reactApi.QRCodeMatrixOptions) =>
+      renderToString(<reactApi.QRCodeSVG payload="東京タワー" options={{matrix}} />);
+
+    expect(markup({kanji: reactApi.kanji})).toBe(markup({mode: 'kanji', kanji: reactApi.kanji}));
+    expect(markup({kanji: reactApi.kanji})).not.toBe(markup({}));
   });
 
   test('accepts payload and options props', () => {
