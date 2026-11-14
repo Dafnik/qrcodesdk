@@ -12,9 +12,11 @@ related:
 
 ## When to use
 
-Use the download renderers inside a browser user action when the SDK should create and click a
-temporary download link. Use the SVG wrapper for scalable files and the Image wrapper for PNG, WebP,
-GIF, or JPEG files.
+Use a download renderer inside a browser user action. The SDK creates and clicks a temporary
+download link for you.
+
+- `QRCodeDownloadSVGRenderer` downloads a scalable SVG file.
+- `QRCodeDownloadImageRenderer` downloads a PNG, WebP, GIF, or JPEG file.
 
 ## Minimal example
 
@@ -30,7 +32,7 @@ qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-For a raster file, wrap an Image element renderer with `QRCodeDownloadImageRenderer()` instead:
+For a raster file, wrap an Image element renderer with `QRCodeDownloadImageRenderer()`:
 
 ```ts
 import {QRCodeDownloadImageRenderer} from '@qrcodesdk/browser/image';
@@ -47,38 +49,42 @@ qrcode('https://qrcodesdk.dev').render(
 
 ## Return value
 
-Both wrappers return `void`. Their effect is a browser download; they do not return the wrapped SVG
-string or Image element.
+Both wrappers return `void`. They start a browser download and do not return the SVG string or
+Image element.
 
-## Renderer-specific options
+## Options
 
-| Wrapper                       | `renderer` requirement                                                | `filename` default | Added extension                    |
-| ----------------------------- | --------------------------------------------------------------------- | ------------------ | ---------------------------------- |
-| `QRCodeDownloadSVGRenderer`   | `QRCodeRenderer<string>` such as `QRCodeSVGRenderer()`                | `'qrcode'`         | `.svg`                             |
-| `QRCodeDownloadImageRenderer` | `QRCodeRenderer<HTMLImageElement>` such as `QRCodePNGImageRenderer()` | `'qrcode'`         | `.png`, `.webp`, `.gif`, or `.jpg` |
+| Wrapper                       | `renderer` (required)                                                  | `filename` default | Added extension                    |
+| ----------------------------- | ---------------------------------------------------------------------- | ------------------ | ---------------------------------- |
+| `QRCodeDownloadSVGRenderer`   | `QRCodeRenderer<string>`, such as `QRCodeSVGRenderer()`                | `'qrcode'`         | `.svg`                             |
+| `QRCodeDownloadImageRenderer` | `QRCodeRenderer<HTMLImageElement>`, such as `QRCodePNGImageRenderer()` | `'qrcode'`         | `.png`, `.webp`, `.gif`, or `.jpg` |
 
-The Image wrapper accepts the PNG, WebP, GIF, and JPEG Image element renderers. It picks the extension
-from the MIME type of the image's data URL. For any other data URL type, it uses the filename
+The Image wrapper accepts the PNG, WebP, GIF, and JPEG Image element renderers. It picks the
+extension from the MIME type of the image's data URL. For any other type, it keeps the filename
 unchanged.
 
-`renderer` is required. `filename` is optional. The wrapper appends its extension unless the name
-already ends with it, compared case-insensitively. A JPEG filename that already ends with `.jpeg`
-keeps that extension. Surrounding whitespace is trimmed, and empty or whitespace-only filenames use
-`qrcode`. Both factories copy their options when called; changing the original object later does
-not change the download.
+### Filenames
 
-## Renderer-specific constraints
+- Surrounding whitespace is trimmed.
+- Empty or whitespace-only names become `qrcode`.
+- The extension is appended unless the name already ends with it, compared case-insensitively.
+- A JPEG filename that already ends with `.jpeg` keeps that extension.
 
-- Both wrappers require browser DOM download behavior and must be called in a context where the
-  browser permits a programmatic link click.
-- The SVG wrapper creates an `image/svg+xml;charset=utf-8` Blob and revokes its object URL 40 seconds
-  after triggering the download, so browsers that start downloads asynchronously can finish reading it.
-- The Image wrapper downloads the wrapped Image element's existing `src`; it does not re-encode it.
-- The wrappers do not validate the wrapped renderer's options, output, or runtime requirements.
+## Constraints
+
+- **User action.** Both wrappers need browser DOM download behavior. Call them where the browser
+  allows a programmatic link click.
+- **SVG Blob.** The SVG wrapper creates an `image/svg+xml;charset=utf-8` Blob. It revokes the object
+  URL 40 seconds after the download starts, so browsers that download asynchronously can finish.
+- **No re-encoding.** The Image wrapper downloads the Image element's existing `src` as is.
+- **No checks of the wrapped renderer.** The wrappers do not validate its options, output, or
+  runtime requirements.
+- **Option copies.** Both factories copy their options when they are called. Later changes to the
+  original object do not affect the download.
 
 ## Related guides
 
 - [Download or save](/guides/download-or-save/) for choosing a format and for framework component,
   Canvas, and Node.js workflows.
 - [SVG string renderer](/reference/renderers/svg/) and
-  [Image element renderers](/reference/renderers/image/) for wrapped options.
+  [Image element renderers](/reference/renderers/image/) for the wrapped options.

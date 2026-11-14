@@ -14,11 +14,15 @@ related:
 
 ## When to use
 
-Use `QRCodeWebPRenderer` when Node.js-compatible code needs small raster bytes for a file, HTTP
-response, attachment, or object store, and the destination accepts WebP. The output is lossless WebP,
-so it keeps every pixel of the [PNG Buffer renderer](/reference/renderers/png/) output. It is usually
-much smaller: a default QR code for `https://qrcodesdk.dev` is about 310 bytes as WebP and 1.1 KB as
-PNG.
+Use `QRCodeWebPRenderer` when Node.js-compatible code needs small raster bytes and the destination
+accepts WebP. Typical uses are files, HTTP responses, attachments, and object stores.
+
+The output is lossless, so it has the same pixels as the [PNG Buffer renderer](/reference/renderers/png/).
+It is usually much smaller. A default QR code for `https://qrcodesdk.dev` is about 310 bytes as WebP
+and 1.1 KB as PNG.
+
+Choose PNG when a destination, such as an older email client or document format, does not accept
+WebP.
 
 ## Minimal example
 
@@ -51,29 +55,31 @@ See [Customize appearance](/guides/customize/) for every color, shape, and finde
 
 ## Return value
 
-The renderer synchronously returns a Node.js `Buffer` containing a complete lossless WebP (VP8L)
-file. Pixels are identical to the PNG renderer's output for the same options. The width and height
-are `style.moduleSize × (matrix width + 2 × style.quietZone)`, shaped edges are anti-aliased, and
-RGBA colors keep their alpha. Output above 8192 × 8192 pixels (67,108,864 pixels) throws
-`QRCodeError` with code `INVALID_OPTIONS` before any pixels are allocated.
+The renderer synchronously returns a Node.js `Buffer` with a complete lossless WebP (VP8L) file:
 
-## Renderer-specific options
+- Pixels are identical to the PNG renderer's output for the same options.
+- Width and height: `style.moduleSize × (matrix width + 2 × style.quietZone)` pixels.
+- Shaped edges are anti-aliased.
+- RGBA colors keep their alpha.
 
-`QRCodeWebPRendererOptions` accepts `style` and `centerImage`. TypeScript rejects every other key;
-the renderer does not repeat that check at runtime.
+Output above 8192 × 8192 pixels (67,108,864 pixels) throws `QRCodeError` with code
+`INVALID_OPTIONS` before any pixels are allocated.
+
+## Options
 
 | Option        | Type                      | Default         | Effect                                           |
 | ------------- | ------------------------- | --------------- | ------------------------------------------------ |
 | `style`       | `QRCodeVisualStyle`       | shared defaults | Applies graphical dimensions, colors, and shapes |
 | `centerImage` | `QRCodeRasterCenterImage` | `undefined`     | Draws a center image from `rasterCenterImage()`  |
 
-The encoder has no quality or effort setting. Output is always lossless.
+- `QRCodeWebPRendererOptions` accepts only these keys.
+- The encoder has no quality or effort setting. Output is always lossless.
 
 ## Center image
 
 Create the center image with `rasterCenterImage()` from PNG bytes, as for the
-[PNG renderer](/reference/renderers/png/#center-image). One center image can be reused across the
-PNG, WebP, GIF, and JPEG renderers:
+[PNG renderer](/reference/renderers/png/#center-image). One center image works for the PNG, WebP,
+GIF, and JPEG renderers.
 
 ```ts
 import {readFile} from 'node:fs/promises';
@@ -87,13 +93,13 @@ const webp = qrcode('https://qrcodesdk.dev')
   .render(QRCodeWebPRenderer({centerImage}));
 ```
 
-## Renderer-specific constraints
+## Constraints
 
-- The center-image source must contain PNG bytes, even for WebP output. See the
-  [PNG renderer constraints](/reference/renderers/png/#renderer-specific-constraints) for its limits.
-- Choose PNG when a destination, such as an older email client or document format, does not accept
-  WebP.
-- Option values are copied when `QRCodeWebPRenderer()` is called.
+- **Center image source.** The source must contain PNG bytes, even for WebP output. See the
+  [PNG renderer constraints](/reference/renderers/png/#constraints) for its limits.
+- **Option checks.** TypeScript rejects unknown keys. The renderer does not repeat that check at
+  runtime.
+- **Option copies.** `QRCodeWebPRenderer()` copies option values when it is called.
 
 ## Related guides
 

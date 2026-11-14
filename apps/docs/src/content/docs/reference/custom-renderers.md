@@ -8,12 +8,15 @@ related:
   - ../packages/core.mdx
 ---
 
-A `QRCodeRenderer<T>` receives an immutable QR matrix and returns any output type. It owns its
-layout, drawing, and output-specific options. The shared drawing pipeline used by built-in renderers
-is internal to the SDK.
+A `QRCodeRenderer<T>` is a function. It receives an immutable QR matrix and returns any output type
+you want. Your renderer owns its layout, drawing, and options.
 
-For custom shapes in SVG, Canvas, Image element, and Node.js raster output, use the public
-[shape paths and styling factories](/guides/customize/#custom-shapes).
+Built-in renderers share an internal drawing pipeline that is not public.
+
+:::tip[Only need custom shapes?]
+You don't need a custom renderer for that. Built-in SVG, Canvas, Image element, and Node.js raster
+renderers accept your own paths through [`customShape()`](/guides/customize/#custom-shapes).
+:::
 
 ## Matrix-only renderer
 
@@ -36,7 +39,7 @@ const text = qrcode('custom output').render(textRenderer);
 ### Matrix data
 
 A `QRCodeMatrix` is a read-only object with flat, row-major module data. The module at column `x`
-and row `y` is at index `y * size + x` in both arrays:
+and row `y` is at index `y * size + x` in both arrays.
 
 | Property  | Type                          | Meaning                                          |
 | --------- | ----------------------------- | ------------------------------------------------ |
@@ -47,7 +50,7 @@ and row `y` is at index `y * size + x` in both arrays:
 ### Module roles
 
 `roles` records the function of every module, light or dark. `QR_CODE_MODULE_ROLES` from
-`@qrcodesdk/core/matrix` names the values:
+`@qrcodesdk/core/matrix` names the values.
 
 | Value | Name              | Modules                                                 |
 | ----- | ----------------- | ------------------------------------------------------- |
@@ -61,8 +64,10 @@ and row `y` is at index `y * size + x` in both arrays:
 | `7`   | `format`          | Format information, including the always-dark module    |
 | `8`   | `version`         | Version information, in version 7 and later             |
 
-Roles depend only on the version. Every matrix of the same size shares one `roles` array.
-Both arrays are frozen. Use `slice()` to obtain a mutable copy.
+- Roles depend only on the version, so every matrix of the same size shares one `roles` array.
+- `modules` and `roles` are frozen. Call `slice()` for a mutable copy.
+
+This example counts the dark data modules:
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';

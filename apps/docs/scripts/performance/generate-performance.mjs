@@ -266,11 +266,25 @@ docType: concept
 
 <!-- Generated from ${sourcePath}. Run \`pnpm turbo run generate-performance --filter=docs\` to update. -->
 
-The matrix, automatic matrix, and SVG benchmarks compare QRCodeSDK with \`qrcode\` and with \`qrcode-generator\` using its stock text encoder. Styled SVG generation compares QRCodeSDK with \`qr-code-styling\`. Results depend on the machine and runtime, so compare the libraries with each other rather than reading the numbers as absolute speeds.
+These benchmarks compare QRCodeSDK with other JavaScript QR code libraries:
 
-The matrix and SVG fixtures supply explicit versions and masks. The \`qrcode-generator\` rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them.
+| Benchmark | Compared with |
+| --- | --- |
+| Matrix, automatic matrix, and SVG generation | \`qrcode\`, and \`qrcode-generator\` using its stock text encoder |
+| Styled SVG generation | \`qr-code-styling\` |
 
-Styled SVG generation uses all ${reportOptions.styledSvg.fixtureCount} shared styling fixtures at ${formatList(reportOptions.styledSvg.multipliers)} repetitions. Both libraries select the mask automatically because \`qr-code-styling\` has no public mask option. Fixture module size and margin determine the matching pixel dimensions passed to \`qr-code-styling\`, which renders SVG through a shared JSDOM environment initialized before measurement.
+Each chart shows throughput calculated from the median time. Higher is better, and the fastest library comes first. Expand the exact benchmark data below each section for median time, min–max range, and throughput.
+
+Results depend on the machine and runtime. Compare the libraries with each other, not with absolute speeds.
+
+## Method
+
+- The matrix and SVG fixtures supply explicit versions and masks.
+- The \`qrcode-generator\` rows use a repository patch that applies each fixture's mask and skips automatic mask evaluation.
+- The automatic matrix fixtures omit both options, so every library selects the version and mask itself.
+- Styled SVG generation uses all ${reportOptions.styledSvg.fixtureCount} shared styling fixtures at ${formatList(reportOptions.styledSvg.multipliers)} repetitions.
+- Both styled SVG libraries select the mask automatically, because \`qr-code-styling\` has no public mask option.
+- Each fixture's module size and margin set the pixel dimensions passed to \`qr-code-styling\`. It renders SVG through a shared JSDOM environment that is set up before measurement.
 
 ## Benchmark environment
 
@@ -281,8 +295,6 @@ Styled SVG generation uses all ${reportOptions.styledSvg.fixtureCount} shared st
 - Samples: ${reportOptions.samples} timed samples after ${reportOptions.warmupStaticPasses} static warm-up passes and ${reportOptions.warmupExhaustivePasses} exhaustive warm-up pass${reportOptions.warmupExhaustivePasses === 1 ? '' : 'es'}
 - SVG output: ${reportOptions.svg.pixelsPerModule} px/module with a ${reportOptions.svg.quietZoneModules}-module quiet zone
 - Styled SVG fixtures: ${reportOptions.styledSvg.fixtureCount}, with fixture-derived dimensions and automatic mask selection
-
-The charts show throughput calculated from the median time. Higher is better, and each chart lists the fastest library first. Expand the exact benchmark data beneath each section for median time, min–max range, and throughput.
 
 ${sections}
 `;

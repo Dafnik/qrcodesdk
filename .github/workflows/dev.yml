@@ -158,10 +158,13 @@ jobs:
         include:
           - package: core
             runtime: node
-            version: 22.x
+            version: 22.0.0
           - package: core
             runtime: node
             version: 24.x
+          - package: core
+            runtime: node
+            version: 26.x
           - package: core
             runtime: deno
             version: v2.x
@@ -175,6 +178,9 @@ jobs:
             runtime: node
             version: 24.x
           - package: node
+            runtime: node
+            version: 26.x
+          - package: node
             runtime: deno
             version: v2.x
           - package: node
@@ -186,6 +192,9 @@ jobs:
           - package: cli
             runtime: node
             version: 24.x
+          - package: cli
+            runtime: node
+            version: 26.x
           - package: cli
             runtime: deno
             version: v2.x

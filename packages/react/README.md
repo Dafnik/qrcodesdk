@@ -8,7 +8,8 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground/?package=react)**
 
-React components for rendering QR codes as inline SVG, PNG, WebP, GIF, and JPEG Image elements, and Canvas elements.
+React components that render QR codes as inline SVG, as PNG, WebP, GIF, or JPEG Image elements, or
+as Canvas elements.
 
 ## Install
 
@@ -51,7 +52,7 @@ yarn add @qrcodesdk/react
 
 ## Quick start
 
-Import the components directly where you need them:
+Import a component where you need it:
 
 ```tsx
 import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/react';
@@ -72,13 +73,12 @@ export function App() {
 }
 ```
 
-The label names the QR code for screen readers, and the link gives everyone another way to reach the
-destination. Without `accessibility` options, the output is decorative and hidden from assistive
-technology. Leave a QR code unlabeled only when nearby content, such as this link, already gives its
-meaning.
-
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload` and
-`options` props. Image components also accept `accessibility.alt`.
+- `ariaLabel` names the QR code for screen readers. The link gives everyone another way to reach the
+  destination.
+- Without `accessibility` options, the QR code is decorative and hidden from assistive technology.
+  Leave it unlabeled only when nearby content, such as this link, already explains it.
+- `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload`
+  and `options` props. Image components also accept `accessibility.alt`.
 
 ## Version compatibility
 
@@ -87,6 +87,9 @@ meaning.
 | `0.x.x`          | `^18.0.0` `^19.0.0` |
 
 ## Components
+
+Each output format has its own component. Your bundle only includes the encoders of the components
+you import.
 
 | Component      | Output               | Download support |
 | -------------- | -------------------- | ---------------- |
@@ -106,20 +109,18 @@ meaning.
 | `className`, `style`, other `<div>` props | `ComponentPropsWithoutRef<'div'>` | Passed to the wrapper `<div>` that contains the output element. `children` and `dangerouslySetInnerHTML` are not accepted. |
 | `ref`                                     | `Ref<QRCodeDownloadHandle>`       | Receives `download(filename?)`, not the wrapper element. `QRCodeCanvas` does not accept a `ref`.                           |
 
-Each image format has its own component, so your bundle only includes the encoders of the components
-you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` uses a lossless encoder
-bundled in the SDK, which also works in Safari, and usually produces the smallest file.
+## Choose an image format
 
-`QRCodeGIF` is limited to 256 colors and binary transparency. Prefer PNG or WebP for transparent
-backgrounds and photographic center images.
+- `QRCodePNG` uses the browser's native PNG encoder.
+- `QRCodeWebP` uses a lossless encoder bundled in the SDK. It also works in Safari and usually
+  produces the smallest file.
+- `QRCodeGIF` is limited to 256 colors and on-or-off transparency. Prefer PNG or WebP for
+  transparent backgrounds and photographic center images.
+- `QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
+  default. Its `quality` option ranges from 1 to 100 and defaults to 92. Use it only when a
+  destination requires JPEG.
 
-`QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
-default. Its `quality` option ranges from 1 to 100, defaults to 92, and trades file size for detail.
-Use it when a destination requires JPEG. See the
-[Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) reference for details.
-
-The components pass `className`, `style`, and other `<div>` props to their wrapper `<div>`.
-Use a React ref when you need a download handle; the rendered SVG, Image, or Canvas element remains inside that wrapper.
+See [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) for details.
 
 ## Live examples
 
@@ -286,47 +287,49 @@ export default function QRCodeDownloadPNGExample() {
 
 ## Center images
 
-Load and decode a browser image first, then store options with
-`centerImage: canvasCenterImage(image)` in state. `QRCodeSVG` takes `svgCenterImage()` with an
-embedded data URL instead. See [Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete
-React example.
+For PNG, WebP, GIF, JPEG, and Canvas components:
+
+1. Load and decode a browser image.
+2. Store the options with `centerImage: canvasCenterImage(image)` in state.
+
+`QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete React example.
 
 ## Download files
 
-All components except `QRCodeCanvas` expose `download(filename?)`. The method appends the
-component's file extension when needed.
+Every component except `QRCodeCanvas` exposes `download(filename?)`. Get it through a React `ref`.
+The method appends the file extension when needed.
 
-See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-react) for the complete
-React example, or its [Canvas export section](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually)
-for manual downloads.
+See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-react) for a complete React example.
+For manual downloads, see [Export a canvas manually](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually).
 
 ## Server-side rendering
 
-`QRCodeSVG` produces runtime-neutral SVG and can render on the server.
-
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and
-Canvas APIs. Outside the browser, they skip element creation and downloads. They populate their host
-after hydration.
+- `QRCodeSVG` produces runtime-neutral SVG and renders on the server.
+- `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` need browser DOM and
+  Canvas APIs. On the server, they render an empty wrapper and skip downloads. They fill the wrapper
+  after hydration.
 
 ### Next.js client boundary
 
 The package entry declares `'use client'`, so Server Components can import its components directly.
-Props crossing that boundary must be serializable. Shape path objects from `@qrcodesdk/core/style`
-can cross it, but these values cannot:
+Props that cross this boundary must be serializable.
+
+Shape path objects from `@qrcodesdk/core/style`, such as `rounded()`, can cross it. Create these
+values inside a client component instead:
 
 - `finder()` and `alignment()` results, which are functions;
 - center images from `svgCenterImage()` and `canvasCenterImage()`;
 - `matrix.segmenter`, including `automaticSegmenter`, which is a function.
 
-Create those values inside a client component.
+In a Server Component, import shape factories from `@qrcodesdk/core/style`, not from
+`@qrcodesdk/react`. On the server, every export of a `'use client'` module is a client reference
+that cannot be called.
 
-On the server, every export of a `'use client'` module is a client reference that cannot be called.
-A Server Component must therefore import shape factories such as `rounded()` from
-`@qrcodesdk/core/style`, not from `@qrcodesdk/react`.
-
-Add `@qrcodesdk/core` as a direct dependency at the exact version that `@qrcodesdk/react` depends
-on, as [Add Core to a framework project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project)
-describes. Mismatched copies can draw shapes incorrectly, ignore center images, and break
+This needs `@qrcodesdk/core` as a direct dependency, at the exact version that `@qrcodesdk/react`
+depends on. Follow
+[Add Core to a framework project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+Mismatched copies can draw shapes incorrectly, ignore center images, and break
 `instanceof QRCodeError`.
 
 ```tsx
@@ -362,8 +365,8 @@ export function StyledQRCode() {
 
 ## Shared options
 
-The `options` prop groups encoding settings under `matrix`. Renderer settings such as
-`style`, `accessibility`, and `centerImage` go alongside it:
+The `options` prop groups encoding settings under `matrix`. Renderer settings, such as `style`,
+`accessibility`, and `centerImage`, sit next to it:
 
 ```ts
 import {type QRCodeSVGOptions, circle, finder, rounded} from '@qrcodesdk/react';
@@ -375,13 +378,30 @@ const options: QRCodeSVGOptions = {
 };
 ```
 
-Pass this object through the component's `options` prop. Use `QRCodePNGImageOptions`,
-`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, `QRCodeJPEGImageOptions`, or `QRCodeCanvasOptions`
-for the corresponding component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`, and
-`QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
+Each component has its own options type:
 
-Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/react` and pass it
-as `matrix.segmenter`. The segmenter is a function, so in Next.js create these options in a client
+| Component      | Options type             | Extra options                   |
+| -------------- | ------------------------ | ------------------------------- |
+| `QRCodeSVG`    | `QRCodeSVGOptions`       | None                            |
+| `QRCodePNG`    | `QRCodePNGImageOptions`  | None                            |
+| `QRCodeWebP`   | `QRCodeWebPImageOptions` | None                            |
+| `QRCodeGIF`    | `QRCodeGIFImageOptions`  | `transparency.threshold`        |
+| `QRCodeJPEG`   | `QRCodeJPEGImageOptions` | `quality`, `transparency.matte` |
+| `QRCodeCanvas` | `QRCodeCanvasOptions`    | None                            |
+
+Learn more about each group:
+
+- [Builder and matrix](https://qrcodesdk.dev/reference/builder/) covers the fields inside `matrix`.
+- [Customize appearance](https://qrcodesdk.dev/guides/customize/) covers `style`.
+- [Renderer outputs](https://qrcodesdk.dev/reference/renderers/) covers output-specific options.
+
+[Payload helpers](https://qrcodesdk.dev/reference/payloads/) and `QRCodeError` come from `@qrcodesdk/core`. To use them,
+[add Core to the project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+
+### Mixed-mode segmentation
+
+Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/react` and pass it as
+`matrix.segmenter`. The segmenter is a function, so in Next.js, create these options in a client
 component:
 
 ```tsx
@@ -396,34 +416,35 @@ export function OptimizedQRCode({payload}: {payload: string}) {
 }
 ```
 
-To build payloads with [payload helpers](https://qrcodesdk.dev/reference/payloads/) or check `instanceof QRCodeError`,
-import them from `@qrcodesdk/core` after you
-[add Core to the project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project).
-
-See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
-[Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
-[Renderer outputs](https://qrcodesdk.dev/reference/renderers/) for output-specific options.
-
 ### Keep options stable
 
-Components create their renderer from `options` and memoize it on the object's identity. An object
-literal written inline in JSX is a new object on every render, so the component recreates the
-renderer and renders the QR code again each time. Image and Canvas components also re-encode and
-replace their element. Define constant options outside the component, or wrap options that depend on
-props or state in `useMemo`. Changing a property of the same object does not update the QR code;
-pass a new object instead.
+Components memoize their renderer on the identity of the `options` object.
+
+- An object literal written inline in JSX is a new object on every render. The component then
+  recreates the renderer and renders the QR code again. Image and Canvas components also re-encode
+  and replace their element.
+- Changing a property of the same object does not update the QR code. Pass a new object instead.
+
+Define constant options outside the component. Wrap options that depend on props or state in
+`useMemo`.
 
 ## Errors
 
-Components throw `QRCodeError` for invalid payloads and options. Every component creates its
-renderer while rendering, so invalid renderer options throw during rendering. `QRCodeSVG` also
-generates the QR code during rendering. The Image and Canvas components generate it in a
-`useEffect`, so payload problems throw there.
+Components throw `QRCodeError` for invalid payloads and options.
 
-In the browser, an error boundary above the component catches both. Error boundaries do not catch
-errors during server-side rendering, so validate user-controlled payloads before rendering. Downloads
-called from an event handler need their own `try`/`catch`. See
-[Check errors from framework packages](https://qrcodesdk.dev/reference/errors/#check-errors-from-framework-packages).
+| Component                   | Where it throws                                     |
+| --------------------------- | --------------------------------------------------- |
+| `QRCodeSVG`                 | During rendering                                    |
+| Image and Canvas components | Options during rendering, payloads in a `useEffect` |
+
+To handle them:
+
+- In the browser, place an error boundary above the component. It catches both cases.
+- Error boundaries do not catch errors during server-side rendering. Validate user-controlled
+  payloads before rendering.
+- Wrap downloads called from an event handler in your own `try`/`catch`.
+
+See [Check errors from framework packages](https://qrcodesdk.dev/reference/errors/#check-errors-from-framework-packages).
 
 ## Public API
 

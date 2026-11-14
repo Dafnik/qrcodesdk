@@ -12,18 +12,16 @@ related:
   - ../learn/how-qr-codes-work.mdx
 ---
 
-`qrcode()` creates an immutable builder from `@qrcodesdk/core`. Each options method returns a
-new builder; the original builder remains unchanged. For how modes, versions, error correction, and
-masks shape the symbol, see [How QR codes work](/learn/how-qr-codes-work/).
+`qrcode()` from `@qrcodesdk/core` creates an immutable builder. Each options method returns a new
+builder and leaves the original unchanged.
+
+For how modes, versions, error correction, and masks shape the symbol, see
+[How QR codes work](/learn/how-qr-codes-work/).
 
 ## Payload
 
 The builder accepts a `string` or a non-negative safe integer. Use a string for values with leading
-zeroes or values outside JavaScript's safe-integer range. At runtime, the builder rejects invalid
-numbers but converts values of other types to text with `String()`. Check payloads from untyped
-sources, as
-[Payload types are not validated at runtime](/reference/errors/#payload-types-are-not-validated-at-runtime)
-describes.
+zeroes or values beyond JavaScript's safe-integer range.
 
 ```ts
 import {QRCodeBuilder, qrcode} from '@qrcodesdk/core';
@@ -34,18 +32,23 @@ qrcode().payload('payload supplied later');
 QRCodeBuilder.create('https://qrcodesdk.dev', {errorCorrectionLevel: 'H'});
 ```
 
-`QRCodeBuilder.create(payload, options?)` creates the same builder as `qrcode(payload)` and applies
-matrix options in one call. `QRCodeBuilder.create()` without arguments matches `qrcode()`.
+- `QRCodeBuilder.create(payload, options?)` equals `qrcode(payload)` plus matrix options in one call.
+  Without arguments, it equals `qrcode()`.
+- Typed [payload helpers](/reference/payloads/) turn email, phone, SMS, geographic, and Wi-Fi values
+  into a payload string.
 
-Typed [payload helpers](/reference/payloads/) serialize email, phone, SMS, geographic, and Wi-Fi
-values into a payload string before you pass it to the builder.
-
-QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, and UTF-8 octet payloads,
-with optional automatic mixed-mode segmentation.
+:::caution[Payload types are checked only by TypeScript]
+At runtime, the builder rejects invalid numbers but converts other types to text with `String()`.
+Check payloads from untyped sources, as
+[Payload types are not validated at runtime](/reference/errors/#payload-types-are-not-validated-at-runtime)
+describes.
+:::
 
 ### Unsupported QR features
 
-QRCodeSDK targets common application payloads in a single symbol. It does not support:
+QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, and UTF-8 octet
+payloads, with optional mixed-mode segmentation. It targets common application payloads in a single
+symbol and does not support:
 
 - Kanji mode. Japanese text is encoded as UTF-8 octets instead;
 - structured append, which splits one payload across several symbols;
@@ -53,7 +56,7 @@ QRCodeSDK targets common application payloads in a single symbol. It does not su
 - GS1 data;
 - raw binary segments. Octet segments always contain the UTF-8 bytes of a string.
 
-Use a library that implements these features when your scanner or industry standard requires them.
+If your scanner or industry standard requires one of these, use a library that implements it.
 
 ## Encoding modes
 
@@ -64,14 +67,14 @@ Use a library that implements these features when your scanner or industry stand
 | `octet`           | UTF-8 bytes                   | URLs, JSON, emoji, lowercase, and general text          |
 | `auto` or omitted | Any supported payload         | Single-mode detection; optional mixed-mode optimization |
 
-Without a segmenter, `auto` selects numeric for digits, alphanumeric for the QR alphanumeric
-character set, and octet for other text. It encodes the complete payload as one segment. A concrete mode forces the entire payload into that mode.
+- `auto` encodes the whole payload as one segment. It picks numeric for digits, alphanumeric for the
+  QR alphanumeric character set, and octet for everything else.
+- A concrete mode forces the whole payload into that mode.
 
 ### Optional mixed-mode optimization
 
-Import `automaticSegmenter` to find the shortest-bit combination of numeric, alphanumeric, and
-octet segments. The default generation path does not import the optimizer, so applications that
-omit it avoid its bundle size and processing cost.
+Import `automaticSegmenter` to split the payload into the shortest combination of numeric,
+alphanumeric, and octet segments:
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -83,28 +86,32 @@ qrcode(payload).mode('auto').segmenter(automaticSegmenter).matrix(); // Mixed se
 qrcode(payload).options({segmenter: automaticSegmenter}).matrix(); // Auto is the default.
 ```
 
-Explicit `numeric`, `alphanumeric`, and `octet` modes bypass the supplied segmenter. Use
-`.mode('auto')` or `.mode()` to return to auto selection. Use `.segmenter()` or
-`.options({segmenter: undefined})` to clear the segmenter.
+- The optimizer is opt-in. Applications that don't import it skip its bundle size and processing
+  cost.
+- Single-mode detection can produce a larger symbol. A payload that fits a pinned version with
+  optimization can exceed it without.
+- Explicit `numeric`, `alphanumeric`, and `octet` modes ignore the segmenter.
+- `.mode('auto')` or `.mode()` returns to auto selection.
+- `.segmenter()` or `.options({segmenter: undefined})` clears the segmenter.
 
-Single-mode detection can produce a larger symbol than mixed-mode optimization, and a payload that
-fits an optimized symbol can exceed the same pinned version without optimization.
+Framework components take the same callback as `options.matrix.segmenter`. The React, Vue, Svelte,
+and Angular packages re-export `automaticSegmenter`, so import it from the framework package.
 
-Framework components accept the same callback through `options.matrix.segmenter`. The React, Vue,
-Svelte, and Angular packages re-export `automaticSegmenter`, so applications import it from the
-framework package.
+### Custom segmenter
 
-A custom `QRCodeSegmenter` receives the original payload and `{version, eci}`. Return a non-empty
-array of `QRCodeSegment` values with concrete modes and unencoded string payloads. Their text must
-concatenate to the original payload.
+A custom `QRCodeSegmenter` receives the original payload and `{version, eci}`. It returns a
+non-empty array of `QRCodeSegment` values. The segments must follow these rules:
 
-Segments must not be empty, unless a single segment encodes an empty payload. A segment boundary
-must not split a surrogate pair. Core validates each segment, UTF-8 encodes octet segments, and
-packs numeric and alphanumeric segments in their respective QR modes.
+- Each segment has a concrete mode and an unencoded string payload.
+- The segment texts concatenate to the original payload.
+- No segment is empty, unless a single segment encodes an empty payload.
+- No boundary splits a surrogate pair.
 
-With automatic version selection, the callback runs once per searched character-count group,
-starting at versions 1, 10, and 27. With a pinned version, it runs once for that version. The
-callback should be deterministic.
+Core validates each segment, UTF-8 encodes octet segments, and packs numeric and alphanumeric
+segments in their QR modes.
+
+The callback should be deterministic. With automatic version selection, it runs once per searched
+character-count group, starting at versions 1, 10, and 27. With a pinned version, it runs once.
 
 ## Matrix options
 
@@ -119,11 +126,7 @@ callback should be deterministic.
 | `version`              | integer `1`–`40`                                   | automatic | Pinned version must fit the encoded payload    |
 | `mask`                 | integer `0`–`7`                                    | automatic | Pinned mask replaces penalty-based selection   |
 
-TypeScript enforces these types and ranges. The builder does not check them again at runtime, so
-values from JavaScript or untyped configuration can produce a matrix that scanners cannot read. See
-[Matrix options are not validated at runtime](/reference/errors/#matrix-options-are-not-validated-at-runtime).
-
-Set options individually or together:
+Set options one by one or together:
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -139,41 +142,49 @@ const equivalent = qrcode('Grüße ✅').options({
 });
 ```
 
+:::caution[Matrix options are checked only by TypeScript]
+The builder does not check these types and ranges at runtime. Values from JavaScript or untyped
+configuration can produce a matrix that scanners cannot read. See
+[Matrix options are not validated at runtime](/reference/errors/#matrix-options-are-not-validated-at-runtime).
+:::
+
 ### ECI and UTF-8
 
-Octet payload bytes are always UTF-8. Enabling `eci` emits ECI assignment 26 once, immediately before
-the first octet segment, so scanners receive an explicit UTF-8 declaration. It adds 12 bits. With
-`eci: false`, scanners may rely on heuristics for non-ASCII text.
+Octet payload bytes are always UTF-8.
 
-No ECI header is emitted when a symbol contains no octet segment, so numeric- and
-alphanumeric-only symbols are identical with either setting.
+- `eci: true` adds ECI assignment 26 once, right before the first octet segment. Scanners get an
+  explicit UTF-8 declaration. It costs 12 bits.
+- `eci: false` leaves scanners to guess the encoding of non-ASCII text.
+- Symbols without octet segments get no ECI header, so the setting changes nothing for them.
 
 ### Error correction
 
 The levels `L`, `M`, `Q`, and `H` add increasing amounts of redundant data. The default is `M`.
-Higher levels can tolerate more damaged or obscured modules, but reduce capacity and may select a
+
+Higher levels survive more damaged or covered modules. They also reduce capacity and may need a
 larger version. Use `H` with a center image, as [Add a center image](/guides/center-images/)
 explains. [How QR codes work](/learn/how-qr-codes-work/#error-correction) lists how much each level
 can restore.
 
 ### Version and mask
 
-:::tip[Prefer automatic selection]
-Most applications should leave both values automatic. Automatic selection returns the same result
-for the same payload and options within one QRCodeSDK release. Pin `version` when the symbol must
-have fixed dimensions, and pin `mask` when a compatibility target or an external fixture requires
-a specific mask pattern.
+Leave both automatic in most applications. Automatic selection returns the same result for the same
+payload and options within one QRCodeSDK release. Pin them only when you must:
 
-Pinned options fix those encoding choices only and do not freeze the implementation. Matrix
-modules, SVG markup, and raster bytes may still change between releases, as the
+- Pin `version` when the symbol needs fixed dimensions.
+- Pin `mask` when a compatibility target or an external fixture needs a specific mask pattern.
+
+:::note[Pinning does not freeze output]
+Pinned options fix those encoding choices, not the implementation. Matrix modules, SVG markup, and
+raster bytes may still change between releases, as the
 [release policy](/project/release-policy/#generated-artifacts) describes. When exact artifacts
 matter, pin exact package versions and keep your own fixtures.
 :::
 
-When a pinned version cannot contain the payload, generation throws a `QRCodeError` with code
+If the payload does not fit a pinned version, generation throws `QRCodeError` with code
 `PAYLOAD_TOO_LARGE` and `details.version`. See the [errors reference](/reference/errors/#payload_too_large).
-Removing the override helps only if a larger version can fit the payload. If automatic selection also
-fails, shorten or change the payload.
+Removing the pin helps only if a larger version fits. If automatic selection also fails, shorten or
+change the payload.
 
 ## Builder methods
 
@@ -196,16 +207,26 @@ fails, shorten or change the payload.
 | `QRCodeBuilder.create()`                  | a builder | Creates a builder without a payload, like `qrcode()` |
 | `QRCodeBuilder.create(payload, options?)` | a builder | Creates a builder with a payload and matrix options  |
 
-In TypeScript, the builder's types prevent `.matrix()` or `.render()` before a payload is set, and
-prevent `.render()` without either a stored or directly supplied renderer. The payload check exists
-only in the types. Called from JavaScript, `.matrix()` on a builder without a payload does not throw
-and encodes the text `undefined`. See
+### When the builder checks values
+
+- `qrcode()` and the option methods never throw.
+- TypeScript checks matrix option names, types, and literal values.
+- Payload format and capacity are checked when the matrix is first requested. See
+  [Errors](/reference/errors/#factory-failures-and-render-failures).
+
+TypeScript also blocks `.matrix()` and `.render()` before a payload is set. It blocks `.render()`
+when no renderer is stored or passed.
+
+The payload check exists only in the types. From JavaScript, `.matrix()` without a payload does not
+throw. It encodes the text `undefined`. See
 [Payload types are not validated at runtime](/reference/errors/#payload-types-are-not-validated-at-runtime).
 
-Use `QRCodeBuilder` without type arguments to annotate a payload-configured builder in application
-helpers. Its default type accepts builders with or without a stored renderer, so TypeScript allows
-`.render()` without arguments through it. If no renderer was stored, that call throws
-`RENDERER_MISSING` at runtime. Supply a renderer when calling `.render()` through the general type:
+### Annotate a builder
+
+Use `QRCodeBuilder` without type arguments to type a builder that has a payload. This general type
+accepts builders with or without a stored renderer. TypeScript therefore allows `.render()` without
+arguments, which throws `RENDERER_MISSING` at runtime if no renderer was stored. Pass a renderer
+explicitly through this type:
 
 ```ts
 import {QRCodeBuilder, QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
@@ -217,16 +238,17 @@ function toSVG(builder: QRCodeBuilder): string {
 toSVG(qrcode('https://qrcodesdk.dev'));
 ```
 
-TypeScript checks matrix option names, types, and supported literal values. Payload format and
-capacity are checked when the matrix is first requested; `qrcode()` and the option methods never
-throw. See [Errors](/reference/errors/#factory-failures-and-render-failures).
-
 ## Matrix output and renderers
 
-`.matrix()` returns a read-only `QRCodeMatrix` with flat, row-major module data. `size` is the
-number of modules per side. `modules` is a frozen array with `1` for dark and `0` for light modules,
-and `roles` is a frozen array with the role of every module, such as data, finder, or timing. The
-module at column `x` and row `y` is at index `y * size + x` in both arrays. See
+`.matrix()` returns a read-only `QRCodeMatrix` with flat, row-major module data:
+
+| Property  | Value                                                                       |
+| --------- | --------------------------------------------------------------------------- |
+| `size`    | Number of modules per side                                                  |
+| `modules` | Frozen array: `1` for dark, `0` for light modules                           |
+| `roles`   | Frozen array with the role of every module, such as data, finder, or timing |
+
+The module at column `x` and row `y` is at index `y * size + x` in both arrays. See
 [Module roles](/reference/custom-renderers/#module-roles) for every role.
 
 ```ts
@@ -248,5 +270,5 @@ const direct = qrcode('renderer output').render(jsonRenderer);
 const stored = qrcode('renderer output').renderer(jsonRenderer).render();
 ```
 
-Built-in renderers use the same function signature. Custom renderers define their output geometry,
-styling, validation, and return type. See [Custom renderers](/reference/custom-renderers/).
+Built-in renderers use the same signature. A custom renderer defines its own geometry, styling,
+validation, and return type. See [Custom renderers](/reference/custom-renderers/).

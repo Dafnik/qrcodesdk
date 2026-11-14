@@ -11,12 +11,14 @@ related:
   - ../guides/server-output.md
 ---
 
-QRCodeSDK reports invalid input and failed output with `QRCodeError`. Branch on its `code`, not on
-its `message`. Messages describe the problem for people and can change in any release.
+QRCodeSDK reports invalid input and failed output with `QRCodeError`.
+
+Branch on its `code`, never on its `message`. Messages are written for people and can change in any
+release.
 
 ## QRCodeError
 
-`QRCodeError` extends `Error` and is exported from `@qrcodesdk/core` and `@qrcodesdk/core/error`:
+`QRCodeError` extends `Error`. Import it from `@qrcodesdk/core` or `@qrcodesdk/core/error`:
 
 ```ts
 import {QRCodeError, type QRCodeErrorCode, QR_CODE_ERROR_CODES} from '@qrcodesdk/core';
@@ -30,10 +32,12 @@ import {QRCodeError, type QRCodeErrorCode, QR_CODE_ERROR_CODES} from '@qrcodesdk
 | `details` | `Readonly<Record<string, unknown>>` | Values that explain the failure; `{}` when there are none    |
 | `cause`   | `unknown`                           | The underlying error, when one exists; otherwise `undefined` |
 
-TypeScript types `name` as `string`, as inherited from `Error`, so it does not narrow the error type.
-`QR_CODE_ERROR_CODES` lists every code as a readonly array. `details` contains plain values for
-diagnostics. Its keys are listed per code below; treat any other key as informal. Some keys, such as
-`payload` and `value`, can hold user input, so check them before you write them to logs.
+- `QR_CODE_ERROR_CODES` lists every code as a readonly array.
+- `name` is typed as `string`, as inherited from `Error`, so it does not narrow the error type.
+- `details` holds plain values for diagnostics. Each code below lists its keys. Treat any other key
+  as informal.
+- Some keys, such as `payload` and `value`, can hold user input. Check them before you write them to
+  logs.
 
 ## Error codes
 
@@ -48,17 +52,21 @@ diagnostics. Its keys are listed per code below; treat any other key as informal
 
 ### INVALID_PAYLOAD
 
-The builder throws it when the matrix is generated:
+The payload cannot be encoded as configured.
 
-- a numeric payload is negative, fractional, or not a safe integer;
-- a concrete `mode` does not accept the payload, such as `mode: 'numeric'` with letters;
-- a `mode` from untyped input is not one of the four documented values;
-- a custom segmenter returns no segments, empty segments (unless one segment encodes an empty
-  payload), unknown segments, segments that split a surrogate pair, or text that does not join to
-  the original payload.
+**Thrown by:** `.matrix()` and `.render()` when they generate the matrix, and
+[payload helpers](/reference/payloads/) such as `wifiPayload()` when you call them.
 
-`details.payload` holds the rejected payload or segment text. `details.mode` is present only when a
-mode was involved:
+**Common causes:**
+
+- A numeric payload is negative, fractional, or not a safe integer.
+- A concrete `mode` does not accept the payload, such as `mode: 'numeric'` with letters.
+- A `mode` from untyped input is not one of the four documented values.
+- A custom segmenter returns invalid segments. See the table below.
+- A payload helper rejects one of its fields.
+
+**Details:** `details.payload` holds the rejected payload or segment text. `details.mode` is set only
+when a mode was involved:
 
 | Failure                                                                                                       | `details`                                       |
 | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -69,18 +77,20 @@ mode was involved:
 | A segment's text does not fit its mode                                                                        | `payload` with the segment text, and its `mode` |
 | The segment texts do not join to the original payload                                                         | `payload`, the original payload                 |
 
-Read `details.mode` as optional. A segment with a missing or unknown mode sets `mode` to that value,
-which can be `undefined`.
+Read `details.mode` as optional. A segment with a missing or unknown mode reports that value, which
+can be `undefined`.
 
-[Payload helpers](/reference/payloads/) such as `wifiPayload()` throw it when you call them. Their
-`details` contain `field`, `value`, and `reason`. A rejected Wi-Fi `password` is replaced with
-`'[REDACTED]'`.
+Payload helpers set `field`, `value`, and `reason` instead. A rejected Wi-Fi `password` is replaced
+with `'[REDACTED]'`.
+
+**Fix:** Omit `mode` to let `auto` choose, or pick a mode that accepts the whole payload. Check
+payloads from untyped sources before you pass them in, as shown below.
 
 #### Payload types are not validated at runtime
 
-`QRCodePayload` is `string | number`. TypeScript rejects a missing payload and values of other
-types, but at runtime the builder checks only numbers. It converts any other value with `String()`
-and encodes the result as text, without an error:
+`QRCodePayload` is `string | number`. TypeScript rejects other types, but at runtime the builder
+checks only numbers. Any other value goes through `String()` and is encoded as text, without an
+error:
 
 | Call from JavaScript or untyped code                            | Encoded text      |
 | --------------------------------------------------------------- | ----------------- |
@@ -90,11 +100,10 @@ and encodes the result as text, without an error:
 | `qrcode({})`                                                    | `[object Object]` |
 | `qrcode([1, 2])`                                                | `1,2`             |
 
-The resulting code scans, so the mistake shows only in the decoded text. It usually comes from a
-value that has not loaded yet, a missing JSON field, or a framework binding that receives
-`undefined`.
+The code still scans, so the mistake shows up only in the decoded text. Typical sources are a value
+that has not loaded yet, a missing JSON field, or a framework binding that receives `undefined`.
 
-Check payloads from untyped sources before you pass them to the builder or a component:
+Check payloads from untyped sources first:
 
 ```ts
 export function isQRCodePayload(value: unknown): value is string | number {
@@ -105,26 +114,40 @@ export function isQRCodePayload(value: unknown): value is string | number {
 }
 ```
 
-Do not replace this check with a truthiness test such as `if (payload)`. It drops `0`, which is a
-valid numeric payload, and the empty string, which the builder also accepts. Decide separately
-whether your application allows an empty payload.
-
-For data that loads asynchronously, keep the QR code out of the page until the value has arrived and
-passes the check. See
-[The QR code scans as undefined](/guides/troubleshooting/#the-qr-code-scans-as-undefined) for
-framework examples.
+- Do not use a truthiness test such as `if (payload)` instead. It drops `0` and the empty string,
+  which are both valid payloads.
+- Decide separately whether your application allows an empty payload.
+- For data that loads asynchronously, render the QR code only after the value arrives and passes the
+  check. See [The QR code scans as undefined](/guides/troubleshooting/#the-qr-code-scans-as-undefined)
+  for framework examples.
 
 ### PAYLOAD_TOO_LARGE
 
-The builder throws it when the encoded payload exceeds the capacity of every version at the chosen
-error correction level, or of the pinned `version`. A pinned version sets `details.version`.
-Removing the pin, lowering the error correction level, enabling mixed-mode segmentation, or
-shortening the payload can make it fit. See [Version and mask](/reference/builder/#version-and-mask).
+The encoded payload does not fit any version at the chosen error correction level, or does not fit
+the pinned `version`.
+
+**Thrown by:** `.matrix()` and `.render()` when they generate the matrix.
+
+**Details:** `details.version` when a version is pinned; otherwise usually `{}`.
+
+**Fix:** Any of these can make the payload fit:
+
+- Remove the `version` pin.
+- Lower the error correction level.
+- Enable mixed-mode segmentation.
+- Shorten the payload.
+
+See [Version and mask](/reference/builder/#version-and-mask).
 
 ### INVALID_OPTIONS
 
-`details.field` names the option and `details.value` holds the rejected value. These are all the
-fields that built-in factories and renderers report:
+An option is outside its accepted range.
+
+**Thrown by:** renderer, shape, pattern, and center-image factories when you call them. `.matrix()`
+and `.render()` throw it for `segmenter`, and `.render()` for `dimensions`.
+
+**Details:** `details.field` names the option and `details.value` holds the rejected value. Built-in
+factories and renderers report these fields:
 
 | `details.field`                                     | Thrown by                                                         | Accepted values                                                                                        |
 | --------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -147,15 +170,21 @@ fields that built-in factories and renderers report:
 | `segmenter`                                         | `.matrix()` or `.render()`                                        | A function                                                                                             |
 | `dimensions`                                        | `.render()` with any built-in renderer                            | See below                                                                                              |
 
-`dimensions` reports the output side length, `moduleSize × (matrix width + 2 × quietZone)`, which
-must be a positive safe integer. Node.js raster renderers also reject output above 67,108,864
-pixels, for example 8,192 × 8,192, before allocating it.
+`dimensions` is the output side length: `moduleSize × (matrix width + 2 × quietZone)`.
+
+- It must be a positive safe integer.
+- Node.js raster renderers also reject output above 67,108,864 pixels, such as 8,192 × 8,192,
+  before allocating it.
+
+**Fix:** Change the option named in `details.field` to a value from the table.
 
 #### Matrix options are not validated at runtime
 
-TypeScript restricts `mode`, `eci`, `errorCorrectionLevel`, `version`, and `mask` to their valid
-values, but the builder does not check them again at runtime. Values that bypass the types, for
-example from JavaScript, JSON configuration, or a type assertion, do not throw `INVALID_OPTIONS`:
+TypeScript restricts `mode`, `eci`, `errorCorrectionLevel`, `version`, and `mask` to valid values.
+The builder does not check them again at runtime.
+
+Values that bypass the types, for example from JavaScript, JSON configuration, or a type assertion,
+do not throw `INVALID_OPTIONS`:
 
 | Invalid value                                                                          | Result                                                            |
 | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -194,34 +223,56 @@ The CLI validates `--mode`, `--error-correction`, `--version`, and `--mask` itse
 
 ### RENDERER_MISSING
 
-`.render()` throws it when no renderer was passed and none was stored with `.renderer()`. Builders
-returned by `qrcode()` track this in their type, so TypeScript rejects that call. The type check is
-lost when you annotate a builder with the broad `QRCodeBuilder` type, whose default accepts builders
-with or without a stored renderer, or when you call the builder from JavaScript. Pass the renderer
-to `.render(renderer)` in those cases.
+`.render()` ran without a renderer.
+
+**Thrown by:** `.render()` when no renderer was passed and none was stored with `.renderer()`.
+
+**Details:** `{}`.
+
+**Common causes:** Builders from `qrcode()` track the stored renderer in their type, so TypeScript
+normally rejects this call. The check is lost when:
+
+- you annotate the builder with the broad `QRCodeBuilder` type, which accepts builders with or
+  without a stored renderer;
+- you call the builder from JavaScript.
+
+**Fix:** Pass the renderer directly: `.render(renderer)`.
 
 ### INVALID_IMAGE_SOURCE
 
-- `svgCenterImage()` throws it when called with anything other than an embedded
-  `data:image/...` URL. `details.source` holds the rejected value.
-- `rasterCenterImage()` throws it when called with bytes that are not a valid PNG, more than
-  16 MiB of bytes, or more than 16,777,216 pixels. For invalid PNG data, `cause` holds the decoder
-  error.
-- Canvas and Image element renderers throw it during rendering when the `canvasCenterImage()` source
-  is not loaded yet or has no positive intrinsic size.
+A center-image source cannot be used.
+
+| Thrown by                                      | When                                                                                       | `details` / `cause`                         |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| `svgCenterImage()`                             | The source is not an embedded `data:image/...` URL                                         | `details.source` holds the rejected value   |
+| `rasterCenterImage()`                          | The bytes are not a valid PNG, exceed 16 MiB, or exceed 16,777,216 pixels (width × height) | `cause` holds the decoder error for bad PNG |
+| Canvas and Image renderers, during `.render()` | The `canvasCenterImage()` source is not loaded yet or has no positive intrinsic size       | `{}`                                        |
+
+**Fix:** Embed SVG center images as data URLs, pass valid PNG bytes to `rasterCenterImage()`, and
+wait for browser images to load before rendering. See
+[Add a center image](/guides/center-images/).
 
 ### RENDER_FAILED
+
+The runtime cannot produce the output.
+
+**Thrown by:** browser renderers during `.render()`.
+
+**Common causes:**
 
 - The Canvas renderer cannot get a 2D context.
 - An Image element renderer cannot encode a Canvas tainted by a cross-origin center image. `cause`
   holds the browser's error, usually a `SecurityError` `DOMException`.
-- A WebP Image element renderer produces output wider or higher than 16,384 pixels, or a GIF or JPEG
-  Image element renderer output wider or higher than 65,535 pixels. Node.js renderers reject output
-  above 8,192 × 8,192 pixels with `INVALID_OPTIONS` first, so they never reach these limits.
+- The output is too large for the browser encoder: wider or higher than 16,384 pixels for WebP, or
+  65,535 pixels for GIF and JPEG Image elements.
+
+Node.js renderers never reach these size limits. They reject output above 8,192 × 8,192 pixels with
+`INVALID_OPTIONS` first.
 
 ## Factory failures and render failures
 
-Builders are lazy. `qrcode(payload)` and its option methods never throw.
+Builders are lazy. `qrcode(payload)` and its option methods never throw. Errors appear at these
+points:
 
 | When it throws                                           | Codes                                                                                         |
 | -------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
@@ -230,13 +281,13 @@ Builders are lazy. `qrcode(payload)` and its option methods never throw.
 | When `.matrix()` or `.render()` generates the matrix     | `INVALID_PAYLOAD`, `PAYLOAD_TOO_LARGE`, `INVALID_OPTIONS` for `segmenter`                     |
 | When `.render()` runs the renderer                       | `RENDERER_MISSING`, `INVALID_OPTIONS` for dimensions, `INVALID_IMAGE_SOURCE`, `RENDER_FAILED` |
 
-Create renderers and center images once, for example at module level or when options change, so
-invalid options fail early. Call `.matrix()` or `.render()` inside the code path that can report a
-payload problem to the user.
+- Create renderers and center images once, at module level or when options change, so invalid
+  options fail early.
+- Call `.matrix()` or `.render()` in the code path that can report a payload problem to the user.
 
-Errors that do not come from QRCodeSDK pass through unchanged. A custom segmenter or custom renderer
-that throws, a browser renderer called where `document` does not exist, or a failed file write
-surfaces its own error.
+Errors that do not come from QRCodeSDK pass through unchanged. Examples: a custom segmenter or
+renderer that throws, a browser renderer called where `document` does not exist, or a failed file
+write.
 
 ## Handle errors by code
 
@@ -265,13 +316,14 @@ export function renderQRCode(payload: string): {svg: string} | {error: string} {
 
 ## Check errors from framework packages
 
-The React, Vue, Svelte, and Angular packages do not re-export `QRCodeError`. To use `instanceof`,
-add `@qrcodesdk/core` as a direct dependency at the same version that your framework package
-depends on, so the package manager installs a single copy. See
-[Add Core to a framework project](/getting-started/choose-your-setup/#add-core-to-a-framework-project). Two copies of Core define two different
-`QRCodeError` classes, and `instanceof` fails for errors from the other copy.
+The React, Vue, Svelte, and Angular packages do not re-export `QRCodeError`. You have two options.
 
-Without a direct Core dependency, check the error structurally:
+**Use `instanceof`:** add `@qrcodesdk/core` as a direct dependency, at the same version your
+framework package uses. See
+[Add Core to a framework project](/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+With two copies of Core installed, there are two `QRCodeError` classes and `instanceof` fails.
+
+**Check the shape:** without a direct Core dependency, test the error structurally:
 
 ```ts
 type QRCodeErrorLike = Error & {readonly code: string; readonly details: Record<string, unknown>};
@@ -281,7 +333,7 @@ export function isQRCodeError(error: unknown): error is QRCodeErrorLike {
 }
 ```
 
-Framework components throw where they render:
+### Where components throw
 
 | Framework | SVG component throws during | Image and Canvas components throw during                                                | Catch it in the browser with                                  |
 | --------- | --------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
@@ -290,38 +342,35 @@ Framework components throw where they render:
 | Svelte    | Rendering, in a `$derived`  | An `$effect`                                                                            | `<svelte:boundary>` around the component, Svelte 5.3 or newer |
 | Angular   | An `effect()`               | An `effect()`                                                                           | Angular's `ErrorHandler`; there is no component boundary      |
 
-React components create their renderer with `useMemo()`, so invalid renderer options, such as a
-`style.moduleSize` of `0`, throw while React renders the component. Payload and matrix problems
-throw later, in the effect that generates the image. React error boundaries catch both in the
-browser.
-
-`@qrcodesdk/svelte` supports Svelte 5.0 and newer, but `<svelte:boundary>` was added in Svelte 5.3.0.
-On Svelte 5.0 to 5.2, validate the payload before rendering the component, as described below.
-
-These mechanisms handle only errors thrown while the QR component renders or runs its own effects.
-They do not catch errors from `download()` in an event handler, or from your own asynchronous code,
-such as loading a center image. Wrap those calls in `try`/`catch`.
+- **React:** components create their renderer with `useMemo()`. Invalid renderer options, such as
+  `style.moduleSize: 0`, throw during render. Payload problems throw later, in the effect that
+  generates the image. Error boundaries catch both in the browser.
+- **Svelte:** `@qrcodesdk/svelte` supports Svelte 5.0 and newer, but `<svelte:boundary>` needs
+  5.3.0. On 5.0 to 5.2, [validate before rendering](#validate-before-rendering).
+- **All frameworks:** these mechanisms catch only errors from the component's own rendering and
+  effects. Wrap `download()` calls in event handlers and your own async code, such as loading a
+  center image, in `try`/`catch`.
 
 ### Server-side rendering
 
-The table above describes rendering in the browser. On the server, only the SVG components generate
-a QR code. Image and Canvas components render an empty wrapper and generate the QR code after
-mounting in the browser.
+The table above covers the browser. On the server, only SVG components generate a QR code. Image and
+Canvas components render an empty wrapper and generate the code after mounting in the browser.
 
-A server-rendered SVG component that throws fails differently:
+A server-rendered SVG component that throws behaves differently:
 
 - React error boundaries do not catch errors during server-side rendering.
-- `<svelte:boundary>` has no effect on the server by default. The whole render fails.
+- `<svelte:boundary>` has no effect on the server by default, so the whole render fails.
 
 Validate payloads before server-side rendering. If an error still reaches the server render, handle
-it with your server framework, for example with its error page or error hook.
+it with your server framework's error page or error hook.
 
 ### Validate before rendering
 
-For user-controlled payloads, validate before rendering the component instead of relying on a
-boundary. This works in the browser and on the server, and in every supported Svelte version.
-[Add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project),
-then generate the matrix with the same matrix options that the component receives:
+For user-controlled payloads, validate before you render the component instead of relying on a
+boundary. This works in the browser, on the server, and in every supported Svelte version.
+
+[Add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project), then
+generate the matrix with the same matrix options the component receives:
 
 ```tsx
 import {useMemo} from 'react';
@@ -359,13 +408,11 @@ export function UserQRCode({payload}: {payload: string}) {
 }
 ```
 
-`getPayloadError()` has no React dependency. Call it from a Vue `computed()`, a Svelte `$derived`,
-or an Angular `computed()` in the same way, and render the QR code component only when it returns
-`undefined`. The component builds its own matrix again, so this check costs one extra matrix
-generation.
+- `getPayloadError()` has no React dependency. Call it from a Vue `computed()`, a Svelte `$derived`,
+  or an Angular `computed()`. Render the QR code only when it returns `undefined`.
+- The component builds its matrix again, so the check costs one extra matrix generation.
+- Renderer options such as `style` usually come from your own code, not from users. Cover them with
+  tests instead.
 
-Renderer options such as `style` usually come from your own code, not from users. Keep them in
-code that your tests render.
-
-See [Troubleshooting](/guides/troubleshooting/) for symptoms that do not throw, such as a missing
-center image.
+For problems that do not throw, such as a missing center image, see
+[Troubleshooting](/guides/troubleshooting/).

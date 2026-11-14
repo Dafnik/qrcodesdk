@@ -11,7 +11,10 @@ related:
 ## When to use
 
 Use `QRCodeCanvasRenderer` when browser code needs to draw, composite, inspect, or manually export
-raster output through the Canvas API.
+raster output with the Canvas API.
+
+For native `alt` text and other image attributes, use the
+[Image element renderers](/reference/renderers/image/) instead.
 
 ## Minimal example
 
@@ -22,8 +25,8 @@ import {qrcode} from '@qrcodesdk/core';
 const canvas = qrcode('https://qrcodesdk.dev').render(QRCodeCanvasRenderer());
 ```
 
-See the [Canvas element section of Render QR codes in the browser](/guides/browser-usage/#canvas-element)
-for insertion and compositing examples.
+To insert or composite the canvas, see
+[Render QR codes in the browser](/guides/browser-usage/#canvas-element).
 
 ## Styled example
 
@@ -43,13 +46,18 @@ See [Customize appearance](/guides/customize/) for every color, shape, and finde
 
 ## Return value
 
-The renderer synchronously returns a new `HTMLCanvasElement`. Its pixel width and height are both
-`style.moduleSize × (matrix width + 2 × style.quietZone)`. RGBA colors retain their alpha.
+The renderer synchronously returns a new `HTMLCanvasElement`:
 
-## Renderer-specific options
+- Width and height: `style.moduleSize × (matrix width + 2 × style.quietZone)` pixels.
+- RGBA colors keep their alpha.
 
-`QRCodeCanvasRendererOptions` accepts the
-[shared visual style](/guides/customize/#shared-visual-style) and a prepared center image:
+Accessibility depends on the labels you pass:
+
+- A non-empty `ariaLabel` sets `role="img"` and `aria-label`.
+- If `ariaLabel` is blank, a non-empty `title` sets them instead.
+- If both are blank, the canvas is decorative and gets `aria-hidden="true"`.
+
+## Options
 
 | Option                    | Type                      | Default         | Effect                                           |
 | ------------------------- | ------------------------- | --------------- | ------------------------------------------------ |
@@ -58,10 +66,12 @@ The renderer synchronously returns a new `HTMLCanvasElement`. Its pixel width an
 | `accessibility.title`     | `string`                  | `undefined`     | Sets a `title` attribute                         |
 | `centerImage`             | `QRCodeCanvasCenterImage` | `undefined`     | Draws a center image from `canvasCenterImage()`  |
 
+`style` takes the [shared visual style](/guides/customize/#shared-visual-style).
+
 ## Center image
 
-`canvasCenterImage(source, layout?)` from `@qrcodesdk/browser` creates the `centerImage` value for
-Canvas and [Image element](/reference/renderers/image/) output in every format:
+Create the `centerImage` value with `canvasCenterImage(source, layout?)` from `@qrcodesdk/browser`.
+The same value works for Canvas and for every [Image element](/reference/renderers/image/) format.
 
 ```ts
 import {QRCodeCanvasRenderer, canvasCenterImage} from '@qrcodesdk/browser';
@@ -83,25 +93,23 @@ const canvas = qrcode('https://qrcodesdk.dev')
 | `layout.padding`         | `number`            | `1`      | Cleared border around the image, in modules           |
 | `layout.clearBackground` | `boolean`           | `true`   | Removes every module the image or its padding touches |
 
-## Renderer-specific constraints
+The source can be any ready `CanvasImageSource`, such as an `HTMLImageElement`, another canvas, or
+an `ImageBitmap`.
+
+## Constraints
 
 :::caution[Canvas APIs required]
 Create this renderer only where the browser DOM, `document.createElement('canvas')`, and a 2D
-Canvas context are available. For environments without Canvas, choose the runtime-neutral SVG
-renderer.
+Canvas context exist. Without Canvas, use the runtime-neutral [SVG renderer](/reference/renderers/svg/).
 :::
 
-- The renderer is synchronous. An image source must be loaded and expose positive intrinsic
-  dimensions before rendering; unloaded or zero-sized sources throw.
-- The center-image source may be any ready `CanvasImageSource`, such as an `HTMLImageElement`,
-  another canvas, or an `ImageBitmap`.
-- Pass a `centerImage` created with `canvasCenterImage()`; TypeScript checks the factory result type. `canvasCenterImage()` validates its layout when it is called.
-- A non-empty `ariaLabel`, or a non-empty `title` when `ariaLabel` is blank, sets `role="img"` and
-  `aria-label` on the Canvas element. When both are blank, the Canvas is decorative and gets
-  `aria-hidden="true"`. For `alt` and other native image attributes,
-  use the [Image element renderers](/reference/renderers/image/).
-- Option values are copied when `QRCodeCanvasRenderer()` is called. The center image
-  retains its source by identity and checks it when rendering.
+- **Synchronous rendering.** The center-image source must be loaded and have positive intrinsic
+  dimensions before rendering. Unloaded or zero-sized sources throw.
+- **Center image layout.** `size` must be finite, greater than `0`, and at most `1`. `padding` must
+  be finite and non-negative. `canvasCenterImage()` validates both when it is called.
+- **Option checks.** TypeScript checks that `centerImage` comes from `canvasCenterImage()`.
+- **Option copies.** `QRCodeCanvasRenderer()` copies option values when it is called. The center
+  image keeps its source by identity and checks it when rendering.
 
 ## Related guides
 

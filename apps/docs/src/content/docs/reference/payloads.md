@@ -10,9 +10,11 @@ related:
   - ../getting-started/choose-your-setup.mdx
 ---
 
-Core exports small serializers for payload formats that scanners commonly understand. Each helper
-returns the string passed to `qrcode()`. Helpers only build the payload text; set encoding options
-on the [builder](/reference/builder/#payload).
+Core exports small serializers for payload formats that scanners understand. Each helper returns a
+string that you pass to `qrcode()`.
+
+Helpers only build the payload text. Set encoding options on the
+[builder](/reference/builder/#payload).
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -25,6 +27,8 @@ const matrix = qrcode(
   }),
 ).matrix();
 ```
+
+## Use with framework components
 
 Framework packages do not re-export the payload helpers.
 [Add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project), then
@@ -42,9 +46,9 @@ export function WiFiQRCode() {
 }
 ```
 
-Helpers throw `INVALID_PAYLOAD` when you call them, outside the component. For values that users
-enter, call the helper in a `try`/`catch` before rendering, as
-[Validate before rendering](/reference/errors/#validate-before-rendering) shows.
+Helpers throw `INVALID_PAYLOAD` when you call them, not inside the component. For user input, call
+the helper in a `try`/`catch` before rendering. See
+[Validate before rendering](/reference/errors/#validate-before-rendering).
 
 ## Available helpers
 
@@ -73,7 +77,7 @@ geoPayload({latitude: 48.2082, longitude: 16.3738});
 ## Email fields
 
 `emailPayload()` accepts `QRCodeEmailPayload` and returns a `mailto:` string. It percent-encodes
-addresses and query values while preserving the `@` in recipient addresses.
+addresses and query values but keeps the `@` in recipient addresses.
 
 | Field     | Type                          | Required | Meaning                         |
 | --------- | ----------------------------- | -------- | ------------------------------- |
@@ -83,9 +87,11 @@ addresses and query values while preserving the `@` in recipient addresses.
 | `subject` | `string`                      | No       | Subject line; may be empty      |
 | `body`    | `string`                      | No       | Message body; may be empty      |
 
-Recipient lists must contain at least one non-empty string. The helper does not check email-address
-syntax. Omitted optional fields do not appear in the output. `subject` and `body` reject line breaks,
-so a multi-line `body` throws `INVALID_PAYLOAD`. Pass the body as a single line.
+- Recipient lists need at least one non-empty string.
+- The helper does not check email-address syntax.
+- Omitted optional fields do not appear in the output.
+- `subject` and `body` reject line breaks. A multi-line `body` throws `INVALID_PAYLOAD`, so pass it as
+  a single line.
 
 ## Phone fields
 
@@ -96,7 +102,8 @@ so a multi-line `body` throws `INVALID_PAYLOAD`. Pass the body as a single line.
 | `number`    | `string` | Yes      | Phone number containing digits, an optional leading `+`, and separators `(`, `)`, `.`, or `-` |
 | `extension` | `string` | No       | One or more digits, appended as `;ext=...`                                                    |
 
-The number must contain at least one digit. An omitted extension adds no `ext` parameter.
+- The number must contain at least one digit.
+- An omitted extension adds no `ext` parameter.
 
 ## SMS fields
 
@@ -107,8 +114,9 @@ The number must contain at least one digit. An omitted extension adds no `ext` p
 | `recipients` | `string \| readonly string[]` | Yes      | One or more phone numbers using the phone helper's number rules |
 | `body`       | `string`                      | No       | Percent-encoded message body; may be empty                      |
 
-Recipient arrays must not be empty. Multiple recipients are comma-separated. An omitted body adds
-no query string; an empty body adds `?body=`.
+- Recipient arrays must not be empty.
+- Multiple recipients are comma-separated.
+- An omitted body adds no query string. An empty body adds `?body=`.
 
 ## Geographic fields
 
@@ -135,13 +143,20 @@ Omitted altitude and uncertainty values do not appear in the output.
 | `encryption` | `'WPA' \| 'WEP' \| 'nopass'` | No       | Defaults to `'WPA'` when `password` is supplied, otherwise `'nopass'` |
 | `hidden`     | `boolean`                    | No       | Writes the hidden-network flag when supplied; omitted by default      |
 
-`'WPA'` and `'WEP'` require a supplied password. `'nopass'` rejects a supplied password, including an
-empty string. The helper escapes backslashes, semicolons, commas, colons, and quotation marks in
-the SSID and password.
+- `'WPA'` and `'WEP'` require a password.
+- `'nopass'` rejects any supplied password, even an empty string.
+- The helper escapes backslashes, semicolons, commas, colons, and quotation marks in the SSID and
+  password.
 
 ## Validation and return values
 
-All helpers return a `string`. Text fields reject NUL, carriage returns, and newlines. Invalid
-structured values throw `QRCodeError` with code `INVALID_PAYLOAD` when you call the helper. Its
-`details` name the `field`, the rejected `value`, and the `reason`; a rejected Wi-Fi password is
-replaced with `'[REDACTED]'`. See the [errors reference](/reference/errors/#invalid_payload).
+All helpers return a `string`. Text fields reject NUL, carriage returns, and newlines.
+
+Invalid values throw `QRCodeError` with code `INVALID_PAYLOAD` when you call the helper. Its
+`details` contain:
+
+- `field`: the rejected field;
+- `value`: the rejected value. A rejected Wi-Fi password is replaced with `'[REDACTED]'`;
+- `reason`: why it was rejected.
+
+See the [errors reference](/reference/errors/#invalid_payload).

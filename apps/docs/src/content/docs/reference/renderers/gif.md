@@ -14,9 +14,11 @@ related:
 
 ## When to use
 
-Use `QRCodeGIFRenderer` when Node.js-compatible code must deliver a GIF file to a destination that
-only accepts GIF. Otherwise, prefer the [PNG](/reference/renderers/png/) or
-[WebP](/reference/renderers/webp/) renderer. GIF is limited to 256 colors and binary transparency.
+Use `QRCodeGIFRenderer` when Node.js-compatible code must deliver a GIF to a destination that only
+accepts GIF.
+
+Otherwise, prefer the [PNG](/reference/renderers/png/) or [WebP](/reference/renderers/webp/)
+renderer. GIF is limited to 256 colors and binary transparency.
 
 ## Minimal example
 
@@ -27,7 +29,9 @@ import {QRCodeGIFRenderer} from '@qrcodesdk/node';
 const gif = qrcode('https://qrcodesdk.dev').render(QRCodeGIFRenderer());
 ```
 
-## Transparent background example
+## Styled example
+
+This example renders a transparent background:
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -45,15 +49,13 @@ See [Customize appearance](/guides/customize/) for every color, shape, and finde
 
 ## Return value
 
-The renderer synchronously returns a Node.js `Buffer` containing a complete single-frame GIF89a file.
-Its pixel width and height are `style.moduleSize × (matrix width + 2 × style.quietZone)`. Output above
-8192 × 8192 pixels (67,108,864 pixels) throws `QRCodeError` with code `INVALID_OPTIONS` before any
-pixels are allocated.
+The renderer synchronously returns a Node.js `Buffer` with a complete single-frame GIF89a file. Its
+width and height are `style.moduleSize × (matrix width + 2 × style.quietZone)` pixels.
 
-## Renderer-specific options
+Output above 8192 × 8192 pixels (67,108,864 pixels) throws `QRCodeError` with code
+`INVALID_OPTIONS` before any pixels are allocated.
 
-`QRCodeGIFRendererOptions` accepts `style`, `centerImage`, and `transparency`. TypeScript rejects
-every other key; the renderer does not repeat that check at runtime.
+## Options
 
 | Option                   | Type                      | Default         | Effect                                                   |
 | ------------------------ | ------------------------- | --------------- | -------------------------------------------------------- |
@@ -61,24 +63,25 @@ every other key; the renderer does not repeat that check at runtime.
 | `transparency.threshold` | integer `0`–`256`         | `128`           | Pixels with a lower alpha value become fully transparent |
 | `centerImage`            | `QRCodeRasterCenterImage` | `undefined`     | Draws a center image from `rasterCenterImage()`          |
 
-A threshold of `0` keeps every pixel opaque; `256` makes every pixel transparent. Raise the threshold
-to drop more of the faint antialiased edge pixels; lower it to keep them.
+- `QRCodeGIFRendererOptions` accepts only these keys.
+- A threshold of `0` keeps every pixel opaque. `256` makes every pixel transparent.
+- Raise the threshold to drop more faint anti-aliased edge pixels. Lower it to keep them.
 
 ## Format limits
 
-- **256 colors.** Images with more colors, such as photographic center images or antialiased edges
-  between many colors, are reduced with median-cut quantization. The most frequent colors, such as
-  the background and module colors, stay exact.
-- **Binary transparency.** A pixel is either fully transparent or opaque. Partially transparent
-  pixels at or above the threshold become opaque, so antialiased edges over a transparent background
-  look rough.
+- **256 colors.** Images with more colors are reduced with median-cut quantization. This affects
+  photographic center images and anti-aliased edges between many colors. The most frequent colors,
+  such as the background and module colors, stay exact.
+- **Binary transparency.** Each pixel is fully transparent or opaque. Partially transparent pixels
+  at or above the threshold become opaque, so anti-aliased edges over a transparent background look
+  rough.
 - **Single frame.** The renderer does not produce animations.
 
 ## Center image
 
 Create the center image with `rasterCenterImage()` from PNG bytes, as for the
-[PNG renderer](/reference/renderers/png/#center-image). One center image can be reused across the
-PNG, WebP, GIF, and JPEG renderers:
+[PNG renderer](/reference/renderers/png/#center-image). One center image works for the PNG, WebP,
+GIF, and JPEG renderers.
 
 ```ts
 import {readFile} from 'node:fs/promises';
@@ -92,13 +95,15 @@ const gif = qrcode('https://qrcodesdk.dev')
   .render(QRCodeGIFRenderer({centerImage}));
 ```
 
-## Renderer-specific constraints
+## Constraints
 
-- `transparency.threshold` must be a safe integer from `0` through `256`. Other values throw
-  `QRCodeError` with code `INVALID_OPTIONS` when `QRCodeGIFRenderer()` is called.
-- The center-image source must contain PNG bytes, even for GIF output. See the
-  [PNG renderer constraints](/reference/renderers/png/#renderer-specific-constraints) for its limits.
-- Option values are copied when `QRCodeGIFRenderer()` is called.
+- **Threshold.** `transparency.threshold` must be a safe integer from `0` through `256`. Other
+  values throw `QRCodeError` with code `INVALID_OPTIONS` when `QRCodeGIFRenderer()` is called.
+- **Center image source.** The source must contain PNG bytes, even for GIF output. See the
+  [PNG renderer constraints](/reference/renderers/png/#constraints) for its limits.
+- **Option checks.** TypeScript rejects unknown keys. The renderer does not repeat that check at
+  runtime.
+- **Option copies.** `QRCodeGIFRenderer()` copies option values when it is called.
 
 ## Related guides
 

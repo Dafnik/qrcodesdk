@@ -1,6 +1,6 @@
 ---
 title: '@qrcodesdk/angular'
-description: '@qrcodesdk/angular provides Angular components for rendering QR codes as inline SVG, PNG, WebP, GIF, and JPEG Image elements, and Canvas elements.'
+description: '@qrcodesdk/angular provides Angular components that render QR codes as inline SVG, as PNG, WebP, GIF, or JPEG Image elements, or as Canvas elements.'
 docType: package
 packageName: '@qrcodesdk/angular'
 
@@ -30,7 +30,8 @@ import QRCodeWebP from '../../../components/astro/angular-examples/qrcode-webp.a
 import PackageManagerTabs from '../../../components/package-manager-tabs.astro';
 import PackageComponents from '../../../components/packages/package-components.astro';
 
-Angular components for rendering QR codes as inline SVG, PNG, WebP, GIF, and JPEG Image elements, and Canvas elements.
+Angular components that render QR codes as inline SVG, as PNG, WebP, GIF, or JPEG Image elements, or
+as Canvas elements.
 
 ## Install
 
@@ -38,7 +39,7 @@ Angular components for rendering QR codes as inline SVG, PNG, WebP, GIF, and JPE
 
 ## Quick start
 
-Import the components directly where you need them:
+Import a component and add it to your component's `imports`:
 
 ```ts
 import {Component} from '@angular/core';
@@ -65,13 +66,12 @@ export class App {
 }
 ```
 
-The label names the QR code for screen readers, and the link gives everyone another way to reach the
-destination. Without `accessibility` options, the output is decorative and hidden from assistive
-technology. Leave a QR code unlabeled only when nearby content, such as this link, already gives its
-meaning.
-
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload` and
-`options` inputs. Image components also accept `accessibility.alt`.
+- `ariaLabel` names the QR code for screen readers. The link gives everyone another way to reach the
+  destination.
+- Without `accessibility` options, the QR code is decorative and hidden from assistive technology.
+  Leave it unlabeled only when nearby content, such as this link, already explains it.
+- `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload`
+  and `options` inputs. Image components also accept `accessibility.alt`.
 
 ## Version compatibility
 
@@ -81,25 +81,26 @@ meaning.
 
 ## Components
 
+Each output format has its own standalone component. Your bundle only includes the encoders of the
+components you import.
+
 <PackageComponents selector={true} />
-
-Each image format has its own component, so your bundle only includes the encoders of the components
-you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` uses a lossless encoder
-bundled in the SDK, which also works in Safari, and usually produces the smallest file.
-
-`QRCodeGIF` is limited to 256 colors and binary transparency. Prefer PNG or WebP for transparent
-backgrounds and photographic center images.
-
-`QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
-default. Its `quality` option ranges from 1 to 100, defaults to 92, and trades file size for detail.
-Use it when a destination requires JPEG. See the
-[Image element renderers](/reference/renderers/image/) reference for details.
-
-All components are standalone. Add the ones you use to the host component's `imports` array, then
-bind their `payload` and `options` inputs.
 
 Unlike the React, Vue, and Svelte components, the Angular components render no wrapper `<div>`. Set
 `display: block` on the host element, such as `<qrcode-svg>`, to size the QR code with CSS.
+
+## Choose an image format
+
+- `QRCodePNG` uses the browser's native PNG encoder.
+- `QRCodeWebP` uses a lossless encoder bundled in the SDK. It also works in Safari and usually
+  produces the smallest file.
+- `QRCodeGIF` is limited to 256 colors and on-or-off transparency. Prefer PNG or WebP for
+  transparent backgrounds and photographic center images.
+- `QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
+  default. Its `quality` option ranges from 1 to 100 and defaults to 92. Use it only when a
+  destination requires JPEG.
+
+See [Image element renderers](/reference/renderers/image/) for details.
 
 ## Live examples
 
@@ -133,34 +134,35 @@ Unlike the React, Vue, and Svelte components, the Angular components render no w
 
 ## Center images
 
-Load and decode a browser image first, then store options with
-`centerImage: canvasCenterImage(image)` in a signal. Instantiate the component inside an `@if` block
-once the signal has a value. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead.
-See
-[Add a center image](/guides/center-images/#angular) for the complete
-component and template.
+For PNG, WebP, GIF, JPEG, and Canvas components:
+
+1. Load and decode a browser image.
+2. Store the options with `centerImage: canvasCenterImage(image)` in a signal.
+3. Render the component inside an `@if` block once the signal has a value.
+
+`QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
+[Add a center image](/guides/center-images/#angular) for the complete component and template.
 
 ## Download files
 
-All components except `QRCodeCanvas` expose `download(filename?)`. The method appends the
-component's file extension when needed.
+Every component except `QRCodeCanvas` exposes `download(filename?)`. Get it through a template
+reference variable or `viewChild()`. The method appends the file extension when needed.
 
-See [Download or save](/guides/download-or-save/#download-from-angular) for the complete
-Angular example, or its [Canvas export section](/guides/download-or-save/#export-a-canvas-manually)
-for manual downloads.
+See [Download or save](/guides/download-or-save/#download-from-angular) for a complete Angular
+example. For manual downloads, see
+[Export a canvas manually](/guides/download-or-save/#export-a-canvas-manually).
 
 ## Server-side rendering
 
-`QRCodeSVG` produces runtime-neutral SVG and can render on the server.
-
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and
-Canvas APIs. Outside the browser, they skip element creation and downloads. They populate their host
-after hydration.
+- `QRCodeSVG` produces runtime-neutral SVG and renders on the server.
+- `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` need browser DOM and
+  Canvas APIs. On the server, they render an empty host element and skip downloads. They fill the
+  host after hydration.
 
 ## Shared options
 
-The `options` input groups encoding settings under `matrix`. Renderer settings such as
-`style`, `accessibility`, and `centerImage` go alongside it:
+The `options` input groups encoding settings under `matrix`. Renderer settings, such as `style`,
+`accessibility`, and `centerImage`, sit next to it:
 
 ```ts
 import {type QRCodeSVGOptions, circle, finder, rounded} from '@qrcodesdk/angular';
@@ -172,10 +174,27 @@ const options: QRCodeSVGOptions = {
 };
 ```
 
-Pass this object through the component's `options` input. Use `QRCodePNGImageOptions`,
-`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, `QRCodeJPEGImageOptions`, or `QRCodeCanvasOptions`
-for the corresponding component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`, and
-`QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
+Each component has its own options type:
+
+| Component      | Options type             | Extra options                   |
+| -------------- | ------------------------ | ------------------------------- |
+| `QRCodeSVG`    | `QRCodeSVGOptions`       | None                            |
+| `QRCodePNG`    | `QRCodePNGImageOptions`  | None                            |
+| `QRCodeWebP`   | `QRCodeWebPImageOptions` | None                            |
+| `QRCodeGIF`    | `QRCodeGIFImageOptions`  | `transparency.threshold`        |
+| `QRCodeJPEG`   | `QRCodeJPEGImageOptions` | `quality`, `transparency.matte` |
+| `QRCodeCanvas` | `QRCodeCanvasOptions`    | None                            |
+
+Learn more about each group:
+
+- [Builder and matrix](/reference/builder/) covers the fields inside `matrix`.
+- [Customize appearance](/guides/customize/) covers `style`.
+- [Renderer outputs](/reference/renderers/) covers output-specific options.
+
+[Payload helpers](/reference/payloads/) and `QRCodeError` come from `@qrcodesdk/core`. To use them,
+[add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+
+### Mixed-mode segmentation
 
 Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/angular` and pass it
 as `matrix.segmenter`:
@@ -186,25 +205,23 @@ import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/angular';
 const options: QRCodeSVGOptions = {matrix: {mode: 'auto', segmenter: automaticSegmenter}};
 ```
 
-To build payloads with [payload helpers](/reference/payloads/) or check `instanceof QRCodeError`,
-import them from `@qrcodesdk/core` after you
-[add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project).
-
-See [Builder and matrix](/reference/builder/) for the fields inside `matrix`,
-[Customize appearance](/guides/customize/) for `style`, and
-[Renderer outputs](/reference/renderers/) for output-specific options.
-
 ### Keep options stable
 
-`options` is a signal input compared by identity. The component renders the QR code again when the
-bound object is replaced, not when a property of the same object changes. Create a new object, for
-example with `signal.set()`, `signal.update()`, or `computed()`. Angular caches object literals
-written in a template and recreates them only when a value bound inside them changes.
+`options` is a signal input compared by identity.
+
+- Replacing the bound object renders the QR code again.
+- Changing a property of the same object does not.
+
+Create a new object instead, for example with `signal.set()`, `signal.update()`, or `computed()`.
+Object literals in a template are fine: Angular caches them and recreates them only when a value
+bound inside them changes.
 
 ## Errors
 
-Components throw `QRCodeError` for invalid payloads and options. Angular reports them to its `ErrorHandler`, because the components render in `effect()`. Downloads called from an
-event handler need their own `try`/`catch`. See
+Components throw `QRCodeError` for invalid payloads and options. They render in `effect()`, so
+Angular reports these errors to its `ErrorHandler`.
+
+Wrap downloads called from an event handler in your own `try`/`catch`. See
 [Check errors from framework packages](/reference/errors/#check-errors-from-framework-packages).
 
 ## Public API
