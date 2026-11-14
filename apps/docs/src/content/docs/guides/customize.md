@@ -62,7 +62,7 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 | Property     | Default     | Validation and meaning                                            |
 | ------------ | ----------- | ----------------------------------------------------------------- |
 | `moduleSize` | `5`         | Positive safe integer; pixels per module                          |
-| `quietZone`  | `4`         | Non-negative safe integer; quiet-zone width in modules            |
+| `quietZone`  | `4`         | Non-negative safe integer; quiet-zone width in modules (Micro: 2) |
 | `foreground` | `'#000000'` | RGB or RGBA hexadecimal color of every dark module                |
 | `background` | `'#ffffff'` | RGB or RGBA hexadecimal color behind the code                     |
 | `modules`    | square      | `QRCodeModuleShape`, such as `rounded()` or `circle()`            |
@@ -302,7 +302,8 @@ QRCodeTextRenderer({
 });
 ```
 
-Text output uses the graphical defaults, `moduleSize: 5` and `quietZone: 4`. A version 1 code then
+Text output uses the graphical defaults, `moduleSize: 5` and `quietZone: 4` (2 for
+[Micro QR codes](/guides/micro-qr-codes/)). A version 1 code then
 prints 145 columns wide. For terminals, use `moduleSize: 1` as above, like the CLI does.
 
 ## Accessibility

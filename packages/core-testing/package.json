@@ -6,6 +6,8 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
+    "./micro-decoder": "./dist/micro-decoder/index.mjs",
+    "./micro-decoder/node": "./dist/micro-decoder/node.mjs",
     "./package.json": "./package.json"
   },
   "files": [
@@ -14,25 +16,26 @@
   "scripts": {
     "build": "tsdown",
     "watch": "tsdown --watch",
-    "test": "vitest --watch false --exclude 'tests/svg/*roundtrip.e2e.spec.ts'",
+    "test": "vitest --watch false --exclude 'tests/svg/*roundtrip.e2e.spec.ts' --exclude 'tests/micro/*roundtrip.e2e.spec.ts'",
     "test:coverage:raw": "vitest --coverage --mode coverage --watch false",
-    "test:roundtrips": "vitest --watch false tests/svg/*roundtrip.e2e.spec.ts",
+    "test:roundtrips": "vitest --watch false tests/svg/*roundtrip.e2e.spec.ts tests/micro/*roundtrip.e2e.spec.ts",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint scripts src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",
     "test:snapshots": "vitest run tests/svg/svg-renderer.snapshot.e2e.spec.ts tests/text/text-renderer.snapshot.e2e.spec.ts"
   },
   "dependencies": {
-    "@qrcodesdk/core": "workspace:*"
+    "@qrcodesdk/core": "workspace:*",
+    "zxing-wasm": "catalog:"
   },
   "devDependencies": {
-    "@types/qrcode": "catalog:",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
+    "@types/qrcode": "catalog:",
+    "jsqr": "catalog:",
     "qrcode": "catalog:",
     "qrcode-generator": "catalog:",
-    "jsqr": "catalog:",
     "sharp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:",

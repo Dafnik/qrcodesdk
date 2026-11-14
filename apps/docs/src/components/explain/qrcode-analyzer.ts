@@ -2,8 +2,8 @@ import {
   type QRCodeErrorCorrectionLevel,
   type QRCodeMask,
   type QRCodeMatrix,
-  type QRCodeMatrixOptions,
   type QRCodeMode,
+  type QRCodeStandardMatrixOptions,
   QRCodeTextRenderer,
   type QRCodeTextStyle,
   type QRCodeVersion,
@@ -17,7 +17,7 @@ export type QRCodeExplainModuleValue = 0 | 1;
 
 export type QRCodeExplainRole = 'functional' | 'encoded' | 'remainder';
 
-export interface QRCodeExplainOptions extends QRCodeMatrixOptions, QRCodeTextStyle {
+export interface QRCodeExplainOptions extends QRCodeStandardMatrixOptions, QRCodeTextStyle {
   payload: string;
   optimizeSegments?: boolean;
 }
@@ -90,7 +90,7 @@ const MASKS = [
 ] as const;
 
 export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation {
-  const matrixOptions: QRCodeMatrixOptions = {
+  const matrixOptions: QRCodeStandardMatrixOptions = {
     mode: options.mode,
     version: options.version,
     errorCorrectionLevel: options.errorCorrectionLevel,
@@ -182,7 +182,7 @@ function createPlacements({size, roles}: QRCodeMatrix): number[] {
 
 function resolveMask(
   payload: string,
-  options: QRCodeMatrixOptions,
+  options: QRCodeStandardMatrixOptions,
   matrix: QRCodeMatrix,
   version: QRCodeVersion,
 ): QRCodeMask {
@@ -199,7 +199,7 @@ function resolveMask(
 
 function resolveMode(
   options: QRCodeExplainOptions,
-  matrixOptions: QRCodeMatrixOptions,
+  matrixOptions: QRCodeStandardMatrixOptions,
   version: QRCodeVersion,
   mask: QRCodeMask,
 ): Exclude<QRCodeMode, 'auto'> | 'mixed' {
@@ -226,7 +226,7 @@ function resolveMode(
  */
 function fitsKanjiMode(
   payload: string,
-  matrixOptions: QRCodeMatrixOptions,
+  matrixOptions: QRCodeStandardMatrixOptions,
   version: QRCodeVersion,
   mask: QRCodeMask,
 ): boolean {

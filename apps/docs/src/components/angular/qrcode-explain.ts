@@ -74,7 +74,8 @@ type LegendItem = {
       </div>
 
       <qr-matrix-controls />
-      <qr-encoding-controls />
+      <!-- The explanation covers standard QR codes only, so Micro QR codes stay hidden. -->
+      <qr-encoding-controls [allowMicro]="false" />
     </div>
   `,
 })

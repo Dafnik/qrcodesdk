@@ -50,6 +50,12 @@ An immutable square grid produced by symbol generation: its size, a flat row-maj
 not transform it in place.
 _Avoid_: Mutable matrix, two-dimensional matrix
 
+**Micro QR code**:
+A smaller QR code symbol (versions M1 to M4, 11 to 17 modules per side) with one finder pattern and a
+2-module quiet zone. It is opt-in through the `symbol` matrix option, so applications that never
+select it do not bundle its encoder.
+_Avoid_: Mini QR code, small QR code
+
 **Module role**:
 The function of a module, light or dark, stored in the matrix's role grid separately from its color:
 data, finder ring, finder center, separator, alignment ring, alignment center, timing, format, or

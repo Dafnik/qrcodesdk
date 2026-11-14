@@ -4,8 +4,8 @@ import {describe, test} from 'vitest';
 
 import {QRCodeTextRenderer, qrcode} from '@qrcodesdk/core';
 
-import {fixtureMatrixOptions} from '../../src';
-import {QR_CODE_TEST_FIXTURES} from '../../src';
+import {fixtureMatrixOptions, fixtureMicroMatrixOptions} from '../../src';
+import {QR_CODE_MICRO_TEST_FIXTURES, QR_CODE_TEST_FIXTURES} from '../../src';
 import {expectTextToMatchFileSnapshot} from './text-helpers';
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('../__snapshots__/text', import.meta.url));
@@ -27,6 +27,15 @@ describe('QRCodeTextRenderer snapshots', () => {
             }),
           ),
         join(SNAPSHOT_DIR, `${fixture.name}${variant.snapshotSuffix}.txt`),
+      );
+    });
+
+    test.each(QR_CODE_MICRO_TEST_FIXTURES)('matches $name Micro QR text snapshot', (fixture) => {
+      expectTextToMatchFileSnapshot(
+        qrcode(fixture.payload)
+          .options(fixtureMicroMatrixOptions(fixture))
+          .render(QRCodeTextRenderer({style: {moduleSize: 2}, layout: variant.layout})),
+        join(SNAPSHOT_DIR, 'micro', `${fixture.name}${variant.snapshotSuffix}.txt`),
       );
     });
   });

@@ -85,9 +85,9 @@ export function* combinationFixtures(filter: CombinationFilter): Generator<DevFi
         payload,
         matrix: {version, errorCorrectionLevel, mask, mode, eci, kanji},
         style: PLAIN_STYLE,
-        knownDecodeIssue:
+        knownDecodeIssues:
           version === 23 && errorCorrectionLevel === 'L'
-            ? 'jsQR cannot decode version 23 L codes (jsQR issue 251).'
+            ? {jsqr: 'jsQR cannot decode version 23 L codes (jsQR issue 251).'}
             : undefined,
       };
     }

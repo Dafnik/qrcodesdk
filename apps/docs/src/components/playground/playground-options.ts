@@ -10,9 +10,11 @@ import {
   type QRCodeDataImageURL,
   type QRCodeMatrixOptions,
   type QRCodeSVGOptions,
+  type QRCodeStandardMatrixOptions,
   type QRCodeVisualStyle,
   svgCenterImage,
 } from '@qrcodesdk/core';
+import {type QRCodeMicroMask, type QRCodeMicroVersion, microQR} from '@qrcodesdk/core/micro';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {
@@ -20,7 +22,11 @@ import {
   playgroundKanjiTable,
   playgroundUsesKanji,
 } from './playground-kanji.ts';
-import {type PlaygroundStyleState, createPlaygroundStyle} from './playground-style.ts';
+import {
+  type PlaygroundShape,
+  type PlaygroundStyleState,
+  createPlaygroundStyle,
+} from './playground-style.ts';
 
 export type PlaygroundPackage = 'angular' | 'react' | 'svelte' | 'vue' | 'cli';
 export type PlaygroundImageOutput = 'png' | 'webp' | 'gif' | 'jpeg';
@@ -41,7 +47,16 @@ export const PLAYGROUND_SECTIONS = [
 ] as const satisfies readonly PlaygroundSection[];
 
 export interface PlaygroundOptions
-  extends Omit<QRCodeMatrixOptions, 'kanji'>, PlaygroundStyleState {
+  extends Omit<QRCodeStandardMatrixOptions, 'kanji'>, PlaygroundStyleState {
+  /**
+   * Generates a Micro QR code with `microQR()`, which also takes `mode`, the Kanji table, and the
+   * error correction level. The standard `version`, `mask`, `eci`, and `optimizeSegments` values
+   * are kept for switching back but not used.
+   */
+  micro?: boolean;
+  microVersion?: QRCodeMicroVersion;
+  microMask?: QRCodeMicroMask;
+  microFallback?: boolean;
   optimizeSegments?: boolean;
   /** Passes the Kanji table so auto mode and optimized segments can use Kanji mode. */
   kanji?: boolean;
@@ -106,6 +121,36 @@ export function updateQrOptions(patch: Partial<PlaygroundOptions>): void {
 /** Replaces the playground options, after loading the Kanji table if they need it. */
 export function setQrOptions(options: PlaygroundOptions): void {
   applyWithPlaygroundKanji(playgroundUsesKanji(options), () => playgroundOptions.set(options));
+}
+
+/** Default quiet zones of standard and Micro QR codes. */
+const QUIET_ZONES = {standard: 4, micro: 2} as const;
+
+/**
+ * Switches between standard and Micro QR codes. A quiet zone at the previous symbol's default moves
+ * to the new symbol's default, so switching keeps the recommended border.
+ */
+export function playgroundSymbolPatch(
+  current: Pick<PlaygroundOptions, 'quietZone'>,
+  micro: boolean,
+): Partial<PlaygroundOptions> {
+  const [from, to] = micro
+    ? [QUIET_ZONES.standard, QUIET_ZONES.micro]
+    : [QUIET_ZONES.micro, QUIET_ZONES.standard];
+  return {micro, ...(current.quietZone === from ? {quietZone: to} : {})};
+}
+
+/**
+ * ZXing cannot reliably locate the single finder pattern of a Micro QR code when its ring has a
+ * corner radius of 0.5 or more. Square and diagonal rings scan.
+ */
+export function isUnreliableMicroFinderRing(shape: PlaygroundShape | undefined): boolean {
+  return (
+    shape === 'rounded' ||
+    shape === 'extra-rounded' ||
+    shape === 'diagonal-rounded' ||
+    shape === 'circle'
+  );
 }
 
 export function setPlaygroundSectionOpen(section: PlaygroundSection, open: boolean): void {
@@ -254,17 +299,35 @@ export function createPlaygroundCanvasOptions(
     : rendererOptions;
 }
 
+function matrixOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeMatrixOptions {
+  const {mode, errorCorrectionLevel} = playgroundOptionsValue;
+  const kanji = playgroundUsesKanji(playgroundOptionsValue) ? playgroundKanjiTable() : undefined;
+  if (playgroundOptionsValue.micro) {
+    return {
+      symbol: microQR({
+        version: playgroundOptionsValue.microVersion,
+        mask: playgroundOptionsValue.microMask,
+        fallback: playgroundOptionsValue.microFallback,
+      }),
+      mode,
+      kanji,
+      errorCorrectionLevel,
+    };
+  }
+  return {
+    version: playgroundOptionsValue.version,
+    mode,
+    segmenter: playgroundOptionsValue.optimizeSegments ? automaticSegmenter : undefined,
+    kanji,
+    errorCorrectionLevel,
+    mask: playgroundOptionsValue.mask,
+    eci: playgroundOptionsValue.eci,
+  };
+}
+
 function baseOptions(playgroundOptionsValue: PlaygroundOptions) {
   return {
-    matrix: {
-      version: playgroundOptionsValue.version,
-      mode: playgroundOptionsValue.mode,
-      segmenter: playgroundOptionsValue.optimizeSegments ? automaticSegmenter : undefined,
-      kanji: playgroundUsesKanji(playgroundOptionsValue) ? playgroundKanjiTable() : undefined,
-      errorCorrectionLevel: playgroundOptionsValue.errorCorrectionLevel,
-      mask: playgroundOptionsValue.mask,
-      eci: playgroundOptionsValue.eci,
-    },
+    matrix: matrixOptions(playgroundOptionsValue),
     style: {
       moduleSize: playgroundOptionsValue.moduleSize,
       quietZone: playgroundOptionsValue.quietZone,

@@ -396,36 +396,9 @@ function formatOptions(
     entries.push(`style: ${formatObject(styleEntries, depth + 1)}`);
   }
 
-  const matrixEntries: string[] = [];
-  if (playgroundOptionsValue.version !== undefined) {
-    matrixEntries.push(`version: ${playgroundOptionsValue.version}`);
-  }
-
-  if (playgroundOptionsValue.mode !== undefined) {
-    matrixEntries.push(`mode: ${quote(playgroundOptionsValue.mode)}`);
-  }
-
-  if (playgroundOptionsValue.errorCorrectionLevel !== undefined) {
-    matrixEntries.push(
-      `errorCorrectionLevel: ${quote(playgroundOptionsValue.errorCorrectionLevel)}`,
-    );
-  }
-
-  if (playgroundOptionsValue.mask !== undefined) {
-    matrixEntries.push(`mask: ${playgroundOptionsValue.mask}`);
-  }
-
-  if (playgroundOptionsValue.optimizeSegments) {
-    matrixEntries.push('segmenter: automaticSegmenter');
-  }
-
-  if (playgroundUsesKanji(playgroundOptionsValue)) {
-    matrixEntries.push('kanji');
-  }
-
-  if (playgroundOptionsValue.eci === true) {
-    matrixEntries.push('eci: true');
-  }
+  const matrixEntries = playgroundOptionsValue.micro
+    ? formatMicroMatrixEntries(playgroundOptionsValue, depth + 2)
+    : formatStandardMatrixEntries(playgroundOptionsValue);
   if (matrixEntries.length > 0) entries.push(`matrix: ${formatObject(matrixEntries, depth + 1)}`);
 
   if (
@@ -459,6 +432,70 @@ function formatOptions(
   }
 
   return formatObject(entries, depth);
+}
+
+function formatStandardMatrixEntries(playgroundOptionsValue: PlaygroundOptions): string[] {
+  const matrixEntries: string[] = [];
+  if (playgroundOptionsValue.version !== undefined) {
+    matrixEntries.push(`version: ${playgroundOptionsValue.version}`);
+  }
+
+  matrixEntries.push(...formatSharedMatrixEntries(playgroundOptionsValue));
+
+  if (playgroundOptionsValue.mask !== undefined) {
+    matrixEntries.push(`mask: ${playgroundOptionsValue.mask}`);
+  }
+
+  if (playgroundOptionsValue.optimizeSegments) {
+    matrixEntries.push('segmenter: automaticSegmenter');
+  }
+
+  if (playgroundUsesKanji(playgroundOptionsValue)) {
+    matrixEntries.push('kanji');
+  }
+
+  if (playgroundOptionsValue.eci === true) {
+    matrixEntries.push('eci: true');
+  }
+  return matrixEntries;
+}
+
+/** Micro QR codes own their version and mask, support Kanji mode, and support neither a segmenter nor ECI. */
+function formatMicroMatrixEntries(
+  playgroundOptionsValue: PlaygroundOptions,
+  depth: number,
+): string[] {
+  const microEntries: string[] = [];
+  if (playgroundOptionsValue.microVersion !== undefined) {
+    microEntries.push(`version: ${quote(playgroundOptionsValue.microVersion)}`);
+  }
+  if (playgroundOptionsValue.microMask !== undefined) {
+    microEntries.push(`mask: ${playgroundOptionsValue.microMask}`);
+  }
+  if (playgroundOptionsValue.microFallback) {
+    microEntries.push('fallback: true');
+  }
+  const microOptions = microEntries.length > 0 ? formatObject(microEntries, depth) : '';
+
+  return [
+    `symbol: microQR(${microOptions})`,
+    ...formatSharedMatrixEntries(playgroundOptionsValue),
+    ...(playgroundUsesKanji(playgroundOptionsValue) ? ['kanji'] : []),
+  ];
+}
+
+function formatSharedMatrixEntries(playgroundOptionsValue: PlaygroundOptions): string[] {
+  const matrixEntries: string[] = [];
+  if (playgroundOptionsValue.mode !== undefined) {
+    matrixEntries.push(`mode: ${quote(playgroundOptionsValue.mode)}`);
+  }
+
+  if (playgroundOptionsValue.errorCorrectionLevel !== undefined) {
+    matrixEntries.push(
+      `errorCorrectionLevel: ${quote(playgroundOptionsValue.errorCorrectionLevel)}`,
+    );
+  }
+  return matrixEntries;
 }
 
 /** Format the center image factory call, passing only the layout values that differ from the defaults. */
@@ -604,7 +641,10 @@ function qrcodesdkImports(
     ...(hasImage ? [CENTER_IMAGE_FACTORIES[output]] : []),
     ...(hasImage && output === 'svg' ? ['type QRCodeDataImageURL'] : []),
     ...factories,
-    ...(playgroundOptionsValue.optimizeSegments ? ['automaticSegmenter'] : []),
+    ...(playgroundOptionsValue.micro ? ['microQR'] : []),
+    ...(!playgroundOptionsValue.micro && playgroundOptionsValue.optimizeSegments
+      ? ['automaticSegmenter']
+      : []),
     ...(playgroundUsesKanji(playgroundOptionsValue) ? ['kanji'] : []),
   ];
   return formatImport(specifiers, `@qrcodesdk/${packageName}`, indentation);

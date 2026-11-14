@@ -1,4 +1,5 @@
 import type {RGBAPixel} from '@repo/core-testing';
+import {type MicroQRCodeScan, decodeMicroQRCode} from '@repo/core-testing/micro-decoder/node';
 import jsQR from 'jsqr';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname} from 'node:path';
@@ -30,6 +31,15 @@ export async function decodeRasterQRCode(input: Buffer): Promise<string> {
   }
 
   return result.data;
+}
+
+/** Scans a Micro QR code with ZXing, because jsQR cannot read Micro QR codes. */
+export async function decodeRasterMicroQRCode(input: Buffer): Promise<MicroQRCodeScan> {
+  // PNG keeps a second lossy encoding of JPEG and WebP input out of the scan, as above.
+  const raster = await readRaster(
+    await sharp(input).flatten({background: '#ffffff'}).png().toBuffer(),
+  );
+  return decodeMicroQRCode(new Uint8ClampedArray(raster.data), raster.width, raster.height);
 }
 
 export type RasterFormat = 'PNG' | 'WebP' | 'GIF' | 'JPEG';

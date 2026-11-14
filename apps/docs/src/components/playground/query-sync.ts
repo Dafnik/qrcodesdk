@@ -1,4 +1,5 @@
 import type {QRCodeColor, QRCodeMask, QRCodeVersion} from '@qrcodesdk/core';
+import type {QRCodeMicroMask, QRCodeMicroVersion} from '@qrcodesdk/core/micro';
 
 import {cliPlaygroundOptions, setCliOptions} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
@@ -41,6 +42,7 @@ const PLAYGROUND_OUTPUTS = [
 ] as const satisfies readonly PlaygroundOutput[];
 const MODES = ['auto', 'numeric', 'alphanumeric', 'octet', 'kanji'] as const;
 const ERROR_CORRECTION_LEVELS = ['L', 'M', 'Q', 'H'] as const;
+const MICRO_VERSIONS = ['M1', 'M2', 'M3', 'M4'] as const satisfies readonly QRCodeMicroVersion[];
 /** Parameters of removed styling options. They are ignored on read and dropped on write. */
 const REMOVED_QUERY_KEYS = [
   'modules-color',
@@ -121,6 +123,38 @@ const QUERY_FIELD_CODECS = [
     (currentOptions, mask) => setOptionalProperty(currentOptions, 'mask', mask),
     (value, fallback) => parseOptionalNumber(value, isQRCodeMask, fallback),
     serializeNumber,
+  ),
+  defineQueryField(
+    'micro',
+    (currentOptions) => currentOptions.micro ?? false,
+    (currentOptions, micro) => {
+      currentOptions.micro = micro;
+    },
+    parseBoolean,
+    serializeBoolean,
+  ),
+  defineQueryField(
+    'micro-version',
+    (currentOptions) => currentOptions.microVersion,
+    (currentOptions, version) => setOptionalProperty(currentOptions, 'microVersion', version),
+    (value, fallback) => parseOptionalStringUnion(value, MICRO_VERSIONS, fallback),
+    serializeString,
+  ),
+  defineQueryField(
+    'micro-mask',
+    (currentOptions) => currentOptions.microMask,
+    (currentOptions, mask) => setOptionalProperty(currentOptions, 'microMask', mask),
+    (value, fallback) => parseOptionalNumber(value, isQRCodeMicroMask, fallback),
+    serializeNumber,
+  ),
+  defineQueryField(
+    'micro-fallback',
+    (currentOptions) => currentOptions.microFallback ?? false,
+    (currentOptions, fallback) => {
+      currentOptions.microFallback = fallback;
+    },
+    parseBoolean,
+    serializeBoolean,
   ),
   defineQueryField(
     'optimize-segments',
@@ -641,8 +675,14 @@ function isQRCodeMask(value: unknown): value is QRCodeMask {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 && value <= 7;
 }
 
+function isQRCodeMicroMask(value: unknown): value is QRCodeMicroMask {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 && value <= 3;
+}
+
 type OptionalPlaygroundOptionsKey =
   | 'version'
+  | 'microVersion'
+  | 'microMask'
   | 'mode'
   | 'errorCorrectionLevel'
   | 'mask'

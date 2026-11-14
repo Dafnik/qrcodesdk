@@ -62,6 +62,7 @@
     "./internal/webp": "./dist/internal/webp.mjs",
     "./kanji": "./dist/kanji.mjs",
     "./matrix": "./dist/matrix.mjs",
+    "./micro": "./dist/micro.mjs",
     "./payload": "./dist/payload.mjs",
     "./segmenter": "./dist/segmenter.mjs",
     "./style": "./dist/style.mjs",

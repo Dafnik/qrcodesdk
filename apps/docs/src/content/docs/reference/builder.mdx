@@ -46,12 +46,12 @@ describes.
 
 ### Unsupported QR features
 
-QRCodeSDK generates QR Code Model 2 symbols. It supports numeric, alphanumeric, UTF-8 octet, and
-opt-in [Kanji](#kanji-mode) payloads, with optional mixed-mode segmentation. It targets payloads in a
-single symbol and does not support:
+QRCodeSDK generates QR Code Model 2 symbols and, with `microQR()`, Micro QR symbols. It supports
+numeric, alphanumeric, UTF-8 octet, and opt-in [Kanji](#kanji-mode) payloads, with optional
+mixed-mode segmentation. It targets payloads in a single symbol and does not support:
 
 - structured append, which splits one payload across several symbols;
-- Micro QR symbols;
+- rMQR (rectangular Micro QR) symbols;
 - GS1 data;
 - raw binary segments. Octet segments always contain the UTF-8 bytes of a string.
 
@@ -165,6 +165,7 @@ character-count group, starting at versions 1, 10, and 27. With a pinned version
 | `errorCorrectionLevel` | `'L' \| 'M' \| 'Q' \| 'H'`                                    | `'M'`     | Higher redundancy reduces payload capacity     |
 | `version`              | integer `1`–`40`                                              | automatic | Pinned version must fit the encoded payload    |
 | `mask`                 | integer `0`–`7`                                               | automatic | Pinned mask replaces penalty-based selection   |
+| `symbol`               | `QRCodeSymbol`, such as `microQR()`                           | omitted   | Generates another symbol type; see below       |
 
 Set options one by one or together:
 
@@ -225,6 +226,26 @@ If the payload does not fit a pinned version, generation throws `QRCodeError` wi
 `PAYLOAD_TOO_LARGE` and `details.version`. See the [errors reference](/reference/errors/#payload_too_large).
 Removing the pin helps only if a larger version fits. If automatic selection also fails, shorten or
 change the payload.
+
+### Symbol type
+
+`symbol` replaces the standard QR code with another symbol type. `microQR()` from
+`@qrcodesdk/core/micro` selects a [Micro QR code](/guides/micro-qr-codes/). The symbol owns its
+version and mask, so `version`, `mask`, `eci`, and `segmenter` are typed `never` next to it and throw
+`INVALID_OPTIONS` at runtime:
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {microQR} from '@qrcodesdk/core/micro';
+
+qrcode('12345')
+  .options({symbol: microQR({version: 'M2'})})
+  .matrix().size; // 13
+```
+
+`QRCodeMatrixOptions` is the union of `QRCodeStandardMatrixOptions` and
+`QRCodeSymbolMatrixOptions`. Use `QRCodeStandardMatrixOptions` when you derive types, such as with
+`Omit`, from options that only describe standard QR codes.
 
 ## Builder methods
 

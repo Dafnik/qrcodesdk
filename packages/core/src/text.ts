@@ -2,6 +2,7 @@ import {
   calculateQRCodeOutputSize,
   parseQRCodeColor,
   resolveQRCodeTextStyle,
+  resolveQuietZone,
   validateColor,
 } from './styling';
 import type {QRCodeColor, QRCodeMatrix, QRCodeRenderer, QRCodeTextStyle} from './types';
@@ -35,7 +36,7 @@ export type QRCodeTextRendererOptions =
     };
 
 export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeRenderer<string> {
-  const {moduleSize, quietZone} = resolveQRCodeTextStyle(options?.style);
+  const {moduleSize, quietZone: requestedQuietZone} = resolveQRCodeTextStyle(options?.style);
   const layout = options?.layout ?? 'compact';
 
   const ansi = options?.ansi === undefined ? false : options.ansi;
@@ -59,6 +60,7 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
   const suffix = ansi === false ? '' : ANSI_RESET;
 
   return (matrix: QRCodeMatrix) => {
+    const quietZone = resolveQuietZone(requestedQuietZone, matrix);
     const outputSize = calculateQRCodeOutputSize(matrix, {moduleSize, quietZone});
     const darkModules = (scaledRow: number): Uint8Array => {
       const modules = new Uint8Array(outputSize);

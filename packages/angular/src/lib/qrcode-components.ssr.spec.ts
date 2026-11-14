@@ -4,6 +4,8 @@ import {renderApplication} from '@angular/platform-server';
 
 import {describe, expect, test} from 'vitest';
 
+import {microQR} from '@qrcodesdk/core/micro';
+
 import {QRCodeCanvas} from './QRCodeCanvas';
 import {QRCodeJPEG} from './QRCodeJPEG';
 import {QRCodePNG} from './QRCodePNG';
@@ -20,6 +22,17 @@ import {QRCodeSVG} from './QRCodeSVG';
   `,
 })
 class QRCodeSSRHost {}
+
+@Component({
+  selector: 'qrcode-ssr-host',
+  imports: [QRCodeSVG],
+  template: `
+    <qrcode-svg [options]="options" payload="12345" />
+  `,
+})
+class QRCodeMicroSSRHost {
+  readonly options = {matrix: {symbol: microQR()}};
+}
 
 describe('Angular QR code server rendering', () => {
   test('renders complete SVG markup and permanent browser-output hosts', async () => {
@@ -39,5 +52,14 @@ describe('Angular QR code server rendering', () => {
     expect(html).toMatch(/<qrcode-canvas[^>]*><\/qrcode-canvas>/);
     expect(html).not.toContain('<img');
     expect(html).not.toContain('<canvas');
+  });
+
+  test('renders a Micro QR code through the matrix options', async () => {
+    const html = await renderApplication(
+      (context) => bootstrapApplication(QRCodeMicroSSRHost, undefined, context),
+      {document: '<qrcode-ssr-host></qrcode-ssr-host>', url: '/'},
+    );
+
+    expect(html).toContain('viewBox="0 0 17 17"');
   });
 });

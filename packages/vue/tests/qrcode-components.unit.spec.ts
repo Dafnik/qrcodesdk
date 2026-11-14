@@ -27,6 +27,14 @@ describe('Vue QR code component API', () => {
     expect((image.vm as unknown as QRCodeDownloadHandle).download).toBeTypeOf('function');
   });
 
+  test('renders a Micro QR code through the matrix options', () => {
+    const wrapper = mount(vueApi.QRCodeSVG, {
+      props: {payload: '12345', options: {matrix: {symbol: vueApi.microQR()}}},
+    });
+
+    expect(wrapper.html()).toContain('viewBox="0 0 17 17"');
+  });
+
   test('keeps factory images valid inside deep reactive options', async () => {
     const options = reactive<vueApi.QRCodeSVGOptions>({
       centerImage: vueApi.svgCenterImage('data:image/png;base64,a'),

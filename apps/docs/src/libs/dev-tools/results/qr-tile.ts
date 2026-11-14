@@ -24,7 +24,7 @@ import {
 } from '@qrcodesdk/angular';
 
 import type {DevFixture} from '../fixtures/fixture-catalog';
-import {captureOutput} from '../rendering/decode';
+import {type DecodeResult, type DecoderId, captureOutput} from '../rendering/decode';
 import {type RendererId, canvasOptions, rendererLabel, svgOptions} from '../rendering/renderers';
 import {DecodeResults, resultKey} from '../state/decode-results';
 import {DevToolsState} from '../state/dev-tools-state';
@@ -82,10 +82,10 @@ import {DecodeBadge} from './decode-badge';
         }
       }
     </div>
-    <div class="flex items-center gap-1" [style.width.px]="size()">
+    <div class="flex flex-wrap items-center gap-1" [style.width.px]="size()">
       <span class="text-muted-foreground text-xs font-medium">{{ label() }}</span>
-      @if (decode()) {
-        <app-decode-badge [result]="result()" />
+      @for (decoder of decoders(); track decoder) {
+        <app-decode-badge [decoder]="decoder" [result]="result(decoder)" />
       }
       @if (renderer() !== 'canvas') {
         <button
@@ -115,30 +115,37 @@ export class QRTile {
   protected readonly svg = computed(() => svgOptions(this.fixture()));
   protected readonly canvas = computed(() => canvasOptions(this.fixture()));
   protected readonly label = computed(() => rendererLabel(this.renderer()));
-  protected readonly decode = this.state.decode;
-  private readonly key = computed(() => resultKey(this.fixture(), this.renderer()));
-  protected readonly result = computed(() => {
-    this.results.version();
-    return this.results.get(this.key());
-  });
+  protected readonly decoders = this.state.decoders;
+  private readonly version = this.results.version;
 
   constructor() {
     // Runs after the component effects rendered the current inputs into the DOM.
     afterRenderEffect({
       read: () => {
-        if (!this.decode()) return;
+        const decoders = this.decoders();
+        if (decoders.length === 0) return;
         // Re-runs keep tiles whose fixture and renderer didn't change, but clear their results.
         this.results.runId();
-        const key = this.key();
-        if (this.results.isKnown(key)) return;
+        const fixture = this.fixture();
         const renderer = this.renderer();
+        if (
+          decoders.every((decoder) => this.results.isKnown(resultKey(fixture, renderer, decoder)))
+        ) {
+          return;
+        }
         this.results.decode(
-          key,
-          this.fixture(),
+          fixture,
+          renderer,
           captureOutput(this.output().nativeElement, renderer),
+          decoders,
         );
       },
     });
+  }
+
+  protected result(decoder: DecoderId): DecodeResult | undefined {
+    this.version();
+    return this.results.get(resultKey(this.fixture(), this.renderer(), decoder));
   }
 
   protected download(): void {

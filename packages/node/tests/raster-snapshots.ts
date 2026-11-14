@@ -1,6 +1,12 @@
-import {encodeFixturePNG, fixtureMatrixOptions} from '@repo/core-testing';
+import {
+  encodeFixturePNG,
+  fixtureMatrixOptions,
+  fixtureMicroMatrixOptions,
+} from '@repo/core-testing';
 import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
+  QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
+  QR_CODE_MICRO_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
   QR_CODE_STYLING_FIXTURES,
   QR_CODE_TEST_FIXTURES,
@@ -70,6 +76,33 @@ export function describeRasterSnapshots(
               }),
             ),
           join(snapshotDirectory, 'center-image', `${fixture.name}.${extension}`),
+        );
+      },
+    );
+
+    // Micro QR fixtures keep the default quiet zone of 2 modules.
+    test.each(QR_CODE_MICRO_TEST_FIXTURES)(
+      `matches $name ${format} Micro QR snapshot`,
+      (fixture) => {
+        expectRasterToMatchFileSnapshot(
+          format,
+          qrcode(fixture.payload)
+            .options(fixtureMicroMatrixOptions(fixture))
+            .render(createRenderer({style: {moduleSize: 8}})),
+          join(snapshotDirectory, 'micro', `${fixture.name}.${extension}`),
+        );
+      },
+    );
+
+    test.each(QR_CODE_MICRO_STYLE_VARIANT_FIXTURES)(
+      `matches $name ${format} Micro QR style variant snapshot`,
+      (fixture) => {
+        expectRasterToMatchFileSnapshot(
+          format,
+          qrcode(fixture.payload)
+            .options(fixture.matrixOptions)
+            .render(createRenderer({style: fixture.styling})),
+          join(snapshotDirectory, 'micro', 'style-variants', `${fixture.name}.${extension}`),
         );
       },
     );

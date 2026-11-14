@@ -22,6 +22,7 @@ import {
   MODES,
 } from '../fixtures/combinations';
 import {FIXTURE_CATEGORIES, type FixtureCategory} from '../fixtures/fixture-catalog';
+import {DECODERS} from '../rendering/decode';
 import {RENDERERS, type RendererId} from '../rendering/renderers';
 import {DevToolsState} from '../state/dev-tools-state';
 
@@ -77,13 +78,15 @@ function clampVersion(value: string | number): number {
 
       <section class="flex flex-col gap-3">
         <h2 class="text-sm font-semibold">Options</h2>
-        <div class="flex items-center gap-2">
-          <hlm-switch
-            [checked]="state.decode()"
-            (checkedChange)="state.decode.set($event)"
-            inputId="decode-switch" />
-          <label hlmLabel for="decode-switch">Decode with jsQR</label>
-        </div>
+        @for (decoder of DECODERS; track decoder.id) {
+          <div class="flex items-center gap-2">
+            <hlm-switch
+              [checked]="state.decoders().includes(decoder.id)"
+              [inputId]="'decode-' + decoder.id"
+              (checkedChange)="state.setDecoder(decoder.id, $event)" />
+            <label [for]="'decode-' + decoder.id" hlmLabel>Decode with {{ decoder.label }}</label>
+          </div>
+        }
         <div class="flex items-center gap-2">
           <label class="w-20" hlmLabel for="tile-size">Tile size</label>
           <hlm-native-select
@@ -303,6 +306,7 @@ export class SelectionPanel {
   protected readonly state = inject(DevToolsState);
 
   protected readonly categories = FIXTURE_CATEGORIES;
+  protected readonly DECODERS = DECODERS;
   protected readonly renderers = RENDERERS;
   protected readonly combinationSets = COMBINATION_SETS;
   protected readonly errorCorrectionLevels = ERROR_CORRECTION_LEVELS;

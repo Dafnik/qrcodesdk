@@ -29,6 +29,7 @@ export type {
   QRCodeErrorCorrectionLevel,
   QRCodeMask,
   QRCodeMatrixOptions,
+  QRCodeStandardMatrixOptions,
   QRCodeMode,
   QRCodeEncodingMode,
   QRCodeKanji,
@@ -46,6 +47,14 @@ export {svgCenterImage} from '@qrcodesdk/core';
 export {alignment, circle, customShape, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 export {kanji} from '@qrcodesdk/core/kanji';
 export {automaticSegmenter} from '@qrcodesdk/core/segmenter';
+export {microQR} from '@qrcodesdk/core/micro';
+export type {
+  QRCodeMicroMask,
+  QRCodeMicroOptions,
+  QRCodeMicroVersion,
+  QRCodeSymbol,
+  QRCodeSymbolMatrixOptions,
+} from '@qrcodesdk/core/micro';
 export type {
   QRCodeAlignmentCenterShape,
   QRCodeAlignmentOptions,

@@ -15,6 +15,7 @@ import {
   FIXTURE_CATEGORIES,
   type FixtureCategoryId,
 } from '../fixtures/fixture-catalog';
+import {DECODERS, type DecoderId} from '../rendering/decode';
 import {RENDERERS, type RendererId} from '../rendering/renderers';
 import {DecodeResults} from './decode-results';
 
@@ -28,7 +29,8 @@ type PersistedSettings = {
   readonly selection: Selection;
   readonly combinations: CombinationFilter;
   readonly renderers: readonly RendererId[];
-  readonly decode: boolean;
+  /** Decoders that scan each output. None turns decoding off. */
+  readonly decoders: readonly DecoderId[];
   readonly tileSize: TileSize;
 };
 
@@ -41,8 +43,10 @@ const STORAGE_KEY = 'qrcodesdk-dev-tools-settings';
 
 const EMPTY_SELECTION: Selection = {
   fixtures: [],
+  micro: [],
   styling: [],
   'style-variants': [],
+  'micro-style-variants': [],
   'center-images': [],
   'fixture-images': [],
 };
@@ -54,7 +58,7 @@ const DEFAULT_SETTINGS: PersistedSettings = {
   },
   combinations: DEFAULT_COMBINATION_FILTER,
   renderers: RENDERERS.map(({id}) => id),
-  decode: false,
+  decoders: [],
   tileSize: 'md',
 };
 
@@ -114,7 +118,7 @@ function loadSettings(): PersistedSettings {
         RENDERERS.map(({id}) => id),
         DEFAULT_SETTINGS.renderers,
       ),
-      decode: parsed.decode === true,
+      decoders: storedDecoders(parsed as Record<string, unknown>),
       tileSize:
         typeof parsed.tileSize === 'string' && parsed.tileSize in TILE_SIZES
           ? (parsed.tileSize as TileSize)
@@ -123,6 +127,16 @@ function loadSettings(): PersistedSettings {
   } catch {
     return DEFAULT_SETTINGS;
   }
+}
+
+/** Reads the stored decoders. Settings from before ZXing stored `decode: true` for jsQR. */
+function storedDecoders(parsed: Record<string, unknown>): DecoderId[] {
+  if (parsed['decoders'] === undefined) return parsed['decode'] === true ? ['jsqr'] : [];
+  return known(
+    parsed['decoders'],
+    DECODERS.map(({id}) => id),
+    DEFAULT_SETTINGS.decoders,
+  );
 }
 
 /** The draft selection in the sidebar and the run it starts. Nothing renders until `run()`. */
@@ -134,7 +148,9 @@ export class DevToolsState {
   readonly selection = signal<Selection>(this.initial.selection);
   readonly combinations = signal<CombinationFilter>(this.initial.combinations);
   readonly renderers = signal<readonly RendererId[]>(this.initial.renderers);
-  readonly decode = signal(this.initial.decode);
+  readonly decoders = signal<readonly DecoderId[]>(this.initial.decoders);
+  /** Whether any decoder scans the outputs. */
+  readonly decode = computed(() => this.decoders().length > 0);
   readonly tileSize = signal<TileSize>(this.initial.tileSize);
 
   readonly combinationCount = computed(() => countCombinations(this.combinations()));
@@ -160,11 +176,17 @@ export class DevToolsState {
         selection: this.selection(),
         combinations: this.combinations(),
         renderers: this.renderers(),
-        decode: this.decode(),
+        decoders: this.decoders(),
         tileSize: this.tileSize(),
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     });
+  }
+
+  setDecoder(decoder: DecoderId, enabled: boolean): void {
+    this.decoders.update((decoders) =>
+      DECODERS.map(({id}) => id).filter((id) => (id === decoder ? enabled : decoders.includes(id))),
+    );
   }
 
   isSelected(category: FixtureCategoryId, id: string): boolean {

@@ -27,6 +27,12 @@ export type {QRCodeFixtureImage} from './fixture-images';
 export {createFixturePayload, createFixtureRandom, fixtureSeed} from './fixture-payloads';
 export type {QRCodeFixturePayloadOptions} from './fixture-payloads';
 export {matrixFromRows, matrixToRows} from './matrix';
+export {
+  fixtureMicroMatrixOptions,
+  QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
+  QR_CODE_MICRO_TEST_FIXTURES,
+} from './micro-fixtures';
+export type {QRCodeMicroStyleVariantFixture, QRCodeMicroTestFixture} from './micro-fixtures';
 export type {QRCodeTestFixture} from './fixtures';
 export {
   createFixtureShape,
