@@ -10,16 +10,16 @@
 
 `@qrcodesdk/cli` generates QR codes from a terminal, shell script, or CI job. The `qrc` command prints compact UTF-8 terminal text or writes SVG, PNG, WebP, GIF, and JPEG files.
 
-Build a command and preview SVG or terminal text in the [CLI playground](https://qrcodesdk.dev/playground/?package=cli).
-The playground does not preview PNG, WebP, GIF, or JPEG output, which requires Node.js APIs.
+Build a command and preview it in the [CLI playground](https://qrcodesdk.dev/playground/?package=cli). The playground
+previews SVG and terminal text only. PNG, WebP, GIF, and JPEG need Node.js APIs.
 
 ## Runtime requirements
 
-`@qrcodesdk/cli` requires Node 22.12.0 or newer.
+`@qrcodesdk/cli` requires Node.js 22.12.0 or newer.
 
 ## Install
 
-Install it globally when you want `qrc` available as a command anywhere:
+Install it globally to use `qrc` anywhere:
 
 ```sh
 npm install -g @qrcodesdk/cli
@@ -41,7 +41,7 @@ vp install -g @qrcodesdk/cli
 **deno**
 
 ```sh
-deno install --global @qrcodesdk/cli
+deno install --global --allow-read --allow-write --allow-env --name qrc npm:@qrcodesdk/cli
 ```
 
 **bun**
@@ -50,15 +50,13 @@ deno install --global @qrcodesdk/cli
 bun add -g @qrcodesdk/cli
 ```
 
-**yarn**
-
-```sh
-yarn global add @qrcodesdk/cli
-```
-
 </details>
 
-You can also run it from a project dependency.
+- **Deno** grants no permissions by default. Its commands allow reading, writing output files, and
+  reading environment variables such as `NO_COLOR`. The global install also names the command `qrc`.
+- **Yarn 2 and newer** have no global install. Use a project dependency or `yarn dlx` instead.
+
+Or add it to a project and run it from there:
 
 ```sh
 npm install -D @qrcodesdk/cli
@@ -80,7 +78,7 @@ vp add -D @qrcodesdk/cli
 **deno**
 
 ```sh
-deno add --dev @qrcodesdk/cli
+deno add --dev npm:@qrcodesdk/cli
 ```
 
 **bun**
@@ -117,7 +115,7 @@ vp exec qrc "https://qrcodesdk.dev"
 **deno**
 
 ```sh
-deno x npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"
+deno x --allow-read --allow-write --allow-env npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"
 ```
 
 **bun**
@@ -134,7 +132,7 @@ yarn qrc "https://qrcodesdk.dev"
 
 </details>
 
-Or use it without installing it.
+Or run it without installing:
 
 ```sh
 npx @qrcodesdk/cli "https://qrcodesdk.dev"
@@ -156,7 +154,7 @@ vp dlx @qrcodesdk/cli "https://qrcodesdk.dev"
 **deno**
 
 ```sh
-deno x npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"
+deno x --allow-read --allow-write --allow-env npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"
 ```
 
 **bun**
@@ -175,86 +173,92 @@ yarn dlx @qrcodesdk/cli "https://qrcodesdk.dev"
 
 ## Print terminal text
 
-Without an output file, `qrc` packs two QR rows into each terminal line and applies ANSI colors:
+Without `--output`, `qrc` prints the code to the terminal. It packs two QR rows into each line and
+adds ANSI colors:
 
 ```sh
 qrc "https://qrcodesdk.dev"
 ```
 
-Use full-height, double-width `██` modules when preferred:
+For full-height, double-width `██` modules, use the `full` layout:
 
 ```sh
 qrc "https://qrcodesdk.dev" --layout full
 ```
 
-ANSI styling is disabled automatically when standard output is redirected or `NO_COLOR` is present.
-You can also disable it explicitly:
+### ANSI colors
+
+`--ansi` controls color output:
+
+| Mode         | Output                                                         |
+| ------------ | -------------------------------------------------------------- |
+| `blocks`     | UTF-8 block glyphs with ANSI colors                            |
+| `background` | ANSI-colored spaces, without block glyphs                      |
+| `off`        | Plain block glyphs in the terminal's own text color, no colors |
+
+Without `--ansi`, `qrc` uses `blocks`. It switches to `off` when standard output is redirected or
+`NO_COLOR` is set. An explicit `--ansi` mode overrides both.
 
 ```sh
 qrc "https://qrcodesdk.dev" --ansi off
-```
-
-Render modules entirely as ANSI-colored spaces, without UTF-8 block glyphs:
-
-```sh
 qrc "https://qrcodesdk.dev" --ansi background
 ```
 
-Use `--layout compact` or `--layout full` with block output. `--ansi background` has fixed full-cell
-geometry and cannot be combined with `--layout`. An explicit ANSI mode takes precedence over
-`NO_COLOR` and TTY detection.
+- `--layout` works only with block output. `--ansi background` has a fixed full-cell layout and
+  cannot be combined with `--layout`, even when writing a file.
+- File formats validate `--layout` and `--ansi`, then ignore them.
 
-## Write SVG files
+**Dark terminal themes:** without ANSI, dark modules use the terminal's text color. On a dark theme
+that draws light modules on a dark background. The code looks inverted and many scanners reject it.
+Keep ANSI on, or pass `--ansi blocks`. ANSI output always paints dark modules with `--foreground`
+and light modules with `--background`.
 
-An `.svg` output path selects SVG automatically:
+## CLI defaults differ from the library
 
-```sh
-qrc "https://qrcodesdk.dev" --output qrcode.svg
-```
+|             | CLI | Library renderers |
+| ----------- | --- | ----------------- |
+| Module size | `1` | `5`               |
+| Quiet zone  | `2` | `4`               |
 
-You can also set the format explicitly:
+The small CLI defaults keep terminal text inside a normal window. They apply to files too: without
+options, a version 1 code becomes a 25 × 25 pixel PNG.
 
-```sh
-qrc "https://qrcodesdk.dev" --format svg --output qrcode.svg
-```
+For files, pass `--module-size 8 --quiet-zone 4`. That gives a 232 × 232 pixel image with the
+standard four-module quiet zone. The examples below use these values.
 
-## Write PNG files
+The output width is `module size × (matrix width + 2 × quiet zone)`.
 
-An `.png` output path selects PNG automatically:
+## Write image files
 
-```sh
-qrc "https://qrcodesdk.dev" --output qrcode.png
-```
+Pass `--output`. The file extension selects the format, ignoring case:
 
-Or pass the format explicitly:
-
-```sh
-qrc "https://qrcodesdk.dev" --format png --output qrcode.png
-```
-
-## Write WebP, GIF, and JPEG files
-
-`.webp`, `.gif`, `.jpg`, and `.jpeg` output paths select WebP, GIF, and JPEG automatically:
-
-```sh
-qrc "https://qrcodesdk.dev" --output qrcode.webp
-qrc "https://qrcodesdk.dev" --output qrcode.gif
-qrc "https://qrcodesdk.dev" --output qrcode.jpg --quality 85
-```
-
-WebP output is lossless and usually much smaller than PNG. GIF output has at most 256 colors and
-binary transparency, so prefer PNG or WebP with a semi-transparent `--background`.
-
-JPEG output is lossy and has no transparency. `--quality` sets the JPEG quality from 1 to 100 and
-defaults to 92. Transparent pixels are blended onto `--matte`, an opaque color that defaults to
-`#ffffff`. Both options are only accepted with JPEG output.
-
-SVG, PNG, WebP, GIF, and JPEG output require `--output`. If the extension is not `.svg`, `.png`,
-`.webp`, `.gif`, `.jpg`, or `.jpeg`, pass `--format` explicitly:
+| Extension       | Format | Notes                                                         |
+| --------------- | ------ | ------------------------------------------------------------- |
+| `.svg`          | SVG    | Scales without losing sharpness                               |
+| `.png`          | PNG    | Lossless                                                      |
+| `.webp`         | WebP   | Lossless, usually much smaller than PNG                       |
+| `.gif`          | GIF    | At most 256 colors; each pixel is fully transparent or opaque |
+| `.jpg`, `.jpeg` | JPEG   | Lossy, no transparency                                        |
 
 ```sh
-qrc "https://qrcodesdk.dev" --format webp --output qrcode.image
+qrc "https://qrcodesdk.dev" --module-size 8 --quiet-zone 4 --output qrcode.svg
+qrc "https://qrcodesdk.dev" --module-size 8 --quiet-zone 4 --output qrcode.png
+qrc "https://qrcodesdk.dev" --module-size 8 --quiet-zone 4 --output qrcode.webp
+qrc "https://qrcodesdk.dev" --module-size 8 --quiet-zone 4 --output qrcode.gif
+qrc "https://qrcodesdk.dev" --module-size 8 --quiet-zone 4 --output qrcode.jpg --quality 85
 ```
+
+For any other extension, set the format with `--format`:
+
+```sh
+qrc "https://qrcodesdk.dev" --format webp --module-size 8 --quiet-zone 4 --output qrcode.image
+```
+
+- SVG output is scalable, but `--module-size` still sets its `width` and `height` attributes.
+- For a semi-transparent `--background`, prefer PNG or WebP. GIF keeps only full transparency.
+- JPEG has two extra options, accepted only with JPEG output:
+  - `--quality` sets the quality from 1 to 100. Default: `92`.
+  - `--matte` sets the opaque color that transparent pixels blend onto. Default: `#ffffff`.
 
 ## Configure generated files
 
@@ -262,89 +266,157 @@ qrc "https://qrcodesdk.dev" --format webp --output qrcode.image
 qrc "https://qrcodesdk.dev" \
   --output qrcode.svg \
   --error-correction H \
-  --module-size 2 \
-  --quiet-zone 3 \
+  --module-size 8 \
+  --quiet-zone 4 \
   --foreground '#111827' \
   --background '#ffffff' \
   --aria-label 'Scan to open qrcodesdk.dev'
 ```
 
-Auto mode is always available through `--mode auto`. It detects one encoding mode by default.
-Pass `--optimize-segments` to combine modes when that reduces the symbol size. Concrete modes
-bypass optimization. Use `--no-optimize-segments` to disable it again.
+For colors, module size, quiet zones, and scan reliability, see
+[Customize appearance](https://qrcodesdk.dev/guides/customize/). For how the encoding flags below work, see the
+[builder reference](https://qrcodesdk.dev/reference/builder/).
 
-The CLI exposes matrix and visual options as flags. Leave mode, version, and mask on automatic
-selection unless you need a compatibility target or deterministic fixture:
+### Encoding mode
+
+- `--mode auto`, the default, picks one encoding mode for the whole payload.
+- `--optimize-segments` combines modes when that makes the symbol smaller.
+- `--no-optimize-segments` restores single-mode detection.
+- A concrete mode, such as `--mode alphanumeric`, skips optimization.
+
+### Version and mask
+
+Leave mode, version, and mask automatic. Pin them only when a compatibility target or a layout
+needs a specific mode, symbol size, or mask:
 
 ```sh
 qrc "HELLO WORLD" \
   --mode alphanumeric \
   --version 1 \
   --mask 2 \
+  --module-size 8 \
+  --quiet-zone 4 \
   --output hello.svg
 ```
 
-Enable the UTF-8 ECI declaration:
+These flags fix encoding choices, not the implementation. Output files may still change between CLI
+releases, as the [release policy](https://qrcodesdk.dev/project/release-policy/#generated-artifacts) describes. To
+reproduce exact files, install an exact `@qrcodesdk/cli` version and keep your generated files as
+fixtures.
+
+### UTF-8 ECI
+
+ECI is off by default. Pass `--eci` to declare UTF-8 explicitly:
 
 ```sh
 qrc "Grüße" --eci
 ```
 
-The CLI does not emit ECI by default. Use `--no-eci` to disable it explicitly. For the behavior and tradeoffs behind these flags, see
-the [builder reference](https://qrcodesdk.dev/reference/builder/). For colors, module size, quiet zones, and scan-reliability guidance,
-see [Customize appearance](https://qrcodesdk.dev/guides/customize/).
+`--no-eci` states the default. It helps when a script builds its flags from variables.
+
+## Payloads that start with a hyphen
+
+`qrc` reads a positional value that starts with `-` as an option. Pass such a payload in one of two
+ways:
+
+```sh
+qrc --output negative.png -- "-42"
+qrc --payload "-42" --output negative.png
+```
+
+- **After `--`:** put every option first, then `--`, then the payload. Everything after `--` counts
+  as a payload, so an option placed there fails with `Expected at most one payload argument`.
+- **With `--payload`:** it accepts values that start with `-`. Like every option, it must come
+  before a `--`.
 
 ## Options
 
-| Option                                        | Description                                             | Default     |
-| --------------------------------------------- | ------------------------------------------------------- | :---------- |
-| `[payload]`                                   | Positional QR code payload.                             | -           |
-| `--payload <value>`                           | QR code payload, equivalent to positional `[payload]`.  | -           |
-| `-V`                                          | Print the installed CLI package version.                | -           |
-| `--format <text\|svg\|png\|webp\|gif\|jpeg>`  | Output format. Inferred from the output path extension. | -           |
-| `-o, --output <path>`                         | Required output path for SVG, PNG, WebP, GIF, and JPEG. | -           |
-| `--mode <auto\|numeric\|alphanumeric\|octet>` | QR code mode.                                           | `Auto`      |
-| `--error-correction <L\|M\|Q\|H>`             | Error correction level.                                 | `M`         |
-| `--version <1-40>`                            | Pin a QR code version.                                  | `Auto`      |
-| `--mask <0-7>`                                | Pin a QR code mask.                                     | `Auto`      |
-| `--optimize-segments`                         | Optimize mixed-mode segments in auto mode.              | `false`     |
-| `--eci`                                       | Emit UTF-8 ECI assignment 26 for octet segments.        | `false`     |
-| `--no-eci`                                    | Do not emit UTF-8 ECI assignment 26.                    | `false`     |
-| `--module-size <number>`                      | Module size as a positive integer.                      | `1`         |
-| `--quiet-zone <number>`                       | Quiet zone as a non-negative integer.                   | `2`         |
-| `--layout <compact\|full>`                    | Text block layout.                                      | `compact`   |
-| `--ansi <off\|blocks\|background>`            | Explicit ANSI output mode.                              | Environment |
-| `--foreground <#rrggbb[aa]>`                  | Dark module color.                                      | `#000000`   |
-| `--background <#rrggbb[aa]>`                  | Light module color.                                     | `#ffffff`   |
-| `--quality <1-100>`                           | JPEG quality. JPEG output only.                         | `92`        |
-| `--matte <#rrggbb>`                           | Opaque color for transparent pixels. JPEG output only.  | `#ffffff`   |
-| `--aria-label <text>`                         | SVG `aria-label` accessible name.                       | `undefined` |
-| `--title <text>`                              | SVG child `<title>` text.                               | `undefined` |
+| Option                                        | Description                                                                 | Default     |
+| --------------------------------------------- | --------------------------------------------------------------------------- | :---------- |
+| `[payload]`                                   | Positional QR code payload. If it starts with `-`, end with `-- <payload>`. | -           |
+| `--payload <value>`                           | QR code payload, equivalent to positional `[payload]`.                      | -           |
+| `-h, --help`                                  | Print usage and every option, then exit with status 0.                      | -           |
+| `-V`                                          | Print the installed CLI package version.                                    | -           |
+| `--format <text\|svg\|png\|webp\|gif\|jpeg>`  | Output format, in lowercase. Inferred from the output path.                 | `text`      |
+| `-o, --output <path>`                         | Required output path for SVG, PNG, WebP, GIF, and JPEG.                     | -           |
+| `--mode <auto\|numeric\|alphanumeric\|octet>` | QR code mode, in lowercase.                                                 | `auto`      |
+| `--error-correction <L\|M\|Q\|H>`             | Error correction level. Lowercase letters are accepted.                     | `M`         |
+| `--version <1-40>`                            | Pin a QR code version.                                                      | Automatic   |
+| `--mask <0-7>`                                | Pin a QR code mask.                                                         | Automatic   |
+| `--optimize-segments`                         | Optimize mixed-mode segments in auto mode.                                  | off         |
+| `--no-optimize-segments`                      | Use single-mode detection in auto mode.                                     | -           |
+| `--eci`                                       | Emit UTF-8 ECI assignment 26 for octet segments.                            | off         |
+| `--no-eci`                                    | Do not emit UTF-8 ECI assignment 26.                                        | -           |
+| `--module-size <number>`                      | Module size as a positive integer.                                          | `1`         |
+| `--quiet-zone <number>`                       | Quiet zone as a non-negative integer.                                       | `2`         |
+| `--layout <compact\|full>`                    | Text block layout. Validated, then ignored by file formats.                 | `compact`   |
+| `--ansi <off\|blocks\|background>`            | Explicit ANSI output mode. Validated, then ignored by file formats.         | Environment |
+| `--foreground <#rrggbb[aa]>`                  | Color of every dark module.                                                 | `#000000`   |
+| `--background <#rrggbb[aa]>`                  | Color behind the code, including the quiet zone.                            | `#ffffff`   |
+| `--quality <1-100>`                           | JPEG quality. Other formats reject it.                                      | `92`        |
+| `--matte <#rrggbb>`                           | Opaque color for transparent pixels. Other formats reject it.               | `#ffffff`   |
+| `--aria-label <text>`                         | SVG `aria-label` accessible name. Ignored by other formats.                 | -           |
+| `--title <text>`                              | SVG child `<title>` text. Ignored by other formats.                         | -           |
 
-Colors must be RGB or RGBA hex values. `--module-size` must be positive and `--quiet-zone` must be non-negative.
-For block-glyph text output, the dark color is the ANSI foreground and the light color is the ANSI
-background. With `--ansi background`, both become module background colors.
+Colors must be RGB or RGBA hex values. In terminal text:
+
+- Block glyphs use `--foreground` as the ANSI foreground and `--background` as the ANSI background.
+- `--ansi background` uses both as cell background colors.
+- Without ANSI, both colors are ignored.
 
 ## Interactive and automated use
 
-In an interactive terminal, `qrc` prompts only for missing required values such as payload, an ambiguous format, or a file output path.
-Choose the output format with the arrow keys, `j`/`k`, or a number key, then press Enter. Press Escape or Ctrl+C to cancel a prompt.
+### Interactive prompts
 
-In a non-interactive shell or CI job, missing required values fail with a clear error instead of opening a prompt. Pass every required value explicitly:
+`qrc` is interactive only when both standard input and standard output are terminals. It then asks
+for missing values:
+
+- the payload;
+- the output format, if the path does not reveal it;
+- the output path, for file formats.
+
+In the format menu, choose with the arrow keys, `j`/`k`, or a number key, then press Enter. Press
+Ctrl+C to cancel any prompt. Escape also cancels the format menu.
+
+### Scripts and CI
+
+Scripts and CI jobs can rely on this behavior:
+
+- `qrc` never reads the payload from standard input. Pass it as `[payload]` or `--payload`.
+  `echo "text" | qrc` fails with a missing-payload error.
+- Missing required values fail instead of opening a prompt.
+- Success, `--help`, and `-V` exit with status `0`.
+- Every failure prints `Error: <message>` to standard error and exits with status `1`. This includes
+  invalid options, a payload that does not fit, a write error, and a cancelled prompt.
+- File output overwrites existing files without asking. The parent directory must already exist.
+- After writing a file, `qrc` prints `Wrote <path>` to standard error. Standard output stays free for
+  terminal QR code text and pipelines.
+
+This CI step creates the directory first and stops with a clear message on failure:
 
 ```sh
-qrc \
+set -eu
+
+mkdir -p artifacts
+
+if ! qrc \
   --payload "https://qrcodesdk.dev" \
   --format png \
-  --output artifacts/qrcode.png
+  --module-size 8 \
+  --quiet-zone 4 \
+  --output artifacts/qrcode.png; then
+  echo "QR code generation failed" >&2
+  exit 1
+fi
 ```
 
-Successful file output writes a confirmation to standard error, leaving standard output available for terminal QR code content and pipeline use.
+See [Troubleshooting](https://qrcodesdk.dev/guides/troubleshooting/#cli-commands-fail) for common CLI errors.
 
 ## Documentation
 
 - [@qrcodesdk/cli](https://qrcodesdk.dev/packages/cli/)
 - [Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/)
+- [Troubleshooting](https://qrcodesdk.dev/guides/troubleshooting/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)
 - [Terminal text renderer](https://qrcodesdk.dev/reference/renderers/text/)
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)

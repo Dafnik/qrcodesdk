@@ -8,7 +8,8 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground/?package=react)**
 
-React components for rendering QR codes as inline SVG, PNG, WebP, GIF, and JPEG Image elements, and Canvas elements.
+React components that render QR codes as inline SVG, as PNG, WebP, GIF, or JPEG Image elements, or
+as Canvas elements.
 
 ## Install
 
@@ -32,7 +33,7 @@ vp add @qrcodesdk/react
 **deno**
 
 ```sh
-deno add @qrcodesdk/react
+deno add npm:@qrcodesdk/react
 ```
 
 **bun**
@@ -51,21 +52,33 @@ yarn add @qrcodesdk/react
 
 ## Quick start
 
-Import the components directly where you need them:
+Import a component where you need it:
 
 ```tsx
-import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/react';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/react';
+
+const options: QRCodeSVGOptions = {
+  accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+};
 
 export function App() {
   return (
-    <>
-      <QRCodeSVG payload="https://qrcodesdk.dev" />
-      <QRCodePNG payload="https://qrcodesdk.dev" />
-      <QRCodeCanvas payload="https://qrcodesdk.dev" />
-    </>
+    <figure>
+      <QRCodeSVG payload="https://qrcodesdk.dev" options={options} />
+      <figcaption>
+        Scan the code or open <a href="https://qrcodesdk.dev">qrcodesdk.dev</a>
+      </figcaption>
+    </figure>
   );
 }
 ```
+
+- `ariaLabel` names the QR code for screen readers. The link gives everyone another way to reach the
+  destination.
+- Without `accessibility` options, the QR code is decorative and hidden from assistive technology.
+  Leave it unlabeled only when nearby content, such as this link, already explains it.
+- `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload`
+  and `options` props. Image components also accept `accessibility.alt`.
 
 ## Version compatibility
 
@@ -74,6 +87,9 @@ export function App() {
 | `0.x.x`          | `^18.0.0` `^19.0.0` |
 
 ## Components
+
+Each output format has its own component. Your bundle only includes the encoders of the components
+you import.
 
 | Component      | Output               | Download support |
 | -------------- | -------------------- | ---------------- |
@@ -84,25 +100,27 @@ export function App() {
 | `QRCodeJPEG`   | `JPEG-backed <img>`  | JPEG             |
 | `QRCodeCanvas` | `<canvas> element`   | None             |
 
-### Options
+### Component props
 
-| Prop        | Type                         | Description                                     |
-| ----------- | ---------------------------- | ----------------------------------------------- |
-| `payload`   | `string \| number`           | Required QR code payload.                       |
-| `options`   | `Component-specific options` | Optional matrix and renderer configuration.     |
-| `className` | `string`                     | CSS class applied to the component wrapper div. |
+| Prop                                      | Type                              | Description                                                                                                                |
+| ----------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `payload`                                 | `string \| number`                | Required QR code payload.                                                                                                  |
+| `options`                                 | Component-specific options        | Optional `matrix` options and renderer options, such as `QRCodeSVGOptions` for `QRCodeSVG`.                                |
+| `className`, `style`, other `<div>` props | `ComponentPropsWithoutRef<'div'>` | Passed to the wrapper `<div>` that contains the output element. `children` and `dangerouslySetInnerHTML` are not accepted. |
+| `ref`                                     | `Ref<QRCodeDownloadHandle>`       | Receives `download(filename?)`, not the wrapper element. `QRCodeCanvas` does not accept a `ref`.                           |
 
-Each image format has its own component, so your bundle only includes the encoders of the components
-you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
-usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
-is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
-and photographic center images. `QRCodeJPEG` is lossy and has no transparency: it blends
-transparent pixels onto a white matte by default, and `quality` (1 to 100, default 92) trades file
-size for detail. Use it when a destination requires JPEG. See the
-[Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) reference for details.
+## Choose an image format
 
-React passes `className`, `style`, and other fallthrough attributes to the component's wrapper `<div>`.
-Use a React ref when you need a download handle; the rendered SVG, Image, or Canvas element remains inside that wrapper.
+- `QRCodePNG` uses the browser's native PNG encoder.
+- `QRCodeWebP` uses a lossless encoder bundled in the SDK. It also works in Safari and usually
+  produces the smallest file.
+- `QRCodeGIF` is limited to 256 colors and on-or-off transparency. Prefer PNG or WebP for
+  transparent backgrounds and photographic center images.
+- `QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
+  default. Its `quality` option ranges from 1 to 100 and defaults to 92. Use it only when a
+  destination requires JPEG.
+
+See [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) for details.
 
 ## Live examples
 
@@ -140,8 +158,7 @@ export default function QRCodePNGExample() {
     () => ({
       style: {moduleSize: 8, quietZone: 4},
       accessibility: {
-        alt: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
+        alt: 'QR code: scan to open qrcodesdk.dev',
       },
     }),
     [],
@@ -163,8 +180,7 @@ export default function QRCodeWebPExample() {
     () => ({
       style: {moduleSize: 8, quietZone: 4},
       accessibility: {
-        alt: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
+        alt: 'QR code: scan to open qrcodesdk.dev',
       },
     }),
     [],
@@ -186,8 +202,7 @@ export default function QRCodeGIFExample() {
     () => ({
       style: {moduleSize: 8, quietZone: 4},
       accessibility: {
-        alt: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
+        alt: 'QR code: scan to open qrcodesdk.dev',
       },
     }),
     [],
@@ -210,8 +225,7 @@ export default function QRCodeJPEGExample() {
       style: {moduleSize: 8, quietZone: 4},
       quality: 90,
       accessibility: {
-        alt: 'QR code for qrcodesdk.dev',
-        ariaLabel: 'Scan to open qrcodesdk.dev',
+        alt: 'QR code: scan to open qrcodesdk.dev',
       },
     }),
     [],
@@ -237,6 +251,7 @@ export default function QRCodeCanvasExample() {
         foreground: '#111827',
         background: '#ffffff',
       },
+      accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
     }),
     [],
   );
@@ -255,65 +270,82 @@ import {QRCodePNG, type QRCodeDownloadHandle, type QRCodePNGImageOptions} from '
 export default function QRCodeDownloadPNGExample() {
   const qrcode = useRef<QRCodeDownloadHandle>(null);
   const options = useMemo<QRCodePNGImageOptions>(
-    () => ({accessibility: {alt: 'QR code for qrcodesdk.dev'}}),
+    () => ({accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'}}),
     [],
   );
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <>
       <QRCodePNG payload="https://qrcodesdk.dev" options={options} ref={qrcode} />
-      <button
-        className="btn-primary"
-        onClick={() => qrcode.current?.download('qrcodesdk')}
-        type="button">
+      <button onClick={() => qrcode.current?.download('qrcodesdk')} type="button">
         Download PNG
       </button>
-    </div>
+    </>
   );
 }
 ```
 
 ## Center images
 
-Load and decode a browser image first, then store options with
-`centerImage: canvasCenterImage(image)` in state. Updating that state rerenders the component with
-the prepared image. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
-[Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete
-React lifecycle.
+For PNG, WebP, GIF, JPEG, and Canvas components:
+
+1. Load and decode a browser image.
+2. Store the options with `centerImage: canvasCenterImage(image)` in state.
+
+`QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#react) for the complete React example.
 
 ## Download files
 
-`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG` expose `download(filename?)`
-for SVG, PNG, WebP, GIF, and JPEG files respectively. The method appends the matching file extension when needed.
-`QRCodeCanvas` has no download method.
+Every component except `QRCodeCanvas` exposes `download(filename?)`. Get it through a React `ref`.
+The method appends the file extension when needed.
 
-See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-react) for the complete
-React example, or its [Canvas export section](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually)
-for manual downloads.
+See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-react) for a complete React example.
+For manual downloads, see [Export a canvas manually](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually).
 
 ## Server-side rendering
 
-`QRCodeSVG` produces runtime-neutral SVG and can render on the server.
-
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they skip element creation and downloads outside the browser and populate their host after hydration.
+- `QRCodeSVG` produces runtime-neutral SVG and renders on the server.
+- `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` need browser DOM and
+  Canvas APIs. On the server, they render an empty wrapper and skip downloads. They fill the wrapper
+  after hydration.
 
 ### Next.js client boundary
 
 The package entry declares `'use client'`, so Server Components can import its components directly.
-Props crossing that boundary must be serializable. Shape path objects from `@qrcodesdk/core/style`
-can cross it, but `finder()`, `alignment()`, and center-image factory values cannot. Create those
-values inside a client component.
+Props that cross this boundary must be serializable.
 
-On the server, every export of a `'use client'` module is a client reference that cannot be called.
-A Server Component must therefore import shape factories such as `rounded()` from
-`@qrcodesdk/core/style`, not from `@qrcodesdk/react`:
+Shape path objects from `@qrcodesdk/core/style`, such as `rounded()`, can cross it. Create these
+values inside a client component instead:
+
+- `finder()` and `alignment()` results, which are functions;
+- center images from `svgCenterImage()` and `canvasCenterImage()`;
+- `matrix.segmenter`, including `automaticSegmenter`, which is a function.
+
+In a Server Component, import shape factories from `@qrcodesdk/core/style`, not from
+`@qrcodesdk/react`. On the server, every export of a `'use client'` module is a client reference
+that cannot be called.
+
+This needs `@qrcodesdk/core` as a direct dependency, at the exact version that `@qrcodesdk/react`
+depends on. Follow
+[Add Core to a framework project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+Mismatched copies can draw shapes incorrectly, ignore center images, and break
+`instanceof QRCodeError`.
 
 ```tsx
 import {rounded} from '@qrcodesdk/core/style';
 import {QRCodeSVG} from '@qrcodesdk/react';
 
 export default function Page() {
-  return <QRCodeSVG payload="https://qrcodesdk.dev" options={{style: {modules: rounded()}}} />;
+  return (
+    <QRCodeSVG
+      payload="https://qrcodesdk.dev"
+      options={{
+        style: {modules: rounded()},
+        accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+      }}
+    />
+  );
 }
 ```
 
@@ -322,9 +354,9 @@ Client components can import every factory from `@qrcodesdk/react`:
 ```tsx
 'use client';
 
-import {QRCodeSVG, circle, finder} from '@qrcodesdk/react';
+import {QRCodeSVG, type QRCodeSVGOptions, circle, finder} from '@qrcodesdk/react';
 
-const options = {style: {finder: finder({center: circle()})}};
+const options: QRCodeSVGOptions = {style: {finder: finder({center: circle()})}};
 
 export function StyledQRCode() {
   return <QRCodeSVG payload="https://qrcodesdk.dev" options={options} />;
@@ -333,8 +365,8 @@ export function StyledQRCode() {
 
 ## Shared options
 
-The `options` prop groups encoding settings under `matrix`. Renderer settings such as
-`style`, `accessibility`, and `centerImage` go alongside it:
+The `options` prop groups encoding settings under `matrix`. Renderer settings, such as `style`,
+`accessibility`, and `centerImage`, sit next to it:
 
 ```ts
 import {type QRCodeSVGOptions, circle, finder, rounded} from '@qrcodesdk/react';
@@ -346,25 +378,73 @@ const options: QRCodeSVGOptions = {
 };
 ```
 
-Pass this object through the component's `options` prop. Use `QRCodePNGImageOptions`,
-`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, `QRCodeJPEGImageOptions`, or `QRCodeCanvasOptions`
-for the corresponding component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`, and
-`QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
+Each component has its own options type:
 
-Import shape and pattern factories, and center-image factories from `@qrcodesdk/react` alongside the components.
+| Component      | Options type             | Extra options                   |
+| -------------- | ------------------------ | ------------------------------- |
+| `QRCodeSVG`    | `QRCodeSVGOptions`       | None                            |
+| `QRCodePNG`    | `QRCodePNGImageOptions`  | None                            |
+| `QRCodeWebP`   | `QRCodeWebPImageOptions` | None                            |
+| `QRCodeGIF`    | `QRCodeGIFImageOptions`  | `transparency.threshold`        |
+| `QRCodeJPEG`   | `QRCodeJPEGImageOptions` | `quality`, `transparency.matte` |
+| `QRCodeCanvas` | `QRCodeCanvasOptions`    | None                            |
 
-Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/react` and pass it
-as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:
+Learn more about each group:
 
-```ts
-import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/react';
+- [Builder and matrix](https://qrcodesdk.dev/reference/builder/) covers the fields inside `matrix`.
+- [Customize appearance](https://qrcodesdk.dev/guides/customize/) covers `style`.
+- [Renderer outputs](https://qrcodesdk.dev/reference/renderers/) covers output-specific options.
+
+[Payload helpers](https://qrcodesdk.dev/reference/payloads/) and `QRCodeError` come from `@qrcodesdk/core`. To use them,
+[add Core to the project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+
+### Mixed-mode segmentation
+
+Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/react` and pass it as
+`matrix.segmenter`. The segmenter is a function, so in Next.js, create these options in a client
+component:
+
+```tsx
+'use client';
+
+import {QRCodeSVG, type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/react';
 
 const options: QRCodeSVGOptions = {matrix: {mode: 'auto', segmenter: automaticSegmenter}};
+
+export function OptimizedQRCode({payload}: {payload: string}) {
+  return <QRCodeSVG payload={payload} options={options} />;
+}
 ```
 
-See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
-[Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
-[Renderer outputs](https://qrcodesdk.dev/reference/renderers/) for output-specific options.
+### Keep options stable
+
+Components memoize their renderer on the identity of the `options` object.
+
+- An object literal written inline in JSX is a new object on every render. The component then
+  recreates the renderer and renders the QR code again. Image and Canvas components also re-encode
+  and replace their element.
+- Changing a property of the same object does not update the QR code. Pass a new object instead.
+
+Define constant options outside the component. Wrap options that depend on props or state in
+`useMemo`.
+
+## Errors
+
+Components throw `QRCodeError` for invalid payloads and options.
+
+| Component                   | Where it throws                                     |
+| --------------------------- | --------------------------------------------------- |
+| `QRCodeSVG`                 | During rendering                                    |
+| Image and Canvas components | Options during rendering, payloads in a `useEffect` |
+
+To handle them:
+
+- In the browser, place an error boundary above the component. It catches both cases.
+- Error boundaries do not catch errors during server-side rendering. Validate user-controlled
+  payloads before rendering.
+- Wrap downloads called from an event handler in your own `try`/`catch`.
+
+See [Check errors from framework packages](https://qrcodesdk.dev/reference/errors/#check-errors-from-framework-packages).
 
 ## Public API
 
@@ -440,6 +520,7 @@ import {
 
 - [@qrcodesdk/react](https://qrcodesdk.dev/packages/react/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [Errors](https://qrcodesdk.dev/reference/errors/)
 - [Add a center image](https://qrcodesdk.dev/guides/center-images/)
 - [Download or save a QR code as SVG, PNG, WebP, GIF, or JPEG](https://qrcodesdk.dev/guides/download-or-save/)
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)

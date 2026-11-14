@@ -1,6 +1,8 @@
 ---
+import corePackage from '@qrcodesdk/core/package.json';
+
 type ComparisonValue = {
-  status: 'yes' | 'partial' | 'no' | 'note';
+  status: 'yes' | 'partial' | 'no';
   title: string;
   detail: string;
 };
@@ -14,7 +16,8 @@ type ComparisonRow = {
 const libraries = [
   {
     name: 'QRCodeSDK',
-    version: '0.0.1',
+    // The documented version, read from the Core package in this repository.
+    version: corePackage.version,
     href: 'https://github.com/Dafnik/qrcodesdk',
     recommended: true,
   },
@@ -41,7 +44,7 @@ const libraries = [
 const rows: readonly ComparisonRow[] = [
   {
     group: 'Foundation',
-    feature: 'TypeScript story',
+    feature: 'TypeScript support',
     values: [
       {status: 'yes', title: 'Native', detail: 'TypeScript source and bundled declarations'},
       {status: 'partial', title: 'Community types', detail: 'Install @types/qrcode separately'},
@@ -61,8 +64,8 @@ const rows: readonly ComparisonRow[] = [
       {status: 'yes', title: 'All in one', detail: 'Node.js API plus a browser build'},
       {
         status: 'yes',
-        title: 'Runtime-light',
-        detail: 'ESM and CommonJS builds with no package dependencies',
+        title: 'No package dependencies',
+        detail: 'ESM and CommonJS builds',
       },
       {
         status: 'partial',
@@ -81,7 +84,7 @@ const rows: readonly ComparisonRow[] = [
       {
         status: 'partial',
         title: 'Examples',
-        detail: 'Examples, but no dedicated component packages',
+        detail: 'No dedicated component packages',
       },
     ],
   },
@@ -111,7 +114,11 @@ const rows: readonly ComparisonRow[] = [
     values: [
       {status: 'yes', title: 'Browser renderer', detail: 'Returns HTMLCanvasElement'},
       {status: 'yes', title: 'Built in', detail: 'Browser canvas or supplied Node canvas'},
-      {status: 'partial', title: 'Bring a context', detail: 'Draws into CanvasRenderingContext2D'},
+      {
+        status: 'partial',
+        title: 'Requires a 2D context',
+        detail: 'Draws into CanvasRenderingContext2D',
+      },
       {status: 'yes', title: 'Primary output', detail: 'Canvas is the default render type'},
     ],
   },
@@ -141,12 +148,24 @@ const rows: readonly ComparisonRow[] = [
     values: [
       {
         status: 'yes',
-        title: 'Strong',
+        title: 'Shapes and center images',
         detail: 'Module, finder, alignment, and custom path shapes, colors, and center images',
       },
-      {status: 'partial', title: 'Basic', detail: 'Colors, module size, width, and quiet zone'},
-      {status: 'partial', title: 'Minimal', detail: 'Module size and quiet-zone helpers'},
-      {status: 'yes', title: 'Deepest', detail: 'Shapes, gradients, logos, and SVG extensions'},
+      {
+        status: 'partial',
+        title: 'Colors and dimensions',
+        detail: 'Colors, module size, width, and quiet zone',
+      },
+      {
+        status: 'partial',
+        title: 'Module size and quiet zone',
+        detail: 'Module size and quiet-zone helpers',
+      },
+      {
+        status: 'yes',
+        title: 'Gradients and extensions',
+        detail: 'Shapes, gradients, logos, and SVG extensions',
+      },
     ],
   },
   {
@@ -179,7 +198,15 @@ const statusSymbol = {
   yes: '+',
   partial: '~',
   no: '−',
-  note: '·',
+} as const;
+
+const versionNote = `QRCodeSDK v${corePackage.version} as documented here; other libraries checked in August 2026`;
+
+// Screen readers announce the same words as the visible legend.
+const statusLabel = {
+  yes: 'Built in:',
+  partial: 'Partial or conditional:',
+  no: 'Absent:',
 } as const;
 ---
 
@@ -190,16 +217,25 @@ const statusSymbol = {
   tabindex="0">
   <table>
     <caption>
-      <span>Version snapshot: August 2026</span>
-      <span class="legend" aria-label="Status legend">
+      <span>{versionNote}</span>
+      <span class="legend" role="group" aria-label="Status legend">
         <span>
-          <i class="status yes">+</i>built in
+          <i class="status yes" aria-hidden="true">
+            +
+          </i>
+          built in
         </span>
         <span>
-          <i class="status partial">~</i>conditional
+          <i class="status partial" aria-hidden="true">
+            ~
+          </i>
+          partial or conditional
         </span>
         <span>
-          <i class="status no">−</i>absent
+          <i class="status no" aria-hidden="true">
+            −
+          </i>
+          absent
         </span>
       </span>
     </caption>
@@ -226,7 +262,7 @@ const statusSymbol = {
           {row.values.map((value, valueIndex) => (
             <td class:list={{recommended: valueIndex === 0}}>
               <div class="cell-title">
-                <span class="sr-only">{value.status}</span>
+                <span class="sr-only">{statusLabel[value.status]}</span>
                 <span class:list={['status', value.status]} aria-hidden="true">
                   {statusSymbol[value.status]}
                 </span>
@@ -447,8 +483,7 @@ const statusSymbol = {
     color: #e9a847;
   }
 
-  .status.no,
-  .status.note {
+  .status.no {
     color: var(--sl-color-gray-3);
   }
 

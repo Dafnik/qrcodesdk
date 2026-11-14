@@ -1,61 +1,16 @@
 ---
+import {
+  PACKAGE_COMPONENTS,
+  getPackageComponentProps,
+  splitInlineCode,
+} from '../../utils/package-components.mjs';
+
 interface Props {
   selector?: boolean;
 }
 
 const {selector = false} = Astro.props;
-
-const components = [
-  {
-    component: 'QRCodeSVG',
-    selector: 'qrcode-svg',
-    output: 'Inline SVG element',
-    downloadSupport: 'SVG',
-  },
-  {
-    component: 'QRCodePNG',
-    selector: 'qrcode-png',
-    output: 'PNG-backed <img>',
-    downloadSupport: 'PNG',
-  },
-  {
-    component: 'QRCodeWebP',
-    selector: 'qrcode-webp',
-    output: 'WebP-backed <img>',
-    downloadSupport: 'WebP',
-  },
-  {
-    component: 'QRCodeGIF',
-    selector: 'qrcode-gif',
-    output: 'GIF-backed <img>',
-    downloadSupport: 'GIF',
-  },
-  {
-    component: 'QRCodeJPEG',
-    selector: 'qrcode-jpeg',
-    output: 'JPEG-backed <img>',
-    downloadSupport: 'JPEG',
-  },
-  {
-    component: 'QRCodeCanvas',
-    selector: 'qrcode-canvas',
-    output: '<canvas> element',
-    downloadSupport: 'None',
-  },
-];
-
-const props = [
-  {
-    prop: 'payload',
-    type: 'string | number',
-    description: 'Required QR code payload.',
-  },
-  {
-    prop: 'options',
-    type: 'Component-specific options',
-    description: 'Optional matrix and renderer options.',
-  },
-];
+const props = getPackageComponentProps(Astro.locals.starlightRoute.entry.data.packageName);
 ---
 
 <table>
@@ -69,7 +24,7 @@ const props = [
   </thead>
 
   <tbody>
-    {components.map((item) => (
+    {PACKAGE_COMPONENTS.map((item) => (
       <tr>
         <td>
           <code>{item.component}</code>
@@ -82,13 +37,13 @@ const props = [
         <td>
           <code>{item.output}</code>
         </td>
-        <td>{item.downloadSupport}</td>
+        <td>{item.download}</td>
       </tr>
     ))}
   </tbody>
 </table>
 
-<h3>Options</h3>
+<h3 id="component-props">Component props</h3>
 
 <table>
   <thead>
@@ -102,13 +57,13 @@ const props = [
   <tbody>
     {props.map((item) => (
       <tr>
-        <td>
-          <code>{item.prop}</code>
-        </td>
-        <td>
-          <code>{item.type}</code>
-        </td>
-        <td>{item.description}</td>
+        {[item.prop, item.type, item.description].map((cell) => (
+          <td>
+            {splitInlineCode(cell).map((part) =>
+              part.code ? <code>{part.text}</code> : part.text,
+            )}
+          </td>
+        ))}
       </tr>
     ))}
   </tbody>

@@ -1,4 +1,4 @@
-import {Component, viewChild} from '@angular/core';
+import {Component} from '@angular/core';
 
 import {QRCodePNG} from '@qrcodesdk/angular';
 
@@ -6,23 +6,13 @@ import {QRCodePNG} from '@qrcodesdk/angular';
   selector: 'qrcode-angular-download-png-example',
   imports: [QRCodePNG],
   template: `
-    <div class="flex flex-col items-center gap-2">
-      <qrcode-png
-        #qrcode
-        [options]="{
-          accessibility: {alt: 'QR code for qrcodesdk.dev'},
-        }"
-        payload="https://qrcodesdk.dev" />
-      <button class="btn-primary" (click)="qrcode.download('qrcodesdk')" type="button">
-        Download PNG
-      </button>
-    </div>
+    <qrcode-png
+      #qrcode
+      [options]="{
+        accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
+      }"
+      payload="https://qrcodesdk.dev" />
+    <button (click)="qrcode.download('qrcodesdk')" type="button">Download PNG</button>
   `,
 })
-export class QRCodeDownloadPNGExample {
-  private readonly qrCode = viewChild.required(QRCodePNG);
-
-  protected download() {
-    this.qrCode().download('qrcode.png');
-  }
-}
+export class QRCodeDownloadPNGExample {}

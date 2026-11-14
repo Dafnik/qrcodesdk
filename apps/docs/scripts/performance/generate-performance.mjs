@@ -20,6 +20,8 @@ const LIBRARIES = [
   ['qrcode-generator', 'qrcode-generator'],
   ['qr-code-styling', 'qr-code-styling'],
 ];
+const SCHEMA_VERSION = 6;
+const BENCHMARK_COMMAND = 'pnpm turbo run benchmark --filter=@repo/benchmarks';
 const LIBRARY_ORDER = new Map(LIBRARIES.map(([libraryId], index) => [libraryId, index]));
 const LIBRARY_LABELS = new Map(LIBRARIES);
 
@@ -63,8 +65,10 @@ function requireFiniteNumber(value, label) {
 export function validateBenchmarkReport(report) {
   const parsedReport = requireObject(report, 'Benchmark report');
 
-  if (parsedReport.schemaVersion !== 6) {
-    throw new Error(`Unsupported benchmark schema version: ${parsedReport.schemaVersion}.`);
+  if (parsedReport.schemaVersion !== SCHEMA_VERSION) {
+    throw new Error(
+      `Unsupported benchmark schema version: ${parsedReport.schemaVersion}. Expected ${SCHEMA_VERSION}. Run \`${BENCHMARK_COMMAND}\` to regenerate benchmark-results/latest.json.`,
+    );
   }
 
   requireString(parsedReport.generatedAt, 'generatedAt');
@@ -131,6 +135,11 @@ function formatInteger(value) {
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+/** @param {readonly number[]} values */
+function formatList(values) {
+  return new Intl.ListFormat('en', {type: 'conjunction'}).format(values.map(String));
+}
+
 /** @param {Record<string, any>} result */
 function formatResultRow(result) {
   return `| ${result.workloadLabel} | ${formatInteger(result.qrCodesPerSample)} | ${result.libraryLabel} v${result.libraryVersion} | ${result.medianMs.toFixed(3)} | ${result.minMs.toFixed(3)}–${result.maxMs.toFixed(3)} | ${formatInteger(result.qrCodesPerSecond)} |`;
@@ -190,7 +199,7 @@ function formatMermaidChart(results, categoryTitle) {
         `${formatChartLibraryLabel(result)} ${formatInteger(result.qrCodesPerSecond)} QR codes per second`,
     )
     .join(', ');
-  const chartTitle = `${workloadLabel} — ${formatInteger(qrCodesPerSample)} QR codes/sample`;
+  const chartTitle = `${workloadLabel}, ${formatInteger(qrCodesPerSample)} QR codes/sample`;
 
   return `\`\`\`mermaid
 ---
@@ -200,7 +209,7 @@ config:
     showDataLabelOutsideBar: true
 ---
 xychart horizontal
-  accTitle: ${categoryTitle}: ${chartTitle}
+  accTitle: ${categoryTitle}, ${chartTitle}
   accDescr: Throughput calculated from median time. ${accessibleValues}. Higher is better.
   title ${JSON.stringify(chartTitle)}
   x-axis "Library" [${libraryLabels.map((label) => JSON.stringify(label)).join(', ')}]
@@ -257,11 +266,25 @@ docType: concept
 
 <!-- Generated from ${sourcePath}. Run \`pnpm turbo run generate-performance --filter=docs\` to update. -->
 
-The matrix, automatic matrix, and SVG benchmarks compare QRCodeSDK with **qrcode** and **qrcode-generator** using its stock text encoder. Styled SVG generation compares QRCodeSDK with **qr-code-styling**. Benchmarks are environment-specific and should be read as relative comparisons, not universal guarantees.
+These benchmarks compare QRCodeSDK with other JavaScript QR code libraries:
 
-The matrix and SVG fixtures supply explicit versions and masks. The **qrcode-generator** rows use the repository patch that applies each fixture's mask and skips automatic mask evaluation. The automatic matrix fixtures omit both options so every library selects them.
+| Benchmark | Compared with |
+| --- | --- |
+| Matrix, automatic matrix, and SVG generation | \`qrcode\`, and \`qrcode-generator\` using its stock text encoder |
+| Styled SVG generation | \`qr-code-styling\` |
 
-Styled SVG generation uses all ${reportOptions.styledSvg.fixtureCount} shared styling fixtures at ${reportOptions.styledSvg.multipliers.join(', ')} repetitions. Both libraries select the mask automatically because **qr-code-styling** has no public mask option. Fixture module size and margin determine the matching pixel dimensions passed to **qr-code-styling**, which renders SVG through a shared JSDOM environment initialized before measurement.
+Each chart shows throughput calculated from the median time. Higher is better, and the fastest library comes first. Expand the exact benchmark data below each section for median time, min–max range, and throughput.
+
+Results depend on the machine and runtime. Compare the libraries with each other, not with absolute speeds.
+
+## Method
+
+- The matrix and SVG fixtures supply explicit versions and masks.
+- The \`qrcode-generator\` rows use a repository patch that applies each fixture's mask and skips automatic mask evaluation.
+- The automatic matrix fixtures omit both options, so every library selects the version and mask itself.
+- Styled SVG generation uses all ${reportOptions.styledSvg.fixtureCount} shared styling fixtures at ${formatList(reportOptions.styledSvg.multipliers)} repetitions.
+- Both styled SVG libraries select the mask automatically, because \`qr-code-styling\` has no public mask option.
+- Each fixture's module size and margin set the pixel dimensions passed to \`qr-code-styling\`. It renders SVG through a shared JSDOM environment that is set up before measurement.
 
 ## Benchmark environment
 
@@ -272,8 +295,6 @@ Styled SVG generation uses all ${reportOptions.styledSvg.fixtureCount} shared st
 - Samples: ${reportOptions.samples} timed samples after ${reportOptions.warmupStaticPasses} static warm-up passes and ${reportOptions.warmupExhaustivePasses} exhaustive warm-up pass${reportOptions.warmupExhaustivePasses === 1 ? '' : 'es'}
 - SVG output: ${reportOptions.svg.pixelsPerModule} px/module with a ${reportOptions.svg.quietZoneModules}-module quiet zone
 - Styled SVG fixtures: ${reportOptions.styledSvg.fixtureCount}, with fixture-derived dimensions and automatic mask selection
-
-The charts show throughput calculated from the median time. Higher is better, and each chart lists the fastest library first. Expand the exact benchmark data beneath each section for median time, min–max range, and throughput.
 
 ${sections}
 `;

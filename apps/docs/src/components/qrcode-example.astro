@@ -5,8 +5,8 @@ const {code, lang = 'angular-ts'} = Astro.props;
 ---
 
 <div class="live-code-layout not-content">
-  <div class="example-container">
-    <div>
+  <div class="qr-preview-surface example-container">
+    <div class="example-preview">
       <slot />
     </div>
   </div>
@@ -24,10 +24,18 @@ const {code, lang = 'angular-ts'} = Astro.props;
     justify-content: center;
     align-items: center;
     padding: 2.5rem;
-    background: var(--ec-frm-edBg, var(--astro-code-color-background));
     border-style: solid;
     border-width: var(--ec-brdWd, 1px);
     border-color: var(--ec-brdCol, var(--sl-color-gray-5));
     border-bottom: none;
+  }
+
+  /* Example sources stay free of site classes, so the frame lays out and styles their output. */
+  .example-preview,
+  .example-preview > :global([ng-version]) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
   }
 </style>

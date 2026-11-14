@@ -5,25 +5,129 @@ docType: concept
 tableOfContents: false
 head:
   - tag: style
-    content: ':root { --sl-content-width: 80rem !important; } .hero { padding: 0 0 5rem 0 !important;}'
+    content: ':root { --sl-content-width: 80rem !important; } .hero { padding: 0 0 5rem 0 !important;} .qr-concept-prose { max-width: 48rem; }'
+related:
+  - ../reference/builder.mdx
+  - ../reference/custom-renderers.md
+  - ../guides/customize.md
+  - ./comparison.mdx
 ---
 
 import QRCodeExplain from '../../../components/astro/qrcode-explain.astro';
 
-A QR code is a grid of small squares called modules. The three large squares in its corners are
-finder patterns. They help scanners locate and orient the code. Other reserved patterns help a
-scanner read the grid and identify its encoding settings.
+A QR code is a square grid of dark and light modules:
 
-A QRCodeSDK matrix keeps these roles. Next to its light and dark modules, it records the role of
-every module, such as finder ring, alignment center, or timing. That is how
-[styles](/guides/customize/#finder-patterns) shape finder and alignment patterns separately from the
-other modules. See [Module roles](/reference/custom-renderers/#module-roles) for every role.
+- Fixed patterns help a scanner find and orient the code.
+- The remaining modules carry the payload, error correction data, and format information.
 
-The remaining modules hold the payload and error-correction data. The encoder groups this data into
-bytes called codewords, then places their bits in a zigzag path through the grid. Some QR code sizes
-need extra remainder bits to fill that path.
-
-Use the explorer below to see these regions. Configure a QR code, then hover or focus a module to
-read its explanation. Click, tap, or press <kbd>Enter</kbd> to keep a selection visible.
+Change the payload and options below, then select a region or a single module to see its role.
 
 <QRCodeExplain />
+
+<div class="qr-concept-prose">
+
+## Modules and versions
+
+Each square in the grid is a module. The version sets the grid size:
+
+- Version 1 is 21 × 21 modules.
+- Each version adds 4 modules per side.
+- Version 40 is 177 × 177 modules.
+
+A larger version holds more data. At the same printed size, its modules are smaller.
+
+Scanners also need a light border around the code, the quiet zone. The QR code standard asks for
+four modules. QRCodeSDK renderers default to `quietZone: 4`.
+
+## Function patterns
+
+Function patterns sit in the same place in every symbol of a version, whatever the payload:
+
+- **Finder patterns** are the three 7 × 7 squares in the corners. Their 1:1:3:1:1 ratio of dark and
+  light modules lets a scanner find the code and its rotation from any angle.
+- **Separators** are light borders, one module wide, around each finder pattern.
+- **Timing patterns** are alternating dark and light modules between the finders. They let the
+  scanner measure the module grid.
+- **Alignment patterns** are 5 × 5 squares that appear from version 2. They help the scanner correct
+  perspective and bent surfaces. Larger versions have more of them.
+- **Format information** stores the error correction level and the mask, twice, next to the
+  finders.
+- **Version information** stores the version number in two more areas, from version 7.
+
+In QRCodeSDK:
+
+- [`QRCodeMatrix.roles`](/reference/custom-renderers/#module-roles) tells you the role of every
+  module.
+- [`finder()` and `alignment()`](/guides/customize/#finder-patterns) restyle the finder and
+  alignment patterns without changing their modules.
+
+## Encoding the payload
+
+The payload is split into segments. Each segment holds:
+
+1. A mode indicator.
+2. A character count.
+3. The characters, packed for that mode.
+
+| Mode         | Characters                                       | Payload bit cost     |
+| ------------ | ------------------------------------------------ | -------------------- |
+| Numeric      | Digits `0`–`9`                                   | About 3.33 per digit |
+| Alphanumeric | Digits, uppercase `A`–`Z`, space, and `$%*+-./:` | 5.5 per character    |
+| Octet        | Any bytes; QRCodeSDK encodes text as UTF-8       | 8 per UTF-8 byte     |
+
+In octet mode, one character can take several bytes. `é` takes 2 UTF-8 bytes, `✅` takes 3, and most
+emoji take 4. So one character costs 8 to 32 bits.
+
+Numeric and alphanumeric modes pack text more densely, so the same payload can fit a smaller
+version. By default, QRCodeSDK picks one mode for the whole payload. Two options change the bit
+stream:
+
+- The optional [mixed-mode segmenter](/reference/builder/#optional-mixed-mode-optimization) combines
+  modes when that makes the bit stream shorter.
+- An optional ECI header declares UTF-8, so scanners do not guess the text encoding.
+
+After the segments, a terminator and padding fill the remaining data capacity.
+
+## Error correction
+
+The data is split into 8-bit codewords. Reed-Solomon error correction codewords are added. They let
+a scanner restore codewords that are damaged, dirty, or covered:
+
+| Level | Approximate share of codewords that can be restored |
+| ----- | --------------------------------------------------- |
+| `L`   | 7%                                                  |
+| `M`   | 15%                                                 |
+| `Q`   | 25%                                                 |
+| `H`   | 30%                                                 |
+
+Higher levels leave less room for data, so the same payload may need a larger version.
+
+- QRCodeSDK defaults to `M`.
+- Use `H` when a [center image](/guides/center-images/) covers modules.
+- The builder picks the smallest version that fits the payload at the chosen level.
+
+## Placement and masking
+
+Data and error correction codewords are interleaved. They are placed in two-module-wide columns,
+zigzagging up and down from the bottom-right corner and skipping the function patterns.
+
+Some layouts confuse scanners: long runs of one color, large blocks, or shapes that look like finder
+patterns. To avoid them, the encoder masks the data:
+
+1. It inverts data modules with each of eight mask patterns.
+2. It scores each candidate with four penalty rules and keeps the lowest score.
+3. It records the chosen mask in the format information.
+
+A scanner reads the mask and removes it before decoding. QRCodeSDK picks the mask automatically. Pin
+`mask` only for fixtures or compatibility tests.
+
+## Learn more
+
+- [Builder and matrix](/reference/builder/) documents modes, ECI, error correction, versions, and
+  masks as options.
+- [Custom renderers](/reference/custom-renderers/) shows how to draw a matrix with its module roles.
+- [Customize appearance](/guides/customize/) explains which styling keeps a code scannable.
+- [Compare with other libraries](/learn/comparison/) puts these features next to other JavaScript
+  QR code libraries.
+
+</div>

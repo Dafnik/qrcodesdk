@@ -53,6 +53,15 @@ body {
 }
 
 @layer components {
+  .qr-preview-surface {
+    --qr-preview-grid: color-mix(in srgb, var(--foreground) 9%, transparent);
+    background:
+      linear-gradient(var(--qr-preview-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--qr-preview-grid) 1px, transparent 1px),
+      color-mix(in srgb, var(--muted) 38%, var(--background));
+    background-size: 1rem 1rem;
+  }
+
   html[data-theme='dark'] .shiki,
   html[data-theme='dark'] .shiki span {
     color: var(--shiki-dark) !important;
@@ -63,7 +72,8 @@ body {
   }
 }
 
-.btn-primary {
+.btn-primary,
+.example-preview button {
   @apply focus-visible:border-ring focus-visible:ring-ring/50 data-[matches-spartan-invalid=true]:ring-destructive/20 dark:data-[matches-spartan-invalid=true]:ring-destructive/40 data-[matches-spartan-invalid=true]:border-destructive dark:data-[matches-spartan-invalid=true]:border-destructive/50 bg-primary text-primary-foreground hover:bg-primary/80 inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-clip-padding px-2.5 text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-3 active:not-aria-[haspopup]:translate-y-px data-disabled:pointer-events-none data-disabled:opacity-50 data-[matches-spartan-invalid=true]:ring-3;
 }
 

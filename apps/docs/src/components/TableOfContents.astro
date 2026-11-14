@@ -20,14 +20,4 @@ import SupportCard from './support-card.astro';
   :global(.right-sidebar-panel .sl-container) {
     max-width: none;
   }
-
-  /* Keep nested headings focused on the section currently being read. */
-  :global(starlight-toc li > ul) {
-    display: none;
-  }
-
-  :global(starlight-toc li:has(> a[aria-current='true']) > ul),
-  :global(starlight-toc li:has(ul a[aria-current='true']) > ul) {
-    display: block;
-  }
 </style>

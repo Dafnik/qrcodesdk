@@ -42,7 +42,7 @@ import {hasQRCodeError} from '../qrcode-error-checker.ts';
         <hlm-alert class="max-w-md" variant="destructive">
           <h4 hlmAlertTitle>QR code generation failed</h4>
           <p hlmAlertDescription>
-            {{ error || 'This QR code options is invalid.' }}
+            {{ error || 'These QR code options are invalid.' }}
           </p>
         </hlm-alert>
       } @else {

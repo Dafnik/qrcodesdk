@@ -15,6 +15,7 @@ export const DOCUMENTATION_SIDEBAR = [
       {label: 'Render QR codes in the browser', slug: 'guides/browser-usage'},
       {label: 'Download or save', slug: 'guides/download-or-save'},
       {label: 'Serve a QR code', slug: 'guides/server-output'},
+      {label: 'Troubleshooting', slug: 'guides/troubleshooting'},
     ],
   },
   {
@@ -51,6 +52,7 @@ export const DOCUMENTATION_SIDEBAR = [
         ],
       },
       {label: 'Custom renderers', slug: 'reference/custom-renderers'},
+      {label: 'Errors', slug: 'reference/errors'},
     ],
   },
   {

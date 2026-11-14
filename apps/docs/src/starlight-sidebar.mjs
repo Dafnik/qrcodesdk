@@ -29,11 +29,6 @@ export const STARLIGHT_SIDEBAR = [
         items: getPackageChangelogsSidebarLinks('react'),
       },
       {
-        label: '@qrcodesdk/angular',
-        collapsed: true,
-        items: getPackageChangelogsSidebarLinks('angular'),
-      },
-      {
         label: '@qrcodesdk/vue',
         collapsed: true,
         items: getPackageChangelogsSidebarLinks('vue'),
@@ -42,6 +37,16 @@ export const STARLIGHT_SIDEBAR = [
         label: '@qrcodesdk/svelte',
         collapsed: true,
         items: getPackageChangelogsSidebarLinks('svelte'),
+      },
+      {
+        label: '@qrcodesdk/angular',
+        collapsed: true,
+        items: getPackageChangelogsSidebarLinks('angular'),
+      },
+      {
+        label: '@qrcodesdk/cli',
+        collapsed: true,
+        items: getPackageChangelogsSidebarLinks('cli'),
       },
     ],
   },

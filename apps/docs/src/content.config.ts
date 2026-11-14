@@ -60,6 +60,11 @@ export const collections = {
         base: 'changelog/svelte',
         changelog: '../../packages/svelte/CHANGELOG.md',
       },
+      {
+        provider: 'changeset',
+        base: 'changelog/cli',
+        changelog: '../../packages/cli/CHANGELOG.md',
+      },
     ]),
   }),
 };

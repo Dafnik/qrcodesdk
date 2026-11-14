@@ -8,6 +8,7 @@ const options: QRCodeCanvasOptions = {
     foreground: '#111827',
     background: '#ffffff',
   },
+  accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
 };
 </script>
 

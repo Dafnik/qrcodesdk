@@ -41,7 +41,7 @@
       </h4>
       <p
         class="text-destructive/90 [&_a]:hover:text-foreground text-sm text-balance md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_p:not(:last-child)]:mb-4">
-        {String(error || 'This QR code options is invalid.')}
+        {String(error || 'These QR code options are invalid.')}
       </p>
     </div>
   {:else if $playgroundOptions.output === 'svg'}

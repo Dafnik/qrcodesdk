@@ -26,7 +26,7 @@ vp add @qrcodesdk/core
 **deno**
 
 ```sh
-deno add @qrcodesdk/core
+deno add npm:@qrcodesdk/core
 ```
 
 **bun**
@@ -51,8 +51,8 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
-SVG is the recommended default for most user-facing QR codes: it stays sharp at any size and works
-in browsers, servers and static assets. See the [SVG renderer reference](https://qrcodesdk.dev/reference/renderers/svg/)
+SVG is the recommended default for most user-facing QR codes. It stays sharp at any size and works
+in browsers, servers, and static assets. See the [SVG renderer reference](https://qrcodesdk.dev/reference/renderers/svg/)
 for its options and return value.
 
 ## Choose by runtime and output
@@ -68,7 +68,7 @@ for its options and return value.
 | Angular                          | SVG, PNG, WebP, GIF, JPEG, or Canvas component          | [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) |
 | Terminal, shell script, or CI    | Terminal text, or SVG, PNG, WebP, GIF, or JPEG file     | [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         |
 
-[Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/) for the matching install command, or compare
+See [Choose your setup](https://qrcodesdk.dev/getting-started/choose-your-setup/) for the matching install command, or compare
 every built-in return type in [Renderer outputs](https://qrcodesdk.dev/reference/renderers/).
 
 ## Next step

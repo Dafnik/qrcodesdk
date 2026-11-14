@@ -8,8 +8,8 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground/?package=svelte)**
 
-Svelte components for rendering QR codes as inline SVG, PNG, WebP, GIF, and JPEG Image elements, and
-Canvas elements.
+Svelte components that render QR codes as inline SVG, as PNG, WebP, GIF, or JPEG Image elements, or
+as Canvas elements.
 
 ## Install
 
@@ -33,7 +33,7 @@ vp add @qrcodesdk/svelte
 **deno**
 
 ```sh
-deno add @qrcodesdk/svelte
+deno add npm:@qrcodesdk/svelte
 ```
 
 **bun**
@@ -52,17 +52,31 @@ yarn add @qrcodesdk/svelte
 
 ## Quick start
 
-Import the components directly in a Svelte component:
+Import a component in a Svelte component:
 
 ```svelte
 <script lang="ts">
-  import {QRCodeCanvas, QRCodePNG, QRCodeSVG} from '@qrcodesdk/svelte';
+  import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/svelte';
+
+  const options: QRCodeSVGOptions = {
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+  };
 </script>
 
-<QRCodeSVG payload="https://qrcodesdk.dev" />
-<QRCodePNG payload="https://qrcodesdk.dev" />
-<QRCodeCanvas payload="https://qrcodesdk.dev" />
+<figure>
+  <QRCodeSVG payload="https://qrcodesdk.dev" {options} />
+  <figcaption>
+    Scan the code or open <a href="https://qrcodesdk.dev">qrcodesdk.dev</a>
+  </figcaption>
+</figure>
 ```
+
+- `ariaLabel` names the QR code for screen readers. The link gives everyone another way to reach the
+  destination.
+- Without `accessibility` options, the QR code is decorative and hidden from assistive technology.
+  Leave it unlabeled only when nearby content, such as this link, already explains it.
+- `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` take the same `payload`
+  and `options` props. Image components also accept `accessibility.alt`.
 
 ## Version compatibility
 
@@ -71,6 +85,9 @@ Import the components directly in a Svelte component:
 | `0.x.x`           | `^5.0.0` |
 
 ## Components
+
+Each output format has its own component. Your bundle only includes the encoders of the components
+you import.
 
 | Component      | Output               | Download support |
 | -------------- | -------------------- | ---------------- |
@@ -81,26 +98,27 @@ Import the components directly in a Svelte component:
 | `QRCodeJPEG`   | `JPEG-backed <img>`  | JPEG             |
 | `QRCodeCanvas` | `<canvas> element`   | None             |
 
-### Options
+### Component props
 
-| Prop      | Type                         | Description                                     |
-| --------- | ---------------------------- | ----------------------------------------------- |
-| `payload` | `string \| number`           | Required QR code payload.                       |
-| `options` | `Component-specific options` | Optional matrix and renderer configuration.     |
-| `class`   | `string`                     | CSS class applied to the component wrapper div. |
+| Prop                                       | Type                             | Description                                                                                    |
+| ------------------------------------------ | -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `payload`                                  | `string \| number`               | Required QR code payload.                                                                      |
+| `options`                                  | Component-specific options       | Optional `matrix` options and renderer options, such as `QRCodeSVGOptions` for `QRCodeSVG`.    |
+| `class`, `style`, other `<div>` attributes | `HTMLAttributes<HTMLDivElement>` | Spread onto the wrapper `<div>` that contains the output element. `children` is not accepted.  |
+| `bind:this`                                | `QRCodeDownloadHandle`           | Exposes `download(filename?)` on every component except `QRCodeCanvas`, which exports nothing. |
 
-Each image format has its own component, so your bundle only includes the encoders of the components
-you import. `QRCodePNG` uses the browser's native PNG encoder. `QRCodeWebP` renders lossless WebP,
-usually the smallest file, with an encoder bundled in the SDK that also works in Safari. `QRCodeGIF`
-is limited to 256 colors and binary transparency, so prefer PNG or WebP for transparent backgrounds
-and photographic center images. `QRCodeJPEG` is lossy and has no transparency: it blends
-transparent pixels onto a white matte by default, and `quality` (1 to 100, default 92) trades file
-size for detail. Use it when a destination requires JPEG. See the
-[Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) reference for details.
+## Choose an image format
 
-The components forward `class`, `style`, and other native `<div>` attributes to their wrapper.
-Use `bind:this` when you need a download handle; the rendered SVG, Image, or Canvas remains inside
-that wrapper.
+- `QRCodePNG` uses the browser's native PNG encoder.
+- `QRCodeWebP` uses a lossless encoder bundled in the SDK. It also works in Safari and usually
+  produces the smallest file.
+- `QRCodeGIF` is limited to 256 colors and on-or-off transparency. Prefer PNG or WebP for
+  transparent backgrounds and photographic center images.
+- `QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
+  default. Its `quality` option ranges from 1 to 100 and defaults to 92. Use it only when a
+  destination requires JPEG.
+
+See [Image element renderers](https://qrcodesdk.dev/reference/renderers/image/) for details.
 
 ## Live examples
 
@@ -111,12 +129,12 @@ that wrapper.
   import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeSVGOptions = {
-    style: {moduleSize: 8, quietZone: 2},
+    style: {moduleSize: 8, quietZone: 4},
     accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
   };
 </script>
 
-<QRCodeSVG class="mx-auto" payload="https://qrcodesdk.dev" {options} />
+<QRCodeSVG payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### PNG component
@@ -126,12 +144,12 @@ that wrapper.
   import {QRCodePNG, type QRCodePNGImageOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodePNGImageOptions = {
-    style: {moduleSize: 8, quietZone: 2},
-    accessibility: {alt: 'QR code for qrcodesdk.dev'},
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
   };
 </script>
 
-<QRCodePNG class="mx-auto" payload="https://qrcodesdk.dev" {options} />
+<QRCodePNG payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### WebP component
@@ -141,12 +159,12 @@ that wrapper.
   import {QRCodeWebP, type QRCodeWebPImageOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeWebPImageOptions = {
-    style: {moduleSize: 8, quietZone: 2},
-    accessibility: {alt: 'QR code for qrcodesdk.dev'},
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
   };
 </script>
 
-<QRCodeWebP class="mx-auto" payload="https://qrcodesdk.dev" {options} />
+<QRCodeWebP payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### GIF component
@@ -156,12 +174,12 @@ that wrapper.
   import {QRCodeGIF, type QRCodeGIFImageOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeGIFImageOptions = {
-    style: {moduleSize: 8, quietZone: 2},
-    accessibility: {alt: 'QR code for qrcodesdk.dev'},
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
   };
 </script>
 
-<QRCodeGIF class="mx-auto" payload="https://qrcodesdk.dev" {options} />
+<QRCodeGIF payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### JPEG component
@@ -171,13 +189,13 @@ that wrapper.
   import {QRCodeJPEG, type QRCodeJPEGImageOptions} from '@qrcodesdk/svelte';
 
   const options: QRCodeJPEGImageOptions = {
-    style: {moduleSize: 8, quietZone: 2},
+    style: {moduleSize: 8, quietZone: 4},
     quality: 90,
-    accessibility: {alt: 'QR code for qrcodesdk.dev'},
+    accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
   };
 </script>
 
-<QRCodeJPEG class="mx-auto" payload="https://qrcodesdk.dev" {options} />
+<QRCodeJPEG payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### Canvas component
@@ -186,10 +204,13 @@ that wrapper.
 <script lang="ts">
   import {QRCodeCanvas, type QRCodeCanvasOptions} from '@qrcodesdk/svelte';
 
-  const options: QRCodeCanvasOptions = {style: {moduleSize: 8, quietZone: 2}};
+  const options: QRCodeCanvasOptions = {
+    style: {moduleSize: 8, quietZone: 4},
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+  };
 </script>
 
-<QRCodeCanvas class="mx-auto" payload="https://qrcodesdk.dev" {options} />
+<QRCodeCanvas payload="https://qrcodesdk.dev" {options} />
 ```
 
 ### PNG download
@@ -203,47 +224,45 @@ that wrapper.
   } from '@qrcodesdk/svelte';
 
   let qrcode: QRCodeDownloadHandle | undefined;
-  const options: QRCodePNGImageOptions = {accessibility: {alt: 'QR code for qrcodesdk.dev'}};
+  const options: QRCodePNGImageOptions = {
+    accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'},
+  };
 </script>
 
-<div class="flex flex-col items-center gap-2">
-  <QRCodePNG bind:this={qrcode} payload="https://qrcodesdk.dev" {options} />
-  <button class="btn-primary" type="button" onclick={() => qrcode?.download('qrcodesdk')}>
-    Download PNG
-  </button>
-</div>
+<QRCodePNG bind:this={qrcode} payload="https://qrcodesdk.dev" {options} />
+<button type="button" onclick={() => qrcode?.download('qrcodesdk')}>Download PNG</button>
 ```
 
 ## Center images
 
-Load and decode a browser image first, store it in rune-mode state, and pass
-`canvasCenterImage(image)` as `options.centerImage`. Render the PNG, WebP, GIF, JPEG, or Canvas component
-only after the source is ready. `QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
-[Add a center image](https://qrcodesdk.dev/guides/center-images/#svelte) for a complete
-Svelte example.
+For PNG, WebP, GIF, JPEG, and Canvas components:
+
+1. Load and decode a browser image.
+2. Store it in `$state`.
+3. Pass `canvasCenterImage(image)` as `options.centerImage`.
+4. Render the component only after the image is ready.
+
+`QRCodeSVG` takes `svgCenterImage()` with an embedded data URL instead. See
+[Add a center image](https://qrcodesdk.dev/guides/center-images/#svelte) for the complete Svelte example.
 
 ## Download files
 
-`QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, and `QRCodeJPEG` expose `download(filename?)`
-for SVG, PNG, WebP, GIF, and JPEG files respectively. The method appends the matching file extension when needed.
-`QRCodeCanvas` has no download method.
+Every component except `QRCodeCanvas` exposes `download(filename?)`. Get it through `bind:this`. The method appends the file extension when needed.
 
-See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-svelte) for the complete
-Svelte example, or its [Canvas export section](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually)
-for manual downloads.
+See [Download or save](https://qrcodesdk.dev/guides/download-or-save/#download-from-svelte) for a complete Svelte example. For
+manual downloads, see [Export a canvas manually](https://qrcodesdk.dev/guides/download-or-save/#export-a-canvas-manually).
 
 ## Server-side rendering
 
-`QRCodeSVG` produces runtime-neutral SVG and can render on the server.
-
-`QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` rely on browser DOM and Canvas APIs, so they render an empty wrapper
-on the server and populate it after mounting in the browser. Their download methods also skip work
-outside the browser.
+- `QRCodeSVG` produces runtime-neutral SVG and renders on the server.
+- `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, and `QRCodeCanvas` need browser DOM and
+  Canvas APIs. On the server, they render an empty wrapper and skip downloads. They fill the wrapper
+  after mounting in the browser.
 
 ## Shared options
 
-The `options` prop groups encoding settings under `matrix`. Renderer settings such as
-`style`, `accessibility`, and `centerImage` go alongside it:
+The `options` prop groups encoding settings under `matrix`. Renderer settings, such as `style`,
+`accessibility`, and `centerImage`, sit next to it:
 
 ```ts
 import {type QRCodeSVGOptions, circle, finder, rounded} from '@qrcodesdk/svelte';
@@ -255,15 +274,30 @@ const options: QRCodeSVGOptions = {
 };
 ```
 
-Pass this object through the component's `options` prop. Use `QRCodePNGImageOptions`,
-`QRCodeWebPImageOptions`, `QRCodeGIFImageOptions`, `QRCodeJPEGImageOptions`, or `QRCodeCanvasOptions`
-for the corresponding component. `QRCodeGIFImageOptions` also accepts `transparency.threshold`, and
-`QRCodeJPEGImageOptions` accepts `quality` and `transparency.matte`.
+Each component has its own options type:
 
-Import shape and pattern factories, and center-image factories from `@qrcodesdk/svelte` alongside the components.
+| Component      | Options type             | Extra options                   |
+| -------------- | ------------------------ | ------------------------------- |
+| `QRCodeSVG`    | `QRCodeSVGOptions`       | None                            |
+| `QRCodePNG`    | `QRCodePNGImageOptions`  | None                            |
+| `QRCodeWebP`   | `QRCodeWebPImageOptions` | None                            |
+| `QRCodeGIF`    | `QRCodeGIFImageOptions`  | `transparency.threshold`        |
+| `QRCodeJPEG`   | `QRCodeJPEGImageOptions` | `quality`, `transparency.matte` |
+| `QRCodeCanvas` | `QRCodeCanvasOptions`    | None                            |
 
-Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/svelte` and pass it
-as `matrix.segmenter`, without installing `@qrcodesdk/core` separately:
+Learn more about each group:
+
+- [Builder and matrix](https://qrcodesdk.dev/reference/builder/) covers the fields inside `matrix`.
+- [Customize appearance](https://qrcodesdk.dev/guides/customize/) covers `style`.
+- [Renderer outputs](https://qrcodesdk.dev/reference/renderers/) covers output-specific options.
+
+[Payload helpers](https://qrcodesdk.dev/reference/payloads/) and `QRCodeError` come from `@qrcodesdk/core`. To use them,
+[add Core to the project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project).
+
+### Mixed-mode segmentation
+
+Mixed-mode segmentation is opt-in. Import `automaticSegmenter` from `@qrcodesdk/svelte` and pass it as
+`matrix.segmenter`:
 
 ```ts
 import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/svelte';
@@ -271,9 +305,48 @@ import {type QRCodeSVGOptions, automaticSegmenter} from '@qrcodesdk/svelte';
 const options: QRCodeSVGOptions = {matrix: {mode: 'auto', segmenter: automaticSegmenter}};
 ```
 
-See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for the fields inside `matrix`,
-[Customize appearance](https://qrcodesdk.dev/guides/customize/) for `style`, and
-[Renderer outputs](https://qrcodesdk.dev/reference/renderers/) for output-specific options.
+### Keep options stable
+
+Components derive their renderer from `options`. They render the QR code again when:
+
+- `options` is reassigned;
+- state read by the options changes, such as a property of a `$state` object or a value used in an
+  inline `options={{...}}` expression.
+
+Unrelated parent updates do not render it again. Changing a property of a plain object that is not
+`$state` has no effect.
+
+## Errors
+
+Components throw `QRCodeError` for invalid payloads and options.
+
+| Component                   | Where it throws  |
+| --------------------------- | ---------------- |
+| `QRCodeSVG`                 | During rendering |
+| Image and Canvas components | In an `$effect`  |
+
+To handle them:
+
+- With Svelte 5.3 or newer, wrap the component in a `<svelte:boundary>` to catch errors in the
+  browser. Give it a `failed` snippet or an `onerror` handler. Without one, Svelte rethrows the
+  error. Svelte 5.0 to 5.2 have no `<svelte:boundary>`.
+- Boundaries have no effect during server-side rendering by default. A throwing `QRCodeSVG` fails
+  the whole server render.
+- Without a boundary, and for server-side rendering, validate user-controlled payloads before
+  rendering.
+- Wrap downloads called from an event handler in your own `try`/`catch`.
+
+```svelte
+<svelte:boundary onerror={(error) => console.error(error)}>
+  <QRCodeSVG payload="https://qrcodesdk.dev" />
+
+  {#snippet failed()}
+    <p>This QR code could not be rendered.</p>
+  {/snippet}
+</svelte:boundary>
+```
+
+See [Check errors from framework packages](https://qrcodesdk.dev/reference/errors/#check-errors-from-framework-packages).
 
 ## Public API
 
@@ -349,6 +422,7 @@ import {
 
 - [@qrcodesdk/svelte](https://qrcodesdk.dev/packages/svelte/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [Errors](https://qrcodesdk.dev/reference/errors/)
 - [Add a center image](https://qrcodesdk.dev/guides/center-images/)
 - [Download or save a QR code as SVG, PNG, WebP, GIF, or JPEG](https://qrcodesdk.dev/guides/download-or-save/)
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)

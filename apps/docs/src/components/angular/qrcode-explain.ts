@@ -90,12 +90,6 @@ export class QRCodeExplainControls {
     .explain-surface {
       --explain-accent: var(--sl-color-accent-high);
       --explain-accent-soft: color-mix(in srgb, var(--sl-color-accent-high) 32%, transparent);
-      --explain-grid: color-mix(in srgb, var(--foreground) 9%, transparent);
-      background:
-        linear-gradient(var(--explain-grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--explain-grid) 1px, transparent 1px),
-        color-mix(in srgb, var(--muted) 38%, var(--background));
-      background-size: 1rem 1rem;
     }
 
     .qr-base {
@@ -188,7 +182,7 @@ export class QRCodeExplainControls {
         </div>
 
         <div
-          class="explain-surface relative grid min-h-96 place-items-center overflow-hidden rounded-xl border p-4 sm:p-6"
+          class="qr-preview-surface explain-surface relative grid min-h-96 place-items-center overflow-hidden rounded-xl border p-4 sm:p-6"
           #surface>
           <svg
             class="focus-visible:ring-ring/50 block h-auto max-h-[70vh] max-w-full touch-none outline-none focus-visible:ring-3"
@@ -197,7 +191,7 @@ export class QRCodeExplainControls {
             [attr.viewBox]="'0 0 ' + qr.viewSize + ' ' + qr.viewSize"
             [attr.width]="renderedPixelSize()"
             (blur)="onBlur()"
-            (click)="onSvgClick()"
+            (click)="onSvgClick($event)"
             (focus)="onSvgFocus()"
             (keydown)="onSvgKeydown($event)"
             (pointerleave)="onPointerLeave()"
@@ -363,8 +357,7 @@ export class QRCodeExplainControls {
             <div class="grid gap-1">
               <h3 class="text-base font-semibold">Inspect a module</h3>
               <p class="text-muted-foreground text-sm leading-relaxed">
-                Hover any square to reveal its job. Click, tap, or press Enter to keep a selection
-                pinned while you explore.
+                Hover a module to see its role. Click, tap, or press Enter to pin it.
               </p>
             </div>
           }
@@ -398,7 +391,6 @@ export class QRCodeExplain {
     this.explanation();
     return undefined;
   });
-  private readonly pointerSelection = signal<ExplainSelection | undefined>(undefined);
   private readonly keyboardPosition = linkedSignal(() => {
     this.explanation();
     return {row: 0, column: 0};
@@ -461,6 +453,7 @@ export class QRCodeExplain {
     return `${this.selectionLabel(selection)}. ${this.moduleSummary(selection.module)}`;
   });
 
+  /** Previews the hovered module without replacing a pinned selection. */
   protected onPointerMove(event: PointerEvent): void {
     const target = event.target;
     if (!(target instanceof SVGElement)) return;
@@ -469,7 +462,6 @@ export class QRCodeExplain {
 
     const selection = this.selectionFromElement(interactive);
     if (selection === undefined) return;
-    this.pointerSelection.set(selection);
     if (this.pinnedSelection() === undefined) {
       if (
         this.previewSelection()?.groupId !== selection.groupId ||
@@ -482,19 +474,29 @@ export class QRCodeExplain {
     this.updateTooltipPosition(event.clientX, event.clientY);
   }
 
+  /** Clears hover details while retaining any pinned selection. */
   protected onPointerLeave(): void {
-    this.pointerSelection.set(undefined);
     this.tooltipSelection.set(undefined);
     if (this.pinnedSelection() === undefined) this.previewSelection.set(undefined);
   }
 
-  protected onSvgClick(): void {
-    const selection = this.pointerSelection() ?? this.previewSelection();
-    if (selection === undefined) return;
-    if (this.pinnedSelection()?.groupId === selection.groupId) {
-      this.pinnedSelection.set(undefined);
-    } else {
-      this.pinnedSelection.set(selection);
+  /** Pins the clicked module or quiet zone without requiring a preceding hover event. */
+  protected onSvgClick(event: MouseEvent): void {
+    const target = event.target;
+    if (!(target instanceof SVGElement)) return;
+    const interactive = target.closest<SVGElement>('[data-group]');
+    if (interactive === null) return;
+    const selection = this.selectionFromElement(interactive);
+    const unpinning =
+      selection !== undefined && this.pinnedSelection()?.groupId === selection.groupId;
+    this.togglePinnedSelection(selection);
+    // Touch and pen fire `pointerleave` before `click`, so no later event clears the preview.
+    if (
+      unpinning &&
+      event instanceof PointerEvent &&
+      (event.pointerType === 'touch' || event.pointerType === 'pen')
+    ) {
+      this.previewSelection.set(undefined);
     }
   }
 

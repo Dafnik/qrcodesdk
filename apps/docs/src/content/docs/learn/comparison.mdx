@@ -5,9 +5,26 @@ docType: concept
 tableOfContents: false
 head:
   - tag: style
-    content: ':root { --sl-content-width: 80rem !important; }'
+    content: ':root { --sl-content-width: 80rem !important; } .qr-concept-prose { max-width: 48rem; }'
+related:
+  - ../getting-started/choose-your-setup.mdx
+  - ../reference/builder.mdx
+  - ./performance.md
+  - ../project/release-policy.md
 ---
 
 import ComparisonPage from '../../../components/comparison-page.astro';
+
+<div class="qr-concept-prose">
+
+QRCodeSDK, [qrcode](https://github.com/soldair/node-qrcode),
+[qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator), and
+[qr-code-styling](https://github.com/kozakdenys/qr-code-styling) all generate standard QR codes.
+They differ in how they split runtimes, which outputs they ship, and how far styling goes.
+
+The table compares documented features, not speed. For timings, see
+[Performance](/learn/performance/).
+
+</div>
 
 <ComparisonPage />

@@ -9,7 +9,9 @@ const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());`;
 const browserExample = `import {QRCodePNGImageRenderer} from '@qrcodesdk/browser/png';
 import {qrcode} from '@qrcodesdk/core';
 
-const image = qrcode('https://qrcodesdk.dev').render(QRCodePNGImageRenderer());
+const image = qrcode('https://qrcodesdk.dev').render(
+  QRCodePNGImageRenderer({accessibility: {alt: 'QR code: scan to open qrcodesdk.dev'}}),
+);
 
 document.body.append(image);`;
 
@@ -18,35 +20,63 @@ import {QRCodePNGRenderer} from '@qrcodesdk/node';
 
 const png = qrcode('https://qrcodesdk.dev').render(QRCodePNGRenderer());`;
 
-const reactExample = `import {QRCodeSVG} from '@qrcodesdk/react';
+const reactExample = `import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/react';
+
+const options: QRCodeSVGOptions = {accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'}};
 
 export function App() {
-  return <QRCodeSVG payload="https://qrcodesdk.dev" />;
+  return (
+    <figure>
+      <QRCodeSVG payload="https://qrcodesdk.dev" options={options} />
+      <figcaption>
+        Scan the code or open <a href="https://qrcodesdk.dev">qrcodesdk.dev</a>
+      </figcaption>
+    </figure>
+  );
 }`;
 
 const vueExample = `<script setup lang="ts">
-import {QRCodeSVG} from '@qrcodesdk/vue';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/vue';
+
+const options: QRCodeSVGOptions = {accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'}};
 </script>
 
 <template>
-  <QRCodeSVG payload="https://qrcodesdk.dev" />
+  <figure>
+    <QRCodeSVG payload="https://qrcodesdk.dev" :options="options" />
+    <figcaption>Scan the code or open <a href="https://qrcodesdk.dev">qrcodesdk.dev</a></figcaption>
+  </figure>
 </template>`;
 
 const svelteExample = `<script lang="ts">
-  import {QRCodeSVG} from '@qrcodesdk/svelte';
+  import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/svelte';
+
+  const options: QRCodeSVGOptions = {accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'}};
 </script>
 
-<QRCodeSVG payload="https://qrcodesdk.dev" />`;
+<figure>
+  <QRCodeSVG payload="https://qrcodesdk.dev" {options} />
+  <figcaption>Scan the code or open <a href="https://qrcodesdk.dev">qrcodesdk.dev</a></figcaption>
+</figure>`;
 
 const angularExample = `import {Component} from '@angular/core';
-import {QRCodeSVG} from '@qrcodesdk/angular';
+import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/angular';
 
 @Component({
   selector: 'app-root',
   imports: [QRCodeSVG],
-  template: '<qrcode-svg payload="https://qrcodesdk.dev" />',
+  template: \`
+    <figure>
+      <qrcode-svg [options]="options" payload="https://qrcodesdk.dev" />
+      <figcaption>Scan the code or open <a href="https://qrcodesdk.dev">qrcodesdk.dev</a></figcaption>
+    </figure>
+  \`,
 })
-export class App {}`;
+export class App {
+  protected readonly options: QRCodeSVGOptions = {
+    accessibility: {ariaLabel: 'Scan to open qrcodesdk.dev'},
+  };
+}`;
 ---
 
 <Tabs syncKey="getting-started-runtime">
@@ -55,8 +85,9 @@ export class App {}`;
     <p>Render a scalable SVG string with the runtime-neutral Core package:</p>
     <Code code={coreExample} lang="ts" />
     <p>
-      SVG is the recommended default for most user-facing QR codes: it stays sharp at any size and
-      works in browsers, servers, email, and static assets.
+      SVG is the recommended default for web pages, print, and static assets. It stays sharp at any
+      size and needs no browser or Node.js APIs. SVG support varies between email clients, so use
+      a&#32;<a href="/reference/renderers/png/">PNG Buffer</a>&#32;for email.
     </p>
   </TabItem>
   <TabItem label="Browser">

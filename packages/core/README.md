@@ -8,8 +8,8 @@
 
 **[Documentation](https://qrcodesdk.dev) | [Live Demo](https://qrcodesdk.dev/playground)**
 
-`@qrcodesdk/core` generates QR matrices, SVG strings, and terminal text without browser or Node.js
-APIs. Custom renderers can turn its matrices into other formats.
+`@qrcodesdk/core` generates QR matrices, SVG strings, and terminal text. It needs no browser or
+Node.js APIs. Custom renderers can turn its matrices into other formats.
 
 ## Install
 
@@ -33,7 +33,7 @@ vp add @qrcodesdk/core
 **deno**
 
 ```sh
-deno add @qrcodesdk/core
+deno add npm:@qrcodesdk/core
 ```
 
 **bun**
@@ -58,8 +58,7 @@ import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 const svg = qrcode('https://qrcodesdk.dev').render(QRCodeSVGRenderer());
 ```
 
-The result is an SVG `string`. See the [SVG renderer reference](https://qrcodesdk.dev/reference/renderers/svg/) for its
-options and constraints.
+The result is an SVG `string`. See the [SVG renderer](https://qrcodesdk.dev/reference/renderers/svg/) for its options.
 
 ## What Core adds
 
@@ -69,8 +68,7 @@ options and constraints.
 | Render scalable vector output | `QRCodeSVGRenderer`        | SVG `string`   |
 | Render terminal output        | `QRCodeTextRenderer`       | text `string`  |
 
-See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for accepted payloads, matrix options, builder methods,
-and matrix output.
+See [Builder and matrix](https://qrcodesdk.dev/reference/builder/) for payloads, matrix options, and builder methods.
 
 ## Style the output
 
@@ -92,28 +90,36 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 );
 ```
 
-See [Customize appearance](https://qrcodesdk.dev/guides/customize/) for style options and custom shapes.
+See [Customize appearance](https://qrcodesdk.dev/guides/customize/) for every style option and custom shapes.
 
-Typed helpers serialize common application values before generation. See
-[Payload helpers](https://qrcodesdk.dev/reference/payloads/) for email, phone, SMS, geographic, and Wi-Fi payloads.
+## Encode common values
+
+Typed [payload helpers](https://qrcodesdk.dev/reference/payloads/) turn email, phone, SMS, geographic, and Wi-Fi data
+into payload strings. Import them from `@qrcodesdk/core/payload`.
 
 ## Runtime compatibility
 
-> `@qrcodesdk/core` supports any JavaScript runtime providing native ESM, ES2020 support, and a global `TextEncoder`.
-> It has no Node.js, DOM, filesystem, or framework dependency.
-
-TypeScript projects should use `moduleResolution: 'bundler'`, `'node16'`, or `'nodenext'` to resolve
-the package's ESM entry points and subpaths.
+Core runs in any JavaScript runtime with native ESM, ES2020, and a global `TextEncoder`. It has no
+Node.js, DOM, filesystem, or framework dependency.
 
 | Runtime                         | Support policy                                          |
 | ------------------------------- | ------------------------------------------------------- |
-| Node.js                         | All maintained LTS lines                                |
+| Node.js                         | 22.0.0 or newer; tested on 22, 24, and 26               |
 | Deno                            | Current stable major                                    |
 | Bun                             | Current stable release                                  |
 | Browsers                        | Current evergreen browser families                      |
 | Other runtimes and edge workers | Native ESM, ES2020, and a global `TextEncoder` required |
 
-For runtime-specific output, add the package for your runtime or framework:
+Module format:
+
+- The package is ES modules only. CommonJS code needs Node.js 22.12 or newer for `require()`, or a
+  dynamic `import()`. See [Module format](https://qrcodesdk.dev/getting-started/choose-your-setup/#module-format).
+- TypeScript projects need `moduleResolution: 'bundler'`, `'node16'`, or `'nodenext'` to resolve the
+  package's entry points and subpaths.
+
+## Other outputs
+
+Add a runtime or framework package for other outputs:
 
 | Package                                                         | Use it for                                                                 | Return value                                       |
 | --------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------- |
@@ -129,15 +135,22 @@ Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/refere
 
 ## Public API
 
-The root exports the builder, renderers, errors, and shared types. For direct ESM imports without a
-bundler, use `@qrcodesdk/core/matrix`, `@qrcodesdk/core/svg`, `@qrcodesdk/core/text`, or
-`@qrcodesdk/core/error` to avoid loading unrelated renderers. Bundled applications can use root
-imports with tree shaking.
+| Entry point                 | Contains                                                         |
+| --------------------------- | ---------------------------------------------------------------- |
+| `@qrcodesdk/core`           | The builder, SVG and text renderers, errors, and shared types    |
+| `@qrcodesdk/core/matrix`    | The builder, matrix types, and module role names                 |
+| `@qrcodesdk/core/svg`       | The SVG renderer and `svgCenterImage()`                          |
+| `@qrcodesdk/core/text`      | The terminal text renderer                                       |
+| `@qrcodesdk/core/error`     | `QRCodeError` and its codes                                      |
+| `@qrcodesdk/core/style`     | Shape and pattern factories and custom path types                |
+| `@qrcodesdk/core/payload`   | Payload helpers                                                  |
+| `@qrcodesdk/core/segmenter` | The optional mixed-mode optimizer, available only from this path |
 
-Import shape and pattern factories and custom path types from `@qrcodesdk/core/style`. Matrix
-types and role names belong to `@qrcodesdk/core/matrix`; payload serializers belong to
-`@qrcodesdk/core/payload`. See [Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/) for matrix-based
-custom renderer examples.
+Bundlers with tree shaking drop the parts you do not use. Without tree shaking, for example directly
+in Node.js, import from a subpath to avoid loading unrelated renderers.
+
+- Build your own output with [Custom renderers](https://qrcodesdk.dev/reference/custom-renderers/).
+- Look up `QRCodeError` codes in the [errors reference](https://qrcodesdk.dev/reference/errors/).
 
 ```ts
 import {
@@ -189,6 +202,7 @@ import {
   smsPayload,
   wifiPayload,
 } from '@qrcodesdk/core/payload';
+import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 import {
   type QRCodeAlignmentCenterShape,
   type QRCodeAlignmentOptions,
@@ -219,14 +233,14 @@ import {
 
 ## Generated output stability
 
-Output is deterministic for one installed implementation, but matrix modules, SVG markup, and PNG,
-WebP, GIF, and JPEG bytes may change between QRCodeSDK releases. Pin exact package versions and keep fixtures when exact
-artifacts matter. See the [version and output policy](https://qrcodesdk.dev/project/release-policy/).
+Output is deterministic for one installed version. Matrix modules, SVG markup, and PNG, WebP, GIF,
+and JPEG bytes may change between releases. When exact output matters, pin exact package versions
+and keep fixtures. See the [version and output policy](https://qrcodesdk.dev/project/release-policy/).
 
 ## Optional mixed-mode segmentation
 
-Auto mode detects one encoding mode by default. Import the optimizer separately to combine modes
-when that reduces the symbol size:
+By default, auto mode picks one encoding mode for the whole payload. Import the optimizer to mix
+modes when that makes the QR code smaller:
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
@@ -235,9 +249,11 @@ import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 qrcode('ABCD12345678901234567890abcd').mode('auto').segmenter(automaticSegmenter).matrix();
 ```
 
-`mode: 'auto'` works with or without the segmenter. Concrete modes bypass it. See
-[Builder and matrix](https://qrcodesdk.dev/reference/builder/#optional-mixed-mode-optimization) for the callback contract
-and version-selection behavior.
+- `mode: 'auto'` works with or without the segmenter.
+- Concrete modes, such as `'octet'`, bypass it.
+
+See [Builder and matrix](https://qrcodesdk.dev/reference/builder/#optional-mixed-mode-optimization) for the callback
+contract and version selection.
 
 ## Documentation
 
@@ -247,3 +263,4 @@ and version-selection behavior.
 - [SVG string renderer](https://qrcodesdk.dev/reference/renderers/svg/)
 - [Terminal text renderer](https://qrcodesdk.dev/reference/renderers/text/)
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/)
+- [Errors](https://qrcodesdk.dev/reference/errors/)
