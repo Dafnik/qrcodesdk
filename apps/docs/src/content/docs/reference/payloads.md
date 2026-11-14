@@ -177,7 +177,7 @@ A supplied name must contain at least one non-whitespace component.
 | Entry type           | Fields                                      | Rules                                                                                                                                                                                                      |
 | -------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `QRCodeVCardPhone`   | `number: string`, optional `type`           | Type is `'home'`, `'work'`, `'cell'`, or `'fax'`. Number permits digits, one optional leading `+`, ASCII spaces, and `().-`, with at least one digit. Formatting is preserved. Extensions are unsupported. |
-| `QRCodeVCardEmail`   | `address: string`, optional `type`          | Type is `'home'` or `'work'`. Address must contain non-whitespace text. Full email syntax is not validated.                                                                                                |
+| `QRCodeVCardEmail`   | `address: string`, optional `type`          | Type is `'home'` or `'work'`. Address must contain non-whitespace text and no line breaks. Full email syntax is not validated.                                                                             |
 | `QRCodeVCardAddress` | Optional `type` and string components below | Type is `'home'` or `'work'`. At least one component must contain non-whitespace text.                                                                                                                     |
 
 The seven address components, in order, are `postOfficeBox`, `extendedAddress`,
@@ -303,11 +303,14 @@ Structured name and address components escape before joining with semicolons.
 Undefined fields are omitted. Supplied scalar fields must contain non-whitespace text, except
 that notes, descriptions, and structured components may be empty. NUL, DEL, unsupported C0 controls,
 and unpaired UTF-16 surrogates are rejected. Tabs and escaped line breaks are permitted in TEXT.
+The single-line fields `formattedName`, email addresses, `uid`, and `summary` reject line breaks.
+Nested entries such as `name` and each phone, email, and address must be objects.
 Valid Unicode is preserved without normalization, transliteration, or quoted-printable encoding.
 
 URLs use the standard `URL` API for validation and normalization. They must be absolute HTTP(S)
 URLs without raw whitespace or controls. They do not use TEXT escaping. Date and time values also
-serialize separately from TEXT.
+serialize separately from TEXT. Without a global `URL`, supplying a URL field throws a `TypeError`
+instead of `INVALID_PAYLOAD`.
 
 Escaped content lines fold at 75 UTF-8 bytes using CRLF followed by one space. The continuation
 space counts toward the next line’s 75-byte limit. Folding never splits a Unicode code point.

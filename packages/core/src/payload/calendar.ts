@@ -1,5 +1,5 @@
 import type {QRCodeCalendarPayload} from '../payload';
-import {contentLines, textValue, urlValue} from './content-line';
+import {contentLines, singleLineTextValue, textValue, urlValue} from './content-line';
 import {invalidPayload} from './error';
 
 export function calendarPayload(value: QRCodeCalendarPayload): string {
@@ -17,11 +17,11 @@ export function calendarPayload(value: QRCodeCalendarPayload): string {
     'PRODID:-//QRCodeSDK//Calendar//EN',
     'VERSION:2.0',
     'BEGIN:VEVENT',
-    `UID:${textValue('uid', value.uid)}`,
+    `UID:${singleLineTextValue('uid', value.uid)}`,
     `DTSTAMP:${timestamp}`,
     `DTSTART${parameter}:${start}`,
     `DTEND${parameter}:${end}`,
-    `SUMMARY:${textValue('summary', value.summary)}`,
+    `SUMMARY:${singleLineTextValue('summary', value.summary)}`,
   ];
   if (value.location !== undefined) lines.push(`LOCATION:${textValue('location', value.location)}`);
   if (value.description !== undefined)
@@ -33,7 +33,7 @@ export function calendarPayload(value: QRCodeCalendarPayload): string {
 
 function date(field: string, value: string, original: string = value): string {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match || match[0] !== value) invalidPayload(field, original, 'Expected YYYY-MM-DD');
+  if (!match) invalidPayload(field, original, 'Expected YYYY-MM-DD');
   const year = Number(match[1]);
   const month = Number(match[2]);
   const day = Number(match[3]);
@@ -49,7 +49,7 @@ function instant(field: string, value: string): string {
   const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|([+-])(\d{2}):(\d{2}))$/.exec(
     value,
   );
-  if (!match || match[0] !== value)
+  if (!match)
     invalidPayload(field, value, 'Expected a date and time with seconds and an explicit offset');
   date(field, match[1]!, value);
   const hour = Number(match[2]);

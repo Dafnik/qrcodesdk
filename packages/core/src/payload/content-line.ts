@@ -17,6 +17,20 @@ export function validateContentText(field: string, value: string, allowEmpty = f
   }
 }
 
+/** TEXT for single-line values (display names, identifiers, email addresses) that must not contain line breaks. */
+export function singleLineTextValue(field: string, value: string): string {
+  const escaped = textValue(field, value);
+  if (/[\r\n]/.test(value)) invalidPayload(field, value, 'Line breaks are not allowed');
+  return escaped;
+}
+
+/** Rejects `null`, primitives, and arrays where a nested payload object is expected. */
+export function validateObject(field: string, value: unknown): asserts value is object {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    invalidPayload(field, value, 'Expected an object');
+  }
+}
+
 export function textValue(field: string, value: string, allowEmpty = false): string {
   validateContentText(field, value, allowEmpty);
   return value
@@ -31,13 +45,16 @@ export function urlValue(field: string, value: string): string {
   if (/\s|[\u0000-\u001f\u007f]/u.test(value)) {
     invalidPayload(field, value, 'URLs must not contain raw whitespace or controls');
   }
+  const URLConstructor = (
+    globalThis as unknown as {
+      URL?: new (input: string) => {protocol: string; href: string};
+    }
+  ).URL;
+  if (typeof URLConstructor !== 'function') {
+    throw new TypeError('Payload URL fields require the standard URL API');
+  }
   let url: {protocol: string; href: string};
   try {
-    const URLConstructor = (
-      globalThis as unknown as {
-        URL: new (input: string) => {protocol: string; href: string};
-      }
-    ).URL;
     url = new URLConstructor(value);
   } catch {
     invalidPayload(field, value, 'Expected an absolute HTTP(S) URL');
@@ -49,18 +66,13 @@ export function urlValue(field: string, value: string): string {
 }
 
 export function contentLines(lines: readonly string[]): string {
-  const encoder = new (
-    globalThis as unknown as {
-      TextEncoder: new () => {encode(input: string): Uint8Array};
-    }
-  ).TextEncoder();
   return (
     lines
       .map((line) => {
         let result = '';
         let width = 0;
         for (const character of line) {
-          const bytes = encoder.encode(character).length;
+          const bytes = utf8Length(character.codePointAt(0)!);
           if (width + bytes > 75) {
             result += '\r\n ';
             width = 1;
@@ -72,4 +84,11 @@ export function contentLines(lines: readonly string[]): string {
       })
       .join('\r\n') + '\r\n'
   );
+}
+
+function utf8Length(codePoint: number): number {
+  if (codePoint < 0x80) return 1;
+  if (codePoint < 0x800) return 2;
+  if (codePoint < 0x10000) return 3;
+  return 4;
 }

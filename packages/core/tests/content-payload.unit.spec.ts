@@ -135,6 +135,16 @@ describe('vCard payload', () => {
     [{formattedName: 'A', emails: [{address: 'a', type: 'cell'}]}, 'emails[0].type'],
     [{formattedName: 'A', addresses: [{type: 'home'}]}, 'addresses[0]'],
     [{formattedName: 'A', addresses: [{postalCode: '\0'}]}, 'addresses[0].postalCode'],
+    [{formattedName: 'A\nB'}, 'formattedName'],
+    [{formattedName: 'A\rB'}, 'formattedName'],
+    [{formattedName: 'A', emails: [{address: 'zoe@example.com\n'}]}, 'emails[0].address'],
+    [{formattedName: 'A', emails: [{address: 'a\r\nTEL:1'}]}, 'emails[0].address'],
+    [{formattedName: 'A', name: null}, 'name'],
+    [{formattedName: 'A', name: 'Ada'}, 'name'],
+    [{formattedName: 'A', phones: [null]}, 'phones[0]'],
+    [{formattedName: 'A', emails: [null]}, 'emails[0]'],
+    [{formattedName: 'A', addresses: [null]}, 'addresses[0]'],
+    [{formattedName: 'A', addresses: [[]]}, 'addresses[0]'],
   ] as const)('rejects invalid contact %j at %s', (value, field) => {
     invalid(() => vcardPayload(value as QRCodeVCardPayload), field);
   });
@@ -155,6 +165,17 @@ describe('shared content lines', () => {
   ])('rejects unsupported text %j', (text) => {
     invalid(() => vcardPayload({formattedName: text}), 'formattedName', text);
     invalid(() => calendarPayload({...event, description: text}), 'description', text);
+  });
+
+  test('reports a missing URL API as a runtime error, not invalid input', () => {
+    vi.stubGlobal('URL', undefined);
+    try {
+      expect(() => vcardPayload({formattedName: 'A', url: 'https://example.com'})).toThrow(
+        new TypeError('Payload URL fields require the standard URL API'),
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   test.each([
@@ -232,7 +253,7 @@ describe('calendar payload', () => {
     expect(
       calendarPayload({
         ...event,
-        uid: 'a,b;\\c\r\nEND:VEVENT',
+        uid: 'a,b;\\c',
         summary: '日本語 😀',
         location: 'Room;1',
         description: 'One\rTwo\nThree\r\nFour',
@@ -240,7 +261,7 @@ describe('calendar payload', () => {
       }),
     ).toContain(
       crlf([
-        'UID:a\\,b\\;\\\\c\\nEND:VEVENT',
+        'UID:a\\,b\\;\\\\c',
         'DTSTAMP:20261114T120000Z',
         'DTSTART:20261201T090000Z',
         'DTEND:20261201T100000Z',
@@ -345,6 +366,14 @@ describe('calendar payload', () => {
       invalid(() => calendarPayload({...event, [field]: ' '}), field, ' ');
     },
   );
+
+  test.each([
+    ['uid', 'event@example.com\r\nEND:VEVENT'],
+    ['summary', 'One\nTwo'],
+    ['summary', 'One\rTwo'],
+  ] as const)('rejects line breaks in single-line %s', (field, value) => {
+    invalid(() => calendarPayload({...event, [field]: value}), field, value);
+  });
 
   test('produces identical output across host timezones', () => {
     const expected = calendarPayload(event);

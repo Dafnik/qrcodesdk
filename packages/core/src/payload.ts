@@ -1,4 +1,5 @@
 import {invalidPayload} from './payload/error';
+import {resolvePhoneNumber} from './payload/phone';
 
 export {vcardPayload} from './payload/vcard';
 export {calendarPayload} from './payload/calendar';
@@ -53,7 +54,7 @@ export function emailPayload(value: QRCodeEmailPayload): string {
 }
 
 export function phonePayload(value: QRCodePhonePayload): string {
-  const number = resolvePhoneNumber(value.number, 'number');
+  const number = resolvePhoneNumber('number', value.number);
   if (value.extension === undefined) return `tel:${number}`;
   if (!/^\d+$/.test(value.extension)) {
     invalidPayload('extension', value.extension, 'Phone extensions must contain only digits');
@@ -63,7 +64,7 @@ export function phonePayload(value: QRCodePhonePayload): string {
 
 export function smsPayload(value: QRCodeSMSPayload): string {
   const recipients = resolveList(value.recipients, 'recipients').map((recipient) =>
-    resolvePhoneNumber(recipient, 'recipients'),
+    resolvePhoneNumber('recipients', recipient),
   );
   if (value.body !== undefined) validateText('body', value.body, true);
   const body = value.body === undefined ? '' : `?body=${encodeURIComponent(value.body)}`;
@@ -123,14 +124,6 @@ function queryEntry(name: string, value: string | undefined): string | undefined
 
 function encodeEmailAddress(value: string): string {
   return encodeURIComponent(value).replace(/%40/g, '@');
-}
-
-function resolvePhoneNumber(value: string, field: string): string {
-  validateText(field, value, false);
-  if (!/^\+?[0-9().-]+$/.test(value) || !/\d/.test(value)) {
-    invalidPayload(field, value, 'Phone numbers may contain digits and RFC 3966 separators');
-  }
-  return value;
 }
 
 function validateCoordinate(field: string, value: number, minimum: number, maximum: number): void {
@@ -215,4 +208,8 @@ export type QRCodeCalendarPayload = {
   location?: string;
   description?: string;
   url?: string;
-} & ({allDay?: false; start: string; end: string} | {allDay: true; start: string; end: string});
+  /** Defaults to `false`. When `true`, `start` and `end` are `YYYY-MM-DD` dates. */
+  allDay?: boolean;
+  start: string;
+  end: string;
+};
