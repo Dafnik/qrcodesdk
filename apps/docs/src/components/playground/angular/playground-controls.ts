@@ -220,75 +220,78 @@ import {titleCase} from './title-case.ts';
                     </div>
                   </label>
                 </div>
-                <div
-                  class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
-                  [attr.data-checked]="overrideAlignment() ? 'true' : 'false'">
-                  <label
-                    class="grid w-full gap-2 p-4 has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-70"
-                    for="override-alignment"
-                    hlmLabel>
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="text-sm leading-4">Alignment patterns</span>
-                      <hlm-switch [(checked)]="overrideAlignment" inputId="override-alignment" />
-                    </div>
+                <!-- Micro QR codes have no alignment patterns. -->
+                @if (!currentOptions().micro) {
+                  <div
+                    class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
+                    [attr.data-checked]="overrideAlignment() ? 'true' : 'false'">
+                    <label
+                      class="grid w-full gap-2 p-4 has-data-[disabled=true]:cursor-not-allowed has-data-[disabled=true]:opacity-70"
+                      for="override-alignment"
+                      hlmLabel>
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="text-sm leading-4">Alignment patterns</span>
+                        <hlm-switch [(checked)]="overrideAlignment" inputId="override-alignment" />
+                      </div>
 
-                    <div class="grid gap-2 md:grid-cols-2">
-                      <div hlmField>
-                        <label hlmFieldLabel for="alignmentRingShape">Alignment ring</label>
-                        <hlm-select
-                          [disabled]="!overrideAlignment()"
-                          [itemToString]="titleCase"
-                          [ngModel]="alignmentRingShape()"
-                          (ngModelChange)="updateQrOptions({alignmentRingShape: $event})">
-                          <hlm-select-trigger class="w-full" buttonId="alignmentRingShape">
-                            <hlm-select-value placeholder="Auto" />
-                          </hlm-select-trigger>
-                          <hlm-select-content *hlmSelectPortal>
-                            <hlm-select-group>
-                              <hlm-select-label>Alignment ring shape</hlm-select-label>
-                              @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
-                                <hlm-select-item [value]="shapeOption">
-                                  {{ titleCase(shapeOption) }}
-                                </hlm-select-item>
-                              }
-                            </hlm-select-group>
-                          </hlm-select-content>
-                        </hlm-select>
+                      <div class="grid gap-2 md:grid-cols-2">
+                        <div hlmField>
+                          <label hlmFieldLabel for="alignmentRingShape">Alignment ring</label>
+                          <hlm-select
+                            [disabled]="!overrideAlignment()"
+                            [itemToString]="titleCase"
+                            [ngModel]="alignmentRingShape()"
+                            (ngModelChange)="updateQrOptions({alignmentRingShape: $event})">
+                            <hlm-select-trigger class="w-full" buttonId="alignmentRingShape">
+                              <hlm-select-value placeholder="Auto" />
+                            </hlm-select-trigger>
+                            <hlm-select-content *hlmSelectPortal>
+                              <hlm-select-group>
+                                <hlm-select-label>Alignment ring shape</hlm-select-label>
+                                @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
+                                  <hlm-select-item [value]="shapeOption">
+                                    {{ titleCase(shapeOption) }}
+                                  </hlm-select-item>
+                                }
+                              </hlm-select-group>
+                            </hlm-select-content>
+                          </hlm-select>
+                        </div>
+                        <div hlmField>
+                          <label hlmFieldLabel for="alignmentCenterShape">Alignment center</label>
+                          <hlm-select
+                            [disabled]="!overrideAlignment()"
+                            [itemToString]="titleCase"
+                            [ngModel]="alignmentCenterShape()"
+                            (ngModelChange)="updateQrOptions({alignmentCenterShape: $event})">
+                            <hlm-select-trigger class="w-full" buttonId="alignmentCenterShape">
+                              <hlm-select-value placeholder="Auto" />
+                            </hlm-select-trigger>
+                            <hlm-select-content *hlmSelectPortal>
+                              <hlm-select-group>
+                                <hlm-select-label>Alignment center shape</hlm-select-label>
+                                @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
+                                  <hlm-select-item [value]="shapeOption">
+                                    {{ titleCase(shapeOption) }}
+                                  </hlm-select-item>
+                                }
+                              </hlm-select-group>
+                            </hlm-select-content>
+                          </hlm-select>
+                        </div>
+                        <div class="md:col-span-2" hlmField>
+                          <label hlmFieldLabel for="alignmentColor">Alignment color</label>
+                          <playground-color-input
+                            [presets]="DARK_COLOR_PRESETS"
+                            [color]="alignmentColor()"
+                            [disabled]="!overrideAlignment()"
+                            (colorChange)="updateQrOptions({alignmentColor: $event})"
+                            buttonId="alignmentColor" />
+                        </div>
                       </div>
-                      <div hlmField>
-                        <label hlmFieldLabel for="alignmentCenterShape">Alignment center</label>
-                        <hlm-select
-                          [disabled]="!overrideAlignment()"
-                          [itemToString]="titleCase"
-                          [ngModel]="alignmentCenterShape()"
-                          (ngModelChange)="updateQrOptions({alignmentCenterShape: $event})">
-                          <hlm-select-trigger class="w-full" buttonId="alignmentCenterShape">
-                            <hlm-select-value placeholder="Auto" />
-                          </hlm-select-trigger>
-                          <hlm-select-content *hlmSelectPortal>
-                            <hlm-select-group>
-                              <hlm-select-label>Alignment center shape</hlm-select-label>
-                              @for (shapeOption of SHAPE_OPTIONS; track shapeOption) {
-                                <hlm-select-item [value]="shapeOption">
-                                  {{ titleCase(shapeOption) }}
-                                </hlm-select-item>
-                              }
-                            </hlm-select-group>
-                          </hlm-select-content>
-                        </hlm-select>
-                      </div>
-                      <div class="md:col-span-2" hlmField>
-                        <label hlmFieldLabel for="alignmentColor">Alignment color</label>
-                        <playground-color-input
-                          [presets]="DARK_COLOR_PRESETS"
-                          [color]="alignmentColor()"
-                          [disabled]="!overrideAlignment()"
-                          (colorChange)="updateQrOptions({alignmentColor: $event})"
-                          buttonId="alignmentColor" />
-                      </div>
-                    </div>
-                  </label>
-                </div>
+                    </label>
+                  </div>
+                }
               </div>
             </hlm-accordion-content>
           </hlm-accordion-item>
