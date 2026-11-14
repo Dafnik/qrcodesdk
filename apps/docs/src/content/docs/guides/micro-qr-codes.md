@@ -14,7 +14,8 @@ A Micro QR code is a smaller relative of the standard QR code, with one finder p
 three. It is 11 to 17 modules wide and needs a quiet zone of only 2 modules, so it fits where a
 standard QR code does not, such as on small parts, labels, and printed circuit boards.
 
-Micro QR codes hold little data: at most 35 digits, 21 alphanumeric characters, or 15 UTF-8 bytes.
+Micro QR codes hold little data: at most 35 digits, 21 alphanumeric characters, 15 UTF-8 bytes, or
+9 Kanji characters.
 
 :::caution[Check your scanners first]
 Many phone camera apps cannot read Micro QR codes. Industrial scanners and libraries such as ZXing
@@ -61,7 +62,7 @@ export function PartLabel({serial}: {serial: string}) {
 | `mask`     | integer `0`–`3`                | automatic | Mask pattern; automatic selection maximizes dark edge modules    |
 | `fallback` | `boolean`                      | `false`   | Generates a standard QR code when no Micro QR code fits the data |
 
-The matrix options `mode` and `errorCorrectionLevel` apply as usual. Micro QR codes do not support
+The matrix options `mode`, `kanji`, and `errorCorrectionLevel` apply as usual. Micro QR codes do not support
 `version`, `mask`, `eci`, or `segmenter` in the matrix options, and generation throws `QRCodeError`
 with code `INVALID_OPTIONS` when they are set.
 
@@ -72,22 +73,42 @@ with code `INVALID_OPTIONS` when they are set.
 Automatic selection returns the smallest version that holds the payload at the requested
 error-correction level. The default level is `M`, as for standard QR codes.
 
-| Version | Size    | Level | Digits | Alphanumeric | Bytes |
-| ------- | ------- | ----- | -----: | -----------: | ----: |
-| M1      | 11 × 11 | –     |      5 |            – |     – |
-| M2      | 13 × 13 | L     |     10 |            6 |     – |
-|         |         | M     |      8 |            5 |     – |
-| M3      | 15 × 15 | L     |     23 |           14 |     9 |
-|         |         | M     |     18 |           11 |     7 |
-| M4      | 17 × 17 | L     |     35 |           21 |    15 |
-|         |         | M     |     30 |           18 |    13 |
-|         |         | Q     |     21 |           13 |     9 |
+| Version | Size    | Level | Digits | Alphanumeric | Bytes | Kanji |
+| ------- | ------- | ----- | -----: | -----------: | ----: | ----: |
+| M1      | 11 × 11 | –     |      5 |            – |     – |     – |
+| M2      | 13 × 13 | L     |     10 |            6 |     – |     – |
+|         |         | M     |      8 |            5 |     – |     – |
+| M3      | 15 × 15 | L     |     23 |           14 |     9 |     6 |
+|         |         | M     |     18 |           11 |     7 |     4 |
+| M4      | 17 × 17 | L     |     35 |           21 |    15 |     9 |
+|         |         | M     |     30 |           18 |    13 |     8 |
+|         |         | Q     |     21 |           13 |     9 |     5 |
 
 - Micro QR codes do not support level `H`, and only M4 supports `Q`.
 - M1 detects errors but cannot correct them. Automatic selection therefore never picks it. Request
   it with `version: 'M1'` and level `L` or `M`.
-- Alphanumeric payloads need at least M2 and octet payloads at least M3.
+- Alphanumeric payloads need at least M2, and octet and Kanji payloads at least M3.
 - Octet payloads are UTF-8, so a non-ASCII character takes 2 to 4 of the available bytes.
+
+## Kanji mode
+
+Pass the Kanji table from `@qrcodesdk/core/kanji` as the `kanji` matrix option, as for standard QR
+codes. [Kanji mode](/reference/builder/#kanji-mode) then encodes Japanese text in 13 bits per
+character instead of 2 to 4 UTF-8 bytes, which often fits a smaller symbol:
+
+```ts
+import {qrcode} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
+import {microQR} from '@qrcodesdk/core/micro';
+
+const symbol = microQR();
+
+qrcode('東京タワー').options({symbol, kanji, errorCorrectionLevel: 'L'}).matrix().size; // 15: M3
+qrcode('東京タワー').options({symbol, errorCorrectionLevel: 'L'}).matrix().size; // 17: M4, UTF-8
+```
+
+With the table, `auto` mode picks Kanji mode for text that it can fully encode. `mode: 'kanji'`
+requires the table and throws `QRCodeError` with code `INVALID_OPTIONS` without it.
 
 ## Fall back to a standard QR code
 
@@ -124,5 +145,5 @@ scan fine on standard QR codes. Rounded finder centers and module shapes are fin
 
 ## Not supported
 
-Micro QR codes in QRCodeSDK hold one segment in numeric, alphanumeric, or octet mode. Mixed-mode
-segmentation, Kanji mode, ECI, and FNC1 are not available for them.
+Micro QR codes in QRCodeSDK hold one segment in numeric, alphanumeric, octet, or Kanji mode.
+Mixed-mode segmentation, ECI, and FNC1 are not available for them.

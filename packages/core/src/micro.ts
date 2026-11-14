@@ -28,7 +28,8 @@ const VERSIONS: readonly QRCodeMicroVersion[] = ['M1', 'M2', 'M3', 'M4'];
 
 /**
  * Selects a Micro QR code as the symbol, for `symbol` in the matrix options. Micro QR codes hold up
- * to 35 digits, 21 alphanumeric characters, or 15 bytes, and need a quiet zone of only 2 modules.
+ * to 35 digits, 21 alphanumeric characters, 15 bytes, or 9 Kanji characters, and need a quiet zone
+ * of only 2 modules.
  * M1 only detects errors, so it is used only when requested with `version: 'M1'`.
  */
 export function microQR(options?: QRCodeMicroOptions): QRCodeSymbol {

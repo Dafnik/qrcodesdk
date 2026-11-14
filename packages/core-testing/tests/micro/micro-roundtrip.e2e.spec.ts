@@ -7,6 +7,7 @@ import {
   type QRCodeVisualStyle,
   qrcode,
 } from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 import {type QRCodeMicroMask, type QRCodeMicroVersion, microQR} from '@qrcodesdk/core/micro';
 import {circle, finder, rounded} from '@qrcodesdk/core/style';
 
@@ -20,18 +21,24 @@ import {
 import {decodeMicroQRCodeMatrix, decodeMicroQRCodeSvg} from './micro-helpers';
 
 // ISO/IEC 18004:2015 Table 7: data capacity by symbol, level, and mode.
-const SYMBOLS: readonly [QRCodeMicroVersion, QRCodeErrorCorrectionLevel, number, number, number][] =
-  [
-    ['M1', 'L', 5, 0, 0],
-    ['M2', 'L', 10, 6, 0],
-    ['M2', 'M', 8, 5, 0],
-    ['M3', 'L', 23, 14, 9],
-    ['M3', 'M', 18, 11, 7],
-    ['M4', 'L', 35, 21, 15],
-    ['M4', 'M', 30, 18, 13],
-    ['M4', 'Q', 21, 13, 9],
-  ];
-const MODES = ['numeric', 'alphanumeric', 'octet'] as const satisfies QRCodeEncodingMode[];
+const SYMBOLS: readonly [
+  QRCodeMicroVersion,
+  QRCodeErrorCorrectionLevel,
+  number,
+  number,
+  number,
+  number,
+][] = [
+  ['M1', 'L', 5, 0, 0, 0],
+  ['M2', 'L', 10, 6, 0, 0],
+  ['M2', 'M', 8, 5, 0, 0],
+  ['M3', 'L', 23, 14, 9, 6],
+  ['M3', 'M', 18, 11, 7, 4],
+  ['M4', 'L', 35, 21, 15, 9],
+  ['M4', 'M', 30, 18, 13, 8],
+  ['M4', 'Q', 21, 13, 9, 5],
+];
+const MODES = ['numeric', 'alphanumeric', 'octet', 'kanji'] as const satisfies QRCodeEncodingMode[];
 
 const CASES = SYMBOLS.flatMap(([version, errorCorrectionLevel, ...capacities]) =>
   MODES.flatMap((mode, index) =>
@@ -53,7 +60,7 @@ describe('Micro QR roundtrips', () => {
     'decodes $version-$errorCorrectionLevel $mode "$payload"',
     async ({version, errorCorrectionLevel, mode, payload}) => {
       const matrix = qrcode(payload)
-        .options({symbol: microQR({version}), errorCorrectionLevel, mode})
+        .options({symbol: microQR({version}), errorCorrectionLevel, mode, kanji})
         .matrix();
       const scan = await decodeMicroQRCodeMatrix(matrix);
       expect(scan).toMatchObject({

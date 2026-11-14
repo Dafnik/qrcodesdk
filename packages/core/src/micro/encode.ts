@@ -1,4 +1,4 @@
-import {MODE_NUMERIC, encodePayload, getPayloadBitLength} from '../matrix/mode';
+import {MODE_KANJI, MODE_NUMERIC, encodePayload, getPayloadBitLength} from '../matrix/mode';
 import type {
   QRCodeCodewords,
   QRCodeEncodedSegment,
@@ -8,18 +8,18 @@ import type {QRCodeMicroVersionNumber} from './tables';
 
 /**
  * Micro QR mode indicators are `version - 1` bits long. Their values are 0 numeric, 1 alphanumeric,
- * and 2 byte, which is the standard indicator shifted right by one.
+ * 2 byte, and 3 Kanji: the bit position of the standard indicators 1, 2, 4, and 8.
  */
 export function getMicroModeIndicator(mode: QRCodeSupportedModeIndicator): number {
-  return mode >> 1;
+  return 31 - Math.clz32(mode);
 }
 
-/** Numeric, alphanumeric, and byte modes start at M1, M2, and M3. */
+/** Numeric, alphanumeric, byte, and Kanji modes start at M1, M2, M3, and M3. */
 export function supportsMicroMode(
   version: QRCodeMicroVersionNumber,
   mode: QRCodeSupportedModeIndicator,
 ): boolean {
-  return getMicroModeIndicator(mode) < version;
+  return Math.min(getMicroModeIndicator(mode), 2) < version;
 }
 
 /** Character count indicator widths (ISO/IEC 18004:2015 Table 3). */
@@ -27,8 +27,8 @@ export function getMicroCharacterCountBits(
   version: QRCodeMicroVersionNumber,
   mode: QRCodeSupportedModeIndicator,
 ): number {
-  // numeric: 3/4/5/6, alphanumeric: -/3/4/5, byte: -/-/4/5
-  return version + 2 - +(mode !== MODE_NUMERIC);
+  // numeric: 3/4/5/6, alphanumeric: -/3/4/5, byte: -/-/4/5, Kanji: -/-/3/4
+  return mode === MODE_NUMERIC ? version + 2 : mode === MODE_KANJI ? version : version + 1;
 }
 
 export function getMicroSegmentBitLength(

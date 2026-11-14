@@ -23,7 +23,7 @@ describe('QR_CODE_MICRO_TEST_FIXTURES', () => {
       ),
     ).toEqual(new Set(['M1', 'M2-L', 'M2-M', 'M3-L', 'M3-M', 'M4-L', 'M4-M', 'M4-Q']));
     expect(new Set(QR_CODE_MICRO_TEST_FIXTURES.map(({mode}) => mode))).toEqual(
-      new Set(['numeric', 'alphanumeric', 'octet']),
+      new Set(['numeric', 'alphanumeric', 'octet', 'kanji']),
     );
     expect(new Set(QR_CODE_MICRO_TEST_FIXTURES.map(({mask}) => mask))).toEqual(
       new Set([0, 1, 2, 3]),
@@ -41,7 +41,9 @@ describe('QR_CODE_MICRO_TEST_FIXTURES', () => {
     '$name fills its symbol',
     (fixture) => {
       expect(() =>
-        qrcode(`${fixture.payload}${fixture.mode === 'numeric' ? '0' : 'A'}`)
+        qrcode(
+          `${fixture.payload}${{numeric: '0', alphanumeric: 'A', octet: 'A', kanji: '漢'}[fixture.mode]}`,
+        )
           .options(fixtureMicroMatrixOptions(fixture))
           .matrix(),
       ).toThrowError(QRCodeError);

@@ -4,6 +4,7 @@ import {describe, test} from 'node:test';
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
 import {generatePlaygroundCode} from './angular/playground-code-generator.ts';
+import {loadPlaygroundKanji} from './playground-kanji.ts';
 import {
   type PlaygroundOptions,
   createPlaygroundSVGOptions,
@@ -54,6 +55,20 @@ describe('playground Micro QR options', () => {
     assert.ok(hasQRCodeError(url, undefined));
     assert.equal(hasQRCodeError({...url, microFallback: true}, undefined), undefined);
     assert.equal(renderMatrixSize({...url, microFallback: true}), 25);
+  });
+
+  test('passes the Kanji table, so Japanese text fits a smaller Micro QR code', async () => {
+    await loadPlaygroundKanji();
+    const options: PlaygroundOptions = {
+      ...microOptions,
+      payload: '東京タワー',
+      errorCorrectionLevel: 'L',
+    };
+
+    // Five Kanji characters fit M3, while their 15 UTF-8 bytes need M4.
+    assert.equal(renderMatrixSize({...options, kanji: true}), 15);
+    assert.equal(renderMatrixSize({...options, mode: 'kanji'}), 15);
+    assert.equal(renderMatrixSize(options), 17);
   });
 
   test('moves a default quiet zone to the default of the selected symbol', () => {
@@ -140,6 +155,17 @@ describe('playground Micro QR code generation', () => {
       assert.match(code, /symbol: microQR\(\),/);
       assert.match(code, /errorCorrectionLevel: 'L',/);
       assert.doesNotMatch(code, /automaticSegmenter|version: 10|mask: 3|eci: true/);
+    }
+  });
+
+  test('passes the Kanji table to microQR matrix options', () => {
+    for (const packageName of ['react', 'vue', 'svelte', 'angular'] as const) {
+      const {code} = generatePlaygroundCode({...microOptions, kanji: true, packageName});
+      assert.match(
+        code,
+        new RegExp(`import \\{[^}]*\\bkanji\\b[^}]*\\} from '@qrcodesdk/${packageName}';`),
+      );
+      assert.match(code, /symbol: microQR\(\),\n\s+kanji,/);
     }
   });
 

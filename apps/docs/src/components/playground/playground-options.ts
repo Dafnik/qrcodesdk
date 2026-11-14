@@ -49,8 +49,9 @@ export const PLAYGROUND_SECTIONS = [
 export interface PlaygroundOptions
   extends Omit<QRCodeStandardMatrixOptions, 'kanji'>, PlaygroundStyleState {
   /**
-   * Generates a Micro QR code with `microQR()`. The standard `version`, `mask`, `eci`, and
-   * `optimizeSegments` values are kept for switching back but not used.
+   * Generates a Micro QR code with `microQR()`, which also takes `mode`, the Kanji table, and the
+   * error correction level. The standard `version`, `mask`, `eci`, and `optimizeSegments` values
+   * are kept for switching back but not used.
    */
   micro?: boolean;
   microVersion?: QRCodeMicroVersion;
@@ -300,6 +301,7 @@ export function createPlaygroundCanvasOptions(
 
 function matrixOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeMatrixOptions {
   const {mode, errorCorrectionLevel} = playgroundOptionsValue;
+  const kanji = playgroundUsesKanji(playgroundOptionsValue) ? playgroundKanjiTable() : undefined;
   if (playgroundOptionsValue.micro) {
     return {
       symbol: microQR({
@@ -308,6 +310,7 @@ function matrixOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeMatrixO
         fallback: playgroundOptionsValue.microFallback,
       }),
       mode,
+      kanji,
       errorCorrectionLevel,
     };
   }
@@ -315,7 +318,7 @@ function matrixOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeMatrixO
     version: playgroundOptionsValue.version,
     mode,
     segmenter: playgroundOptionsValue.optimizeSegments ? automaticSegmenter : undefined,
-    kanji: playgroundUsesKanji(playgroundOptionsValue) ? playgroundKanjiTable() : undefined,
+    kanji,
     errorCorrectionLevel,
     mask: playgroundOptionsValue.mask,
     eci: playgroundOptionsValue.eci,

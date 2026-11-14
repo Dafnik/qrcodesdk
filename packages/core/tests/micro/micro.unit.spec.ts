@@ -10,17 +10,25 @@ import {
   QR_CODE_MODULE_ROLES as ROLES,
   qrcode,
 } from '../../src';
+import {kanji} from '../../src/kanji';
 import {calculateECC} from '../../src/matrix/calculate-ecc';
 import {getGF256GeneratorPolynomial} from '../../src/matrix/error-correction';
-import {MODE_ALPHANUMERIC, MODE_NUMERIC, MODE_OCTET} from '../../src/matrix/mode';
+import {resolveKanjiLookup} from '../../src/matrix/kanji';
+import {MODE_ALPHANUMERIC, MODE_KANJI, MODE_NUMERIC, MODE_OCTET} from '../../src/matrix/mode';
 import {createSingleSegment} from '../../src/matrix/segments';
+import type {QRCodeSupportedModeIndicator} from '../../src/matrix/types';
 import {
   type QRCodeMicroMask,
   type QRCodeMicroOptions,
   type QRCodeMicroVersion,
   microQR,
 } from '../../src/micro';
-import {encodeMicro, getMicroCharacterCountBits} from '../../src/micro/encode';
+import {
+  encodeMicro,
+  getMicroCharacterCountBits,
+  getMicroModeIndicator,
+  supportsMicroMode,
+} from '../../src/micro/encode';
 import {fillMicroFormatInformation} from '../../src/micro/matrix';
 import {
   getMicroDataBits,
@@ -33,7 +41,7 @@ import type {QRCodeErrorCorrectionLevel, QRCodeMode} from '../../src/types';
 import {fixturePayload, toRows} from '../helpers';
 
 type Level = Extract<QRCodeErrorCorrectionLevel, 'L' | 'M' | 'Q'>;
-type Mode = Exclude<QRCodeMode, 'auto' | 'kanji'>;
+type Mode = Exclude<QRCodeMode, 'auto'>;
 
 function micro(
   payload: string | number,
@@ -59,14 +67,14 @@ function expectQRCodeError(run: () => unknown, code: QRCodeError['code'], field?
 
 // ISO/IEC 18004:2015 Table 7: data capacity by symbol, level, and mode.
 const CAPACITIES: readonly [QRCodeMicroVersion, Level, Record<Mode, number>][] = [
-  ['M1', 'L', {numeric: 5, alphanumeric: 0, octet: 0}],
-  ['M2', 'L', {numeric: 10, alphanumeric: 6, octet: 0}],
-  ['M2', 'M', {numeric: 8, alphanumeric: 5, octet: 0}],
-  ['M3', 'L', {numeric: 23, alphanumeric: 14, octet: 9}],
-  ['M3', 'M', {numeric: 18, alphanumeric: 11, octet: 7}],
-  ['M4', 'L', {numeric: 35, alphanumeric: 21, octet: 15}],
-  ['M4', 'M', {numeric: 30, alphanumeric: 18, octet: 13}],
-  ['M4', 'Q', {numeric: 21, alphanumeric: 13, octet: 9}],
+  ['M1', 'L', {numeric: 5, alphanumeric: 0, octet: 0, kanji: 0}],
+  ['M2', 'L', {numeric: 10, alphanumeric: 6, octet: 0, kanji: 0}],
+  ['M2', 'M', {numeric: 8, alphanumeric: 5, octet: 0, kanji: 0}],
+  ['M3', 'L', {numeric: 23, alphanumeric: 14, octet: 9, kanji: 6}],
+  ['M3', 'M', {numeric: 18, alphanumeric: 11, octet: 7, kanji: 4}],
+  ['M4', 'L', {numeric: 35, alphanumeric: 21, octet: 15, kanji: 9}],
+  ['M4', 'M', {numeric: 30, alphanumeric: 18, octet: 13, kanji: 8}],
+  ['M4', 'Q', {numeric: 21, alphanumeric: 13, octet: 9, kanji: 5}],
 ];
 
 describe('Micro QR tables', () => {
@@ -107,6 +115,20 @@ describe('Micro QR tables', () => {
       3, 4, 5,
     ]);
     expect([3, 4].map((v) => getMicroCharacterCountBits(v as 3, MODE_OCTET))).toEqual([4, 5]);
+    expect([3, 4].map((v) => getMicroCharacterCountBits(v as 3, MODE_KANJI))).toEqual([3, 4]);
+  });
+
+  test('uses Micro QR mode indicators and the first version of each mode', () => {
+    const MODES: readonly QRCodeSupportedModeIndicator[] = [
+      MODE_NUMERIC,
+      MODE_ALPHANUMERIC,
+      MODE_OCTET,
+      MODE_KANJI,
+    ];
+    expect(MODES.map(getMicroModeIndicator)).toEqual([0, 1, 2, 3]);
+    const firstVersion = (mode: QRCodeSupportedModeIndicator) =>
+      ([1, 2, 3, 4] as const).find((version) => supportsMicroMode(version, mode));
+    expect(MODES.map(firstVersion)).toEqual([1, 2, 3, 3]);
   });
 });
 
@@ -189,7 +211,7 @@ describe('Micro QR matrices', () => {
       const matrix = micro(
         payload,
         {version: version ?? undefined, mask: mask ?? undefined},
-        {mode, errorCorrectionLevel},
+        {mode, errorCorrectionLevel, kanji},
       );
       expect(toRows(matrix).map((row) => row.join(''))).toEqual(rows);
     },
@@ -239,7 +261,7 @@ describe('Micro QR version selection', () => {
     ),
   )('$version-$level holds $capacity $mode characters', ({version, level, mode, capacity}) => {
     const payload = fixturePayload(mode, capacity);
-    const options = {mode, errorCorrectionLevel: level} as const;
+    const options = {mode, errorCorrectionLevel: level, kanji} as const;
     expect(micro(payload, {version}, options).size).toBe(+version[1]! * 2 + 9);
     expectQRCodeError(
       () => micro(fixturePayload(mode, capacity + 1), {version}, options),
@@ -339,6 +361,45 @@ describe('Micro QR version selection', () => {
   });
 });
 
+describe('Micro QR Kanji mode', () => {
+  test('encodes the ISO/IEC 18004 example 点茗 with a 2-bit Kanji indicator in M3', () => {
+    // Mode 11, count 010, then 点 0x0D9F and 茗 0x1AAA in 13 bits each, and a 7-bit terminator.
+    const segment = createSingleSegment(MODE_KANJI, '点茗', kanjiLookup())!;
+    expect(encodeMicro(3, segment, 84).slice(0, 5)).toEqual([
+      0b11010011, 0b01100111, 0b11110101, 0b01010100, 0b00000000,
+    ]);
+  });
+
+  test('uses Kanji mode for Japanese text when the Kanji table is present', () => {
+    const payload = '東京タワー';
+    // Five Kanji characters fit M3, while their 15 UTF-8 bytes need M4.
+    expect(micro(payload, {}, {errorCorrectionLevel: 'L', kanji}).size).toBe(15);
+    expect(micro(payload, {}, {errorCorrectionLevel: 'L'}).size).toBe(17);
+    expect(micro(payload, {}, {errorCorrectionLevel: 'L', mode: 'kanji', kanji}).size).toBe(15);
+  });
+
+  test('requires the Kanji table and M3 or larger', () => {
+    expectQRCodeError(() => micro('点茗', {}, {mode: 'kanji'}), 'INVALID_OPTIONS', 'kanji');
+    expectQRCodeError(
+      () => micro('点茗', {}, {mode: 'kanji', kanji: {} as typeof kanji}),
+      'INVALID_OPTIONS',
+      'kanji',
+    );
+    expectQRCodeError(
+      () => micro('点茗', {version: 'M2'}, {mode: 'kanji', kanji, errorCorrectionLevel: 'L'}),
+      'PAYLOAD_TOO_LARGE',
+    );
+    expectQRCodeError(() => micro('Grüße', {}, {mode: 'kanji', kanji}), 'INVALID_PAYLOAD');
+  });
+
+  test('passes the Kanji table to the standard QR code fallback', () => {
+    const payload = createKanjiPayload(20);
+    expect(micro(payload, {fallback: true}, {mode: 'kanji', kanji})).toEqual(
+      qrcode(payload).options({mode: 'kanji', kanji}).matrix(),
+    );
+  });
+});
+
 describe('Micro QR rendering', () => {
   const matrix = micro('12345');
 
@@ -365,3 +426,11 @@ describe('Micro QR rendering', () => {
     );
   });
 });
+
+function kanjiLookup() {
+  return resolveKanjiLookup(kanji)!;
+}
+
+function createKanjiPayload(length: number): string {
+  return fixturePayload('kanji', length);
+}

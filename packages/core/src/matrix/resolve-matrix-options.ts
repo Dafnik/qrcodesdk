@@ -1,10 +1,10 @@
 import {QRCodeError} from '../error';
 import {throwInvalid} from '../options';
 import type {
-  QRCodeStandardMatrixOptions,
   QRCodePayload,
   QRCodeSegment,
   QRCodeSegmenter,
+  QRCodeStandardMatrixOptions,
   QRCodeVersion,
 } from '../types';
 import {ECC_LEVELS_MAP} from './error-correction';

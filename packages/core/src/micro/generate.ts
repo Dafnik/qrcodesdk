@@ -3,6 +3,7 @@ import {applyMaskToMatrix} from '../matrix/apply-mask-to-matrix';
 import {calculateECC} from '../matrix/calculate-ecc';
 import {getGF256GeneratorPolynomial} from '../matrix/error-correction';
 import {generateQRCodeMatrix} from '../matrix/generate-qrcode-matrix';
+import {resolveKanjiLookup, throwMissingKanji} from '../matrix/kanji';
 import {resolveMode} from '../matrix/mode';
 import {toPublicArray} from '../matrix/public-array';
 import {createSingleSegment} from '../matrix/segments';
@@ -44,11 +45,18 @@ export function generateMicroQRCodeMatrix(
   if (options.mask !== undefined) throwStandardOnly('mask', options.mask);
   if (options.eci) throwStandardOnly('eci', options.eci);
 
-  const {mode, errorCorrectionLevel = 'M'} = options;
+  const {mode, errorCorrectionLevel = 'M', kanji} = options;
   const level = ['L', 'M', 'Q', 'H'].indexOf(errorCorrectionLevel) as QRCodeMicroLevel;
   if (level < 0) throwInvalid('errorCorrectionLevel', 'L, M, Q, or H', errorCorrectionLevel);
 
-  const segment = createSingleSegment(resolveMode(payload, mode), payload);
+  // Kanji mode needs the Shift JIS table, as for standard QR codes. M3 and M4 support it.
+  const kanjiLookup = resolveKanjiLookup(kanji);
+  if (mode === 'kanji' && !kanjiLookup) throwMissingKanji();
+  const segment = createSingleSegment(
+    resolveMode(payload, mode, kanjiLookup),
+    payload,
+    kanjiLookup,
+  );
   if (!segment) {
     throw new QRCodeError('INVALID_PAYLOAD', 'QRCode: Invalid payload format', {
       details: {payload, mode},
@@ -69,7 +77,7 @@ export function generateMicroQRCodeMatrix(
     }
   }
 
-  if (fallback) return generateQRCodeMatrix(payload, {mode, errorCorrectionLevel});
+  if (fallback) return generateQRCodeMatrix(payload, {mode, errorCorrectionLevel, kanji});
   if (!supportsLevel) {
     throwInvalid(
       'errorCorrectionLevel',

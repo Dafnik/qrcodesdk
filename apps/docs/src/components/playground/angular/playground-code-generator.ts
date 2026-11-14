@@ -460,7 +460,7 @@ function formatStandardMatrixEntries(playgroundOptionsValue: PlaygroundOptions):
   return matrixEntries;
 }
 
-/** Micro QR codes own their version and mask, and support neither a segmenter nor ECI. */
+/** Micro QR codes own their version and mask, support Kanji mode, and support neither a segmenter nor ECI. */
 function formatMicroMatrixEntries(
   playgroundOptionsValue: PlaygroundOptions,
   depth: number,
@@ -477,7 +477,11 @@ function formatMicroMatrixEntries(
   }
   const microOptions = microEntries.length > 0 ? formatObject(microEntries, depth) : '';
 
-  return [`symbol: microQR(${microOptions})`, ...formatSharedMatrixEntries(playgroundOptionsValue)];
+  return [
+    `symbol: microQR(${microOptions})`,
+    ...formatSharedMatrixEntries(playgroundOptionsValue),
+    ...(playgroundUsesKanji(playgroundOptionsValue) ? ['kanji'] : []),
+  ];
 }
 
 function formatSharedMatrixEntries(playgroundOptionsValue: PlaygroundOptions): string[] {
@@ -641,9 +645,7 @@ function qrcodesdkImports(
     ...(!playgroundOptionsValue.micro && playgroundOptionsValue.optimizeSegments
       ? ['automaticSegmenter']
       : []),
-    ...(!playgroundOptionsValue.micro && playgroundUsesKanji(playgroundOptionsValue)
-      ? ['kanji']
-      : []),
+    ...(playgroundUsesKanji(playgroundOptionsValue) ? ['kanji'] : []),
   ];
   return formatImport(specifiers, `@qrcodesdk/${packageName}`, indentation);
 }

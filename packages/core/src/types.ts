@@ -181,6 +181,11 @@ export type QRCodeSymbolMatrixOptions = {
   symbol: QRCodeSymbol;
   /** `auto` detects a single mode. Defaults to `auto`. */
   mode?: QRCodeMode;
+  /**
+   * Enables Kanji mode with the Shift JIS table from `@qrcodesdk/core/kanji`. Required by the
+   * `kanji` mode and used by `auto` when present. Micro QR codes support Kanji mode in M3 and M4.
+   */
+  kanji?: QRCodeKanji;
   errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
   version?: never;
   segmenter?: never;

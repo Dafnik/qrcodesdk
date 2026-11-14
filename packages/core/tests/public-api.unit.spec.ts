@@ -110,9 +110,7 @@ describe('public API', () => {
     expect(Object.keys(core)).not.toContain('kanji');
     expectTypeOf(kanjiEntry.kanji).toEqualTypeOf<core.QRCodeKanji>();
     expectTypeOf<kanjiEntry.QRCodeKanji>().toEqualTypeOf<core.QRCodeKanji>();
-    expectTypeOf<core.QRCodeStandardMatrixOptions['kanji']>().toEqualTypeOf<
-      core.QRCodeKanji | undefined
-    >();
+    expectTypeOf<core.QRCodeMatrixOptions['kanji']>().toEqualTypeOf<core.QRCodeKanji | undefined>();
     expectTypeOf<core.QRCodeEncodingMode>().toEqualTypeOf<
       'numeric' | 'alphanumeric' | 'octet' | 'kanji'
     >();

@@ -1,4 +1,5 @@
-import type {QRCodeEncodingMode, QRCodeSymbolMatrixOptions} from '@qrcodesdk/core';
+import type {QRCodeEncodingMode, QRCodeKanji, QRCodeSymbolMatrixOptions} from '@qrcodesdk/core';
+import {kanji} from '@qrcodesdk/core/kanji';
 import {type QRCodeMicroMask, type QRCodeMicroVersion, microQR} from '@qrcodesdk/core/micro';
 import {circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
@@ -14,6 +15,8 @@ export type QRCodeMicroTestFixture = {
   readonly mask: QRCodeMicroMask;
   /** Micro QR codes support `L` and `M`, and `Q` in M4. M1 only detects errors. */
   readonly errorCorrectionLevel: 'L' | 'M' | 'Q';
+  /** The Kanji table, which Kanji mode requires. M3 and M4 support Kanji mode. */
+  readonly kanji?: QRCodeKanji;
 };
 
 /** Creates the matrix options that select the fixture's Micro QR symbol. */
@@ -22,13 +25,14 @@ export function fixtureMicroMatrixOptions({
   version,
   mask,
   errorCorrectionLevel,
+  kanji,
 }: QRCodeMicroTestFixture): QRCodeSymbolMatrixOptions {
-  return {symbol: microQR({version, mask}), mode, errorCorrectionLevel};
+  return {symbol: microQR({version, mask}), mode, errorCorrectionLevel, kanji};
 }
 
 /**
  * Micro QR fixtures across every symbol (M1, M2-L/M, M3-L/M, M4-L/M/Q), mode, and mask, including
- * the ISO/IEC 18004 Annex example and the maximum capacity of each mode. jsQR cannot read Micro QR
+ * the ISO/IEC 18004 examples and the maximum capacity of each mode. jsQR cannot read Micro QR
  * codes, so roundtrips decode them with ZXing.
  */
 export const QR_CODE_MICRO_TEST_FIXTURES = [
@@ -113,6 +117,24 @@ export const QR_CODE_MICRO_TEST_FIXTURES = [
     errorCorrectionLevel: 'M',
   },
   {
+    name: 'micro-m3-kanji-iso-example',
+    payload: '点茗',
+    mode: 'kanji',
+    kanji,
+    version: 'M3',
+    mask: 0,
+    errorCorrectionLevel: 'M',
+  },
+  {
+    name: 'micro-m4-kanji-q',
+    payload: 'ＱＲ０１',
+    mode: 'kanji',
+    kanji,
+    version: 'M4',
+    mask: 3,
+    errorCorrectionLevel: 'Q',
+  },
+  {
     name: 'micro-numeric-max-capacity',
     payload: createFixturePayload('numeric', 35, fixtureSeed('micro-numeric-max-capacity')),
     mode: 'numeric',
@@ -130,6 +152,15 @@ export const QR_CODE_MICRO_TEST_FIXTURES = [
     mode: 'alphanumeric',
     version: 'M4',
     mask: 1,
+    errorCorrectionLevel: 'L',
+  },
+  {
+    name: 'micro-kanji-max-capacity',
+    payload: createFixturePayload('kanji', 9, fixtureSeed('micro-kanji-max-capacity')),
+    mode: 'kanji',
+    kanji,
+    version: 'M4',
+    mask: 0,
     errorCorrectionLevel: 'L',
   },
   {
