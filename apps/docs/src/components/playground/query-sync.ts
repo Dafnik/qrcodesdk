@@ -2,6 +2,7 @@ import type {QRCodeColor, QRCodeMask, QRCodeVersion} from '@qrcodesdk/core';
 
 import {cliPlaygroundOptions, setCliOptions} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
+import {playgroundKanjiPending, playgroundKanjiSettled} from './playground-kanji.ts';
 import {
   PLAYGROUND_SECTIONS,
   PLAYGROUND_VIEWS,
@@ -293,6 +294,12 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
 
   let applyingUrlState = true;
   let updateTimer: ReturnType<typeof setTimeout> | undefined;
+  // Incremented to cancel a write that is still waiting for the Kanji table.
+  let writeVersion = 0;
+  const cancelWrite = (): void => {
+    clearTimeout(updateTimer);
+    writeVersion++;
+  };
 
   setQrOptions(readQrOptionsFromUrl());
   setCliOptions(readCliOptionsFromSearchParams(new URLSearchParams(window.location.search)));
@@ -308,11 +315,19 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
       return;
     }
 
-    clearTimeout(updateTimer);
+    cancelWrite();
 
     updateTimer = setTimeout(() => {
-      writeQrOptionsToUrl(playgroundOptions.get(), {
-        omitDefaults,
+      const write = () => writeQrOptionsToUrl(playgroundOptions.get(), {omitDefaults});
+      if (!playgroundKanjiPending()) {
+        write();
+        return;
+      }
+      // A restored Kanji URL is applied once the table loads. Writing earlier would replace the
+      // URL with the options it is about to restore over.
+      const version = writeVersion;
+      void playgroundKanjiSettled().then(() => {
+        if (version === writeVersion) write();
       });
     }, debounceMs);
   };
@@ -322,7 +337,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   const unsubscribeView = playgroundView.subscribe(scheduleWrite);
 
   const handlePopState = (): void => {
-    clearTimeout(updateTimer);
+    cancelWrite();
     applyingUrlState = true;
 
     try {
@@ -340,7 +355,7 @@ export function startQrQuerySync(options: QrQuerySyncOptions = {}): () => void {
   window.addEventListener('popstate', handlePopState);
 
   activeCleanup = () => {
-    clearTimeout(updateTimer);
+    cancelWrite();
     unsubscribe();
     unsubscribeCli();
     unsubscribeSections();

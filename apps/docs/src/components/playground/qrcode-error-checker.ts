@@ -7,6 +7,7 @@ import {
 } from '@qrcodesdk/browser';
 import {QRCodeSVGRenderer, qrcode} from '@qrcodesdk/core';
 
+import {assertPlaygroundKanjiAvailable} from './playground-kanji.ts';
 import {
   type PlaygroundOptions,
   type PlaygroundPreparedImage,
@@ -28,6 +29,7 @@ export function hasQRCodeError(
   preparedImage: PlaygroundPreparedImage | undefined = playgroundPreparedImage.get(),
 ) {
   try {
+    assertPlaygroundKanjiAvailable(options);
     switch (options.output) {
       case 'canvas': {
         const {matrix, ...rendererOptions} = createPlaygroundCanvasOptions(options, preparedImage);

@@ -2,6 +2,7 @@ import type {QRCodeKanji, QRCodeMode} from '@qrcodesdk/core';
 
 let table: QRCodeKanji | undefined;
 let loading: Promise<QRCodeKanji> | undefined;
+let loadError: unknown;
 let queue: Promise<void> | undefined;
 
 /**
@@ -23,14 +24,32 @@ export function playgroundKanjiTable(): QRCodeKanji | undefined {
 /** Loads the Kanji table in its own chunk, so the playground only downloads it when needed. */
 export function loadPlaygroundKanji(): Promise<QRCodeKanji> {
   loading ??= import('@qrcodesdk/core/kanji').then(
-    (module) => (table = module.kanji),
+    (module) => {
+      loadError = undefined;
+      return (table = module.kanji);
+    },
     (error: unknown) => {
-      // Allow a later attempt after a failed download.
+      // Keep the error for the preview and allow a later attempt.
+      loadError = error;
       loading = undefined;
       throw error;
     },
   );
   return loading;
+}
+
+/**
+ * Throws when the options need the Kanji table but it is unavailable, so previews report a failed
+ * download instead of silently encoding Japanese text without Kanji mode.
+ */
+export function assertPlaygroundKanjiAvailable(options: {
+  readonly kanji?: boolean;
+  readonly mode?: QRCodeMode;
+}): void {
+  if (!playgroundUsesKanji(options) || table) return;
+  if (loadError === undefined) throw new Error('The Kanji table is still loading.');
+  const reason = loadError instanceof Error ? loadError.message : String(loadError);
+  throw new Error(`The Kanji table could not be loaded: ${reason}. Change an option to retry.`);
 }
 
 /**
@@ -53,6 +72,11 @@ export function applyWithPlaygroundKanji(needsKanji: boolean, apply: () => void)
       if (queue === current) queue = undefined;
     });
   queue = current;
+}
+
+/** Whether playground updates are waiting for the Kanji table. */
+export function playgroundKanjiPending(): boolean {
+  return queue !== undefined;
 }
 
 /** Resolves once every queued playground update has been applied. */

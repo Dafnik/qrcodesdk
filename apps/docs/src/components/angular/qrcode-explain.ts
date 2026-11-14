@@ -26,7 +26,10 @@ import {
   explainQRCode,
 } from '../explain/qrcode-analyzer.ts';
 import {QrEncodingControls, QrMatrixControls} from '../playground/angular/qr-matrix-controls.ts';
-import {playgroundKanjiTable} from '../playground/playground-kanji.ts';
+import {
+  assertPlaygroundKanjiAvailable,
+  playgroundKanjiTable,
+} from '../playground/playground-kanji.ts';
 import {
   playgroundOptions,
   playgroundUsesKanji,
@@ -383,6 +386,7 @@ export class QRCodeExplain {
   protected readonly state = computed<ExplainState>(() => {
     try {
       const options = this.options();
+      assertPlaygroundKanjiAvailable(options);
       return {
         explanation: explainQRCode({
           ...options,

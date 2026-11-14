@@ -14,6 +14,7 @@ import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 import {createPackageManagerCommands} from '../../utils/package-manager-commands.mjs';
 import {
   applyWithPlaygroundKanji,
+  assertPlaygroundKanjiAvailable,
   playgroundKanjiTable,
   playgroundUsesKanji,
 } from './playground-kanji.ts';
@@ -252,6 +253,7 @@ export function createCliPreview(options: CliPlaygroundOptions): CliPreview {
     }
     if (options.format === 'svg' && !options.outputPath.trim())
       throw new Error('Enter an SVG output path.');
+    assertPlaygroundKanjiAvailable(options);
     const command = generateCliCommand(options);
     const svgOptions = createCliSVGOptions(options);
     const builder = qrcode(options.payload).options(svgOptions.matrix);

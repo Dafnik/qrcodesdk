@@ -7,7 +7,12 @@ import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {explainQRCode} from '../explain/qrcode-analyzer.ts';
 import {generatePlaygroundCode} from './angular/playground-code-generator.ts';
-import {createCliSVGOptions, defaultCliOptions, generateCliCommand} from './cli-playground.ts';
+import {
+  createCliPreview,
+  createCliSVGOptions,
+  defaultCliOptions,
+  generateCliCommand,
+} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
 import {
   loadPlaygroundKanji,
@@ -20,6 +25,7 @@ import {
   playgroundOptions,
   updateQrOptions,
 } from './playground-options.ts';
+import {hasQRCodeError} from './qrcode-error-checker.ts';
 import {readQrOptionsFromSearchParams, writeQrOptionsToSearchParams} from './query-sync.ts';
 
 const payload = 'ABCD12345678901234567890abcd';
@@ -90,6 +96,16 @@ test('the explainer reports actual modes for default, optimized, and forced enco
 
 test('playground loads the Kanji table before it applies updates that need it', async () => {
   assert.equal(playgroundKanjiTable(), undefined);
+  // Without the table, the preview reports an error instead of encoding without Kanji mode.
+  assert.match(
+    String(hasQRCodeError({...defaultPlaygroundOptions, payload: '東京', kanji: true})),
+    /Kanji table is still loading/,
+  );
+  assert.equal(hasQRCodeError({...defaultPlaygroundOptions, payload: '東京'}), undefined);
+  assert.equal(
+    createCliPreview({...defaultCliOptions, payload: '東京', kanji: true}).state,
+    'error',
+  );
   assert.equal(
     createPlaygroundSVGOptions({...defaultPlaygroundOptions, kanji: true}).matrix?.kanji,
     undefined,
