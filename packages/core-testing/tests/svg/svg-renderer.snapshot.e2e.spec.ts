@@ -4,11 +4,18 @@ import {describe, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
 
-import {fixtureImageDataURL, fixtureMatrixOptions, fixtureMicroMatrixOptions} from '../../src';
+import {
+  fixtureImageDataURL,
+  fixtureMatrixOptions,
+  fixtureMicroMatrixOptions,
+  fixtureRMQRMatrixOptions,
+} from '../../src';
 import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
   QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
   QR_CODE_MICRO_TEST_FIXTURES,
+  QR_CODE_RMQR_STYLE_VARIANT_FIXTURES,
+  QR_CODE_RMQR_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
   QR_CODE_STYLING_FIXTURES,
   QR_CODE_TEST_FIXTURES,
@@ -32,6 +39,14 @@ describe('QRCodeSVGRenderer snapshots', () => {
     expectSvgToMatchFileSnapshot(
       qrcode(fixture.payload).options(fixtureMicroMatrixOptions(fixture)).render(microRenderer),
       join(SNAPSHOT_DIR, 'micro', `${fixture.name}.svg`),
+    );
+  });
+
+  // rMQR fixtures keep the default quiet zone of 2 modules.
+  test.each(QR_CODE_RMQR_TEST_FIXTURES)('matches $name rMQR SVG snapshot', (fixture) => {
+    expectSvgToMatchFileSnapshot(
+      qrcode(fixture.payload).options(fixtureRMQRMatrixOptions(fixture)).render(microRenderer),
+      join(SNAPSHOT_DIR, 'rmqr', `${fixture.name}.svg`),
     );
   });
 
@@ -64,6 +79,18 @@ describe('QRCodeSVGRenderer snapshots', () => {
           .options(fixture.matrixOptions)
           .render(QRCodeSVGRenderer({style: fixture.styling})),
         join(SNAPSHOT_DIR, 'micro', 'style-variants', `${fixture.name}.svg`),
+      );
+    },
+  );
+
+  test.each(QR_CODE_RMQR_STYLE_VARIANT_FIXTURES)(
+    'matches $name rMQR SVG style variant snapshot',
+    (fixture) => {
+      expectSvgToMatchFileSnapshot(
+        qrcode(fixture.payload)
+          .options(fixture.matrixOptions)
+          .render(QRCodeSVGRenderer({style: fixture.styling})),
+        join(SNAPSHOT_DIR, 'rmqr', 'style-variants', `${fixture.name}.svg`),
       );
     },
   );
