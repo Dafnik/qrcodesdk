@@ -88,9 +88,11 @@ The React, Vue, Svelte, and Angular packages depend on Core. They re-export:
 
 - shape and center-image factories
 - `automaticSegmenter` and the `kanji` table
+- `microQR()`
+- the [payload helpers](/reference/payloads/), such as `wifiPayload()`
 - types
 
-They do **not** re-export `qrcode()`, `QRCodeError`, or the [payload helpers](/reference/payloads/).
+They do **not** re-export `qrcode()` or `QRCodeError`.
 Add Core as a direct dependency when you need those, or when Next.js Server Components import style
 factories from `@qrcodesdk/core/style`. Your app can only import packages it declares.
 

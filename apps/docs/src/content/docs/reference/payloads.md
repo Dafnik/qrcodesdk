@@ -10,8 +10,9 @@ related:
   - ../getting-started/choose-your-setup.mdx
 ---
 
-Core exports small serializers for payload formats that scanners understand. Each helper returns a
-string that you pass to `qrcode()` or a framework component’s `payload` input.
+`@qrcodesdk/core/payload` exports small serializers for payload formats that scanners understand.
+The React, Vue, Svelte, and Angular packages re-export them. Each helper returns a string that you
+pass to `qrcode()` or a framework component’s `payload` input.
 Scanner recognition of each format depends on the app and device.
 
 Helpers only build the payload text. Set encoding options on the
@@ -31,13 +32,12 @@ const matrix = qrcode(
 
 ## Use with framework components
 
-Framework packages do not re-export the payload helpers.
-[Add Core to the project](/getting-started/choose-your-setup/#add-core-to-a-framework-project), then
-pass the helper's result as the component's `payload`:
+Framework packages re-export the payload helpers and their input types, so you don't need a direct
+Core dependency. Import the helper from the framework package and pass its result as the
+component's `payload`:
 
 ```tsx
-import {wifiPayload} from '@qrcodesdk/core/payload';
-import {QRCodeSVG, type QRCodeSVGOptions} from '@qrcodesdk/react';
+import {QRCodeSVG, type QRCodeSVGOptions, wifiPayload} from '@qrcodesdk/react';
 
 const payload = wifiPayload({ssid: 'Office Wi-Fi', password: 'correct horse battery staple'});
 const options: QRCodeSVGOptions = {accessibility: {ariaLabel: 'Scan to join Office Wi-Fi'}};
@@ -278,8 +278,7 @@ END:VCARD
 Use the returned string directly with a framework component:
 
 ```tsx
-import {vcardPayload} from '@qrcodesdk/core/payload';
-import {QRCodeSVG} from '@qrcodesdk/react';
+import {QRCodeSVG, vcardPayload} from '@qrcodesdk/react';
 
 const contact = vcardPayload({formattedName: 'Zoë Müller'});
 

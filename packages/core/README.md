@@ -95,7 +95,8 @@ See [Customize appearance](https://qrcodesdk.dev/guides/customize/) for every st
 ## Encode common values
 
 Typed [payload helpers](https://qrcodesdk.dev/reference/payloads/) turn contact, calendar, email, phone, SMS, geographic, and Wi-Fi data
-into payload strings. Import them from `@qrcodesdk/core/payload`.
+into payload strings. Import them from `@qrcodesdk/core/payload`. The React, Vue, Svelte, and Angular
+packages re-export them.
 
 ## Runtime compatibility
 

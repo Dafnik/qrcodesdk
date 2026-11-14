@@ -42,6 +42,29 @@ export {svgCenterImage} from '@qrcodesdk/core';
 export {alignment, circle, customShape, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 export {kanji} from '@qrcodesdk/core/kanji';
 export {automaticSegmenter} from '@qrcodesdk/core/segmenter';
+export {
+  calendarPayload,
+  emailPayload,
+  geoPayload,
+  phonePayload,
+  smsPayload,
+  vcardPayload,
+  wifiPayload,
+} from '@qrcodesdk/core/payload';
+export type {
+  QRCodeCalendarPayload,
+  QRCodeEmailPayload,
+  QRCodeGeoPayload,
+  QRCodePhonePayload,
+  QRCodeSMSPayload,
+  QRCodeVCardAddress,
+  QRCodeVCardEmail,
+  QRCodeVCardName,
+  QRCodeVCardPayload,
+  QRCodeVCardPhone,
+  QRCodeWiFiEncryption,
+  QRCodeWiFiPayload,
+} from '@qrcodesdk/core/payload';
 export {microQR} from '@qrcodesdk/core/micro';
 export type {
   QRCodeMicroMask,

@@ -19,6 +19,14 @@ describe('Svelte QR code component API', () => {
     expect(image.component.download).toBeTypeOf('function');
   });
 
+  test('re-exports the payload helpers', () => {
+    const payload = svelteApi.wifiPayload({ssid: 'Office', password: 'secret'});
+    const {container} = render(svelteApi.QRCodeSVG, {payload});
+
+    expect(payload).toBe('WIFI:T:WPA;S:Office;P:secret;;');
+    expect(container.innerHTML).toContain('<svg');
+  });
+
   test('renders a Micro QR code through the matrix options', () => {
     const {container} = render(svelteApi.QRCodeSVG, {
       payload: '12345',
