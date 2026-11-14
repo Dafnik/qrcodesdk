@@ -6,7 +6,7 @@ import {describe, expect, test} from 'vitest';
 
 import {microQR} from '@qrcodesdk/core/micro';
 
-import {wifiPayload} from '../public-api';
+import {rMQR, wifiPayload} from '../public-api';
 import {QRCodeCanvas} from './QRCodeCanvas';
 import {QRCodeJPEG} from './QRCodeJPEG';
 import {QRCodePNG} from './QRCodePNG';
@@ -33,6 +33,17 @@ class QRCodeSSRHost {}
 })
 class QRCodeMicroSSRHost {
   readonly options = {matrix: {symbol: microQR()}};
+}
+
+@Component({
+  selector: 'qrcode-ssr-host',
+  imports: [QRCodeSVG],
+  template: `
+    <qrcode-svg [options]="options" payload="12345" />
+  `,
+})
+class QRCodeRMQRSSRHost {
+  readonly options = {matrix: {symbol: rMQR()}};
 }
 
 describe('Angular QR code server rendering', () => {
@@ -68,5 +79,14 @@ describe('Angular QR code server rendering', () => {
     );
 
     expect(html).toContain('viewBox="0 0 17 17"');
+  });
+
+  test('renders an rMQR code through the matrix options', async () => {
+    const html = await renderApplication(
+      (context) => bootstrapApplication(QRCodeRMQRSSRHost, undefined, context),
+      {document: '<qrcode-ssr-host></qrcode-ssr-host>', url: '/'},
+    );
+
+    expect(html).toContain('width="155" height="75" viewBox="0 0 31 15"');
   });
 });

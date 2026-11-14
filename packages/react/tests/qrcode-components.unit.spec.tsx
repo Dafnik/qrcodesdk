@@ -74,4 +74,12 @@ describe('React QR code component handles', () => {
 
     expect(svg).toContain('viewBox="0 0 17 17"');
   });
+
+  test('renders an rMQR code through the matrix options', () => {
+    const svg = renderToString(
+      <QRCodeSVG payload="12345" options={{matrix: {symbol: reactApi.rMQR()}}} />,
+    );
+
+    expect(svg).toContain('viewBox="0 0 31 15"');
+  });
 });
