@@ -36,6 +36,14 @@ describe('SVG QR roundtrips', () => {
   const testSVGRenderer = QRCodeSVGRenderer({style: {moduleSize: 4, quietZone: 4}});
 
   test.each(
+    ['A\u0000B', 'A\u001dB'].flatMap((payload) => [false, true].map((eci) => ({payload, eci}))),
+  )('preserves control characters in $payload with ECI $eci', async ({payload, eci}) => {
+    await expect(
+      decodeSvgQRCode(qrcode(payload).mode('octet').eci(eci).render(testSVGRenderer)),
+    ).resolves.toBe(payload);
+  });
+
+  test.each(
     ['ABCDE12345678?A1A', 'ABé12345678901234567890', 'AB✅🚀12345678901234567890', '00123'].flatMap(
       (payload) =>
         [false, true].flatMap((optimized) =>

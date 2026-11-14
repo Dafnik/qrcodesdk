@@ -24,7 +24,13 @@ export async function decodeQRCode(
 ): Promise<QRCodeScan> {
   const [result] = await readBarcodes(
     {data, width, height, colorSpace: 'srgb'},
-    {formats: [format], tryHarder: true, tryInvert: false, maxNumberOfSymbols: 1},
+    {
+      formats: [format],
+      tryHarder: true,
+      tryInvert: false,
+      maxNumberOfSymbols: 1,
+      textMode: 'Plain',
+    },
   );
   if (!result?.isValid) {
     throw new Error(`Unable to decode ${format} rendered to ${width}x${height} pixels`);
