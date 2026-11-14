@@ -7,13 +7,13 @@ import {getAlignmentPatternPositions} from './version-config';
 
 // Role numbers match QR_CODE_MODULE_ROLES; literals keep the public object out of the hot path.
 export const DATA_ROLE = 0;
-const FINDER_RING_ROLE = 1;
-const FINDER_CENTER_ROLE = 2;
-const SEPARATOR_ROLE = 3;
+export const FINDER_RING_ROLE = 1;
+export const FINDER_CENTER_ROLE = 2;
+export const SEPARATOR_ROLE = 3;
 const ALIGNMENT_RING_ROLE = 4;
 const ALIGNMENT_CENTER_ROLE = 5;
-const TIMING_ROLE = 6;
-const FORMAT_ROLE = 7;
+export const TIMING_ROLE = 6;
+export const FORMAT_ROLE = 7;
 const VERSION_ROLE = 8;
 
 /** Function patterns of one version. Every non-data module is reserved. */

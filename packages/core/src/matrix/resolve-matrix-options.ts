@@ -1,7 +1,7 @@
 import {QRCodeError} from '../error';
 import {throwInvalid} from '../options';
 import type {
-  QRCodeMatrixOptions,
+  QRCodeStandardMatrixOptions,
   QRCodePayload,
   QRCodeSegment,
   QRCodeSegmenter,
@@ -16,7 +16,7 @@ import type {QRCodeErrorCorrectionLevelValue, QRCodeResolvedMatrixOptions} from 
 
 export function resolveQRCodeMatrixOptions(
   payload: QRCodePayload,
-  options: QRCodeMatrixOptions = {},
+  options: QRCodeStandardMatrixOptions = {},
 ): QRCodeResolvedMatrixOptions {
   if (typeof payload === 'number' && (!Number.isSafeInteger(payload) || payload < 0)) {
     throw invalidPayload({payload});
@@ -95,7 +95,7 @@ function createSegments(
   payload: QRCodePayload,
   version: QRCodeVersion,
   eci: boolean,
-  kanji: QRCodeMatrixOptions['kanji'],
+  kanji: QRCodeStandardMatrixOptions['kanji'],
   kanjiLookup: QRCodeKanjiLookup | undefined,
 ): QRCodeResolvedMatrixOptions['segments'] {
   const segments: unknown = segmenter(payload, kanji ? {version, eci, kanji} : {version, eci});

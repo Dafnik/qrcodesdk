@@ -41,14 +41,14 @@ import {QRCodeError, type QRCodeErrorCode, QR_CODE_ERROR_CODES} from '@qrcodesdk
 
 ## Error codes
 
-| Code                   | Thrown when                                                                                                                                     | `details`                                                                           | `cause`                   |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------- |
-| `INVALID_PAYLOAD`      | The payload cannot be encoded as configured, or a payload helper rejects a field                                                                | `payload` and optional `mode`; from payload helpers, `field`, `value`, and `reason` | `undefined`               |
-| `PAYLOAD_TOO_LARGE`    | No version from 1 to 40 fits the payload, or the pinned version is too small                                                                    | `version` for a pinned version; otherwise usually `{}`                              | `undefined`               |
-| `INVALID_OPTIONS`      | A renderer, shape, pattern, or center-image option is outside its range, the `segmenter` is not a function, or Kanji mode lacks the Kanji table | `field` and `value`                                                                 | `undefined`               |
-| `RENDERER_MISSING`     | `.render()` runs without a stored or supplied renderer                                                                                          | `{}`                                                                                | `undefined`               |
-| `INVALID_IMAGE_SOURCE` | A center-image source is not usable                                                                                                             | `source` for `svgCenterImage()`; otherwise `{}`                                     | PNG decoder error, if any |
-| `RENDER_FAILED`        | The runtime cannot produce the output                                                                                                           | `{}`                                                                                | Browser error, if any     |
+| Code                   | Thrown when                                                                                                                                               | `details`                                                                           | `cause`                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------- |
+| `INVALID_PAYLOAD`      | The payload cannot be encoded as configured, or a payload helper rejects a field                                                                          | `payload` and optional `mode`; from payload helpers, `field`, `value`, and `reason` | `undefined`               |
+| `PAYLOAD_TOO_LARGE`    | No version from 1 to 40 (or M1 to M4) fits the payload, or the pinned version is too small                                                                | `version` for a pinned version; otherwise usually `{}`                              | `undefined`               |
+| `INVALID_OPTIONS`      | A renderer, shape, pattern, center-image, or Micro QR option is outside its range, the `segmenter` is not a function, or Kanji mode lacks the Kanji table | `field` and `value`                                                                 | `undefined`               |
+| `RENDERER_MISSING`     | `.render()` runs without a stored or supplied renderer                                                                                                    | `{}`                                                                                | `undefined`               |
+| `INVALID_IMAGE_SOURCE` | A center-image source is not usable                                                                                                                       | `source` for `svgCenterImage()`; otherwise `{}`                                     | PNG decoder error, if any |
+| `RENDER_FAILED`        | The runtime cannot produce the output                                                                                                                     | `{}`                                                                                | Browser error, if any     |
 
 ### INVALID_PAYLOAD
 
@@ -149,33 +149,37 @@ See [Version and mask](/reference/builder/#version-and-mask).
 
 An option is outside its accepted range.
 
-**Thrown by:** renderer, shape, pattern, and center-image factories when you call them. `.matrix()`
-and `.render()` throw it for `segmenter` and `kanji`, and `.render()` for `dimensions`.
+**Thrown by:** renderer, shape, pattern, center-image, and `microQR()` factories when you call them.
+`.matrix()` and `.render()` throw it for `segmenter`, `kanji`, and matrix options that a Micro QR
+code does not support, and `.render()` for `dimensions`.
 
 **Details:** `details.field` names the option and `details.value` holds the rejected value. Built-in
 factories and renderers report these fields:
 
-| `details.field`                                     | Thrown by                                                         | Accepted values                                                                                        |
-| --------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `style.moduleSize`                                  | Every built-in renderer factory                                   | A positive safe integer                                                                                |
-| `style.quietZone`                                   | Every built-in renderer factory                                   | A non-negative safe integer                                                                            |
-| `style.foreground`, `style.background`              | SVG, Canvas, Image element, and Node.js raster renderer factories | `#RRGGBB` or `#RRGGBBAA`                                                                               |
-| `ansi.foreground`, `ansi.background`                | `QRCodeTextRenderer()`                                            | `#RRGGBB` or `#RRGGBBAA`                                                                               |
-| `accessibility.ariaLabel`, `accessibility.title`    | `QRCodeSVGRenderer()`                                             | Characters that XML allows; no control characters other than tab, line feed, and carriage return       |
-| `quality`                                           | `QRCodeJPEGRenderer()`, `QRCodeJPEGImageRenderer()`               | An integer from 1 to 100                                                                               |
-| `transparency.matte`                                | `QRCodeJPEGRenderer()`, `QRCodeJPEGImageRenderer()`               | An opaque `#RRGGBB` or `#RRGGBBFF` color                                                               |
-| `transparency.threshold`                            | `QRCodeGIFRenderer()`, `QRCodeGIFImageRenderer()`                 | An integer from 0 to 256                                                                               |
-| `compression.level`                                 | `QRCodePNGRenderer()` from `@qrcodesdk/node`                      | An integer from 0 to 9                                                                                 |
-| `centerImage.size`                                  | `svgCenterImage()`, `canvasCenterImage()`, `rasterCenterImage()`  | A finite number greater than 0 and at most 1                                                           |
-| `centerImage.padding`                               | `svgCenterImage()`, `canvasCenterImage()`, `rasterCenterImage()`  | A finite number of at least 0                                                                          |
-| `circle.size`                                       | `circle()`                                                        | A number from 0.001 to 1                                                                               |
-| `rounded.radius`                                    | `rounded()`                                                       | A number from 0 to 1                                                                                   |
-| `diagonal.radius`                                   | `diagonal()`                                                      | A number from 0 to 1                                                                                   |
-| `customShape.<piece>`, such as `customShape.module` | `customShape()`                                                   | Closed relative path data with `m`, `l`, `h`, `v`, `c`, `a`, and `z` that stays within the piece's box |
-| `finder.color`, `alignment.color`                   | `finder()`, `alignment()`                                         | `#RRGGBB` or `#RRGGBBAA`                                                                               |
-| `segmenter`                                         | `.matrix()` or `.render()`                                        | A function                                                                                             |
-| `kanji`                                             | `.matrix()`, `.render()`, or `automaticSegmenter`                 | The `kanji` export of `@qrcodesdk/core/kanji`. Required by the `kanji` mode and Kanji segments         |
-| `dimensions`                                        | `.render()` with any built-in renderer                            | See below                                                                                              |
+| `details.field`                                       | Thrown by                                                         | Accepted values                                                                                        |
+| ----------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `style.moduleSize`                                    | Every built-in renderer factory                                   | A positive safe integer                                                                                |
+| `style.quietZone`                                     | Every built-in renderer factory                                   | A non-negative safe integer                                                                            |
+| `style.foreground`, `style.background`                | SVG, Canvas, Image element, and Node.js raster renderer factories | `#RRGGBB` or `#RRGGBBAA`                                                                               |
+| `ansi.foreground`, `ansi.background`                  | `QRCodeTextRenderer()`                                            | `#RRGGBB` or `#RRGGBBAA`                                                                               |
+| `accessibility.ariaLabel`, `accessibility.title`      | `QRCodeSVGRenderer()`                                             | Characters that XML allows; no control characters other than tab, line feed, and carriage return       |
+| `quality`                                             | `QRCodeJPEGRenderer()`, `QRCodeJPEGImageRenderer()`               | An integer from 1 to 100                                                                               |
+| `transparency.matte`                                  | `QRCodeJPEGRenderer()`, `QRCodeJPEGImageRenderer()`               | An opaque `#RRGGBB` or `#RRGGBBFF` color                                                               |
+| `transparency.threshold`                              | `QRCodeGIFRenderer()`, `QRCodeGIFImageRenderer()`                 | An integer from 0 to 256                                                                               |
+| `compression.level`                                   | `QRCodePNGRenderer()` from `@qrcodesdk/node`                      | An integer from 0 to 9                                                                                 |
+| `centerImage.size`                                    | `svgCenterImage()`, `canvasCenterImage()`, `rasterCenterImage()`  | A finite number greater than 0 and at most 1                                                           |
+| `centerImage.padding`                                 | `svgCenterImage()`, `canvasCenterImage()`, `rasterCenterImage()`  | A finite number of at least 0                                                                          |
+| `circle.size`                                         | `circle()`                                                        | A number from 0.001 to 1                                                                               |
+| `rounded.radius`                                      | `rounded()`                                                       | A number from 0 to 1                                                                                   |
+| `diagonal.radius`                                     | `diagonal()`                                                      | A number from 0 to 1                                                                                   |
+| `customShape.<piece>`, such as `customShape.module`   | `customShape()`                                                   | Closed relative path data with `m`, `l`, `h`, `v`, `c`, `a`, and `z` that stays within the piece's box |
+| `finder.color`, `alignment.color`                     | `finder()`, `alignment()`                                         | `#RRGGBB` or `#RRGGBBAA`                                                                               |
+| `segmenter`                                           | `.matrix()` or `.render()`                                        | A function                                                                                             |
+| `kanji`                                               | `.matrix()`, `.render()`, or `automaticSegmenter`                 | The `kanji` export of `@qrcodesdk/core/kanji`. Required by the `kanji` mode and Kanji segments         |
+| `microQR.version`, `microQR.mask`, `microQR.fallback` | `microQR()`                                                       | `'M1'` to `'M4'`, an integer from 0 to 3, and a boolean                                                |
+| `version`, `mask`, `eci`, `segmenter`                 | `.matrix()` or `.render()` with a `microQR()` symbol              | Unset                                                                                                  |
+| `errorCorrectionLevel`                                | `.matrix()` or `.render()` with a `microQR()` symbol              | `L` or `M`, or `Q` for M4. A pinned M1 accepts `L` or `M`                                              |
+| `dimensions`                                          | `.render()` with any built-in renderer                            | See below                                                                                              |
 
 `dimensions` is the output side length: `moduleSize × (matrix width + 2 × quietZone)`.
 

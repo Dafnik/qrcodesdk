@@ -1,5 +1,6 @@
 import {QRCodeError} from './error';
 import {generateQRCodeMatrix} from './matrix/generate-qrcode-matrix';
+import type {QRCodeMatrixGenerator} from './matrix/types';
 import type {
   QRCodeErrorCorrectionLevel,
   QRCodeKanji,
@@ -99,9 +100,11 @@ export class QRCodeBuilder<
   }
 
   matrix(this: QRCodeBuilder<HasPayload, R>): QRCodeMatrix {
-    return (this.cachedMatrix ??= Object.freeze(
-      generateQRCodeMatrix(this._payload, this._options),
-    ));
+    // A symbol, such as `microQR()`, is its own generator, so other symbols stay tree-shakeable.
+    const generate =
+      (this._options.symbol as unknown as QRCodeMatrixGenerator | undefined) ??
+      generateQRCodeMatrix;
+    return (this.cachedMatrix ??= Object.freeze(generate(this._payload, this._options)));
   }
 
   render<TOutput>(this: QRCodeBuilder<HasPayload, R>, renderer: QRCodeRenderer<TOutput>): TOutput;
@@ -122,10 +125,11 @@ export class QRCodeBuilder<
   private withOptions(options: QRCodeMatrixOptions = {}): QRCodeBuilder<P, R> {
     return new QRCodeBuilder(
       this._payload,
+      // Merging can mix standard options with a symbol; the symbol rejects them when generating.
       {
         ...this._options,
         ...options,
-      },
+      } as QRCodeMatrixOptions,
       this.currentRenderer,
     );
   }

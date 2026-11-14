@@ -19,6 +19,15 @@ describe('Svelte QR code component API', () => {
     expect(image.component.download).toBeTypeOf('function');
   });
 
+  test('renders a Micro QR code through the matrix options', () => {
+    const {container} = render(svelteApi.QRCodeSVG, {
+      payload: '12345',
+      options: {matrix: {symbol: svelteApi.microQR()}},
+    });
+
+    expect(container.innerHTML).toContain('viewBox="0 0 17 17"');
+  });
+
   test('keeps factory images valid inside deep reactive options', async () => {
     const {container, getByRole} = render(ReactiveCenterImage);
     expect(container.querySelector('image')?.getAttribute('href')).toBe('data:image/png;base64,a');

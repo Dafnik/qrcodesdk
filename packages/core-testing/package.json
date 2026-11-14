@@ -14,9 +14,9 @@
   "scripts": {
     "build": "tsdown",
     "watch": "tsdown --watch",
-    "test": "vitest --watch false --exclude 'tests/svg/*roundtrip.e2e.spec.ts'",
+    "test": "vitest --watch false --exclude 'tests/svg/*roundtrip.e2e.spec.ts' --exclude 'tests/micro/*roundtrip.e2e.spec.ts'",
     "test:coverage:raw": "vitest --coverage --mode coverage --watch false",
-    "test:roundtrips": "vitest --watch false tests/svg/*roundtrip.e2e.spec.ts",
+    "test:roundtrips": "vitest --watch false tests/svg/*roundtrip.e2e.spec.ts tests/micro/*roundtrip.e2e.spec.ts",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint scripts src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",
@@ -26,16 +26,17 @@
     "@qrcodesdk/core": "workspace:*"
   },
   "devDependencies": {
-    "@types/qrcode": "catalog:",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
+    "@types/qrcode": "catalog:",
+    "jsqr": "catalog:",
     "qrcode": "catalog:",
     "qrcode-generator": "catalog:",
-    "jsqr": "catalog:",
     "sharp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "zxing-wasm": "3.1.6"
   }
 }

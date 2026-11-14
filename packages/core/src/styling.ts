@@ -5,16 +5,28 @@ import type {QRCodeColor, QRCodeMatrix, QRCodeTextStyle} from './types';
 const COLOR_PATTERN = /^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i;
 export type QRCodeRGBA = readonly [red: number, green: number, blue: number, alpha: number];
 
-export function resolveQRCodeTextStyle(style?: QRCodeTextStyle): Required<QRCodeTextStyle> {
+/** Validates a text style. An unset quiet zone depends on the matrix; see `resolveQuietZone`. */
+export function resolveQRCodeTextStyle(
+  style?: QRCodeTextStyle,
+): Required<Pick<QRCodeTextStyle, 'moduleSize'>> & Pick<QRCodeTextStyle, 'quietZone'> {
   const moduleSize = style?.moduleSize ?? 5;
-  const quietZone = style?.quietZone ?? 4;
+  const quietZone = style?.quietZone;
   if (!Number.isSafeInteger(moduleSize) || moduleSize <= 0) {
     throwInvalid('style.moduleSize', 'a positive safe integer', moduleSize);
   }
-  if (!Number.isSafeInteger(quietZone) || quietZone < 0) {
+  // `undefined < 0` is false, so an unset quiet zone passes.
+  if (!Number.isSafeInteger(quietZone ?? 0) || quietZone! < 0) {
     throwInvalid('style.quietZone', 'a non-negative safe integer', quietZone);
   }
   return {moduleSize, quietZone};
+}
+
+/**
+ * Defaults the quiet zone to the minimum of the symbol type: 2 modules for Micro QR codes, which
+ * are at most 17 modules wide, and 4 modules for standard QR codes, which are at least 21.
+ */
+export function resolveQuietZone(quietZone: number | undefined, matrix: QRCodeMatrix): number {
+  return quietZone ?? (matrix.size < 21 ? 2 : 4);
 }
 
 export function calculateQRCodeOutputSize(

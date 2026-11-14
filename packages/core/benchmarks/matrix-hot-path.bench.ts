@@ -9,6 +9,7 @@ import {evaluateMatrix} from '../src/matrix/evaluate-matrix';
 import {fillDataInMatrix} from '../src/matrix/fill-data-in-matrix';
 import {fillFormatInformationInMatrix} from '../src/matrix/fill-format-information-in-matrix';
 import {resolveQRCodeMatrixOptions} from '../src/matrix/resolve-matrix-options';
+import {microQR} from '../src/micro';
 import type {QRCodeMask, QRCodeVersion} from '../src/types';
 
 const VERSIONS = [1, 7, 20, 40] as const satisfies readonly QRCodeVersion[];
@@ -91,4 +92,21 @@ describe('explicit mask stages', () => {
       );
     });
   }
+});
+
+describe('Micro QR', () => {
+  const symbol = microQR();
+  test('automatic version and mask', async ({bench}) => {
+    await bench.compare(
+      bench('M2 numeric', () => {
+        qrcode('12345').options({symbol}).matrix();
+      }),
+      bench('M4 alphanumeric', () => {
+        qrcode('QRCODESDK MICRO').options({symbol}).matrix();
+      }),
+      bench('standard version 1 for comparison', () => {
+        qrcode('12345').matrix();
+      }),
+    );
+  });
 });

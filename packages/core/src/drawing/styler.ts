@@ -1,7 +1,12 @@
 import {arrayStorage} from '../matrix/public-array';
 import {throwInvalid} from '../options';
 import type {PreparedShapePath} from '../shape-path';
-import {calculateQRCodeOutputSize, resolveColor, resolveQRCodeTextStyle} from '../styling';
+import {
+  calculateQRCodeOutputSize,
+  resolveColor,
+  resolveQRCodeTextStyle,
+  resolveQuietZone,
+} from '../styling';
 import type {QRCodeColor, QRCodeMatrix, QRCodeVisualStyle} from '../types';
 import type {QRCodeDrawContext, QRCodeDrawLayer, QRCodeStylePart} from './types';
 import type {QRCodeDrawingLayer, QRCodeStyler} from './types';
@@ -25,7 +30,7 @@ export function createQRCodeStyler(
   style?: QRCodeVisualStyle,
   rendererParts: readonly (QRCodeStylePart | undefined)[] = [],
 ): QRCodeStyler {
-  const {moduleSize, quietZone} = resolveQRCodeTextStyle(style);
+  const {moduleSize, quietZone: requestedQuietZone} = resolveQRCodeTextStyle(style);
   const foreground = resolveColor('style.foreground', style?.foreground ?? '#000000');
   const background = resolveColor('style.background', style?.background ?? '#ffffff');
   const tiles = style?.modules?.module as unknown as ModuleTiles;
@@ -36,6 +41,7 @@ export function createQRCodeStyler(
   )[];
 
   return (matrix: QRCodeMatrix) => {
+    const quietZone = resolveQuietZone(requestedQuietZone, matrix);
     const outputSize = calculateQRCodeOutputSize(matrix, {moduleSize, quietZone});
     const layers = new Map<QRCodeColor, Layer>();
     let claimedRoles = 0;

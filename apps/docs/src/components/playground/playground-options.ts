@@ -8,8 +8,8 @@ import {
 import {
   type QRCodeCenterImageLayout,
   type QRCodeDataImageURL,
-  type QRCodeMatrixOptions,
   type QRCodeSVGOptions,
+  type QRCodeStandardMatrixOptions,
   type QRCodeVisualStyle,
   svgCenterImage,
 } from '@qrcodesdk/core';
@@ -41,7 +41,7 @@ export const PLAYGROUND_SECTIONS = [
 ] as const satisfies readonly PlaygroundSection[];
 
 export interface PlaygroundOptions
-  extends Omit<QRCodeMatrixOptions, 'kanji'>, PlaygroundStyleState {
+  extends Omit<QRCodeStandardMatrixOptions, 'kanji'>, PlaygroundStyleState {
   optimizeSegments?: boolean;
   /** Passes the Kanji table so auto mode and optimized segments can use Kanji mode. */
   kanji?: boolean;

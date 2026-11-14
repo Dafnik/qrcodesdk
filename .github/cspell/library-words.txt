@@ -30,3 +30,4 @@ vitesse
 Vuedotjs
 nums
 rehype
+Barcodes

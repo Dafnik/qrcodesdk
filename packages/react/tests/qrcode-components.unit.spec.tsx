@@ -59,4 +59,12 @@ describe('React QR code component handles', () => {
     expect(image).toMatch(/^<div><\/div>$/);
     expect(canvas).toMatch(/^<div><\/div>$/);
   });
+
+  test('renders a Micro QR code through the matrix options', () => {
+    const svg = renderToString(
+      <QRCodeSVG payload="12345" options={{matrix: {symbol: reactApi.microQR()}}} />,
+    );
+
+    expect(svg).toContain('viewBox="0 0 17 17"');
+  });
 });

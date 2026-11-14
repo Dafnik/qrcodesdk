@@ -4,6 +4,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     matrix: 'src/matrix.ts',
+    micro: 'src/micro.ts',
     segmenter: 'src/segmenter.ts',
     kanji: 'src/kanji.ts',
     svg: 'src/svg.ts',

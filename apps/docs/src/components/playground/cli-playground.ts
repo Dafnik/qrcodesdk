@@ -2,9 +2,9 @@ import {atom, computed} from 'nanostores';
 
 import {
   type QRCodeColor,
-  type QRCodeMatrixOptions,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
+  type QRCodeStandardMatrixOptions,
   QRCodeTextRenderer,
   type QRCodeTextRendererOptions,
   qrcode,
@@ -21,7 +21,7 @@ import {
 import {playgroundOptions} from './playground-options.ts';
 
 export type CliLauncher = 'npm' | 'installed' | 'pnpm' | 'viteplus' | 'bun' | 'yarn';
-export interface CliPlaygroundOptions extends Omit<QRCodeMatrixOptions, 'kanji'> {
+export interface CliPlaygroundOptions extends Omit<QRCodeStandardMatrixOptions, 'kanji'> {
   optimizeSegments?: boolean;
   /** Adds `--kanji`, so auto mode and optimized segments can use Kanji mode. */
   kanji?: boolean;

@@ -1,11 +1,11 @@
-import type {QRCodeEncodingMode, QRCodeMatrixOptions} from '@qrcodesdk/core';
+import type {QRCodeEncodingMode, QRCodeStandardMatrixOptions} from '@qrcodesdk/core';
 import {kanji} from '@qrcodesdk/core/kanji';
 
 import {fixtureCapacity} from './capacity';
 import {createFixturePayload, fixtureSeed} from './fixture-payloads';
 
 export type QRCodeTestFixture = Readonly<
-  Omit<QRCodeMatrixOptions, 'mode' | 'segmenter'> & {
+  Omit<QRCodeStandardMatrixOptions, 'mode' | 'segmenter' | 'symbol'> & {
     readonly mode?: QRCodeEncodingMode;
     readonly name: string;
     readonly payload: string;
@@ -13,7 +13,9 @@ export type QRCodeTestFixture = Readonly<
 >;
 
 /** Extracts encoding options without fixture names or payloads. */
-export function fixtureMatrixOptions(fixture: QRCodeMatrixOptions): QRCodeMatrixOptions {
+export function fixtureMatrixOptions(
+  fixture: QRCodeStandardMatrixOptions,
+): QRCodeStandardMatrixOptions {
   const {mode, version, mask, eci, errorCorrectionLevel, kanji} = fixture;
   return {mode, version, mask, eci, errorCorrectionLevel, kanji};
 }

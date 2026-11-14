@@ -147,7 +147,17 @@ export type QRCodeTextStyle = {
 
 export type QRCodeRenderer<TOutput> = (matrix: QRCodeMatrix) => TOutput;
 
-export type QRCodeMatrixOptions = {
+declare const symbolValue: unique symbol;
+
+/**
+ * An alternative symbol type, such as the Micro QR code returned by `microQR()` from
+ * `@qrcodesdk/core/micro`. Consumers cannot call or inspect it.
+ */
+export type QRCodeSymbol = {readonly [symbolValue]: 'symbol'};
+
+/** Matrix options for a standard QR code (versions 1 to 40). */
+export type QRCodeStandardMatrixOptions = {
+  symbol?: undefined;
   version?: QRCodeVersion;
   /** `auto` detects a single mode unless a segmenter is supplied. Defaults to `auto`. */
   mode?: QRCodeMode;
@@ -162,6 +172,23 @@ export type QRCodeMatrixOptions = {
   mask?: QRCodeMask;
   eci?: boolean;
 };
+
+/**
+ * Matrix options for an alternative symbol type. The symbol owns its version and mask, and it
+ * supports neither a segmenter nor ECI.
+ */
+export type QRCodeSymbolMatrixOptions = {
+  symbol: QRCodeSymbol;
+  /** `auto` detects a single mode. Defaults to `auto`. */
+  mode?: QRCodeMode;
+  errorCorrectionLevel?: QRCodeErrorCorrectionLevel;
+  version?: never;
+  segmenter?: never;
+  mask?: never;
+  eci?: never;
+};
+
+export type QRCodeMatrixOptions = QRCodeStandardMatrixOptions | QRCodeSymbolMatrixOptions;
 
 export type QRCodeCenterImageLayout = {
   /** Image width and height as a fraction of the symbol, greater than 0 and at most 1. */

@@ -87,19 +87,22 @@ export function circle(options?: QRCodeCircleShapeOptions): QRCodeShape {
   };
 }
 
-/** Draws the three finder patterns with their own shapes and color. */
+/** Draws the finder patterns with their own shapes and color. */
 export function finder(options?: QRCodeFinderOptions): QRCodeFinderStyle {
   const {ring, center, color} = resolvePartOptions('finder', options, 'finderRing', 'finderCenter');
   return ((context) => {
     context.claimRoles(FINDER_RING_ROLE, FINDER_CENTER_ROLE);
-    const n = context.matrix.size;
+    const {size: n, roles} = context.matrix;
     const layer = context.layer(color);
     for (const [x, y] of [
       [0, 0],
       [n - 7, 0],
       [0, n - 7],
     ] as const) {
-      if (context.isAreaCleared(x, y, 7, 7)) continue;
+      // Micro QR codes have only the top-left finder pattern.
+      if (roles[(y + 3) * n + x + 3] !== FINDER_CENTER_ROLE || context.isAreaCleared(x, y, 7, 7)) {
+        continue;
+      }
       drawPattern(layer, ring, x, y, 7);
       drawPattern(layer, center, x + 2, y + 2, 3);
     }
