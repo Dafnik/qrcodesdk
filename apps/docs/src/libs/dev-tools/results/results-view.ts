@@ -10,6 +10,7 @@ import {HlmNativeSelectImports} from '@spartan-ng/helm/native-select';
 import {HlmProgressImports} from '@spartan-ng/helm/progress';
 
 import {type DevFixture, describeMatrix} from '../fixtures/fixture-catalog';
+import {DECODERS, type DecoderId, decoderLabel} from '../rendering/decode';
 import {DecodeResults, resultKey} from '../state/decode-results';
 import {DevToolsState, TILE_SIZES} from '../state/dev-tools-state';
 import {QRTile} from './qr-tile';
@@ -61,7 +62,7 @@ const PAYLOAD_PREVIEW_EDGE_LENGTH = 44;
             class="w-44"
             [value]="statusFilter()"
             (valueChange)="statusFilter.set($any($event))"
-            aria-label="Filter by jsQR status">
+            aria-label="Filter by decode status">
             <option hlmNativeSelectOption value="all">All rows</option>
             <option hlmNativeSelectOption value="fail">With failures</option>
             <option hlmNativeSelectOption value="known-fail">With known failures</option>
@@ -76,17 +77,21 @@ const PAYLOAD_PREVIEW_EDGE_LENGTH = 44;
         </span>
 
         @if (state.decode()) {
-          <div class="ms-auto flex items-center gap-2">
-            <span class="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" hlmBadge>
-              {{ results.summary().pass }} pass
-            </span>
-            <span hlmBadge variant="destructive">{{ results.summary().fail }} fail</span>
-            <span class="text-amber-700 dark:text-amber-400" hlmBadge variant="outline">
-              {{ results.summary()['known-fail'] }} known
-            </span>
-            <span class="text-muted-foreground text-xs">
-              {{ results.checked() }} / {{ totalRenders() }} checked
-            </span>
+          <div class="ms-auto flex flex-wrap items-center gap-2">
+            @for (decoder of state.decoders(); track decoder) {
+              @let counts = results.summary()[decoder];
+              <span class="text-xs font-medium">{{ decoderLabel(decoder) }}</span>
+              <span class="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" hlmBadge>
+                {{ counts.pass }} pass
+              </span>
+              <span hlmBadge variant="destructive">{{ counts.fail }} fail</span>
+              <span class="text-amber-700 dark:text-amber-400" hlmBadge variant="outline">
+                {{ counts['known-fail'] }} known
+              </span>
+              <span class="text-muted-foreground text-xs">
+                {{ results.checked(decoder) }} / {{ totalRenders() }} checked
+              </span>
+            }
 
             @if (results.bulkProgress(); as progress) {
               <hlm-progress class="w-32" [value]="progress.done" [max]="progress.total">
@@ -98,8 +103,8 @@ const PAYLOAD_PREVIEW_EDGE_LENGTH = 44;
               </button>
             } @else {
               <button
-                [disabled]="results.checked() >= totalRenders()"
-                (click)="results.decodeAll(run.fixtures, run.renderers)"
+                [disabled]="allChecked()"
+                (click)="results.decodeAll(run.fixtures, run.renderers, state.decoders())"
                 hlmBtn
                 size="sm"
                 variant="outline">
@@ -130,13 +135,13 @@ const PAYLOAD_PREVIEW_EDGE_LENGTH = 44;
             </span>
             <div class="flex flex-wrap gap-1">
               <span hlmBadge variant="secondary">{{ fixture.category }}</span>
-              @if (fixture.knownDecodeIssue) {
+              @for (issue of knownIssues(fixture); track issue.decoder) {
                 <span
                   class="text-amber-700 dark:text-amber-400"
-                  [title]="fixture.knownDecodeIssue"
+                  [title]="issue.message"
                   hlmBadge
                   variant="outline">
-                  known jsQR issue
+                  known {{ issue.label }} issue
                 </span>
               }
             </div>
@@ -182,6 +187,10 @@ export class ResultsView {
     return run ? run.fixtures.length * run.renderers.length : 0;
   });
 
+  protected readonly allChecked = computed(() =>
+    this.state.decoders().every((decoder) => this.results.checked(decoder) >= this.totalRenders()),
+  );
+
   protected readonly rows = computed<readonly DevFixture[]>(() => {
     const run = this.state.currentRun();
     if (!run) return [];
@@ -196,8 +205,9 @@ export class ResultsView {
       }
       if (status === 'all') return true;
 
-      const statuses = run.renderers.map(
-        (renderer) => this.results.get(resultKey(fixture, renderer))?.status,
+      const decoders = this.state.decoders();
+      const statuses = run.renderers.flatMap((renderer) =>
+        decoders.map((decoder) => this.results.get(resultKey(fixture, renderer, decoder))?.status),
       );
       switch (status) {
         case 'fail':
@@ -213,8 +223,19 @@ export class ResultsView {
 
   protected readonly trackById = (_index: number, fixture: DevFixture) => fixture.id;
 
+  protected readonly decoderLabel = decoderLabel;
+
+  protected knownIssues(
+    fixture: DevFixture,
+  ): readonly {readonly decoder: DecoderId; readonly label: string; readonly message: string}[] {
+    return DECODERS.flatMap(({id, label}) => {
+      const message = fixture.knownDecodeIssues?.[id];
+      return message === undefined ? [] : [{decoder: id, label, message}];
+    });
+  }
+
   protected matrix(fixture: DevFixture): string {
-    return describeMatrix(fixture.matrix);
+    return fixture.matrixDescription ?? describeMatrix(fixture.matrix);
   }
 
   protected payloadPreview(fixture: DevFixture): string {

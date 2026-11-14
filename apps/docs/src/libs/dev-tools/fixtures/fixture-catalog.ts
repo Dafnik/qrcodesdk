@@ -2,7 +2,10 @@ import {
   GRADIENT_IMAGE,
   LOGO_IMAGE,
   type QRCodeFixtureImage,
+  type QRCodeMicroTestFixture,
   QR_CODE_CENTER_IMAGE_FIXTURES,
+  QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
+  QR_CODE_MICRO_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
   QR_CODE_STYLING_FIXTURES,
   QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
@@ -11,6 +14,7 @@ import {
   TRANSLUCENT_IMAGE,
   WIDE_IMAGE,
   fixtureMatrixOptions,
+  fixtureMicroMatrixOptions,
 } from '@repo/core-testing';
 
 import type {
@@ -19,8 +23,16 @@ import type {
   QRCodeVisualStyle,
 } from '@qrcodesdk/core';
 
+import type {KnownDecodeIssues} from '../rendering/decode';
+
 export type FixtureCategoryId =
-  'fixtures' | 'styling' | 'style-variants' | 'center-images' | 'fixture-images';
+  | 'fixtures'
+  | 'micro'
+  | 'styling'
+  | 'style-variants'
+  | 'micro-style-variants'
+  | 'center-images'
+  | 'fixture-images';
 
 export type CategoryId = FixtureCategoryId | 'all-combinations';
 
@@ -36,8 +48,10 @@ export type DevFixture = {
     readonly image: QRCodeFixtureImage;
     readonly layout?: QRCodeCenterImageLayout;
   };
-  /** Set when jsQR is known to fail on this fixture, so a failed decode isn't a regression. */
-  readonly knownDecodeIssue?: string;
+  /** Replaces the description of `matrix`, whose symbol hides its version and mask. */
+  readonly matrixDescription?: string;
+  /** Decoders known to fail on this fixture, so their failed decodes aren't regressions. */
+  readonly knownDecodeIssues?: KnownDecodeIssues;
 };
 
 export type FixtureCategory = {
@@ -49,6 +63,9 @@ export type FixtureCategory = {
 
 /** The style the roundtrip tests use for fixtures without their own style. */
 export const PLAIN_STYLE: QRCodeVisualStyle = {moduleSize: 4, quietZone: 4};
+
+/** jsQR reads only standard QR codes. ZXing reads Micro QR codes too. */
+const MICRO_DECODE_ISSUES: KnownDecodeIssues = {jsqr: 'jsQR cannot read Micro QR codes.'};
 
 const STYLING_ROUNDTRIP_NAMES = new Set(QR_CODE_STYLING_ROUNDTRIP_FIXTURES.map(({name}) => name));
 
@@ -75,6 +92,22 @@ export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = [
     })),
   },
   {
+    id: 'micro',
+    label: 'Micro QR fixtures',
+    source: 'QR_CODE_MICRO_TEST_FIXTURES',
+    fixtures: QR_CODE_MICRO_TEST_FIXTURES.map((fixture) => ({
+      id: `micro/${fixture.name}`,
+      category: 'micro',
+      name: fixture.name,
+      payload: fixture.payload,
+      matrix: fixtureMicroMatrixOptions(fixture),
+      matrixDescription: describeMicroSymbol(fixture),
+      // Micro QR codes take the default quiet zone of 2 modules.
+      style: {moduleSize: 4},
+      knownDecodeIssues: MICRO_DECODE_ISSUES,
+    })),
+  },
+  {
     id: 'styling',
     label: 'Styling fixtures',
     source: 'QR_CODE_STYLING_FIXTURES',
@@ -85,9 +118,9 @@ export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = [
       payload: fixture.payload,
       matrix: fixture.matrixOptions,
       style: fixture.styling,
-      knownDecodeIssue: STYLING_ROUNDTRIP_NAMES.has(fixture.name)
+      knownDecodeIssues: STYLING_ROUNDTRIP_NAMES.has(fixture.name)
         ? undefined
-        : 'jsQR misses circle finder centers between dot modules in this palette.',
+        : {jsqr: 'jsQR misses circle finder centers between dot modules in this palette.'},
     })),
   },
   {
@@ -101,6 +134,21 @@ export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = [
       payload: fixture.payload,
       matrix: fixture.matrixOptions,
       style: fixture.styling,
+    })),
+  },
+  {
+    id: 'micro-style-variants',
+    label: 'Micro QR style variant fixtures',
+    source: 'QR_CODE_MICRO_STYLE_VARIANT_FIXTURES',
+    fixtures: QR_CODE_MICRO_STYLE_VARIANT_FIXTURES.map((fixture) => ({
+      id: `micro-style-variants/${fixture.name}`,
+      category: 'micro-style-variants',
+      name: fixture.name,
+      payload: fixture.payload,
+      matrix: fixture.matrixOptions,
+      matrixDescription: describeMicroSymbol(fixture.symbol),
+      style: fixture.styling,
+      knownDecodeIssues: MICRO_DECODE_ISSUES,
     })),
   },
   {
@@ -149,4 +197,16 @@ export function describeMatrix({
   ]
     .filter(Boolean)
     .join(' · ');
+}
+
+/** Describes a Micro QR symbol, whose version and mask `describeMatrix` cannot read. */
+function describeMicroSymbol({
+  version,
+  errorCorrectionLevel,
+  mask,
+  mode,
+}: Pick<QRCodeMicroTestFixture, 'version' | 'errorCorrectionLevel' | 'mask'> & {
+  readonly mode?: QRCodeMicroTestFixture['mode'];
+}): string {
+  return [version, `ECC ${errorCorrectionLevel}`, `mask ${mask}`, mode ?? 'mode auto'].join(' · ');
 }

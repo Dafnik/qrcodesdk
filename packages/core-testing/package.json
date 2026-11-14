@@ -6,6 +6,8 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
+    "./micro-decoder": "./dist/micro-decoder/index.mjs",
+    "./micro-decoder/node": "./dist/micro-decoder/node.mjs",
     "./package.json": "./package.json"
   },
   "files": [
@@ -23,7 +25,8 @@
     "test:snapshots": "vitest run tests/svg/svg-renderer.snapshot.e2e.spec.ts tests/text/text-renderer.snapshot.e2e.spec.ts"
   },
   "dependencies": {
-    "@qrcodesdk/core": "workspace:*"
+    "@qrcodesdk/core": "workspace:*",
+    "zxing-wasm": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -36,7 +39,6 @@
     "sharp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:",
-    "zxing-wasm": "3.1.6"
+    "vitest": "catalog:"
   }
 }

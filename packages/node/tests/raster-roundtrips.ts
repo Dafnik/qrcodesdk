@@ -1,6 +1,12 @@
-import {encodeFixturePNG, fixtureMatrixOptions} from '@repo/core-testing';
+import {
+  encodeFixturePNG,
+  fixtureMatrixOptions,
+  fixtureMicroMatrixOptions,
+} from '@repo/core-testing';
 import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
+  QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
+  QR_CODE_MICRO_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
   QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
   QR_CODE_TEST_FIXTURES,
@@ -10,7 +16,7 @@ import {describe, expect, test} from 'vitest';
 import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
 import {type QRCodeRasterRendererOptions, rasterCenterImage} from '../src';
-import {decodeRasterQRCode} from './raster-helpers';
+import {decodeRasterMicroQRCode, decodeRasterQRCode} from './raster-helpers';
 
 /**
  * Scans every fixture rendered by one raster renderer, except the named styling fixtures that jsQR
@@ -85,6 +91,35 @@ export function describeRasterRoundtrips(
               .render(createRenderer({style: fixture.styling})),
           ),
         ).resolves.toBe(fixture.payload);
+      },
+    );
+
+    // Micro QR fixtures keep the default quiet zone of 2 modules.
+    const microRenderer = createRenderer({style: {moduleSize: 4}});
+
+    test.each(QR_CODE_MICRO_TEST_FIXTURES)(
+      `decodes $name ${format} Micro QR output`,
+      async (fixture) => {
+        await expect(
+          decodeRasterMicroQRCode(
+            qrcode(fixture.payload)
+              .options(fixtureMicroMatrixOptions(fixture))
+              .render(microRenderer),
+          ),
+        ).resolves.toMatchObject({text: fixture.payload, version: fixture.version});
+      },
+    );
+
+    test.each(QR_CODE_MICRO_STYLE_VARIANT_FIXTURES)(
+      `decodes $name ${format} Micro QR style variant`,
+      async (fixture) => {
+        await expect(
+          decodeRasterMicroQRCode(
+            qrcode(fixture.payload)
+              .options(fixture.matrixOptions)
+              .render(createRenderer({style: fixture.styling})),
+          ),
+        ).resolves.toMatchObject({text: fixture.payload});
       },
     );
   });

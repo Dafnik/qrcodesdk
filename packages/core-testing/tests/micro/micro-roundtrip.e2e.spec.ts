@@ -10,7 +10,13 @@ import {
 import {type QRCodeMicroMask, type QRCodeMicroVersion, microQR} from '@qrcodesdk/core/micro';
 import {circle, finder, rounded} from '@qrcodesdk/core/style';
 
-import {createFixturePayload, fixtureSeed} from '../../src';
+import {
+  QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
+  QR_CODE_MICRO_TEST_FIXTURES,
+  createFixturePayload,
+  fixtureMicroMatrixOptions,
+  fixtureSeed,
+} from '../../src';
 import {decodeMicroQRCodeMatrix, decodeMicroQRCodeSvg} from './micro-helpers';
 
 // ISO/IEC 18004:2015 Table 7: data capacity by symbol, level, and mode.
@@ -76,6 +82,25 @@ describe('Micro QR roundtrips', () => {
     async (payload) => {
       const matrix = qrcode(payload).options({symbol: microQR()}).matrix();
       await expect(decodeMicroQRCodeMatrix(matrix)).resolves.toMatchObject({text: payload});
+    },
+  );
+
+  test.each(QR_CODE_MICRO_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
+    const svg = qrcode(fixture.payload)
+      .options(fixtureMicroMatrixOptions(fixture))
+      .render(QRCodeSVGRenderer({style: {moduleSize: 4}}));
+    const scan = await decodeMicroQRCodeSvg(svg);
+    expect(scan).toMatchObject({text: fixture.payload, version: fixture.version});
+    if (fixture.version !== 'M1') expect(scan.ecLevel).toBe(fixture.errorCorrectionLevel);
+  });
+
+  test.each(QR_CODE_MICRO_STYLE_VARIANT_FIXTURES)(
+    'decodes $name SVG style variant',
+    async (fixture) => {
+      const svg = qrcode(fixture.payload)
+        .options(fixture.matrixOptions)
+        .render(QRCodeSVGRenderer({style: fixture.styling}));
+      await expect(decodeMicroQRCodeSvg(svg)).resolves.toMatchObject({text: fixture.payload});
     },
   );
 
