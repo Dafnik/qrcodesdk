@@ -42,7 +42,7 @@ class QRCodeMicroSSRHost {
     <qrcode-svg [options]="options" payload="12345" />
   `,
 })
-class QRCodeRMQRSSRHost {
+class QRCodeRectangularSSRHost {
   readonly options = {matrix: {symbol: rMQR()}};
 }
 
@@ -83,7 +83,7 @@ describe('Angular QR code server rendering', () => {
 
   test('renders an rMQR code through the matrix options', async () => {
     const html = await renderApplication(
-      (context) => bootstrapApplication(QRCodeRMQRSSRHost, undefined, context),
+      (context) => bootstrapApplication(QRCodeRectangularSSRHost, undefined, context),
       {document: '<qrcode-ssr-host></qrcode-ssr-host>', url: '/'},
     );
 

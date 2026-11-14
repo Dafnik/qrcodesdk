@@ -334,7 +334,10 @@ test('core publishes rMQR codes independently of default generation', async () =
   const root = await importTarget(packageJson.exports['.']);
   const {rMQR} = await importTarget(packageJson.exports['./rmqr']);
   assert.equal(root.rMQR, undefined);
-  const matrix = root.qrcode('rMQR').options({symbol: rMQR({version: 'R7'})}).matrix();
+  const matrix = root
+    .qrcode('rMQR')
+    .options({symbol: rMQR({version: 'R7'})})
+    .matrix();
   assert.deepEqual([matrix.width, matrix.height], [43, 7]);
 
   const encoder = path.resolve(packageDirectory, packageJson.exports['./rmqr']);

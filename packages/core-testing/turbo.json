@@ -1,7 +1,5 @@
 {
-  "extends": [
-    "//"
-  ],
+  "extends": ["//"],
   "tasks": {
     "build": {
       "inputs": [
@@ -10,30 +8,19 @@
         "!scripts/generate-rmqr-fixtures.mjs"
       ]
     },
+    "generate:rmqr-fixtures": {
+      "cache": false
+    },
     "test": {
-      "env": [
-        "UPDATE_SVG_SNAPSHOTS",
-        "UPDATE_TEXT_SNAPSHOTS"
-      ]
+      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
     },
     "test:coverage:raw": {
-      "env": [
-        "UPDATE_SVG_SNAPSHOTS",
-        "UPDATE_TEXT_SNAPSHOTS"
-      ]
+      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
     },
     "test:snapshots": {
       "cache": false,
-      "dependsOn": [
-        "build"
-      ],
-      "env": [
-        "UPDATE_SVG_SNAPSHOTS",
-        "UPDATE_TEXT_SNAPSHOTS"
-      ]
-    },
-    "generate:rmqr-fixtures": {
-      "cache": false
+      "dependsOn": ["build"],
+      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
     }
   }
 }
