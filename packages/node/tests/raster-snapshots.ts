@@ -1,19 +1,4 @@
-import {
-  encodeFixturePNG,
-  fixtureMatrixOptions,
-  fixtureMicroMatrixOptions,
-  fixtureRMQRMatrixOptions,
-} from '@repo/core-testing';
-import {
-  QR_CODE_CENTER_IMAGE_FIXTURES,
-  QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
-  QR_CODE_MICRO_TEST_FIXTURES,
-  QR_CODE_RMQR_STYLE_VARIANT_FIXTURES,
-  QR_CODE_RMQR_TEST_FIXTURES,
-  QR_CODE_STYLE_VARIANT_FIXTURES,
-  QR_CODE_STYLING_FIXTURES,
-  QR_CODE_TEST_FIXTURES,
-} from '@repo/core-testing';
+import {QR_CODE_RENDER_FIXTURES, encodeFixturePNG} from '@repo/core-testing';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {describe, test} from 'vitest';
@@ -23,7 +8,10 @@ import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
 import {type QRCodeRasterRendererOptions, rasterCenterImage} from '../src';
 import {type RasterFormat, expectRasterToMatchFileSnapshot} from './raster-helpers';
 
-/** Compares every fixture rendered by one raster renderer with its tracked file snapshot. */
+/**
+ * Compares every render fixture drawn by one raster renderer with its tracked file snapshot. The
+ * docs dev tools render the same fixtures with the same options.
+ */
 export function describeRasterSnapshots(
   format: RasterFormat,
   createRenderer: (options: QRCodeRasterRendererOptions) => QRCodeRenderer<Buffer>,
@@ -32,106 +20,22 @@ export function describeRasterSnapshots(
   const snapshotDirectory = fileURLToPath(new URL(`__snapshots__/${extension}`, import.meta.url));
 
   describe(`${format} renderer snapshots`, () => {
-    test.each(QR_CODE_TEST_FIXTURES)(`matches %s generated QR ${format} snapshot`, (fixture) => {
+    test.each(QR_CODE_RENDER_FIXTURES)(`matches $id ${format} snapshot`, (fixture) => {
+      const {centerImage} = fixture;
       expectRasterToMatchFileSnapshot(
         format,
         qrcode(fixture.payload)
-          .options(fixtureMatrixOptions(fixture))
-          .render(createRenderer({style: {moduleSize: 8, quietZone: 4}})),
-        join(snapshotDirectory, `${fixture.name}.${extension}`),
+          .options(fixture.matrix)
+          .render(
+            createRenderer({
+              style: fixture.style,
+              centerImage: centerImage
+                ? rasterCenterImage(encodeFixturePNG(centerImage.image), centerImage.layout)
+                : undefined,
+            }),
+          ),
+        join(snapshotDirectory, `${fixture.snapshotPath}.${extension}`),
       );
     });
-
-    test.each(QR_CODE_STYLING_FIXTURES)(`matches $name ${format} styling snapshot`, (fixture) => {
-      expectRasterToMatchFileSnapshot(
-        format,
-        qrcode(fixture.payload)
-          .options(fixture.matrixOptions)
-          .render(createRenderer({style: fixture.styling})),
-        join(snapshotDirectory, 'styling', `${fixture.name}.${extension}`),
-      );
-    });
-
-    test.each(QR_CODE_STYLE_VARIANT_FIXTURES)(
-      `matches $name ${format} style variant snapshot`,
-      (fixture) => {
-        expectRasterToMatchFileSnapshot(
-          format,
-          qrcode(fixture.payload)
-            .options(fixture.matrixOptions)
-            .render(createRenderer({style: fixture.styling})),
-          join(snapshotDirectory, 'style-variants', `${fixture.name}.${extension}`),
-        );
-      },
-    );
-
-    test.each(QR_CODE_CENTER_IMAGE_FIXTURES)(
-      `matches $name ${format} center image snapshot`,
-      (fixture) => {
-        expectRasterToMatchFileSnapshot(
-          format,
-          qrcode(fixture.payload)
-            .options(fixture.matrixOptions)
-            .render(
-              createRenderer({
-                style: fixture.style,
-                centerImage: rasterCenterImage(encodeFixturePNG(fixture.image), fixture.layout),
-              }),
-            ),
-          join(snapshotDirectory, 'center-image', `${fixture.name}.${extension}`),
-        );
-      },
-    );
-
-    // Micro QR fixtures keep the default quiet zone of 2 modules.
-    test.each(QR_CODE_MICRO_TEST_FIXTURES)(
-      `matches $name ${format} Micro QR snapshot`,
-      (fixture) => {
-        expectRasterToMatchFileSnapshot(
-          format,
-          qrcode(fixture.payload)
-            .options(fixtureMicroMatrixOptions(fixture))
-            .render(createRenderer({style: {moduleSize: 8}})),
-          join(snapshotDirectory, 'micro', `${fixture.name}.${extension}`),
-        );
-      },
-    );
-
-    test.each(QR_CODE_MICRO_STYLE_VARIANT_FIXTURES)(
-      `matches $name ${format} Micro QR style variant snapshot`,
-      (fixture) => {
-        expectRasterToMatchFileSnapshot(
-          format,
-          qrcode(fixture.payload)
-            .options(fixture.matrixOptions)
-            .render(createRenderer({style: fixture.styling})),
-          join(snapshotDirectory, 'micro', 'style-variants', `${fixture.name}.${extension}`),
-        );
-      },
-    );
-
-    // rMQR fixtures keep the default quiet zone of 2 modules.
-    test.each(QR_CODE_RMQR_TEST_FIXTURES)(`matches $name ${format} rMQR snapshot`, (fixture) => {
-      expectRasterToMatchFileSnapshot(
-        format,
-        qrcode(fixture.payload)
-          .options(fixtureRMQRMatrixOptions(fixture))
-          .render(createRenderer({style: {moduleSize: 8}})),
-        join(snapshotDirectory, 'rmqr', `${fixture.name}.${extension}`),
-      );
-    });
-
-    test.each(QR_CODE_RMQR_STYLE_VARIANT_FIXTURES)(
-      `matches $name ${format} rMQR style variant snapshot`,
-      (fixture) => {
-        expectRasterToMatchFileSnapshot(
-          format,
-          qrcode(fixture.payload)
-            .options(fixture.matrixOptions)
-            .render(createRenderer({style: fixture.styling})),
-          join(snapshotDirectory, 'rmqr', 'style-variants', `${fixture.name}.${extension}`),
-        );
-      },
-    );
   });
 }

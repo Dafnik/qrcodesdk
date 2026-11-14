@@ -75,7 +75,9 @@ pnpm turbo run start --filter=docs
 
 The docs also serve the dev tools at `/devtools`, a standalone page outside Starlight. They render
 the shared `@repo/core-testing` fixtures with the `@qrcodesdk/angular` components (SVG, PNG, WebP,
-GIF, JPEG, and Canvas), and can scan each output with ZXing. Nothing renders until you pick fixtures and
+GIF, JPEG, and Canvas), and can scan each output with ZXing. Their fixture categories are
+`QR_CODE_RENDER_FIXTURE_GROUPS`, the fixtures and options that the SVG and raster snapshot tests
+write to disk, so each tile matches a tracked snapshot file. Nothing renders until you pick fixtures and
 renderers and press Run. Large selections, such as all combinations, render lazily in a virtual
 list. The code lives in `apps/docs/src/libs/dev-tools`.
 

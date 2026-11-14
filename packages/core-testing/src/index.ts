@@ -44,6 +44,12 @@ export {
   QR_CODE_RMQR_TEST_FIXTURES,
 } from './rmqr-fixtures';
 export type {QRCodeRMQRStyleVariantFixture, QRCodeRMQRTestFixture} from './rmqr-fixtures';
+export {QR_CODE_RENDER_FIXTURE_GROUPS, QR_CODE_RENDER_FIXTURES} from './render-fixtures';
+export type {
+  QRCodeRenderFixture,
+  QRCodeRenderFixtureGroup,
+  QRCodeRenderFixtureGroupId,
+} from './render-fixtures';
 export type {QRCodeTestFixture} from './fixtures';
 export {createFixtureShape, createFixtureStyle, QR_CODE_STYLING_FIXTURES} from './styling-fixtures';
 export type {

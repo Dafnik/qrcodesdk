@@ -1,23 +1,7 @@
 import {
-  GRADIENT_IMAGE,
-  LOGO_IMAGE,
   type QRCodeFixtureImage,
-  type QRCodeMicroTestFixture,
-  type QRCodeRMQRTestFixture,
-  QR_CODE_CENTER_IMAGE_FIXTURES,
-  QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
-  QR_CODE_MICRO_TEST_FIXTURES,
-  QR_CODE_RMQR_STYLE_VARIANT_FIXTURES,
-  QR_CODE_RMQR_TEST_FIXTURES,
-  QR_CODE_STYLE_VARIANT_FIXTURES,
-  QR_CODE_STYLING_FIXTURES,
-  QR_CODE_TEST_FIXTURES,
-  TALL_IMAGE,
-  TRANSLUCENT_IMAGE,
-  WIDE_IMAGE,
-  fixtureMatrixOptions,
-  fixtureMicroMatrixOptions,
-  fixtureRMQRMatrixOptions,
+  type QRCodeRenderFixtureGroupId,
+  QR_CODE_RENDER_FIXTURE_GROUPS,
 } from '@repo/core-testing';
 
 import type {
@@ -28,20 +12,11 @@ import type {
 
 import type {KnownDecodeIssues} from '../rendering/decode';
 
-export type FixtureCategoryId =
-  | 'fixtures'
-  | 'micro'
-  | 'rmqr'
-  | 'styling'
-  | 'style-variants'
-  | 'micro-style-variants'
-  | 'rmqr-style-variants'
-  | 'center-images'
-  | 'fixture-images';
+export type FixtureCategoryId = QRCodeRenderFixtureGroupId;
 
 export type CategoryId = FixtureCategoryId | 'all-combinations';
 
-/** One QR code to render, normalized from the different fixture shapes of `@repo/core-testing`. */
+/** One QR code to render: a render fixture of `@repo/core-testing` or a generated combination. */
 export type DevFixture = {
   readonly id: string;
   readonly category: CategoryId;
@@ -66,7 +41,7 @@ export type FixtureCategory = {
   readonly fixtures: readonly DevFixture[];
 };
 
-/** The style the roundtrip tests use for fixtures without their own style. */
+/** The style the roundtrip tests use for the generated combinations. */
 export const PLAIN_STYLE: QRCodeVisualStyle = {moduleSize: 4, quietZone: 4};
 
 /** ZXing drops symbols without content. The matrix tests compare the empty payload instead. */
@@ -74,142 +49,28 @@ const EMPTY_PAYLOAD_DECODE_ISSUES: KnownDecodeIssues = {
   zxing: 'ZXing ignores QR codes without content.',
 };
 
-export const FIXTURE_IMAGES: readonly QRCodeFixtureImage[] = [
-  LOGO_IMAGE,
-  WIDE_IMAGE,
-  TALL_IMAGE,
-  GRADIENT_IMAGE,
-  TRANSLUCENT_IMAGE,
-];
-
-export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = [
-  {
-    id: 'fixtures',
-    label: 'Fixtures',
-    source: 'QR_CODE_TEST_FIXTURES',
-    fixtures: QR_CODE_TEST_FIXTURES.map((fixture) => ({
-      id: `fixtures/${fixture.name}`,
-      category: 'fixtures',
+/**
+ * The render fixtures of `@repo/core-testing`, with the same options as the SVG and raster snapshot
+ * files that the snapshot tests write to disk.
+ */
+export const FIXTURE_CATEGORIES: readonly FixtureCategory[] = QR_CODE_RENDER_FIXTURE_GROUPS.map(
+  ({id, label, source, fixtures}) => ({
+    id,
+    label,
+    source,
+    fixtures: fixtures.map((fixture) => ({
+      id: fixture.id,
+      category: id,
       name: fixture.name,
       payload: fixture.payload,
-      matrix: fixtureMatrixOptions(fixture),
-      style: PLAIN_STYLE,
+      matrix: fixture.matrix,
+      style: fixture.style,
+      centerImage: fixture.centerImage,
+      matrixDescription: fixture.description,
       knownDecodeIssues: fixture.payload === '' ? EMPTY_PAYLOAD_DECODE_ISSUES : undefined,
     })),
-  },
-  {
-    id: 'micro',
-    label: 'Micro QR fixtures',
-    source: 'QR_CODE_MICRO_TEST_FIXTURES',
-    fixtures: QR_CODE_MICRO_TEST_FIXTURES.map((fixture) => ({
-      id: `micro/${fixture.name}`,
-      category: 'micro',
-      name: fixture.name,
-      payload: fixture.payload,
-      matrix: fixtureMicroMatrixOptions(fixture),
-      matrixDescription: describeMicroSymbol(fixture),
-      // Micro QR codes take the default quiet zone of 2 modules.
-      style: {moduleSize: 4},
-    })),
-  },
-  {
-    id: 'rmqr',
-    label: 'rMQR fixtures',
-    source: 'QR_CODE_RMQR_TEST_FIXTURES',
-    fixtures: QR_CODE_RMQR_TEST_FIXTURES.map((fixture) => ({
-      id: `rmqr/${fixture.name}`,
-      category: 'rmqr',
-      name: fixture.name,
-      payload: fixture.payload,
-      matrix: fixtureRMQRMatrixOptions(fixture),
-      matrixDescription: describeRMQRSymbol(fixture),
-      // rMQR codes take the default quiet zone of 2 modules.
-      style: {moduleSize: 4},
-    })),
-  },
-  {
-    id: 'styling',
-    label: 'Styling fixtures',
-    source: 'QR_CODE_STYLING_FIXTURES',
-    fixtures: QR_CODE_STYLING_FIXTURES.map((fixture) => ({
-      id: `styling/${fixture.name}`,
-      category: 'styling',
-      name: fixture.name,
-      payload: fixture.payload,
-      matrix: fixture.matrixOptions,
-      style: fixture.styling,
-    })),
-  },
-  {
-    id: 'style-variants',
-    label: 'Style variant fixtures',
-    source: 'QR_CODE_STYLE_VARIANT_FIXTURES',
-    fixtures: QR_CODE_STYLE_VARIANT_FIXTURES.map((fixture) => ({
-      id: `style-variants/${fixture.name}`,
-      category: 'style-variants',
-      name: fixture.name,
-      payload: fixture.payload,
-      matrix: fixture.matrixOptions,
-      style: fixture.styling,
-    })),
-  },
-  {
-    id: 'micro-style-variants',
-    label: 'Micro QR style variant fixtures',
-    source: 'QR_CODE_MICRO_STYLE_VARIANT_FIXTURES',
-    fixtures: QR_CODE_MICRO_STYLE_VARIANT_FIXTURES.map((fixture) => ({
-      id: `micro-style-variants/${fixture.name}`,
-      category: 'micro-style-variants',
-      name: fixture.name,
-      payload: fixture.payload,
-      matrix: fixture.matrixOptions,
-      matrixDescription: describeMicroSymbol(fixture.symbol),
-      style: fixture.styling,
-    })),
-  },
-  {
-    id: 'rmqr-style-variants',
-    label: 'rMQR style variant fixtures',
-    source: 'QR_CODE_RMQR_STYLE_VARIANT_FIXTURES',
-    fixtures: QR_CODE_RMQR_STYLE_VARIANT_FIXTURES.map((fixture) => ({
-      id: `rmqr-style-variants/${fixture.name}`,
-      category: 'rmqr-style-variants',
-      name: fixture.name,
-      payload: fixture.payload,
-      matrix: fixture.matrixOptions,
-      matrixDescription: describeRMQRSymbol({symbol: fixture.symbol, errorCorrectionLevel: 'M'}),
-      style: fixture.styling,
-    })),
-  },
-  {
-    id: 'center-images',
-    label: 'Center image fixtures',
-    source: 'QR_CODE_CENTER_IMAGE_FIXTURES',
-    fixtures: QR_CODE_CENTER_IMAGE_FIXTURES.map((fixture) => ({
-      id: `center-images/${fixture.name}`,
-      category: 'center-images',
-      name: fixture.name,
-      payload: fixture.payload,
-      matrix: fixture.matrixOptions,
-      style: fixture.style,
-      centerImage: {image: fixture.image, layout: fixture.layout},
-    })),
-  },
-  {
-    id: 'fixture-images',
-    label: 'Fixture images',
-    source: 'fixture-images.ts',
-    fixtures: FIXTURE_IMAGES.map((image) => ({
-      id: `fixture-images/${image.name}`,
-      category: 'fixture-images',
-      name: `${image.name} (${image.width}×${image.height})`,
-      payload: 'https://qrcodesdk.dev/guides/center-images/',
-      matrix: {version: 6, errorCorrectionLevel: 'H', mask: 2},
-      style: {moduleSize: 6, quietZone: 4},
-      centerImage: {image},
-    })),
-  },
-];
+  }),
+);
 
 export function describeMatrix({
   version,
@@ -227,27 +88,4 @@ export function describeMatrix({
   ]
     .filter(Boolean)
     .join(' · ');
-}
-
-/** Describes a Micro QR symbol, whose version and mask `describeMatrix` cannot read. */
-function describeMicroSymbol({
-  version,
-  errorCorrectionLevel,
-  mask,
-  mode,
-}: Pick<QRCodeMicroTestFixture, 'version' | 'errorCorrectionLevel' | 'mask'> & {
-  readonly mode?: QRCodeMicroTestFixture['mode'];
-}): string {
-  return [version, `ECC ${errorCorrectionLevel}`, `mask ${mask}`, mode ?? 'mode auto'].join(' · ');
-}
-
-/** Describes an rMQR symbol, whose version `describeMatrix` cannot read. */
-function describeRMQRSymbol({
-  symbol,
-  errorCorrectionLevel,
-  mode,
-}: Pick<QRCodeRMQRTestFixture, 'symbol' | 'errorCorrectionLevel'> & {
-  readonly mode?: QRCodeRMQRTestFixture['mode'];
-}): string {
-  return [symbol, `ECC ${errorCorrectionLevel}`, mode ?? 'mode auto'].join(' · ');
 }
