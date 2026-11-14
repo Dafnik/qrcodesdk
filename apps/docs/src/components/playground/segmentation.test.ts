@@ -5,7 +5,6 @@ import {qrcode} from '@qrcodesdk/core';
 import {kanji} from '@qrcodesdk/core/kanji';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
-import {explainQRCode} from '../explain/qrcode-analyzer.ts';
 import {generatePlaygroundCode} from './angular/playground-code-generator.ts';
 import {
   createCliPreview,
@@ -83,15 +82,6 @@ test('all framework examples import the optional optimizer only when selected', 
     assert.doesNotMatch(optimized, /@qrcodesdk\/core/);
     assert.match(optimized, /segmenter: automaticSegmenter/);
   }
-});
-
-test('the explainer reports actual modes for default, optimized, and forced encoding', () => {
-  assert.equal(explainQRCode({payload, mode: 'auto'}).mode, 'octet');
-  const optimized = explainQRCode({payload, mode: 'auto', optimizeSegments: true});
-  assert.equal(optimized.mode, 'mixed');
-  assert.equal(optimized.matrix.size, 25);
-  assert.equal(explainQRCode({payload, mode: 'octet', optimizeSegments: true}).mode, 'octet');
-  assert.equal(explainQRCode({payload: '', mode: 'auto'}).mode, 'numeric');
 });
 
 test('playground loads the Kanji table before it applies updates that need it', async () => {

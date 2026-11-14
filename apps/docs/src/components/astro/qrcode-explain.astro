@@ -15,7 +15,8 @@ import {QRCodeExplain, QRCodeExplainControls} from '../angular/qrcode-explain.ts
   <div class="grid min-w-0 grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
     <QRCodeExplainControls client:load />
 
-    <div class="lg:sticky lg:top-20">
+    <!-- The open encoding trace is taller than the viewport, so the column scrolls with the page. -->
+    <div class="lg:sticky lg:top-20 lg:has-[[data-trace-open]]:static">
       <QRCodeExplain client:load />
     </div>
   </div>

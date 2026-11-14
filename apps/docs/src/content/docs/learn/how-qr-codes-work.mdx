@@ -21,6 +21,12 @@ A QR code is a square grid of dark and light modules:
 - The remaining modules carry the payload, error correction data, and format information.
 
 Change the payload and options below, then select a region or a single module to see its role.
+Both standard and Micro QR codes are supported.
+
+Turn on **Show encoding trace** to see how the encoder filled the symbol: the segments and their
+bit costs, the terminator and padding, the error correction blocks, the codewords in placement
+order, and the score of every mask. With the trace on, a module's details also name its codeword and
+the part of the bit stream it carries. The trace is part of this page, not a QRCodeSDK API.
 
 <QRCodeExplain />
 
@@ -88,7 +94,33 @@ stream:
   modes when that makes the bit stream shorter.
 - An optional ECI header declares UTF-8, so scanners do not guess the text encoding.
 
-After the segments, a terminator and padding fill the remaining data capacity.
+After the segments, a terminator and padding fill the remaining data capacity:
+
+1. The **terminator** is 4 zero bits. When fewer bits are left, it is cut short.
+2. **Alignment** zeros complete the last partly used byte.
+3. **Pad codewords** `EC` and `11` alternate until the data capacity is full.
+
+### Why a payload needs a larger version
+
+The version depends on the bits the segments need, not on the length of the string. Each segment
+costs its mode indicator, its character count indicator, and its packed characters. For example, at
+level `M` version 1 holds 128 data bits:
+
+| Payload                         | Mode    | Bits needed               | Version |
+| ------------------------------- | ------- | ------------------------- | ------- |
+| 34 digits                       | Numeric | 4 + 10 + 114 = 128        | 1       |
+| 35 digits                       | Numeric | 4 + 10 + 117 = 131        | 2       |
+| `https://qrcodesdk.dev`         | Octet   | 4 + 8 + 21 × 8 = 180      | 2       |
+| `https://qrcodesdk.dev` and ECI | Octet   | 12 + 4 + 8 + 21 × 8 = 192 | 2       |
+
+One more digit pushes the payload past version 1, so the builder picks version 2, which holds 224
+data bits at level `M`. A higher error correction level leaves fewer data bits in every version.
+
+Character count indicators widen at versions 10 and 27, so the same segments cost a few more bits in
+larger versions. In octet mode, the count is the number of UTF-8 bytes, so `é✅😀` counts 9 bytes,
+although the string has 4 UTF-16 code units.
+
+If you request a `version`, the builder uses it even when a smaller version would hold the payload.
 
 ## Error correction
 
@@ -104,14 +136,25 @@ a scanner restore codewords that are damaged, dirty, or covered:
 
 Higher levels leave less room for data, so the same payload may need a larger version.
 
+Larger versions split the codewords into several **blocks** of almost equal length, and each block
+gets its own error correction codewords. Blocks of one more data codeword come last. Version 5 at
+level `Q`, for example, has two blocks of 15 and two blocks of 16 data codewords, each with 18 error
+correction codewords.
+
 - QRCodeSDK defaults to `M`.
 - Use `H` when a [center image](/guides/center-images/) covers modules.
 - The builder picks the smallest version that fits the payload at the chosen level.
 
 ## Placement and masking
 
-Data and error correction codewords are interleaved. They are placed in two-module-wide columns,
-zigzagging up and down from the bottom-right corner and skipping the function patterns.
+The codewords are **interleaved** before placement: the first data codeword of every block, then
+the second of every block, and so on. The error correction codewords follow in the same way. A
+damaged area of the symbol then hits a few codewords of many blocks instead of many codewords of one
+block.
+
+The bits are placed in two-module-wide columns, zigzagging up and down from the bottom-right corner
+and skipping the function patterns. In some versions a few **remainder bits** are left over at the
+end of the path; they stay zero.
 
 Some layouts confuse scanners: long runs of one color, large blocks, or shapes that look like finder
 patterns. To avoid them, the encoder masks the data:
@@ -120,8 +163,29 @@ patterns. To avoid them, the encoder masks the data:
 2. It scores each candidate with four penalty rules and keeps the lowest score.
 3. It records the chosen mask in the format information.
 
-A scanner reads the mask and removes it before decoding. QRCodeSDK picks the mask automatically. Pin
-`mask` only for fixtures or compatibility tests.
+When two masks score the same, the encoder keeps the lower mask number. A scanner reads the mask and
+removes it before decoding. QRCodeSDK picks the mask automatically. Pin `mask` only for fixtures or
+compatibility tests.
+
+The mask changes which modules are dark, not how many codewords fit, so it never changes the size of
+the symbol.
+
+## Micro QR codes
+
+[Micro QR codes](/guides/micro-qr-codes/) follow the same steps with a few differences:
+
+- One finder pattern, timing patterns along the top row and left column, and one copy of the format
+  information. The format information stores a symbol number for the version and error correction
+  level, and the mask.
+- One segment, one error correction block, and no interleaving.
+- Mode indicators are 0 to 3 bits long; M1 has none because it only supports numeric mode. The
+  terminator is 3, 5, 7, or 9 zero bits for M1 to M4.
+- M1 and M3 end their data with a 4-bit codeword. Its zero low nibble counts for error correction
+  but is not placed in the matrix.
+- M1 only detects errors and has no error correction level.
+- There are four masks. The encoder counts the dark modules along the right column and the bottom
+  row, excluding the timing patterns. The score is 16 × the smaller count plus the larger count, and
+  the highest score wins.
 
 ## Learn more
 
