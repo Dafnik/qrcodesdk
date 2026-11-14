@@ -29,18 +29,18 @@ export function createRGBARenderer(
 
   return (matrix: QRCodeMatrix) => {
     const drawing = draw(matrix);
-    const {moduleSize: scale, outputSize} = drawing;
-    if (outputSize * outputSize > MAX_OUTPUT_PIXELS) {
+    const {moduleSize: scale, outputWidth, outputHeight} = drawing;
+    if (outputWidth * outputHeight > MAX_OUTPUT_PIXELS) {
       throw new QRCodeError(
         'INVALID_OPTIONS',
-        `QR code raster output must not exceed ${MAX_OUTPUT_PIXELS} pixels, received ${outputSize} x ${outputSize}`,
-        {details: {field: 'dimensions', value: outputSize}},
+        `QR code raster output must not exceed ${MAX_OUTPUT_PIXELS} pixels, received ${outputWidth} x ${outputHeight}`,
+        {details: {field: 'dimensions', value: [outputWidth, outputHeight]}},
       );
     }
-    const pixels = new Uint32Array(outputSize * outputSize);
+    const pixels = new Uint32Array(outputWidth * outputHeight);
     const image: RGBAImage = {
-      width: outputSize,
-      height: outputSize,
+      width: outputWidth,
+      height: outputHeight,
       data: Buffer.from(pixels.buffer),
     };
     const background = parseColor(drawing.background);

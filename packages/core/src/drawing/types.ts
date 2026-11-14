@@ -5,13 +5,20 @@ export type QRCodeStyler = (matrix: QRCodeMatrix) => QRCodeDrawing;
 
 /** Renderer-neutral geometry in view coordinates, where one unit is one module. */
 export type QRCodeDrawing = {
-  readonly moduleCount: number;
+  /** Matrix width in modules, without the quiet zone. */
+  readonly moduleWidth: number;
+  /** Matrix height in modules, without the quiet zone. */
+  readonly moduleHeight: number;
   readonly moduleSize: number;
   readonly quietZone: number;
-  /** Width and height in modules, including the quiet zone. */
-  readonly viewSize: number;
-  /** Width and height in pixels. */
-  readonly outputSize: number;
+  /** Width in modules, including the quiet zone. */
+  readonly viewWidth: number;
+  /** Height in modules, including the quiet zone. */
+  readonly viewHeight: number;
+  /** Width in pixels. */
+  readonly outputWidth: number;
+  /** Height in pixels. */
+  readonly outputHeight: number;
   readonly background: QRCodeColor;
   /** Layers in paint order. Geometry never overlaps, within or across layers. */
   readonly layers: readonly QRCodeDrawingLayer[];

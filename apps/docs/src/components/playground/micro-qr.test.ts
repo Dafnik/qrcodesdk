@@ -24,7 +24,7 @@ const microOptions: PlaygroundOptions = {
 
 function renderMatrixSize(options: PlaygroundOptions): number {
   const {matrix} = createPlaygroundSVGOptions(options, undefined);
-  return qrcode(options.payload).options(matrix).matrix().size;
+  return qrcode(options.payload).options(matrix).matrix().width;
 }
 
 describe('playground Micro QR options', () => {

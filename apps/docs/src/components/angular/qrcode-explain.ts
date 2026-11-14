@@ -223,7 +223,7 @@ export class QRCodeExplainControls {
           </span>
           <span
             class="bg-secondary text-secondary-foreground rounded-md px-2.5 py-1 font-mono text-xs">
-            {{ qr.matrix.size }}×{{ qr.matrix.size }} modules
+            {{ qr.matrix.width }}×{{ qr.matrix.width }} modules
           </span>
         </div>
 
@@ -256,17 +256,17 @@ export class QRCodeExplainControls {
                 <rect
                   [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
-                  [attr.y]="qr.quietZone + qr.matrix.size"
+                  [attr.y]="qr.quietZone + qr.matrix.width"
                   fill="var(--background)" />
                 <rect
-                  [attr.height]="qr.matrix.size"
+                  [attr.height]="qr.matrix.width"
                   [attr.width]="qr.quietZone"
                   [attr.y]="qr.quietZone"
                   fill="var(--background)" />
                 <rect
-                  [attr.height]="qr.matrix.size"
+                  [attr.height]="qr.matrix.width"
                   [attr.width]="qr.quietZone"
-                  [attr.x]="qr.quietZone + qr.matrix.size"
+                  [attr.x]="qr.quietZone + qr.matrix.width"
                   [attr.y]="qr.quietZone"
                   fill="var(--background)" />
               </g>
@@ -295,15 +295,15 @@ export class QRCodeExplainControls {
                 <rect
                   [attr.height]="qr.quietZone"
                   [attr.width]="qr.viewSize"
-                  [attr.y]="qr.quietZone + qr.matrix.size" />
+                  [attr.y]="qr.quietZone + qr.matrix.width" />
                 <rect
-                  [attr.height]="qr.matrix.size"
+                  [attr.height]="qr.matrix.width"
                   [attr.width]="qr.quietZone"
                   [attr.y]="qr.quietZone" />
                 <rect
-                  [attr.height]="qr.matrix.size"
+                  [attr.height]="qr.matrix.width"
                   [attr.width]="qr.quietZone"
-                  [attr.x]="qr.quietZone + qr.matrix.size"
+                  [attr.x]="qr.quietZone + qr.matrix.width"
                   [attr.y]="qr.quietZone" />
               </g>
             } @else {
@@ -554,7 +554,7 @@ export class QRCodeExplain {
               id: 'role:quiet-zone',
               role: 'quiet-zone',
               label: 'Quiet zone',
-              count: explanation.viewSize ** 2 - explanation.matrix.size ** 2,
+              count: explanation.viewSize ** 2 - explanation.matrix.width ** 2,
             },
           ]
         : [];
@@ -669,13 +669,13 @@ export class QRCodeExplain {
         next = {...current, row: Math.max(0, current.row - 1)};
         break;
       case 'ArrowDown':
-        next = {...current, row: Math.min(explanation.matrix.size - 1, current.row + 1)};
+        next = {...current, row: Math.min(explanation.matrix.width - 1, current.row + 1)};
         break;
       case 'ArrowLeft':
         next = {...current, column: Math.max(0, current.column - 1)};
         break;
       case 'ArrowRight':
-        next = {...current, column: Math.min(explanation.matrix.size - 1, current.column + 1)};
+        next = {...current, column: Math.min(explanation.matrix.width - 1, current.column + 1)};
         break;
       case 'Enter':
       case ' ':

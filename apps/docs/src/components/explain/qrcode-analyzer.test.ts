@@ -19,7 +19,7 @@ describe('explainQRCode', () => {
       moduleSize: 8,
       quietZone: 4,
     });
-    const {size, modules} = explanation.matrix;
+    const {width: size, modules} = explanation.matrix;
     assert.equal(explanation.modules.length, size ** 2);
     assert.equal(explanation.moduleGrid.length, size);
     assert.ok(explanation.modules.some(({role}) => role === 'functional'));
@@ -43,7 +43,7 @@ describe('explainQRCode', () => {
         explanation.modules.filter((module) => module.role === role).length;
       assert.equal(count('encoded'), codewords * 8);
       assert.equal(count('remainder'), remainderBits);
-      const {size, roles} = explanation.matrix;
+      const {width: size, roles} = explanation.matrix;
       for (const module of explanation.modules) {
         const isData = roles[module.row * size + module.column] === QR_CODE_MODULE_ROLES.data;
         assert.equal(module.role === 'functional', !isData);
@@ -65,7 +65,7 @@ describe('explainQRCode', () => {
     assert.equal(explanation.mask, 0);
     assert.equal(explanation.moduleSize, 8);
     assert.equal(explanation.quietZone, 4);
-    assert.equal(explanation.viewSize, explanation.matrix.size + 8);
+    assert.equal(explanation.viewSize, explanation.matrix.width + 8);
   });
 
   test('maps encoded bits to zig-zag coordinates and stable unmasked values', () => {
@@ -124,7 +124,7 @@ describe('explainQRCode', () => {
     assert.equal(explainQRCode({payload, mode: 'auto'}).mode, 'octet');
     const optimized = explainQRCode({payload, mode: 'auto', optimizeSegments: true});
     assert.equal(optimized.mode, 'mixed');
-    assert.equal(optimized.matrix.size, 25);
+    assert.equal(optimized.matrix.width, 25);
     assert.equal(explainQRCode({payload, mode: 'octet', optimizeSegments: true}).mode, 'octet');
     assert.equal(explainQRCode({payload: '', mode: 'auto'}).mode, 'numeric');
   });
@@ -178,7 +178,7 @@ describe('explainQRCode', () => {
       });
       assert.equal(explanation.symbol, 'micro');
       assert.equal(explanation.version, microVersion);
-      assert.equal(explanation.matrix.size, size);
+      assert.equal(explanation.matrix.width, size);
       assert.equal(explanation.mask, 2);
       assert.equal(explanation.mode, 'numeric');
       assert.equal(explanation.modules.filter(({role}) => role === 'encoded').length, encodedBits);

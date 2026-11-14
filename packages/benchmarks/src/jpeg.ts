@@ -23,14 +23,14 @@ export interface JPEGBenchmarkFixture {
 export function createJPEGBenchmarkWorkloads(): BenchmarkWorkload<JPEGBenchmarkFixture>[] {
   return ([1, 10, 40] as const).flatMap((version) => {
     const matrix = qrcode('JPEG BENCHMARK').options({version, mask: 0}).matrix();
-    const width = (matrix.size + JPEG_QUIET_ZONE_MODULES * 2) * JPEG_PIXELS_PER_MODULE;
+    const width = (matrix.width + JPEG_QUIET_ZONE_MODULES * 2) * JPEG_PIXELS_PER_MODULE;
 
     return (['grayscale', 'color'] as const).map((color) => {
       const data = new Uint8Array(width * width * 4).fill(255);
       const foreground = color === 'grayscale' ? [0, 0, 0, 255] : [16, 48, 128, 255];
-      for (let y = 0; y < matrix.size; y += 1) {
-        for (let x = 0; x < matrix.size; x += 1) {
-          if (matrix.modules[y * matrix.size + x] === 0) continue;
+      for (let y = 0; y < matrix.width; y += 1) {
+        for (let x = 0; x < matrix.width; x += 1) {
+          if (matrix.modules[y * matrix.width + x] === 0) continue;
           const left = (x + JPEG_QUIET_ZONE_MODULES) * JPEG_PIXELS_PER_MODULE;
           const top = (y + JPEG_QUIET_ZONE_MODULES) * JPEG_PIXELS_PER_MODULE;
           for (let row = top; row < top + JPEG_PIXELS_PER_MODULE; row += 1) {

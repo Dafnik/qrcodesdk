@@ -32,7 +32,7 @@ describe('QR_CODE_MICRO_TEST_FIXTURES', () => {
 
   test.each(QR_CODE_MICRO_TEST_FIXTURES)('$name fits its pinned symbol', (fixture) => {
     const size = Number(fixture.version.slice(1)) * 2 + 9;
-    expect(qrcode(fixture.payload).options(fixtureMicroMatrixOptions(fixture)).matrix().size).toBe(
+    expect(qrcode(fixture.payload).options(fixtureMicroMatrixOptions(fixture)).matrix().width).toBe(
       size,
     );
   });

@@ -28,7 +28,7 @@ function matrixChecksum(matrix) {
 }
 
 function assertMatrix(matrix) {
-  assert(matrix.size === EXPECTED_MATRIX_SIZE, 'Expected a 29×29 QR code matrix');
+  assert(matrix.width === EXPECTED_MATRIX_SIZE, 'Expected a 29×29 QR code matrix');
   const length = EXPECTED_MATRIX_SIZE * EXPECTED_MATRIX_SIZE;
   assert(
     Array.isArray(matrix.modules) &&
@@ -131,21 +131,21 @@ globalThis.console.log('@qrcodesdk/core installed-package smoke test passed');
 
 const mixedPayload = 'ABCD12345678901234567890abcd';
 assert(
-  core.qrcode(mixedPayload).mode('auto').matrix().size === 29,
+  core.qrcode(mixedPayload).mode('auto').matrix().width === 29,
   'Expected single-mode auto detection',
 );
 assert(
-  core.qrcode(mixedPayload).mode('auto').segmenter(automaticSegmenter).matrix().size === 25,
+  core.qrcode(mixedPayload).mode('auto').segmenter(automaticSegmenter).matrix().width === 25,
   'Expected opt-in mixed-mode optimization',
 );
 logSuccess('auto mode works with and without the optional segmenter');
 
 assert(
-  core.qrcode('点茗').mode('kanji').kanji(kanji).matrix().size === 21,
+  core.qrcode('点茗').mode('kanji').kanji(kanji).matrix().width === 21,
   'Expected Kanji mode with the Kanji table',
 );
 assert(
-  core.qrcode('東京タワー123').segmenter(automaticSegmenter).kanji(kanji).matrix().size === 21,
+  core.qrcode('東京タワー123').segmenter(automaticSegmenter).kanji(kanji).matrix().width === 21,
   'Expected Kanji segments from the automatic segmenter',
 );
 logSuccess('Kanji mode works with the opt-in Kanji table');
@@ -161,6 +161,6 @@ const calendar = payload.calendarPayload({
 assert(contact.startsWith('BEGIN:VCARD\r\nVERSION:3.0\r\n'), 'Expected a vCard wrapper');
 assert(contact.includes('NOTE:First\\nSecond\r\n'), 'Expected escaped contact text');
 assert(calendar.includes('DTSTART:20261201T090000Z\r\n'), 'Expected UTC calendar time');
-assert(core.qrcode(contact).matrix().size > 0, 'Expected the contact to encode');
-assert(core.qrcode(calendar).matrix().size > 0, 'Expected the event to encode');
+assert(core.qrcode(contact).matrix().width > 0, 'Expected the contact to encode');
+assert(core.qrcode(calendar).matrix().width > 0, 'Expected the event to encode');
 logSuccess('installed contact and calendar serializers produce encodable strings');

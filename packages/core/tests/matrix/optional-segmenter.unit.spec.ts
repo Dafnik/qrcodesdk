@@ -19,14 +19,14 @@ describe('optional segmentation', () => {
     expect(qrcode(MIXED).mode('auto').mask(0).matrix()).toEqual(single);
     expect(qrcode(MIXED).mode('numeric').mode('auto').mask(0).matrix()).toEqual(single);
     expect(qrcode(MIXED).mode('numeric').mode().mask(0).matrix()).toEqual(single);
-    expect(single.size).toBe(29);
+    expect(single.width).toBe(29);
   });
 
   test('auto uses an optional segmenter and can reset it without changing the original builder', () => {
     const segmenter = vi.fn(automaticSegmenter);
     const original = qrcode(MIXED).mode('auto').segmenter(segmenter).mask(0);
     const optimized = original.matrix();
-    expect(optimized.size).toBe(25);
+    expect(optimized.width).toBe(25);
     expect(segmenter).toHaveBeenCalledExactlyOnceWith(MIXED, {version: 1, eci: false});
     expect(original.matrix()).toBe(optimized);
     expect(original.render((matrix) => matrix)).toBe(optimized);
@@ -66,7 +66,7 @@ describe('optional segmentation', () => {
 
   test('retains capacity errors when single-mode detection cannot fit the selected version', () => {
     expect(() => qrcode(MIXED).mode('auto').version(2).matrix()).toThrow('Payload too large');
-    expect(qrcode(MIXED).mode('auto').segmenter(automaticSegmenter).version(2).matrix().size).toBe(
+    expect(qrcode(MIXED).mode('auto').segmenter(automaticSegmenter).version(2).matrix().width).toBe(
       25,
     );
   });
@@ -112,7 +112,7 @@ describe('optional segmentation', () => {
       {mode: 'octet', payload: 'A'},
       {mode: 'octet', payload: '🚀B'},
     ]) as QRCodeSegmenter;
-    expect(qrcode(payload).segmenter(whole).matrix().size).toBe(21);
+    expect(qrcode(payload).segmenter(whole).matrix().width).toBe(21);
   });
 
   test('accepts a single empty segment for an empty payload', () => {

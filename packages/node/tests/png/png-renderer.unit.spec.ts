@@ -233,7 +233,7 @@ describe('QRCodePNGRenderer', () => {
     ).toThrowError(
       expect.objectContaining({
         code: 'INVALID_OPTIONS',
-        details: {field: 'dimensions', value: 8193},
+        details: {field: 'dimensions', value: [8193, 8193]},
       }),
     );
   });

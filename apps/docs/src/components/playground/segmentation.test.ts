@@ -46,11 +46,11 @@ test('playground shares explicit auto and optimization through URLs and renderer
   assert.equal(restored.optimizeSegments, true);
   const matrixOptions = createPlaygroundSVGOptions(restored).matrix;
   assert.equal(matrixOptions?.segmenter, automaticSegmenter);
-  assert.equal(qrcode(payload).options(matrixOptions).matrix().size, 25);
+  assert.equal(qrcode(payload).options(matrixOptions).matrix().width, 25);
   assert.equal(
     qrcode(payload)
       .options(createPlaygroundSVGOptions({...restored, optimizeSegments: false}).matrix)
-      .matrix().size,
+      .matrix().width,
     29,
   );
 });
@@ -132,11 +132,11 @@ test('playground shares the Kanji switch through URLs and renderers', async () =
   assert.equal(restored.kanji, true);
   const matrixOptions = createPlaygroundSVGOptions(restored).matrix;
   assert.equal(matrixOptions?.kanji, kanji);
-  assert.equal(qrcode('東京タワー').options(matrixOptions).matrix().size, 21);
+  assert.equal(qrcode('東京タワー').options(matrixOptions).matrix().width, 21);
   assert.equal(
     qrcode('東京タワー')
       .options(createPlaygroundSVGOptions({...restored, kanji: false}).matrix)
-      .matrix().size,
+      .matrix().width,
     25,
   );
 });
@@ -148,7 +148,7 @@ test('playground forced Kanji mode uses the Kanji table', async () => {
   assert.equal(restored.mode, 'kanji');
   const matrixOptions = createPlaygroundSVGOptions({...restored, payload: '漢字'}).matrix;
   assert.equal(matrixOptions?.kanji, kanji);
-  assert.equal(qrcode('漢字').options(matrixOptions).matrix().size, 21);
+  assert.equal(qrcode('漢字').options(matrixOptions).matrix().width, 21);
 });
 
 test('all framework examples import the Kanji table only when it is used', () => {

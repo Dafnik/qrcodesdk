@@ -116,8 +116,8 @@ test('core publishes the automatic segmenter independently of default generation
   assert.equal(typeof automaticSegmenter, 'function');
   assert.equal(root.automaticSegmenter, undefined);
   const payload = 'ABCD12345678901234567890abcd';
-  assert.equal(root.qrcode(payload).mode('auto').matrix().size, 29);
-  assert.equal(root.qrcode(payload).mode('auto').segmenter(automaticSegmenter).matrix().size, 25);
+  assert.equal(root.qrcode(payload).mode('auto').matrix().width, 29);
+  assert.equal(root.qrcode(payload).mode('auto').segmenter(automaticSegmenter).matrix().width, 25);
 
   const optimizer = path.resolve(packageDirectory, packageJson.exports['./segmenter']);
   const visited = new Set();
@@ -146,10 +146,10 @@ test('core publishes the Kanji table independently of every other entry', async 
   const {automaticSegmenter} = await importTarget(packageJson.exports['./segmenter']);
   const {kanji} = await importTarget(packageJson.exports['./kanji']);
   assert.equal(root.kanji, undefined);
-  assert.equal(root.qrcode('点茗').mode('kanji').kanji(kanji).matrix().size, 21);
-  assert.equal(root.qrcode('東京タワー123').segmenter(automaticSegmenter).matrix().size, 25);
+  assert.equal(root.qrcode('点茗').mode('kanji').kanji(kanji).matrix().width, 21);
+  assert.equal(root.qrcode('東京タワー123').segmenter(automaticSegmenter).matrix().width, 25);
   assert.equal(
-    root.qrcode('東京タワー123').segmenter(automaticSegmenter).kanji(kanji).matrix().size,
+    root.qrcode('東京タワー123').segmenter(automaticSegmenter).kanji(kanji).matrix().width,
     21,
   );
 

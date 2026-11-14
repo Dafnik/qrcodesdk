@@ -66,9 +66,9 @@ const MICRO_FORMAT_MASK = 0x4445;
 const FORMAT_GENERATOR = 0x537;
 const SMALLEST_STANDARD_SIZE = 21;
 
-/** Whether a matrix is a Micro QR code. Micro QR codes are 11 to 17 modules wide. */
-export function isMicroMatrix({size}: Pick<QRCodeMatrix, 'size'>): boolean {
-  return size < SMALLEST_STANDARD_SIZE;
+/** Whether a matrix is a Micro QR code. Micro QR codes are square and 11 to 17 modules wide. */
+export function isMicroMatrix({width, height}: Pick<QRCodeMatrix, 'width' | 'height'>): boolean {
+  return width === height && width < SMALLEST_STANDARD_SIZE;
 }
 
 /**
@@ -76,7 +76,9 @@ export function isMicroMatrix({size}: Pick<QRCodeMatrix, 'size'>): boolean {
  * wrote, and checks its BCH code. No symbol is regenerated.
  */
 export function readSymbolFormat(matrix: QRCodeMatrix): QRCodeSymbolFormat {
-  const {size: n, modules} = matrix;
+  const {width: n, height, modules} = matrix;
+  // The explanation covers square symbols only; rMQR codes are not explained.
+  if (n !== height) throw new Error('QRCode explain: Rectangular Micro QR codes are not supported');
   if (isMicroMatrix(matrix)) {
     // Bit 14 to bit 7 along row 8 from column 1, and bit 6 to bit 0 up column 8 from row 7.
     let code = 0;
@@ -147,7 +149,7 @@ function microLevel(
  * Micro QR codes stop before the timing pattern in column 0. Every module with the data role
  * belongs to the placement path; all other roles are reserved function patterns.
  */
-export function createPlacements({size, roles}: QRCodeMatrix, micro: boolean): number[] {
+export function createPlacements({width: size, roles}: QRCodeMatrix, micro: boolean): number[] {
   const placements: number[] = [];
   const dataRole = QR_CODE_MODULE_ROLES.data;
   let direction = -1;
@@ -169,7 +171,7 @@ export function createPlacements({size, roles}: QRCodeMatrix, micro: boolean): n
 /** Copies the matrix and removes the selected mask from its data modules. */
 export function unmaskModules(matrix: QRCodeMatrix, format: QRCodeSymbolFormat): Uint8Array {
   const modules = Uint8Array.from(matrix.modules);
-  return applyMaskToMatrix(modules, matrixRoles(matrix), matrix.size, format.standardMask);
+  return applyMaskToMatrix(modules, matrixRoles(matrix), matrix.width, format.standardMask);
 }
 
 export function matrixRoles(matrix: QRCodeMatrix): Uint8Array {

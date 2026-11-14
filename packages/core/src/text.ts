@@ -61,25 +61,25 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
 
   return (matrix: QRCodeMatrix) => {
     const quietZone = resolveQuietZone(requestedQuietZone, matrix);
-    const outputSize = calculateQRCodeOutputSize(matrix, {moduleSize, quietZone});
+    const {width, height} = calculateQRCodeOutputSize(matrix, {moduleSize, quietZone});
     const darkModules = (scaledRow: number): Uint8Array => {
-      const modules = new Uint8Array(outputSize);
+      const modules = new Uint8Array(width);
       const row = Math.floor(scaledRow / moduleSize) - quietZone;
-      if (row < 0 || row >= matrix.size) return modules;
-      for (let column = 0; column < outputSize; column++) {
+      if (row < 0 || row >= matrix.height) return modules;
+      for (let column = 0; column < width; column++) {
         const matrixColumn = Math.floor(column / moduleSize) - quietZone;
-        if (matrixColumn >= 0 && matrixColumn < matrix.size) {
-          modules[column] = matrix.modules[row * matrix.size + matrixColumn]!;
+        if (matrixColumn >= 0 && matrixColumn < matrix.width) {
+          modules[column] = matrix.modules[row * matrix.width + matrixColumn]!;
         }
       }
       return modules;
     };
     const rows: string[] = [];
-    for (let row = 0; row < outputSize; row += compact ? 2 : 1) {
+    for (let row = 0; row < height; row += compact ? 2 : 1) {
       const upper = darkModules(row);
       const lower = compact ? darkModules(row + 1) : upper;
       let line = prefix;
-      for (let column = 0; column < outputSize; column++) {
+      for (let column = 0; column < width; column++) {
         line += compact
           ? ' ▀▄█'[upper[column]! | (lower[column]! << 1)]
           : upper[column]

@@ -47,9 +47,10 @@ export function QRCodeCanvasRenderer(
 
   return (matrix: QRCodeMatrix) => {
     const drawing = draw(matrix);
-    const {moduleSize, viewSize} = drawing;
+    const {moduleSize, viewWidth, viewHeight} = drawing;
     const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = drawing.outputSize;
+    canvas.width = drawing.outputWidth;
+    canvas.height = drawing.outputHeight;
     applyAccessibility(canvas, accessibility);
 
     // A software-backed context rasterizes the same pixels with or without GPU acceleration, so
@@ -64,7 +65,7 @@ export function QRCodeCanvasRenderer(
     // Draw in module units.
     context.setTransform(moduleSize, 0, 0, moduleSize, 0, 0);
     context.fillStyle = drawing.background;
-    context.fillRect(0, 0, viewSize, viewSize);
+    context.fillRect(0, 0, viewWidth, viewHeight);
     for (const layer of drawing.layers) {
       context.fillStyle = layer.color;
       context.fill(new Path2D(toQRCodePathData(layer)), 'evenodd');

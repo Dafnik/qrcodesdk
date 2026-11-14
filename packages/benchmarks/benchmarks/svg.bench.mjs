@@ -21,7 +21,7 @@ describe('SVG rendering without matrix generation', () => {
       });
       const options = {style: {moduleSize: 4, quietZone: 4}};
       const renderer = QRCodeSVGRenderer(options);
-      const referenceOptions = {width: (matrix.size + 8) * 4, margin: 4};
+      const referenceOptions = {width: (matrix.width + 8) * 4, margin: 4};
 
       await bench.compare(
         bench('QRCodeSDK reused renderer', () => {

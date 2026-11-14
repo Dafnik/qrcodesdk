@@ -1,17 +1,23 @@
 import type {QRCodeMatrix} from '../src/types';
 
-export function toRows({size, modules}: {size: number; modules: ArrayLike<number>}): number[][] {
-  return Array.from({length: size}, (_, y) =>
-    Array.from({length: size}, (_, x) => modules[y * size + x]!),
+/** Rows of a matrix, or of an internal square base matrix with `size` modules per side. */
+export function toRows(
+  matrix: ({width: number; height: number} | {size: number}) & {modules: ArrayLike<number>},
+): number[][] {
+  const [width, height] =
+    'size' in matrix ? [matrix.size, matrix.size] : [matrix.width, matrix.height];
+  return Array.from({length: height}, (_, y) =>
+    Array.from({length: width}, (_, x) => matrix.modules[y * width + x]!),
   );
 }
 
 /** Creates a matrix with every module in the data role. */
 export function fromRows(rows: readonly (readonly (0 | 1)[])[]): QRCodeMatrix {
   return {
-    size: rows.length,
+    width: rows[0]?.length ?? 0,
+    height: rows.length,
     modules: rows.flat(),
-    roles: Array<0>(rows.length * rows.length).fill(0),
+    roles: Array<0>(rows.flat().length).fill(0),
   };
 }
 

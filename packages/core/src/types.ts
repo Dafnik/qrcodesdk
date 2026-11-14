@@ -8,13 +8,18 @@ export type QRCodePayload = string | number;
  */
 export type QRCodeModuleRole = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
-/** An immutable square QR code symbol with row-major module data. */
+/**
+ * An immutable QR code symbol with row-major module data. Standard and Micro QR codes are square,
+ * and rectangular Micro QR (rMQR) codes are wider than they are high.
+ */
 export type QRCodeMatrix = {
-  /** Modules per side. */
-  readonly size: number;
-  /** `1` for dark and `0` for light modules, at index `y * size + x`. */
+  /** Modules per row. */
+  readonly width: number;
+  /** Rows of modules. Equal to `width` for standard and Micro QR codes. */
+  readonly height: number;
+  /** `1` for dark and `0` for light modules, at index `y * width + x`. */
   readonly modules: readonly (0 | 1)[];
-  /** `QRCodeModuleRole` of every module, shared by all matrices of the same size. */
+  /** `QRCodeModuleRole` of every module, shared by all matrices of the same version. */
   readonly roles: readonly QRCodeModuleRole[];
 };
 

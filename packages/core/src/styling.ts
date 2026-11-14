@@ -22,26 +22,32 @@ export function resolveQRCodeTextStyle(
 }
 
 /**
- * Defaults the quiet zone to the minimum of the symbol type: 2 modules for Micro QR codes, which
- * are at most 17 modules wide, and 4 modules for standard QR codes, which are at least 21.
+ * Defaults the quiet zone to the minimum of the symbol type: 2 modules for Micro QR and rMQR codes,
+ * which are at most 17 modules high, and 4 modules for standard QR codes, which are at least 21.
  */
 export function resolveQuietZone(quietZone: number | undefined, matrix: QRCodeMatrix): number {
-  return quietZone ?? (matrix.size < 21 ? 2 : 4);
+  return quietZone ?? (Math.min(matrix.width, matrix.height) < 21 ? 2 : 4);
 }
+
+/** Output dimensions in pixels, including the quiet zone. */
+export type QRCodeOutputSize = {readonly width: number; readonly height: number};
 
 export function calculateQRCodeOutputSize(
   matrix: QRCodeMatrix,
   style: Required<QRCodeTextStyle>,
-): number {
-  const outputSize = style.moduleSize * (matrix.size + 2 * style.quietZone);
-  if (!Number.isSafeInteger(outputSize) || outputSize <= 0) {
-    throw new QRCodeError(
-      'INVALID_OPTIONS',
-      `QR code dimensions must be positive safe integers, received ${String(outputSize)}`,
-      {details: {field: 'dimensions', value: outputSize}},
-    );
+): QRCodeOutputSize {
+  const width = style.moduleSize * (matrix.width + 2 * style.quietZone);
+  const height = style.moduleSize * (matrix.height + 2 * style.quietZone);
+  for (const value of [width, height]) {
+    if (!Number.isSafeInteger(value) || value <= 0) {
+      throw new QRCodeError(
+        'INVALID_OPTIONS',
+        `QR code dimensions must be positive safe integers, received ${String(value)}`,
+        {details: {field: 'dimensions', value}},
+      );
+    }
   }
-  return outputSize;
+  return {width, height};
 }
 
 export function parseQRCodeColor(color: QRCodeColor): QRCodeRGBA {

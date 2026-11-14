@@ -10,10 +10,15 @@ export type QRCodeCenterImagePlacement = {
   /** Clears the modules behind the image and its padding, unless clearing is disabled. */
   readonly part: QRCodeStylePart;
   /** Returns the image box for a drawing. */
-  place(drawing: Pick<QRCodeDrawing, 'moduleCount' | 'quietZone'>): QRCodeCenterImageBox;
+  place(
+    drawing: Pick<QRCodeDrawing, 'moduleWidth' | 'moduleHeight' | 'quietZone'>,
+  ): QRCodeCenterImageBox;
 };
 
-/** Validates a center-image layout and returns its clearing part and placement. */
+/**
+ * Validates a center-image layout and returns its clearing part and placement. The image is a
+ * square sized from the shorter side of the symbol and centered on both axes.
+ */
 export function createQRCodeCenterImagePlacement(
   layout?: QRCodeCenterImageLayout,
 ): QRCodeCenterImagePlacement {
@@ -26,21 +31,29 @@ export function createQRCodeCenterImagePlacement(
   if (!Number.isFinite(padding) || padding < 0) {
     throwInvalid('centerImage.padding', 'a non-negative finite number', padding);
   }
-  // Image position in matrix coordinates.
-  const position = (moduleCount: number) => (moduleCount * (1 - size)) / 2;
+  // Image box in matrix coordinates.
+  const box = (width: number, height: number) => {
+    const side = Math.min(width, height) * size;
+    return {x: (width - side) / 2, y: (height - side) / 2, size: side};
+  };
 
   return {
     part(context) {
       if (!clearBackground) return;
-      const moduleCount = context.matrix.size;
+      const {x, y, size: side} = box(context.matrix.width, context.matrix.height);
       // Whole modules that the image or its padding touches.
-      const start = Math.floor(position(moduleCount) - padding);
-      const end = Math.ceil(position(moduleCount) + moduleCount * size + padding);
-      context.claimArea(start, start, end - start, end - start);
+      const startX = Math.floor(x - padding);
+      const startY = Math.floor(y - padding);
+      context.claimArea(
+        startX,
+        startY,
+        Math.ceil(x + side + padding) - startX,
+        Math.ceil(y + side + padding) - startY,
+      );
     },
-    place({moduleCount, quietZone}) {
-      const offset = quietZone + position(moduleCount);
-      return {x: offset, y: offset, size: moduleCount * size};
+    place({moduleWidth, moduleHeight, quietZone}) {
+      const {x, y, size: side} = box(moduleWidth, moduleHeight);
+      return {x: quietZone + x, y: quietZone + y, size: side};
     },
   };
 }

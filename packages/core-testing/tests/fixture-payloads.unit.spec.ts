@@ -59,7 +59,7 @@ describe('createFixturePayload()', () => {
       expect(new Set(payload).size).toBeGreaterThan(mode === 'numeric' ? 9 : 40);
       if (mode === 'kanji') {
         const chunk = payload.slice(0, 1_000);
-        expect(qrcode(chunk).mode('kanji').kanji(kanji).matrix().size).toBeGreaterThan(21);
+        expect(qrcode(chunk).mode('kanji').kanji(kanji).matrix().width).toBeGreaterThan(21);
       }
     }
   });
@@ -94,7 +94,7 @@ describe('fixtureCapacity()', () => {
       const build = (value: string) =>
         qrcode(value).options({mode, version, errorCorrectionLevel, eci, mask: 0, kanji}).matrix();
 
-      expect(build(fitting).size).toBe(17 + 4 * version);
+      expect(build(fitting).width).toBe(17 + 4 * version);
       expect(() => build(oversized)).toThrow('QRCode: Payload too large');
     },
   );

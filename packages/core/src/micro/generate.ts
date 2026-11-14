@@ -129,7 +129,7 @@ function assembleMicroQRCodeMatrix(
   }
   fillMicroFormatInformation(bestModules, size, symbolNumber, bestMask);
 
-  return {size, modules: toPublicArray(bestModules), roles: publicRoles};
+  return {width: size, height: size, modules: toPublicArray(bestModules), roles: publicRoles};
 }
 
 function throwStandardOnly(field: string, value: unknown): never {
