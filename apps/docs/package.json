@@ -81,7 +81,7 @@
     "@types/culori": "4.0.1",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "astro": "7.4.4",
+    "astro": "7.4.7",
     "nx": "23.3.1",
     "prettier": "catalog:",
     "remark-gfm": "4.0.1",
