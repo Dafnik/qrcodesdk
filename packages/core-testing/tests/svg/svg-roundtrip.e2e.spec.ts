@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
+import {calendarPayload, vcardPayload} from '@qrcodesdk/core/payload';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {fixtureImageDataURL, fixtureMatrixOptions} from '../../src';
@@ -112,4 +113,46 @@ describe('SVG QR roundtrips', () => {
       ),
     ).resolves.toBe(fixture.payload);
   });
+});
+
+describe('contact and calendar transport fidelity', () => {
+  const event = {
+    uid: 'roundtrip@example.com',
+    timestamp: '2026-11-14T12:00:00Z',
+    summary: 'Meeting',
+  };
+  const examples = [
+    {name: 'ASCII contact', payload: vcardPayload({formattedName: 'Ada Lovelace'})},
+    {
+      name: 'folded Unicode contact',
+      payload: vcardPayload({
+        formattedName: 'Zoë 日本語 😀',
+        note: 'Zoë 日本語 😀;\\\n'.repeat(12),
+      }),
+    },
+    {
+      name: 'UTC event',
+      payload: calendarPayload({
+        ...event,
+        start: '2026-12-01T10:00:00+01:00',
+        end: '2026-12-01T11:00:00+01:00',
+      }),
+    },
+    {
+      name: 'all-day event',
+      payload: calendarPayload({...event, allDay: true, start: '2026-12-25', end: '2026-12-26'}),
+    },
+  ];
+  test.each(examples.flatMap((example) => [false, true].map((eci) => ({...example, eci}))))(
+    'decodes complete $name with ECI $eci',
+    async ({payload, eci}) => {
+      await expect(
+        decodeSvgQRCode(
+          qrcode(payload)
+            .eci(eci)
+            .render(QRCodeSVGRenderer({style: {moduleSize: 4, quietZone: 4}})),
+        ),
+      ).resolves.toBe(payload);
+    },
+  );
 });

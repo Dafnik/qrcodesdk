@@ -1,4 +1,7 @@
-import {QRCodeError} from './error';
+import {invalidPayload} from './payload/error';
+
+export {vcardPayload} from './payload/vcard';
+export {calendarPayload} from './payload/calendar';
 
 export type QRCodeEmailPayload = {
   to: string | readonly string[];
@@ -164,8 +167,52 @@ function escapeWiFiValue(value: string): string {
   return value.replace(/([\\;,:"'])/g, '\\$1');
 }
 
-function invalidPayload(field: string, value: unknown, reason: string): never {
-  throw new QRCodeError('INVALID_PAYLOAD', `Invalid QR code payload: ${reason}`, {
-    details: {field, value: field === 'password' ? '[REDACTED]' : value, reason},
-  });
-}
+export type QRCodeVCardName = {
+  familyName?: string;
+  givenName?: string;
+  additionalNames?: string;
+  honorificPrefix?: string;
+  honorificSuffix?: string;
+};
+
+export type QRCodeVCardPhone = {
+  number: string;
+  type?: 'home' | 'work' | 'cell' | 'fax';
+};
+
+export type QRCodeVCardEmail = {
+  address: string;
+  type?: 'home' | 'work';
+};
+
+export type QRCodeVCardAddress = {
+  type?: 'home' | 'work';
+  postOfficeBox?: string;
+  extendedAddress?: string;
+  streetAddress?: string;
+  locality?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;
+};
+
+export type QRCodeVCardPayload = {
+  formattedName: string;
+  name?: QRCodeVCardName;
+  organization?: string;
+  title?: string;
+  phones?: readonly QRCodeVCardPhone[];
+  emails?: readonly QRCodeVCardEmail[];
+  addresses?: readonly QRCodeVCardAddress[];
+  url?: string;
+  note?: string;
+};
+
+export type QRCodeCalendarPayload = {
+  uid: string;
+  timestamp: string;
+  summary: string;
+  location?: string;
+  description?: string;
+  url?: string;
+} & ({allDay?: false; start: string; end: string} | {allDay: true; start: string; end: string});

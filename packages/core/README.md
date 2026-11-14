@@ -94,12 +94,12 @@ See [Customize appearance](https://qrcodesdk.dev/guides/customize/) for every st
 
 ## Encode common values
 
-Typed [payload helpers](https://qrcodesdk.dev/reference/payloads/) turn email, phone, SMS, geographic, and Wi-Fi data
+Typed [payload helpers](https://qrcodesdk.dev/reference/payloads/) turn contact, calendar, email, phone, SMS, geographic, and Wi-Fi data
 into payload strings. Import them from `@qrcodesdk/core/payload`.
 
 ## Runtime compatibility
 
-Core runs in any JavaScript runtime with native ESM, ES2020, and a global `TextEncoder`. It has no
+Core runs in any JavaScript runtime with native ESM, ES2020, and a global `TextEncoder`. Payload URL fields also require the standard `URL` API. It has no
 Node.js, DOM, filesystem, or framework dependency.
 
 | Runtime                         | Support policy                                          |
@@ -193,16 +193,24 @@ import {
   qrcode,
 } from '@qrcodesdk/core/matrix';
 import {
+  type QRCodeCalendarPayload,
   type QRCodeEmailPayload,
   type QRCodeGeoPayload,
   type QRCodePhonePayload,
   type QRCodeSMSPayload,
+  type QRCodeVCardAddress,
+  type QRCodeVCardEmail,
+  type QRCodeVCardName,
+  type QRCodeVCardPayload,
+  type QRCodeVCardPhone,
   type QRCodeWiFiEncryption,
   type QRCodeWiFiPayload,
+  calendarPayload,
   emailPayload,
   geoPayload,
   phonePayload,
   smsPayload,
+  vcardPayload,
   wifiPayload,
 } from '@qrcodesdk/core/payload';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
