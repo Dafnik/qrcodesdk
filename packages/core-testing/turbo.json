@@ -1,19 +1,39 @@
 {
-  "extends": ["//"],
+  "extends": [
+    "//"
+  ],
   "tasks": {
     "build": {
-      "inputs": ["$TURBO_EXTENDS$", "!scripts/verify-package-artifact.mjs"]
+      "inputs": [
+        "$TURBO_EXTENDS$",
+        "!scripts/verify-package-artifact.mjs",
+        "!scripts/generate-rmqr-fixtures.mjs"
+      ]
     },
     "test": {
-      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
+      "env": [
+        "UPDATE_SVG_SNAPSHOTS",
+        "UPDATE_TEXT_SNAPSHOTS"
+      ]
     },
     "test:coverage:raw": {
-      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
+      "env": [
+        "UPDATE_SVG_SNAPSHOTS",
+        "UPDATE_TEXT_SNAPSHOTS"
+      ]
     },
     "test:snapshots": {
       "cache": false,
-      "dependsOn": ["build"],
-      "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]
+      "dependsOn": [
+        "build"
+      ],
+      "env": [
+        "UPDATE_SVG_SNAPSHOTS",
+        "UPDATE_TEXT_SNAPSHOTS"
+      ]
+    },
+    "generate:rmqr-fixtures": {
+      "cache": false
     }
   }
 }

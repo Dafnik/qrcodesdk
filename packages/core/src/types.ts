@@ -156,7 +156,8 @@ declare const symbolValue: unique symbol;
 
 /**
  * An alternative symbol type, such as the Micro QR code returned by `microQR()` from
- * `@qrcodesdk/core/micro`. Consumers cannot call or inspect it.
+ * `@qrcodesdk/core/micro` or the rMQR code returned by `rMQR()` from `@qrcodesdk/core/rmqr`.
+ * Consumers cannot call or inspect it.
  */
 export type QRCodeSymbol = {readonly [symbolValue]: 'symbol'};
 
@@ -188,7 +189,8 @@ export type QRCodeSymbolMatrixOptions = {
   mode?: QRCodeMode;
   /**
    * Enables Kanji mode with the Shift JIS table from `@qrcodesdk/core/kanji`. Required by the
-   * `kanji` mode and used by `auto` when present. Micro QR codes support Kanji mode in M3 and M4.
+   * `kanji` mode and used by `auto` when present. Micro QR codes support Kanji mode in M3 and M4,
+   * and rMQR codes in every version.
    */
   kanji?: QRCodeKanji;
   errorCorrectionLevel?: QRCodeErrorCorrectionLevel;

@@ -26,6 +26,8 @@ const cases = {
   canvas: `${generation} import {QRCodeCanvasRenderer} from '@qrcodesdk/browser/canvas'; export default qrcode('bundle').render(QRCodeCanvasRenderer());`,
   micro: `${generation} import {microQR} from '@qrcodesdk/core/micro'; export default qrcode('12345').options({symbol:microQR()}).matrix();`,
   microSvg: `${generation} ${svg} import {microQR} from '@qrcodesdk/core/micro'; export default qrcode('12345').options({symbol:microQR()}).render(QRCodeSVGRenderer());`,
+  rmqr: `${generation} import {rMQR} from '@qrcodesdk/core/rmqr'; export default qrcode('12345').options({symbol:rMQR()}).matrix();`,
+  rmqrSvg: `${generation} ${svg} import {rMQR} from '@qrcodesdk/core/rmqr'; export default qrcode('12345').options({symbol:rMQR()}).render(QRCodeSVGRenderer());`,
 };
 const measurements = {};
 for (const [name, source] of Object.entries(cases)) {
@@ -58,6 +60,8 @@ for (const [name, source] of Object.entries(cases)) {
   assert.equal(includesOptimizer, name === 'matrixOptimized', `${name}: optimizer inclusion`);
   const includesMicro = map.sources.some((source) => /(?:^|\/)micro(?:\.mjs|\/)/.test(source));
   assert.equal(includesMicro, name.startsWith('micro'), `${name}: Micro QR inclusion`);
+  const includesRMQR = map.sources.some((source) => /(?:^|\/)rmqr(?:\.mjs|\/)/.test(source));
+  assert.equal(includesRMQR, name.startsWith('rmqr'), `${name}: rMQR inclusion`);
   assert.ok(code.length > 0, `${name} must contain bundled consumer code`);
   await writeFile(path.join(directory, `${name}.bundle.mjs`), code);
   measurements[name] = {

@@ -30,3 +30,4 @@ Vuedotjs
 nums
 rehype
 Barcodes
+zint
