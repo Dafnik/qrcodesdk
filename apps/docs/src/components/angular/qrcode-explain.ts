@@ -58,7 +58,9 @@ type ExplainSelection = {
 };
 
 type ExplainState =
-  {explanation: QRCodeExplanation; error?: undefined} | {explanation?: undefined; error: string};
+  | {explanation: QRCodeExplanation; error?: undefined; unsupported?: undefined}
+  | {explanation?: undefined; error: string; unsupported?: undefined}
+  | {explanation?: undefined; error?: undefined; unsupported: true};
 
 type TooltipPosition = {
   x: number;
@@ -181,7 +183,17 @@ export class QRCodeExplainControls {
     }
   `,
   template: `
-    @if (state().error; as error) {
+    @if (state().unsupported) {
+      <hlm-alert>
+        <h3 hlmAlertTitle>rMQR codes are not explained here</h3>
+        <p hlmAlertDescription>
+          This page explains standard and Micro QR codes. Choose one of them as the symbol to see
+          how it is encoded. The
+          <a href="/guides/rmqr-codes/">rMQR guide</a>
+          describes rMQR codes.
+        </p>
+      </hlm-alert>
+    } @else if (state().error; as error) {
       <hlm-alert variant="destructive">
         <h3 hlmAlertTitle>QR code generation failed</h3>
         <p hlmAlertDescription>{{ error }}</p>
@@ -462,6 +474,8 @@ export class QRCodeExplain {
   protected readonly state = computed<ExplainState>(() => {
     try {
       const options = this.options();
+      // The explanation covers square symbols only.
+      if (options.rmqr) return {unsupported: true};
       assertPlaygroundKanjiAvailable(options);
       return {
         explanation: explainQRCode({

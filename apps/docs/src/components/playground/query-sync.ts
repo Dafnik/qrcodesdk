@@ -1,5 +1,6 @@
 import type {QRCodeColor, QRCodeMask, QRCodeVersion} from '@qrcodesdk/core';
 import type {QRCodeMicroMask, QRCodeMicroVersion} from '@qrcodesdk/core/micro';
+import type {QRCodeRMQRHeight, QRCodeRMQRVersion} from '@qrcodesdk/core/rmqr';
 
 import {cliPlaygroundOptions, setCliOptions} from './cli-playground.ts';
 import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './cli-query.ts';
@@ -43,6 +44,26 @@ const PLAYGROUND_OUTPUTS = [
 const MODES = ['auto', 'numeric', 'alphanumeric', 'octet', 'kanji'] as const;
 const ERROR_CORRECTION_LEVELS = ['L', 'M', 'Q', 'H'] as const;
 const MICRO_VERSIONS = ['M1', 'M2', 'M3', 'M4'] as const satisfies readonly QRCodeMicroVersion[];
+const RMQR_VERSIONS = [
+  'R7',
+  'R9',
+  'R11',
+  'R13',
+  'R15',
+  'R17',
+  ...(
+    [
+      [7, [43, 59, 77, 99, 139]],
+      [9, [43, 59, 77, 99, 139]],
+      [11, [27, 43, 59, 77, 99, 139]],
+      [13, [27, 43, 59, 77, 99, 139]],
+      [15, [43, 59, 77, 99, 139]],
+      [17, [43, 59, 77, 99, 139]],
+    ] as const
+  ).flatMap(([height, widths]) =>
+    widths.map((width) => `R${String(height)}x${String(width)}` as QRCodeRMQRVersion),
+  ),
+] as const satisfies readonly (QRCodeRMQRVersion | QRCodeRMQRHeight)[];
 /** Parameters of removed styling options. They are ignored on read and dropped on write. */
 const REMOVED_QUERY_KEYS = [
   'modules-color',
@@ -155,6 +176,22 @@ const QUERY_FIELD_CODECS = [
     },
     parseBoolean,
     serializeBoolean,
+  ),
+  defineQueryField(
+    'rmqr',
+    (currentOptions) => currentOptions.rmqr ?? false,
+    (currentOptions, rmqr) => {
+      currentOptions.rmqr = rmqr;
+    },
+    parseBoolean,
+    serializeBoolean,
+  ),
+  defineQueryField(
+    'rmqr-version',
+    (currentOptions) => currentOptions.rmqrVersion,
+    (currentOptions, version) => setOptionalProperty(currentOptions, 'rmqrVersion', version),
+    (value, fallback) => parseOptionalStringUnion(value, RMQR_VERSIONS, fallback),
+    serializeString,
   ),
   defineQueryField(
     'optimize-segments',
@@ -683,6 +720,7 @@ type OptionalPlaygroundOptionsKey =
   | 'version'
   | 'microVersion'
   | 'microMask'
+  | 'rmqrVersion'
   | 'mode'
   | 'errorCorrectionLevel'
   | 'mask'

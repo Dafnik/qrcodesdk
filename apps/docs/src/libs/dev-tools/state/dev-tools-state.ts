@@ -44,9 +44,11 @@ const STORAGE_KEY = 'qrcodesdk-dev-tools-settings';
 const EMPTY_SELECTION: Selection = {
   fixtures: [],
   micro: [],
+  rmqr: [],
   styling: [],
   'style-variants': [],
   'micro-style-variants': [],
+  'rmqr-style-variants': [],
   'center-images': [],
   'fixture-images': [],
 };

@@ -15,6 +15,7 @@ import {
   svgCenterImage,
 } from '@qrcodesdk/core';
 import {type QRCodeMicroMask, type QRCodeMicroVersion, microQR} from '@qrcodesdk/core/micro';
+import {type QRCodeRMQRHeight, type QRCodeRMQRVersion, rMQR} from '@qrcodesdk/core/rmqr';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {
@@ -57,6 +58,14 @@ export interface PlaygroundOptions
   microVersion?: QRCodeMicroVersion;
   microMask?: QRCodeMicroMask;
   microFallback?: boolean;
+  /**
+   * Generates an rMQR code with `rMQR()`, which also takes `mode`, the Kanji table, and the error
+   * correction level `M` or `H`. Takes precedence over `micro`; the other symbols' values are kept
+   * for switching back but not used.
+   */
+  rmqr?: boolean;
+  /** An exact rMQR version, or a height whose narrowest fitting width is used. */
+  rmqrVersion?: QRCodeRMQRVersion | QRCodeRMQRHeight;
   optimizeSegments?: boolean;
   /** Passes the Kanji table so auto mode and optimized segments can use Kanji mode. */
   kanji?: boolean;
@@ -123,21 +132,38 @@ export function setQrOptions(options: PlaygroundOptions): void {
   applyWithPlaygroundKanji(playgroundUsesKanji(options), () => playgroundOptions.set(options));
 }
 
-/** Default quiet zones of standard and Micro QR codes. */
-const QUIET_ZONES = {standard: 4, micro: 2} as const;
+export type PlaygroundSymbol = 'standard' | 'micro' | 'rmqr';
+
+/** The symbol that the options generate. */
+export function playgroundSymbol(
+  options: Pick<PlaygroundOptions, 'micro' | 'rmqr'>,
+): PlaygroundSymbol {
+  return options.rmqr ? 'rmqr' : options.micro ? 'micro' : 'standard';
+}
+
+/** Default quiet zones of standard, Micro QR, and rMQR codes. */
+const QUIET_ZONES = {standard: 4, micro: 2, rmqr: 2} as const satisfies Record<
+  PlaygroundSymbol,
+  number
+>;
 
 /**
- * Switches between standard and Micro QR codes. A quiet zone at the previous symbol's default moves
- * to the new symbol's default, so switching keeps the recommended border.
+ * Switches between symbols. A quiet zone at the previous symbol's default moves to the new symbol's
+ * default, so switching keeps the recommended border. rMQR codes support only the levels `M` and
+ * `H`, so `L` becomes `M` and `Q` becomes `H`.
  */
 export function playgroundSymbolPatch(
-  current: Pick<PlaygroundOptions, 'quietZone'>,
-  micro: boolean,
+  current: Pick<PlaygroundOptions, 'quietZone' | 'micro' | 'rmqr' | 'errorCorrectionLevel'>,
+  symbol: PlaygroundSymbol,
 ): Partial<PlaygroundOptions> {
-  const [from, to] = micro
-    ? [QUIET_ZONES.standard, QUIET_ZONES.micro]
-    : [QUIET_ZONES.micro, QUIET_ZONES.standard];
-  return {micro, ...(current.quietZone === from ? {quietZone: to} : {})};
+  const from = QUIET_ZONES[playgroundSymbol(current)];
+  const to = QUIET_ZONES[symbol];
+  const patch: Partial<PlaygroundOptions> = {micro: symbol === 'micro', rmqr: symbol === 'rmqr'};
+  if (current.quietZone === from && from !== to) patch.quietZone = to;
+  if (symbol === 'rmqr' && current.errorCorrectionLevel === 'L')
+    patch.errorCorrectionLevel = undefined;
+  if (symbol === 'rmqr' && current.errorCorrectionLevel === 'Q') patch.errorCorrectionLevel = 'H';
+  return patch;
 }
 
 /**
@@ -151,6 +177,20 @@ export function isUnreliableMicroFinderRing(shape: PlaygroundShape | undefined):
     shape === 'diagonal-rounded' ||
     shape === 'circle'
   );
+}
+
+/**
+ * ZXing cannot reliably locate an rMQR code when its finder ring or the center of its finder
+ * sub-pattern, which `alignment()` styles, is not square. Finder centers and sub-pattern rings scan.
+ */
+export function unreliableRMQRPatterns(
+  options: Pick<PlaygroundOptions, 'finderRingShape' | 'alignmentCenterShape'>,
+): ('finder ring' | 'alignment center')[] {
+  const shaped = (shape: PlaygroundShape | undefined) => shape !== undefined && shape !== 'square';
+  return [
+    ...(shaped(options.finderRingShape) ? (['finder ring'] as const) : []),
+    ...(shaped(options.alignmentCenterShape) ? (['alignment center'] as const) : []),
+  ];
 }
 
 export function setPlaygroundSectionOpen(section: PlaygroundSection, open: boolean): void {
@@ -302,6 +342,14 @@ export function createPlaygroundCanvasOptions(
 function matrixOptions(playgroundOptionsValue: PlaygroundOptions): QRCodeMatrixOptions {
   const {mode, errorCorrectionLevel} = playgroundOptionsValue;
   const kanji = playgroundUsesKanji(playgroundOptionsValue) ? playgroundKanjiTable() : undefined;
+  if (playgroundOptionsValue.rmqr) {
+    return {
+      symbol: rMQR({version: playgroundOptionsValue.rmqrVersion}),
+      mode,
+      kanji,
+      errorCorrectionLevel,
+    };
+  }
   if (playgroundOptionsValue.micro) {
     return {
       symbol: microQR({

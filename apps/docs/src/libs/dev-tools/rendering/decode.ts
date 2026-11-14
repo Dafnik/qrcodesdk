@@ -111,7 +111,7 @@ const DECODE: Readonly<Record<DecoderId, (pixels: Pixels) => Promise<string | un
       {...pixels, colorSpace: 'srgb'},
       // The same options as the roundtrip tests in `@repo/core-testing/decoder`.
       {
-        formats: ['QRCodeModel2', 'MicroQRCode'],
+        formats: ['QRCodeModel2', 'MicroQRCode', 'RMQRCode'],
         tryHarder: true,
         tryInvert: false,
         maxNumberOfSymbols: 1,

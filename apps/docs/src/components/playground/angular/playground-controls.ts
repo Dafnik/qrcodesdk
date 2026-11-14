@@ -220,8 +220,9 @@ import {titleCase} from './title-case.ts';
                     </div>
                   </label>
                 </div>
-                <!-- Micro QR codes have no alignment patterns. -->
-                @if (!currentOptions().micro) {
+                <!-- Micro QR codes have no alignment patterns; rMQR codes style their finder
+                     sub-pattern as one. -->
+                @if (!currentOptions().micro || currentOptions().rmqr) {
                   <div
                     class="border-input data-[checked=true]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border shadow-xs outline-none"
                     [attr.data-checked]="overrideAlignment() ? 'true' : 'false'">
