@@ -52,7 +52,7 @@ async function handle(request: DecodeWorkerRequest): Promise<[DecoderId, DecodeR
   try {
     raster = await rasterizeInWorker(renderHeadless(fixture, request.renderer));
   } catch (error) {
-    console.error(`Rendering ${fixture.id} with ${request.renderer} failed`, error);
+    console.error('Rendering %s with %s failed', fixture.id, request.renderer, error);
     raster = {pixels: `Rendering failed: ${String(error)}`, durationMs: 0};
   }
   return decodeRaster(raster, fixture.payload, request.decoders, fixture.knownDecodeIssues);
