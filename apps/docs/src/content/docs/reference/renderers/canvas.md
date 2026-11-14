@@ -48,7 +48,8 @@ See [Customize appearance](/guides/customize/) for every color, shape, and finde
 
 The renderer synchronously returns a new `HTMLCanvasElement`:
 
-- Width and height: `style.moduleSize × (matrix width + 2 × style.quietZone)` pixels.
+- Width: `style.moduleSize × (matrix.width + 2 × style.quietZone)` pixels.
+- Height: `style.moduleSize × (matrix.height + 2 × style.quietZone)` pixels.
 - RGBA colors keep their alpha.
 
 Accessibility depends on the labels you pass:
@@ -86,12 +87,12 @@ const canvas = qrcode('https://qrcodesdk.dev')
   .render(QRCodeCanvasRenderer({centerImage: canvasCenterImage(logo, {size: 0.3})}));
 ```
 
-| Parameter                | Type                | Default  | Effect                                                |
-| ------------------------ | ------------------- | -------- | ----------------------------------------------------- |
-| `source`                 | `CanvasImageSource` | required | Loaded browser image source                           |
-| `layout.size`            | `number`            | `0.3`    | Image box as a fraction of matrix width               |
-| `layout.padding`         | `number`            | `1`      | Cleared border around the image, in modules           |
-| `layout.clearBackground` | `boolean`           | `true`   | Removes every module the image or its padding touches |
+| Parameter                | Type                | Default  | Effect                                                    |
+| ------------------------ | ------------------- | -------- | --------------------------------------------------------- |
+| `source`                 | `CanvasImageSource` | required | Loaded browser image source                               |
+| `layout.size`            | `number`            | `0.3`    | Square image box as a fraction of the shorter matrix side |
+| `layout.padding`         | `number`            | `1`      | Cleared border around the image, in modules               |
+| `layout.clearBackground` | `boolean`           | `true`   | Removes every module the image or its padding touches     |
 
 The source can be any ready `CanvasImageSource`, such as an `HTMLImageElement`, another canvas, or
 an `ImageBitmap`.

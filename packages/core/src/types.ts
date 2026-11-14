@@ -203,7 +203,10 @@ export type QRCodeSymbolMatrixOptions = {
 export type QRCodeMatrixOptions = QRCodeStandardMatrixOptions | QRCodeSymbolMatrixOptions;
 
 export type QRCodeCenterImageLayout = {
-  /** Image width and height as a fraction of the symbol, greater than 0 and at most 1. */
+  /**
+   * Square image width and height as a fraction of the shorter symbol side, greater than 0 and at
+   * most 1.
+   */
   readonly size?: number;
   /** Cleared border around the image in modules. */
   readonly padding?: number;

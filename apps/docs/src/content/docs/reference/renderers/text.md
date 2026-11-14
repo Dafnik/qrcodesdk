@@ -36,8 +36,9 @@ console.log(text);
 ```
 
 :::tip[Use one cell per module in terminals]
-The defaults match the graphical renderers: `moduleSize: 5` and `quietZone: 4`. A version 1 code
-then prints 145 columns wide and 73 lines high in the compact layout, wider than most terminals.
+The defaults match the graphical renderers: `moduleSize: 5` and a quiet zone of 4 modules for
+standard QR codes or 2 for Micro QR and rMQR codes. A version 1 code then prints 145 columns wide
+and 73 lines high in the compact layout, wider than most terminals.
 
 Pass `style: {moduleSize: 1, quietZone: 2}`, as above and as the CLI does, for 25 columns and 13
 lines.
@@ -47,12 +48,13 @@ lines.
 
 The renderer returns a `string`. Lines are separated by `\n`, with no trailing newline.
 
-Let `S = (matrix width + 2 × quietZone) × moduleSize`. Then:
+Let `W = (matrix.width + 2 × quietZone) × moduleSize` and
+`H = (matrix.height + 2 × quietZone) × moduleSize`. Then:
 
 | Output                         | Width         | Height              |
 | ------------------------------ | ------------- | ------------------- |
-| Compact layout                 | `S` cells     | `ceil(S / 2)` lines |
-| Full layout or ANSI background | `2 × S` cells | `S` lines           |
+| Compact layout                 | `W` cells     | `ceil(H / 2)` lines |
+| Full layout or ANSI background | `2 × W` cells | `H` lines           |
 
 The cells depend on `layout` and `ansi`:
 
@@ -75,16 +77,17 @@ color sequences and ends it with a reset, so it looks the same on every theme.
 
 ## Options
 
-| Option             | Type                               | Default     | Effect                                                                  |
-| ------------------ | ---------------------------------- | ----------- | ----------------------------------------------------------------------- |
-| `style.moduleSize` | `number`                           | `5`         | Positive safe integer module scale, in cells                            |
-| `style.quietZone`  | `number`                           | `4`         | Non-negative safe integer border, in modules                            |
-| `layout`           | `'compact' \| 'full'`              | `'compact'` | `'compact'` packs two rows per line; `'full'` uses two cells per module |
-| `ansi`             | `boolean \| QRCodeTextANSIOptions` | `false`     | `true` or an ANSI options object enables 24-bit ANSI colors             |
-| `ansi.mode`        | `'blocks' \| 'background'`         | `'blocks'`  | `'blocks'` colors glyphs; `'background'` uses colored spaces            |
-| `ansi.foreground`  | `QRCodeColor`                      | `'#000000'` | RGB or RGBA hexadecimal dark color                                      |
-| `ansi.background`  | `QRCodeColor`                      | `'#ffffff'` | RGB or RGBA hexadecimal light color                                     |
+| Option             | Type                               | Default        | Effect                                                                  |
+| ------------------ | ---------------------------------- | -------------- | ----------------------------------------------------------------------- |
+| `style.moduleSize` | `number`                           | `5`            | Positive safe integer module scale, in cells                            |
+| `style.quietZone`  | `number`                           | Symbol minimum | Non-negative safe integer border, in modules                            |
+| `layout`           | `'compact' \| 'full'`              | `'compact'`    | `'compact'` packs two rows per line; `'full'` uses two cells per module |
+| `ansi`             | `boolean \| QRCodeTextANSIOptions` | `false`        | `true` or an ANSI options object enables 24-bit ANSI colors             |
+| `ansi.mode`        | `'blocks' \| 'background'`         | `'blocks'`     | `'blocks'` colors glyphs; `'background'` uses colored spaces            |
+| `ansi.foreground`  | `QRCodeColor`                      | `'#000000'`    | RGB or RGBA hexadecimal dark color                                      |
+| `ansi.background`  | `QRCodeColor`                      | `'#ffffff'`    | RGB or RGBA hexadecimal light color                                     |
 
+- The quiet zone defaults to 4 modules for standard QR codes and 2 for Micro QR and rMQR codes.
 - Passing an ANSI object enables ANSI output.
 - Background mode always uses full cells, so its option type (`QRCodeTextANSIBackgroundOptions`)
   does not accept `layout`.
@@ -114,8 +117,8 @@ color sequences and ends it with a reset, so it looks the same on every theme.
 | `ansi.foreground`  | `#RRGGBB` or `#RRGGBBAA`    |
 | `ansi.background`  | `#RRGGBB` or `#RRGGBBAA`    |
 
-Rendering throws `INVALID_OPTIONS` with `details.field` set to `dimensions` when `S` is not a safe
-integer.
+Rendering throws `INVALID_OPTIONS` with `details.field` set to `dimensions` when either `W` or `H` is
+not a safe integer.
 
 Matrix errors, such as `PAYLOAD_TOO_LARGE`, come from the builder. See [Errors](/reference/errors/)
 for every code.

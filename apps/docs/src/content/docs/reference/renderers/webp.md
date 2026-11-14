@@ -58,7 +58,8 @@ See [Customize appearance](/guides/customize/) for every color, shape, and finde
 The renderer synchronously returns a Node.js `Buffer` with a complete lossless WebP (VP8L) file:
 
 - Pixels are identical to the PNG renderer's output for the same options.
-- Width and height: `style.moduleSize × (matrix width + 2 × style.quietZone)` pixels.
+- Width: `style.moduleSize × (matrix.width + 2 × style.quietZone)` pixels.
+- Height: `style.moduleSize × (matrix.height + 2 × style.quietZone)` pixels.
 - Shaped edges are anti-aliased.
 - RGBA colors keep their alpha.
 
