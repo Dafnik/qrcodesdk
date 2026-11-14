@@ -230,17 +230,23 @@ change the payload.
 ### Symbol type
 
 `symbol` replaces the standard QR code with another symbol type. `microQR()` from
-`@qrcodesdk/core/micro` selects a [Micro QR code](/guides/micro-qr-codes/). The symbol owns its
-version and mask, so `version`, `mask`, `eci`, and `segmenter` are typed `never` next to it and throw
-`INVALID_OPTIONS` at runtime:
+`@qrcodesdk/core/micro` selects a [Micro QR code](/guides/micro-qr-codes/), and `rMQR()` from
+`@qrcodesdk/core/rmqr` selects a [rectangular Micro QR (rMQR) code](/guides/rmqr-codes/). The
+symbol owns its version and mask, so `version`, `mask`, `eci`, and `segmenter` are typed `never`
+next to it and throw `INVALID_OPTIONS` at runtime:
 
 ```ts
 import {qrcode} from '@qrcodesdk/core';
 import {microQR} from '@qrcodesdk/core/micro';
+import {rMQR} from '@qrcodesdk/core/rmqr';
 
 qrcode('12345')
   .options({symbol: microQR({version: 'M2'})})
-  .matrix().size; // 13
+  .matrix().width; // 13
+
+const {width, height} = qrcode('12345')
+  .options({symbol: rMQR({version: 'R7'})})
+  .matrix(); // 43 × 7
 ```
 
 `QRCodeMatrixOptions` is the union of `QRCodeStandardMatrixOptions` and
@@ -306,18 +312,19 @@ toSVG(qrcode('https://qrcodesdk.dev'));
 
 | Property  | Value                                                                       |
 | --------- | --------------------------------------------------------------------------- |
-| `size`    | Number of modules per side                                                  |
+| `width`   | Number of modules per row                                                   |
+| `height`  | Number of rows; equal to `width` except for rMQR codes                      |
 | `modules` | Frozen array: `1` for dark, `0` for light modules                           |
 | `roles`   | Frozen array with the role of every module, such as data, finder, or timing |
 
-The module at column `x` and row `y` is at index `y * size + x` in both arrays. See
+The module at column `x` and row `y` is at index `y * width + x` in both arrays. See
 [Module roles](/reference/custom-renderers/#module-roles) for every role.
 
 ```ts
 import {type QRCodeMatrix, qrcode} from '@qrcodesdk/core';
 
 const matrix: QRCodeMatrix = qrcode('custom output').matrix();
-const isDark = (x: number, y: number) => matrix.modules[y * matrix.size + x] === 1;
+const isDark = (x: number, y: number) => matrix.modules[y * matrix.width + x] === 1;
 ```
 
 A `QRCodeRenderer<TOutput>` receives that matrix and returns `TOutput`:
@@ -325,8 +332,8 @@ A `QRCodeRenderer<TOutput>` receives that matrix and returns `TOutput`:
 ```ts
 import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
-const jsonRenderer: QRCodeRenderer<string> = ({size, modules}) =>
-  JSON.stringify({size, modules: Array.from(modules)});
+const jsonRenderer: QRCodeRenderer<string> = ({width, height, modules}) =>
+  JSON.stringify({width, height, modules: Array.from(modules)});
 
 const direct = qrcode('renderer output').render(jsonRenderer);
 const stored = qrcode('renderer output').renderer(jsonRenderer).render();

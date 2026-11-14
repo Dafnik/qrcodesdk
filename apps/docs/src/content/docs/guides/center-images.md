@@ -54,15 +54,17 @@ const svg = qrcode('https://qrcodesdk.dev')
 
 All factories share these layout options:
 
-| Option            | Default | Accepted value                                 | Meaning                                                      |
-| ----------------- | ------: | ---------------------------------------------- | ------------------------------------------------------------ |
-| `size`            |   `0.3` | finite number greater than `0` and at most `1` | Image box relative to matrix width, excluding the quiet zone |
-| `padding`         |     `1` | non-negative finite number                     | Cleared space around the image, in modules                   |
-| `clearBackground` |  `true` | `boolean`                                      | Removes every module the image or its padding touches        |
+| Option            | Default | Accepted value                                 | Meaning                                                                 |
+| ----------------- | ------: | ---------------------------------------------- | ----------------------------------------------------------------------- |
+| `size`            |   `0.3` | finite number greater than `0` and at most `1` | Image box relative to the shorter matrix side, excluding the quiet zone |
+| `padding`         |     `1` | non-negative finite number                     | Cleared space around the image, in modules                              |
+| `clearBackground` |  `true` | `boolean`                                      | Removes every module the image or its padding touches                   |
 
 Factories validate these values when you call them. Invalid values throw `INVALID_OPTIONS`.
 
-The image is scaled to fit the centered square. It is never cropped.
+The image is scaled to fit the centered square. It is never cropped. In
+[rMQR codes](/guides/rmqr-codes/), which are wider than they are high, the square is sized from the
+height and centered on both axes.
 
 ### How clearing works
 

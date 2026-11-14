@@ -226,7 +226,7 @@ For a raster file, work out `style.moduleSize` from the printed width and the pr
 Example: 30 mm wide at 300 DPI.
 
 1. Read the matrix width for your payload and matrix options:
-   `qrcode('https://qrcodesdk.dev').matrix().size` is `25` modules.
+   `qrcode('https://qrcodesdk.dev').matrix().width` is `25` modules.
 2. Add the quiet zone on both sides: `25 + 2 × 4 = 33` modules.
 3. Convert the printed width to pixels: `30 ÷ 25.4 × 300 ≈ 354` pixels.
 4. Divide and round **up**: `354 ÷ 33 ≈ 10.7`, so use `moduleSize: 11`.

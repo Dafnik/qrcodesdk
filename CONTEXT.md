@@ -45,9 +45,10 @@ renderer receives the matrix, including module roles, but not styling informatio
 drawing logic. The shared styler that applies visual styling for the bundled renderers is internal.
 
 **QR code matrix**:
-An immutable square grid produced by symbol generation: its size, a flat row-major array of dark
-(`1`) and light (`0`) modules, and the module role of every module. Renderers read the matrix but do
-not transform it in place.
+An immutable grid produced by symbol generation: its width and height in modules, a flat row-major
+array of dark (`1`) and light (`0`) modules, and the module role of every module. Standard and Micro
+QR codes are square; rMQR codes are wider than they are high. Renderers read the matrix but do not
+transform it in place.
 _Avoid_: Mutable matrix, two-dimensional matrix
 
 **Micro QR code**:
@@ -55,6 +56,13 @@ A smaller QR code symbol (versions M1 to M4, 11 to 17 modules per side) with one
 2-module quiet zone. It is opt-in through the `symbol` matrix option, so applications that never
 select it do not bundle its encoder.
 _Avoid_: Mini QR code, small QR code
+
+**rMQR code**:
+A rectangular Micro QR code (ISO/IEC 23941), 7 to 17 modules high and 27 to 139 modules wide, with
+one finder pattern, a finder sub-pattern, and a 2-module quiet zone. It is opt-in through the
+`symbol` matrix option, so applications that never select it do not bundle its encoder. It reuses
+the standard module roles: its finder sub-pattern has the alignment roles.
+_Avoid_: Rectangular QR code, bar QR code
 
 **Module role**:
 The function of a module, light or dark, stored in the matrix's role grid separately from its color:
