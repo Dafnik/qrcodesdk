@@ -172,7 +172,7 @@ import {
   QR_CODE_ERROR_CODES,
   svgCenterImage,
 } from '@qrcodesdk/core';
-import {type QRCodeKanji, kanji} from '@qrcodesdk/core/kanji';
+import {kanji} from '@qrcodesdk/core/kanji';
 import {
   QRCodeBuilder,
   type QRCodeEncodingMode,

@@ -106,6 +106,8 @@ describe('explainQRCode', () => {
     assert.equal(explainQRCode({payload: '漢字テスト', kanji}).mode, 'kanji');
     assert.equal(explainQRCode({payload: '漢字 test', kanji}).mode, 'octet');
     assert.equal(explainQRCode({payload: '漢字123', kanji, optimizeSegments: true}).mode, 'mixed');
+    assert.equal(explainQRCode({payload: '漢字テスト', kanji, version: 5, mask: 2}).mode, 'kanji');
+    assert.equal(explainQRCode({payload: '漢字 test', kanji, version: 5}).mode, 'octet');
     assert.deepEqual(
       explainQRCode({payload: '漢字テスト', kanji}).matrix,
       qrcode('漢字テスト').mode('kanji').kanji(kanji).matrix(),
