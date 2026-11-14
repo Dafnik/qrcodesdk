@@ -34,3 +34,4 @@ zint
 vite
 esbuild
 jridgewell
+hermesc

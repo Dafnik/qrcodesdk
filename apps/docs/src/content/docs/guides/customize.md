@@ -51,7 +51,7 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 ```
 
 - Import shapes, `finder()`, and `alignment()` from `@qrcodesdk/core/style`.
-- In React, Vue, Svelte, and Angular, import them from your framework package instead, such as
+- In React, React Native, Vue, Svelte, and Angular, import them from your framework package instead, such as
   `import {finder, rounded} from '@qrcodesdk/react'`. Pass the style through the component's
   `options`.
 - Renderer factories validate and copy the style when you call them. Changing a `style` property

@@ -1,9 +1,8 @@
 import {describe, expect, test} from 'vitest';
 
-import type {QRCodeModuleShape} from '@qrcodesdk/core';
-import {circle, diagonal, rounded} from '@qrcodesdk/core/style';
-
-import {rasterizeShapePath} from '../src/raster';
+import {rasterizeShapePath} from '../../src/raster/shape';
+import {circle, diagonal, rounded} from '../../src/style';
+import type {QRCodeModuleShape} from '../../src/types';
 
 // The internal representation of a prepared shape piece.
 type PreparedPath = {readonly data: string};

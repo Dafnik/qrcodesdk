@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["es2020"],
+    "outDir": "dist",
+    "target": "es2020"
+  },
+  "exclude": ["node_modules", "dist"],
+  "extends": "@repo/typescript-config/ts-library.json",
+  "include": ["src"]
+}

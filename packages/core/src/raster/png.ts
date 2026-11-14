@@ -1,8 +1,18 @@
-import {deflateSync, inflateSync} from 'node:zlib';
+import type {RGBAImage} from './types';
 
-import type {RGBAImage} from './pixels';
+/** Compresses filtered PNG rows into a zlib stream. */
+export type Deflate = (data: Uint8Array) => Uint8Array;
+/** Decompresses a zlib stream, throwing when it would exceed `maxOutputLength` bytes. */
+export type Inflate = (data: Uint8Array, maxOutputLength: number) => Uint8Array;
 
-const SIGNATURE = '89504e470d0a1a0a';
+/** Decoded RGBA pixels, which callers may modify. */
+export type DecodedImage = {
+  readonly width: number;
+  readonly height: number;
+  readonly data: Uint8Array;
+};
+
+const SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 // Adam7 passes as [x start, y start, x step, y step].
 const PASSES: readonly (readonly [number, number, number, number])[] = [
   [0, 0, 8, 8],
@@ -25,7 +35,7 @@ const pixelWords = new Int32Array(8);
 const pixelBytes = new Uint8Array(pixelWords.buffer);
 
 /** Encodes 8-bit RGBA pixels with adaptive per-row filtering. */
-export function encodePNG({width, height, data}: RGBAImage, level: number): Buffer {
+export function encodePNG({width, height, data}: RGBAImage, deflate: Deflate): Uint8Array {
   const byteWidth = width * 4;
   // Pixels are compared as 32-bit words. The renderer allocates them aligned.
   const words = new Int32Array(data.buffer, data.byteOffset, width * height);
@@ -34,15 +44,12 @@ export function encodePNG({width, height, data}: RGBAImage, level: number): Buff
   // The row filtered with Sub, Up, Average, and Paeth.
   const rows = new Int32Array(width * 4);
   const rowBytes = new Uint8Array(rows.buffer);
-  const filtered = Buffer.alloc((byteWidth + 1) * height);
+  const filtered = new Uint8Array((byteWidth + 1) * height);
   for (let y = 0, position = 0; y < height; y++, position += byteWidth) {
     const row = y * (byteWidth + 1);
     // Module rows repeat for the module size. The Up filter turns a repeated row into zeros,
     // which `filtered` already holds.
-    if (
-      y > 0 &&
-      data.compare(data, position - byteWidth, position, position, position + byteWidth) === 0
-    ) {
+    if (y > 0 && repeatsPreviousRow(data, position, byteWidth)) {
       filtered[row] = 2;
       continue;
     }
@@ -55,44 +62,45 @@ export function encodePNG({width, height, data}: RGBAImage, level: number): Buff
       rows,
     );
     filtered[row] = filter;
-    if (filter === 0) data.copy(filtered, row + 1, position, position + byteWidth);
+    if (filter === 0) filtered.set(data.subarray(position, position + byteWidth), row + 1);
     else filtered.set(rowBytes.subarray((filter - 1) * byteWidth, filter * byteWidth), row + 1);
   }
-  const header = Buffer.alloc(13);
-  header.writeUInt32BE(width, 0);
-  header.writeUInt32BE(height, 4);
+  const header = new Uint8Array(13);
+  const view = new DataView(header.buffer);
+  view.setUint32(0, width);
+  view.setUint32(4, height);
   header[8] = 8;
   header[9] = 6;
-  return Buffer.concat([
-    Buffer.from(SIGNATURE, 'hex'),
+  return concat([
+    Uint8Array.from(SIGNATURE),
     chunk('IHDR', header),
-    chunk('IDAT', deflateSync(filtered, {chunkSize: 32 * 1024, level, strategy: 3})),
-    chunk('IEND', Buffer.alloc(0)),
+    chunk('IDAT', deflate(filtered)),
+    chunk('IEND', new Uint8Array(0)),
   ]);
 }
 
 /** Decodes any standard PNG into 8-bit RGBA pixels. */
-export function decodePNG(source: Buffer): RGBAImage {
-  if (source.toString('hex', 0, 8) !== SIGNATURE) throw new Error('Invalid PNG signature');
+export function decodePNG(source: Uint8Array, inflate: Inflate): DecodedImage {
+  if (!hasSignature(source)) throw new Error('Invalid PNG signature');
   let width = 0;
   let height = 0;
   let depth = 0;
   let colorType = 0;
   let interlaced = false;
-  let palette: Buffer | undefined;
-  let transparency: Buffer | undefined;
-  const compressed: Buffer[] = [];
+  let palette: Uint8Array | undefined;
+  let transparency: Uint8Array | undefined;
+  const compressed: Uint8Array[] = [];
   for (let offset = 8, type = ''; type !== 'IEND';) {
-    const end = offset + 8 + source.readUInt32BE(offset);
-    type = source.toString('latin1', offset + 4, offset + 8);
+    const end = offset + 8 + readUint32(source, offset);
+    type = String.fromCharCode(...readBytes(source, offset + 4, offset + 8));
     const data = source.subarray(offset + 8, end);
-    if (crc32(source.subarray(offset + 4, end)) !== source.readUInt32BE(end)) {
+    if (crc32(source.subarray(offset + 4, end)) !== readUint32(source, end)) {
       throw new Error(`Invalid ${type} checksum`);
     }
     offset = end + 4;
     if (type === 'IHDR') {
-      width = data.readUInt32BE(0);
-      height = data.readUInt32BE(4);
+      width = readUint32(data, 0);
+      height = readUint32(data, 4);
       depth = data[8]!;
       colorType = data[9]!;
       interlaced = data[12] === 1;
@@ -134,13 +142,13 @@ export function decodePNG(source: Buffer): RGBAImage {
         passSize(height, startY, stepY) * (((passWidth * bitsPerPixel + 7) >> 3) + 1);
     }
   }
-  const raw = inflateSync(Buffer.concat(compressed), {maxOutputLength: expectedLength || 1});
+  const raw = inflate(concat(compressed), expectedLength || 1);
   if (raw.length !== expectedLength) throw new Error('Invalid PNG data length');
 
-  const pixels = Buffer.alloc(width * height * 4);
-  const sample = (row: Buffer, index: number): number =>
+  const pixels = new Uint8Array(width * height * 4);
+  const sample = (row: Uint8Array, index: number): number =>
     depth === 16
-      ? row.readUInt16BE(index * 2)
+      ? readUint16(row, index * 2)
       : depth === 8
         ? row[index]!
         : (row[(index * depth) >> 3]! >> (8 - depth - ((index * depth) & 7))) & maximum;
@@ -151,7 +159,7 @@ export function decodePNG(source: Buffer): RGBAImage {
     const passWidth = passSize(width, startX, stepX);
     const passHeight = passWidth > 0 ? passSize(height, startY, stepY) : 0;
     const byteWidth = (passWidth * bitsPerPixel + 7) >> 3;
-    let previous: Buffer | undefined;
+    let previous: Uint8Array | undefined;
     for (let y = 0; y < passHeight; y++) {
       const filter = raw[position]!;
       if (filter > 4) throw new Error('Invalid PNG filter');
@@ -183,9 +191,9 @@ export function decodePNG(source: Buffer): RGBAImage {
           alpha = colorType & 4 ? sample(row, x * channels + (color ? 3 : 1)) : maximum;
           if (
             transparency &&
-            red === transparency.readUInt16BE(0) &&
+            red === readUint16(transparency, 0) &&
             (!color ||
-              (green === transparency.readUInt16BE(2) && blue === transparency.readUInt16BE(4)))
+              (green === readUint16(transparency, 2) && blue === readUint16(transparency, 4)))
           ) {
             red = green = blue = alpha = 0;
           }
@@ -204,6 +212,32 @@ export function decodePNG(source: Buffer): RGBAImage {
     }
   }
   return {width, height, data: pixels};
+}
+
+/** Reads the dimensions from a PNG header, or returns `undefined` when there is none. */
+export function readPNGDimensions(
+  source: Uint8Array,
+): {readonly width: number; readonly height: number} | undefined {
+  if (
+    source.length < 24 ||
+    !hasSignature(source) ||
+    readUint32(source, 8) !== 13 ||
+    String.fromCharCode(...source.subarray(12, 16)) !== 'IHDR'
+  ) {
+    return undefined;
+  }
+  return {width: readUint32(source, 16), height: readUint32(source, 20)};
+}
+
+function hasSignature(source: Uint8Array): boolean {
+  return source.length >= 8 && SIGNATURE.every((value, index) => source[index] === value);
+}
+
+function repeatsPreviousRow(data: ArrayLike<number>, position: number, byteWidth: number): boolean {
+  for (let x = 0; x < byteWidth; x++) {
+    if (data[position + x] !== data[position + x - byteWidth]) return false;
+  }
+  return true;
 }
 
 /**
@@ -371,13 +405,42 @@ function predict(type: number, left: number, up: number, upLeft: number): number
   return type === 4 ? paethPredictor(left, up, upLeft) : 0;
 }
 
-function chunk(type: string, data: Buffer): Buffer {
-  const result = Buffer.alloc(data.length + 12);
-  result.writeUInt32BE(data.length, 0);
-  result.write(type, 4, 'latin1');
-  data.copy(result, 8);
-  result.writeUInt32BE(crc32(result.subarray(4, data.length + 8)), data.length + 8);
+function chunk(type: string, data: Uint8Array): Uint8Array {
+  const result = new Uint8Array(data.length + 12);
+  const view = new DataView(result.buffer);
+  view.setUint32(0, data.length);
+  for (let index = 0; index < 4; index++) result[4 + index] = type.charCodeAt(index);
+  result.set(data, 8);
+  view.setUint32(data.length + 8, crc32(result.subarray(4, data.length + 8)));
   return result;
+}
+
+function concat(parts: readonly Uint8Array[]): Uint8Array {
+  let length = 0;
+  for (const part of parts) length += part.length;
+  const result = new Uint8Array(length);
+  let offset = 0;
+  for (const part of parts) {
+    result.set(part, offset);
+    offset += part.length;
+  }
+  return result;
+}
+
+/** Reads bytes, throwing when the range ends past the source. */
+function readBytes(source: Uint8Array, start: number, end: number): Uint8Array {
+  if (end > source.length) throw new RangeError('PNG data ends unexpectedly');
+  return source.subarray(start, end);
+}
+
+function readUint16(source: Uint8Array, offset: number): number {
+  const [high, low] = readBytes(source, offset, offset + 2);
+  return (high! << 8) | low!;
+}
+
+function readUint32(source: Uint8Array, offset: number): number {
+  const [first, second, third, fourth] = readBytes(source, offset, offset + 4);
+  return ((first! << 24) | (second! << 16) | (third! << 8) | fourth!) >>> 0;
 }
 
 function crc32(data: Uint8Array): number {

@@ -351,12 +351,13 @@ export function isQRCodeError(error: unknown): error is QRCodeErrorLike {
 
 ### Where components throw
 
-| Framework | SVG component throws during | Image and Canvas components throw during                                                | Catch it in the browser with                                                  |
-| --------- | --------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| React     | Rendering                   | Rendering for invalid renderer options; a `useEffect` after commit for payload problems | An error boundary above the component                                         |
-| Vue       | Rendering, in a `computed`  | A watcher after mounting                                                                | `onErrorCaptured()` in a parent or `app.config.errorHandler`                  |
-| Svelte    | Rendering, in a `$derived`  | An `$effect`                                                                            | `<svelte:boundary>` with a `failed` snippet or `onerror`, Svelte 5.3 or newer |
-| Angular   | An `effect()`               | An `effect()`                                                                           | Angular's `ErrorHandler`; there is no component boundary                      |
+| Framework    | SVG component throws during | Image and Canvas components throw during                                                | Catch it in the browser with                                                  |
+| ------------ | --------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| React        | Rendering                   | Rendering for invalid renderer options; a `useEffect` after commit for payload problems | An error boundary above the component                                         |
+| Vue          | Rendering, in a `computed`  | A watcher after mounting                                                                | `onErrorCaptured()` in a parent or `app.config.errorHandler`                  |
+| Svelte       | Rendering, in a `$derived`  | An `$effect`                                                                            | `<svelte:boundary>` with a `failed` snippet or `onerror`, Svelte 5.3 or newer |
+| Angular      | An `effect()`               | An `effect()`                                                                           | Angular's `ErrorHandler`; there is no component boundary                      |
+| React Native | Rendering                   | Rendering                                                                               | An error boundary above the component                                         |
 
 - **React:** components create their renderer with `useMemo()`. Invalid renderer options, such as
   `style.moduleSize: 0`, throw during render. Payload problems throw later, in the effect that

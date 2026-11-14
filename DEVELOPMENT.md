@@ -64,6 +64,8 @@ then merges the results. HTML, LCOV, and combined JSON reports are written to `c
 
 Installed-package smoke tests have separate consumer and browser prerequisites. See
 [the runtime test guide](packages/browser/runtime/README.md) for their commands.
+The React Native smoke test bundles with Metro and runs in Hermes. See
+[the React Native runtime test guide](packages/react-native/runtime/README.md).
 
 ### Docs
 

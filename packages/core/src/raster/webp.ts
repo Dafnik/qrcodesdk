@@ -1,5 +1,5 @@
 import {QRCodeError} from '../error';
-import {ByteBuffer} from './byte-buffer';
+import {BitWriter, huffmanCodeLengths, reversedCanonicalCodes} from './huffman';
 import {type RGBAImage, pixelWords} from './types';
 
 const MAX_DIMENSION = 16_384;
@@ -42,7 +42,7 @@ export function encodeWebP({width, height, data}: RGBAImage): Uint8Array {
   let xsize = width;
   let pixels: Int32Array;
   if (colors) {
-    const palette = new Int32Array(Uint32Array.from(colors).sort().buffer);
+    const palette = new Int32Array(new Uint32Array(Array.from(colors)).sort().buffer);
     // Color-indexing transform. The color table is stored as differences between entries.
     writer.write(1, 1);
     writer.write(3, 2);
@@ -409,105 +409,12 @@ function writeCodeLengths(writer: BitWriter, lengths: Uint8Array): void {
   }
 }
 
-/**
- * Builds Huffman code lengths of at most `limit` bits. Rare symbols are given larger weights until
- * the tree fits.
- */
-function huffmanCodeLengths(histogram: Uint32Array, limit: number): Uint8Array {
-  const lengths = new Uint8Array(histogram.length);
-  const symbols: number[] = [];
-  for (let symbol = 0; symbol < histogram.length; symbol++) {
-    if (histogram[symbol]! > 0) symbols.push(symbol);
-  }
-  if (symbols.length <= 1) {
-    if (symbols.length === 1) lengths[symbols[0]!] = 1;
-    return lengths;
-  }
-
-  const leafCount = symbols.length;
-  const nodeCount = 2 * leafCount - 1;
-  for (let minimum = 1; ; minimum *= 2) {
-    const weights = symbols.map((symbol) => Math.max(histogram[symbol]!, minimum));
-    const order = symbols.map((_, index) => index);
-    order.sort((left, right) => weights[left]! - weights[right]! || left - right);
-    const nodeWeights = new Float64Array(nodeCount);
-    order.forEach((leaf, index) => (nodeWeights[index] = weights[leaf]!));
-    const parents = new Int32Array(nodeCount);
-    // Leaves and merged nodes are each already sorted by weight, so two queues replace a heap.
-    let nextLeaf = 0;
-    let nextInternal = leafCount;
-    let next = leafCount;
-    const take = () =>
-      nextLeaf < leafCount &&
-      (nextInternal >= next || nodeWeights[nextLeaf]! <= nodeWeights[nextInternal]!)
-        ? nextLeaf++
-        : nextInternal++;
-    for (; next < nodeCount; next++) {
-      const left = take();
-      const right = take();
-      nodeWeights[next] = nodeWeights[left]! + nodeWeights[right]!;
-      parents[left] = parents[right] = next;
-    }
-    const depths = new Uint16Array(nodeCount);
-    let maximum = 0;
-    for (let node = nodeCount - 2; node >= 0; node--) {
-      depths[node] = depths[parents[node]!]! + 1;
-      if (node < leafCount) maximum = Math.max(maximum, depths[node]!);
-    }
-    if (maximum <= limit) {
-      for (let index = 0; index < leafCount; index++) {
-        lengths[symbols[order[index]!]!] = depths[index]!;
-      }
-      return lengths;
-    }
-  }
-}
-
-/** Assigns canonical codes, bit-reversed because the bitstream is read least significant bit first. */
 function createPrefixCode(lengths: Uint8Array): PrefixCode {
-  const counts = new Uint16Array(MAX_CODE_LENGTH + 1);
   let used = 0;
-  for (const length of lengths) {
-    if (length === 0) continue;
-    counts[length]!++;
-    used++;
-  }
-  const nextCodes = new Uint16Array(MAX_CODE_LENGTH + 1);
-  for (let bits = 1, code = 0; bits <= MAX_CODE_LENGTH; bits++) {
-    code = (code + counts[bits - 1]!) << 1;
-    nextCodes[bits] = code;
-  }
-  const codes = new Uint16Array(lengths.length);
-  for (let symbol = 0; symbol < lengths.length; symbol++) {
-    const length = lengths[symbol]!;
-    if (length === 0) continue;
-    const code = nextCodes[length]!++;
-    let reversed = 0;
-    for (let bit = 0; bit < length; bit++) reversed |= ((code >>> bit) & 1) << (length - 1 - bit);
-    codes[symbol] = reversed;
-  }
+  for (const length of lengths) if (length !== 0) used++;
   // Decoders read a code with only one symbol without consuming bits.
-  return {codes, lengths: used === 1 ? new Uint8Array(lengths.length) : lengths};
-}
-
-/** Writes bits least significant bit first. */
-class BitWriter {
-  private readonly buffer = new ByteBuffer();
-  private bits = 0;
-  private count = 0;
-
-  write(value: number, count: number): void {
-    this.bits |= value << this.count;
-    this.count += count;
-    while (this.count >= 8) {
-      this.buffer.push(this.bits & 0xff);
-      this.bits >>>= 8;
-      this.count -= 8;
-    }
-  }
-
-  finish(): Uint8Array {
-    if (this.count > 0) this.buffer.push(this.bits & 0xff);
-    return this.buffer.toUint8Array();
-  }
+  return {
+    codes: reversedCanonicalCodes(lengths),
+    lengths: used === 1 ? new Uint8Array(lengths.length) : lengths,
+  };
 }

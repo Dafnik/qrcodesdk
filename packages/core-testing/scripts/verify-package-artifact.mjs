@@ -28,6 +28,9 @@ const sdkDependencyPolicy = {
   '@qrcodesdk/react': {
     dependencies: ['@qrcodesdk/browser', '@qrcodesdk/core'],
   },
+  '@qrcodesdk/react-native': {
+    dependencies: ['@qrcodesdk/core'],
+  },
   '@qrcodesdk/svelte': {
     dependencies: ['@qrcodesdk/browser', '@qrcodesdk/core'],
   },
@@ -102,6 +105,18 @@ test('core exports style factories, internal drawing helpers, and encoders', asy
   assert.equal(typeof jpeg.ɵencodeJPEG, 'function');
   assert.equal(typeof jpeg.ɵresolveJPEGOptions, 'function');
   assert.equal(typeof webp.ɵencodeWebP, 'function');
+  const raster = await importTarget(packageJson.exports['./internal/raster']);
+  const zlib = await importTarget(packageJson.exports['./internal/zlib']);
+  for (const name of [
+    'ɵcreateRasterCenterImage',
+    'ɵcreateRGBARenderer',
+    'ɵdecodePNG',
+    'ɵencodePNG',
+  ]) {
+    assert.equal(typeof raster[name], 'function');
+  }
+  assert.equal(typeof zlib.ɵzlibDeflate, 'function');
+  assert.equal(typeof zlib.ɵzlibInflate, 'function');
 });
 
 test('core publishes the automatic segmenter independently of default generation', async () => {

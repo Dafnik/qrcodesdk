@@ -1,8 +1,24 @@
-import {crc32, deflateSync} from 'node:zlib';
+import {crc32, deflateSync, inflateSync} from 'node:zlib';
 import sharp from 'sharp';
 import {describe, expect, test} from 'vitest';
 
-import {decodePNG, encodePNG} from '../../src/png-codec';
+import {type Inflate, decodePNG as decodeWith, encodePNG} from '../../src/raster/png';
+import {zlibDeflate, zlibInflate} from '../../src/raster/zlib';
+
+const nodeInflate: Inflate = (data, maxOutputLength) => inflateSync(data, {maxOutputLength});
+const nodeDeflate = (level: number) => (data: Uint8Array) =>
+  deflateSync(data, {chunkSize: 32 * 1024, level, strategy: 3});
+const INFLATERS = [
+  {name: 'node:zlib', inflate: nodeInflate},
+  {name: 'the bundled inflater', inflate: zlibInflate},
+];
+
+/** Decodes with both inflaters and checks that they agree. */
+function decodePNG(source: Buffer) {
+  const results = INFLATERS.map(({inflate}) => decodeWith(source, inflate));
+  expect(Buffer.from(results[1]!.data).equals(Buffer.from(results[0]!.data))).toBe(true);
+  return {...results[0]!, data: Buffer.from(results[0]!.data)};
+}
 
 const PASSES = [
   [0, 0, 8, 8],
@@ -152,17 +168,23 @@ describe('PNG codec', () => {
     expect([...decodePNG(transparent).data]).toEqual([0, 0, 0, 0]);
   });
 
-  test.each([0, 3, 6, 9])('encodes RGBA pixels losslessly at level %i', async (level) => {
-    const image = {width: 17, height: 11, data: randomBytes(17 * 11 * 4, level + 1)};
+  test.each([
+    ...[0, 3, 6, 9].map((level) => ({
+      name: `node:zlib at level ${level}`,
+      deflate: nodeDeflate(level),
+    })),
+    {name: 'the bundled deflater', deflate: zlibDeflate},
+  ])('encodes RGBA pixels losslessly with $name', async ({deflate}) => {
+    const image = {width: 17, height: 11, data: randomBytes(17 * 11 * 4, 4)};
     image.data.fill(255, 0, 200);
-    const encoded = encodePNG(image, level);
+    const encoded = Buffer.from(encodePNG(image, deflate));
     expect(decodePNG(encoded).data.equals(image.data)).toBe(true);
     expect((await decodeReference(encoded)).equals(image.data)).toBe(true);
   });
 
   test('keeps encoded output stable', () => {
     const image = {width: 3, height: 2, data: randomBytes(3 * 2 * 4, 42)};
-    expect(encodePNG(image, 9).toString('base64')).toMatchInlineSnapshot(
+    expect(Buffer.from(encodePNG(image, nodeDeflate(9))).toString('base64')).toMatchInlineSnapshot(
       `"iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAYAAACddGYaAAAAI0lEQVR4AWPs7JTJv71t+v/HO0QNmFLTzBL+PRLhr2L7YAIAo94LsPxq/PcAAAAASUVORK5CYII="`,
     );
   });
@@ -216,7 +238,7 @@ describe('PNG codec', () => {
       shortData,
       badFilterData,
     ]) {
-      expect(() => decodePNG(source)).toThrow();
+      for (const {inflate} of INFLATERS) expect(() => decodeWith(source, inflate)).toThrow();
     }
   });
 });

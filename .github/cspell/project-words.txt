@@ -70,3 +70,9 @@ YYYYMMDDTH
 Hmmss
 rmqr
 paeth
+ɵdecode
+ɵzlib
+bitstreams
+deflater
+inflater
+inflaters

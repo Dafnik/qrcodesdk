@@ -18,6 +18,7 @@
         "@qrcodesdk/node#build",
         "@qrcodesdk/cli#build",
         "@qrcodesdk/react#build",
+        "@qrcodesdk/react-native#build",
         "@qrcodesdk/angular#build",
         "@qrcodesdk/vue#build",
         "@qrcodesdk/svelte#build"

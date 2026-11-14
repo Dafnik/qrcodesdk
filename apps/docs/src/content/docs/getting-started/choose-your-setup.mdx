@@ -11,16 +11,17 @@ terminal text is enough. Every other package builds on it.
 
 ## Choose a package
 
-| Package                                    | Choose it for                                    | Outputs                                                                                      |
-| ------------------------------------------ | ------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| [`@qrcodesdk/core`](/packages/core/)       | Runtime-neutral generation and raw matrix access | SVG `string`, terminal text `string`, `QRCodeMatrix`                                         |
-| [`@qrcodesdk/browser`](/packages/browser/) | Direct DOM output and client-side downloads      | `HTMLCanvasElement`, PNG, WebP, GIF, or JPEG `HTMLImageElement`, SVG or image download       |
-| [`@qrcodesdk/node`](/packages/node/)       | Server-side raster output                        | PNG, WebP, GIF, or JPEG `Buffer`                                                             |
-| [`@qrcodesdk/react`](/packages/react/)     | React and Next.js components                     | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, `QRCodeCanvas`, downloads |
-| [`@qrcodesdk/vue`](/packages/vue/)         | Vue components                                   | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, `QRCodeCanvas`, downloads |
-| [`@qrcodesdk/svelte`](/packages/svelte/)   | Svelte components                                | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, `QRCodeCanvas`, downloads |
-| [`@qrcodesdk/angular`](/packages/angular/) | Standalone Angular components                    | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, `QRCodeCanvas`, downloads |
-| [`@qrcodesdk/cli`](/packages/cli/)         | Terminal, shell, and CI workflows                | Terminal text, SVG, PNG, WebP, GIF, or JPEG file                                             |
+| Package                                              | Choose it for                                    | Outputs                                                                                      |
+| ---------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| [`@qrcodesdk/core`](/packages/core/)                 | Runtime-neutral generation and raw matrix access | SVG `string`, terminal text `string`, `QRCodeMatrix`                                         |
+| [`@qrcodesdk/browser`](/packages/browser/)           | Direct DOM output and client-side downloads      | `HTMLCanvasElement`, PNG, WebP, GIF, or JPEG `HTMLImageElement`, SVG or image download       |
+| [`@qrcodesdk/node`](/packages/node/)                 | Server-side raster output                        | PNG, WebP, GIF, or JPEG `Buffer`                                                             |
+| [`@qrcodesdk/react`](/packages/react/)               | React and Next.js components                     | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, `QRCodeCanvas`, downloads |
+| [`@qrcodesdk/react-native`](/packages/react-native/) | React Native and Expo components                 | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`                            |
+| [`@qrcodesdk/vue`](/packages/vue/)                   | Vue components                                   | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, `QRCodeCanvas`, downloads |
+| [`@qrcodesdk/svelte`](/packages/svelte/)             | Svelte components                                | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, `QRCodeCanvas`, downloads |
+| [`@qrcodesdk/angular`](/packages/angular/)           | Standalone Angular components                    | `QRCodeSVG`, `QRCodePNG`, `QRCodeWebP`, `QRCodeGIF`, `QRCodeJPEG`, `QRCodeCanvas`, downloads |
+| [`@qrcodesdk/cli`](/packages/cli/)                   | Terminal, shell, and CI workflows                | Terminal text, SVG, PNG, WebP, GIF, or JPEG file                                             |
 
 - Compare outputs and exact return types in [Renderer outputs](/reference/renderers/).
 - Compare QRCodeSDK with other libraries in [Compare with other libraries](/learn/comparison/).
@@ -53,6 +54,13 @@ Next.js Server Components that import style factories also need Core as a direct
 [Add Core to a framework project](#add-core-to-a-framework-project) and
 [Next.js client boundary](/packages/react/#nextjs-client-boundary).
 
+## Install React Native components
+
+<PackageManagerTabs packages={['@qrcodesdk/react-native', 'react-native-svg']} mode="add" />
+
+React Native 0.79 or newer, React, and react-native-svg are peer dependencies. In an Expo app,
+install react-native-svg with `npx expo install react-native-svg`.
+
 ## Install Vue components
 
 <PackageManagerTabs packages={['@qrcodesdk/vue']} mode="add" />
@@ -83,7 +91,7 @@ Yarn 2 and newer have no global install. Add the CLI to a project or run it with
 
 ## Add Core to a framework project
 
-The React, Vue, Svelte, and Angular packages depend on Core. They re-export:
+The React, React Native, Vue, Svelte, and Angular packages depend on Core. They re-export:
 
 - shape and center-image factories
 - `automaticSegmenter` and the `kanji` table

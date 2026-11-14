@@ -10,6 +10,7 @@ related:
   - ../packages/react.mdx
   - ../packages/vue.mdx
   - ../packages/svelte.mdx
+  - ../packages/react-native.mdx
   - ../packages/angular.mdx
   - ../packages/cli.mdx
 ---
@@ -159,6 +160,12 @@ component:
 <qrcode-webp #qrcodeWebp payload="https://qrcodesdk.dev" />
 <button (click)="qrcodeWebp.download('qrcodesdk')" type="button">Download WebP</button>
 ```
+
+## Save from React Native
+
+React Native has no downloads. The PNG, WebP, GIF, and JPEG components expose `toDataURL()` through
+a `ref` instead. Pass the base64 data to a file system or sharing library. See
+[Save or share](/packages/react-native/#save-or-share).
 
 ## Export a Canvas manually
 

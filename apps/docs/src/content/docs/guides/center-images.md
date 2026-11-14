@@ -28,6 +28,8 @@ A center image covers some of the encoded modules. To keep the code readable:
   - SVG output takes an embedded `data:image/...` URL.
   - Node.js output takes PNG bytes as a `Uint8Array` or `Buffer`.
   - Browser output takes a same-origin or CORS-enabled image.
+  - React Native SVG output also takes bundled assets and `{uri}` sources, which react-native-svg
+    loads.
 - Prefer a simple logo with a transparent or solid background. Photos and fine detail are hard to
   recognize at this size.
 
@@ -313,6 +315,28 @@ export class QRCodeWithLogo {
       centerImage: canvasCenterImage(image, {size: 0.3}),
     });
   }
+}
+```
+
+### React Native
+
+`@qrcodesdk/react-native` cannot load browser images. Its components take their own factories:
+
+- `QRCodeSVG` takes `svgCenterImage()` with a bundled asset, such as `require('./logo.png')`, a
+  `{uri}` object, or an embedded data URL.
+- The PNG, WebP, GIF, and JPEG components take `rasterCenterImage()` with PNG bytes, like Node.js
+  output.
+
+```tsx
+import {QRCodeSVG, type QRCodeSVGOptions, svgCenterImage} from '@qrcodesdk/react-native';
+
+const options: QRCodeSVGOptions = {
+  matrix: {errorCorrectionLevel: 'H'},
+  centerImage: svgCenterImage(require('./logo.png'), {size: 0.3}),
+};
+
+export function QRCodeWithLogo() {
+  return <QRCodeSVG payload="https://qrcodesdk.dev" options={options} />;
 }
 ```
 

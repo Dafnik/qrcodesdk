@@ -11,7 +11,7 @@ related:
 ---
 
 `@qrcodesdk/core/payload` exports small serializers for payload formats that scanners understand.
-The React, Vue, Svelte, and Angular packages re-export them. Each helper returns a string that you
+The React, React Native, Vue, Svelte, and Angular packages re-export them. Each helper returns a string that you
 pass to `qrcode()` or a framework component’s `payload` input.
 Scanner recognition of each format depends on the app and device.
 
