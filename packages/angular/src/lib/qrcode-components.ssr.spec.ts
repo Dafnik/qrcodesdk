@@ -6,6 +6,7 @@ import {describe, expect, test} from 'vitest';
 
 import {microQR} from '@qrcodesdk/core/micro';
 
+import {wifiPayload} from '../public-api';
 import {QRCodeCanvas} from './QRCodeCanvas';
 import {QRCodeJPEG} from './QRCodeJPEG';
 import {QRCodePNG} from './QRCodePNG';
@@ -35,6 +36,12 @@ class QRCodeMicroSSRHost {
 }
 
 describe('Angular QR code server rendering', () => {
+  test('re-exports the payload helpers', () => {
+    expect(wifiPayload({ssid: 'Office', password: 'secret'})).toBe(
+      'WIFI:T:WPA;S:Office;P:secret;;',
+    );
+  });
+
   test('renders complete SVG markup and permanent browser-output hosts', async () => {
     const html = await renderApplication(
       (context) => bootstrapApplication(QRCodeSSRHost, undefined, context),

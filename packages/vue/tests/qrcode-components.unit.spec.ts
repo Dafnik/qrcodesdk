@@ -27,6 +27,14 @@ describe('Vue QR code component API', () => {
     expect((image.vm as unknown as QRCodeDownloadHandle).download).toBeTypeOf('function');
   });
 
+  test('re-exports the payload helpers', () => {
+    const payload = vueApi.wifiPayload({ssid: 'Office', password: 'secret'});
+    const wrapper = mount(vueApi.QRCodeSVG, {props: {payload}});
+
+    expect(payload).toBe('WIFI:T:WPA;S:Office;P:secret;;');
+    expect(wrapper.html()).toContain('<svg');
+  });
+
   test('renders a Micro QR code through the matrix options', () => {
     const wrapper = mount(vueApi.QRCodeSVG, {
       props: {payload: '12345', options: {matrix: {symbol: vueApi.microQR()}}},

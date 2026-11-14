@@ -29,6 +29,13 @@ describe('React QR code component handles', () => {
     expect(markup({kanji: reactApi.kanji})).not.toBe(markup({}));
   });
 
+  test('re-exports the payload helpers', () => {
+    const payload = reactApi.wifiPayload({ssid: 'Office', password: 'secret'});
+
+    expect(payload).toBe('WIFI:T:WPA;S:Office;P:secret;;');
+    expect(renderToString(<reactApi.QRCodeSVG payload={payload} />)).toContain('<svg');
+  });
+
   test('accepts payload and options props', () => {
     expectTypeOf<QRCodeSVGProps>().toHaveProperty('payload');
     expectTypeOf<QRCodeSVGProps>().toHaveProperty('options');

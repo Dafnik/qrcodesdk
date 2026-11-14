@@ -363,7 +363,8 @@ Learn more about each group:
 - [Customize appearance](https://qrcodesdk.dev/guides/customize/) covers `style`.
 - [Renderer outputs](https://qrcodesdk.dev/reference/renderers/) covers output-specific options.
 
-[Payload helpers](https://qrcodesdk.dev/reference/payloads/) and `QRCodeError` come from `@qrcodesdk/core`. To use them,
+Import [payload helpers](https://qrcodesdk.dev/reference/payloads/), such as `wifiPayload()`, from `@qrcodesdk/angular`.
+`QRCodeError` comes from `@qrcodesdk/core`. To use it,
 [add Core to the project](https://qrcodesdk.dev/getting-started/choose-your-setup/#add-core-to-a-framework-project).
 
 ### Mixed-mode segmentation
