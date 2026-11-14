@@ -13,7 +13,12 @@ export {QR_CODE_CENTER_IMAGE_FIXTURES} from './center-image-fixtures';
 export type {QRCodeCenterImageFixture} from './center-image-fixtures';
 export {captureDownloads, mockCanvasRendering} from './dom';
 export type {CapturedDownload} from './dom';
-export {fixtureMatrixOptions, QR_CODE_ECI_TEST_FIXTURE, QR_CODE_TEST_FIXTURES} from './fixtures';
+export {
+  fixtureMatrixOptions,
+  QR_CODE_ECI_TEST_FIXTURE,
+  QR_CODE_ROUNDTRIP_TEST_FIXTURES,
+  QR_CODE_TEST_FIXTURES,
+} from './fixtures';
 export {
   encodeFixturePNG,
   fixtureImageDataURL,
@@ -34,12 +39,7 @@ export {
 } from './micro-fixtures';
 export type {QRCodeMicroStyleVariantFixture, QRCodeMicroTestFixture} from './micro-fixtures';
 export type {QRCodeTestFixture} from './fixtures';
-export {
-  createFixtureShape,
-  createFixtureStyle,
-  QR_CODE_STYLING_FIXTURES,
-  QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
-} from './styling-fixtures';
+export {createFixtureShape, createFixtureStyle, QR_CODE_STYLING_FIXTURES} from './styling-fixtures';
 export type {
   QRCodeFixtureFinderShape,
   QRCodeFixtureModuleShape,

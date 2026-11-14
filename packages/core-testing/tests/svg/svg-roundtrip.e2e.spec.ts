@@ -7,20 +7,13 @@ import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 import {fixtureImageDataURL, fixtureMatrixOptions} from '../../src';
 import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
+  QR_CODE_ROUNDTRIP_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
-  QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
-  QR_CODE_TEST_FIXTURES,
+  QR_CODE_STYLING_FIXTURES,
   getAllQRCodeCombinations,
 } from '../../src';
 import {decodeSvgQRCode} from './svg-helpers';
 
-/**
- * Version 23 QR codes always fail to decode
- * https://github.com/cozmo/jsQR/issues/251
- */
-const JSQR_ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()].filter(
-  ({version, errorCorrectionLevel}) => version !== 23 || errorCorrectionLevel !== 'L',
-);
 describe('SVG QR roundtrips', () => {
   test.each(QR_CODE_CENTER_IMAGE_FIXTURES)(
     'decodes $name SVG center image fixture',
@@ -41,6 +34,14 @@ describe('SVG QR roundtrips', () => {
   );
 
   const testSVGRenderer = QRCodeSVGRenderer({style: {moduleSize: 4, quietZone: 4}});
+
+  test.each(
+    ['A\u0000B', 'A\u001dB'].flatMap((payload) => [false, true].map((eci) => ({payload, eci}))),
+  )('preserves control characters in $payload with ECI $eci', async ({payload, eci}) => {
+    await expect(
+      decodeSvgQRCode(qrcode(payload).mode('octet').eci(eci).render(testSVGRenderer)),
+    ).resolves.toBe(payload);
+  });
 
   test.each(
     ['ABCDE12345678?A1A', 'ABé12345678901234567890', 'AB✅🚀12345678901234567890', '00123'].flatMap(
@@ -75,7 +76,7 @@ describe('SVG QR roundtrips', () => {
     ).resolves.toBe(payload);
   });
 
-  test.each(QR_CODE_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
+  test.each(QR_CODE_ROUNDTRIP_TEST_FIXTURES)('decodes $name SVG output', async (fixture) => {
     await expect(
       decodeSvgQRCode(
         qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(testSVGRenderer),
@@ -83,7 +84,7 @@ describe('SVG QR roundtrips', () => {
     ).resolves.toBe(fixture.payload);
   });
 
-  test.each(JSQR_ROUNDTRIP_COMBINATIONS)('decodes $name SVG output', async (fixture) => {
+  test.each([...getAllQRCodeCombinations()])('decodes $name SVG output', async (fixture) => {
     await expect(
       decodeSvgQRCode(
         qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(testSVGRenderer),
@@ -91,18 +92,15 @@ describe('SVG QR roundtrips', () => {
     ).resolves.toBe(fixture.payload);
   });
 
-  test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES)(
-    'decodes $name SVG styling fixture',
-    async (fixture) => {
-      await expect(
-        decodeSvgQRCode(
-          qrcode(fixture.payload)
-            .options(fixture.matrixOptions)
-            .render(QRCodeSVGRenderer({style: fixture.styling})),
-        ),
-      ).resolves.toBe(fixture.payload);
-    },
-  );
+  test.each(QR_CODE_STYLING_FIXTURES)('decodes $name SVG styling fixture', async (fixture) => {
+    await expect(
+      decodeSvgQRCode(
+        qrcode(fixture.payload)
+          .options(fixture.matrixOptions)
+          .render(QRCodeSVGRenderer({style: fixture.styling})),
+      ),
+    ).resolves.toBe(fixture.payload);
+  });
 
   test.each(QR_CODE_STYLE_VARIANT_FIXTURES)('decodes $name SVG style variant', async (fixture) => {
     await expect(

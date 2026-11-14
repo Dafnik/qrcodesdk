@@ -1,18 +1,12 @@
-import jsQR from 'jsqr';
 import zxingWasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url';
 
-import type {RendererId} from './renderers';
-
-/** A renderer's output, captured before a recycled tile replaces it. */
-export type RenderedOutput =
-  | {readonly kind: 'svg'; readonly svg: string}
-  | {readonly kind: 'image'; readonly image: HTMLImageElement}
-  | {readonly kind: 'canvas'; readonly canvas: HTMLCanvasElement};
-
-export type DecoderId = 'jsqr' | 'zxing';
+/**
+ * Decoder results without DOM access, shared by the page and the decode workers. The page
+ * rasterizes in `rasterize.ts`, the workers in `worker-dom.ts`.
+ */
+export type DecoderId = 'zxing';
 
 export const DECODERS: readonly {readonly id: DecoderId; readonly label: string}[] = [
-  {id: 'jsqr', label: 'jsQR'},
   {id: 'zxing', label: 'ZXing'},
 ];
 
@@ -34,45 +28,24 @@ export type DecodeResult = {
   readonly durationMs: number;
 };
 
-type Pixels = {readonly data: Uint8ClampedArray<ArrayBuffer>; width: number; height: number};
+/** RGBA pixels of an output on a white page. */
+export type Pixels = {
+  readonly data: Uint8ClampedArray<ArrayBuffer>;
+  readonly width: number;
+  readonly height: number;
+};
 
-/** Reads the output a `@qrcodesdk/angular` component rendered into its host element. */
-export function captureOutput(host: Element, renderer: RendererId): RenderedOutput | undefined {
-  switch (renderer) {
-    case 'svg': {
-      const svg = host.querySelector('svg');
-      return svg ? {kind: 'svg', svg: svg.outerHTML} : undefined;
-    }
-    case 'canvas': {
-      const canvas = host.querySelector('canvas');
-      return canvas ? {kind: 'canvas', canvas} : undefined;
-    }
-    default: {
-      const image = host.querySelector('img');
-      return image ? {kind: 'image', image} : undefined;
-    }
-  }
-}
+/** Rasterized pixels, or why rasterizing failed, and how long it took. */
+export type Raster = {readonly pixels: Pixels | string; readonly durationMs: number};
 
-/**
- * Scans the output with each decoder on a white page, so transparent backgrounds stay light. The
- * output is rasterized once and shared by the decoders.
- */
-export async function decodeOutput(
-  output: RenderedOutput | undefined,
+/** Scans rasterized output with each decoder and compares the text with the payload. */
+export async function decodeRaster(
+  {pixels, durationMs: rasterizeMs}: Raster,
   payload: string,
   decoders: readonly DecoderId[],
   knownIssues: KnownDecodeIssues = {},
-): Promise<Map<DecoderId, DecodeResult>> {
-  const results = new Map<DecoderId, DecodeResult>();
-  const start = performance.now();
-  let pixels: Pixels | string;
-  try {
-    pixels = await rasterize(output);
-  } catch (error) {
-    pixels = error instanceof Error ? error.message : String(error);
-  }
-  const rasterizeMs = performance.now() - start;
+): Promise<[DecoderId, DecodeResult][]> {
+  const results: [DecoderId, DecodeResult][] = [];
 
   for (const decoder of decoders) {
     const decoderStart = performance.now();
@@ -89,7 +62,7 @@ export async function decodeOutput(
     });
 
     if (typeof pixels === 'string') {
-      results.set(decoder, result('fail', pixels));
+      results.push([decoder, result('fail', pixels)]);
       continue;
     }
     const {width, height} = pixels;
@@ -97,49 +70,52 @@ export async function decodeOutput(
     try {
       decoded = await DECODE[decoder](pixels);
     } catch (error) {
-      results.set(
+      results.push([
         decoder,
         result('fail', `${decoderLabel(decoder)} failed: ${String(error)}`, {width, height}),
-      );
+      ]);
       continue;
     }
 
     if (decoded === undefined) {
-      results.set(
+      results.push([
         decoder,
         result(
           'fail',
           `${decoderLabel(decoder)} found no QR code in the ${width}×${height} output.`,
         ),
-      );
+      ]);
     } else if (decoded !== payload) {
-      results.set(
+      results.push([
         decoder,
         result('fail', 'The decoded text differs from the payload.', {decoded, width, height}),
-      );
+      ]);
     } else {
-      results.set(
+      results.push([
         decoder,
         result('pass', `${decoderLabel(decoder)} decoded the ${width}×${height} output.`, {
           decoded,
           width,
           height,
         }),
-      );
+      ]);
     }
   }
   return results;
 }
 
 const DECODE: Readonly<Record<DecoderId, (pixels: Pixels) => Promise<string | undefined>>> = {
-  jsqr: ({data, width, height}) =>
-    Promise.resolve(jsQR(data, width, height, {inversionAttempts: 'dontInvert'})?.data),
   async zxing(pixels) {
     const {readBarcodes} = await loadZXing();
     const [code] = await readBarcodes(
       {...pixels, colorSpace: 'srgb'},
-      // jsQR reads only standard QR codes. ZXing also reads Micro QR codes.
-      {formats: ['QRCode', 'MicroQRCode'], tryHarder: true, maxNumberOfSymbols: 1},
+      // The same options as the roundtrip tests in `@repo/core-testing/decoder`.
+      {
+        formats: ['QRCodeModel2', 'MicroQRCode'],
+        tryHarder: true,
+        tryInvert: false,
+        maxNumberOfSymbols: 1,
+      },
     );
     return code?.isValid ? code.text : undefined;
   },
@@ -159,59 +135,4 @@ function loadZXing(): Promise<typeof import('zxing-wasm/reader')> {
     return module;
   });
   return zxing;
-}
-
-async function rasterize(output: RenderedOutput | undefined): Promise<Pixels> {
-  if (!output) throw new Error('The component rendered no output.');
-  const {source, width, height} = await toImageSource(output);
-  if (!width || !height) throw new Error('The output has no size.');
-
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext('2d', {willReadFrequently: true});
-  if (!context) throw new Error('Unable to create a 2D canvas context.');
-  context.fillStyle = '#ffffff';
-  context.fillRect(0, 0, width, height);
-  context.drawImage(source, 0, 0, width, height);
-  return {data: context.getImageData(0, 0, width, height).data, width, height};
-}
-
-async function toImageSource(
-  output: RenderedOutput,
-): Promise<{source: CanvasImageSource; width: number; height: number}> {
-  switch (output.kind) {
-    case 'canvas':
-      return {source: output.canvas, width: output.canvas.width, height: output.canvas.height};
-    case 'image':
-      await waitForImage(output.image);
-      return {
-        source: output.image,
-        width: output.image.naturalWidth,
-        height: output.image.naturalHeight,
-      };
-    case 'svg': {
-      const image = new Image();
-      image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(output.svg)}`;
-      await waitForImage(image);
-      const root = new DOMParser().parseFromString(output.svg, 'image/svg+xml').documentElement;
-      const width = Number(root.getAttribute('width')) || image.naturalWidth;
-      const height = Number(root.getAttribute('height')) || image.naturalHeight;
-      return {source: image, width, height};
-    }
-  }
-}
-
-function waitForImage(image: HTMLImageElement): Promise<void> {
-  if (image.complete) {
-    return image.naturalWidth > 0
-      ? Promise.resolve()
-      : Promise.reject(new Error('The image failed to load.'));
-  }
-  return new Promise((resolve, reject) => {
-    image.addEventListener('load', () => resolve(), {once: true});
-    image.addEventListener('error', () => reject(new Error('The image failed to load.')), {
-      once: true,
-    });
-  });
 }

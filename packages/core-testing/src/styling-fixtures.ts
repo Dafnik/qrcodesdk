@@ -117,12 +117,3 @@ for (let index = 0; index < 60; index++) {
 }
 
 export const QR_CODE_STYLING_FIXTURES: readonly QRCodeStylingFixture[] = fixtures;
-
-// jsQR misses circle finder centers between dot modules in these palettes.
-const SCANNER_SENSITIVE_FIXTURES = new Set([
-  'modules-circle_ring-square_center-circle_palette-default',
-  'modules-circle_ring-rounded_center-circle_palette-navy',
-]);
-
-export const QR_CODE_STYLING_ROUNDTRIP_FIXTURES: readonly QRCodeStylingFixture[] =
-  QR_CODE_STYLING_FIXTURES.filter(({name}) => !SCANNER_SENSITIVE_FIXTURES.has(name));

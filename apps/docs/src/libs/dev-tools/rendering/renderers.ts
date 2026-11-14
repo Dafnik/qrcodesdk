@@ -1,11 +1,10 @@
 import {type QRCodeFixtureImage, fixtureImageDataURL} from '@repo/core-testing';
 
-import {
-  type QRCodeCanvasOptions,
-  type QRCodeSVGOptions,
-  canvasCenterImage,
-  svgCenterImage,
-} from '@qrcodesdk/angular';
+import type {QRCodeCanvasOptions, QRCodeSVGOptions} from '@qrcodesdk/angular';
+// The functions `@qrcodesdk/angular` re-exports, imported directly so the decode workers don't load
+// Angular.
+import {canvasCenterImage} from '@qrcodesdk/browser';
+import {svgCenterImage} from '@qrcodesdk/core';
 
 import type {DevFixture} from '../fixtures/fixture-catalog';
 

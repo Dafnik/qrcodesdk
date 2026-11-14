@@ -56,6 +56,11 @@ const CASES = SYMBOLS.flatMap(([version, errorCorrectionLevel, ...capacities]) =
 );
 
 describe('Micro QR roundtrips', () => {
+  test.each(['A\u0000B', 'A\u001dB'])('preserves control characters in %j', async (payload) => {
+    const matrix = qrcode(payload).options({symbol: microQR()}).matrix();
+    await expect(decodeMicroQRCodeMatrix(matrix)).resolves.toMatchObject({text: payload});
+  });
+
   test.each(CASES)(
     'decodes $version-$errorCorrectionLevel $mode "$payload"',
     async ({version, errorCorrectionLevel, mode, payload}) => {

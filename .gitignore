@@ -19,6 +19,8 @@ node_modules
 .coverage
 coverage
 /benchmark-results/
+# Vitest browser mode failure screenshots and attachments
+.vitest
 
 # Turbo
 .turbo

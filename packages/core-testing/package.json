@@ -6,8 +6,8 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
-    "./micro-decoder": "./dist/micro-decoder/index.mjs",
-    "./micro-decoder/node": "./dist/micro-decoder/node.mjs",
+    "./decoder": "./dist/decoder/index.mjs",
+    "./decoder/node": "./dist/decoder/node.mjs",
     "./package.json": "./package.json"
   },
   "files": [
@@ -33,7 +33,6 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "@types/qrcode": "catalog:",
-    "jsqr": "catalog:",
     "qrcode": "catalog:",
     "qrcode-generator": "catalog:",
     "sharp": "catalog:",

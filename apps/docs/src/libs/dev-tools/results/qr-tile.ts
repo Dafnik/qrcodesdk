@@ -24,7 +24,8 @@ import {
 } from '@qrcodesdk/angular';
 
 import type {DevFixture} from '../fixtures/fixture-catalog';
-import {type DecodeResult, type DecoderId, captureOutput} from '../rendering/decode';
+import type {DecodeResult, DecoderId} from '../rendering/decode';
+import {captureOutput} from '../rendering/rasterize';
 import {type RendererId, canvasOptions, rendererLabel, svgOptions} from '../rendering/renderers';
 import {DecodeResults, resultKey} from '../state/decode-results';
 import {DevToolsState} from '../state/dev-tools-state';

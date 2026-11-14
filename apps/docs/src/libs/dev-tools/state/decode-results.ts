@@ -1,15 +1,10 @@
 import {Injectable, signal} from '@angular/core';
 
 import type {DevFixture} from '../fixtures/fixture-catalog';
-import {
-  DECODERS,
-  type DecodeResult,
-  type DecodeStatus,
-  type DecoderId,
-  type RenderedOutput,
-  decodeOutput,
-} from '../rendering/decode';
+import {DECODERS, type DecodeResult, type DecodeStatus, type DecoderId} from '../rendering/decode';
+import {DecodePool} from '../rendering/decode-pool';
 import {renderHeadless} from '../rendering/headless-render';
+import {type RenderedOutput, rasterize} from '../rendering/rasterize';
 import type {RendererId} from '../rendering/renderers';
 
 export function resultKey(fixture: DevFixture, renderer: RendererId, decoder: DecoderId): string {
@@ -29,16 +24,19 @@ function emptyDecoderCounts(): Record<DecoderId, Record<DecodeStatus, number>> {
 }
 
 /**
- * Decoder results of the current run, one per fixture, renderer, and decoder. Decodes run one at a
- * time, so scrolling stays responsive, and signal updates are batched per animation frame, so
- * thousands of results don't recompute filters thousands of times.
+ * Decoder results of the current run, one per fixture, renderer, and decoder. Workers render and
+ * decode in parallel, so scrolling stays responsive, and signal updates are batched per animation
+ * frame, so thousands of results don't recompute filters thousands of times.
  */
 @Injectable({providedIn: 'root'})
 export class DecodeResults {
+  private readonly pool = new DecodePool();
   private readonly results = new Map<string, DecodeResult>();
   private readonly pending = new Set<string>();
-  private queue: Promise<void> = Promise.resolve();
   private generation = 0;
+  /** Identifies the running "Decode all", so a cancel or a reset stops it. */
+  private bulkRun = 0;
+  private bulkDone = 0;
   private flushScheduled = false;
   private counts = emptyDecoderCounts();
 
@@ -73,6 +71,7 @@ export class DecodeResults {
   /** Drops all results and cancels queued decodes and "Decode all". */
   reset(): void {
     this.generation++;
+    this.bulkRun++;
     this._runId.update((id) => id + 1);
     this.results.clear();
     this.pending.clear();
@@ -81,7 +80,7 @@ export class DecodeResults {
     this.scheduleFlush();
   }
 
-  /** Queues the decoders that have no result yet for output a mounted component rendered. */
+  /** Decodes the decoders that have no result yet for output a mounted component rendered. */
   decode(
     fixture: DevFixture,
     renderer: RendererId,
@@ -91,26 +90,32 @@ export class DecodeResults {
     const missing = this.claim(fixture, renderer, decoders);
     if (missing.length === 0) return;
     const generation = this.generation;
-    this.enqueue(async () => {
-      if (generation !== this.generation) return;
-      const results = await decodeOutput(
-        output,
-        fixture.payload,
-        missing,
-        fixture.knownDecodeIssues,
+    // Rasterizes right away, before a recycled tile replaces the output.
+    void rasterize(output)
+      .then((raster) =>
+        this.pool.decode(raster, fixture.payload, missing, fixture.knownDecodeIssues),
+      )
+      .then(
+        (results) => {
+          if (generation === this.generation) this.storeAll(fixture, renderer, results);
+        },
+        (error: unknown) => {
+          console.error(`Decoding ${fixture.id} with ${renderer} failed`, error);
+          if (generation === this.generation) this.release(fixture, renderer, missing);
+        },
       );
-      if (generation === this.generation) this.storeAll(fixture, renderer, results);
-    });
   }
 
-  /** Renders and decodes every fixture × renderer pair without mounting components. */
+  /**
+   * Renders and decodes every fixture × renderer pair without mounting components. Workers render
+   * the raster outputs; the page renders and rasterizes SVG, which workers cannot decode.
+   */
   decodeAll(
     fixtures: readonly DevFixture[],
     renderers: readonly RendererId[],
     decoders: readonly DecoderId[],
   ): void {
     if (this._bulk()) return;
-    const generation = this.generation;
     const pairs: [DevFixture, RendererId, DecoderId[]][] = [];
     for (const fixture of fixtures) {
       for (const renderer of renderers) {
@@ -120,49 +125,75 @@ export class DecodeResults {
     }
     if (pairs.length === 0) return;
 
+    const run = ++this.bulkRun;
+    const generation = this.generation;
+    this.bulkDone = 0;
     this._bulk.set({done: 0, total: pairs.length});
-
-    this.enqueue(async () => {
-      let sliceStart = performance.now();
-      for (let index = 0; index < pairs.length; index++) {
-        if (generation !== this.generation || !this._bulk()) break;
-        const [fixture, renderer, missing] = pairs[index]!;
-        let output: RenderedOutput | undefined;
-        try {
-          output = renderHeadless(fixture, renderer);
-        } catch (error) {
-          console.error(`Rendering ${fixture.id} with ${renderer} failed`, error);
-        }
-        const results = await decodeOutput(
-          output,
-          fixture.payload,
-          missing,
-          fixture.knownDecodeIssues,
-        );
-        // A reset during the decode drops this run's results.
-        if (generation !== this.generation) break;
-        this.storeAll(fixture, renderer, results);
-        // Yield to the browser every ~12ms.
-        if (performance.now() - sliceStart > 12) {
-          this._bulk.set({done: index + 1, total: pairs.length});
-          await new Promise((resolve) => setTimeout(resolve));
-          sliceStart = performance.now();
-        }
-      }
-      if (generation === this.generation) {
-        for (const [fixture, renderer, missing] of pairs) {
-          for (const decoder of missing) {
-            const key = resultKey(fixture, renderer, decoder);
-            if (!this.results.has(key)) this.pending.delete(key);
-          }
-        }
-        this._bulk.set(undefined);
-      }
+    void this.runBulk(run, generation, pairs).finally(() => {
+      // A reset already dropped the claims, and a new run may have claimed the same keys.
+      if (generation !== this.generation) return;
+      for (const [fixture, renderer, missing] of pairs) this.release(fixture, renderer, missing);
+      if (run === this.bulkRun) this._bulk.set(undefined);
     });
   }
 
   cancelDecodeAll(): void {
+    this.bulkRun++;
     this._bulk.set(undefined);
+  }
+
+  /** Keeps `pool.capacity` pairs in flight until all are done or the run is cancelled. */
+  private async runBulk(
+    run: number,
+    generation: number,
+    pairs: readonly [DevFixture, RendererId, DecoderId[]][],
+  ): Promise<void> {
+    const inFlight = new Set<Promise<void>>();
+    for (const [fixture, renderer, missing] of pairs) {
+      if (run !== this.bulkRun) break;
+      const job = this.decodePair(fixture, renderer, missing)
+        .then(
+          // Results of a cancelled run still count, unless a reset dropped them.
+          (results) => {
+            if (generation === this.generation) this.storeAll(fixture, renderer, results);
+          },
+          (error: unknown) =>
+            console.error(`Decoding ${fixture.id} with ${renderer} failed`, error),
+        )
+        .finally(() => {
+          inFlight.delete(job);
+          if (run !== this.bulkRun) return;
+          this.bulkDone++;
+          this.scheduleFlush();
+        });
+      inFlight.add(job);
+      if (inFlight.size >= this.pool.capacity) await Promise.race(inFlight);
+    }
+    await Promise.all(inFlight);
+  }
+
+  private async decodePair(
+    fixture: DevFixture,
+    renderer: RendererId,
+    decoders: readonly DecoderId[],
+  ): Promise<readonly [DecoderId, DecodeResult][]> {
+    if (renderer !== 'svg') return this.pool.render(fixture.id, renderer, decoders);
+    let output: RenderedOutput | undefined;
+    try {
+      output = renderHeadless(fixture, renderer);
+    } catch (error) {
+      console.error(`Rendering ${fixture.id} with ${renderer} failed`, error);
+    }
+    const raster = await rasterize(output);
+    return this.pool.decode(raster, fixture.payload, decoders, fixture.knownDecodeIssues);
+  }
+
+  /** Forgets pending decoders that got no result, so mounted tiles decode them again. */
+  private release(fixture: DevFixture, renderer: RendererId, decoders: readonly DecoderId[]): void {
+    for (const decoder of decoders) {
+      const key = resultKey(fixture, renderer, decoder);
+      if (!this.results.has(key)) this.pending.delete(key);
+    }
   }
 
   /** Marks the decoders without a result as pending and returns them. */
@@ -178,14 +209,10 @@ export class DecodeResults {
     return missing;
   }
 
-  private enqueue(task: () => Promise<void>): void {
-    this.queue = this.queue.then(task).catch((error: unknown) => console.error(error));
-  }
-
   private storeAll(
     fixture: DevFixture,
     renderer: RendererId,
-    results: ReadonlyMap<DecoderId, DecodeResult>,
+    results: Iterable<readonly [DecoderId, DecodeResult]>,
   ): void {
     for (const [decoder, result] of results) {
       const key = resultKey(fixture, renderer, decoder);
@@ -209,6 +236,8 @@ export class DecodeResults {
         ) as unknown as DecoderCounts,
       );
       this._version.update((version) => version + 1);
+      const bulk = this._bulk();
+      if (bulk && bulk.done !== this.bulkDone) this._bulk.set({...bulk, done: this.bulkDone});
     });
   }
 }

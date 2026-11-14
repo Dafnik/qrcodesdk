@@ -3,23 +3,27 @@ import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
   QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
   QR_CODE_MICRO_TEST_FIXTURES,
+  QR_CODE_ROUNDTRIP_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
-  QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
-  QR_CODE_TEST_FIXTURES,
+  QR_CODE_STYLING_FIXTURES,
 } from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
 import {qrcode} from '@qrcodesdk/core';
 
 import {QRCodeCanvasRenderer, canvasCenterImage} from '../src';
-import {JSQR_ROUNDTRIP_COMBINATIONS_ONE, decodeCanvasQRCode, fixtureImageCanvas} from './helper';
-import {decodeCanvasMicroQRCode} from './micro-decoder';
+import {
+  ROUNDTRIP_COMBINATIONS_ONE,
+  decodeCanvasMicroQRCode,
+  decodeCanvasQRCode,
+  fixtureImageCanvas,
+} from './helper';
 
 describe('QRCodeCanvasRenderer', () => {
   test.each(QR_CODE_CENTER_IMAGE_FIXTURES)(
     'decodes $name canvas center image fixture',
-    (fixture) => {
-      expect(
+    async (fixture) => {
+      await expect(
         decodeCanvasQRCode(
           qrcode(fixture.payload)
             .options(fixture.matrixOptions)
@@ -30,53 +34,56 @@ describe('QRCodeCanvasRenderer', () => {
               }),
             ),
         ),
-      ).toBe(fixture.payload);
+      ).resolves.toBe(fixture.payload);
     },
   );
 
   const defaultRenderer = QRCodeCanvasRenderer({style: {moduleSize: 4, quietZone: 4}});
 
-  test.each(QR_CODE_TEST_FIXTURES)('decodes $name canvas output', (fixture) => {
-    expect(
+  test.each(QR_CODE_ROUNDTRIP_TEST_FIXTURES)('decodes $name canvas output', async (fixture) => {
+    await expect(
       decodeCanvasQRCode(
         qrcode()
           .payload(fixture.payload)
           .options(fixtureMatrixOptions(fixture))
           .render(defaultRenderer),
       ),
-    ).toBe(fixture.payload);
+    ).resolves.toBe(fixture.payload);
   });
 
-  test.each(JSQR_ROUNDTRIP_COMBINATIONS_ONE)('decodes $name image output', async (fixture) => {
-    expect(
-      decodeCanvasQRCode(
-        qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(defaultRenderer),
-      ),
-    ).toBe(fixture.payload);
-  });
-
-  test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES)(
-    'decodes $name canvas styling fixture',
-    (fixture) => {
-      expect(
+  test.each(ROUNDTRIP_COMBINATIONS_ONE)(
+    'decodes combination $name canvas output',
+    async (fixture) => {
+      await expect(
         decodeCanvasQRCode(
-          qrcode(fixture.payload)
-            .options(fixture.matrixOptions)
-            .render(QRCodeCanvasRenderer({style: fixture.styling})),
+          qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(defaultRenderer),
         ),
-      ).toBe(fixture.payload);
+      ).resolves.toBe(fixture.payload);
     },
   );
 
-  test.each(QR_CODE_STYLE_VARIANT_FIXTURES)('decodes $name canvas style variant', (fixture) => {
-    expect(
+  test.each(QR_CODE_STYLING_FIXTURES)('decodes $name canvas styling fixture', async (fixture) => {
+    await expect(
       decodeCanvasQRCode(
         qrcode(fixture.payload)
           .options(fixture.matrixOptions)
           .render(QRCodeCanvasRenderer({style: fixture.styling})),
       ),
-    ).toBe(fixture.payload);
+    ).resolves.toBe(fixture.payload);
   });
+
+  test.each(QR_CODE_STYLE_VARIANT_FIXTURES)(
+    'decodes $name canvas style variant',
+    async (fixture) => {
+      await expect(
+        decodeCanvasQRCode(
+          qrcode(fixture.payload)
+            .options(fixture.matrixOptions)
+            .render(QRCodeCanvasRenderer({style: fixture.styling})),
+        ),
+      ).resolves.toBe(fixture.payload);
+    },
+  );
 
   // Micro QR fixtures keep the default quiet zone of 2 modules.
   const microRenderer = QRCodeCanvasRenderer({style: {moduleSize: 4}});

@@ -79,12 +79,13 @@ function microSymbolNumber(result: Extract<QRCodeEncodingTrace, {family: 'micro'
 }
 
 describe('analyzeQRCodeEncoding for standard QR codes', () => {
-  test('recovers the blocks and codewords of every version and level', () => {
-    for (let version = 1; version <= 40; version++) {
+  test.each(Array.from({length: 40}, (_, index) => (index + 1) as QRCodeVersion))(
+    'recovers the blocks and codewords of version %i at every level',
+    (version) => {
       for (const errorCorrectionLevel of LEVELS) {
         const options = {
           payload: 'Hi 12',
-          version: version as QRCodeVersion,
+          version,
           errorCorrectionLevel,
           mask: (version % 8) as QRCodeMask,
         };
@@ -111,8 +112,8 @@ describe('analyzeQRCodeEncoding for standard QR codes', () => {
         }
         assert.deepEqual(reconstruct(result), qrcode('Hi 12').options(options).matrix().modules);
       }
-    }
-  });
+    },
+  );
 
   test('matches the block structure of ISO/IEC 18004 Table 9', () => {
     const blockShape = (version: QRCodeVersion, errorCorrectionLevel: QRCodeErrorCorrectionLevel) =>

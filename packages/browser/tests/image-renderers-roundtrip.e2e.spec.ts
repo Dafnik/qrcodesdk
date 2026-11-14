@@ -3,9 +3,9 @@ import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
   QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
   QR_CODE_MICRO_TEST_FIXTURES,
+  QR_CODE_ROUNDTRIP_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
-  QR_CODE_STYLING_ROUNDTRIP_FIXTURES,
-  QR_CODE_TEST_FIXTURES,
+  QR_CODE_STYLING_FIXTURES,
 } from '@repo/core-testing';
 import {describe, expect, test} from 'vitest';
 
@@ -19,12 +19,12 @@ import {
   canvasCenterImage,
 } from '../src';
 import {
-  JSQR_ROUNDTRIP_COMBINATIONS_TWO,
+  ROUNDTRIP_COMBINATIONS_TWO,
+  decodeCanvasMicroQRCode,
   decodeCanvasQRCode,
   fixtureImageCanvas,
   imageToCanvas,
 } from './helper';
-import {decodeCanvasMicroQRCode} from './micro-decoder';
 
 async function decodeImageQRCode(image: HTMLImageElement): Promise<string> {
   return decodeCanvasQRCode(await imageToCanvas(image));
@@ -33,7 +33,7 @@ async function decodeImageQRCode(image: HTMLImageElement): Promise<string> {
 describe('QRCodePNGImageRenderer', () => {
   const defaultRenderer = QRCodePNGImageRenderer({style: {moduleSize: 4, quietZone: 4}});
 
-  test.each(JSQR_ROUNDTRIP_COMBINATIONS_TWO)('decodes $name image output', async (fixture) => {
+  test.each(ROUNDTRIP_COMBINATIONS_TWO)('decodes $name image output', async (fixture) => {
     await expect(
       decodeImageQRCode(
         qrcode(fixture.payload).options(fixtureMatrixOptions(fixture)).render(defaultRenderer),
@@ -50,16 +50,19 @@ describe.each([
 ])('$format image renderer roundtrips', ({format, createRenderer}) => {
   const defaultRenderer = createRenderer({style: {moduleSize: 4, quietZone: 4}});
 
-  test.each(QR_CODE_TEST_FIXTURES)(`decodes $name ${format} image output`, async (fixture) => {
-    await expect(
-      decodeImageQRCode(
-        qrcode()
-          .payload(fixture.payload)
-          .options(fixtureMatrixOptions(fixture))
-          .render(defaultRenderer),
-      ),
-    ).resolves.toBe(fixture.payload);
-  });
+  test.each(QR_CODE_ROUNDTRIP_TEST_FIXTURES)(
+    `decodes $name ${format} image output`,
+    async (fixture) => {
+      await expect(
+        decodeImageQRCode(
+          qrcode()
+            .payload(fixture.payload)
+            .options(fixtureMatrixOptions(fixture))
+            .render(defaultRenderer),
+        ),
+      ).resolves.toBe(fixture.payload);
+    },
+  );
 
   // Micro QR fixtures keep the default quiet zone of 2 modules.
   const microRenderer = createRenderer({style: {moduleSize: 4}});
@@ -91,7 +94,7 @@ describe.each([
     },
   );
 
-  test.each(QR_CODE_STYLING_ROUNDTRIP_FIXTURES)(
+  test.each(QR_CODE_STYLING_FIXTURES)(
     `decodes $name ${format} image styling fixture`,
     async (fixture) => {
       const image = qrcode(fixture.payload)
