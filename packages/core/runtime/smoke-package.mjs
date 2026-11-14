@@ -66,6 +66,8 @@ for (const exportName of ['alignment', 'circle', 'customShape', 'diagonal', 'fin
 logSuccess('style subpath exposes the shapes, custom shapes, and the finder and alignment parts');
 
 for (const exportName of [
+  'calendarPayload',
+  'vcardPayload',
   'emailPayload',
   'geoPayload',
   'phonePayload',
@@ -147,3 +149,18 @@ assert(
   'Expected Kanji segments from the automatic segmenter',
 );
 logSuccess('Kanji mode works with the opt-in Kanji table');
+
+const contact = payload.vcardPayload({formattedName: 'Zoë 日本語', note: 'First\nSecond'});
+const calendar = payload.calendarPayload({
+  uid: 'runtime@example.com',
+  timestamp: '2026-11-14T12:00:00Z',
+  summary: 'Runtime',
+  start: '2026-12-01T10:00:00+01:00',
+  end: '2026-12-01T11:00:00+01:00',
+});
+assert(contact.startsWith('BEGIN:VCARD\r\nVERSION:3.0\r\n'), 'Expected a vCard wrapper');
+assert(contact.includes('NOTE:First\\nSecond\r\n'), 'Expected escaped contact text');
+assert(calendar.includes('DTSTART:20261201T090000Z\r\n'), 'Expected UTC calendar time');
+assert(core.qrcode(contact).matrix().size > 0, 'Expected the contact to encode');
+assert(core.qrcode(calendar).matrix().size > 0, 'Expected the event to encode');
+logSuccess('installed contact and calendar serializers produce encodable strings');

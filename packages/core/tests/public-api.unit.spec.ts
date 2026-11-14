@@ -18,10 +18,16 @@ import * as kanjiEntry from '../src/kanji';
 import * as matrix from '../src/matrix';
 import * as payload from '../src/payload';
 import type {
+  QRCodeCalendarPayload,
   QRCodeEmailPayload,
   QRCodeGeoPayload,
   QRCodePhonePayload,
   QRCodeSMSPayload,
+  QRCodeVCardAddress,
+  QRCodeVCardEmail,
+  QRCodeVCardName,
+  QRCodeVCardPayload,
+  QRCodeVCardPhone,
   QRCodeWiFiEncryption,
   QRCodeWiFiPayload,
 } from '../src/payload';
@@ -118,6 +124,8 @@ describe('public API', () => {
   test('exposes payload utilities and types from the payload subpath', () => {
     expect(Object.keys(payload).sort()).toEqual(
       expect.arrayContaining([
+        'calendarPayload',
+        'vcardPayload',
         'emailPayload',
         'geoPayload',
         'phonePayload',
@@ -125,6 +133,14 @@ describe('public API', () => {
         'wifiPayload',
       ]),
     );
+    expectTypeOf<QRCodeCalendarPayload>().toHaveProperty('uid');
+    expectTypeOf<QRCodeVCardPayload>().toHaveProperty('formattedName');
+    expectTypeOf<QRCodeVCardName>().toHaveProperty('familyName');
+    expectTypeOf<QRCodeVCardPhone>().toHaveProperty('number');
+    expectTypeOf<QRCodeVCardEmail>().toHaveProperty('address');
+    expectTypeOf<QRCodeVCardAddress>().toHaveProperty('postalCode');
+    expectTypeOf(payload.vcardPayload).returns.toEqualTypeOf<string>();
+    expectTypeOf(payload.calendarPayload).returns.toEqualTypeOf<string>();
     expectTypeOf<QRCodeEmailPayload>().toHaveProperty('to');
     expectTypeOf<QRCodePhonePayload>().toHaveProperty('number');
     expectTypeOf<QRCodeSMSPayload>().toHaveProperty('recipients');
@@ -133,3 +149,41 @@ describe('public API', () => {
     expectTypeOf<QRCodeWiFiPayload>().toHaveProperty('ssid');
   });
 });
+
+// Compile-time failures belong outside executed tests.
+function payloadTypeChecks() {
+  // @ts-expect-error Calendar identity is mandatory.
+  const missingUID: QRCodeCalendarPayload = {
+    timestamp: '2026-01-01T00:00:00Z',
+    summary: 'A',
+    start: '2026-01-01',
+    end: '2026-01-02',
+  };
+  // @ts-expect-error Timestamp is caller supplied.
+  const missingTimestamp: QRCodeCalendarPayload = {
+    uid: 'a',
+    summary: 'A',
+    start: '2026-01-01',
+    end: '2026-01-02',
+  };
+  // @ts-expect-error An explicit end is mandatory.
+  const missingEnd: QRCodeCalendarPayload = {
+    uid: 'a',
+    timestamp: '2026-01-01T00:00:00Z',
+    summary: 'A',
+    start: '2026-01-01',
+  };
+  const invalidVariant: QRCodeCalendarPayload = {
+    uid: 'a',
+    timestamp: '2026-01-01T00:00:00Z',
+    summary: 'A',
+    start: '2026-01-01',
+    end: '2026-01-02',
+    // @ts-expect-error The discriminant is boolean.
+    allDay: 'true',
+  };
+  // @ts-expect-error A formatted name is mandatory.
+  const missingName: QRCodeVCardPayload = {};
+  return [missingUID, missingTimestamp, missingEnd, invalidVariant, missingName];
+}
+void payloadTypeChecks;

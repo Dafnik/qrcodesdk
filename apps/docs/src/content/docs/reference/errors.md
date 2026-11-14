@@ -64,7 +64,8 @@ The payload cannot be encoded as configured.
 - A `mode` from untyped input is not one of the four documented values. If the payload uses only
   [alphanumeric-mode characters](#payload_too_large), Core throws `PAYLOAD_TOO_LARGE` instead.
 - A custom segmenter returns invalid segments. See the table below.
-- A payload helper rejects one of its fields.
+- A payload helper rejects one of its fields. Helper errors include `details.field`, `details.value`,
+  and `details.reason`. Nested fields use paths such as `addresses[0].postalCode`.
 
 **Details:** `details.payload` holds the rejected payload or segment text. `details.mode` is set only
 when a mode was involved:

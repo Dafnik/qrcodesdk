@@ -1,4 +1,8 @@
-import {QRCodeError} from './error';
+import {invalidPayload} from './payload/error';
+import {resolvePhoneNumber} from './payload/phone';
+
+export {vcardPayload} from './payload/vcard';
+export {calendarPayload} from './payload/calendar';
 
 export type QRCodeEmailPayload = {
   to: string | readonly string[];
@@ -50,7 +54,7 @@ export function emailPayload(value: QRCodeEmailPayload): string {
 }
 
 export function phonePayload(value: QRCodePhonePayload): string {
-  const number = resolvePhoneNumber(value.number, 'number');
+  const number = resolvePhoneNumber('number', value.number);
   if (value.extension === undefined) return `tel:${number}`;
   if (!/^\d+$/.test(value.extension)) {
     invalidPayload('extension', value.extension, 'Phone extensions must contain only digits');
@@ -60,7 +64,7 @@ export function phonePayload(value: QRCodePhonePayload): string {
 
 export function smsPayload(value: QRCodeSMSPayload): string {
   const recipients = resolveList(value.recipients, 'recipients').map((recipient) =>
-    resolvePhoneNumber(recipient, 'recipients'),
+    resolvePhoneNumber('recipients', recipient),
   );
   if (value.body !== undefined) validateText('body', value.body, true);
   const body = value.body === undefined ? '' : `?body=${encodeURIComponent(value.body)}`;
@@ -122,14 +126,6 @@ function encodeEmailAddress(value: string): string {
   return encodeURIComponent(value).replace(/%40/g, '@');
 }
 
-function resolvePhoneNumber(value: string, field: string): string {
-  validateText(field, value, false);
-  if (!/^\+?[0-9().-]+$/.test(value) || !/\d/.test(value)) {
-    invalidPayload(field, value, 'Phone numbers may contain digits and RFC 3966 separators');
-  }
-  return value;
-}
-
 function validateCoordinate(field: string, value: number, minimum: number, maximum: number): void {
   if (!Number.isFinite(value) || value < minimum || value > maximum) {
     invalidPayload(field, value, `${field} must be from ${minimum} to ${maximum}`);
@@ -164,8 +160,56 @@ function escapeWiFiValue(value: string): string {
   return value.replace(/([\\;,:"'])/g, '\\$1');
 }
 
-function invalidPayload(field: string, value: unknown, reason: string): never {
-  throw new QRCodeError('INVALID_PAYLOAD', `Invalid QR code payload: ${reason}`, {
-    details: {field, value: field === 'password' ? '[REDACTED]' : value, reason},
-  });
-}
+export type QRCodeVCardName = {
+  familyName?: string;
+  givenName?: string;
+  additionalNames?: string;
+  honorificPrefix?: string;
+  honorificSuffix?: string;
+};
+
+export type QRCodeVCardPhone = {
+  number: string;
+  type?: 'home' | 'work' | 'cell' | 'fax';
+};
+
+export type QRCodeVCardEmail = {
+  address: string;
+  type?: 'home' | 'work';
+};
+
+export type QRCodeVCardAddress = {
+  type?: 'home' | 'work';
+  postOfficeBox?: string;
+  extendedAddress?: string;
+  streetAddress?: string;
+  locality?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;
+};
+
+export type QRCodeVCardPayload = {
+  formattedName: string;
+  name?: QRCodeVCardName;
+  organization?: string;
+  title?: string;
+  phones?: readonly QRCodeVCardPhone[];
+  emails?: readonly QRCodeVCardEmail[];
+  addresses?: readonly QRCodeVCardAddress[];
+  url?: string;
+  note?: string;
+};
+
+export type QRCodeCalendarPayload = {
+  uid: string;
+  timestamp: string;
+  summary: string;
+  location?: string;
+  description?: string;
+  url?: string;
+  /** Defaults to `false`. When `true`, `start` and `end` are `YYYY-MM-DD` dates. */
+  allDay?: boolean;
+  start: string;
+  end: string;
+};
