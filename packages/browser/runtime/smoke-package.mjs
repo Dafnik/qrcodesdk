@@ -95,9 +95,11 @@ try {
 
   await page.goto('http://qrcodesdk.test/');
   await page.evaluate(async () => {
-    const [core, browserPackage] = await Promise.all([
+    const [core, browserPackage, {kanji}, {automaticSegmenter}] = await Promise.all([
       import('@qrcodesdk/core'),
       import('@qrcodesdk/browser'),
+      import('@qrcodesdk/core/kanji'),
+      import('@qrcodesdk/core/segmenter'),
     ]);
     const check = (condition, message) => {
       if (!condition) throw new Error(message);
@@ -147,6 +149,44 @@ try {
       );
       check(image.alt === 'Runtime QR code', 'Expected image accessibility attributes');
     }
+
+    // The Kanji entry registers its table in a chunk shared with the root entry, so the root
+    // builder must accept the separately imported table.
+    const kanjiPayload = '東京タワー';
+    check(
+      core.qrcode(kanjiPayload).matrix().size === 25,
+      'Expected Japanese text to need version 2 as UTF-8 octets',
+    );
+    const kanjiBuilder = core.qrcode(kanjiPayload).mode('kanji').kanji(kanji).mask(3);
+    check(kanjiBuilder.matrix().size === 21, 'Expected forced Kanji mode to fit version 1');
+    check(
+      core.qrcode(kanjiPayload).kanji(kanji).matrix().size === 21,
+      'Expected auto mode to pick Kanji mode with the Kanji table',
+    );
+    check(
+      core.qrcode(`${kanjiPayload}123`).segmenter(automaticSegmenter).kanji(kanji).matrix().size ===
+        21,
+      'Expected the automatic segmenter to combine Kanji and numeric segments',
+    );
+    const kanjiCanvas = kanjiBuilder.render(browserPackage.QRCodeCanvasRenderer({style}));
+    check(
+      kanjiCanvas.width === 46 && kanjiCanvas.height === 46,
+      'Expected a 46×46 Kanji mode canvas',
+    );
+    const kanjiImage = kanjiBuilder.render(browserPackage.QRCodePNGImageRenderer({style}));
+    globalThis.document.body.append(kanjiImage);
+    await kanjiImage.decode();
+    check(
+      kanjiImage.naturalWidth === 46 && kanjiImage.naturalHeight === 46,
+      'Expected a loaded 46×46 Kanji mode PNG image',
+    );
+    let rejected = false;
+    try {
+      core.qrcode(kanjiPayload).mode('kanji').matrix();
+    } catch (error) {
+      rejected = error instanceof core.QRCodeError && error.code === 'INVALID_OPTIONS';
+    }
+    check(rejected, 'Expected Kanji mode without the Kanji table to throw INVALID_OPTIONS');
   });
 
   logSuccess('installed ESM bundles import in a real browser page');
@@ -154,6 +194,9 @@ try {
   logSuccess('Canvas renderer creates a 62×62 canvas with dark and light pixels');
   logSuccess(
     'PNG, WebP, GIF, and JPEG image renderers create loaded 62×62 images with accessible alternative text',
+  );
+  logSuccess(
+    'Kanji table from @qrcodesdk/core/kanji enables Kanji mode, auto detection, and Kanji segments',
   );
   globalThis.console.log(
     `@qrcodesdk/browser installed-package smoke test passed in ${browserName}`,

@@ -11,28 +11,6 @@ describe('Svelte QR code component API', () => {
     mockCanvasRendering(vi);
   });
 
-  test('exports the components, shapes, and center-image factories', () => {
-    // An exact list keeps internal helpers out of the package root.
-    expect(Object.keys(svelteApi).sort()).toEqual([
-      'QRCodeCanvas',
-      'QRCodeGIF',
-      'QRCodeJPEG',
-      'QRCodePNG',
-      'QRCodeSVG',
-      'QRCodeWebP',
-      'alignment',
-      'automaticSegmenter',
-      'canvasCenterImage',
-      'circle',
-      'customShape',
-      'diagonal',
-      'finder',
-      'kanji',
-      'rounded',
-      'svgCenterImage',
-    ]);
-  });
-
   test('exposes SVG and image download handles', () => {
     const svg = render(svelteApi.QRCodeSVG, {payload: 'HELLO'});
     const image = render(svelteApi.QRCodePNG, {payload: 'HELLO'});

@@ -1,9 +1,11 @@
 import {StrictMode, version} from 'react';
 import {createRoot} from 'react-dom/client';
 
-import {QRCodeCanvas, QRCodeJPEG, QRCodePNG, QRCodeSVG} from '@qrcodesdk/react';
+import {QRCodeCanvas, QRCodeJPEG, QRCodePNG, QRCodeSVG, kanji} from '@qrcodesdk/react';
 
 const options = {style: {moduleSize: 2, quietZone: 1}};
+// Kanji mode fits this payload into version 1; UTF-8 octets would need version 2.
+const kanjiOptions = {...options, matrix: {kanji}};
 const imageOptions = {
   ...options,
   accessibility: {
@@ -27,6 +29,9 @@ createRoot(document.getElementById('root')!).render(
       </section>
       <section data-testid="qrcode-canvas">
         <QRCodeCanvas payload="HELLO" options={options} />
+      </section>
+      <section data-testid="qrcode-kanji-svg">
+        <QRCodeSVG payload="東京タワー" options={kanjiOptions} />
       </section>
     </main>
   </StrictMode>,

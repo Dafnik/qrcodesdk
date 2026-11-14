@@ -147,6 +147,7 @@ try {
   await page.locator('[data-testid="qrcode-canvas"] canvas').waitFor();
   await page.locator('[data-testid="qrcode-image"] img').waitFor();
   await page.locator('[data-testid="qrcode-jpeg"] img').waitFor();
+  await page.locator('[data-testid="qrcode-kanji-svg"] svg').waitFor();
   if (framework === 'next') {
     await page.locator('[data-testid="qrcode-server-svg"] svg').waitFor();
     await page.locator('[data-testid="qrcode-styled-svg"] svg image').waitFor();
@@ -193,6 +194,10 @@ try {
       globalThis.document.querySelector('[data-testid="qrcode-jpeg"] img'),
       'Expected a JPEG QR code',
     );
+    const kanjiSvg = check(
+      globalThis.document.querySelector('[data-testid="qrcode-kanji-svg"] svg'),
+      'Expected a Kanji SVG QR code',
+    );
 
     await image.decode();
     await jpeg.decode();
@@ -230,6 +235,8 @@ try {
       jpegSource: jpeg.src,
       jpegWidth: jpeg.naturalWidth,
       jpegHeight: jpeg.naturalHeight,
+      kanjiSvgWidth: kanjiSvg.getAttribute('width'),
+      kanjiSvgPaths: kanjiSvg.querySelectorAll('path').length,
     };
   });
 
@@ -264,6 +271,11 @@ try {
   assert.equal(result.jpegWidth, 46);
   assert.equal(result.jpegHeight, 46);
   logSuccess('JPEG component renders a loaded 46×46 JPEG');
+
+  // 東京タワー fits version 1 (46×46 here) only in Kanji mode; as UTF-8 octets it needs version 2.
+  assert.equal(result.kanjiSvgWidth, '46', 'Expected a version 1 Kanji mode QR code');
+  assert.ok(result.kanjiSvgPaths > 0, 'Expected Kanji SVG QR paths');
+  logSuccess('re-exported Kanji table enables Kanji mode in the SVG component');
 
   assert.deepEqual(browserErrors, [], `Unexpected browser errors:\n${browserErrors.join('\n')}`);
   logSuccess('browser reports no page or console errors');

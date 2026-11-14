@@ -1,6 +1,6 @@
 import {Component, VERSION} from '@angular/core';
 
-import {QRCodeCanvas, QRCodeJPEG, QRCodePNG, QRCodeSVG} from '@qrcodesdk/angular';
+import {QRCodeCanvas, QRCodeJPEG, QRCodePNG, QRCodeSVG, kanji} from '@qrcodesdk/angular';
 
 @Component({
   selector: 'app-root',
@@ -20,12 +20,17 @@ import {QRCodeCanvas, QRCodeJPEG, QRCodePNG, QRCodeSVG} from '@qrcodesdk/angular
       <section data-testid="qrcode-canvas">
         <qrcode-canvas [options]="options" payload="HELLO" />
       </section>
+      <section data-testid="qrcode-kanji-svg">
+        <qrcode-svg [options]="kanjiOptions" payload="東京タワー" />
+      </section>
     </main>
   `,
 })
 export class App {
   protected readonly frameworkVersion = VERSION.full;
   protected readonly options = {style: {moduleSize: 2, quietZone: 1}};
+  // Kanji mode fits this payload into version 1; UTF-8 octets would need version 2.
+  protected readonly kanjiOptions = {...this.options, matrix: {kanji}};
   protected readonly imageOptions = {
     ...this.options,
     accessibility: {

@@ -9,10 +9,14 @@ import {
   QRCodeSVG,
   circle,
   finder,
+  kanji,
   svgCenterImage,
 } from '@qrcodesdk/react';
 
 const options = {style: {moduleSize: 2, quietZone: 1}};
+// The Kanji table cannot cross the server-client boundary, so client code passes it. Kanji mode
+// fits this payload into version 1; UTF-8 octets would need version 2.
+const kanjiOptions = {...options, matrix: {kanji}};
 const imageOptions = {
   ...options,
   accessibility: {
@@ -38,6 +42,9 @@ export function QRCodeConsumer() {
       </section>
       <section data-testid="qrcode-canvas">
         <QRCodeCanvas payload="HELLO" options={options} />
+      </section>
+      <section data-testid="qrcode-kanji-svg">
+        <QRCodeSVG payload="東京タワー" options={kanjiOptions} />
       </section>
       <section data-testid="qrcode-styled-svg">
         <QRCodeSVG
