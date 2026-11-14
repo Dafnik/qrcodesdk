@@ -107,7 +107,7 @@ try {
 
     const builder = core.qrcode('Runtime ✅ 你好').mode('octet').errorCorrection('H').mask(3);
     const matrix = builder.matrix();
-    check(matrix.size === 29, 'Expected a 29×29 QR code matrix');
+    check(matrix.width === 29, 'Expected a 29×29 QR code matrix');
     check(
       matrix.modules.length === 29 * 29 && matrix.roles.length === 29 * 29,
       'Expected row-major QR code modules and roles',
@@ -154,18 +154,18 @@ try {
     // builder must accept the separately imported table.
     const kanjiPayload = '東京タワー';
     check(
-      core.qrcode(kanjiPayload).matrix().size === 25,
+      core.qrcode(kanjiPayload).matrix().width === 25,
       'Expected Japanese text to need version 2 as UTF-8 octets',
     );
     const kanjiBuilder = core.qrcode(kanjiPayload).mode('kanji').kanji(kanji).mask(3);
-    check(kanjiBuilder.matrix().size === 21, 'Expected forced Kanji mode to fit version 1');
+    check(kanjiBuilder.matrix().width === 21, 'Expected forced Kanji mode to fit version 1');
     check(
-      core.qrcode(kanjiPayload).kanji(kanji).matrix().size === 21,
+      core.qrcode(kanjiPayload).kanji(kanji).matrix().width === 21,
       'Expected auto mode to pick Kanji mode with the Kanji table',
     );
     check(
-      core.qrcode(`${kanjiPayload}123`).segmenter(automaticSegmenter).kanji(kanji).matrix().size ===
-        21,
+      core.qrcode(`${kanjiPayload}123`).segmenter(automaticSegmenter).kanji(kanji).matrix()
+        .width === 21,
       'Expected the automatic segmenter to combine Kanji and numeric segments',
     );
     const kanjiCanvas = kanjiBuilder.render(browserPackage.QRCodeCanvasRenderer({style}));

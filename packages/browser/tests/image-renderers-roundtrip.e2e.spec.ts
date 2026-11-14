@@ -1,8 +1,14 @@
-import {fixtureMatrixOptions, fixtureMicroMatrixOptions} from '@repo/core-testing';
+import {
+  fixtureMatrixOptions,
+  fixtureMicroMatrixOptions,
+  fixtureRMQRMatrixOptions,
+} from '@repo/core-testing';
 import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
   QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
   QR_CODE_MICRO_TEST_FIXTURES,
+  QR_CODE_RMQR_STYLE_VARIANT_FIXTURES,
+  QR_CODE_RMQR_TEST_FIXTURES,
   QR_CODE_ROUNDTRIP_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
   QR_CODE_STYLING_FIXTURES,
@@ -22,6 +28,7 @@ import {
   ROUNDTRIP_COMBINATIONS_TWO,
   decodeCanvasMicroQRCode,
   decodeCanvasQRCode,
+  decodeCanvasRMQRCode,
   fixtureImageCanvas,
   imageToCanvas,
 } from './helper';
@@ -64,15 +71,15 @@ describe.each([
     },
   );
 
-  // Micro QR fixtures keep the default quiet zone of 2 modules.
-  const microRenderer = createRenderer({style: {moduleSize: 4}});
+  // Micro QR and rMQR fixtures keep the default quiet zone of 2 modules.
+  const smallSymbolRenderer = createRenderer({style: {moduleSize: 4}});
 
   test.each(QR_CODE_MICRO_TEST_FIXTURES)(
     `decodes $name ${format} Micro QR image output`,
     async (fixture) => {
       const image = qrcode(fixture.payload)
         .options(fixtureMicroMatrixOptions(fixture))
-        .render(microRenderer);
+        .render(smallSymbolRenderer);
 
       await expect(decodeCanvasMicroQRCode(await imageToCanvas(image))).resolves.toMatchObject({
         text: fixture.payload,
@@ -90,6 +97,34 @@ describe.each([
 
       await expect(decodeCanvasMicroQRCode(await imageToCanvas(image))).resolves.toMatchObject({
         text: fixture.payload,
+      });
+    },
+  );
+
+  test.each(QR_CODE_RMQR_TEST_FIXTURES)(
+    `decodes $name ${format} rMQR image output`,
+    async (fixture) => {
+      const image = qrcode(fixture.payload)
+        .options(fixtureRMQRMatrixOptions(fixture))
+        .render(smallSymbolRenderer);
+
+      await expect(decodeCanvasRMQRCode(await imageToCanvas(image))).resolves.toMatchObject({
+        text: fixture.payload,
+        version: fixture.symbol,
+      });
+    },
+  );
+
+  test.each(QR_CODE_RMQR_STYLE_VARIANT_FIXTURES)(
+    `decodes $name ${format} rMQR image style variant`,
+    async (fixture) => {
+      const image = qrcode(fixture.payload)
+        .options(fixture.matrixOptions)
+        .render(createRenderer({style: fixture.styling}));
+
+      await expect(decodeCanvasRMQRCode(await imageToCanvas(image))).resolves.toMatchObject({
+        text: fixture.payload,
+        version: fixture.symbol,
       });
     },
   );

@@ -86,7 +86,7 @@ describe('Kanji mode encoding', () => {
           .version(version)
           .errorCorrection(errorCorrectionLevel)
           .mask(0);
-      expect(builder(capacity).matrix().size).toBe(17 + 4 * version);
+      expect(builder(capacity).matrix().width).toBe(17 + 4 * version);
       expectError(() => builder(capacity + 1).matrix(), 'PAYLOAD_TOO_LARGE');
     },
   );

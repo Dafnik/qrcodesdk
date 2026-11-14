@@ -43,6 +43,14 @@ describe('Vue QR code component API', () => {
     expect(wrapper.html()).toContain('viewBox="0 0 17 17"');
   });
 
+  test('renders an rMQR code through the matrix options', () => {
+    const wrapper = mount(vueApi.QRCodeSVG, {
+      props: {payload: '12345', options: {matrix: {symbol: vueApi.rMQR()}}},
+    });
+
+    expect(wrapper.html()).toContain('viewBox="0 0 31 15"');
+  });
+
   test('keeps factory images valid inside deep reactive options', async () => {
     const options = reactive<vueApi.QRCodeSVGOptions>({
       centerImage: vueApi.svgCenterImage('data:image/png;base64,a'),

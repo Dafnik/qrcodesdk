@@ -13,6 +13,7 @@ export const DOCUMENTATION_SIDEBAR = [
       {label: 'Customize appearance', slug: 'guides/customize'},
       {label: 'Add a center image', slug: 'guides/center-images'},
       {label: 'Generate Micro QR codes', slug: 'guides/micro-qr-codes'},
+      {label: 'Generate rMQR codes', slug: 'guides/rmqr-codes'},
       {label: 'Render QR codes in the browser', slug: 'guides/browser-usage'},
       {label: 'Download or save', slug: 'guides/download-or-save'},
       {label: 'Serve a QR code', slug: 'guides/server-output'},

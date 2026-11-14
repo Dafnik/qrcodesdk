@@ -221,7 +221,7 @@ describe('Micro QR matrices', () => {
     const matrix = micro('1', {version: `M${version}`}, {errorCorrectionLevel: 'L'});
     const n = version * 2 + 9;
     const count = (role: number) => matrix.roles.filter((value) => value === role).length;
-    expect(matrix.size).toBe(n);
+    expect(matrix.width).toBe(n);
     expect(count(ROLES.finderCenter)).toBe(9);
     expect(count(ROLES.finderRing)).toBe(40);
     expect(count(ROLES.separator)).toBe(15);
@@ -262,7 +262,7 @@ describe('Micro QR version selection', () => {
   )('$version-$level holds $capacity $mode characters', ({version, level, mode, capacity}) => {
     const payload = fixturePayload(mode, capacity);
     const options = {mode, errorCorrectionLevel: level, kanji} as const;
-    expect(micro(payload, {version}, options).size).toBe(+version[1]! * 2 + 9);
+    expect(micro(payload, {version}, options).width).toBe(+version[1]! * 2 + 9);
     expectQRCodeError(
       () => micro(fixturePayload(mode, capacity + 1), {version}, options),
       'PAYLOAD_TOO_LARGE',
@@ -270,18 +270,18 @@ describe('Micro QR version selection', () => {
   });
 
   test('chooses the smallest version that holds the payload and supports the level', () => {
-    expect(micro('12345').size).toBe(13);
-    expect(micro('12345', {}, {errorCorrectionLevel: 'L'}).size).toBe(13);
-    expect(micro('12345', {}, {errorCorrectionLevel: 'Q'}).size).toBe(17);
-    expect(micro('HELLO WORLD').size).toBe(15);
-    expect(micro('hello').size).toBe(15);
-    expect(micro(12345678901).size).toBe(15);
-    expect(micro(fixturePayload('numeric', 35), {}, {errorCorrectionLevel: 'L'}).size).toBe(17);
+    expect(micro('12345').width).toBe(13);
+    expect(micro('12345', {}, {errorCorrectionLevel: 'L'}).width).toBe(13);
+    expect(micro('12345', {}, {errorCorrectionLevel: 'Q'}).width).toBe(17);
+    expect(micro('HELLO WORLD').width).toBe(15);
+    expect(micro('hello').width).toBe(15);
+    expect(micro(12345678901).width).toBe(15);
+    expect(micro(fixturePayload('numeric', 35), {}, {errorCorrectionLevel: 'L'}).width).toBe(17);
   });
 
   test('uses M1 only when requested', () => {
-    expect(micro('12345', {version: 'M1'}).size).toBe(11);
-    expect(micro('12345', {version: 'M1'}, {errorCorrectionLevel: 'L'}).size).toBe(11);
+    expect(micro('12345', {version: 'M1'}).width).toBe(11);
+    expect(micro('12345', {version: 'M1'}, {errorCorrectionLevel: 'L'}).width).toBe(11);
     expectQRCodeError(
       () => micro('12345', {version: 'M1'}, {errorCorrectionLevel: 'Q'}),
       'INVALID_OPTIONS',
@@ -313,7 +313,7 @@ describe('Micro QR version selection', () => {
         field,
       );
     }
-    expect(micro('1', {}, {eci: false} as QRCodeMatrixOptions).size).toBe(13);
+    expect(micro('1', {}, {eci: false} as QRCodeMatrixOptions).width).toBe(13);
     expectQRCodeError(() => microQR({version: 'M5' as 'M1'}), 'INVALID_OPTIONS', 'microQR.version');
     expectQRCodeError(() => microQR({mask: 4 as 0}), 'INVALID_OPTIONS', 'microQR.mask');
     expectQRCodeError(() => microQR({mask: 1.5 as 0}), 'INVALID_OPTIONS', 'microQR.mask');
@@ -341,15 +341,15 @@ describe('Micro QR version selection', () => {
     expect(micro('1', {fallback: true}, {errorCorrectionLevel: 'H'})).toEqual(
       qrcode('1').errorCorrection('H').matrix(),
     );
-    expect(micro('12345', {fallback: true}).size).toBe(13);
+    expect(micro('12345', {fallback: true}).width).toBe(13);
   });
 
   test('works through the builder chain and caches the matrix', () => {
     const builder = qrcode('12345').options({symbol: microQR()}).errorCorrection('L');
     expect(builder.matrix()).toBe(builder.matrix());
-    expect(builder.matrix().size).toBe(13);
+    expect(builder.matrix().width).toBe(13);
     expectQRCodeError(() => builder.version(2).matrix(), 'INVALID_OPTIONS', 'version');
-    expect(builder.options({symbol: undefined}).matrix().size).toBe(21);
+    expect(builder.options({symbol: undefined}).matrix().width).toBe(21);
   });
 
   test('types the symbol options', () => {
@@ -373,9 +373,9 @@ describe('Micro QR Kanji mode', () => {
   test('uses Kanji mode for Japanese text when the Kanji table is present', () => {
     const payload = '東京タワー';
     // Five Kanji characters fit M3, while their 15 UTF-8 bytes need M4.
-    expect(micro(payload, {}, {errorCorrectionLevel: 'L', kanji}).size).toBe(15);
-    expect(micro(payload, {}, {errorCorrectionLevel: 'L'}).size).toBe(17);
-    expect(micro(payload, {}, {errorCorrectionLevel: 'L', mode: 'kanji', kanji}).size).toBe(15);
+    expect(micro(payload, {}, {errorCorrectionLevel: 'L', kanji}).width).toBe(15);
+    expect(micro(payload, {}, {errorCorrectionLevel: 'L'}).width).toBe(17);
+    expect(micro(payload, {}, {errorCorrectionLevel: 'L', mode: 'kanji', kanji}).width).toBe(15);
   });
 
   test('requires the Kanji table and M3 or larger', () => {

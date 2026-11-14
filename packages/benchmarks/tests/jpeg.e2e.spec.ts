@@ -37,25 +37,25 @@ describe('JPEG benchmark', () => {
     for (const workload of workloads) {
       const {image, version, color} = workload.fixtures[0];
       const matrix = qrcode('JPEG BENCHMARK').options({version, mask: 0}).matrix();
-      expect(image.width).toBe((matrix.size + 8) * JPEG_PIXELS_PER_MODULE);
+      expect(image.width).toBe((matrix.width + 8) * JPEG_PIXELS_PER_MODULE);
       expect(image.height).toBe(image.width);
       expect(workload.qrCodesPerSample).toBe(workload.fixtures.length * workload.repetitions);
       expect([...image.data.subarray(0, image.width * 4)]).toEqual(
         Array.from({length: image.width * 4}, () => 255),
       );
-      const modulePixels = Buffer.alloc(matrix.size * matrix.size * 4);
+      const modulePixels = Buffer.alloc(matrix.width * matrix.width * 4);
       const expectedPixels = Buffer.alloc(modulePixels.length);
       const foreground = color === 'grayscale' ? [0, 0, 0, 255] : [16, 48, 128, 255];
       const background = [255, 255, 255, 255];
-      for (let y = 0; y < matrix.size; y += 1) {
-        for (let x = 0; x < matrix.size; x += 1) {
+      for (let y = 0; y < matrix.width; y += 1) {
+        for (let x = 0; x < matrix.width; x += 1) {
           const pixelX = (x + JPEG_QUIET_ZONE_MODULES) * JPEG_PIXELS_PER_MODULE;
           const pixelY = (y + JPEG_QUIET_ZONE_MODULES) * JPEG_PIXELS_PER_MODULE;
           const offset = (pixelY * image.width + pixelX) * 4;
-          const moduleOffset = (y * matrix.size + x) * 4;
+          const moduleOffset = (y * matrix.width + x) * 4;
           modulePixels.set(image.data.subarray(offset, offset + 4), moduleOffset);
           expectedPixels.set(
-            matrix.modules[y * matrix.size + x] ? foreground : background,
+            matrix.modules[y * matrix.width + x] ? foreground : background,
             moduleOffset,
           );
         }

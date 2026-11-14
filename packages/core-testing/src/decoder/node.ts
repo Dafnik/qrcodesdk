@@ -21,6 +21,8 @@ export {
   decodeMicroQRCode,
   decodeMicroQRCodeMatrix,
   decodeQRCode,
+  decodeRMQRCode,
+  decodeRMQRCodeMatrix,
   type QRCodeScan,
   type QRCodeScanFormat,
 } from './index';

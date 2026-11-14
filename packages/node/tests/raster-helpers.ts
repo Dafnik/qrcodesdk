@@ -43,6 +43,11 @@ export function decodeRasterMicroQRCode(input: Buffer): Promise<QRCodeScan> {
   return scanRasterQRCode(input, 'MicroQRCode');
 }
 
+/** Scans an rMQR code. */
+export function decodeRasterRMQRCode(input: Buffer): Promise<QRCodeScan> {
+  return scanRasterQRCode(input, 'RMQRCode');
+}
+
 export type RasterFormat = 'PNG' | 'WebP' | 'GIF' | 'JPEG';
 
 /** Compares bytes with a tracked file, which `UPDATE_<FORMAT>_SNAPSHOTS=1` rewrites. */

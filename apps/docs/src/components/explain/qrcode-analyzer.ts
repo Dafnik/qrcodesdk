@@ -130,7 +130,7 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
   const moduleSize = options.moduleSize ?? 5;
   const quietZone = options.quietZone ?? 4;
 
-  const {size} = matrix;
+  const {width: size} = matrix;
   const placements = createPlacements(matrix, format.family === 'micro');
   // Micro QR codes have no remainder bits: their placed bits exclude the omitted low nibble.
   const codewordBitCount =

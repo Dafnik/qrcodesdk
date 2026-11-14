@@ -2,11 +2,14 @@ import {
   encodeFixturePNG,
   fixtureMatrixOptions,
   fixtureMicroMatrixOptions,
+  fixtureRMQRMatrixOptions,
 } from '@repo/core-testing';
 import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
   QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
   QR_CODE_MICRO_TEST_FIXTURES,
+  QR_CODE_RMQR_STYLE_VARIANT_FIXTURES,
+  QR_CODE_RMQR_TEST_FIXTURES,
   QR_CODE_ROUNDTRIP_TEST_FIXTURES,
   QR_CODE_STYLE_VARIANT_FIXTURES,
   QR_CODE_STYLING_FIXTURES,
@@ -16,7 +19,7 @@ import {describe, expect, test} from 'vitest';
 import {type QRCodeRenderer, qrcode} from '@qrcodesdk/core';
 
 import {type QRCodeRasterRendererOptions, rasterCenterImage} from '../src';
-import {decodeRasterMicroQRCode, decodeRasterQRCode} from './raster-helpers';
+import {decodeRasterMicroQRCode, decodeRasterQRCode, decodeRasterRMQRCode} from './raster-helpers';
 
 /**
  * Scans every fixture rendered by one raster renderer, except the named styling fixtures that ZXing
@@ -97,8 +100,8 @@ export function describeRasterRoundtrips(
       },
     );
 
-    // Micro QR fixtures keep the default quiet zone of 2 modules.
-    const microRenderer = createRenderer({style: {moduleSize: 4}});
+    // Micro QR and rMQR fixtures keep the default quiet zone of 2 modules.
+    const smallSymbolRenderer = createRenderer({style: {moduleSize: 4}});
 
     test.each(QR_CODE_MICRO_TEST_FIXTURES)(
       `decodes $name ${format} Micro QR output`,
@@ -107,7 +110,7 @@ export function describeRasterRoundtrips(
           decodeRasterMicroQRCode(
             qrcode(fixture.payload)
               .options(fixtureMicroMatrixOptions(fixture))
-              .render(microRenderer),
+              .render(smallSymbolRenderer),
           ),
         ).resolves.toMatchObject({text: fixture.payload, version: fixture.version});
       },
@@ -123,6 +126,32 @@ export function describeRasterRoundtrips(
               .render(createRenderer({style: fixture.styling})),
           ),
         ).resolves.toMatchObject({text: fixture.payload});
+      },
+    );
+
+    test.each(QR_CODE_RMQR_TEST_FIXTURES)(
+      `decodes $name ${format} rMQR output`,
+      async (fixture) => {
+        await expect(
+          decodeRasterRMQRCode(
+            qrcode(fixture.payload)
+              .options(fixtureRMQRMatrixOptions(fixture))
+              .render(smallSymbolRenderer),
+          ),
+        ).resolves.toMatchObject({text: fixture.payload, version: fixture.symbol});
+      },
+    );
+
+    test.each(QR_CODE_RMQR_STYLE_VARIANT_FIXTURES)(
+      `decodes $name ${format} rMQR style variant`,
+      async (fixture) => {
+        await expect(
+          decodeRasterRMQRCode(
+            qrcode(fixture.payload)
+              .options(fixture.matrixOptions)
+              .render(createRenderer({style: fixture.styling})),
+          ),
+        ).resolves.toMatchObject({text: fixture.payload, version: fixture.symbol});
       },
     );
   });

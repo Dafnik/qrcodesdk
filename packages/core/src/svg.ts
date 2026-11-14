@@ -49,18 +49,18 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
 
   return (matrix: QRCodeMatrix) => {
     const drawing = draw(matrix);
-    const {viewSize, outputSize} = drawing;
+    const {viewWidth, viewHeight, outputWidth, outputHeight} = drawing;
     let layers = '';
     let needsAntialiasing = false;
     for (const layer of drawing.layers) {
       needsAntialiasing ||= layer.tiles.length > 0 || fractionalRects.has(layer.rects);
       layers += `<path${fill(layer.color)} fill-rule="evenodd" d="${toQRCodePathData(layer)}"/>`;
     }
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${outputSize}" height="${outputSize}" viewBox="0 0 ${viewSize} ${viewSize}"${accessibleName || title?.trim() ? ' role="img"' : ' aria-hidden="true"'}${needsAntialiasing ? '' : ' shape-rendering="crispEdges"'}`;
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${outputWidth}" height="${outputHeight}" viewBox="0 0 ${viewWidth} ${viewHeight}"${accessibleName || title?.trim() ? ' role="img"' : ' aria-hidden="true"'}${needsAntialiasing ? '' : ' shape-rendering="crispEdges"'}`;
     if (accessibleName) svg += ` aria-label="${escapeXML(accessibleName, true)}"`;
     svg += '>';
     if (title) svg += `<title>${escapeXML(title)}</title>`;
-    return `${svg}<path${fill(drawing.background)} d="M0 0h${viewSize}v${viewSize}H0z"/>${layers}${centerImage?.markup(drawing) ?? ''}</svg>`;
+    return `${svg}<path${fill(drawing.background)} d="M0 0h${viewWidth}v${viewHeight}H0z"/>${layers}${centerImage?.markup(drawing) ?? ''}</svg>`;
   };
 }
 

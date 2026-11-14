@@ -148,6 +148,7 @@ Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/refere
 | `@qrcodesdk/core/segmenter` | The optional mixed-mode optimizer, available only from this path |
 | `@qrcodesdk/core/kanji`     | The optional Kanji mode table, available only from this path     |
 | `@qrcodesdk/core/micro`     | `microQR()` for Micro QR codes, available only from this path    |
+| `@qrcodesdk/core/rmqr`      | `rMQR()` for rMQR codes, available only from this path           |
 
 Bundlers with tree shaking drop the parts you do not use. Without tree shaking, for example directly
 in Node.js, import from a subpath to avoid loading unrelated renderers.
@@ -224,6 +225,12 @@ import {
   vcardPayload,
   wifiPayload,
 } from '@qrcodesdk/core/payload';
+import {
+  type QRCodeRMQRHeight,
+  type QRCodeRMQROptions,
+  type QRCodeRMQRVersion,
+  rMQR,
+} from '@qrcodesdk/core/rmqr';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 import {
   type QRCodeAlignmentCenterShape,

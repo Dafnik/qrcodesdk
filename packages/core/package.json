@@ -64,6 +64,7 @@
     "./matrix": "./dist/matrix.mjs",
     "./micro": "./dist/micro.mjs",
     "./payload": "./dist/payload.mjs",
+    "./rmqr": "./dist/rmqr.mjs",
     "./segmenter": "./dist/segmenter.mjs",
     "./style": "./dist/style.mjs",
     "./svg": "./dist/svg.mjs",

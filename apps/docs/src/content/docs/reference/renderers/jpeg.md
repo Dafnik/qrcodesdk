@@ -58,7 +58,8 @@ See [Customize appearance](/guides/customize/) for every color, shape, and finde
 ## Return value
 
 The renderer synchronously returns a Node.js `Buffer` with a complete baseline JPEG (JFIF) file. Its
-width and height are `style.moduleSize × (matrix width + 2 × style.quietZone)` pixels.
+width is `style.moduleSize × (matrix.width + 2 × style.quietZone)` pixels, and its height is
+`style.moduleSize × (matrix.height + 2 × style.quietZone)` pixels.
 
 Output above 8192 × 8192 pixels (67,108,864 pixels) throws `QRCodeError` with code
 `INVALID_OPTIONS` before any pixels are allocated.

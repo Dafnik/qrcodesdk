@@ -44,11 +44,14 @@ describe('createQRCodeStyler', () => {
     );
 
     expect(drawing).toMatchObject({
-      moduleCount: 21,
+      moduleWidth: 21,
+      moduleHeight: 21,
       moduleSize: 3,
       quietZone: 2,
-      viewSize: 25,
-      outputSize: 75,
+      viewWidth: 25,
+      viewHeight: 25,
+      outputWidth: 75,
+      outputHeight: 75,
       background: '#abcdef',
     });
   });
@@ -120,7 +123,7 @@ describe('createQRCodeStyler', () => {
     const matrix = qrcode('custom part').matrix();
     const {layers} = createQRCodeStyler({quietZone: 1}, [corner])(matrix);
     const cleared = [9, 10, 11].flatMap((y) =>
-      [9, 10, 11].map((x) => matrix.modules[y * matrix.size + x]!),
+      [9, 10, 11].map((x) => matrix.modules[y * matrix.width + x]!),
     );
 
     expect(layers[0]!.rects).toEqual([1, 1, 1, 1]);
@@ -179,7 +182,7 @@ describe('createQRCodeStyler', () => {
     const matrix = qrcode('cleared patterns').version(7).matrix();
     const draw = createQRCodeStyler(
       {finder: finder({color: '#ff0000'}), alignment: alignment({color: '#00ff00'})},
-      [(context) => context.claimArea(0, 0, matrix.size, matrix.size)],
+      [(context) => context.claimArea(0, 0, matrix.width, matrix.width)],
     );
     expect(draw(matrix).layers).toEqual([]);
   });
@@ -220,7 +223,7 @@ describe('createQRCodeCenterImagePlacement', () => {
     // The image spans 6.3 to 14.7, so padding clears modules 5 through 15.
     let cleared = 0;
     for (let y = 5; y <= 15; y++) {
-      for (let x = 5; x <= 15; x++) cleared += matrix.modules[y * matrix.size + x]!;
+      for (let x = 5; x <= 15; x++) cleared += matrix.modules[y * matrix.width + x]!;
     }
 
     expect(area(drawing.layers[0]!.rects)).toBe(countDark(matrix) - cleared);

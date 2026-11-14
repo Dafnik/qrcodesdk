@@ -14,7 +14,8 @@ describe('QR_CODE_STYLING_FIXTURES', () => {
       const drawing = createQRCodeStyler(fixture.styling)(matrix);
       expect(drawing.moduleSize).toBe(12);
       expect(drawing.quietZone).toBe(4);
-      expect(drawing.outputSize).toBeGreaterThan(0);
+      expect(drawing.outputWidth).toBeGreaterThan(0);
+      expect(drawing.outputHeight).toBe(drawing.outputWidth);
     }
   });
 

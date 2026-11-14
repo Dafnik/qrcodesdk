@@ -92,15 +92,22 @@ export function finder(options?: QRCodeFinderOptions): QRCodeFinderStyle {
   const {ring, center, color} = resolvePartOptions('finder', options, 'finderRing', 'finderCenter');
   return ((context) => {
     context.claimRoles(FINDER_RING_ROLE, FINDER_CENTER_ROLE);
-    const {size: n, roles} = context.matrix;
+    const {width, height, roles} = context.matrix;
     const layer = context.layer(color);
-    for (const [x, y] of [
+    const candidates = [
       [0, 0],
-      [n - 7, 0],
-      [0, n - 7],
-    ] as const) {
-      // Micro QR codes have only the top-left finder pattern.
-      if (roles[(y + 3) * n + x + 3] !== FINDER_CENTER_ROLE || context.isAreaCleared(x, y, 7, 7)) {
+      [width - 7, 0],
+      [0, height - 7],
+    ] as const;
+    for (let index = 0; index < candidates.length; index++) {
+      const [x, y] = candidates[index]!;
+      // Micro QR and rMQR codes have only the top-left finder pattern. A 7-module-high rMQR code
+      // repeats it as the bottom-left candidate, so it is skipped there.
+      if (
+        (index > 0 && x === 0 && y === 0) ||
+        roles[(y + 3) * width + x + 3] !== FINDER_CENTER_ROLE ||
+        context.isAreaCleared(x, y, 7, 7)
+      ) {
         continue;
       }
       drawPattern(layer, ring, x, y, 7);
@@ -119,12 +126,12 @@ export function alignment(options?: QRCodeAlignmentOptions): QRCodeAlignmentStyl
   );
   return ((context) => {
     context.claimRoles(ALIGNMENT_RING_ROLE, ALIGNMENT_CENTER_ROLE);
-    const {size: n, roles} = context.matrix;
+    const {width, roles} = context.matrix;
     const layer = context.layer(color);
     for (let index = 0; index < roles.length; index++) {
       if (roles[index] !== ALIGNMENT_CENTER_ROLE) continue;
-      const x = index % n;
-      const y = (index - x) / n;
+      const x = index % width;
+      const y = (index - x) / width;
       if (context.isAreaCleared(x - 2, y - 2, 5, 5)) continue;
       drawPattern(layer, ring, x - 2, y - 2, 5);
       drawPattern(layer, center, x, y, 1);

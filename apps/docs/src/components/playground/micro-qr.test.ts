@@ -24,7 +24,7 @@ const microOptions: PlaygroundOptions = {
 
 function renderMatrixSize(options: PlaygroundOptions): number {
   const {matrix} = createPlaygroundSVGOptions(options, undefined);
-  return qrcode(options.payload).options(matrix).matrix().size;
+  return qrcode(options.payload).options(matrix).matrix().width;
 }
 
 describe('playground Micro QR options', () => {
@@ -72,10 +72,18 @@ describe('playground Micro QR options', () => {
   });
 
   test('moves a default quiet zone to the default of the selected symbol', () => {
-    assert.deepEqual(playgroundSymbolPatch({quietZone: 4}, true), {micro: true, quietZone: 2});
-    assert.deepEqual(playgroundSymbolPatch({quietZone: 2}, false), {micro: false, quietZone: 4});
-    assert.deepEqual(playgroundSymbolPatch({quietZone: 6}, true), {micro: true});
-    assert.deepEqual(playgroundSymbolPatch({quietZone: undefined}, false), {micro: false});
+    const standard = {micro: false, rmqr: false};
+    assert.deepEqual(playgroundSymbolPatch({quietZone: 4}, 'micro'), {
+      micro: true,
+      rmqr: false,
+      quietZone: 2,
+    });
+    assert.deepEqual(playgroundSymbolPatch({quietZone: 2, micro: true}, 'standard'), {
+      ...standard,
+      quietZone: 4,
+    });
+    assert.deepEqual(playgroundSymbolPatch({quietZone: 6}, 'micro'), {micro: true, rmqr: false});
+    assert.deepEqual(playgroundSymbolPatch({quietZone: undefined}, 'standard'), standard);
   });
 
   test('flags the finder rings that ZXing cannot locate in Micro QR codes', () => {

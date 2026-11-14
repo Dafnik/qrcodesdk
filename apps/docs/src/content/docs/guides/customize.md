@@ -59,15 +59,15 @@ const svg = qrcode('https://qrcodesdk.dev').render(
 
 ## Shared visual style
 
-| Property     | Default     | Validation and meaning                                            |
-| ------------ | ----------- | ----------------------------------------------------------------- |
-| `moduleSize` | `5`         | Positive safe integer; pixels per module                          |
-| `quietZone`  | `4`         | Non-negative safe integer; quiet-zone width in modules (Micro: 2) |
-| `foreground` | `'#000000'` | RGB or RGBA hexadecimal color of every dark module                |
-| `background` | `'#ffffff'` | RGB or RGBA hexadecimal color behind the code                     |
-| `modules`    | square      | `QRCodeModuleShape`, such as `rounded()` or `circle()`            |
-| `finder`     | square      | `QRCodeFinderStyle`, created with `finder({ring, center, color})` |
-| `alignment`  | `modules`   | `QRCodeAlignmentStyle`, created with `alignment({ring, center})`  |
+| Property     | Default     | Validation and meaning                                                     |
+| ------------ | ----------- | -------------------------------------------------------------------------- |
+| `moduleSize` | `5`         | Positive safe integer; pixels per module                                   |
+| `quietZone`  | `4`         | Non-negative safe integer; quiet-zone width in modules (Micro and rMQR: 2) |
+| `foreground` | `'#000000'` | RGB or RGBA hexadecimal color of every dark module                         |
+| `background` | `'#ffffff'` | RGB or RGBA hexadecimal color behind the code                              |
+| `modules`    | square      | `QRCodeModuleShape`, such as `rounded()` or `circle()`                     |
+| `finder`     | square      | `QRCodeFinderStyle`, created with `finder({ring, center, color})`          |
+| `alignment`  | `modules`   | `QRCodeAlignmentStyle`, created with `alignment({ring, center})`           |
 
 The output width and height are `moduleSize × (matrix width + 2 × quietZone)`.
 
@@ -208,6 +208,9 @@ There is a difference between no style and an empty style:
 - **`alignment()` without `ring` or `center`:** pieces are drawn square, even when `modules` has a
   shape.
 
+In [rMQR codes](/guides/rmqr-codes/#styling), `alignment()` styles the finder sub-pattern in the
+bottom-right corner instead. Without an `alignment` style it stays square, like a finder pattern.
+
 ## Custom shapes
 
 Use `customShape()` to define your own paths. Prepare the shape once and reuse it across renderers.
@@ -303,7 +306,7 @@ QRCodeTextRenderer({
 ```
 
 Text output uses the graphical defaults, `moduleSize: 5` and `quietZone: 4` (2 for
-[Micro QR codes](/guides/micro-qr-codes/)). A version 1 code then
+[Micro QR](/guides/micro-qr-codes/) and [rMQR codes](/guides/rmqr-codes/)). A version 1 code then
 prints 145 columns wide. For terminals, use `moduleSize: 1` as above, like the CLI does.
 
 ## Accessibility

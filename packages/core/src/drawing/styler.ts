@@ -20,6 +20,9 @@ type ModuleTiles = PreparedShapePath | readonly (PreparedShapePath | undefined)[
 
 // Roles that take the module shape. Finder modules stay square unless a finder part draws them.
 const SHAPED_ROLES = 0b111111001;
+// rMQR codes are located by the finder sub-pattern, which has the alignment roles, so it also stays
+// square unless an alignment part draws it. Scanners do not find it with shaped modules.
+const RECTANGULAR_SHAPED_ROLES = 0b111001001;
 export const fractionalRects = new WeakSet<readonly number[]>();
 
 /**
@@ -85,11 +88,14 @@ export function createQRCodeStyler(
     );
 
     return {
-      moduleCount: matrix.size,
+      moduleWidth: matrix.width,
+      moduleHeight: matrix.height,
       moduleSize,
       quietZone,
-      viewSize: matrix.size + 2 * quietZone,
-      outputSize,
+      viewWidth: matrix.width + 2 * quietZone,
+      viewHeight: matrix.height + 2 * quietZone,
+      outputWidth: outputSize.width,
+      outputHeight: outputSize.height,
       background,
       layers: [...layers.values()]
         .filter(({rects, tiles}) => rects.length > 0 || tiles.size > 0)
@@ -159,7 +165,7 @@ function validateRectangle(
  * and equal runs in consecutive rows are merged into one rectangle.
  */
 function drawModules(
-  {size: n, modules: publicModules, roles: publicRoles}: QRCodeMatrix,
+  {width: w, height: h, modules: publicModules, roles: publicRoles}: QRCodeMatrix,
   claimedRoles: number,
   areas: readonly number[],
   neighbors: readonly (PreparedShapePath | undefined)[] | undefined,
@@ -170,24 +176,25 @@ function drawModules(
   const {rects} = layer;
   const modules = arrayStorage.get(publicModules);
   const roles = arrayStorage.get(publicRoles) ?? publicRoles;
-  const stride = n + 2;
-  const shapedRoles = neighbors || constant ? SHAPED_ROLES : 0;
+  const stride = w + 2;
+  const shapedRoles =
+    !neighbors && !constant ? 0 : w === h ? SHAPED_ROLES : RECTANGULAR_SHAPED_ROLES;
   // 0 not drawn, 1 filled, 2 shaped. A light border keeps neighbor reads in bounds.
-  const cells = new Uint8Array(stride * stride);
+  const cells = new Uint8Array(stride * (h + 2));
   if (modules) {
-    for (let y = 0; y < n; y++) {
-      cells.set(modules.subarray(y * n, (y + 1) * n), (y + 1) * stride + 1);
+    for (let y = 0; y < h; y++) {
+      cells.set(modules.subarray(y * w, (y + 1) * w), (y + 1) * stride + 1);
     }
   } else {
-    for (let y = 0; y < n; y++) {
-      for (let x = 0, source = y * n, target = (y + 1) * stride + 1; x < n; x++) {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0, source = y * w, target = (y + 1) * stride + 1; x < w; x++) {
         cells[target + x] = publicModules[source + x]!;
       }
     }
   }
   if (claimedRoles || shapedRoles) {
-    for (let y = 0; y < n; y++) {
-      for (let x = 0, index = y * n, cell = (y + 1) * stride + 1; x < n; x++, index++, cell++) {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0, index = y * w, cell = (y + 1) * stride + 1; x < w; x++, index++, cell++) {
         const role = roles[index]!;
         cells[cell] =
           cells[cell]! * (1 - ((claimedRoles >> role) & 1)) * (1 + ((shapedRoles >> role) & 1));
@@ -196,18 +203,18 @@ function drawModules(
   }
   for (let index = 0; index < areas.length; index += 4) {
     const startX = Math.max(0, areas[index]!);
-    const endX = Math.min(n, areas[index]! + areas[index + 2]!);
+    const endX = Math.min(w, areas[index]! + areas[index + 2]!);
     for (
       let y = Math.max(0, areas[index + 1]!);
-      y < Math.min(n, areas[index + 1]! + areas[index + 3]!);
+      y < Math.min(h, areas[index + 1]! + areas[index + 3]!);
       y++
     ) {
       if (endX > startX) cells.fill(0, (y + 1) * stride + 1 + startX, (y + 1) * stride + 1 + endX);
     }
   }
   if (shapedRoles) {
-    for (let y = 0; y < n; y++) {
-      for (let x = 0, index = (y + 1) * stride + 1; x < n; x++, index++) {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0, index = (y + 1) * stride + 1; x < w; x++, index++) {
         if (cells[index] === 2) {
           const path = neighbors
             ? neighbors[
@@ -224,9 +231,9 @@ function drawModules(
     }
   }
   // Last row, width, and rectangle index for each starting column. -2 marks no previous run.
-  const runs = new Int32Array(n * 3).fill(-2);
-  for (let y = 0; y < n; y++) {
-    for (let x = 0, index = (y + 1) * stride + 1; x < n; x++, index++) {
+  const runs = new Int32Array(w * 3).fill(-2);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0, index = (y + 1) * stride + 1; x < w; x++, index++) {
       if (cells[index] === 1) {
         const start = x;
         do {

@@ -55,7 +55,7 @@ describe('playground prepared image options', () => {
 
     const {matrix, ...rendererOptions} = svgOptions;
     const builder = qrcode(defaultPlaygroundOptions.payload).options(matrix);
-    const width = builder.matrix().size * 0.3;
+    const width = builder.matrix().width * 0.3;
     const svg = builder.render(QRCodeSVGRenderer(rendererOptions));
     assert.match(svg, new RegExp(`<image href="${preparedImage.dataUrl}"[^>]* width="${width}"`));
   });

@@ -31,7 +31,8 @@ export function bitsToBytes(bits: string, maxLength: number): number[] {
 }
 
 export function expectSquareMatrix(matrix: QRCodeMatrix, size: number): void {
-  expect(matrix.size).toBe(size);
+  expect(matrix.width).toBe(size);
+  expect(matrix.height).toBe(size);
   expect(matrix.modules).toHaveLength(size * size);
   expect(matrix.roles).toHaveLength(size * size);
   expect(matrix.modules.every((value) => value === 0 || value === 1)).toBe(true);

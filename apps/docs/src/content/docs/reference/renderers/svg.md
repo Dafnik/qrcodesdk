@@ -95,12 +95,12 @@ const svg = qrcode('https://qrcodesdk.dev')
   .render(QRCodeSVGRenderer({centerImage: svgCenterImage(logo, {size: 0.3})}));
 ```
 
-| Parameter                | Type                 | Default  | Effect                                                |
-| ------------------------ | -------------------- | -------- | ----------------------------------------------------- |
-| `source`                 | `QRCodeDataImageURL` | required | Embeds a prepared `data:image/...` URL                |
-| `layout.size`            | `number`             | `0.3`    | Image box as a fraction of matrix width               |
-| `layout.padding`         | `number`             | `1`      | Cleared border around the image, in modules           |
-| `layout.clearBackground` | `boolean`            | `true`   | Removes every module the image or its padding touches |
+| Parameter                | Type                 | Default  | Effect                                                    |
+| ------------------------ | -------------------- | -------- | --------------------------------------------------------- |
+| `source`                 | `QRCodeDataImageURL` | required | Embeds a prepared `data:image/...` URL                    |
+| `layout.size`            | `number`             | `0.3`    | Square image box as a fraction of the shorter matrix side |
+| `layout.padding`         | `number`             | `1`      | Cleared border around the image, in modules               |
+| `layout.clearBackground` | `boolean`            | `true`   | Removes every module the image or its padding touches     |
 
 ## Constraints
 

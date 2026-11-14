@@ -104,8 +104,8 @@ import {microQR} from '@qrcodesdk/core/micro';
 
 const symbol = microQR();
 
-qrcode('東京タワー').options({symbol, kanji, errorCorrectionLevel: 'L'}).matrix().size; // 15: M3
-qrcode('東京タワー').options({symbol, errorCorrectionLevel: 'L'}).matrix().size; // 17: M4, UTF-8
+qrcode('東京タワー').options({symbol, kanji, errorCorrectionLevel: 'L'}).matrix().width; // 15: M3
+qrcode('東京タワー').options({symbol, errorCorrectionLevel: 'L'}).matrix().width; // 17: M4, UTF-8
 ```
 
 With the table, `auto` mode picks Kanji mode for text that it can fully encode. `mode: 'kanji'`
@@ -122,8 +122,8 @@ import {microQR} from '@qrcodesdk/core/micro';
 
 const symbol = microQR({fallback: true});
 
-qrcode('12345').options({symbol}).matrix().size; // 13: a Micro QR code (M2)
-qrcode('https://qrcodesdk.dev').options({symbol}).matrix().size; // 25: a standard QR code
+qrcode('12345').options({symbol}).matrix().width; // 13: a Micro QR code (M2)
+qrcode('https://qrcodesdk.dev').options({symbol}).matrix().width; // 25: a standard QR code
 ```
 
 The fallback uses the same `mode` and `errorCorrectionLevel`, including level `H`, with automatic

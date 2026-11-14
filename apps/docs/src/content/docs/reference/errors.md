@@ -41,14 +41,14 @@ import {QRCodeError, type QRCodeErrorCode, QR_CODE_ERROR_CODES} from '@qrcodesdk
 
 ## Error codes
 
-| Code                   | Thrown when                                                                                                                                               | `details`                                                                           | `cause`                   |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------- |
-| `INVALID_PAYLOAD`      | The payload cannot be encoded as configured, or a payload helper rejects a field                                                                          | `payload` and optional `mode`; from payload helpers, `field`, `value`, and `reason` | `undefined`               |
-| `PAYLOAD_TOO_LARGE`    | No version from 1 to 40 (or M1 to M4) fits the payload, or the pinned version is too small                                                                | `version` for a pinned version; otherwise usually `{}`                              | `undefined`               |
-| `INVALID_OPTIONS`      | A renderer, shape, pattern, center-image, or Micro QR option is outside its range, the `segmenter` is not a function, or Kanji mode lacks the Kanji table | `field` and `value`                                                                 | `undefined`               |
-| `RENDERER_MISSING`     | `.render()` runs without a stored or supplied renderer                                                                                                    | `{}`                                                                                | `undefined`               |
-| `INVALID_IMAGE_SOURCE` | A center-image source is not usable                                                                                                                       | `source` for `svgCenterImage()`; otherwise `{}`                                     | PNG decoder error, if any |
-| `RENDER_FAILED`        | The runtime cannot produce the output                                                                                                                     | `{}`                                                                                | Browser error, if any     |
+| Code                   | Thrown when                                                                                                                                                     | `details`                                                                           | `cause`                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------- |
+| `INVALID_PAYLOAD`      | The payload cannot be encoded as configured, or a payload helper rejects a field                                                                                | `payload` and optional `mode`; from payload helpers, `field`, `value`, and `reason` | `undefined`               |
+| `PAYLOAD_TOO_LARGE`    | No version from 1 to 40 (or M1 to M4) fits the payload, or the pinned version is too small                                                                      | `version` for a pinned version; otherwise usually `{}`                              | `undefined`               |
+| `INVALID_OPTIONS`      | A renderer, shape, pattern, center-image, Micro QR, or rMQR option is outside its range, the `segmenter` is not a function, or Kanji mode lacks the Kanji table | `field` and `value`                                                                 | `undefined`               |
+| `RENDERER_MISSING`     | `.render()` runs without a stored or supplied renderer                                                                                                          | `{}`                                                                                | `undefined`               |
+| `INVALID_IMAGE_SOURCE` | A center-image source is not usable                                                                                                                             | `source` for `svgCenterImage()`; otherwise `{}`                                     | PNG decoder error, if any |
+| `RENDER_FAILED`        | The runtime cannot produce the output                                                                                                                           | `{}`                                                                                | Browser error, if any     |
 
 ### INVALID_PAYLOAD
 
@@ -149,9 +149,9 @@ See [Version and mask](/reference/builder/#version-and-mask).
 
 An option is outside its accepted range.
 
-**Thrown by:** renderer, shape, pattern, center-image, and `microQR()` factories when you call them.
-`.matrix()` and `.render()` throw it for `segmenter`, `kanji`, and matrix options that a Micro QR
-code does not support, and `.render()` for `dimensions`.
+**Thrown by:** renderer, shape, pattern, center-image, `microQR()`, and `rMQR()` factories when you
+call them. `.matrix()` and `.render()` throw it for `segmenter`, `kanji`, and matrix options that a
+Micro QR or rMQR code does not support, and `.render()` for `dimensions`.
 
 **Details:** `details.field` names the option and `details.value` holds the rejected value. Built-in
 factories and renderers report these fields:
@@ -179,13 +179,17 @@ factories and renderers report these fields:
 | `microQR.version`, `microQR.mask`, `microQR.fallback` | `microQR()`                                                       | `'M1'` to `'M4'`, an integer from 0 to 3, and a boolean                                                |
 | `version`, `mask`, `eci`, `segmenter`                 | `.matrix()` or `.render()` with a `microQR()` symbol              | Unset                                                                                                  |
 | `errorCorrectionLevel`                                | `.matrix()` or `.render()` with a `microQR()` symbol              | `L` or `M`, or `Q` for M4. A pinned M1 accepts `L` or `M`                                              |
+| `rMQR.version`                                        | `rMQR()`                                                          | A version from `'R7x43'` to `'R17x139'`, or a height from `'R7'` to `'R17'`                            |
+| `version`, `mask`, `eci`, `segmenter`                 | `.matrix()` or `.render()` with an `rMQR()` symbol                | Unset                                                                                                  |
+| `errorCorrectionLevel`                                | `.matrix()` or `.render()` with an `rMQR()` symbol                | `M` or `H`                                                                                             |
 | `dimensions`                                          | `.render()` with any built-in renderer                            | See below                                                                                              |
 
-`dimensions` is the output side length: `moduleSize × (matrix width + 2 × quietZone)`.
+`dimensions` is the output width or height: `moduleSize × (matrix width + 2 × quietZone)`, and the
+same with the matrix height.
 
-- It must be a positive safe integer.
+- Both must be positive safe integers.
 - Node.js raster renderers also reject output above 67,108,864 pixels, such as 8,192 × 8,192,
-  before allocating it.
+  before allocating it. `details.value` then holds the width and the height.
 
 **Fix:** Change the option named in `details.field` to a value from the table.
 

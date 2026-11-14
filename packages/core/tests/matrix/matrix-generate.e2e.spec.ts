@@ -100,7 +100,7 @@ describe('qrcode().matrix()', () => {
     expect(qrcode('hello world').mask(1).matrix()).toEqual(
       qrcode('hello world').mode('octet').mask(1).matrix(),
     );
-    expect(qrcode(fixturePayload('numeric', 42)).mask(1).matrix().size).toBe(25);
+    expect(qrcode(fixturePayload('numeric', 42)).mask(1).matrix().width).toBe(25);
   });
 
   test('uses mixed modes when opted in while explicit modes remain forced', () => {
@@ -112,8 +112,8 @@ describe('qrcode().matrix()', () => {
       .mask(1)
       .matrix();
 
-    expect(automatic.size).toBe(25);
-    expect(forcedOctet.size).toBe(29);
+    expect(automatic.width).toBe(25);
+    expect(forcedOctet.width).toBe(29);
     expect(qrcode(payload).segmenter(automaticSegmenter).version(2).mask(1).matrix()).toEqual(
       automatic,
     );
@@ -128,10 +128,10 @@ describe('qrcode().matrix()', () => {
         .mask(1)
         .matrix(),
     ).toEqual(automatic);
-    expect(qrcode('ABCDE12345678?A1A').segmenter(automaticSegmenter).version(1).matrix().size).toBe(
-      21,
-    );
-    expect(qrcode('ABCDE12345678?A1A').segmenter(automaticSegmenter).eci(true).matrix().size).toBe(
+    expect(
+      qrcode('ABCDE12345678?A1A').segmenter(automaticSegmenter).version(1).matrix().width,
+    ).toBe(21);
+    expect(qrcode('ABCDE12345678?A1A').segmenter(automaticSegmenter).eci(true).matrix().width).toBe(
       25,
     );
     expect(() =>
@@ -168,7 +168,7 @@ describe('qrcode().matrix()', () => {
       qrcode('123456789')
         .mode('numeric')
         .mask(1)
-        .render((value) => value.size),
+        .render((value) => value.width),
     ).toBe(21);
   });
 
@@ -186,7 +186,7 @@ describe('qrcode().matrix()', () => {
     expect(builder.render()).toBe(matrix);
     expect(Object.isFrozen(matrix)).toBe(true);
     expect(() => {
-      (matrix as {size: number}).size = 0;
+      (matrix as {width: number}).width = 0;
     }).toThrow(TypeError);
     expect(renderedMatrices).toEqual([matrix, matrix]);
     expect(builder.payload('new payload').matrix()).not.toBe(matrix);
@@ -194,7 +194,7 @@ describe('qrcode().matrix()', () => {
   });
 
   test('builder options are immutable and retain the selected renderer', () => {
-    const original = qrcode('123').renderer((matrix) => matrix.size);
+    const original = qrcode('123').renderer((matrix) => matrix.width);
     const configuredBuilders = [
       original.mode('numeric'),
       original.options({mode: 'numeric'}),
@@ -260,9 +260,9 @@ describe('qrcode().matrix()', () => {
   });
 
   test('accepts non-negative safe integer payload', () => {
-    expect(qrcode(0).matrix().size).toBe(21);
-    expect(qrcode(12345).matrix().size).toBe(21);
-    expect(qrcode(Number.MAX_SAFE_INTEGER).matrix().size).toBe(21);
+    expect(qrcode(0).matrix().width).toBe(21);
+    expect(qrcode(12345).matrix().width).toBe(21);
+    expect(qrcode(Number.MAX_SAFE_INTEGER).matrix().width).toBe(21);
   });
 
   test('throws Error instances for invalid runtime usage', () => {

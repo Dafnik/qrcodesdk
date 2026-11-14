@@ -279,7 +279,7 @@ URL. Don't combine an empty `alt` with `ariaLabel`.
 
 ## Size it responsively
 
-Renderers set a fixed `width` and `height`. Let CSS shrink the output and keep it square:
+Renderers set a fixed `width` and `height`. Let CSS shrink the output and keep its aspect ratio:
 
 ```css
 .qrcode-container {

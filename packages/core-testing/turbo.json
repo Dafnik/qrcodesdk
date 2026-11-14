@@ -2,7 +2,14 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "inputs": ["$TURBO_EXTENDS$", "!scripts/verify-package-artifact.mjs"]
+      "inputs": [
+        "$TURBO_EXTENDS$",
+        "!scripts/verify-package-artifact.mjs",
+        "!scripts/generate-rmqr-fixtures.mjs"
+      ]
+    },
+    "generate:rmqr-fixtures": {
+      "cache": false
     },
     "test": {
       "env": ["UPDATE_SVG_SNAPSHOTS", "UPDATE_TEXT_SNAPSHOTS"]

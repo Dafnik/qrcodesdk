@@ -98,7 +98,7 @@ describe('public API', () => {
   test('accepts configured builders through a bare builder type', () => {
     const plain: QRCodeBuilder = qrcode('typed builder');
     const withRenderer: QRCodeBuilder = qrcode('typed builder').renderer(QRCodeSVGRenderer());
-    const size = (builder: QRCodeBuilder) => builder.render((value) => value.size);
+    const size = (builder: QRCodeBuilder) => builder.render((value) => value.width);
     expect(size(plain)).toBe(size(withRenderer));
     expect(() => plain.render()).toThrowError(
       expect.objectContaining({name: 'QRCodeError', code: 'RENDERER_MISSING'}),

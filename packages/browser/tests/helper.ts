@@ -85,6 +85,11 @@ export function decodeCanvasMicroQRCode(source: HTMLCanvasElement): Promise<QRCo
   return scanCanvasQRCode(source, 'MicroQRCode');
 }
 
+/** Scans an rMQR code. */
+export function decodeCanvasRMQRCode(source: HTMLCanvasElement): Promise<QRCodeScan> {
+  return scanCanvasQRCode(source, 'RMQRCode');
+}
+
 function waitForImage(image: HTMLImageElement): Promise<void> {
   if (image.complete && image.naturalWidth > 0) return Promise.resolve();
 

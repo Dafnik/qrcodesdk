@@ -13,17 +13,19 @@ import {HlmTextareaImports} from '@spartan-ng/helm/textarea';
 
 import type {QRCodeErrorCorrectionLevel} from '@qrcodesdk/core';
 import type {QRCodeMicroMask, QRCodeMicroVersion} from '@qrcodesdk/core/micro';
+import type {QRCodeRMQRHeight, QRCodeRMQRVersion} from '@qrcodesdk/core/rmqr';
 
 import {
   type PlaygroundOptions,
+  type PlaygroundSymbol,
   isUnreliableMicroFinderRing,
   playgroundOptions,
+  playgroundSymbol,
   playgroundSymbolPatch,
+  unreliableRMQRPatterns,
   updateQrOptions,
 } from '../playground-options.ts';
 import {titleCase} from './title-case.ts';
-
-type PlaygroundSymbol = 'standard' | 'micro';
 
 /** The level core applies when none is set. Picking it clears the option. */
 const DEFAULT_ERROR_CORRECTION_LEVEL = 'M' satisfies QRCodeErrorCorrectionLevel;
@@ -103,7 +105,7 @@ abstract class QrOptionsControls {
             <hlm-select-content *hlmSelectPortal>
               <hlm-select-group>
                 <hlm-select-label>Error Correction Levels</hlm-select-label>
-                @for (level of ERROR_CORRECTION_LEVELS; track level) {
+                @for (level of errorCorrectionLevels(); track level) {
                   <hlm-select-item [value]="level">
                     {{ errorCorrectionLabel(level) }}
                   </hlm-select-item>
@@ -146,12 +148,10 @@ export class QrMatrixControls extends QrOptionsControls {
 
   protected readonly titleCase = titleCase;
   protected readonly DEFAULT_ERROR_CORRECTION_LEVEL = DEFAULT_ERROR_CORRECTION_LEVEL;
-  protected readonly ERROR_CORRECTION_LEVELS = [
-    'L',
-    'M',
-    'Q',
-    'H',
-  ] as const satisfies readonly QRCodeErrorCorrectionLevel[];
+  /** rMQR codes support only the levels M and H. */
+  protected readonly errorCorrectionLevels = computed((): readonly QRCodeErrorCorrectionLevel[] =>
+    this.currentOptions().rmqr ? ['M', 'H'] : ['L', 'M', 'Q', 'H'],
+  );
   protected readonly errorCorrectionLabel = (level: QRCodeErrorCorrectionLevel): string =>
     level === DEFAULT_ERROR_CORRECTION_LEVEL ? `${level} (Default)` : level;
 
@@ -168,11 +168,11 @@ export class QrMatrixControls extends QrOptionsControls {
   providers: [{provide: NANOSTORES, useClass: NanostoresService}],
   template: `
     <div class="grid gap-4">
-      @if (allowMicro()) {
+      @if (allowSymbols()) {
         <div hlmField>
           <label [for]="idPrefix() + 'symbol'" hlmFieldLabel>Symbol</label>
           <hlm-select
-            [ngModel]="micro() ? 'micro' : 'standard'"
+            [ngModel]="symbol()"
             [itemToString]="symbolLabel"
             (ngModelChange)="setSymbol($event)">
             <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'symbol'">
@@ -183,19 +183,63 @@ export class QrMatrixControls extends QrOptionsControls {
                 <hlm-select-label>Symbols</hlm-select-label>
                 <hlm-select-item value="standard">{{ symbolLabel('standard') }}</hlm-select-item>
                 <hlm-select-item value="micro">{{ symbolLabel('micro') }}</hlm-select-item>
+                <hlm-select-item value="rmqr">{{ symbolLabel('rmqr') }}</hlm-select-item>
               </hlm-select-group>
             </hlm-select-content>
           </hlm-select>
-          @if (micro()) {
+          @if (symbol() === 'micro') {
             <p hlmFieldDescription>
               11 to 17 modules wide for up to 35 digits, 21 alphanumeric characters, or 15 bytes.
               Many phone camera apps cannot read Micro QR codes.
+            </p>
+          } @else if (symbol() === 'rmqr') {
+            <p hlmFieldDescription>
+              7 to 17 modules high and 27 to 139 modules wide for up to 361 digits, 219 alphanumeric
+              characters, or 150 bytes. Many phone camera apps cannot read rMQR codes.
             </p>
           }
         </div>
       }
 
-      @if (micro()) {
+      @if (symbol() === 'rmqr') {
+        <div hlmField>
+          <label [for]="idPrefix() + 'rmqr-version'" hlmFieldLabel>Version</label>
+          <hlm-select
+            [ngModel]="currentOptions().rmqrVersion"
+            [itemToString]="rmqrVersionLabel"
+            (ngModelChange)="updateQrOptions({rmqrVersion: $event})">
+            <hlm-select-trigger class="w-full" [buttonId]="idPrefix() + 'rmqr-version'">
+              <hlm-select-value placeholder="Auto (fewest modules)" />
+            </hlm-select-trigger>
+            <hlm-select-content *hlmSelectPortal>
+              <hlm-select-group>
+                <hlm-select-label>Heights</hlm-select-label>
+                <hlm-select-item [value]="undefined">Auto (fewest modules)</hlm-select-item>
+                @for (height of RMQR_HEIGHT_OPTIONS; track height) {
+                  <hlm-select-item [value]="height">{{ rmqrVersionLabel(height) }}</hlm-select-item>
+                }
+              </hlm-select-group>
+              <hlm-select-group>
+                <hlm-select-label>Versions</hlm-select-label>
+                @for (version of RMQR_VERSION_OPTIONS; track version) {
+                  <hlm-select-item [value]="version">{{ version }}</hlm-select-item>
+                }
+              </hlm-select-group>
+            </hlm-select-content>
+          </hlm-select>
+        </div>
+
+        @if (unreliableRMQRPatterns().length > 0) {
+          <hlm-alert>
+            <h4 hlmAlertTitle>Patterns may not scan</h4>
+            <p hlmAlertDescription>
+              Scanners locate an rMQR code by its finder pattern and finder sub-pattern. ZXing
+              cannot reliably find a shaped {{ unreliableRMQRPatterns().join(' or ') }}; keep it
+              square.
+            </p>
+          </hlm-alert>
+        }
+      } @else if (symbol() === 'micro') {
         <div class="grid gap-4 md:grid-cols-2">
           <div hlmField>
             <label [for]="idPrefix() + 'micro-version'" hlmFieldLabel>Version</label>
@@ -364,8 +408,8 @@ export class QrMatrixControls extends QrOptionsControls {
   `,
 })
 export class QrEncodingControls extends QrOptionsControls {
-  /** The CLI cannot generate Micro QR codes, so it hides the symbol choice. */
-  readonly allowMicro = input(true);
+  /** The CLI cannot generate Micro QR or rMQR codes, so it hides the symbol choice. */
+  readonly allowSymbols = input(true);
 
   protected readonly VERSION_OPTIONS = Array.from({length: 40}, (_, index) => index + 1);
   protected readonly MASK_OPTIONS = Array.from({length: 8}, (_, index) => index);
@@ -379,14 +423,52 @@ export class QrEncodingControls extends QrOptionsControls {
     0, 1, 2, 3,
   ] as const satisfies readonly QRCodeMicroMask[];
 
-  protected readonly micro = computed(() => this.allowMicro() && !!this.currentOptions().micro);
+  protected readonly RMQR_HEIGHT_OPTIONS = [
+    'R7',
+    'R9',
+    'R11',
+    'R13',
+    'R15',
+    'R17',
+  ] as const satisfies readonly QRCodeRMQRHeight[];
+  protected readonly RMQR_VERSION_OPTIONS = (
+    [
+      [7, [43, 59, 77, 99, 139]],
+      [9, [43, 59, 77, 99, 139]],
+      [11, [27, 43, 59, 77, 99, 139]],
+      [13, [27, 43, 59, 77, 99, 139]],
+      [15, [43, 59, 77, 99, 139]],
+      [17, [43, 59, 77, 99, 139]],
+    ] as const
+  ).flatMap(([height, widths]) =>
+    widths.map((width) => `R${String(height)}x${String(width)}` as QRCodeRMQRVersion),
+  );
+
+  protected readonly symbol = computed(() =>
+    this.allowSymbols() ? playgroundSymbol(this.currentOptions()) : 'standard',
+  );
   protected readonly hasUnreliableFinderRing = computed(() =>
     isUnreliableMicroFinderRing(this.currentOptions().finderRingShape),
   );
+  protected readonly unreliableRMQRPatterns = computed(() =>
+    unreliableRMQRPatterns(this.currentOptions()),
+  );
   protected readonly symbolLabel = (symbol: PlaygroundSymbol): string =>
-    symbol === 'micro' ? 'Micro QR code' : 'QR code (Default)';
+    symbol === 'micro'
+      ? 'Micro QR code'
+      : symbol === 'rmqr'
+        ? 'Rectangular Micro QR (rMQR) code'
+        : 'QR code (Default)';
+  protected readonly rmqrVersionLabel = (
+    version: QRCodeRMQRVersion | QRCodeRMQRHeight | undefined,
+  ): string =>
+    version === undefined
+      ? 'Auto (fewest modules)'
+      : version.includes('x')
+        ? version
+        : `${version.slice(1)} modules high`;
 
   protected setSymbol(symbol: PlaygroundSymbol): void {
-    this.updateQrOptions(playgroundSymbolPatch(this.currentOptions(), symbol === 'micro'));
+    this.updateQrOptions(playgroundSymbolPatch(this.currentOptions(), symbol));
   }
 }

@@ -396,9 +396,11 @@ function formatOptions(
     entries.push(`style: ${formatObject(styleEntries, depth + 1)}`);
   }
 
-  const matrixEntries = playgroundOptionsValue.micro
-    ? formatMicroMatrixEntries(playgroundOptionsValue, depth + 2)
-    : formatStandardMatrixEntries(playgroundOptionsValue);
+  const matrixEntries = playgroundOptionsValue.rmqr
+    ? formatRMQRMatrixEntries(playgroundOptionsValue, depth + 2)
+    : playgroundOptionsValue.micro
+      ? formatMicroMatrixEntries(playgroundOptionsValue, depth + 2)
+      : formatStandardMatrixEntries(playgroundOptionsValue);
   if (matrixEntries.length > 0) entries.push(`matrix: ${formatObject(matrixEntries, depth + 1)}`);
 
   if (
@@ -479,6 +481,21 @@ function formatMicroMatrixEntries(
 
   return [
     `symbol: microQR(${microOptions})`,
+    ...formatSharedMatrixEntries(playgroundOptionsValue),
+    ...(playgroundUsesKanji(playgroundOptionsValue) ? ['kanji'] : []),
+  ];
+}
+
+/** rMQR codes own their version and mask, support Kanji mode, and support neither a segmenter nor ECI. */
+function formatRMQRMatrixEntries(
+  playgroundOptionsValue: PlaygroundOptions,
+  depth: number,
+): string[] {
+  const version = playgroundOptionsValue.rmqrVersion;
+  const rmqrOptions =
+    version === undefined ? '' : formatObject([`version: ${quote(version)}`], depth);
+  return [
+    `symbol: rMQR(${rmqrOptions})`,
     ...formatSharedMatrixEntries(playgroundOptionsValue),
     ...(playgroundUsesKanji(playgroundOptionsValue) ? ['kanji'] : []),
   ];
@@ -641,8 +658,10 @@ function qrcodesdkImports(
     ...(hasImage ? [CENTER_IMAGE_FACTORIES[output]] : []),
     ...(hasImage && output === 'svg' ? ['type QRCodeDataImageURL'] : []),
     ...factories,
-    ...(playgroundOptionsValue.micro ? ['microQR'] : []),
-    ...(!playgroundOptionsValue.micro && playgroundOptionsValue.optimizeSegments
+    ...(playgroundOptionsValue.rmqr ? ['rMQR'] : playgroundOptionsValue.micro ? ['microQR'] : []),
+    ...(!playgroundOptionsValue.micro &&
+    !playgroundOptionsValue.rmqr &&
+    playgroundOptionsValue.optimizeSegments
       ? ['automaticSegmenter']
       : []),
     ...(playgroundUsesKanji(playgroundOptionsValue) ? ['kanji'] : []),

@@ -116,8 +116,8 @@ test('core publishes the automatic segmenter independently of default generation
   assert.equal(typeof automaticSegmenter, 'function');
   assert.equal(root.automaticSegmenter, undefined);
   const payload = 'ABCD12345678901234567890abcd';
-  assert.equal(root.qrcode(payload).mode('auto').matrix().size, 29);
-  assert.equal(root.qrcode(payload).mode('auto').segmenter(automaticSegmenter).matrix().size, 25);
+  assert.equal(root.qrcode(payload).mode('auto').matrix().width, 29);
+  assert.equal(root.qrcode(payload).mode('auto').segmenter(automaticSegmenter).matrix().width, 25);
 
   const optimizer = path.resolve(packageDirectory, packageJson.exports['./segmenter']);
   const visited = new Set();
@@ -146,10 +146,10 @@ test('core publishes the Kanji table independently of every other entry', async 
   const {automaticSegmenter} = await importTarget(packageJson.exports['./segmenter']);
   const {kanji} = await importTarget(packageJson.exports['./kanji']);
   assert.equal(root.kanji, undefined);
-  assert.equal(root.qrcode('点茗').mode('kanji').kanji(kanji).matrix().size, 21);
-  assert.equal(root.qrcode('東京タワー123').segmenter(automaticSegmenter).matrix().size, 25);
+  assert.equal(root.qrcode('点茗').mode('kanji').kanji(kanji).matrix().width, 21);
+  assert.equal(root.qrcode('東京タワー123').segmenter(automaticSegmenter).matrix().width, 25);
   assert.equal(
-    root.qrcode('東京タワー123').segmenter(automaticSegmenter).kanji(kanji).matrix().size,
+    root.qrcode('東京タワー123').segmenter(automaticSegmenter).kanji(kanji).matrix().width,
     21,
   );
 
@@ -322,4 +322,36 @@ test('packed package contains every declared entrypoint', async () => {
   } finally {
     await rm(packDirectory, {recursive: true, force: true});
   }
+});
+
+test('core publishes rMQR codes independently of default generation', async () => {
+  const packageJson = JSON.parse(
+    await readFile(path.join(packageDirectory, 'package.json'), 'utf8'),
+  );
+  if (packageJson.name !== '@qrcodesdk/core') return;
+
+  const importTarget = (target) => import(pathToFileURL(path.join(packageDirectory, target)).href);
+  const root = await importTarget(packageJson.exports['.']);
+  const {rMQR} = await importTarget(packageJson.exports['./rmqr']);
+  assert.equal(root.rMQR, undefined);
+  const matrix = root
+    .qrcode('rMQR')
+    .options({symbol: rMQR({version: 'R7'})})
+    .matrix();
+  assert.deepEqual([matrix.width, matrix.height], [43, 7]);
+
+  const encoder = path.resolve(packageDirectory, packageJson.exports['./rmqr']);
+  const visited = new Set();
+  async function visit(file) {
+    if (visited.has(file)) return;
+    visited.add(file);
+    const source = await readFile(file, 'utf8');
+    for (const match of source.matchAll(/(?:from\s*|import\s*)['"]([^'"]+\.mjs)['"]/g)) {
+      if (match[1].startsWith('.')) await visit(path.resolve(path.dirname(file), match[1]));
+    }
+  }
+  for (const entry of ['.', './matrix', './micro', './svg', './style']) {
+    await visit(path.resolve(packageDirectory, packageJson.exports[entry]));
+  }
+  assert.equal(visited.has(encoder), false, 'other entries must not load the rMQR encoder');
 });

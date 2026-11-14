@@ -346,7 +346,7 @@ describe('analyzeQRCodeEncoding for standard QR codes', () => {
     assert.equal(result.masks.selection, 'automatic');
     assert.equal(result.masks.winner, 'lower');
     for (const candidate of result.masks.candidates) {
-      const {size, modules} = qrcode('MASKS').version(2).mask(candidate.mask).matrix();
+      const {width: size, modules} = qrcode('MASKS').version(2).mask(candidate.mask).matrix();
       assert.equal(candidate.score, evaluateMatrix(Uint8Array.from(modules), size));
     }
     const best = Math.min(...result.masks.candidates.map(({score}) => score));

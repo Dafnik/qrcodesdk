@@ -35,7 +35,8 @@ export function assembleQRCodeMatrix(
   }
 
   return {
-    size,
+    width: size,
+    height: size,
     modules: toPublicArray(bestModules),
     roles: publicRoles,
   };
