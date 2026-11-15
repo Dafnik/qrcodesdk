@@ -24,8 +24,11 @@ export {
   fixtureRMQRCapacity,
   RMQR_VERSIONS,
 } from './capacity';
-export {QR_CODE_CENTER_IMAGE_FIXTURES} from './center-image-fixtures';
-export type {QRCodeCenterImageFixture} from './center-image-fixtures';
+export {
+  QR_CODE_CENTER_IMAGE_FIXTURES,
+  QR_CODE_RMQR_CENTER_IMAGE_FIXTURES,
+} from './center-image-fixtures';
+export type {QRCodeCenterImageFixture, QRCodeRMQRCenterImageFixture} from './center-image-fixtures';
 export {captureDownloads, mockCanvasRendering} from './dom';
 export type {CapturedDownload} from './dom';
 export {

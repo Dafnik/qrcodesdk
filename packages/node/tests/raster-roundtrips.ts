@@ -8,6 +8,7 @@ import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
   QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
   QR_CODE_MICRO_TEST_FIXTURES,
+  QR_CODE_RMQR_CENTER_IMAGE_FIXTURES,
   QR_CODE_RMQR_STYLE_VARIANT_FIXTURES,
   QR_CODE_RMQR_TEST_FIXTURES,
   QR_CODE_ROUNDTRIP_TEST_FIXTURES,
@@ -150,6 +151,24 @@ export function describeRasterRoundtrips(
             qrcode(fixture.payload)
               .options(fixture.matrixOptions)
               .render(createRenderer({style: fixture.styling})),
+          ),
+        ).resolves.toMatchObject({text: fixture.payload, version: fixture.symbol});
+      },
+    );
+
+    test.each(QR_CODE_RMQR_CENTER_IMAGE_FIXTURES)(
+      `decodes $name ${format} rMQR center image fixture`,
+      async (fixture) => {
+        await expect(
+          decodeRasterRMQRCode(
+            qrcode(fixture.payload)
+              .options(fixture.matrixOptions)
+              .render(
+                createRenderer({
+                  style: fixture.style,
+                  centerImage: rasterCenterImage(encodeFixturePNG(fixture.image), fixture.layout),
+                }),
+              ),
           ),
         ).resolves.toMatchObject({text: fixture.payload, version: fixture.symbol});
       },

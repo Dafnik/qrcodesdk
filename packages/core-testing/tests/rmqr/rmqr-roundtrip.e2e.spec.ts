@@ -5,7 +5,7 @@ import {rMQR} from '@qrcodesdk/core/rmqr';
 import {alignment, circle, diagonal, finder, rounded} from '@qrcodesdk/core/style';
 
 import {
-  LOGO_IMAGE,
+  QR_CODE_RMQR_CENTER_IMAGE_FIXTURES,
   QR_CODE_RMQR_STYLE_VARIANT_FIXTURES,
   QR_CODE_RMQR_TEST_FIXTURES,
   RMQR_VERSIONS,
@@ -95,19 +95,21 @@ describe('rMQR roundtrips', () => {
     }
   });
 
-  test.each(['R11x77', 'R13x99', 'R15x139', 'R17x139'] as const)(
-    'decodes a centered center image at level H in %s',
-    async (version) => {
-      const payload = 'https://qrcodesdk.dev';
-      const svg = qrcode(payload)
-        .options({symbol: rMQR({version}), errorCorrectionLevel: 'H'})
+  test.each(QR_CODE_RMQR_CENTER_IMAGE_FIXTURES)(
+    'decodes $name SVG center image fixture',
+    async (fixture) => {
+      const svg = qrcode(fixture.payload)
+        .options(fixture.matrixOptions)
         .render(
           QRCodeSVGRenderer({
-            style: {moduleSize: 6},
-            centerImage: svgCenterImage(fixtureImageDataURL(LOGO_IMAGE), {size: 0.3}),
+            style: fixture.style,
+            centerImage: svgCenterImage(fixtureImageDataURL(fixture.image), fixture.layout),
           }),
         );
-      await expect(decodeRMQRCodeSvg(svg)).resolves.toMatchObject({text: payload, version});
+      await expect(decodeRMQRCodeSvg(svg)).resolves.toMatchObject({
+        text: fixture.payload,
+        version: fixture.symbol,
+      });
     },
   );
 });
