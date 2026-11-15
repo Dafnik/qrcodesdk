@@ -25,6 +25,8 @@ import {
   canvasCenterImage,
 } from '../src';
 import {
+  MICRO_ROUNDTRIP_COMBINATIONS_TWO,
+  RMQR_ROUNDTRIP_COMBINATIONS_TWO,
   ROUNDTRIP_COMBINATIONS_TWO,
   decodeCanvasMicroQRCode,
   decodeCanvasQRCode,
@@ -47,6 +49,37 @@ describe('QRCodePNGImageRenderer', () => {
       ),
     ).resolves.toBe(fixture.payload);
   });
+
+  // Micro QR and rMQR codes keep the default quiet zone of 2 modules.
+  const smallSymbolRenderer = QRCodePNGImageRenderer({style: {moduleSize: 4}});
+
+  test.each(MICRO_ROUNDTRIP_COMBINATIONS_TWO)(
+    'decodes combination $name Micro QR image output',
+    async (fixture) => {
+      const image = qrcode(fixture.payload)
+        .options(fixtureMicroMatrixOptions(fixture))
+        .render(smallSymbolRenderer);
+
+      await expect(decodeCanvasMicroQRCode(await imageToCanvas(image))).resolves.toMatchObject({
+        text: fixture.payload,
+        version: fixture.version,
+      });
+    },
+  );
+
+  test.each(RMQR_ROUNDTRIP_COMBINATIONS_TWO)(
+    'decodes combination $name rMQR image output',
+    async (fixture) => {
+      const image = qrcode(fixture.payload)
+        .options(fixtureRMQRMatrixOptions(fixture))
+        .render(smallSymbolRenderer);
+
+      await expect(decodeCanvasRMQRCode(await imageToCanvas(image))).resolves.toMatchObject({
+        text: fixture.payload,
+        version: fixture.symbol,
+      });
+    },
+  );
 });
 
 describe.each([

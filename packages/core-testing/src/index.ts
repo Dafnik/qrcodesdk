@@ -1,14 +1,29 @@
 export {
+  getAllMicroQRCodeCombinations,
   getAllQRCodeAutoMaskCombinations,
   getAllQRCodeCombinations,
   getAllQRCodeECICombinations,
   getAllQRCodeKanjiCombinations,
+  getAllRMQRCodeCombinations,
+  TOTAL_MICRO_QR_CODE_COMBINATIONS,
   TOTAL_QR_CODE_AUTO_MASK_COMBINATIONS,
   TOTAL_QR_CODE_COMBINATIONS,
   TOTAL_QR_CODE_KANJI_COMBINATIONS,
+  TOTAL_RMQR_CODE_COMBINATIONS,
+  ZXING_MICRO_QR_CODE_DECODE_FAILURES,
 } from './all-combinations';
-export type {QRCodeAutoMaskCombination, QRCodeCombination} from './all-combinations';
-export {fixtureCapacity} from './capacity';
+export type {
+  QRCodeAutoMaskCombination,
+  QRCodeCombination,
+  QRCodeMicroCombination,
+  QRCodeRMQRCombination,
+} from './all-combinations';
+export {
+  fixtureCapacity,
+  fixtureMicroCapacity,
+  fixtureRMQRCapacity,
+  RMQR_VERSIONS,
+} from './capacity';
 export {QR_CODE_CENTER_IMAGE_FIXTURES} from './center-image-fixtures';
 export type {QRCodeCenterImageFixture} from './center-image-fixtures';
 export {captureDownloads, mockCanvasRendering} from './dom';

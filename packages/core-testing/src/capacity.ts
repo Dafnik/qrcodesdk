@@ -1,4 +1,6 @@
 import type {QRCodeEncodingMode, QRCodeErrorCorrectionLevel, QRCodeVersion} from '@qrcodesdk/core';
+import type {QRCodeMicroVersion} from '@qrcodesdk/core/micro';
+import type {QRCodeRMQRVersion} from '@qrcodesdk/core/rmqr';
 
 /**
  * Data codewords per version and ECC level (L, M, Q, H), from ISO/IEC 18004 table 7.
@@ -81,7 +83,11 @@ export function fixtureCapacity(
     MODE_INDICATOR_BITS -
     CHARACTER_COUNT_BITS[mode][versionGroup] -
     (eci && mode === 'octet' ? UTF8_ECI_HEADER_BITS : 0);
+  return capacityOfBits(dataBits, mode);
+}
 
+/** Returns how many characters (or bytes in octet mode) of a mode fit into `dataBits`. */
+function capacityOfBits(dataBits: number, mode: QRCodeEncodingMode): number {
   switch (mode) {
     case 'numeric': {
       // Three digits use 10 bits; a trailing pair uses 7 and a single digit 4.
@@ -96,4 +102,105 @@ export function fixtureCapacity(
     case 'kanji':
       return Math.floor(dataBits / 13);
   }
+}
+
+/**
+ * Micro QR data capacity per symbol and mode (numeric, alphanumeric, octet, Kanji), from
+ * ISO/IEC 18004 table 7. `0` marks a mode that the symbol does not support.
+ */
+const MICRO_CAPACITY = {
+  M1: [5, 0, 0, 0],
+  'M2-L': [10, 6, 0, 0],
+  'M2-M': [8, 5, 0, 0],
+  'M3-L': [23, 14, 9, 6],
+  'M3-M': [18, 11, 7, 4],
+  'M4-L': [35, 21, 15, 9],
+  'M4-M': [30, 18, 13, 8],
+  'M4-Q': [21, 13, 9, 5],
+} as const satisfies Record<string, readonly [number, number, number, number]>;
+
+const MODE_INDEX = {numeric: 0, alphanumeric: 1, octet: 2, kanji: 3} as const satisfies Record<
+  QRCodeEncodingMode,
+  number
+>;
+
+/**
+ * Returns the largest single-segment payload that fits the given Micro QR symbol, or `0` when the
+ * symbol does not support the mode. M1 only detects errors, so it ignores `errorCorrectionLevel`.
+ *
+ * The result counts characters for numeric, alphanumeric, and Kanji mode and bytes for octet mode.
+ */
+export function fixtureMicroCapacity(
+  version: QRCodeMicroVersion,
+  errorCorrectionLevel: QRCodeErrorCorrectionLevel,
+  mode: QRCodeEncodingMode,
+): number {
+  const symbol = version === 'M1' ? version : `${version}-${errorCorrectionLevel}`;
+  const capacities = (MICRO_CAPACITY as Record<string, readonly number[] | undefined>)[symbol];
+  if (!capacities)
+    throw new Error(`Micro QR ${version} does not support level ${errorCorrectionLevel}`);
+  return capacities[MODE_INDEX[mode]]!;
+}
+
+/** rMQR versions in version-indicator order, from ISO/IEC 23941 table 1. */
+export const RMQR_VERSIONS = (
+  [
+    [7, [43, 59, 77, 99, 139]],
+    [9, [43, 59, 77, 99, 139]],
+    [11, [27, 43, 59, 77, 99, 139]],
+    [13, [27, 43, 59, 77, 99, 139]],
+    [15, [43, 59, 77, 99, 139]],
+    [17, [43, 59, 77, 99, 139]],
+  ] as const
+).flatMap(([height, widths]) =>
+  widths.map((width) => `R${String(height)}x${String(width)}` as QRCodeRMQRVersion),
+);
+
+/** rMQR data codewords per version at the levels M and H, from ISO/IEC 23941 table 6. */
+const RMQR_DATA_CODEWORDS = {
+  M: [
+    6, 12, 20, 28, 44, 12, 21, 31, 42, 63, 7, 19, 31, 43, 57, 84, 12, 27, 38, 53, 73, 106, 33, 48,
+    67, 88, 127, 39, 56, 78, 100, 152,
+  ],
+  H: [
+    3, 7, 10, 14, 24, 7, 11, 17, 22, 33, 5, 11, 15, 23, 29, 42, 7, 13, 20, 29, 35, 54, 15, 26, 31,
+    48, 69, 21, 28, 38, 56, 76,
+  ],
+} as const;
+
+/** rMQR character count indicator bits per mode and version, from ISO/IEC 23941 table 3. */
+const RMQR_CHARACTER_COUNT_BITS = {
+  numeric: [
+    4, 5, 6, 7, 7, 5, 6, 7, 7, 8, 4, 6, 7, 7, 8, 8, 5, 6, 7, 7, 8, 8, 7, 7, 8, 8, 9, 7, 8, 8, 8, 9,
+  ],
+  alphanumeric: [
+    3, 5, 5, 6, 6, 5, 5, 6, 6, 7, 4, 5, 6, 6, 7, 7, 5, 6, 6, 7, 7, 8, 6, 7, 7, 7, 8, 6, 7, 7, 8, 8,
+  ],
+  octet: [
+    3, 4, 5, 5, 6, 4, 5, 5, 6, 6, 3, 5, 5, 6, 6, 7, 4, 5, 6, 6, 7, 7, 6, 6, 7, 7, 7, 6, 6, 7, 7, 8,
+  ],
+  kanji: [
+    2, 3, 4, 5, 5, 3, 4, 5, 5, 6, 2, 4, 5, 5, 6, 6, 3, 5, 5, 6, 6, 7, 5, 5, 6, 6, 7, 5, 6, 6, 6, 7,
+  ],
+} as const satisfies Record<QRCodeEncodingMode, readonly number[]>;
+
+const RMQR_MODE_INDICATOR_BITS = 3;
+
+/**
+ * Returns the largest single-segment payload that fits the given rMQR version.
+ *
+ * The result counts characters for numeric, alphanumeric, and Kanji mode and bytes for octet mode.
+ */
+export function fixtureRMQRCapacity(
+  version: QRCodeRMQRVersion,
+  errorCorrectionLevel: 'M' | 'H',
+  mode: QRCodeEncodingMode,
+): number {
+  const index = RMQR_VERSIONS.indexOf(version);
+  return capacityOfBits(
+    RMQR_DATA_CODEWORDS[errorCorrectionLevel][index]! * 8 -
+      RMQR_MODE_INDICATOR_BITS -
+      RMQR_CHARACTER_COUNT_BITS[mode][index]!,
+    mode,
+  );
 }

@@ -1,7 +1,10 @@
 import {
   type QRCodeFixtureImage,
   type RGBAPixel,
+  ZXING_MICRO_QR_CODE_DECODE_FAILURES,
+  getAllMicroQRCodeCombinations,
   getAllQRCodeCombinations,
+  getAllRMQRCodeCombinations,
 } from '@repo/core-testing';
 import {type QRCodeScan, type QRCodeScanFormat, decodeQRCode} from '@repo/core-testing/decoder';
 import {expect} from 'vitest';
@@ -19,10 +22,24 @@ prepareZXingModule({
 export const BLACK = {red: 0, green: 0, blue: 0, alpha: 255};
 export const WHITE = {red: 255, green: 255, blue: 255, alpha: 255};
 
-/** All combinations, split in two halves so the canvas and the image roundtrips share them. */
-const ROUNDTRIP_COMBINATIONS = [...getAllQRCodeCombinations()];
-export const ROUNDTRIP_COMBINATIONS_ONE = ROUNDTRIP_COMBINATIONS.filter((_, i) => i % 2 === 0);
-export const ROUNDTRIP_COMBINATIONS_TWO = ROUNDTRIP_COMBINATIONS.filter((_, i) => i % 2 !== 0);
+/** Splits combinations in two halves, so the canvas and the image roundtrips share them. */
+function halves<T>(combinations: Iterable<T>): readonly [T[], T[]] {
+  const all = [...combinations];
+  return [all.filter((_, i) => i % 2 === 0), all.filter((_, i) => i % 2 !== 0)];
+}
+
+export const [ROUNDTRIP_COMBINATIONS_ONE, ROUNDTRIP_COMBINATIONS_TWO] = halves(
+  getAllQRCodeCombinations(),
+);
+/** Leaves out the Micro QR combinations that ZXing cannot decode. */
+export const [MICRO_ROUNDTRIP_COMBINATIONS_ONE, MICRO_ROUNDTRIP_COMBINATIONS_TWO] = halves(
+  [...getAllMicroQRCodeCombinations()].filter(
+    ({name}) => !ZXING_MICRO_QR_CODE_DECODE_FAILURES.has(name),
+  ),
+);
+export const [RMQR_ROUNDTRIP_COMBINATIONS_ONE, RMQR_ROUNDTRIP_COMBINATIONS_TWO] = halves(
+  getAllRMQRCodeCombinations(),
+);
 
 export async function imageToCanvas(image: HTMLImageElement): Promise<HTMLCanvasElement> {
   await waitForImage(image);
