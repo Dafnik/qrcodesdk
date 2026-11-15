@@ -44,7 +44,8 @@ function pixelsOf(matrix: QRCodeMatrix, dark: readonly number[]) {
   return {width, height, data};
 }
 
-const GRAY = [17, 24, 39];
+const GRAY = [24, 24, 24];
+const DARK = [17, 24, 39];
 const COLOR = [124, 58, 237];
 
 const renderers = {
@@ -102,14 +103,14 @@ export const group: WorkloadGroup = {
         id: `encoder/webp-v${version}`,
         title: `Version ${version}: WebP encoder`,
         features: ['webp'],
-        setup: () => pixelsOf(matrixOf(version), GRAY),
+        setup: () => pixelsOf(matrixOf(version), DARK),
         run: (pixels) => ɵencodeWebP(pixels),
       }),
       workload({
         id: `encoder/gif-v${version}`,
         title: `Version ${version}: GIF encoder`,
         features: ['gif'],
-        setup: () => pixelsOf(matrixOf(version), GRAY),
+        setup: () => pixelsOf(matrixOf(version), DARK),
         run: (pixels) => ɵencodeGIF(pixels),
       }),
     ]),

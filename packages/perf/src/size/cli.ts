@@ -273,6 +273,9 @@ console.log(
 );
 
 if (values['update-baseline']) {
+  if (results.some((result) => result.problems.length)) {
+    throw new Error('Cannot update the size baseline: some scenarios have measurement problems.');
+  }
   if (bundlers.length !== ALL_BUNDLERS.length) {
     throw new Error('--update-baseline needs every bundler. Remove --check and --bundlers.');
   }

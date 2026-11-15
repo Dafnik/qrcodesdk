@@ -63,7 +63,18 @@ export const group: WorkloadGroup = {
       id: `stages/evaluate-mask-v${version}`,
       title: `Version ${version}: score a mask`,
       features: ['matrix'],
-      setup: () => prepare(version),
+      setup: () => {
+        const state = prepare(version);
+        fillDataInMatrix(state.modules, state.base.roles, state.base.size, state.codewords);
+        applyMaskToMatrix(state.modules, state.base.roles, state.base.size, 0);
+        fillFormatInformationInMatrix(
+          state.modules,
+          state.base.size,
+          state.resolved.errorCorrectionLevel,
+          0,
+        );
+        return state;
+      },
       run: ({modules, base}) => evaluateMatrix(modules, base.size),
     }),
     workload({

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-15T19:16:24.914Z",
-  "commit": "22bc5378d199",
+  "generatedAt": "2026-11-15T19:34:54.566Z",
+  "commit": "0bb87325fe9d-dirty",
   "environment": {"os": "Linux 7.2.11-200.fc44.x86_64 x64", "cpu": "AMD Ryzen 7 3700X 8-Core Processor", "cores": 16, "memoryGB": 31, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
@@ -2781,8 +2781,8 @@
       },
       "esbuild": {
         "total": {"min": 16900, "gzip": 8111, "brotli": 7298},
-        "initial": {"min": 16900, "gzip": 8111, "brotli": 7298},
-        "lazy": {"min": 0, "gzip": 0, "brotli": 0},
+        "initial": {"min": 10141, "gzip": 4754, "brotli": 4271},
+        "lazy": {"min": 6759, "gzip": 3357, "brotli": 3027},
         "chunkCount": 3
       },
       "webpack": {
@@ -2893,8 +2893,8 @@
       },
       "esbuild": {
         "total": {"min": 24997, "gzip": 12000, "brotli": 10786},
-        "initial": {"min": 24997, "gzip": 12000, "brotli": 10786},
-        "lazy": {"min": 0, "gzip": 0, "brotli": 0},
+        "initial": {"min": 15996, "gzip": 7581, "brotli": 6837},
+        "lazy": {"min": 9001, "gzip": 4419, "brotli": 3949},
         "chunkCount": 5
       },
       "webpack": {
@@ -2997,8 +2997,8 @@
       },
       "esbuild": {
         "total": {"min": 24290, "gzip": 11887, "brotli": 10811},
-        "initial": {"min": 24290, "gzip": 11887, "brotli": 10811},
-        "lazy": {"min": 0, "gzip": 0, "brotli": 0},
+        "initial": {"min": 16116, "gzip": 7895, "brotli": 7167},
+        "lazy": {"min": 8174, "gzip": 3992, "brotli": 3644},
         "chunkCount": 5
       },
       "webpack": {
@@ -3106,8 +3106,8 @@
       },
       "esbuild": {
         "total": {"min": 20662, "gzip": 9829, "brotli": 8849},
-        "initial": {"min": 20662, "gzip": 9829, "brotli": 8849},
-        "lazy": {"min": 0, "gzip": 0, "brotli": 0},
+        "initial": {"min": 142, "gzip": 139, "brotli": 130},
+        "lazy": {"min": 20520, "gzip": 9690, "brotli": 8719},
         "chunkCount": 4
       },
       "webpack": {

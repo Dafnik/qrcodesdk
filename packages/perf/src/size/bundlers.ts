@@ -237,7 +237,9 @@ async function buildWithEsbuild({appDir}: BuildRequest): Promise<BuildOutput> {
       return {
         fileName: path.relative(outDir, file.path),
         code: file.text,
-        isEntry: meta.entryPoint !== undefined,
+        isEntry:
+          meta.entryPoint !== undefined &&
+          path.resolve(appDir, meta.entryPoint) === path.join(appDir, 'main.js'),
         imports: meta.imports
           .filter((item) => item.kind === 'import-statement')
           .map((item) => path.relative(outDir, path.join(appDir, item.path))),

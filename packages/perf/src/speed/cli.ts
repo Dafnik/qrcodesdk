@@ -51,6 +51,9 @@ const only = values.only?.split(',');
 const options = values.quick ? QUICK_SAMPLER_OPTIONS : DEFAULT_SAMPLER_OPTIONS;
 // Alternating builds over several rounds spreads drift, such as thermal throttling, over both.
 const rounds = Number(values.rounds ?? (values.against ? 3 : 1));
+if (!Number.isSafeInteger(rounds) || rounds < 1) {
+  throw new Error('--rounds must be a positive safe integer');
+}
 
 const REPORT_FILE = path.join(REPORTS_ROOT, 'speed.json');
 const BASELINE_FILE = path.join(BASELINE_ROOT, 'speed.json');
@@ -224,6 +227,9 @@ console.log(
 );
 
 if (values['update-baseline']) {
+  if (!results.length || results.some((result) => result.error || !result.stats)) {
+    throw new Error('Cannot update the speed baseline: every workload must succeed.');
+  }
   await mkdir(BASELINE_ROOT, {recursive: true});
   await writeFile(BASELINE_FILE, stringifyReport(mergeRun(baselineReport, run)));
   console.log(`Updated the ${target} run in ${path.relative(process.cwd(), BASELINE_FILE)}`);

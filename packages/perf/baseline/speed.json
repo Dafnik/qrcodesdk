@@ -284,7 +284,7 @@
             "matrix"
           ],
           "target": "browser",
-          "stats": {"samples": 84, "batch": 4606, "mean": 2584.85, "median": 2573.82, "p75": 2612.08, "p99": 2838.27, "min": 2468.52, "max": 2958.1, "hz": 388528.05, "rme": 0.73}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "stages/fill-format-v1",
@@ -364,7 +364,7 @@
             "matrix"
           ],
           "target": "browser",
-          "stats": {"samples": 63, "batch": 854, "mean": 18654.23, "median": 18454.33, "p75": 18908.08, "p99": 20838.17, "min": 17874.71, "max": 20954.33, "hz": 54187.82, "rme": 0.9}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "stages/fill-format-v10",
@@ -444,7 +444,7 @@
             "matrix"
           ],
           "target": "browser",
-          "stats": {"samples": 81, "batch": 68, "mean": 182367.47, "median": 182132.35, "p75": 183308.82, "p99": 203838.24, "min": 175882.35, "max": 206250, "hz": 5490.51, "rme": 0.59}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "stages/fill-format-v40",
@@ -1294,7 +1294,7 @@
             "jpeg"
           ],
           "target": "browser",
-          "stats": {"samples": 75, "batch": 10, "mean": 1337500, "median": 1300000, "p75": 1366500, "p99": 1844590, "min": 1191500, "max": 2027000, "hz": 769.23, "rme": 2.3}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "encoder/jpeg-color-v1",
@@ -1334,7 +1334,7 @@
             "jpeg"
           ],
           "target": "browser",
-          "stats": {"samples": 157, "batch": 1, "mean": 6371114.65, "median": 6305000.01, "p75": 6415000.02, "p99": 7628199.99, "min": 6065000, "max": 10150000.01, "hz": 158.6, "rme": 0.95}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "encoder/jpeg-color-v10",
@@ -1374,7 +1374,7 @@
             "jpeg"
           ],
           "target": "browser",
-          "stats": {"samples": 20, "batch": 1, "mean": 51913000, "median": 51657500, "p75": 52735000, "p99": 54096749.99, "min": 50734999.98, "max": 54130000, "hz": 19.36, "rme": 0.88}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "encoder/jpeg-color-v40",
@@ -1976,7 +1976,7 @@
             "matrix"
           ],
           "target": "node",
-          "stats": {"samples": 85, "batch": 4547, "mean": 2588.83, "median": 2607.81, "p75": 2632.34, "p99": 2723.57, "min": 2465.08, "max": 2724.08, "hz": 383464.04, "rme": 0.52}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "stages/fill-format-v1",
@@ -2056,7 +2056,7 @@
             "matrix"
           ],
           "target": "node",
-          "stats": {"samples": 75, "batch": 728, "mean": 18550.16, "median": 18679.5, "p75": 18846.52, "p99": 19246.9, "min": 17986.34, "max": 19876.76, "hz": 53534.63, "rme": 0.45}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "stages/fill-format-v10",
@@ -2136,7 +2136,7 @@
             "matrix"
           ],
           "target": "node",
-          "stats": {"samples": 87, "batch": 62, "mean": 187320.62, "median": 186884.73, "p75": 190057.02, "p99": 203343.65, "min": 178559.71, "max": 203779.19, "hz": 5350.89, "rme": 0.6}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "stages/fill-format-v40",
@@ -3037,7 +3037,7 @@
             "jpeg"
           ],
           "target": "node",
-          "stats": {"samples": 114, "batch": 7, "mean": 1256370.7, "median": 1252781.93, "p75": 1265556.64, "p99": 1313637.03, "min": 1221473.86, "max": 1388619.14, "hz": 798.22, "rme": 0.33}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "encoder/jpeg-color-v1",
@@ -3128,7 +3128,7 @@
             "jpeg"
           ],
           "target": "node",
-          "stats": {"samples": 149, "batch": 1, "mean": 6746722.37, "median": 6679067, "p75": 6823738, "p99": 7617610.8, "min": 6457116, "max": 8392487, "hz": 149.72, "rme": 0.6}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "encoder/jpeg-color-v10",
@@ -3219,7 +3219,7 @@
             "jpeg"
           ],
           "target": "node",
-          "stats": {"samples": 20, "batch": 1, "mean": 55952965.6, "median": 56079510.5, "p75": 56542330.75, "p99": 62031765.22, "min": 53841288, "max": 63168129, "hz": 17.83, "rme": 1.56}
+          "error": "Invalidated: workload input corrected; regenerate the speed baseline."
         },
         {
           "id": "encoder/jpeg-color-v40",
