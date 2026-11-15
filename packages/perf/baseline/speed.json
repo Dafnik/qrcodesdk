@@ -1,0 +1,3388 @@
+{
+  "schemaVersion": 1,
+  "kind": "speed",
+  "generatedAt": "2026-11-15T19:24:13.452Z",
+  "commit": "22bc5378d199",
+  "features": [
+    {"id": "matrix", "title": "Matrix generation"},
+    {"id": "auto-mode", "title": "Automatic mode"},
+    {"id": "segmenter", "title": "Automatic segmenter"},
+    {"id": "kanji", "title": "Kanji"},
+    {"id": "micro", "title": "Micro QR"},
+    {"id": "rmqr", "title": "rMQR"},
+    {"id": "payload", "title": "Payload helpers"},
+    {"id": "text", "title": "Text renderer"},
+    {"id": "svg", "title": "SVG renderer"},
+    {"id": "canvas", "title": "Canvas renderer"},
+    {"id": "png", "title": "PNG"},
+    {"id": "webp", "title": "WebP"},
+    {"id": "gif", "title": "GIF"},
+    {"id": "jpeg", "title": "JPEG"},
+    {"id": "styling", "title": "Styling"},
+    {"id": "custom-shape", "title": "Custom shapes"},
+    {"id": "center-image", "title": "Center image"},
+    {"id": "download", "title": "Downloads"},
+    {"id": "code-splitting", "title": "Code splitting"},
+    {"id": "react", "title": "React"},
+    {"id": "vue", "title": "Vue"},
+    {"id": "svelte", "title": "Svelte"},
+    {"id": "angular", "title": "Angular"},
+    {"id": "explain", "title": "Docs explanation"}
+  ],
+  "groups": [
+    {"id": "matrix", "title": "Matrix generation"},
+    {"id": "matrix-stages", "title": "Matrix encoder stages"},
+    {"id": "modes", "title": "Modes and segmentation"},
+    {"id": "symbols", "title": "Micro QR and rMQR"},
+    {"id": "payload", "title": "Payload helpers"},
+    {"id": "styling", "title": "Styling"},
+    {"id": "renderers", "title": "SVG and text renderers"},
+    {"id": "raster-node", "title": "Node.js raster output and encoders"},
+    {"id": "browser", "title": "Browser output"},
+    {"id": "explain", "title": "Docs explanation"}
+  ],
+  "runs": [
+    {
+      "target": "browser",
+      "environment": {"os": "Linux 7.2.11-200.fc44.x86_64 x64", "cpu": "AMD Ryzen 7 3700X 8-Core Processor", "cores": 16, "memoryGB": 31, "node": "v26.13.1", "chromium": "156.0.8078.4"},
+      "workloads": [
+        {
+          "id": "matrix/url",
+          "title": "URL, automatic version and mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 111, "batch": 68, "mean": 133133.28, "median": 131691.18, "p75": 135404.41, "p99": 144779.41, "min": 126544.12, "max": 160882.35, "hz": 7593.52, "rme": 0.68}
+        },
+        {
+          "id": "matrix/fixed-v1",
+          "title": "Version 1, fixed mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 91, "batch": 2312, "mean": 4753.1, "median": 4628.03, "p75": 5007.57, "p99": 5962.8, "min": 4269.03, "max": 6355.97, "hz": 216074.77, "rme": 1.66}
+        },
+        {
+          "id": "matrix/auto-mask-v1",
+          "title": "Version 1, automatic mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 174, "batch": 159, "mean": 36194.97, "median": 35754.72, "p75": 37421.38, "p99": 44975.16, "min": 32421.38, "max": 46918.24, "hz": 27968.34, "rme": 1.12}
+        },
+        {
+          "id": "matrix/auto-version-v1",
+          "title": "Version 1 payload, automatic version and mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 191, "batch": 152, "mean": 34479.88, "median": 33947.37, "p75": 35427.63, "p99": 40898.03, "min": 31809.21, "max": 42598.68, "hz": 29457.36, "rme": 0.81}
+        },
+        {
+          "id": "matrix/fixed-v10",
+          "title": "Version 10, fixed mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 86, "batch": 280, "mean": 41991.07, "median": 41035.71, "p75": 43250, "p99": 49170.54, "min": 39571.43, "max": 51250, "hz": 24369.02, "rme": 1.05}
+        },
+        {
+          "id": "matrix/auto-mask-v10",
+          "title": "Version 10, automatic mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 108, "batch": 21, "mean": 441067.02, "median": 439523.81, "p75": 444345.24, "p99": 464971.43, "min": 429047.62, "max": 467380.95, "hz": 2275.19, "rme": 0.31}
+        },
+        {
+          "id": "matrix/auto-version-v10",
+          "title": "Version 10 payload, automatic version and mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 74, "batch": 30, "mean": 454281.53, "median": 452416.67, "p75": 456833.33, "p99": 490620, "min": 437833.33, "max": 495000, "hz": 2210.35, "rme": 0.56}
+        },
+        {
+          "id": "matrix/fixed-v40",
+          "title": "Version 40, fixed mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 99, "batch": 22, "mean": 460619.83, "median": 456818.18, "p75": 461477.27, "p99": 554331.82, "min": 444772.73, "max": 566136.36, "hz": 2189.05, "rme": 0.82}
+        },
+        {
+          "id": "matrix/auto-mask-v40",
+          "title": "Version 40, automatic mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 187, "batch": 1, "mean": 5368262.03, "median": 4950000.02, "p75": 6235000, "p99": 7098799.99, "min": 4460000.01, "max": 7430000.01, "hz": 202.02, "rme": 2.09}
+        },
+        {
+          "id": "matrix/auto-version-v40",
+          "title": "Version 40 payload, automatic version and mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 212, "batch": 1, "mean": 4720990.57, "median": 4620000, "p75": 4855000.02, "p99": 5530600, "min": 4484999.98, "max": 5625000, "hz": 216.45, "rme": 0.6}
+        },
+        {
+          "id": "matrix/mask-0-v20",
+          "title": "Version 20, mask 0",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 236, "batch": 33, "mean": 128308.29, "median": 127121.21, "p75": 131098.49, "p99": 162015.15, "min": 117878.79, "max": 186515.15, "hz": 7866.51, "rme": 0.89}
+        },
+        {
+          "id": "matrix/mask-1-v20",
+          "title": "Version 20, mask 1",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 55, "batch": 136, "mean": 134242.65, "median": 133860.29, "p75": 140202.21, "p99": 162419.12, "min": 121286.76, "max": 171948.53, "hz": 7470.48, "rme": 1.97}
+        },
+        {
+          "id": "matrix/mask-2-v20",
+          "title": "Version 20, mask 2",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 237, "batch": 33, "mean": 128000.9, "median": 124545.45, "p75": 130454.55, "p99": 166327.27, "min": 115000, "max": 199393.94, "hz": 8029.2, "rme": 1.23}
+        },
+        {
+          "id": "matrix/mask-3-v20",
+          "title": "Version 20, mask 3",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 207, "batch": 33, "mean": 146494.66, "median": 141969.7, "p75": 147045.45, "p99": 195872.73, "min": 128939.39, "max": 202272.73, "hz": 7043.76, "rme": 1.37}
+        },
+        {
+          "id": "matrix/mask-4-v20",
+          "title": "Version 20, mask 4",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 74, "batch": 88, "mean": 155399.26, "median": 153210.23, "p75": 163181.82, "p99": 190927.27, "min": 136363.64, "max": 191590.91, "hz": 6526.98, "rme": 1.8}
+        },
+        {
+          "id": "matrix/mask-5-v20",
+          "title": "Version 20, mask 5",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 259, "batch": 27, "mean": 143070.93, "median": 139629.63, "p75": 144351.85, "p99": 207529.63, "min": 129629.63, "max": 217962.96, "hz": 7161.8, "rme": 1.33}
+        },
+        {
+          "id": "matrix/mask-6-v20",
+          "title": "Version 20, mask 6",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 65, "batch": 104, "mean": 149539.2, "median": 145000, "p75": 155913.46, "p99": 184703.85, "min": 137596.15, "max": 185288.46, "hz": 6896.55, "rme": 2.03}
+        },
+        {
+          "id": "matrix/mask-7-v20",
+          "title": "Version 20, mask 7",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 92, "batch": 76, "mean": 143235.84, "median": 140460.53, "p75": 142894.74, "p99": 184926.32, "min": 134473.68, "max": 186842.11, "hz": 7119.44, "rme": 1.38}
+        },
+        {
+          "id": "stages/resolve-options-v1",
+          "title": "Version 1: resolve options",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 55, "batch": 139798, "mean": 130.77, "median": 111.52, "p75": 114.81, "p99": 511.6, "min": 108.48, "max": 849.33, "hz": 8967158.43, "rme": 20.32}
+        },
+        {
+          "id": "stages/codewords-v1",
+          "title": "Version 1: codewords and error correction",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 93, "batch": 8382, "mean": 1294.7, "median": 1138.15, "p75": 1199.59, "p99": 5883.13, "min": 1061.2, "max": 5982.46, "hz": 878616.35, "rme": 11.36}
+        },
+        {
+          "id": "stages/base-matrix-v1",
+          "title": "Version 1: copy cached base matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 320, "batch": 6600, "mean": 472.93, "median": 453.41, "p75": 496.97, "p99": 771, "min": 339.39, "max": 855.3, "hz": 2205513.79, "rme": 2.14}
+        },
+        {
+          "id": "stages/fill-data-v1",
+          "title": "Version 1: fill data",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 77, "batch": 12854, "mean": 1014.54, "median": 1012.91, "p75": 1022.64, "p99": 1042.21, "min": 992.69, "max": 1047.53, "hz": 987250.38, "rme": 0.26}
+        },
+        {
+          "id": "stages/apply-mask-v1",
+          "title": "Version 1: apply mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 49, "batch": 125710, "mean": 163.2, "median": 162.95, "p75": 167.01, "p99": 186.77, "min": 154.4, "max": 195.73, "hz": 6136685.38, "rme": 1.21}
+        },
+        {
+          "id": "stages/evaluate-mask-v1",
+          "title": "Version 1: score a mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 84, "batch": 4606, "mean": 2584.85, "median": 2573.82, "p75": 2612.08, "p99": 2838.27, "min": 2468.52, "max": 2958.1, "hz": 388528.05, "rme": 0.73}
+        },
+        {
+          "id": "stages/fill-format-v1",
+          "title": "Version 1: fill format information",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 55, "batch": 657930, "mean": 27.99, "median": 28.03, "p75": 28.26, "p99": 28.77, "min": 27.3, "max": 28.79, "hz": 35669829.24, "rme": 0.37}
+        },
+        {
+          "id": "stages/assemble-v1",
+          "title": "Version 1: assemble matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 167, "batch": 1579, "mean": 3793.39, "median": 3404.05, "p75": 4395.19, "p99": 6426.22, "min": 3043.07, "max": 7507.92, "hz": 293767.44, "rme": 3.27}
+        },
+        {
+          "id": "stages/resolve-options-v10",
+          "title": "Version 10: resolve options",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 98, "batch": 26446, "mean": 389.66, "median": 386.26, "p75": 396.99, "p99": 406.94, "min": 380.02, "max": 415.37, "hz": 2588937.84, "rme": 0.4}
+        },
+        {
+          "id": "stages/codewords-v10",
+          "title": "Version 10: codewords and error correction",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 109, "batch": 465, "mean": 19725.26, "median": 19537.63, "p75": 19870.97, "p99": 21034.41, "min": 19172.04, "max": 21462.37, "hz": 51183.27, "rme": 0.46}
+        },
+        {
+          "id": "stages/base-matrix-v10",
+          "title": "Version 10: copy cached base matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 138, "batch": 4400, "mean": 1645.65, "median": 1608.52, "p75": 1949.43, "p99": 2722.58, "min": 681.82, "max": 2900, "hz": 621688.45, "rme": 4.79}
+        },
+        {
+          "id": "stages/fill-data-v10",
+          "title": "Version 10: fill data",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 117, "batch": 853, "mean": 10083.27, "median": 8915.59, "p75": 9390.39, "p99": 14279.25, "min": 8733.88, "max": 15363.42, "hz": 112163.05, "rme": 3.77}
+        },
+        {
+          "id": "stages/apply-mask-v10",
+          "title": "Version 10: apply mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 98, "batch": 10105, "mean": 1015.83, "median": 1007.92, "p75": 1015.22, "p99": 1146.24, "min": 987.63, "max": 1283.03, "hz": 992145.31, "rme": 0.68}
+        },
+        {
+          "id": "stages/evaluate-mask-v10",
+          "title": "Version 10: score a mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 63, "batch": 854, "mean": 18654.23, "median": 18454.33, "p75": 18908.08, "p99": 20838.17, "min": 17874.71, "max": 20954.33, "hz": 54187.82, "rme": 0.9}
+        },
+        {
+          "id": "stages/fill-format-v10",
+          "title": "Version 10: fill format information",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 53, "batch": 604388, "mean": 31.23, "median": 31.11, "p75": 31.4, "p99": 33, "min": 30.26, "max": 33.16, "hz": 32148297.9, "rme": 0.58}
+        },
+        {
+          "id": "stages/assemble-v10",
+          "title": "Version 10: assemble matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 94, "batch": 491, "mean": 21805.59, "median": 21486.76, "p75": 22347.25, "p99": 25319.65, "min": 20173.12, "max": 26995.93, "hz": 46540.28, "rme": 1.11}
+        },
+        {
+          "id": "stages/resolve-options-v40",
+          "title": "Version 40: resolve options",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 137, "batch": 2182, "mean": 3366.81, "median": 3370.76, "p75": 3379.93, "p99": 3428.69, "min": 3311.18, "max": 3469.29, "hz": 296668.93, "rme": 0.14}
+        },
+        {
+          "id": "stages/codewords-v40",
+          "title": "Version 40: codewords and error correction",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 88, "batch": 48, "mean": 236779.12, "median": 232656.25, "p75": 242135.42, "p99": 283081.25, "min": 218229.17, "max": 298125, "hz": 4298.19, "rme": 1.37}
+        },
+        {
+          "id": "stages/base-matrix-v40",
+          "title": "Version 40: copy cached base matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 76, "batch": 565, "mean": 23786.21, "median": 16482.3, "p75": 41475.66, "p99": 49778.76, "min": 14380.53, "max": 50362.83, "hz": 60671.14, "rme": 12.36}
+        },
+        {
+          "id": "stages/fill-data-v40",
+          "title": "Version 40: fill data",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 80, "batch": 92, "mean": 136531.93, "median": 134619.57, "p75": 137092.39, "p99": 153614.13, "min": 132500, "max": 168641.3, "hz": 7428.34, "rme": 0.88}
+        },
+        {
+          "id": "stages/apply-mask-v40",
+          "title": "Version 40: apply mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 91, "batch": 446, "mean": 24665.16, "median": 26950.67, "p75": 27225.34, "p99": 29322.87, "min": 9360.99, "max": 33116.59, "hz": 37104.83, "rme": 5.23}
+        },
+        {
+          "id": "stages/evaluate-mask-v40",
+          "title": "Version 40: score a mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 81, "batch": 68, "mean": 182367.47, "median": 182132.35, "p75": 183308.82, "p99": 203838.24, "min": 175882.35, "max": 206250, "hz": 5490.51, "rme": 0.59}
+        },
+        {
+          "id": "stages/fill-format-v40",
+          "title": "Version 40: fill format information",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 51, "batch": 707660, "mean": 27.91, "median": 27.92, "p75": 28.02, "p99": 28.38, "min": 27.45, "max": 28.39, "hz": 35821817.27, "rme": 0.21}
+        },
+        {
+          "id": "stages/assemble-v40",
+          "title": "Version 40: assemble matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 98, "batch": 44, "mean": 233766.23, "median": 232159.09, "p75": 237642.05, "p99": 291018.18, "min": 222159.09, "max": 294545.45, "hz": 4307.39, "rme": 0.93}
+        },
+        {
+          "id": "modes/numeric",
+          "title": "Numeric mode, version 10",
+          "group": "modes",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 93, "batch": 250, "mean": 42990.11, "median": 42380, "p75": 44600, "p99": 50419.2, "min": 40000, "max": 51560, "hz": 23596.04, "rme": 1.15}
+        },
+        {
+          "id": "modes/alphanumeric",
+          "title": "Alphanumeric mode, version 10",
+          "group": "modes",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 95, "batch": 249, "mean": 42674.06, "median": 42510.04, "p75": 43162.65, "p99": 48882.73, "min": 39799.2, "max": 51827.31, "hz": 23523.85, "rme": 0.91}
+        },
+        {
+          "id": "modes/octet",
+          "title": "Octet mode, version 10",
+          "group": "modes",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 94, "batch": 226, "mean": 47371.49, "median": 47455.75, "p75": 48655.97, "p99": 56072.79, "min": 43097.35, "max": 56216.81, "hz": 21072.26, "rme": 1}
+        },
+        {
+          "id": "modes/kanji",
+          "title": "Kanji mode, version 10",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "kanji"
+          ],
+          "target": "browser",
+          "stats": {"samples": 127, "batch": 200, "mean": 39545.47, "median": 38675, "p75": 40737.5, "p99": 54272.5, "min": 35825, "max": 56275, "hz": 25856.5, "rme": 1.5}
+        },
+        {
+          "id": "segmenter/short/segments",
+          "title": "short payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "browser",
+          "stats": {"samples": 106, "batch": 4556, "mean": 2085.84, "median": 2055.53, "p75": 2103.82, "p99": 2405.23, "min": 1964.44, "max": 2565.85, "hz": 486492.26, "rme": 0.88}
+        },
+        {
+          "id": "segmenter/short/auto-single",
+          "title": "short payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode"
+          ],
+          "target": "browser",
+          "stats": {"samples": 91, "batch": 1756, "mean": 6289.24, "median": 5714.69, "p75": 6882.12, "p99": 8958.71, "min": 5298.97, "max": 10017.08, "hz": 174987.54, "rme": 3.48}
+        },
+        {
+          "id": "segmenter/short/auto-mixed",
+          "title": "short payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "browser",
+          "stats": {"samples": 72, "batch": 1516, "mean": 9177.16, "median": 8721.97, "p75": 9704.82, "p99": 13245.38, "min": 7585.75, "max": 13947.89, "hz": 114653.05, "rme": 3.55}
+        },
+        {
+          "id": "segmenter/numeric/segments",
+          "title": "numeric payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "browser",
+          "stats": {"samples": 114, "batch": 16446, "mean": 537.56, "median": 533.56, "p75": 538.96, "p99": 635.43, "min": 522.32, "max": 652.74, "hz": 1874188.03, "rme": 0.56}
+        },
+        {
+          "id": "segmenter/numeric/auto-single",
+          "title": "numeric payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode"
+          ],
+          "target": "browser",
+          "stats": {"samples": 93, "batch": 117, "mean": 92144.56, "median": 91111.11, "p75": 93119.66, "p99": 103998.29, "min": 89145.3, "max": 107222.22, "hz": 10975.61, "rme": 0.68}
+        },
+        {
+          "id": "segmenter/numeric/auto-mixed",
+          "title": "numeric payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "browser",
+          "stats": {"samples": 102, "batch": 105, "mean": 94112.04, "median": 93857.14, "p75": 94619.05, "p99": 105177.14, "min": 90380.95, "max": 116095.24, "hz": 10654.49, "rme": 0.65}
+        },
+        {
+          "id": "segmenter/mixed/segments",
+          "title": "mixed payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "browser",
+          "stats": {"samples": 129, "batch": 684, "mean": 11375.29, "median": 11345.03, "p75": 11491.23, "p99": 12066.67, "min": 10964.91, "max": 12602.34, "hz": 88144.33, "rme": 0.35}
+        },
+        {
+          "id": "segmenter/mixed/auto-single",
+          "title": "mixed payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode"
+          ],
+          "target": "browser",
+          "stats": {"samples": 77, "batch": 1032, "mean": 12640.63, "median": 12330.43, "p75": 12703.49, "p99": 18276.55, "min": 11337.21, "max": 19830.43, "hz": 81100.2, "rme": 2.71}
+        },
+        {
+          "id": "segmenter/mixed/auto-mixed",
+          "title": "mixed payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "browser",
+          "stats": {"samples": 203, "batch": 233, "mean": 21227.51, "median": 20450.64, "p75": 22274.68, "p99": 27213.73, "min": 18819.74, "max": 28798.28, "hz": 48898.22, "rme": 1.36}
+        },
+        {
+          "id": "segmenter/long/segments",
+          "title": "long payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "browser",
+          "stats": {"samples": 111, "batch": 36, "mean": 251869.37, "median": 248333.33, "p75": 254791.67, "p99": 343083.33, "min": 231666.67, "max": 372638.89, "hz": 4026.85, "rme": 1.39}
+        },
+        {
+          "id": "segmenter/long/auto-single",
+          "title": "long payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode"
+          ],
+          "target": "browser",
+          "stats": {"samples": 71, "batch": 62, "mean": 229152.66, "median": 227177.42, "p75": 231572.58, "p99": 266217.74, "min": 219032.26, "max": 268870.97, "hz": 4401.85, "rme": 0.81}
+        },
+        {
+          "id": "segmenter/long/auto-mixed",
+          "title": "long payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "browser",
+          "stats": {"samples": 1000, "batch": 1, "mean": 865630, "median": 810000, "p75": 829999.98, "p99": 1860000.01, "min": 740000.01, "max": 2569999.99, "hz": 1234.57, "rme": 1.46}
+        },
+        {
+          "id": "segmenter/kanji/segments",
+          "title": "kanji payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter",
+            "kanji"
+          ],
+          "target": "browser",
+          "stats": {"samples": 182, "batch": 706, "mean": 7825.58, "median": 7730.17, "p75": 7970.96, "p99": 9697.73, "min": 7145.89, "max": 10424.93, "hz": 129363.26, "rme": 0.89}
+        },
+        {
+          "id": "segmenter/kanji/auto-single",
+          "title": "kanji payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "kanji"
+          ],
+          "target": "browser",
+          "stats": {"samples": 73, "batch": 1088, "mean": 12757.16, "median": 12251.84, "p75": 12775.74, "p99": 17895.59, "min": 11309.74, "max": 18180.15, "hz": 81620.41, "rme": 2.98}
+        },
+        {
+          "id": "segmenter/kanji/auto-mixed",
+          "title": "kanji payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter",
+            "kanji"
+          ],
+          "target": "browser",
+          "stats": {"samples": 172, "batch": 277, "mean": 21071.49, "median": 20514.44, "p75": 21759.93, "p99": 28367.69, "min": 18790.61, "max": 29711.19, "hz": 48746.15, "rme": 1.52}
+        },
+        {
+          "id": "symbols/qr-v1",
+          "title": "Standard QR, version 1 (for comparison)",
+          "group": "symbols",
+          "features": [
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 173, "batch": 172, "mean": 33703.29, "median": 33284.88, "p75": 34360.47, "p99": 37703.49, "min": 31715.12, "max": 37877.91, "hz": 30043.67, "rme": 0.65}
+        },
+        {
+          "id": "symbols/micro-m2-numeric",
+          "title": "Micro QR M2, numeric",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "micro"
+          ],
+          "target": "browser",
+          "stats": {"samples": 212, "batch": 939, "mean": 5021.42, "median": 4685.84, "p75": 4978.7, "p99": 7961.87, "min": 4211.93, "max": 9020.23, "hz": 213409.09, "rme": 2.45}
+        },
+        {
+          "id": "symbols/micro-m4-alphanumeric",
+          "title": "Micro QR M4, alphanumeric",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "micro"
+          ],
+          "target": "browser",
+          "stats": {"samples": 209, "batch": 615, "mean": 7807.91, "median": 7325.2, "p75": 8317.07, "p99": 12300.81, "min": 6650.41, "max": 14121.95, "hz": 136514.98, "rme": 2.14}
+        },
+        {
+          "id": "symbols/micro-m4-fixed-mask",
+          "title": "Micro QR M4, fixed mask",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "micro"
+          ],
+          "target": "browser",
+          "stats": {"samples": 56, "batch": 4672, "mean": 3860.33, "median": 3665.99, "p75": 4092.73, "p99": 5487.75, "min": 3275.9, "max": 5590.75, "hz": 272777.7, "rme": 3.88}
+        },
+        {
+          "id": "symbols/rmqr-auto",
+          "title": "rMQR, automatic version",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "rmqr"
+          ],
+          "target": "browser",
+          "stats": {"samples": 270, "batch": 808, "mean": 4595.07, "median": 4204.83, "p75": 4704.52, "p99": 7423.21, "min": 3978.96, "max": 9009.9, "hz": 237821.93, "rme": 2.2}
+        },
+        {
+          "id": "symbols/rmqr-r17x139",
+          "title": "rMQR R17x139",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "rmqr"
+          ],
+          "target": "browser",
+          "stats": {"samples": 92, "batch": 368, "mean": 29621.93, "median": 28437.5, "p75": 31260.19, "p99": 39592.12, "min": 26970.11, "max": 39864.13, "hz": 35164.84, "rme": 1.84}
+        },
+        {
+          "id": "payload/wifi",
+          "title": "Format a Wi-Fi payload",
+          "group": "payload",
+          "features": [
+            "payload"
+          ],
+          "target": "browser",
+          "stats": {"samples": 59, "batch": 26668, "mean": 639.69, "median": 626.78, "p75": 632.69, "p99": 842.71, "min": 614.78, "max": 859.46, "hz": 1595453.19, "rme": 1.84}
+        },
+        {
+          "id": "payload/vcard",
+          "title": "Format a vCard",
+          "group": "payload",
+          "features": [
+            "payload"
+          ],
+          "target": "browser",
+          "stats": {"samples": 89, "batch": 1736, "mean": 6487.83, "median": 6074.31, "p75": 6664.75, "p99": 9545.16, "min": 5769.01, "max": 10391.71, "hz": 164627.79, "rme": 2.83}
+        },
+        {
+          "id": "payload/calendar",
+          "title": "Format a calendar event",
+          "group": "payload",
+          "features": [
+            "payload"
+          ],
+          "target": "browser",
+          "stats": {"samples": 1000, "batch": 1, "mean": 9930, "median": 9999.99, "p75": 10000.02, "p99": 19999.98, "min": 5000, "max": 60000, "hz": 100000.1, "rme": 2.93}
+        },
+        {
+          "id": "payload/vcard-matrix",
+          "title": "vCard to matrix",
+          "group": "payload",
+          "features": [
+            "payload",
+            "matrix"
+          ],
+          "target": "browser",
+          "stats": {"samples": 90, "batch": 24, "mean": 463467.59, "median": 463333.33, "p75": 469739.58, "p99": 490760.42, "min": 443541.67, "max": 493541.67, "hz": 2158.27, "rme": 0.48}
+        },
+        {
+          "id": "styling/setup-rounded-finder",
+          "title": "Create rounded shapes, finder, and styler",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 81, "batch": 248, "mean": 50155.81, "median": 46411.29, "p75": 54778.23, "p99": 76241.94, "min": 43346.77, "max": 82661.29, "hz": 21546.48, "rme": 3.17}
+        },
+        {
+          "id": "styling/setup-circle",
+          "title": "Create circle shape and styler",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 204, "batch": 1294, "mean": 3791.01, "median": 3408.04, "p75": 3636.98, "p99": 7360.05, "min": 3230.29, "max": 8458.27, "hz": 293424.04, "rme": 3.5}
+        },
+        {
+          "id": "styling/setup-custom-shape",
+          "title": "Parse a custom hexagon and create a styler",
+          "group": "styling",
+          "features": [
+            "styling",
+            "custom-shape"
+          ],
+          "target": "browser",
+          "stats": {"samples": 91, "batch": 2504, "mean": 4401.95, "median": 4297.12, "p75": 4376, "p99": 6311.5, "min": 4151.36, "max": 6379.79, "hz": 232713.75, "rme": 1.82}
+        },
+        {
+          "id": "styling/setup-shared-shapes",
+          "title": "Create a styler from shared shapes",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 103, "batch": 75066, "mean": 130.37, "median": 128.62, "p75": 130.95, "p99": 160.87, "min": 122.43, "max": 182.24, "hz": 7774831.69, "rme": 1.22}
+        },
+        {
+          "id": "styling/draw-plain-v1",
+          "title": "Version 1: draw plain modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 125, "batch": 2540, "mean": 3160.35, "median": 3131.89, "p75": 3169.29, "p99": 3709.61, "min": 3029.53, "max": 4192.91, "hz": 319296.04, "rme": 0.76}
+        },
+        {
+          "id": "styling/draw-styled-v1",
+          "title": "Version 1: draw rounded modules and finder",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 80, "batch": 1824, "mean": 6902.07, "median": 6483, "p75": 6742.74, "p99": 12189.56, "min": 6288.38, "max": 15167.21, "hz": 154249.47, "rme": 4.23}
+        },
+        {
+          "id": "styling/draw-circle-v1",
+          "title": "Version 1: draw circle modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 66, "batch": 2632, "mean": 5838.86, "median": 5753.23, "p75": 5840.62, "p99": 7119.21, "min": 5592.71, "max": 7505.7, "hz": 173815.42, "rme": 1.21}
+        },
+        {
+          "id": "styling/draw-diagonal-v1",
+          "title": "Version 1: draw diagonal modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 73, "batch": 2348, "mean": 5872.33, "median": 5870.95, "p75": 5900.77, "p99": 6049.83, "min": 5755.96, "max": 6126.49, "hz": 170330.07, "rme": 0.27}
+        },
+        {
+          "id": "styling/draw-patterns-v1",
+          "title": "Version 1: draw finder and alignment patterns",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 70, "batch": 2112, "mean": 6800.6, "median": 6754.26, "p75": 6815.22, "p99": 7398.91, "min": 6631.16, "max": 8101.33, "hz": 148054.68, "rme": 0.67}
+        },
+        {
+          "id": "styling/draw-custom-v1",
+          "title": "Version 1: draw custom hexagons",
+          "group": "styling",
+          "features": [
+            "styling",
+            "custom-shape"
+          ],
+          "target": "browser",
+          "stats": {"samples": 66, "batch": 2604, "mean": 5824.43, "median": 5751.73, "p75": 5848.21, "p99": 6894.11, "min": 5647.08, "max": 6977.73, "hz": 173860.79, "rme": 1.01}
+        },
+        {
+          "id": "styling/path-plain-v1",
+          "title": "Version 1: serialize plain path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 74, "batch": 5956, "mean": 2273.88, "median": 2266.62, "p75": 2296.63, "p99": 2397.24, "min": 2209.54, "max": 2407.66, "hz": 441185.19, "rme": 0.4}
+        },
+        {
+          "id": "styling/path-styled-v1",
+          "title": "Version 1: serialize styled path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 91, "batch": 1536, "mean": 7180.35, "median": 7014.97, "p75": 7161.46, "p99": 8405.92, "min": 6829.43, "max": 8619.79, "hz": 142552.2, "rme": 1.11}
+        },
+        {
+          "id": "styling/draw-plain-v10",
+          "title": "Version 10: draw plain modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 120, "batch": 486, "mean": 17246.57, "median": 16929.01, "p75": 17445.99, "p99": 20457.2, "min": 15853.91, "max": 21676.95, "hz": 59070.19, "rme": 1.02}
+        },
+        {
+          "id": "styling/draw-styled-v10",
+          "title": "Version 10: draw rounded modules and finder",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 80, "batch": 276, "mean": 45850.09, "median": 45380.43, "p75": 46557.97, "p99": 55249.09, "min": 43768.12, "max": 57753.62, "hz": 22035.93, "rme": 1.07}
+        },
+        {
+          "id": "styling/draw-circle-v10",
+          "title": "Version 10: draw circle modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 74, "batch": 284, "mean": 48123.57, "median": 47447.18, "p75": 48899.65, "p99": 60101.41, "min": 44929.58, "max": 65088.03, "hz": 21076.07, "rme": 1.37}
+        },
+        {
+          "id": "styling/draw-diagonal-v10",
+          "title": "Version 10: draw diagonal modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 113, "batch": 208, "mean": 42789.53, "median": 42475.96, "p75": 43942.31, "p99": 52775, "min": 39471.15, "max": 53533.65, "hz": 23542.73, "rme": 1.04}
+        },
+        {
+          "id": "styling/draw-patterns-v10",
+          "title": "Version 10: draw finder and alignment patterns",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 96, "batch": 248, "mean": 42419.56, "median": 42772.18, "p75": 43467.74, "p99": 49623.99, "min": 39778.23, "max": 53971.77, "hz": 23379.68, "rme": 0.99}
+        },
+        {
+          "id": "styling/draw-custom-v10",
+          "title": "Version 10: draw custom hexagons",
+          "group": "styling",
+          "features": [
+            "styling",
+            "custom-shape"
+          ],
+          "target": "browser",
+          "stats": {"samples": 80, "batch": 270, "mean": 46821.06, "median": 46731.48, "p75": 47055.56, "p99": 52544.26, "min": 43888.89, "max": 62185.19, "hz": 21398.85, "rme": 0.96}
+        },
+        {
+          "id": "styling/path-plain-v10",
+          "title": "Version 10: serialize plain path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 113, "batch": 630, "mean": 14131.2, "median": 13976.19, "p75": 14111.11, "p99": 17649.84, "min": 13722.22, "max": 19650.79, "hz": 71550.26, "rme": 0.93}
+        },
+        {
+          "id": "styling/path-styled-v10",
+          "title": "Version 10: serialize styled path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 118, "batch": 126, "mean": 67218.52, "median": 65575.4, "p75": 67222.22, "p99": 83569.84, "min": 62817.46, "max": 87658.73, "hz": 15249.62, "rme": 1.22}
+        },
+        {
+          "id": "styling/draw-plain-v40",
+          "title": "Version 40: draw plain modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 67, "batch": 54, "mean": 279958.54, "median": 274537.04, "p75": 279305.56, "p99": 406372.22, "min": 257777.78, "max": 416944.44, "hz": 3642.5, "rme": 2.17}
+        },
+        {
+          "id": "styling/draw-styled-v40",
+          "title": "Version 40: draw rounded modules and finder",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 65, "batch": 24, "mean": 641766.03, "median": 633541.67, "p75": 642708.33, "p99": 790891.67, "min": 616041.67, "max": 827291.67, "hz": 1578.43, "rme": 1.27}
+        },
+        {
+          "id": "styling/draw-circle-v40",
+          "title": "Version 40: draw circle modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 103, "batch": 20, "mean": 489842.23, "median": 483000, "p75": 493250, "p99": 617400, "min": 470500, "max": 694000, "hz": 2070.39, "rme": 1.09}
+        },
+        {
+          "id": "styling/draw-diagonal-v40",
+          "title": "Version 40: draw diagonal modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 68, "batch": 24, "mean": 615370.71, "median": 609270.83, "p75": 616979.17, "p99": 739958.33, "min": 596666.67, "max": 776250, "hz": 1641.31, "rme": 1.01}
+        },
+        {
+          "id": "styling/draw-patterns-v40",
+          "title": "Version 40: draw finder and alignment patterns",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 81, "batch": 24, "mean": 517867.8, "median": 508541.67, "p75": 515833.33, "p99": 731958.33, "min": 485000, "max": 826458.33, "hz": 1966.41, "rme": 2.02}
+        },
+        {
+          "id": "styling/draw-custom-v40",
+          "title": "Version 40: draw custom hexagons",
+          "group": "styling",
+          "features": [
+            "styling",
+            "custom-shape"
+          ],
+          "target": "browser",
+          "stats": {"samples": 83, "batch": 24, "mean": 505931.23, "median": 492083.33, "p75": 528750, "p99": 629887.5, "min": 471666.67, "max": 663541.67, "hz": 2032.18, "rme": 1.46}
+        },
+        {
+          "id": "styling/path-plain-v40",
+          "title": "Version 40: serialize plain path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 127, "batch": 63, "mean": 125056.24, "median": 123730.16, "p75": 126587.3, "p99": 173552.38, "min": 117301.59, "max": 181269.84, "hz": 8082.1, "rme": 1.16}
+        },
+        {
+          "id": "styling/path-styled-v40",
+          "title": "Version 40: serialize styled path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 140, "batch": 10, "mean": 715392.86, "median": 701750, "p75": 733750, "p99": 969490, "min": 661000, "max": 1257000, "hz": 1425.01, "rme": 1.51}
+        },
+        {
+          "id": "svg/plain-v1",
+          "title": "Version 1: SVG, reused renderer",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 74, "batch": 2256, "mean": 6053.38, "median": 5978.5, "p75": 6063.83, "p99": 6829.23, "min": 5862.15, "max": 7322.7, "hz": 167265.99, "rme": 0.86}
+        },
+        {
+          "id": "svg/fresh-v1",
+          "title": "Version 1: SVG, new renderer per call",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 67, "batch": 2528, "mean": 5922.95, "median": 5888.05, "p75": 5955.3, "p99": 6489.4, "min": 5757.52, "max": 6954.11, "hz": 169835.4, "rme": 0.66}
+        },
+        {
+          "id": "svg/styled-v1",
+          "title": "Version 1: styled SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 123, "batch": 560, "mean": 14599.96, "median": 14339.29, "p75": 14607.14, "p99": 18948.39, "min": 13955.36, "max": 19964.29, "hz": 69738.48, "rme": 1.04}
+        },
+        {
+          "id": "svg/circle-v1",
+          "title": "Version 1: circle SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 103, "batch": 588, "mean": 16550.01, "median": 16224.49, "p75": 16585.88, "p99": 20941.5, "min": 15756.8, "max": 21896.26, "hz": 61635.22, "rme": 1.14}
+        },
+        {
+          "id": "svg/center-image-v1",
+          "title": "Version 1: styled SVG with a center image",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling",
+            "center-image"
+          ],
+          "target": "browser",
+          "stats": {"samples": 73, "batch": 1064, "mean": 12907.35, "median": 12791.35, "p75": 12932.33, "p99": 14345.68, "min": 12434.21, "max": 15164.47, "hz": 78177.81, "rme": 0.75}
+        },
+        {
+          "id": "text/blocks-v1",
+          "title": "Version 1: compact terminal text",
+          "group": "renderers",
+          "features": [
+            "text"
+          ],
+          "target": "browser",
+          "stats": {"samples": 80, "batch": 1710, "mean": 7311.15, "median": 7267.54, "p75": 7374.27, "p99": 8040.29, "min": 7134.5, "max": 8774.85, "hz": 137598.07, "rme": 0.6}
+        },
+        {
+          "id": "svg/plain-v10",
+          "title": "Version 10: SVG, reused renderer",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 139, "batch": 237, "mean": 30390.22, "median": 30316.46, "p75": 30917.72, "p99": 35937.97, "min": 27974.68, "max": 39873.42, "hz": 32985.39, "rme": 0.76}
+        },
+        {
+          "id": "svg/fresh-v10",
+          "title": "Version 10: SVG, new renderer per call",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 134, "batch": 244, "mean": 30743.67, "median": 30532.79, "p75": 30983.61, "p99": 34447.75, "min": 27766.39, "max": 48073.77, "hz": 32751.68, "rme": 1.09}
+        },
+        {
+          "id": "svg/styled-v10",
+          "title": "Version 10: styled SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 86, "batch": 96, "mean": 121181.56, "median": 120286.46, "p75": 122473.96, "p99": 141184.9, "min": 115520.83, "max": 141406.25, "hz": 8313.49, "rme": 0.84}
+        },
+        {
+          "id": "svg/circle-v10",
+          "title": "Version 10: circle SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 67, "batch": 80, "mean": 187168.84, "median": 185437.5, "p75": 188656.25, "p99": 214095, "min": 180187.5, "max": 217312.5, "hz": 5392.65, "rme": 0.97}
+        },
+        {
+          "id": "svg/center-image-v10",
+          "title": "Version 10: styled SVG with a center image",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling",
+            "center-image"
+          ],
+          "target": "browser",
+          "stats": {"samples": 95, "batch": 98, "mean": 107737.92, "median": 107295.92, "p75": 108826.53, "p99": 125336.73, "min": 101887.75, "max": 125816.33, "hz": 9320.02, "rme": 0.72}
+        },
+        {
+          "id": "text/blocks-v10",
+          "title": "Version 10: compact terminal text",
+          "group": "renderers",
+          "features": [
+            "text"
+          ],
+          "target": "browser",
+          "stats": {"samples": 116, "batch": 188, "mean": 46085.84, "median": 45784.57, "p75": 46648.94, "p99": 55648.94, "min": 43643.62, "max": 57101.06, "hz": 21841.42, "rme": 0.78}
+        },
+        {
+          "id": "svg/plain-v40",
+          "title": "Version 40: SVG, reused renderer",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 84, "batch": 30, "mean": 397980.16, "median": 392833.33, "p75": 397500, "p99": 545836.67, "min": 374000, "max": 574333.33, "hz": 2545.61, "rme": 1.41}
+        },
+        {
+          "id": "svg/fresh-v40",
+          "title": "Version 40: SVG, new renderer per call",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 82, "batch": 30, "mean": 410215.45, "median": 401416.67, "p75": 419541.67, "p99": 542933.33, "min": 384833.33, "max": 575333.33, "hz": 2491.18, "rme": 1.51}
+        },
+        {
+          "id": "svg/styled-v40",
+          "title": "Version 40: styled SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 192, "batch": 4, "mean": 1307285.16, "median": 1255000, "p75": 1313750, "p99": 1933050.01, "min": 1200000, "max": 1953750, "hz": 796.81, "rme": 1.53}
+        },
+        {
+          "id": "svg/circle-v40",
+          "title": "Version 40: circle SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 131, "batch": 4, "mean": 1917299.62, "median": 1833750, "p75": 2001250, "p99": 2852875, "min": 1771249.99, "max": 2966249.99, "hz": 545.33, "rme": 1.69}
+        },
+        {
+          "id": "svg/center-image-v40",
+          "title": "Version 40: styled SVG with a center image",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling",
+            "center-image"
+          ],
+          "target": "browser",
+          "stats": {"samples": 104, "batch": 8, "mean": 1208894.23, "median": 1177187.5, "p75": 1224062.5, "p99": 1757125, "min": 1109375, "max": 1764375, "hz": 849.48, "rme": 1.74}
+        },
+        {
+          "id": "text/blocks-v40",
+          "title": "Version 40: compact terminal text",
+          "group": "renderers",
+          "features": [
+            "text"
+          ],
+          "target": "browser",
+          "stats": {"samples": 107, "batch": 18, "mean": 519730.01, "median": 508055.55, "p75": 528888.89, "p99": 805272.22, "min": 458888.89, "max": 862777.78, "hz": 1968.29, "rme": 2.43}
+        },
+        {
+          "id": "end-to-end/url-svg",
+          "title": "URL to SVG",
+          "group": "renderers",
+          "features": [
+            "matrix",
+            "svg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 125, "batch": 54, "mean": 148730.37, "median": 148425.93, "p75": 149444.44, "p99": 161325.93, "min": 145277.78, "max": 172777.78, "hz": 6737.37, "rme": 0.39}
+        },
+        {
+          "id": "end-to-end/url-styled-svg",
+          "title": "URL to styled SVG with a center image",
+          "group": "renderers",
+          "features": [
+            "matrix",
+            "svg",
+            "styling",
+            "center-image"
+          ],
+          "target": "browser",
+          "stats": {"samples": 292, "batch": 19, "mean": 180250.54, "median": 178421.05, "p75": 183684.21, "p99": 211147.37, "min": 169473.68, "max": 216315.79, "hz": 5604.72, "rme": 0.47}
+        },
+        {
+          "id": "encoder/jpeg-gray-v1",
+          "title": "Version 1: JPEG encoder, grayscale pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 75, "batch": 10, "mean": 1337500, "median": 1300000, "p75": 1366500, "p99": 1844590, "min": 1191500, "max": 2027000, "hz": 769.23, "rme": 2.3}
+        },
+        {
+          "id": "encoder/jpeg-color-v1",
+          "title": "Version 1: JPEG encoder, color pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 767, "batch": 1, "mean": 1304445.89, "median": 1289999.99, "p75": 1319999.99, "p99": 1544999.99, "min": 1210000.01, "max": 1685000, "hz": 775.19, "rme": 0.34}
+        },
+        {
+          "id": "encoder/webp-v1",
+          "title": "Version 1: WebP encoder",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "browser",
+          "stats": {"samples": 159, "batch": 13, "mean": 485493.47, "median": 489230.77, "p75": 508846.15, "p99": 583315.39, "min": 377307.69, "max": 693461.54, "hz": 2044.03, "rme": 1.38}
+        },
+        {
+          "id": "encoder/gif-v1",
+          "title": "Version 1: GIF encoder",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "browser",
+          "stats": {"samples": 91, "batch": 22, "mean": 503064.44, "median": 475454.54, "p75": 540454.55, "p99": 651727.27, "min": 436818.18, "max": 679545.45, "hz": 2103.25, "rme": 2.32}
+        },
+        {
+          "id": "encoder/jpeg-gray-v10",
+          "title": "Version 10: JPEG encoder, grayscale pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 157, "batch": 1, "mean": 6371114.65, "median": 6305000.01, "p75": 6415000.02, "p99": 7628199.99, "min": 6065000, "max": 10150000.01, "hz": 158.6, "rme": 0.95}
+        },
+        {
+          "id": "encoder/jpeg-color-v10",
+          "title": "Version 10: JPEG encoder, color pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 148, "batch": 1, "mean": 6775878.38, "median": 6697499.99, "p75": 6849999.99, "p99": 7639800.01, "min": 6545000.02, "max": 8185000, "hz": 149.31, "rme": 0.55}
+        },
+        {
+          "id": "encoder/webp-v10",
+          "title": "Version 10: WebP encoder",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "browser",
+          "stats": {"samples": 122, "batch": 5, "mean": 1647573.77, "median": 1731000, "p75": 1785750, "p99": 1861850, "min": 1331000, "max": 1873000, "hz": 577.7, "rme": 1.67}
+        },
+        {
+          "id": "encoder/gif-v10",
+          "title": "Version 10: GIF encoder",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "browser",
+          "stats": {"samples": 112, "batch": 4, "mean": 2252354.91, "median": 2155625, "p75": 2189375, "p99": 3344887.5, "min": 2047500, "max": 3533750, "hz": 463.9, "rme": 2.43}
+        },
+        {
+          "id": "encoder/jpeg-gray-v40",
+          "title": "Version 40: JPEG encoder, grayscale pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 20, "batch": 1, "mean": 51913000, "median": 51657500, "p75": 52735000, "p99": 54096749.99, "min": 50734999.98, "max": 54130000, "hz": 19.36, "rme": 0.88}
+        },
+        {
+          "id": "encoder/jpeg-color-v40",
+          "title": "Version 40: JPEG encoder, color pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 20, "batch": 1, "mean": 57236000, "median": 57054999.99, "p75": 57581250, "p99": 58825950.01, "min": 56405000, "max": 59015000.02, "hz": 17.53, "rme": 0.48}
+        },
+        {
+          "id": "encoder/webp-v40",
+          "title": "Version 40: WebP encoder",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "browser",
+          "stats": {"samples": 62, "batch": 1, "mean": 16153548.39, "median": 15899999.99, "p75": 16448749.99, "p99": 21488600, "min": 14729999.99, "max": 23770000.01, "hz": 62.89, "rme": 2.27}
+        },
+        {
+          "id": "encoder/gif-v40",
+          "title": "Version 40: GIF encoder",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "browser",
+          "stats": {"samples": 91, "batch": 1, "mean": 11064450.55, "median": 10920000.02, "p75": 11099999.99, "p99": 13294500, "min": 10665000.02, "max": 15944999.99, "hz": 91.58, "rme": 1.15}
+        },
+        {
+          "id": "canvas/plain-v1",
+          "title": "Version 1: canvas",
+          "group": "browser",
+          "features": [
+            "canvas"
+          ],
+          "target": "browser",
+          "stats": {"samples": 94, "batch": 104, "mean": 102748.06, "median": 86250, "p75": 122271.63, "p99": 226863.46, "min": 68221.15, "max": 243317.31, "hz": 11594.2, "rme": 7.25}
+        },
+        {
+          "id": "canvas/styled-v1",
+          "title": "Version 1: styled canvas",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 70, "batch": 94, "mean": 153810.03, "median": 165132.98, "p75": 175651.6, "p99": 190147.87, "min": 119574.47, "max": 191542.55, "hz": 6055.73, "rme": 3.82}
+        },
+        {
+          "id": "image/png-v1",
+          "title": "Version 1: PNG image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "png"
+          ],
+          "target": "browser",
+          "stats": {"samples": 1000, "batch": 1, "mean": 309050, "median": 255000, "p75": 275000.01, "p99": 905300, "min": 220000, "max": 22755000, "hz": 3921.57, "rme": 15.76}
+        },
+        {
+          "id": "image/webp-v1",
+          "title": "Version 1: WEBP image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "webp"
+          ],
+          "target": "browser",
+          "stats": {"samples": 1000, "batch": 1, "mean": 762065, "median": 669999.99, "p75": 786250, "p99": 2295299.99, "min": 359999.98, "max": 13020000.01, "hz": 1492.54, "rme": 4.96}
+        },
+        {
+          "id": "image/gif-v1",
+          "title": "Version 1: GIF image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "gif"
+          ],
+          "target": "browser",
+          "stats": {"samples": 85, "batch": 16, "mean": 735474.26, "median": 758750, "p75": 805312.5, "p99": 887925, "min": 606875, "max": 893437.5, "hz": 1317.96, "rme": 2.46}
+        },
+        {
+          "id": "image/jpeg-v1",
+          "title": "Version 1: JPEG image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 97, "batch": 12, "mean": 862212.2, "median": 802500, "p75": 869583.33, "p99": 1389350, "min": 730416.67, "max": 2033750, "hz": 1246.11, "rme": 3.88}
+        },
+        {
+          "id": "canvas/plain-v10",
+          "title": "Version 10: canvas",
+          "group": "browser",
+          "features": [
+            "canvas"
+          ],
+          "target": "browser",
+          "stats": {"samples": 84, "batch": 32, "mean": 374990.7, "median": 381562.5, "p75": 410039.06, "p99": 576543.75, "min": 286562.5, "max": 649687.5, "hz": 2620.8, "rme": 3.75}
+        },
+        {
+          "id": "canvas/styled-v10",
+          "title": "Version 10: styled canvas",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 72, "batch": 16, "mean": 870711.81, "median": 807500, "p75": 986484.38, "p99": 1047034.37, "min": 737812.5, "max": 1051250, "hz": 1238.39, "rme": 2.81}
+        },
+        {
+          "id": "image/png-v10",
+          "title": "Version 10: PNG image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "png"
+          ],
+          "target": "browser",
+          "stats": {"samples": 96, "batch": 10, "mean": 1042510.42, "median": 985250, "p75": 1059375, "p99": 1346000, "min": 899000, "max": 1355500, "hz": 1014.97, "rme": 2.63}
+        },
+        {
+          "id": "image/webp-v10",
+          "title": "Version 10: WEBP image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "webp"
+          ],
+          "target": "browser",
+          "stats": {"samples": 310, "batch": 1, "mean": 3229580.65, "median": 2834999.98, "p75": 3165000.01, "p99": 5480500.01, "min": 2634999.99, "max": 8575000.02, "hz": 352.73, "rme": 3.08}
+        },
+        {
+          "id": "image/gif-v10",
+          "title": "Version 10: GIF image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "gif"
+          ],
+          "target": "browser",
+          "stats": {"samples": 308, "batch": 1, "mean": 3255357.14, "median": 2974999.99, "p75": 3220000, "p99": 5954400.01, "min": 2584999.98, "max": 6454999.98, "hz": 336.13, "rme": 2.45}
+        },
+        {
+          "id": "image/jpeg-v10",
+          "title": "Version 10: JPEG image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 237, "batch": 1, "mean": 4221371.31, "median": 4065000, "p75": 4295000.02, "p99": 6744200, "min": 3590000, "max": 11584999.98, "hz": 246, "rme": 2.51}
+        },
+        {
+          "id": "canvas/plain-v40",
+          "title": "Version 40: canvas",
+          "group": "browser",
+          "features": [
+            "canvas"
+          ],
+          "target": "browser",
+          "stats": {"samples": 318, "batch": 1, "mean": 3157468.55, "median": 2694999.99, "p75": 2925000, "p99": 6192050.01, "min": 2455000.01, "max": 6740000.01, "hz": 371.06, "rme": 3.61}
+        },
+        {
+          "id": "canvas/styled-v40",
+          "title": "Version 40: styled canvas",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "styling"
+          ],
+          "target": "browser",
+          "stats": {"samples": 115, "batch": 1, "mean": 8817347.83, "median": 8155000, "p75": 8595000, "p99": 14459300.01, "min": 7310000, "max": 15990000.01, "hz": 122.62, "rme": 4.21}
+        },
+        {
+          "id": "image/png-v40",
+          "title": "Version 40: PNG image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "png"
+          ],
+          "target": "browser",
+          "stats": {"samples": 102, "batch": 1, "mean": 9821666.67, "median": 9310000, "p75": 9779999.99, "p99": 13116850, "min": 8755000, "max": 13620000, "hz": 107.41, "rme": 2.45}
+        },
+        {
+          "id": "image/webp-v40",
+          "title": "Version 40: WEBP image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "webp"
+          ],
+          "target": "browser",
+          "stats": {"samples": 42, "batch": 1, "mean": 24174047.62, "median": 24315000.01, "p75": 25061250, "p99": 25939150, "min": 22810000, "max": 26015000.02, "hz": 41.13, "rme": 1.29}
+        },
+        {
+          "id": "image/gif-v40",
+          "title": "Version 40: GIF image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "gif"
+          ],
+          "target": "browser",
+          "stats": {"samples": 49, "batch": 1, "mean": 20668265.3, "median": 20304999.98, "p75": 21880000, "p99": 24266400.01, "min": 18549999.98, "max": 24420000.02, "hz": 49.25, "rme": 2.33}
+        },
+        {
+          "id": "image/jpeg-v40",
+          "title": "Version 40: JPEG image element",
+          "group": "browser",
+          "features": [
+            "canvas",
+            "jpeg"
+          ],
+          "target": "browser",
+          "stats": {"samples": 25, "batch": 1, "mean": 40715400, "median": 40925000.01, "p75": 41669999.99, "p99": 48163999.99, "min": 38049999.98, "max": 49039999.99, "hz": 24.43, "rme": 2.41}
+        },
+        {
+          "id": "end-to-end/url-canvas",
+          "title": "URL to canvas",
+          "group": "browser",
+          "features": [
+            "matrix",
+            "canvas"
+          ],
+          "target": "browser",
+          "stats": {"samples": 76, "batch": 38, "mean": 348388.16, "median": 352236.84, "p75": 379375, "p99": 524243.42, "min": 288684.21, "max": 531842.1, "hz": 2839, "rme": 3.51}
+        },
+        {
+          "id": "explain/url/explanation",
+          "title": "short URL, version 2: explanation, trace off",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 83, "batch": 54, "mean": 223168.23, "median": 220277.78, "p75": 223009.26, "p99": 274257.41, "min": 215000, "max": 297870.37, "hz": 4539.72, "rme": 1.11}
+        },
+        {
+          "id": "explain/url/with-trace",
+          "title": "short URL, version 2: explanation and trace",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 68, "batch": 40, "mean": 368338.24, "median": 366750, "p75": 370281.25, "p99": 393735, "min": 359250, "max": 396750, "hz": 2726.65, "rme": 0.44}
+        },
+        {
+          "id": "explain/url/trace",
+          "title": "short URL, version 2: trace analysis only",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 230, "batch": 34, "mean": 128273.02, "median": 126838.24, "p75": 129522.06, "p99": 144933.82, "min": 122794.12, "max": 152941.18, "hz": 7884.06, "rme": 0.48}
+        },
+        {
+          "id": "explain/kanji/explanation",
+          "title": "mixed segments with Kanji: explanation, trace off",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 82, "batch": 40, "mean": 308022.87, "median": 304437.5, "p75": 308718.75, "p99": 379398.75, "min": 299000, "max": 389625, "hz": 3284.75, "rme": 0.96}
+        },
+        {
+          "id": "explain/kanji/with-trace",
+          "title": "mixed segments with Kanji: explanation and trace",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 81, "batch": 24, "mean": 518778.29, "median": 516041.67, "p75": 520833.33, "p99": 594583.33, "min": 506875, "max": 600416.67, "hz": 1937.83, "rme": 0.57}
+        },
+        {
+          "id": "explain/kanji/trace",
+          "title": "mixed segments with Kanji: trace analysis only",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 178, "batch": 30, "mean": 188492.51, "median": 186166.67, "p75": 190000, "p99": 226086.67, "min": 179500, "max": 246000, "hz": 5371.53, "rme": 0.72}
+        },
+        {
+          "id": "explain/v40/explanation",
+          "title": "version 40-L, 2000 bytes: explanation, trace off",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 81, "batch": 1, "mean": 12459814.81, "median": 11585000.01, "p75": 13115000.01, "p99": 18113999.98, "min": 11044999.99, "max": 23210000.01, "hz": 86.32, "rme": 3.32}
+        },
+        {
+          "id": "explain/v40/with-trace",
+          "title": "version 40-L, 2000 bytes: explanation and trace",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 53, "batch": 1, "mean": 19073301.89, "median": 18414999.99, "p75": 19270000.01, "p99": 24319000.02, "min": 18170000.02, "max": 25320000.02, "hz": 54.3, "rme": 2.09}
+        },
+        {
+          "id": "explain/v40/trace",
+          "title": "version 40-L, 2000 bytes: trace analysis only",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 137, "batch": 1, "mean": 7345000, "median": 7204999.98, "p75": 7410000, "p99": 8307799.99, "min": 7090000, "max": 8675000.01, "hz": 138.79, "rme": 0.69}
+        },
+        {
+          "id": "explain/micro/explanation",
+          "title": "Micro QR M3: explanation, trace off",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 80, "batch": 224, "mean": 56401.51, "median": 55468.75, "p75": 56618.3, "p99": 67058.04, "min": 54040.18, "max": 67410.71, "hz": 18028.17, "rme": 1.03}
+        },
+        {
+          "id": "explain/micro/with-trace",
+          "title": "Micro QR M3: explanation and trace",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 86, "batch": 144, "mean": 81121.61, "median": 79513.89, "p75": 84088.54, "p99": 93383.68, "min": 76875, "max": 101736.11, "hz": 12576.42, "rme": 1.06}
+        },
+        {
+          "id": "explain/micro/trace",
+          "title": "Micro QR M3: trace analysis only",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "browser",
+          "stats": {"samples": 72, "batch": 532, "mean": 26277.15, "median": 26203.01, "p75": 26296.99, "p99": 28488.53, "min": 25770.68, "max": 28768.8, "hz": 38163.56, "rme": 0.42}
+        }
+      ]
+    },
+    {
+      "target": "node",
+      "environment": {"os": "Linux 7.2.11-200.fc44.x86_64 x64", "cpu": "AMD Ryzen 7 3700X 8-Core Processor", "cores": 16, "memoryGB": 31, "node": "v26.13.1"},
+      "workloads": [
+        {
+          "id": "matrix/url",
+          "title": "URL, automatic version and mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 122, "batch": 59, "mean": 139479, "median": 137547.42, "p75": 143259.82, "p99": 160166.74, "min": 129021.31, "max": 180148.98, "hz": 7270.22, "rme": 0.99}
+        },
+        {
+          "id": "matrix/fixed-v1",
+          "title": "Version 1, fixed mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 75, "batch": 2652, "mean": 5054.71, "median": 4887.79, "p75": 5206.54, "p99": 8326.92, "min": 4481.49, "max": 8610.93, "hz": 204591.41, "rme": 2.98}
+        },
+        {
+          "id": "matrix/auto-mask-v1",
+          "title": "Version 1, automatic mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 89, "batch": 322, "mean": 35245.43, "median": 34495.53, "p75": 36850.24, "p99": 43621.13, "min": 32088.69, "max": 44436.17, "hz": 28989.26, "rme": 1.64}
+        },
+        {
+          "id": "matrix/auto-version-v1",
+          "title": "Version 1 payload, automatic version and mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 116, "batch": 252, "mean": 34202.27, "median": 33805.54, "p75": 35034.9, "p99": 41322.49, "min": 31858.56, "max": 44858.03, "hz": 29580.95, "rme": 1.28}
+        },
+        {
+          "id": "matrix/fixed-v10",
+          "title": "Version 10, fixed mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 87, "batch": 260, "mean": 44355.88, "median": 44039.25, "p75": 45260.89, "p99": 49722.29, "min": 42193.7, "max": 58029.23, "hz": 22707.02, "rme": 0.95}
+        },
+        {
+          "id": "matrix/auto-mask-v10",
+          "title": "Version 10, automatic mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 92, "batch": 24, "mean": 453416.47, "median": 450322.54, "p75": 460562.56, "p99": 494649.05, "min": 434974.54, "max": 506888.21, "hz": 2220.63, "rme": 0.64}
+        },
+        {
+          "id": "matrix/auto-version-v10",
+          "title": "Version 10 payload, automatic version and mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 92, "batch": 24, "mean": 457184.57, "median": 452110.25, "p75": 458996.33, "p99": 524907.13, "min": 434968.75, "max": 583426.08, "hz": 2211.85, "rme": 0.92}
+        },
+        {
+          "id": "matrix/fixed-v40",
+          "title": "Version 40, fixed mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 96, "batch": 22, "mean": 476244.92, "median": 469968.14, "p75": 478580.68, "p99": 606914.25, "min": 449503, "max": 709705.64, "hz": 2127.8, "rme": 1.4}
+        },
+        {
+          "id": "matrix/auto-mask-v40",
+          "title": "Version 40, automatic mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 222, "batch": 1, "mean": 4522673.78, "median": 4436936, "p75": 4581811.25, "p99": 5467752.9, "min": 4326200, "max": 6488580, "hz": 225.38, "rme": 0.69}
+        },
+        {
+          "id": "matrix/auto-version-v40",
+          "title": "Version 40 payload, automatic version and mask",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 220, "batch": 1, "mean": 4549688.49, "median": 4463966, "p75": 4596633.75, "p99": 5316479.9, "min": 4368431, "max": 7739947, "hz": 224.02, "rme": 0.79}
+        },
+        {
+          "id": "matrix/mask-0-v20",
+          "title": "Version 20, mask 0",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 88, "batch": 91, "mean": 126172.47, "median": 124348.77, "p75": 126505.58, "p99": 160754.03, "min": 119699.8, "max": 163562.42, "hz": 8041.9, "rme": 1.09}
+        },
+        {
+          "id": "matrix/mask-1-v20",
+          "title": "Version 20, mask 1",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 87, "batch": 92, "mean": 125474.99, "median": 123932, "p75": 126319.24, "p99": 162461.16, "min": 119233.07, "max": 164197.62, "hz": 8068.94, "rme": 1.18}
+        },
+        {
+          "id": "matrix/mask-2-v20",
+          "title": "Version 20, mask 2",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 93, "batch": 87, "mean": 124357.73, "median": 122619.89, "p75": 125040.82, "p99": 168119.66, "min": 117333.31, "max": 176472.56, "hz": 8155.28, "rme": 1.27}
+        },
+        {
+          "id": "matrix/mask-3-v20",
+          "title": "Version 20, mask 3",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 93, "batch": 76, "mean": 142803.22, "median": 141124.88, "p75": 142868.7, "p99": 185913.6, "min": 134454.32, "max": 196228.43, "hz": 7085.92, "rme": 1.12}
+        },
+        {
+          "id": "matrix/mask-4-v20",
+          "title": "Version 20, mask 4",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 82, "batch": 87, "mean": 141550.65, "median": 140326.81, "p75": 141281.61, "p99": 183381.8, "min": 137387.2, "max": 183944.9, "hz": 7126.22, "rme": 1.04}
+        },
+        {
+          "id": "matrix/mask-5-v20",
+          "title": "Version 20, mask 5",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 108, "batch": 64, "mean": 144834.36, "median": 140761.52, "p75": 143047.74, "p99": 234457.31, "min": 135120.94, "max": 242502.86, "hz": 7104.21, "rme": 2.12}
+        },
+        {
+          "id": "matrix/mask-6-v20",
+          "title": "Version 20, mask 6",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 78, "batch": 88, "mean": 145770.6, "median": 143879.72, "p75": 145488.5, "p99": 183300.79, "min": 140604.53, "max": 185377.35, "hz": 6950.25, "rme": 1.1}
+        },
+        {
+          "id": "matrix/mask-7-v20",
+          "title": "Version 20, mask 7",
+          "group": "matrix",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 77, "batch": 90, "mean": 145166.41, "median": 143430.46, "p75": 145618.34, "p99": 184581.46, "min": 138835.88, "max": 185118.88, "hz": 6972.02, "rme": 1.18}
+        },
+        {
+          "id": "stages/resolve-options-v1",
+          "title": "Version 1: resolve options",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 76, "batch": 136216, "mean": 97.14, "median": 96.87, "p75": 97.57, "p99": 100.53, "min": 95.31, "max": 100.57, "hz": 10323086.79, "rme": 0.23}
+        },
+        {
+          "id": "stages/codewords-v1",
+          "title": "Version 1: codewords and error correction",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 56, "batch": 15006, "mean": 1191.97, "median": 1164.26, "p75": 1196.2, "p99": 1393.76, "min": 1139.33, "max": 1395.68, "hz": 858911.38, "rme": 1.37}
+        },
+        {
+          "id": "stages/base-matrix-v1",
+          "title": "Version 1: copy cached base matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 37, "batch": 30726, "mean": 889.6, "median": 888.78, "p75": 899.66, "p99": 948.56, "min": 850.84, "max": 954.06, "hz": 1125139.28, "rme": 0.84}
+        },
+        {
+          "id": "stages/fill-data-v1",
+          "title": "Version 1: fill data",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 86, "batch": 12368, "mean": 946.31, "median": 945.6, "p75": 955.35, "p99": 989.72, "min": 910.3, "max": 1018.79, "hz": 1057525.61, "rme": 0.34}
+        },
+        {
+          "id": "stages/apply-mask-v1",
+          "title": "Version 1: apply mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 102, "batch": 64960, "mean": 151.69, "median": 151.58, "p75": 154.24, "p99": 168.05, "min": 144.93, "max": 204.18, "hz": 6596972.27, "rme": 0.88}
+        },
+        {
+          "id": "stages/evaluate-mask-v1",
+          "title": "Version 1: score a mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 85, "batch": 4547, "mean": 2588.83, "median": 2607.81, "p75": 2632.34, "p99": 2723.57, "min": 2465.08, "max": 2724.08, "hz": 383464.04, "rme": 0.52}
+        },
+        {
+          "id": "stages/fill-format-v1",
+          "title": "Version 1: fill format information",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 120, "batch": 269629, "mean": 30.91, "median": 30.85, "p75": 31.1, "p99": 33.27, "min": 29.88, "max": 35.28, "hz": 32412865.68, "rme": 0.37}
+        },
+        {
+          "id": "stages/assemble-v1",
+          "title": "Version 1: assemble matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 74, "batch": 3808, "mean": 3587.34, "median": 3412.29, "p75": 3972.88, "p99": 5584.15, "min": 2929.58, "max": 5920.2, "hz": 293058.53, "rme": 3.85}
+        },
+        {
+          "id": "stages/resolve-options-v10",
+          "title": "Version 10: resolve options",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 105, "batch": 24510, "mean": 390.87, "median": 385.91, "p75": 393.11, "p99": 455.5, "min": 380.08, "max": 461.39, "hz": 2591261.08, "rme": 0.67}
+        },
+        {
+          "id": "stages/codewords-v10",
+          "title": "Version 10: codewords and error correction",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 102, "batch": 446, "mean": 22038.12, "median": 22027.47, "p75": 22354.44, "p99": 24465.17, "min": 20661.13, "max": 26472.84, "hz": 45397.86, "rme": 0.68}
+        },
+        {
+          "id": "stages/base-matrix-v10",
+          "title": "Version 10: copy cached base matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 110, "batch": 6986, "mean": 1308.82, "median": 1207.68, "p75": 1989.23, "p99": 2462.13, "min": 632.14, "max": 2514.46, "hz": 828036.66, "rme": 8.49}
+        },
+        {
+          "id": "stages/fill-data-v10",
+          "title": "Version 10: fill data",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 131, "batch": 868, "mean": 8827.88, "median": 8121.32, "p75": 8169.25, "p99": 12196.23, "min": 8015.14, "max": 12805.42, "hz": 123132.72, "rme": 2.99}
+        },
+        {
+          "id": "stages/apply-mask-v10",
+          "title": "Version 10: apply mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 94, "batch": 9257, "mean": 1154.64, "median": 1154.31, "p75": 1158.39, "p99": 1182.78, "min": 1133.2, "max": 1369.71, "hz": 866320.57, "rme": 0.42}
+        },
+        {
+          "id": "stages/evaluate-mask-v10",
+          "title": "Version 10: score a mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 75, "batch": 728, "mean": 18550.16, "median": 18679.5, "p75": 18846.52, "p99": 19246.9, "min": 17986.34, "max": 19876.76, "hz": 53534.63, "rme": 0.45}
+        },
+        {
+          "id": "stages/fill-format-v10",
+          "title": "Version 10: fill format information",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 104, "batch": 298631, "mean": 32.46, "median": 30.65, "p75": 31.23, "p99": 55.55, "min": 29.99, "max": 59, "hz": 32626452.89, "rme": 3.19}
+        },
+        {
+          "id": "stages/assemble-v10",
+          "title": "Version 10: assemble matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 76, "batch": 620, "mean": 21327.67, "median": 20944.39, "p75": 21405.21, "p99": 25744.64, "min": 20239.01, "max": 29382.15, "hz": 47745.48, "rme": 1.3}
+        },
+        {
+          "id": "stages/resolve-options-v40",
+          "title": "Version 40: resolve options",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 70, "batch": 4296, "mean": 3350.58, "median": 3339.96, "p75": 3360.37, "p99": 3501.59, "min": 3284.61, "max": 3578.43, "hz": 299404.91, "rme": 0.31}
+        },
+        {
+          "id": "stages/codewords-v40",
+          "title": "Version 40: codewords and error correction",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 64, "batch": 60, "mean": 262558.58, "median": 259861.31, "p75": 266079.46, "p99": 320897.15, "min": 243053.63, "max": 324709.2, "hz": 3848.21, "rme": 1.38}
+        },
+        {
+          "id": "stages/base-matrix-v40",
+          "title": "Version 40: copy cached base matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 210, "batch": 1000, "mean": 4769.48, "median": 5033.41, "p75": 5347.71, "p99": 6458.7, "min": 3314.38, "max": 6668.65, "hz": 198672.55, "rme": 2.39}
+        },
+        {
+          "id": "stages/fill-data-v40",
+          "title": "Version 40: fill data",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 75, "batch": 112, "mean": 120373.13, "median": 120236.11, "p75": 120655.39, "p99": 125224.5, "min": 118665.29, "max": 133527.86, "hz": 8316.97, "rme": 0.31}
+        },
+        {
+          "id": "stages/apply-mask-v40",
+          "title": "Version 40: apply mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 108, "batch": 507, "mean": 18341.2, "median": 23460.69, "p75": 23677.61, "p99": 24824.2, "min": 11523.89, "max": 24965.76, "hz": 42624.49, "rme": 6.22}
+        },
+        {
+          "id": "stages/evaluate-mask-v40",
+          "title": "Version 40: score a mask",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 87, "batch": 62, "mean": 187320.62, "median": 186884.73, "p75": 190057.02, "p99": 203343.65, "min": 178559.71, "max": 203779.19, "hz": 5350.89, "rme": 0.6}
+        },
+        {
+          "id": "stages/fill-format-v40",
+          "title": "Version 40: fill format information",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 116, "batch": 292340, "mean": 29.59, "median": 28.64, "p75": 29.83, "p99": 36.41, "min": 28.04, "max": 39.17, "hz": 34911141.63, "rme": 1.21}
+        },
+        {
+          "id": "stages/assemble-v40",
+          "title": "Version 40: assemble matrix",
+          "group": "matrix-stages",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 87, "batch": 52, "mean": 222694.02, "median": 219901.81, "p75": 223681.43, "p99": 299593.88, "min": 207599.79, "max": 318210.98, "hz": 4547.48, "rme": 1.51}
+        },
+        {
+          "id": "modes/numeric",
+          "title": "Numeric mode, version 10",
+          "group": "modes",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 90, "batch": 230, "mean": 48734.27, "median": 48476.36, "p75": 49474.99, "p99": 59389.56, "min": 46075.95, "max": 59951.16, "hz": 20628.61, "rme": 0.9}
+        },
+        {
+          "id": "modes/alphanumeric",
+          "title": "Alphanumeric mode, version 10",
+          "group": "modes",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 108, "batch": 210, "mean": 44403.88, "median": 43711.24, "p75": 45714.38, "p99": 54524.88, "min": 41802.09, "max": 54663.02, "hz": 22877.41, "rme": 0.99}
+        },
+        {
+          "id": "modes/octet",
+          "title": "Octet mode, version 10",
+          "group": "modes",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 90, "batch": 238, "mean": 47092.6, "median": 46200.32, "p75": 48157.54, "p99": 63421.89, "min": 44144.57, "max": 64874.77, "hz": 21644.87, "rme": 1.51}
+        },
+        {
+          "id": "modes/kanji",
+          "title": "Kanji mode, version 10",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "kanji"
+          ],
+          "target": "node",
+          "stats": {"samples": 98, "batch": 238, "mean": 42999.84, "median": 42439.18, "p75": 43383.45, "p99": 55185.89, "min": 39043.71, "max": 55734.72, "hz": 23563.13, "rme": 1.57}
+        },
+        {
+          "id": "segmenter/short/segments",
+          "title": "short payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "node",
+          "stats": {"samples": 55, "batch": 4152, "mean": 4453.24, "median": 4443.61, "p75": 4517.41, "p99": 4710.78, "min": 4196.69, "max": 4711.65, "hz": 225042.33, "rme": 0.72}
+        },
+        {
+          "id": "segmenter/short/auto-single",
+          "title": "short payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode"
+          ],
+          "target": "node",
+          "stats": {"samples": 76, "batch": 2348, "mean": 5641.48, "median": 5430.61, "p75": 5808.34, "p99": 8070.96, "min": 5056.4, "max": 8425.23, "hz": 184141.33, "rme": 2.55}
+        },
+        {
+          "id": "segmenter/short/auto-mixed",
+          "title": "short payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "node",
+          "stats": {"samples": 75, "batch": 1552, "mean": 8610.19, "median": 8438.44, "p75": 8558.97, "p99": 12905.96, "min": 7929.13, "max": 14593.39, "hz": 118505.37, "rme": 2.48}
+        },
+        {
+          "id": "segmenter/numeric/segments",
+          "title": "numeric payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "node",
+          "stats": {"samples": 112, "batch": 16678, "mean": 535.76, "median": 533.28, "p75": 536.4, "p99": 583.14, "min": 526.89, "max": 586.26, "hz": 1875196.97, "rme": 0.31}
+        },
+        {
+          "id": "segmenter/numeric/auto-single",
+          "title": "numeric payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode"
+          ],
+          "target": "node",
+          "stats": {"samples": 84, "batch": 114, "mean": 104789.7, "median": 103894.08, "p75": 104709.29, "p99": 134445.97, "min": 101429.6, "max": 134625.66, "hz": 9625.19, "rme": 1}
+        },
+        {
+          "id": "segmenter/numeric/auto-mixed",
+          "title": "numeric payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "node",
+          "stats": {"samples": 81, "batch": 112, "mean": 110790.48, "median": 109207.21, "p75": 111829.72, "p99": 142284.7, "min": 105238.44, "max": 144889.63, "hz": 9156.9, "rme": 1.19}
+        },
+        {
+          "id": "segmenter/mixed/segments",
+          "title": "mixed payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "node",
+          "stats": {"samples": 75, "batch": 1128, "mean": 11935.82, "median": 11855.98, "p75": 12084.89, "p99": 12934.24, "min": 11563.73, "max": 14006.81, "hz": 84345.63, "rme": 0.66}
+        },
+        {
+          "id": "segmenter/mixed/auto-single",
+          "title": "mixed payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode"
+          ],
+          "target": "node",
+          "stats": {"samples": 67, "batch": 1152, "mean": 12954.17, "median": 12498.42, "p75": 13361.56, "p99": 17786.08, "min": 11746.77, "max": 18178.86, "hz": 80010.12, "rme": 2.43}
+        },
+        {
+          "id": "segmenter/mixed/auto-mixed",
+          "title": "mixed payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "node",
+          "stats": {"samples": 118, "batch": 386, "mean": 21949.91, "median": 21402.86, "p75": 22111.34, "p99": 28727.2, "min": 20468.04, "max": 31467.84, "hz": 46722.72, "rme": 1.33}
+        },
+        {
+          "id": "segmenter/long/segments",
+          "title": "long payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "node",
+          "stats": {"samples": 176, "batch": 23, "mean": 247390.89, "median": 245347.02, "p75": 248146.68, "p99": 294151.09, "min": 239586.57, "max": 324403.09, "hz": 4075.86, "rme": 0.58}
+        },
+        {
+          "id": "segmenter/long/auto-single",
+          "title": "long payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode"
+          ],
+          "target": "node",
+          "stats": {"samples": 75, "batch": 56, "mean": 238899.65, "median": 237625.41, "p75": 239901.33, "p99": 307423.68, "min": 228087.7, "max": 311554.21, "hz": 4208.3, "rme": 1.2}
+        },
+        {
+          "id": "segmenter/long/auto-mixed",
+          "title": "long payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter"
+          ],
+          "target": "node",
+          "stats": {"samples": 1000, "batch": 1, "mean": 867872.25, "median": 785229.5, "p75": 887910, "p99": 1461047.6, "min": 733584, "max": 2111492, "hz": 1273.51, "rme": 1.31}
+        },
+        {
+          "id": "segmenter/kanji/segments",
+          "title": "kanji payload: segmentation only",
+          "group": "modes",
+          "features": [
+            "auto-mode",
+            "segmenter",
+            "kanji"
+          ],
+          "target": "node",
+          "stats": {"samples": 189, "batch": 662, "mean": 7996.73, "median": 7992.19, "p75": 8099.05, "p99": 8335.79, "min": 7651.42, "max": 8835.21, "hz": 125122.17, "rme": 0.29}
+        },
+        {
+          "id": "segmenter/kanji/auto-single",
+          "title": "kanji payload: automatic single mode",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "kanji"
+          ],
+          "target": "node",
+          "stats": {"samples": 61, "batch": 1352, "mean": 12164.54, "median": 12011.1, "p75": 12169.85, "p99": 15257.62, "min": 11642.79, "max": 17359.61, "hz": 83256.31, "rme": 1.57}
+        },
+        {
+          "id": "segmenter/kanji/auto-mixed",
+          "title": "kanji payload: automatic mixed modes",
+          "group": "modes",
+          "features": [
+            "matrix",
+            "auto-mode",
+            "segmenter",
+            "kanji"
+          ],
+          "target": "node",
+          "stats": {"samples": 133, "batch": 358, "mean": 21083.94, "median": 20568.08, "p75": 21395.37, "p99": 31308.81, "min": 19836.06, "max": 34390.08, "hz": 48619.04, "rme": 1.57}
+        },
+        {
+          "id": "symbols/qr-v1",
+          "title": "Standard QR, version 1 (for comparison)",
+          "group": "symbols",
+          "features": [
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 73, "batch": 350, "mean": 39722.3, "median": 37949.58, "p75": 42243.75, "p99": 51963.1, "min": 34463.68, "max": 52568.95, "hz": 26350.75, "rme": 2.66}
+        },
+        {
+          "id": "symbols/micro-m2-numeric",
+          "title": "Micro QR M2, numeric",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "micro"
+          ],
+          "target": "node",
+          "stats": {"samples": 151, "batch": 1041, "mean": 6388, "median": 5422.74, "p75": 7449.75, "p99": 11040.97, "min": 4644.52, "max": 11248.69, "hz": 184408.66, "rme": 4.5}
+        },
+        {
+          "id": "symbols/micro-m4-alphanumeric",
+          "title": "Micro QR M4, alphanumeric",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "micro"
+          ],
+          "target": "node",
+          "stats": {"samples": 90, "batch": 1360, "mean": 8185.68, "median": 7939.55, "p75": 8930.89, "p99": 11125.35, "min": 6952.44, "max": 12021.37, "hz": 125951.76, "rme": 2.79}
+        },
+        {
+          "id": "symbols/micro-m4-fixed-mask",
+          "title": "Micro QR M4, fixed mask",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "micro"
+          ],
+          "target": "node",
+          "stats": {"samples": 104, "batch": 2476, "mean": 3890.12, "median": 3547.3, "p75": 3991.77, "p99": 6355.82, "min": 3377.21, "max": 6649.58, "hz": 281904.41, "rme": 3.26}
+        },
+        {
+          "id": "symbols/rmqr-auto",
+          "title": "rMQR, automatic version",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "rmqr"
+          ],
+          "target": "node",
+          "stats": {"samples": 61, "batch": 3532, "mean": 4706.73, "median": 4486.49, "p75": 4864.18, "p99": 6970.34, "min": 4179.78, "max": 7750.26, "hz": 222891.6, "rme": 3.17}
+        },
+        {
+          "id": "symbols/rmqr-r17x139",
+          "title": "rMQR R17x139",
+          "group": "symbols",
+          "features": [
+            "matrix",
+            "rmqr"
+          ],
+          "target": "node",
+          "stats": {"samples": 84, "batch": 390, "mean": 30823.18, "median": 29609.33, "p75": 31076.13, "p99": 41114.31, "min": 27822.56, "max": 42706.98, "hz": 33773.14, "rme": 2.08}
+        },
+        {
+          "id": "payload/wifi",
+          "title": "Format a Wi-Fi payload",
+          "group": "payload",
+          "features": [
+            "payload"
+          ],
+          "target": "node",
+          "stats": {"samples": 94, "batch": 12104, "mean": 886.21, "median": 877.47, "p75": 888.6, "p99": 953.9, "min": 864.51, "max": 1003.62, "hz": 1139646.37, "rme": 0.49}
+        },
+        {
+          "id": "payload/vcard",
+          "title": "Format a vCard",
+          "group": "payload",
+          "features": [
+            "payload"
+          ],
+          "target": "node",
+          "stats": {"samples": 102, "batch": 1444, "mean": 6821.75, "median": 6832.69, "p75": 6893.48, "p99": 7029.51, "min": 6521.42, "max": 7116.11, "hz": 146355.24, "rme": 0.28}
+        },
+        {
+          "id": "payload/calendar",
+          "title": "Format a calendar event",
+          "group": "payload",
+          "features": [
+            "payload"
+          ],
+          "target": "node",
+          "stats": {"samples": 82, "batch": 1048, "mean": 11697.17, "median": 11608.38, "p75": 11823.32, "p99": 12656.05, "min": 11308.41, "max": 12695.21, "hz": 86144.7, "rme": 0.56}
+        },
+        {
+          "id": "payload/vcard-matrix",
+          "title": "vCard to matrix",
+          "group": "payload",
+          "features": [
+            "payload",
+            "matrix"
+          ],
+          "target": "node",
+          "stats": {"samples": 98, "batch": 22, "mean": 464170.61, "median": 462661.64, "p75": 468544.98, "p99": 489941.62, "min": 449869.77, "max": 500635.91, "hz": 2161.41, "rme": 0.42}
+        },
+        {
+          "id": "styling/setup-rounded-finder",
+          "title": "Create rounded shapes, finder, and styler",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 117, "batch": 122, "mean": 70327.31, "median": 61568.62, "p75": 83606.78, "p99": 102340.05, "min": 58293.69, "max": 129330.47, "hz": 16242.04, "rme": 3.56}
+        },
+        {
+          "id": "styling/setup-circle",
+          "title": "Create circle shape and styler",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 103, "batch": 1928, "mean": 5073.14, "median": 4493.01, "p75": 6271.13, "p99": 7379.91, "min": 4376.14, "max": 7806.23, "hz": 222567.82, "rme": 3.68}
+        },
+        {
+          "id": "styling/setup-custom-shape",
+          "title": "Parse a custom hexagon and create a styler",
+          "group": "styling",
+          "features": [
+            "styling",
+            "custom-shape"
+          ],
+          "target": "node",
+          "stats": {"samples": 71, "batch": 2204, "mean": 6391.61, "median": 6395.65, "p75": 6417.74, "p99": 6573.8, "min": 6270.73, "max": 6616.57, "hz": 156356.21, "rme": 0.22}
+        },
+        {
+          "id": "styling/setup-shared-shapes",
+          "title": "Create a styler from shared shapes",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 68, "batch": 87020, "mean": 169.3, "median": 168.53, "p75": 169.32, "p99": 180.41, "min": 165.89, "max": 184.12, "hz": 5933685.57, "rme": 0.42}
+        },
+        {
+          "id": "styling/draw-plain-v1",
+          "title": "Version 1: draw plain modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 58, "batch": 4332, "mean": 4024.8, "median": 3972.74, "p75": 4192.73, "p99": 4946.39, "min": 3702.24, "max": 5131.03, "hz": 251715.5, "rme": 1.81}
+        },
+        {
+          "id": "styling/draw-styled-v1",
+          "title": "Version 1: draw rounded modules and finder",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 78, "batch": 1896, "mean": 6836.83, "median": 6831.18, "p75": 6886.22, "p99": 6988.88, "min": 6706.19, "max": 6999.46, "hz": 146387.49, "rme": 0.23}
+        },
+        {
+          "id": "styling/draw-circle-v1",
+          "title": "Version 1: draw circle modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 104, "batch": 1516, "mean": 6344.77, "median": 6301.05, "p75": 6543.44, "p99": 7134.42, "min": 5934.48, "max": 7215.44, "hz": 158703.77, "rme": 0.88}
+        },
+        {
+          "id": "styling/draw-diagonal-v1",
+          "title": "Version 1: draw diagonal modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 66, "batch": 2452, "mean": 6209.21, "median": 6168.57, "p75": 6231.33, "p99": 6906.1, "min": 6048.24, "max": 7154.58, "hz": 162112.24, "rme": 0.65}
+        },
+        {
+          "id": "styling/draw-patterns-v1",
+          "title": "Version 1: draw finder and alignment patterns",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 59, "batch": 2104, "mean": 8070.97, "median": 7942.95, "p75": 8312.49, "p99": 10071.96, "min": 7407.18, "max": 10856.82, "hz": 125897.84, "rme": 1.73}
+        },
+        {
+          "id": "styling/draw-custom-v1",
+          "title": "Version 1: draw custom hexagons",
+          "group": "styling",
+          "features": [
+            "styling",
+            "custom-shape"
+          ],
+          "target": "node",
+          "stats": {"samples": 109, "batch": 1442, "mean": 6372.42, "median": 6328.38, "p75": 6432.37, "p99": 7083.45, "min": 5894.83, "max": 7910.38, "hz": 158018.2, "rme": 0.82}
+        },
+        {
+          "id": "styling/path-plain-v1",
+          "title": "Version 1: serialize plain path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 76, "batch": 5224, "mean": 2544.94, "median": 2504.98, "p75": 2546.81, "p99": 3118.14, "min": 2459.36, "max": 3648.06, "hz": 399205.04, "rme": 1.31}
+        },
+        {
+          "id": "styling/path-styled-v1",
+          "title": "Version 1: serialize styled path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 150, "batch": 834, "mean": 7992.16, "median": 7843.23, "p75": 8124.96, "p99": 10317.29, "min": 7470.83, "max": 11193.06, "hz": 127498.55, "rme": 1.04}
+        },
+        {
+          "id": "styling/draw-plain-v10",
+          "title": "Version 10: draw plain modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 69, "batch": 694, "mean": 21036.02, "median": 20892.13, "p75": 21453.42, "p99": 25853.14, "min": 18910.57, "max": 29997.13, "hz": 47864.91, "rme": 1.48}
+        },
+        {
+          "id": "styling/draw-styled-v10",
+          "title": "Version 10: draw rounded modules and finder",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 70, "batch": 290, "mean": 49414.1, "median": 48987.37, "p75": 50081.47, "p99": 60485.89, "min": 47017.16, "max": 66108.71, "hz": 20413.42, "rme": 1.2}
+        },
+        {
+          "id": "styling/draw-circle-v10",
+          "title": "Version 10: draw circle modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 84, "batch": 242, "mean": 49619.94, "median": 49223.95, "p75": 49740.26, "p99": 62382.86, "min": 47008.32, "max": 68909.68, "hz": 20315.31, "rme": 1.16}
+        },
+        {
+          "id": "styling/draw-diagonal-v10",
+          "title": "Version 10: draw diagonal modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 77, "batch": 296, "mean": 44141.71, "median": 43588.25, "p75": 44202.41, "p99": 57398.27, "min": 42432.87, "max": 58036.47, "hz": 22941.96, "rme": 1.25}
+        },
+        {
+          "id": "styling/draw-patterns-v10",
+          "title": "Version 10: draw finder and alignment patterns",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 84, "batch": 256, "mean": 46581.9, "median": 46152.95, "p75": 46815.64, "p99": 62429.37, "min": 43375, "max": 62626.99, "hz": 21667.09, "rme": 1.32}
+        },
+        {
+          "id": "styling/draw-custom-v10",
+          "title": "Version 10: draw custom hexagons",
+          "group": "styling",
+          "features": [
+            "styling",
+            "custom-shape"
+          ],
+          "target": "node",
+          "stats": {"samples": 83, "batch": 236, "mean": 51486.46, "median": 51029.73, "p75": 51823.61, "p99": 59631.51, "min": 48083.78, "max": 82025.24, "hz": 19596.42, "rme": 1.51}
+        },
+        {
+          "id": "styling/path-plain-v10",
+          "title": "Version 10: serialize plain path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 65, "batch": 1036, "mean": 14897.24, "median": 14743.61, "p75": 14851.43, "p99": 17554.39, "min": 14431.07, "max": 18990.44, "hz": 67825.98, "rme": 1.06}
+        },
+        {
+          "id": "styling/path-styled-v10",
+          "title": "Version 10: serialize styled path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 119, "batch": 116, "mean": 72789.69, "median": 70402.28, "p75": 75419.73, "p99": 94062.38, "min": 67841.75, "max": 115593.83, "hz": 14204.08, "rme": 1.44}
+        },
+        {
+          "id": "styling/draw-plain-v40",
+          "title": "Version 40: draw plain modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 84, "batch": 38, "mean": 314637.2, "median": 310967.79, "p75": 314463.07, "p99": 458814.04, "min": 286458.68, "max": 588880.37, "hz": 3215.77, "rme": 2.41}
+        },
+        {
+          "id": "styling/draw-styled-v40",
+          "title": "Version 40: draw rounded modules and finder",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 67, "batch": 24, "mean": 626174.2, "median": 614407.58, "p75": 623306.77, "p99": 900726.73, "min": 592586.58, "max": 984832.13, "hz": 1627.58, "rme": 2.15}
+        },
+        {
+          "id": "styling/draw-circle-v40",
+          "title": "Version 40: draw circle modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 106, "batch": 18, "mean": 525656.26, "median": 516575.92, "p75": 525444.14, "p99": 884366.81, "min": 484606, "max": 958303.06, "hz": 1935.82, "rme": 2.35}
+        },
+        {
+          "id": "styling/draw-diagonal-v40",
+          "title": "Version 40: draw diagonal modules",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 134, "batch": 12, "mean": 625326.57, "median": 612769.25, "p75": 629545.37, "p99": 936153.49, "min": 583358.25, "max": 1033370.75, "hz": 1631.94, "rme": 1.7}
+        },
+        {
+          "id": "styling/draw-patterns-v40",
+          "title": "Version 40: draw finder and alignment patterns",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 56, "batch": 32, "mean": 560552.9, "median": 556154.8, "p75": 560003.67, "p99": 724943.59, "min": 523558.5, "max": 761760.44, "hz": 1798.06, "rme": 1.91}
+        },
+        {
+          "id": "styling/draw-custom-v40",
+          "title": "Version 40: draw custom hexagons",
+          "group": "styling",
+          "features": [
+            "styling",
+            "custom-shape"
+          ],
+          "target": "node",
+          "stats": {"samples": 68, "batch": 28, "mean": 528615.7, "median": 512770.34, "p75": 526812.01, "p99": 800333.29, "min": 488429.82, "max": 859806.18, "hz": 1950.19, "rme": 2.61}
+        },
+        {
+          "id": "styling/path-plain-v40",
+          "title": "Version 40: serialize plain path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 113, "batch": 72, "mean": 123885.55, "median": 121977.9, "p75": 122610.4, "p99": 220331.36, "min": 117253.83, "max": 231183.36, "hz": 8198.21, "rme": 2.22}
+        },
+        {
+          "id": "styling/path-styled-v40",
+          "title": "Version 40: serialize styled path data",
+          "group": "styling",
+          "features": [
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 112, "batch": 12, "mean": 750019.5, "median": 743436.58, "p75": 774166.42, "p99": 977047.23, "min": 668137.92, "max": 1068147.58, "hz": 1345.1, "rme": 1.58}
+        },
+        {
+          "id": "svg/plain-v1",
+          "title": "Version 1: SVG, reused renderer",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "node",
+          "stats": {"samples": 56, "batch": 2650, "mean": 6798.43, "median": 6770.75, "p75": 6840.37, "p99": 7158.37, "min": 6576.79, "max": 7247.15, "hz": 147694.02, "rme": 0.44}
+        },
+        {
+          "id": "svg/fresh-v1",
+          "title": "Version 1: SVG, new renderer per call",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "node",
+          "stats": {"samples": 61, "batch": 2332, "mean": 7135.46, "median": 7034.39, "p75": 7273.5, "p99": 8571.61, "min": 6735.96, "max": 9277.25, "hz": 142158.8, "rme": 1.4}
+        },
+        {
+          "id": "svg/styled-v1",
+          "title": "Version 1: styled SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 72, "batch": 836, "mean": 16767.64, "median": 16590.22, "p75": 17036.22, "p99": 20106.61, "min": 15504.88, "max": 20407.49, "hz": 60276.46, "rme": 1.37}
+        },
+        {
+          "id": "svg/circle-v1",
+          "title": "Version 1: circle SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 103, "batch": 502, "mean": 19344.62, "median": 18831.5, "p75": 19992.99, "p99": 26115.19, "min": 17890.96, "max": 28940.46, "hz": 53102.51, "rme": 1.6}
+        },
+        {
+          "id": "svg/center-image-v1",
+          "title": "Version 1: styled SVG with a center image",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling",
+            "center-image"
+          ],
+          "target": "node",
+          "stats": {"samples": 84, "batch": 872, "mean": 13722.16, "median": 13505.88, "p75": 13934.37, "p99": 16459.6, "min": 13080.23, "max": 16506.66, "hz": 74041.81, "rme": 1.03}
+        },
+        {
+          "id": "text/blocks-v1",
+          "title": "Version 1: compact terminal text",
+          "group": "renderers",
+          "features": [
+            "text"
+          ],
+          "target": "node",
+          "stats": {"samples": 70, "batch": 1748, "mean": 8235.35, "median": 8182.53, "p75": 8243.87, "p99": 9058.38, "min": 8022.38, "max": 9716.84, "hz": 122211.58, "rme": 0.65}
+        },
+        {
+          "id": "svg/plain-v10",
+          "title": "Version 10: SVG, reused renderer",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "node",
+          "stats": {"samples": 75, "batch": 368, "mean": 36580.52, "median": 36360.91, "p75": 36949.92, "p99": 45777.32, "min": 33151.41, "max": 56880.56, "hz": 27502.06, "rme": 1.77}
+        },
+        {
+          "id": "svg/fresh-v10",
+          "title": "Version 10: SVG, new renderer per call",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "node",
+          "stats": {"samples": 76, "batch": 368, "mean": 36139.78, "median": 35619.46, "p75": 36229.25, "p99": 49824.87, "min": 33791.87, "max": 56797.3, "hz": 28074.54, "rme": 1.87}
+        },
+        {
+          "id": "svg/styled-v10",
+          "title": "Version 10: styled SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 93, "batch": 84, "mean": 128906.19, "median": 124863.79, "p75": 128978.93, "p99": 189769.4, "min": 120259.12, "max": 195419.65, "hz": 8008.73, "rme": 1.93}
+        },
+        {
+          "id": "svg/circle-v10",
+          "title": "Version 10: circle SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 140, "batch": 36, "mean": 198268.82, "median": 197677.19, "p75": 205455.44, "p99": 236047.01, "min": 180672.39, "max": 241476.61, "hz": 5058.75, "rme": 0.88}
+        },
+        {
+          "id": "svg/center-image-v10",
+          "title": "Version 10: styled SVG with a center image",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling",
+            "center-image"
+          ],
+          "target": "node",
+          "stats": {"samples": 106, "batch": 78, "mean": 121800.87, "median": 120511.56, "p75": 124681.78, "p99": 143132.28, "min": 113161, "max": 149854.29, "hz": 8297.96, "rme": 1.13}
+        },
+        {
+          "id": "text/blocks-v10",
+          "title": "Version 10: compact terminal text",
+          "group": "renderers",
+          "features": [
+            "text"
+          ],
+          "target": "node",
+          "stats": {"samples": 58, "batch": 336, "mean": 51881.12, "median": 50987.53, "p75": 51924.96, "p99": 66065.93, "min": 49825.19, "max": 66075.4, "hz": 19612.64, "rme": 1.64}
+        },
+        {
+          "id": "svg/plain-v40",
+          "title": "Version 40: SVG, reused renderer",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "node",
+          "stats": {"samples": 92, "batch": 24, "mean": 455121.95, "median": 442952.44, "p75": 460287.02, "p99": 680950.83, "min": 417942.75, "max": 780916.42, "hz": 2257.58, "rme": 2.32}
+        },
+        {
+          "id": "svg/fresh-v40",
+          "title": "Version 40: SVG, new renderer per call",
+          "group": "renderers",
+          "features": [
+            "svg"
+          ],
+          "target": "node",
+          "stats": {"samples": 98, "batch": 22, "mean": 467063.33, "median": 457169.8, "p75": 474371.16, "p99": 622197.38, "min": 424481.86, "max": 938296.09, "hz": 2187.37, "rme": 2.52}
+        },
+        {
+          "id": "svg/styled-v40",
+          "title": "Version 40: styled SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 181, "batch": 4, "mean": 1386607.01, "median": 1342327.5, "p75": 1487125.75, "p99": 1697692.9, "min": 1251792, "max": 2011101.25, "hz": 744.97, "rme": 1.26}
+        },
+        {
+          "id": "svg/circle-v40",
+          "title": "Version 40: circle SVG",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 239, "batch": 2, "mean": 2091401.01, "median": 1931735.5, "p75": 2078854, "p99": 3087896.4, "min": 1801390, "max": 4692411, "hz": 517.67, "rme": 2.32}
+        },
+        {
+          "id": "svg/center-image-v40",
+          "title": "Version 40: styled SVG with a center image",
+          "group": "renderers",
+          "features": [
+            "svg",
+            "styling",
+            "center-image"
+          ],
+          "target": "node",
+          "stats": {"samples": 198, "batch": 4, "mean": 1265345.51, "median": 1229466.88, "p75": 1343168.06, "p99": 1470915.47, "min": 1163176.5, "max": 1955251, "hz": 813.36, "rme": 1.1}
+        },
+        {
+          "id": "text/blocks-v40",
+          "title": "Version 40: compact terminal text",
+          "group": "renderers",
+          "features": [
+            "text"
+          ],
+          "target": "node",
+          "stats": {"samples": 104, "batch": 18, "mean": 537333.13, "median": 532620.44, "p75": 565964.68, "p99": 973422.72, "min": 479988.22, "max": 1024465.67, "hz": 1877.51, "rme": 2.74}
+        },
+        {
+          "id": "end-to-end/url-svg",
+          "title": "URL to SVG",
+          "group": "renderers",
+          "features": [
+            "matrix",
+            "svg"
+          ],
+          "target": "node",
+          "stats": {"samples": 76, "batch": 88, "mean": 149580.92, "median": 148992.69, "p75": 151429.59, "p99": 163776.9, "min": 143628.52, "max": 170547.99, "hz": 6711.74, "rme": 0.64}
+        },
+        {
+          "id": "end-to-end/url-styled-svg",
+          "title": "URL to styled SVG with a center image",
+          "group": "renderers",
+          "features": [
+            "matrix",
+            "svg",
+            "styling",
+            "center-image"
+          ],
+          "target": "node",
+          "stats": {"samples": 208, "batch": 26, "mean": 185477.64, "median": 184047.73, "p75": 188921.72, "p99": 216439.13, "min": 174633.27, "max": 244640.19, "hz": 5433.37, "rme": 0.62}
+        },
+        {
+          "id": "node/png-v1",
+          "title": "Version 1: PNG file",
+          "group": "raster-node",
+          "features": [
+            "png"
+          ],
+          "target": "node",
+          "stats": {"samples": 185, "batch": 16, "mean": 339450.79, "median": 326830.56, "p75": 348903.81, "p99": 416720.94, "min": 310105.5, "max": 454860.63, "hz": 3059.69, "rme": 1.19}
+        },
+        {
+          "id": "node/webp-v1",
+          "title": "Version 1: WEBP file",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "node",
+          "stats": {"samples": 132, "batch": 28, "mean": 271953.61, "median": 269437.04, "p75": 273387.13, "p99": 324514.24, "min": 263891.79, "max": 357063.39, "hz": 3711.44, "rme": 0.69}
+        },
+        {
+          "id": "node/gif-v1",
+          "title": "Version 1: GIF file",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "node",
+          "stats": {"samples": 120, "batch": 20, "mean": 419614.83, "median": 440159.95, "p75": 449054, "p99": 473663.38, "min": 359915, "max": 474193.65, "hz": 2271.9, "rme": 1.63}
+        },
+        {
+          "id": "node/jpeg-v1",
+          "title": "Version 1: JPEG file",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 111, "batch": 16, "mean": 563384.37, "median": 562072.5, "p75": 567159.09, "p99": 587316.18, "min": 545188, "max": 599385.81, "hz": 1779.13, "rme": 0.27}
+        },
+        {
+          "id": "node/png-styled-v1",
+          "title": "Version 1: styled PNG file",
+          "group": "raster-node",
+          "features": [
+            "png",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 83, "batch": 12, "mean": 1007822.88, "median": 992659.67, "p75": 1034744.5, "p99": 1310051.37, "min": 927594.25, "max": 1364904.25, "hz": 1007.39, "rme": 1.9}
+        },
+        {
+          "id": "encoder/jpeg-gray-v1",
+          "title": "Version 1: JPEG encoder, grayscale pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 114, "batch": 7, "mean": 1256370.7, "median": 1252781.93, "p75": 1265556.64, "p99": 1313637.03, "min": 1221473.86, "max": 1388619.14, "hz": 798.22, "rme": 0.33}
+        },
+        {
+          "id": "encoder/jpeg-color-v1",
+          "title": "Version 1: JPEG encoder, color pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 63, "batch": 12, "mean": 1327448.91, "median": 1322589, "p75": 1338730.33, "p99": 1380199.16, "min": 1304736.42, "max": 1399646.08, "hz": 756.09, "rme": 0.33}
+        },
+        {
+          "id": "encoder/webp-v1",
+          "title": "Version 1: WebP encoder",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "node",
+          "stats": {"samples": 100, "batch": 42, "mean": 238178.85, "median": 237805.6, "p75": 239928.58, "p99": 244611.32, "min": 233008.67, "max": 245694.21, "hz": 4205.12, "rme": 0.21}
+        },
+        {
+          "id": "encoder/gif-v1",
+          "title": "Version 1: GIF encoder",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "node",
+          "stats": {"samples": 117, "batch": 23, "mean": 371239.95, "median": 385796.04, "p75": 392238.7, "p99": 410662.15, "min": 328577, "max": 419858.83, "hz": 2592.04, "rme": 1.27}
+        },
+        {
+          "id": "node/png-v10",
+          "title": "Version 10: PNG file",
+          "group": "raster-node",
+          "features": [
+            "png"
+          ],
+          "target": "node",
+          "stats": {"samples": 108, "batch": 5, "mean": 1864200.8, "median": 1834251.1, "p75": 1883568.55, "p99": 2170898.71, "min": 1762865.8, "max": 2175576.2, "hz": 545.18, "rme": 0.9}
+        },
+        {
+          "id": "node/webp-v10",
+          "title": "Version 10: WEBP file",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "node",
+          "stats": {"samples": 716, "batch": 1, "mean": 1397109.47, "median": 1399832, "p75": 1424575.5, "p99": 1625263.5, "min": 1304517, "max": 2123062, "hz": 714.37, "rme": 0.35}
+        },
+        {
+          "id": "node/gif-v10",
+          "title": "Version 10: GIF file",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "node",
+          "stats": {"samples": 165, "batch": 4, "mean": 1521203.22, "median": 1395430.25, "p75": 1626536.5, "p99": 2398819.98, "min": 1290214.5, "max": 2500936.5, "hz": 716.62, "rme": 2.55}
+        },
+        {
+          "id": "node/jpeg-v10",
+          "title": "Version 10: JPEG file",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 329, "batch": 1, "mean": 3041456.08, "median": 3019466, "p75": 3047617, "p99": 3362146.72, "min": 2934047, "max": 3574580, "hz": 331.18, "rme": 0.27}
+        },
+        {
+          "id": "node/png-styled-v10",
+          "title": "Version 10: styled PNG file",
+          "group": "raster-node",
+          "features": [
+            "png",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 150, "batch": 1, "mean": 6697383.4, "median": 6636401.5, "p75": 6786365.5, "p99": 7423025, "min": 6323605, "max": 8883959, "hz": 150.68, "rme": 0.67}
+        },
+        {
+          "id": "encoder/jpeg-gray-v10",
+          "title": "Version 10: JPEG encoder, grayscale pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 149, "batch": 1, "mean": 6746722.37, "median": 6679067, "p75": 6823738, "p99": 7617610.8, "min": 6457116, "max": 8392487, "hz": 149.72, "rme": 0.6}
+        },
+        {
+          "id": "encoder/jpeg-color-v10",
+          "title": "Version 10: JPEG encoder, color pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 137, "batch": 1, "mean": 7319633.99, "median": 7233350, "p75": 7326681, "p99": 9091592.88, "min": 7071529, "max": 10163546, "hz": 138.25, "rme": 0.85}
+        },
+        {
+          "id": "encoder/webp-v10",
+          "title": "Version 10: WebP encoder",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "node",
+          "stats": {"samples": 105, "batch": 8, "mean": 1191876.88, "median": 1181866.62, "p75": 1202048, "p99": 1273588.25, "min": 1160395.12, "max": 1295068.5, "hz": 846.12, "rme": 0.4}
+        },
+        {
+          "id": "encoder/gif-v10",
+          "title": "Version 10: GIF encoder",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "node",
+          "stats": {"samples": 199, "batch": 4, "mean": 1255165.11, "median": 1196899.25, "p75": 1279579.5, "p99": 1681147.65, "min": 1115478.75, "max": 1782190, "hz": 835.49, "rme": 1.51}
+        },
+        {
+          "id": "node/png-v40",
+          "title": "Version 40: PNG file",
+          "group": "raster-node",
+          "features": [
+            "png"
+          ],
+          "target": "node",
+          "stats": {"samples": 64, "batch": 1, "mean": 15807120.3, "median": 15353215, "p75": 15986073, "p99": 18998680.57, "min": 14741292, "max": 19035196, "hz": 65.13, "rme": 1.73}
+        },
+        {
+          "id": "node/webp-v40",
+          "title": "Version 40: WEBP file",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "node",
+          "stats": {"samples": 71, "batch": 1, "mean": 14232601.61, "median": 12387738, "p75": 14307184.5, "p99": 23887432.3, "min": 11821106, "max": 26459667, "hz": 80.72, "rme": 5.6}
+        },
+        {
+          "id": "node/gif-v40",
+          "title": "Version 40: GIF file",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "node",
+          "stats": {"samples": 89, "batch": 1, "mean": 11285854.92, "median": 11032811, "p75": 11249572, "p99": 14306149.92, "min": 10575959, "max": 14332190, "hz": 90.64, "rme": 1.54}
+        },
+        {
+          "id": "node/jpeg-v40",
+          "title": "Version 40: JPEG file",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 39, "batch": 1, "mean": 26237951.1, "median": 26083644, "p75": 26289406, "p99": 29244078.74, "min": 25313790, "max": 29753745, "hz": 38.34, "rme": 1.06}
+        },
+        {
+          "id": "node/png-styled-v40",
+          "title": "Version 40: styled PNG file",
+          "group": "raster-node",
+          "features": [
+            "png",
+            "styling"
+          ],
+          "target": "node",
+          "stats": {"samples": 20, "batch": 1, "mean": 68094737.35, "median": 55348611.5, "p75": 59424998.25, "p99": 169758247.58, "min": 52132729, "max": 170026721, "hz": 18.07, "rme": 22.49}
+        },
+        {
+          "id": "encoder/jpeg-gray-v40",
+          "title": "Version 40: JPEG encoder, grayscale pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 20, "batch": 1, "mean": 55952965.6, "median": 56079510.5, "p75": 56542330.75, "p99": 62031765.22, "min": 53841288, "max": 63168129, "hz": 17.83, "rme": 1.56}
+        },
+        {
+          "id": "encoder/jpeg-color-v40",
+          "title": "Version 40: JPEG encoder, color pixels",
+          "group": "raster-node",
+          "features": [
+            "jpeg"
+          ],
+          "target": "node",
+          "stats": {"samples": 20, "batch": 1, "mean": 65422022.5, "median": 64165000.5, "p75": 66049285.25, "p99": 73411205.84, "min": 61111148, "max": 73533597, "hz": 15.58, "rme": 2.52}
+        },
+        {
+          "id": "encoder/webp-v40",
+          "title": "Version 40: WebP encoder",
+          "group": "raster-node",
+          "features": [
+            "webp"
+          ],
+          "target": "node",
+          "stats": {"samples": 76, "batch": 1, "mean": 13237142.97, "median": 14764226.5, "p75": 16013593.25, "p99": 17575251.75, "min": 9971505, "max": 17878899, "hz": 67.73, "rme": 4.99}
+        },
+        {
+          "id": "encoder/gif-v40",
+          "title": "Version 40: GIF encoder",
+          "group": "raster-node",
+          "features": [
+            "gif"
+          ],
+          "target": "node",
+          "stats": {"samples": 104, "batch": 1, "mean": 9646756.45, "median": 9200981, "p75": 9686931.25, "p99": 12377765.75, "min": 8856379, "max": 15372625, "hz": 108.68, "rme": 2.02}
+        },
+        {
+          "id": "end-to-end/url-png",
+          "title": "URL to PNG file",
+          "group": "raster-node",
+          "features": [
+            "matrix",
+            "png"
+          ],
+          "target": "node",
+          "stats": {"samples": 940, "batch": 1, "mean": 1063207.83, "median": 1012505.5, "p75": 1081691, "p99": 1599155.4, "min": 951386, "max": 2885266, "hz": 987.65, "rme": 0.87}
+        },
+        {
+          "id": "explain/url/explanation",
+          "title": "short URL, version 2: explanation, trace off",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 116, "batch": 34, "mean": 255064.03, "median": 251357, "p75": 256560.01, "p99": 355349.5, "min": 242394.85, "max": 390763.62, "hz": 3978.41, "rme": 1.29}
+        },
+        {
+          "id": "explain/url/with-trace",
+          "title": "short URL, version 2: explanation and trace",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 108, "batch": 22, "mean": 422205.41, "median": 418576.41, "p75": 422927.67, "p99": 493087.61, "min": 401784.05, "max": 541372.55, "hz": 2389.05, "rme": 0.87}
+        },
+        {
+          "id": "explain/url/trace",
+          "title": "short URL, version 2: trace analysis only",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 106, "batch": 68, "mean": 139279.42, "median": 138943.27, "p75": 140555.89, "p99": 150694.04, "min": 134042.81, "max": 159447.65, "hz": 7197.18, "rme": 0.5}
+        },
+        {
+          "id": "explain/kanji/explanation",
+          "title": "mixed segments with Kanji: explanation, trace off",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 72, "batch": 40, "mean": 353974.89, "median": 346008.91, "p75": 347831.84, "p99": 543619.77, "min": 342402.4, "max": 552332.07, "hz": 2890.1, "rme": 2.32}
+        },
+        {
+          "id": "explain/kanji/with-trace",
+          "title": "mixed segments with Kanji: explanation and trace",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 74, "batch": 24, "mean": 568020.92, "median": 562684.96, "p75": 568931.91, "p99": 695388.28, "min": 551158.88, "max": 749018.33, "hz": 1777.19, "rme": 1.09}
+        },
+        {
+          "id": "explain/kanji/trace",
+          "title": "mixed segments with Kanji: trace analysis only",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 93, "batch": 54, "mean": 199346.29, "median": 198350.19, "p75": 200728.52, "p99": 213847.34, "min": 193269.78, "max": 219821.41, "hz": 5041.59, "rme": 0.41}
+        },
+        {
+          "id": "explain/v40/explanation",
+          "title": "version 40-L, 2000 bytes: explanation, trace off",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 60, "batch": 1, "mean": 16818089.38, "median": 15516375.5, "p75": 18959512.5, "p99": 29343955.8, "min": 12948721, "max": 30324878, "hz": 64.45, "rme": 5.53}
+        },
+        {
+          "id": "explain/v40/with-trace",
+          "title": "version 40-L, 2000 bytes: explanation and trace",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 45, "batch": 1, "mean": 22456232.47, "median": 22333194, "p75": 23232538, "p99": 28147449.88, "min": 20572544, "max": 30021706, "hz": 44.78, "rme": 2.25}
+        },
+        {
+          "id": "explain/v40/trace",
+          "title": "version 40-L, 2000 bytes: trace analysis only",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 121, "batch": 1, "mean": 8281427.87, "median": 8202165, "p75": 8470217, "p99": 10022485, "min": 7580992, "max": 11285092, "hz": 121.92, "rme": 1.15}
+        },
+        {
+          "id": "explain/micro/explanation",
+          "title": "Micro QR M3: explanation, trace off",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 75, "batch": 192, "mean": 69940.36, "median": 68329.28, "p75": 72475.56, "p99": 93232.84, "min": 66301.3, "max": 93374.63, "hz": 14635.01, "rme": 1.5}
+        },
+        {
+          "id": "explain/micro/with-trace",
+          "title": "Micro QR M3: explanation and trace",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 103, "batch": 96, "mean": 101446.37, "median": 101381.08, "p75": 102401.29, "p99": 112791.18, "min": 95620.43, "max": 143885.9, "hz": 9863.77, "rme": 0.95}
+        },
+        {
+          "id": "explain/micro/trace",
+          "title": "Micro QR M3: trace analysis only",
+          "group": "explain",
+          "features": [
+            "explain"
+          ],
+          "target": "node",
+          "stats": {"samples": 145, "batch": 222, "mean": 31156.58, "median": 30941.48, "p75": 31934.73, "p99": 33629.61, "min": 29544.04, "max": 33724.06, "hz": 32319.08, "rme": 0.55}
+        }
+      ]
+    }
+  ]
+}
