@@ -85,11 +85,18 @@ module, so its size depends on the symbol version and quiet zone.
   it.
 - The image components draw and encode pixels in JavaScript, on the JavaScript thread. Use them when
   you need an image file, for example to save or share the QR code. Large module sizes take longer.
-- `QRCodeWebP` usually produces the smallest file. iOS displays WebP from iOS 14.
+- `QRCodeWebP` usually produces the smallest file. Display support depends on the native image
+  decoder in your app.
 - `QRCodeGIF` is limited to 256 colors and on-or-off transparency. Prefer PNG or WebP for
   transparent backgrounds and photographic center images.
 - `QRCodeJPEG` is lossy and has no transparency. It blends transparent pixels onto a white matte by
   default. Its `quality` option ranges from 1 to 100 and defaults to 92.
+
+For Android apps that build their own native code, follow React Native's
+[GIF and WebP setup instructions](https://reactnative.dev/docs/image#gif-and-webp-support-on-android).
+They describe the optional Fresco modules to add in `android/app/build.gradle`; use versions that
+match your React Native release. Check these formats in your native app before choosing them.
+Use `QRCodeSVG` or `QRCodePNG` if you do not need GIF or WebP.
 
 ## Center images
 
