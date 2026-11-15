@@ -23,7 +23,8 @@
     "CHANGELOG.md",
     "*.svg",
     "apps/docs/src/libs",
-    "package-lock.json"
+    "package-lock.json",
+    "packages/perf/baseline"
   ],
   "version": "0.2"
 }

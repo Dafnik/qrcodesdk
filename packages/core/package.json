@@ -77,16 +77,13 @@
     "dist"
   ],
   "scripts": {
-    "benchmark:matrix": "vitest bench --run benchmarks/matrix-hot-path.bench.ts",
-    "benchmark:segmenter": "vitest bench --run benchmarks/segmenter.bench.mjs",
-    "benchmark:styler": "vitest bench --run benchmarks/styler-hot-path.bench.mjs",
     "build": "tsdown",
     "postbuild": "cp ../../LICENSE .",
     "watch": "tsdown --watch",
     "test": "vitest --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
     "test:coverage:raw": "vitest --coverage --watch false",
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
-    "lint": "eslint benchmarks scripts src tests runtime --max-warnings 0",
+    "lint": "eslint scripts src tests runtime --max-warnings 0",
     "generate:kanji-table": "node scripts/generate-kanji-table.mjs",
     "clean": "rm -rf .turbo dist",
     "prepublishOnly": "pnpm run build"

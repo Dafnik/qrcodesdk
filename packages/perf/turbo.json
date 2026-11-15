@@ -1,0 +1,21 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "check:size": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "report:size": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "report:speed": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "report:speed:browser": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    }
+  }
+}

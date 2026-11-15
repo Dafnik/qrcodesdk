@@ -1,12 +1,13 @@
 {
   "extends": ["//"],
   "tasks": {
-    "benchmark:explain": {
-      "cache": false,
-      "dependsOn": ["^build"]
-    },
     "build": {
-      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/packages/core/src/**"]
+      "inputs": [
+        "$TURBO_EXTENDS$",
+        "$TURBO_ROOT$/packages/core/src/**",
+        "$TURBO_ROOT$/packages/perf/baseline/**",
+        "$TURBO_ROOT$/packages/perf/reports/**"
+      ]
     },
     "check-readmes": {
       "cache": false

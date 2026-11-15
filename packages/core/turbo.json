@@ -1,18 +1,6 @@
 {
   "extends": ["//"],
   "tasks": {
-    "benchmark:matrix": {
-      "cache": false
-    },
-    "benchmark:segmenter": {
-      "cache": false,
-      "dependsOn": ["build"]
-    },
-    "benchmark:styler": {
-      "cache": false,
-      "dependsOn": ["build"],
-      "env": ["QRCODESDK_BENCHMARK_CORE"]
-    },
     "generate:kanji-table": {
       "cache": false
     }
