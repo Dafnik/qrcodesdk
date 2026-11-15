@@ -7,6 +7,7 @@ import {
   QR_CODE_CENTER_IMAGE_FIXTURES,
   QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
   QR_CODE_MICRO_TEST_FIXTURES,
+  QR_CODE_RMQR_CENTER_IMAGE_FIXTURES,
   QR_CODE_RMQR_STYLE_VARIANT_FIXTURES,
   QR_CODE_RMQR_TEST_FIXTURES,
   QR_CODE_ROUNDTRIP_TEST_FIXTURES,
@@ -167,6 +168,23 @@ describe('QRCodeCanvasRenderer', () => {
           qrcode(fixture.payload)
             .options(fixture.matrixOptions)
             .render(QRCodeCanvasRenderer({style: fixture.styling})),
+        ),
+      ).resolves.toMatchObject({text: fixture.payload, version: fixture.symbol});
+    },
+  );
+  test.each(QR_CODE_RMQR_CENTER_IMAGE_FIXTURES)(
+    'decodes $name canvas rMQR center image fixture',
+    async (fixture) => {
+      await expect(
+        decodeCanvasRMQRCode(
+          qrcode(fixture.payload)
+            .options(fixture.matrixOptions)
+            .render(
+              QRCodeCanvasRenderer({
+                style: fixture.style,
+                centerImage: canvasCenterImage(fixtureImageCanvas(fixture.image), fixture.layout),
+              }),
+            ),
         ),
       ).resolves.toMatchObject({text: fixture.payload, version: fixture.symbol});
     },

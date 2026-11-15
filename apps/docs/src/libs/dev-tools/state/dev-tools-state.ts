@@ -50,7 +50,7 @@ const EMPTY_SELECTION: Selection = {
   'micro-style-variants': [],
   'rmqr-style-variants': [],
   'center-images': [],
-  'fixture-images': [],
+  'rmqr-center-images': [],
 };
 
 const DEFAULT_SETTINGS: PersistedSettings = {
