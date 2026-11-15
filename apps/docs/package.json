@@ -6,14 +6,12 @@
   "scripts": {
     "start": "astro dev",
     "build": "astro build",
-    "check-performance": "node scripts/performance/generate-performance.mjs --check",
     "check-readmes": "node scripts/readmes/generate-readmes.mjs --check",
-    "generate-performance": "node scripts/performance/generate-performance.mjs --write",
     "generate-readmes": "node scripts/readmes/generate-readmes.mjs --write",
     "preview": "astro preview",
     "check-types": "astro check && ngc -p tsconfig.app.json --noEmit",
     "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
-    "test": "node --test scripts/readmes/*.test.mjs scripts/performance/*.test.mjs src/components/playground/*.test.ts src/utils/*.test.mjs && vitest run",
+    "test": "node --test scripts/readmes/*.test.mjs src/components/playground/*.test.ts src/utils/*.test.mjs && vitest run",
     "benchmark:explain": "vitest bench --run --reporter=verbose",
     "astro": "astro",
     "clean": "rm -rf .turbo dist .astro"

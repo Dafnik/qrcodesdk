@@ -32,7 +32,7 @@ pnpm turbo run check
 
 This runs formatting, spelling, terminology, linting, type checking, builds, and the regular
 tests. Docs linting also checks the generated package READMEs. Roundtrip tests, coverage,
-benchmarks, performance-file checks, and installed-package smoke tests run separately.
+benchmarks, and installed-package smoke tests run separately.
 
 To run individual checks:
 
@@ -125,23 +125,11 @@ pnpm turbo run generate-readmes --filter=docs
 pnpm turbo run check-readmes --filter=docs
 ```
 
-Performance generation and validation read `benchmark-results/latest.json`.
-Run the full benchmark task first to create that file:
-
-```sh
-pnpm turbo run benchmark --filter=@repo/benchmarks
-pnpm turbo run generate-performance --filter=docs
-pnpm turbo run check-performance --filter=docs
-```
-
 ### Benchmarks
 
-Run the full benchmark suite or a focused matrix or styling benchmark:
+Run a focused matrix or styling benchmark:
 
 ```sh
-pnpm turbo run benchmark --filter=@repo/benchmarks
-pnpm turbo run benchmark:jpeg --filter=@repo/benchmarks
-pnpm turbo run benchmark:svg --filter=@repo/benchmarks
 pnpm turbo run benchmark:matrix --filter=@qrcodesdk/core
 pnpm turbo run benchmark:styler --filter=@qrcodesdk/core
 pnpm turbo run benchmark:segmenter --filter=@qrcodesdk/core
