@@ -19,6 +19,8 @@ import {qrcode} from '@qrcodesdk/core';
 
 import {QRCodeCanvasRenderer, canvasCenterImage} from '../src';
 import {
+  MICRO_ROUNDTRIP_COMBINATIONS_ONE,
+  RMQR_ROUNDTRIP_COMBINATIONS_ONE,
   ROUNDTRIP_COMBINATIONS_ONE,
   decodeCanvasMicroQRCode,
   decodeCanvasQRCode,
@@ -108,6 +110,19 @@ describe('QRCodeCanvasRenderer', () => {
     },
   );
 
+  test.each(MICRO_ROUNDTRIP_COMBINATIONS_ONE)(
+    'decodes combination $name canvas Micro QR output',
+    async (fixture) => {
+      await expect(
+        decodeCanvasMicroQRCode(
+          qrcode(fixture.payload)
+            .options(fixtureMicroMatrixOptions(fixture))
+            .render(smallSymbolRenderer),
+        ),
+      ).resolves.toMatchObject({text: fixture.payload, version: fixture.version});
+    },
+  );
+
   test.each(QR_CODE_MICRO_STYLE_VARIANT_FIXTURES)(
     'decodes $name canvas Micro QR style variant',
     async (fixture) => {
@@ -130,6 +145,19 @@ describe('QRCodeCanvasRenderer', () => {
       ),
     ).resolves.toMatchObject({text: fixture.payload, version: fixture.symbol});
   });
+
+  test.each(RMQR_ROUNDTRIP_COMBINATIONS_ONE)(
+    'decodes combination $name canvas rMQR output',
+    async (fixture) => {
+      await expect(
+        decodeCanvasRMQRCode(
+          qrcode(fixture.payload)
+            .options(fixtureRMQRMatrixOptions(fixture))
+            .render(smallSymbolRenderer),
+        ),
+      ).resolves.toMatchObject({text: fixture.payload, version: fixture.symbol});
+    },
+  );
 
   test.each(QR_CODE_RMQR_STYLE_VARIANT_FIXTURES)(
     'decodes $name canvas rMQR style variant',

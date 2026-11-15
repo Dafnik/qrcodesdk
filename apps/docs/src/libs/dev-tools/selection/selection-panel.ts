@@ -187,7 +187,11 @@ function clampVersion(value: string | number): number {
                 </div>
 
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-medium">Versions</span>
+                  <span
+                    class="text-xs font-medium"
+                    title="Standard QR versions. Ignored by Micro QR and rMQR.">
+                    QR versions
+                  </span>
                   <input
                     class="h-7 w-16"
                     [value]="state.combinations().versionFrom"
@@ -229,7 +233,7 @@ function clampVersion(value: string | number): number {
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                  <span class="text-xs font-medium">Masks (ignored by auto mask)</span>
+                  <span class="text-xs font-medium">Masks (ignored by auto mask and rMQR)</span>
                   <hlm-toggle-group
                     [value]="$any(state.combinations().masks)"
                     (valueChange)="setMasks($any($event))"

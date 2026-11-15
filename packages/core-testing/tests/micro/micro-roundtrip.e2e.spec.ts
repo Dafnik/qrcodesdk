@@ -14,44 +14,43 @@ import {circle, finder, rounded} from '@qrcodesdk/core/style';
 import {
   QR_CODE_MICRO_STYLE_VARIANT_FIXTURES,
   QR_CODE_MICRO_TEST_FIXTURES,
+  ZXING_MICRO_QR_CODE_DECODE_FAILURES,
   createFixturePayload,
+  fixtureMicroCapacity,
   fixtureMicroMatrixOptions,
   fixtureSeed,
+  getAllMicroQRCodeCombinations,
 } from '../../src';
 import {decodeMicroQRCodeMatrix, decodeMicroQRCodeSvg} from './micro-helpers';
 
-// ISO/IEC 18004:2015 Table 7: data capacity by symbol, level, and mode.
-const SYMBOLS: readonly [
-  QRCodeMicroVersion,
-  QRCodeErrorCorrectionLevel,
-  number,
-  number,
-  number,
-  number,
-][] = [
-  ['M1', 'L', 5, 0, 0, 0],
-  ['M2', 'L', 10, 6, 0, 0],
-  ['M2', 'M', 8, 5, 0, 0],
-  ['M3', 'L', 23, 14, 9, 6],
-  ['M3', 'M', 18, 11, 7, 4],
-  ['M4', 'L', 35, 21, 15, 9],
-  ['M4', 'M', 30, 18, 13, 8],
-  ['M4', 'Q', 21, 13, 9, 5],
-];
+// The Micro QR symbols: M1 only detects errors, so its level is a placeholder.
+const SYMBOLS = [
+  ['M1', 'L'],
+  ['M2', 'L'],
+  ['M2', 'M'],
+  ['M3', 'L'],
+  ['M3', 'M'],
+  ['M4', 'L'],
+  ['M4', 'M'],
+  ['M4', 'Q'],
+] as const satisfies readonly (readonly [QRCodeMicroVersion, QRCodeErrorCorrectionLevel])[];
 const MODES = ['numeric', 'alphanumeric', 'octet', 'kanji'] as const satisfies QRCodeEncodingMode[];
 
-const CASES = SYMBOLS.flatMap(([version, errorCorrectionLevel, ...capacities]) =>
-  MODES.flatMap((mode, index) =>
-    Array.from({length: capacities[index]!}, (_, length) => ({
-      version,
-      errorCorrectionLevel,
-      mode,
-      payload: createFixturePayload(
+const CASES = SYMBOLS.flatMap(([version, errorCorrectionLevel]) =>
+  MODES.flatMap((mode) =>
+    Array.from(
+      {length: fixtureMicroCapacity(version, errorCorrectionLevel, mode)},
+      (_, length) => ({
+        version,
+        errorCorrectionLevel,
         mode,
-        length + 1,
-        fixtureSeed(`${version}-${errorCorrectionLevel}-${mode}-${String(length)}`),
-      ),
-    })),
+        payload: createFixturePayload(
+          mode,
+          length + 1,
+          fixtureSeed(`${version}-${errorCorrectionLevel}-${mode}-${String(length)}`),
+        ),
+      }),
+    ),
   ),
 );
 
@@ -105,6 +104,29 @@ describe('Micro QR roundtrips', () => {
     expect(scan).toMatchObject({text: fixture.payload, version: fixture.version});
     if (fixture.version !== 'M1') expect(scan.ecLevel).toBe(fixture.errorCorrectionLevel);
   });
+
+  const combinations = [...getAllMicroQRCodeCombinations()];
+
+  test.each(combinations.filter(({name}) => !ZXING_MICRO_QR_CODE_DECODE_FAILURES.has(name)))(
+    'decodes combination $name SVG output',
+    async (fixture) => {
+      const svg = qrcode(fixture.payload)
+        .options(fixtureMicroMatrixOptions(fixture))
+        .render(QRCodeSVGRenderer({style: {moduleSize: 4}}));
+      const scan = await decodeMicroQRCodeSvg(svg);
+      expect(scan).toMatchObject({text: fixture.payload, version: fixture.version});
+      if (fixture.version !== 'M1') expect(scan.ecLevel).toBe(fixture.errorCorrectionLevel);
+    },
+  );
+
+  // Fails once ZXing decodes these symbols, so they can move back into the decoded combinations.
+  test.each(combinations.filter(({name}) => ZXING_MICRO_QR_CODE_DECODE_FAILURES.has(name)))(
+    'still fails to decode combination $name with ZXing',
+    async (fixture) => {
+      const matrix = qrcode(fixture.payload).options(fixtureMicroMatrixOptions(fixture)).matrix();
+      await expect(decodeMicroQRCodeMatrix(matrix)).rejects.toThrow('Unable to decode');
+    },
+  );
 
   test.each(QR_CODE_MICRO_STYLE_VARIANT_FIXTURES)(
     'decodes $name SVG style variant',
