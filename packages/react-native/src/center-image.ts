@@ -1,4 +1,4 @@
-import type {ImageSourcePropType} from 'react-native';
+import type {ImageURISource} from 'react-native';
 
 import type {QRCodeCenterImageLayout, QRCodeDataImageURL} from '@qrcodesdk/core';
 import {QRCodeError} from '@qrcodesdk/core/error';
@@ -28,7 +28,7 @@ type Box = {readonly x: number; readonly y: number; readonly size: number};
 // Kept private so published declarations do not reference internal drawing types.
 export const svgCenterImages = createCenterImageStore<{
   readonly part: QRCodeStylePart;
-  readonly source: ImageSourcePropType | QRCodeDataImageURL;
+  readonly source: number | ImageURISource | QRCodeDataImageURL;
   place(drawing: QRCodeDrawing): Box;
 }>();
 export const rasterCenterImages = createCenterImageStore<RasterCenterImageRenderer>();
@@ -38,7 +38,7 @@ export const rasterCenterImages = createCenterImageStore<RasterCenterImageRender
  * `{uri: 'https://…'}`, or an embedded `data:image` URL. react-native-svg loads the image.
  */
 export function svgCenterImage(
-  source: ImageSourcePropType | QRCodeDataImageURL,
+  source: number | ImageURISource | QRCodeDataImageURL,
   layout?: QRCodeCenterImageLayout,
 ): QRCodeSVGCenterImage {
   if (!isImageSource(source)) {
@@ -69,7 +69,7 @@ function isImageSource(source: unknown): boolean {
   if (typeof source === 'string') return source.startsWith('data:image/');
   // Bundled assets from require() are numeric asset IDs.
   if (typeof source === 'number') return true;
-  if (Array.isArray(source)) return source.length > 0 && source.every(isURISource);
+  if (Array.isArray(source)) return false;
   return isURISource(source);
 }
 

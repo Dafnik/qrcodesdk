@@ -1,7 +1,8 @@
 import {crc32, deflateSync, inflateSync} from 'node:zlib';
 import sharp from 'sharp';
-import {describe, expect, test} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 
+import {createRasterCenterImage} from '../../src/raster/center-image';
 import {type Inflate, decodePNG as decodeWith, encodePNG} from '../../src/raster/png';
 import {zlibDeflate, zlibInflate} from '../../src/raster/zlib';
 
@@ -117,6 +118,40 @@ function expectPixelsToMatchReference(actual: Buffer, expected: Buffer, depth: n
     }
   }
 }
+
+describe('PNG allocation limits', () => {
+  const header = (width: number, height: number, length = 13) => {
+    const bytes = Buffer.alloc(Math.max(13, length));
+    bytes.writeUInt32BE(width, 0);
+    bytes.writeUInt32BE(height, 4);
+    bytes[8] = 8;
+    bytes[9] = 6;
+    return chunk('IHDR', bytes.subarray(0, length));
+  };
+  const signature = Buffer.from('89504e470d0a1a0a', 'hex');
+  const sources = [
+    {name: 'duplicate headers', chunks: [header(1, 1), header(8192, 8192)]},
+    {name: 'an extended header', chunks: [header(8192, 8192, 14)]},
+    {name: 'a short header', chunks: [header(1, 1, 12)]},
+    {name: 'too many pixels', chunks: [header(4097, 4096)]},
+    {name: 'zero width', chunks: [header(0, 1)]},
+    {name: 'zero height', chunks: [header(1, 0)]},
+    {name: 'a missing header', chunks: []},
+  ];
+
+  test.each(sources)('rejects $name before inflating', ({chunks}) => {
+    const source = Buffer.concat([signature, ...chunks, chunk('IEND', Buffer.alloc(0))]);
+    const inflate = vi.fn(() => {
+      throw new Error('Unexpected inflate call');
+    });
+    expect(() => decodeWith(source, inflate)).toThrow();
+    expect(inflate).not.toHaveBeenCalled();
+    expect(() => createRasterCenterImage(source, undefined, inflate)).toThrow(
+      expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}),
+    );
+    expect(inflate).not.toHaveBeenCalled();
+  });
+});
 
 describe('PNG codec', () => {
   test.each(

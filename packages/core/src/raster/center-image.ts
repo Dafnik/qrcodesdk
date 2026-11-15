@@ -3,7 +3,7 @@ import type {QRCodeDrawing, QRCodeStylePart} from '../drawing/types';
 import {QRCodeError} from '../error';
 import type {QRCodeCenterImageLayout} from '../types';
 import {blendPixel} from './blend';
-import {type DecodedImage, type Inflate, decodePNG, readPNGDimensions} from './png';
+import {type DecodedImage, type Inflate, MAX_PNG_PIXELS, decodePNG, readPNGDimensions} from './png';
 import type {RGBAImage} from './types';
 
 /** Clears the modules behind a raster center image and draws it into the rendered pixels. */
@@ -13,7 +13,6 @@ export type RasterCenterImageRenderer = {
 };
 
 const MAX_CENTER_IMAGE_BYTES = 16 * 1024 * 1024;
-const MAX_CENTER_IMAGE_PIXELS = 16_777_216;
 
 /**
  * Validates the layout and PNG bytes of a raster center image, decodes them once, and returns its
@@ -64,11 +63,11 @@ function assertImageDimensions(width: number, height: number): void {
     !Number.isSafeInteger(height) ||
     width <= 0 ||
     height <= 0 ||
-    width * height > MAX_CENTER_IMAGE_PIXELS
+    width * height > MAX_PNG_PIXELS
   ) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
-      `QR code PNG image source must not exceed ${MAX_CENTER_IMAGE_PIXELS} pixels`,
+      `QR code PNG image source must not exceed ${MAX_PNG_PIXELS} pixels`,
     );
   }
 }

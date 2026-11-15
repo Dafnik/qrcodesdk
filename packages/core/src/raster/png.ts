@@ -12,6 +12,8 @@ export type DecodedImage = {
   readonly data: Uint8Array;
 };
 
+export const MAX_PNG_PIXELS = 16_777_216;
+
 const SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 // Adam7 passes as [x start, y start, x step, y step].
 const PASSES: readonly (readonly [number, number, number, number])[] = [
@@ -82,6 +84,7 @@ export function encodePNG({width, height, data}: RGBAImage, deflate: Deflate): U
 /** Decodes any standard PNG into 8-bit RGBA pixels. */
 export function decodePNG(source: Uint8Array, inflate: Inflate): DecodedImage {
   if (!hasSignature(source)) throw new Error('Invalid PNG signature');
+  let sawHeader = false;
   let width = 0;
   let height = 0;
   let depth = 0;
@@ -99,8 +102,13 @@ export function decodePNG(source: Uint8Array, inflate: Inflate): DecodedImage {
     }
     offset = end + 4;
     if (type === 'IHDR') {
+      if (sawHeader || data.length !== 13) throw new Error('Invalid PNG IHDR');
+      sawHeader = true;
       width = readUint32(data, 0);
       height = readUint32(data, 4);
+      if (width === 0 || height === 0 || width * height > MAX_PNG_PIXELS) {
+        throw new Error('Invalid PNG dimensions');
+      }
       depth = data[8]!;
       colorType = data[9]!;
       interlaced = data[12] === 1;
@@ -113,7 +121,7 @@ export function decodePNG(source: Uint8Array, inflate: Inflate): DecodedImage {
       ) {
         throw new Error('Unsupported PNG header');
       }
-    } else if (width === 0) {
+    } else if (!sawHeader) {
       throw new Error('Expected IHDR');
     } else if (type === 'PLTE') {
       palette = data;

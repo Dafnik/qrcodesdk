@@ -175,8 +175,8 @@ pnpm turbo run report:speed --filter=@repo/perf -- --against=main
   for example [`packages/core.mdx`](apps/docs/src/content/docs/packages/core.mdx#public-api). The
   `exports` field of each package's `package.json` lists every published subpath.
 - Exports that exist only for other `@qrcodesdk` packages live in `@qrcodesdk/core/internal`,
-  `@qrcodesdk/core/internal/gif`, `@qrcodesdk/core/internal/jpeg`, and
-  `@qrcodesdk/core/internal/webp`. Their names start with `ɵ`, as [AGENTS.md](./AGENTS.md) requires.
+  `@qrcodesdk/core/internal/gif`, `@qrcodesdk/core/internal/jpeg`, `@qrcodesdk/core/internal/raster`,
+  `@qrcodesdk/core/internal/webp`, and `@qrcodesdk/core/internal/zlib`. Their names start with `ɵ`, as [AGENTS.md](./AGENTS.md) requires.
   [`verify-package-artifact.mjs`](packages/core-testing/scripts/verify-package-artifact.mjs) checks
   the published entry points and the dependency policy between packages.
 - The breaking styling API changes, including the move to `@qrcodesdk/core/style` factories and

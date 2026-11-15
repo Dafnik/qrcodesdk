@@ -147,11 +147,7 @@ describe('QRCodeSVG', () => {
   });
 
   test('accepts bundled assets and URI sources as center images', () => {
-    for (const source of [
-      42,
-      {uri: 'https://qrcodesdk.dev/logo.png'},
-      [{uri: 'file:///logo.png'}],
-    ]) {
+    for (const source of [42, {uri: 'https://qrcodesdk.dev/logo.png'}]) {
       const {container, unmount} = render(
         <QRCodeSVG payload="HELLO" options={{centerImage: api.svgCenterImage(source)}} />,
       );
@@ -164,6 +160,7 @@ describe('QRCodeSVG', () => {
     ['an empty object', {}],
     ['a remote URL string', 'https://qrcodesdk.dev/logo.png'],
     ['an empty array', []],
+    ['a URI source array', [{uri: 'file:///logo.png'}]],
     ['null', null],
   ])('rejects %s as a center image source', (_name, source) => {
     expect(() => api.svgCenterImage(source as never)).toThrow(
