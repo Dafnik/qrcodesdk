@@ -61,7 +61,6 @@ export const DOCUMENTATION_SIDEBAR = [
     label: 'Learn and project',
     items: [
       {label: 'How QR codes work', slug: 'learn/how-qr-codes-work'},
-      {label: 'Performance', slug: 'learn/performance'},
       {label: 'Version and output policy', slug: 'project/release-policy'},
       {label: 'Compare with other libraries', slug: 'learn/comparison'},
       {label: 'Credits', slug: 'project/credits'},

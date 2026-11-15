@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "lib": [
+      "es2021",
+      "es2022.array",
+      "es2022.intl",
+      "es2022.object",
+      "es2022.regexp",
+      "es2022.string",
+      "es2023.array",
+      "dom",
+      "dom.iterable"
+    ],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "types": ["node"],
+    "verbatimModuleSyntax": true
+  },
+  "exclude": ["src/speed/workloads/explain.ts"],
+  "extends": "@repo/typescript-config/ts-library.json",
+  "include": ["src", "tests"]
+}

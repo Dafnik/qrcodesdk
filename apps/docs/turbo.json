@@ -1,15 +1,13 @@
 {
   "extends": ["//"],
   "tasks": {
-    "benchmark:explain": {
-      "cache": false,
-      "dependsOn": ["^build"]
-    },
     "build": {
-      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/packages/core/src/**"]
-    },
-    "check-performance": {
-      "cache": false
+      "inputs": [
+        "$TURBO_EXTENDS$",
+        "$TURBO_ROOT$/packages/core/src/**",
+        "$TURBO_ROOT$/packages/perf/baseline/**",
+        "$TURBO_ROOT$/packages/perf/reports/**"
+      ]
     },
     "check-readmes": {
       "cache": false
@@ -17,9 +15,6 @@
     "check-types": {
       "dependsOn": ["$TURBO_EXTENDS$", "build"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/core/src/**"]
-    },
-    "generate-performance": {
-      "cache": false
     },
     "generate-readmes": {
       "cache": false

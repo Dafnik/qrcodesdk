@@ -1,0 +1,73 @@
+---
+/*
+ * Standalone layout of the internal size and speed reports next to the dev tools. Like
+ * `/devtools`, these pages live outside Starlight and are not indexed.
+ */
+import '../../styles/perf-reports.css';
+
+type Props = {
+  title: string;
+  active: 'size' | 'speed';
+  subtitle: string;
+};
+
+const {title, active, subtitle} = Astro.props;
+const links = [
+  {href: '/devtools/size/', label: 'Bundle size', id: 'size'},
+  {href: '/devtools/speed/', label: 'Speed', id: 'speed'},
+] as const;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title} | QRCodeSDK Dev Tools</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      // Applies Starlight's stored theme before the first paint.
+      const stored = localStorage.getItem('starlight-theme');
+      const theme =
+        stored === 'dark' || stored === 'light'
+          ? stored
+          : matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+      document.documentElement.dataset.theme = theme;
+    </script>
+  </head>
+  <body>
+    <header class="perf-header">
+      <a class="perf-button" href="/">
+        ← Docs
+      </a>
+      <a class="perf-button" href="/devtools">
+        Dev tools
+      </a>
+      <nav class="perf-tabs" aria-label="Reports">
+        {links.map((link) => (
+          <a href={link.href} aria-current={link.id === active ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))}
+      </nav>
+      <button class="perf-button perf-theme" type="button" data-theme-toggle>
+        Toggle theme
+      </button>
+    </header>
+    <main class="perf-main">
+      <h1>{title}</h1>
+      <p class="perf-muted">{subtitle}</p>
+      <slot />
+    </main>
+    <script is:inline>
+      document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('starlight-theme', next);
+      });
+    </script>
+  </body>
+</html>

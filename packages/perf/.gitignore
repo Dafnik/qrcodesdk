@@ -1,0 +1,4 @@
+# Generated apps, bundles, and comparison checkouts.
+/.cache/
+# Latest reports. The committed reports live in baseline/.
+/reports/

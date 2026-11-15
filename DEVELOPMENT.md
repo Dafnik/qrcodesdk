@@ -32,7 +32,7 @@ pnpm turbo run check
 
 This runs formatting, spelling, terminology, linting, type checking, builds, and the regular
 tests. Docs linting also checks the generated package READMEs. Roundtrip tests, coverage,
-benchmarks, performance-file checks, and installed-package smoke tests run separately.
+size and speed reports, and installed-package smoke tests run separately.
 
 To run individual checks:
 
@@ -109,14 +109,8 @@ coupled to private core source:
 - The trace is a docs inspector, not a published API. Its types stay in the docs and need no `ɵ`
   prefix.
 
-Measure the explanation with the trace off and on, separately from other tasks:
-
-```sh
-pnpm turbo run benchmark:explain --filter=docs
-```
-
-Vitest's module runner adds overhead to every access of an exported binding, which inflates hot
-loops in core source. Compare results between runs rather than reading them as browser timings.
+The speed report measures the explanation with the trace off and on (`--only=explain/`). See
+[Size and speed reports](#size-and-speed-reports).
 
 Generate or check package READMEs:
 
@@ -125,47 +119,41 @@ pnpm turbo run generate-readmes --filter=docs
 pnpm turbo run check-readmes --filter=docs
 ```
 
-Performance generation and validation read `benchmark-results/latest.json`.
-Run the full benchmark task first to create that file:
+### Size and speed reports
+
+[`@repo/perf`](packages/perf/README.md) measures the bundle size and speed of every feature.
+Nothing here compares QRCodeSDK with other libraries. Build the reports from the workspace root:
 
 ```sh
-pnpm turbo run benchmark --filter=@repo/benchmarks
-pnpm turbo run generate-performance --filter=docs
-pnpm turbo run check-performance --filter=docs
+pnpm turbo run report:size --filter=@repo/perf
+pnpm turbo run report:speed --filter=@repo/perf
+pnpm turbo run report:speed:browser --filter=@repo/perf
 ```
 
-### Benchmarks
+- The size report builds about 60 small apps, such as "matrix with Micro QR" or "React with all
+  components", with Vite. Source maps attribute every byte to a source file and code area. esbuild
+  and webpack build the same apps as a check.
+- The speed report times each workload in its own Node.js process or Chromium page. Run it without
+  other build or test tasks competing for CPU time.
+- Both reports are written to `packages/perf/reports/`. The dev tools show them at
+  `/devtools/size` and `/devtools/speed`, next to the committed baseline in
+  `packages/perf/baseline/`.
 
-Run the full benchmark suite or a focused matrix or styling benchmark:
+CI runs `check:size`, which fails when a scenario grows by more than 1% (at least 64 bytes) gzip
+over the baseline or bundles a feature it does not use. To accept a change, update the baseline
+and commit it:
 
 ```sh
-pnpm turbo run benchmark --filter=@repo/benchmarks
-pnpm turbo run benchmark:jpeg --filter=@repo/benchmarks
-pnpm turbo run benchmark:svg --filter=@repo/benchmarks
-pnpm turbo run benchmark:matrix --filter=@qrcodesdk/core
-pnpm turbo run benchmark:styler --filter=@qrcodesdk/core
-pnpm turbo run benchmark:segmenter --filter=@qrcodesdk/core
+pnpm turbo run report:size --filter=@repo/perf -- --update-baseline
 ```
 
-The segmenter benchmark loads built modules natively. It measures segmentation alone and compares
-full matrix generation with single-mode auto detection and optional mixed-mode optimization.
-
-Measure minified, gzip, and Brotli sizes of standalone consumer bundles:
+Speed is not checked in CI, because shared runners are too noisy. Timings only compare with the
+baseline when they come from the same machine and runtime. To compare with another commit on any
+machine, build it and run both builds interleaved:
 
 ```sh
-pnpm turbo run benchmark:bundles --filter=@qrcodesdk/browser
+pnpm turbo run report:speed --filter=@repo/perf -- --against=main
 ```
-
-The measurements are written to `packages/browser/.turbo/style-bundles/measurements.json`.
-The styler benchmark separates fresh factory setup, setup with reused shapes, plain/styled/circle/
-custom-path drawing, pattern drawing, path serialization, and SVG output with a center image at
-versions 1, 10, and 40. Run performance
-measurements without other build or test tasks competing for CPU time.
-Factory setup measurements batch 100 calls; divide those timings by 100 for a single setup.
-Each workload retains its result so the runtime cannot discard unused output.
-It loads built artifacts natively to avoid Vitest's module-export tracking overhead. To compare
-against a previous build, set `QRCODESDK_BENCHMARK_CORE` to an absolute directory containing that
-build's `index.mjs`, `style.mjs`, `internal.mjs`, and their shared chunks.
 
 ### Public API and internal exports
 

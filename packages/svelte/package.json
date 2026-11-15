@@ -86,7 +86,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@sveltejs/package": "2.5.8",
-    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
     "@testing-library/svelte": "5.4.2",
     "eslint-plugin-svelte": "3.23.1",
     "jsdom": "catalog:",

@@ -5,6 +5,5 @@ import {defineConfig} from 'vitest/config';
 export default defineConfig({
   test: {
     include: ['src/components/explain/**/*.test.ts'],
-    benchmark: {include: ['src/components/explain/**/*.bench.ts']},
   },
 });
