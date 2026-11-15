@@ -37,8 +37,11 @@ function prefersDark(document: Document): boolean {
       <span class="text-muted-foreground text-xs">
         &#64;repo/core-testing fixtures rendered with &#64;qrcodesdk/angular
       </span>
+      <nav class="ms-auto flex gap-1" aria-label="Reports">
+        <a hlmBtn href="/devtools/size/" size="sm" variant="ghost">Bundle size</a>
+        <a hlmBtn href="/devtools/speed/" size="sm" variant="ghost">Speed</a>
+      </nav>
       <button
-        class="ms-auto"
         [attr.aria-label]="dark() ? 'Use light theme' : 'Use dark theme'"
         (click)="dark.set(!dark())"
         hlmBtn

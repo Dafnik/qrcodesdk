@@ -1,0 +1,211 @@
+---
+import type {SpeedRun, SpeedTarget, SpeedWorkloadResult} from '@repo/perf/report-types';
+
+import {
+  type SpeedComparison,
+  compareWorkload,
+  describeEnvironment,
+  formatDate,
+  formatDuration,
+  formatPercent,
+  groupBy,
+  loadSpeedReport,
+  sameEnvironment,
+} from '../../components/perf/report-data';
+import ReportLayout from '../../components/perf/report-layout.astro';
+
+const source = loadSpeedReport();
+const report = source?.report;
+const baseline = source?.baseline;
+const TARGETS: readonly {id: SpeedTarget; title: string}[] = [
+  {id: 'node', title: 'Node.js'},
+  {id: 'browser', title: 'Chromium'},
+];
+const runs = TARGETS.map((target) => ({
+  ...target,
+  run: report?.runs.find((run) => run.target === target.id),
+  baselineRun: baseline?.runs.find((run) => run.target === target.id),
+})).filter((item): item is typeof item & {run: SpeedRun} => item.run !== undefined);
+
+// One row per workload id, with a result for each target that measured it.
+const rows = new Map<
+  string,
+  {workload: SpeedWorkloadResult; results: Map<SpeedTarget, SpeedWorkloadResult>}
+>();
+for (const {run} of runs) {
+  for (const workload of run.workloads) {
+    const row = rows.get(workload.id) ?? {workload, results: new Map()};
+    row.results.set(run.target, workload);
+    rows.set(workload.id, row);
+  }
+}
+const groupOrder = report?.groups.map((group) => group.id) ?? [];
+const groupTitles = new Map(report?.groups.map((group) => [group.id, group.title]));
+const sortedRows = [...rows.values()].sort(
+  (a, b) => groupOrder.indexOf(a.workload.group) - groupOrder.indexOf(b.workload.group),
+);
+const usedFeatures = new Set(sortedRows.flatMap((row) => row.workload.features));
+const features = (report?.features ?? []).filter((feature) => usedFeatures.has(feature.id));
+
+function comparison(
+  target: SpeedTarget,
+  row: (typeof sortedRows)[number],
+): SpeedComparison | undefined {
+  const entry = runs.find((item) => item.id === target);
+  const result = row.results.get(target);
+  if (!entry || !result) return undefined;
+  return compareWorkload(entry.run, result.id, result.stats, entry.baselineRun);
+}
+
+const changes = runs.flatMap(({id, title}) =>
+  sortedRows
+    .map((row) => ({row, change: comparison(id, row)}))
+    .filter(({change}) => change && change.change !== 'same')
+    .map(({row, change}) => ({target: title, row, change: change!})),
+);
+
+const subtitle = !report
+  ? 'No speed report yet. Run report:speed and report:speed:browser in @repo/perf.'
+  : source?.isLocal
+    ? `Local report from ${formatDate(report.generatedAt)} (${report.commit}), compared with the committed baseline (${baseline?.commit ?? 'none'}) where the environment matches.`
+    : `Committed baseline from ${formatDate(report.generatedAt)} (${report.commit}). Run report:speed to compare a local build.`;
+---
+
+<ReportLayout title="Speed" active="speed" subtitle={subtitle}>
+  <p class="perf-note">
+    Each workload runs in its own Node.js process or a fresh Chromium page, so earlier workloads
+    cannot warm up or slow down later ones. The runner warms each workload up, then times batches of
+    at least 10 ms. Times are the median per operation; RME is the relative margin of error of the
+    mean at 95% confidence. A change counts as faster or slower when the median moves by more than
+    5% and more than both margins of error. Timings only compare with a run from the same machine
+    and runtime, or with a build measured in the same run with<code>--against</code>.
+  </p>
+
+  {runs.map(({title, run, baselineRun}) => (
+    <p class="perf-muted">
+      <strong>{title}:</strong> {describeEnvironment(run.environment)}
+      {run.against
+        ? ` · compared with ${run.against.ref} (${run.against.commit}), measured interleaved`
+        : baselineRun && !sameEnvironment(run.environment, baselineRun.environment)
+          ? ' · the baseline comes from another environment, so no comparison is shown'
+          : ''}
+    </p>
+  ))}
+
+  {changes.length > 0 && (
+    <div class="perf-callout">
+      <strong>Changes</strong>
+      <ul>
+        {changes.map(({target, row, change}) => (
+          <li>
+            <span class={change.change === 'slower' ? 'perf-bad' : 'perf-good'}>
+              {formatPercent(change.ratio)} {change.change}
+            </span>{' '}
+            {target}: <a href={`#workload-${row.workload.id}`}>{row.workload.title}</a> vs{' '}
+            {change.against}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  {report && (
+    <div class="perf-filter">
+      <label for="feature-filter">Feature</label>
+      <select id="feature-filter" data-feature-filter>
+        <option value="">All features</option>
+        {features.map((feature) => (
+          <option value={feature.id}>{feature.title}</option>
+        ))}
+      </select>
+    </div>
+  )}
+
+  {report && (
+    <div class="perf-scroll">
+      <table class="perf-table">
+        <thead>
+          <tr>
+            <th>Workload</th>
+            {runs.map(({title}) => (
+              <>
+                <th>{title} median</th>
+                <th>ops/s</th>
+                <th>RME</th>
+                <th>Change</th>
+              </>
+            ))}
+          </tr>
+        </thead>
+        {groupBy(sortedRows, (row) => row.workload.group).map(([group, groupRows]) => (
+          <tbody data-group>
+            <tr>
+              <th colspan={1 + runs.length * 4}>{groupTitles.get(group) ?? group}</th>
+            </tr>
+            {groupRows.map((row) => (
+              <tr
+                id={`workload-${row.workload.id}`}
+                data-features={row.workload.features.join(' ')}>
+                <td>
+                  {row.workload.title}
+                  <small>
+                    <code>{row.workload.id}</code>
+                  </small>
+                </td>
+                {runs.map(({id}) => {
+                  const result = row.results.get(id);
+                  const stats = result?.stats;
+                  const change = comparison(id, row);
+                  if (!result) return <td colspan="4" />;
+                  if (!stats) {
+                    return (
+                      <td colspan="4" class="perf-bad">
+                        {result.error ?? 'failed'}
+                      </td>
+                    );
+                  }
+                  return (
+                    <>
+                      <td
+                        title={`p75 ${formatDuration(stats.p75)} · p99 ${formatDuration(stats.p99)} · min ${formatDuration(stats.min)} · ${stats.samples} samples of ${stats.batch}`}>
+                        {formatDuration(stats.median)}
+                      </td>
+                      <td>{Math.round(stats.hz).toLocaleString('en-US')}</td>
+                      <td>±{stats.rme.toFixed(1)}%</td>
+                      <td
+                        class={
+                          change?.change === 'slower'
+                            ? 'perf-bad'
+                            : change?.change === 'faster'
+                              ? 'perf-good'
+                              : 'perf-muted'
+                        }
+                        title={change ? `vs ${change.against}` : undefined}>
+                        {change ? formatPercent(change.ratio) : ''}
+                      </td>
+                    </>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        ))}
+      </table>
+    </div>
+  )}
+
+  <script>
+    const select = document.querySelector<HTMLSelectElement>('[data-feature-filter]');
+    select?.addEventListener('change', () => {
+      for (const group of document.querySelectorAll<HTMLElement>('tbody[data-group]')) {
+        let visible = 0;
+        for (const row of group.querySelectorAll<HTMLElement>('tr[data-features]')) {
+          const show = !select.value || row.dataset['features']!.split(' ').includes(select.value);
+          row.hidden = !show;
+          if (show) visible++;
+        }
+        group.hidden = visible === 0;
+      }
+    });
+  </script>
+</ReportLayout>

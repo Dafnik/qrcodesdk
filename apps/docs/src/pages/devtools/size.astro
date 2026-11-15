@@ -1,0 +1,416 @@
+---
+import {allowedGrowth} from '@repo/perf/budget';
+import type {SizeReport, SizeScenarioResult} from '@repo/perf/report-types';
+
+import {
+  describeEnvironment,
+  formatBytes,
+  formatDate,
+  formatDelta,
+  groupBy,
+  loadSizeReport,
+} from '../../components/perf/report-data';
+import ReportLayout from '../../components/perf/report-layout.astro';
+
+const source = loadSizeReport();
+// Without a baseline or local report, the page renders empty tables and says how to create one.
+const report: SizeReport = source?.report ?? {
+  schemaVersion: 1,
+  kind: 'size',
+  generatedAt: new Date(0).toISOString(),
+  commit: '',
+  environment: {os: '', cpu: '', cores: 0, memoryGB: 0, node: ''},
+  tools: {},
+  features: [],
+  areas: [],
+  scenarios: [],
+  packages: [],
+};
+const baseline = source?.baseline;
+
+const byId = new Map(report.scenarios.map((scenario) => [scenario.id, scenario]));
+const before = new Map(baseline?.scenarios.map((scenario) => [scenario.id, scenario]));
+const areas = new Map(report.areas.map((area) => [area.id, area]));
+const features = new Map(report.features.map((feature) => [feature.id, feature.title]));
+
+function featureCost(scenario: SizeScenarioResult): number | undefined {
+  const base = scenario.baseline ? byId.get(scenario.baseline) : undefined;
+  return base ? scenario.vite.total.gzip - base.vite.total.gzip : undefined;
+}
+
+function baselineDelta(scenario: SizeScenarioResult) {
+  const previous = before.get(scenario.id);
+  if (!previous) return undefined;
+  const growth = scenario.vite.total.gzip - previous.vite.total.gzip;
+  return {growth, over: growth > allowedGrowth(previous.vite.total.gzip)};
+}
+
+const maxCost = Math.max(1, ...report.scenarios.map((scenario) => featureCost(scenario) ?? 0));
+const problems = report.scenarios.flatMap((scenario) =>
+  scenario.problems.map((problem) => `${scenario.id}: ${problem}`),
+);
+const warnings = report.scenarios.flatMap((scenario) =>
+  scenario.warnings.map((warning) => `${scenario.id}: ${warning}`),
+);
+const overBudget = report.scenarios.filter((scenario) => baselineDelta(scenario)?.over);
+
+const CARDS = ['matrix', 'svg', 'canvas', 'style-all', 'image-all', 'browser-root'];
+
+// The largest size of each QRCodeSDK code area across all scenarios: its full cost.
+const areaSizes = report.areas
+  .filter((area) => area.sdk)
+  .map((area) => {
+    let largest = {bytes: 0, scenario: ''};
+    for (const scenario of report.scenarios) {
+      const bytes = scenario.vite.areas[area.id] ?? 0;
+      if (bytes > largest.bytes) largest = {bytes, scenario: scenario.id};
+    }
+    return {...area, ...largest};
+  })
+  .filter((area) => area.bytes > 0)
+  .sort((a, b) => b.bytes - a.bytes);
+const maxArea = Math.max(1, ...areaSizes.map((area) => area.bytes));
+const packagesBefore = new Map(baseline?.packages.map((item) => [item.name, item]));
+
+function sdkModules(scenario: SizeScenarioResult) {
+  const totals = new Map<string, {bytes: number; area: string}>();
+  for (const chunk of scenario.vite.chunks) {
+    for (const module of chunk.modules) {
+      if (!areas.get(module.area)?.sdk) continue;
+      const total = totals.get(module.path) ?? {bytes: 0, area: module.area};
+      total.bytes += module.bytes;
+      totals.set(module.path, total);
+    }
+  }
+  return [...totals].map(([path, total]) => ({path, ...total})).sort((a, b) => b.bytes - a.bytes);
+}
+
+// Built as strings: Prettier's Astro formatting drops the spaces between text and expressions.
+const introStart = `Every scenario is a small production app built with Vite ${report.tools['vite'] ?? ''}. It reads its payload at runtime, so nothing folds away. Sizes are the JavaScript a browser downloads: minified, gzip (level 6), and Brotli (quality 11). `;
+const introEnd = ` is the gzip difference to the scenario it builds on. Source maps attribute every minified byte to a source file, so each scenario lists the code areas it contains. esbuild ${report.tools['esbuild'] ?? ''} and webpack ${report.tools['webpack'] ?? ''} build the same apps as a tree-shaking check.`;
+
+const subtitle = !source
+  ? 'No size report yet. Run report:size in @repo/perf.'
+  : source.isLocal
+    ? `Local report from ${formatDate(report.generatedAt)} (${report.commit}), compared with the committed baseline (${baseline?.commit ?? 'none'}).`
+    : `Committed baseline from ${formatDate(report.generatedAt)} (${report.commit}). Run report:size to compare a local build.`;
+---
+
+<ReportLayout title="Bundle size" active="size" subtitle={subtitle}>
+  <p class="perf-note">
+    {introStart}
+    <strong>Feature cost</strong>
+    {introEnd}
+  </p>
+
+  {(problems.length > 0 || overBudget.length > 0) && (
+    <div class="perf-callout" data-tone="bad">
+      <strong>Failing the size check</strong>
+      <ul>
+        {problems.map((problem) => (
+          <li>{problem}</li>
+        ))}
+        {overBudget.map((scenario) => (
+          <li>
+            {scenario.id}: grew by {formatBytes(baselineDelta(scenario)!.growth)} gzip, more than
+            its budget
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+  {warnings.length > 0 && (
+    <div class="perf-callout">
+      <strong>Bundler differences</strong>
+      <ul>
+        {warnings.map((warning) => (
+          <li>{warning}</li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  <div class="perf-cards">
+    {CARDS.map((id) => byId.get(id))
+      .filter((scenario) => scenario !== undefined)
+      .map((scenario) => {
+        const delta = baselineDelta(scenario);
+        return (
+          <div class="perf-card">
+            <span>{scenario.title}</span>
+            <strong>{formatBytes(scenario.vite.total.gzip)}</strong>
+            <span>
+              gzip
+              {delta && delta.growth !== 0 && (
+                <span class={delta.growth > 0 ? 'perf-bad' : 'perf-good'}>
+                  {' '}
+                  {formatDelta(delta.growth)}
+                </span>
+              )}
+            </span>
+          </div>
+        );
+      })}
+  </div>
+
+  <h2>Scenarios</h2>
+  <div class="perf-scroll">
+    <table class="perf-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Feature cost</th>
+          <th>gzip</th>
+          <th>Initial / lazy gzip</th>
+          <th>Brotli</th>
+          <th>Minified</th>
+          <th>SDK minified</th>
+          <th>vs baseline</th>
+          <th>esbuild gzip</th>
+          <th>webpack gzip</th>
+        </tr>
+      </thead>
+      {groupBy(report.scenarios, (scenario) => scenario.group).map(([group, scenarios]) => (
+        <tbody>
+          <tr>
+            <th colspan="10">{group}</th>
+          </tr>
+          {scenarios.map((scenario) => {
+            const cost = featureCost(scenario);
+            const delta = baselineDelta(scenario);
+            const issues = scenario.problems.length + scenario.warnings.length;
+            return (
+              <tr>
+                <td>
+                  <a href={`#scenario-${scenario.id}`}>{scenario.title}</a>
+                  {issues > 0 && (
+                    <span
+                      class="perf-badge"
+                      data-tone={scenario.problems.length ? 'bad' : undefined}>
+                      {issues} {issues === 1 ? 'issue' : 'issues'}
+                    </span>
+                  )}
+                  <small>
+                    <code>{scenario.id}</code>
+                    {scenario.baseline && <> over {scenario.baseline}</>}
+                  </small>
+                </td>
+                <td>
+                  {cost === undefined ? '' : formatDelta(cost)}
+                  {cost !== undefined && cost > 0 && (
+                    <span class="perf-bar" style={`width: ${(cost / maxCost) * 100}%`} />
+                  )}
+                </td>
+                <td>{formatBytes(scenario.vite.total.gzip)}</td>
+                <td>
+                  {scenario.vite.lazy.gzip > 0
+                    ? `${formatBytes(scenario.vite.initial.gzip)} / ${formatBytes(scenario.vite.lazy.gzip)}`
+                    : ''}
+                </td>
+                <td>{formatBytes(scenario.vite.total.brotli)}</td>
+                <td>{formatBytes(scenario.vite.total.min)}</td>
+                <td>{formatBytes(scenario.vite.sdkBytes)}</td>
+                <td
+                  class={
+                    delta?.over ? 'perf-bad' : delta && delta.growth < 0 ? 'perf-good' : undefined
+                  }>
+                  {delta ? formatDelta(delta.growth) : baseline ? 'new' : ''}
+                </td>
+                <td>{scenario.esbuild ? formatBytes(scenario.esbuild.total.gzip) : ''}</td>
+                <td>{scenario.webpack ? formatBytes(scenario.webpack.total.gzip) : ''}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      ))}
+    </table>
+  </div>
+
+  <h2>Code areas</h2>
+  <p class="perf-note">
+    The full minified size of each QRCodeSDK code area, from the scenario that contains the most of
+    it. Optional areas are only bundled by apps that use them, and the size check fails a scenario
+    that contains one without using it.
+  </p>
+  <div class="perf-scroll">
+    <table class="perf-table">
+      <thead>
+        <tr>
+          <th>Code area</th>
+          <th>Minified</th>
+          <th>Largest in</th>
+        </tr>
+      </thead>
+      <tbody>
+        {areaSizes.map((area) => (
+          <tr>
+            <td>
+              {area.title}
+              {area.optional && <span class="perf-badge">optional</span>}
+              <small>
+                <code>{area.id}</code>
+              </small>
+            </td>
+            <td style="min-width: 14rem">
+              {formatBytes(area.bytes)}
+              <span class="perf-bar" style={`width: ${(area.bytes / maxArea) * 100}%`} />
+            </td>
+            <td>
+              <a href={`#scenario-${area.scenario}`}>{area.scenario}</a>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Scenario details</h2>
+  {report.scenarios.map((scenario) => {
+    const total = Math.max(1, scenario.vite.total.min);
+    const modules = sdkModules(scenario);
+    return (
+      <details class="perf-details" id={`scenario-${scenario.id}`}>
+        <summary>
+          <strong>{scenario.title}</strong>
+          <span class="perf-muted">
+            {formatBytes(scenario.vite.total.gzip)} gzip · {scenario.vite.chunks.length}{' '}
+            {scenario.vite.chunks.length === 1 ? 'chunk' : 'chunks'} ·{' '}
+            {scenario.features.map((feature) => features.get(feature) ?? feature).join(', ')}
+          </span>
+        </summary>
+        <div>
+          <p class="perf-muted">
+            {scenario.description
+              .split('`')
+              .map((part, index) => (index % 2 === 1 ? <code>{part}</code> : part))}
+          </p>
+          {[...scenario.problems, ...scenario.warnings].map((issue) => (
+            <p class={scenario.problems.includes(issue) ? 'perf-bad' : undefined}>{issue}</p>
+          ))}
+          <div class="perf-grid">
+            <div>
+              <h3>Code areas (minified)</h3>
+              <table class="perf-table">
+                <tbody>
+                  {Object.entries(scenario.vite.areas).map(([id, bytes]) => (
+                    <tr>
+                      <td>
+                        {areas.get(id)?.title ?? id}
+                        <span
+                          class="perf-bar"
+                          data-muted={areas.get(id)?.sdk ? undefined : ''}
+                          style={`width: ${(bytes / total) * 100}%`}
+                        />
+                      </td>
+                      <td>{formatBytes(bytes)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Chunks</h3>
+              <table class="perf-table">
+                <thead>
+                  <tr>
+                    <th>Chunk</th>
+                    <th>Minified</th>
+                    <th>gzip</th>
+                    <th>Brotli</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scenario.vite.chunks.map((chunk) => (
+                    <tr>
+                      <td>
+                        <code>{chunk.name}</code>
+                        <span class="perf-badge">{chunk.kind}</span>
+                      </td>
+                      <td>{formatBytes(chunk.sizes.min)}</td>
+                      <td>{formatBytes(chunk.sizes.gzip)}</td>
+                      <td>{formatBytes(chunk.sizes.brotli)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {scenario.vite.duplicates.length > 0 && (
+                <>
+                  <h3>Duplicated across chunks</h3>
+                  <table class="perf-table">
+                    <tbody>
+                      {scenario.vite.duplicates.map((duplicate) => (
+                        <tr>
+                          <td>
+                            <code>{duplicate.path}</code>
+                            <small>{duplicate.chunks.join(', ')}</small>
+                          </td>
+                          <td>{formatBytes(duplicate.bytes)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </>
+              )}
+            </div>
+          </div>
+          {modules.length > 0 && (
+            <>
+              <h3>QRCodeSDK source files (minified)</h3>
+              <table class="perf-table">
+                <tbody>
+                  {modules.map((module) => (
+                    <tr>
+                      <td>
+                        <code>{module.path}</code>
+                        <small>{areas.get(module.area)?.title}</small>
+                      </td>
+                      <td>{formatBytes(module.bytes)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
+        </div>
+      </details>
+    );
+  })}
+
+  <h2>Published packages</h2>
+  <p class="perf-note">
+    The size of each package as<code>npm pack</code>creates it, including type declarations, source
+    maps, and documentation. This is install size, not what an app bundles.
+  </p>
+  <div class="perf-scroll">
+    <table class="perf-table">
+      <thead>
+        <tr>
+          <th>Package</th>
+          <th>Packed</th>
+          <th>vs baseline</th>
+          <th>Unpacked</th>
+          <th>Files</th>
+        </tr>
+      </thead>
+      <tbody>
+        {report.packages.map((item) => {
+          const previous = packagesBefore.get(item.name);
+          return (
+            <tr>
+              <td>
+                <code>{item.name}</code>
+                <small>{item.version}</small>
+              </td>
+              <td>{formatBytes(item.packed)}</td>
+              <td>{previous ? formatDelta(item.packed - previous.packed) : ''}</td>
+              <td>{formatBytes(item.unpacked)}</td>
+              <td>{item.files}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  {source && <p class="perf-muted">{`Measured on ${describeEnvironment(report.environment)}.`}</p>}
+</ReportLayout>
