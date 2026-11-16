@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-16T11:50:27.492Z",
-  "commit": "61de1389db3f-dirty",
-  "environment": {"os": "Linux 7.2.13-200.fc44.x86_64 x64", "cpu": "AMD Ryzen 7 3700X 8-Core Processor", "cores": 16, "memoryGB": 31, "node": "v26.13.1"},
+  "generatedAt": "2026-11-16T16:21:12.572Z",
+  "commit": "0a71520e7a28",
+  "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "INTEL(R) XEON(R) PLATINUM 8573C", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
     {"id": "matrix", "title": "Matrix generation"},
