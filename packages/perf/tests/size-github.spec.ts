@@ -230,7 +230,7 @@ test('daily writer commits only the fixed baseline path with a file SHA guard', 
     path: 'packages/perf/baseline/size.json',
     branch: 'main',
     sha: 'existing-file-sha',
-    message: 'chore: update size baseline',
+    message: 'chore: update size baseline [skip ci]',
     content: Buffer.from(await readFile(baselineFile, 'utf8')).toString('base64'),
   });
 });

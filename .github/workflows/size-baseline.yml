@@ -48,10 +48,10 @@ jobs:
     needs: measure
     runs-on: ubuntu-24.04
     permissions:
-      contents: write
+      contents: read
     cache-mode: none
     steps:
-      # The write token never reaches a package manager or build command.
+      # The App token is created last and never reaches a package manager or build command.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: main
@@ -62,12 +62,22 @@ jobs:
           name: daily-size-baseline
           path: ${{ runner.temp }}/size-baseline
 
+      # main is protected; only the baseline App may bypass its ruleset.
+      - name: Create baseline App token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.SIZE_BASELINE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SIZE_BASELINE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
       - name: Commit baseline file to main
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           SIZE_SOURCE_COMMIT: ${{ needs.measure.outputs.commit }}
           SIZE_REPORT: ${{ runner.temp }}/size-baseline/size.json
         with:
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             const {commitSizeBaseline} = await import(`${process.env.GITHUB_WORKSPACE}/packages/perf/src/size/github.ts`);
             await commitSizeBaseline(github, context.repo, process.env.SIZE_REPORT, process.env.SIZE_SOURCE_COMMIT);

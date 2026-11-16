@@ -148,7 +148,7 @@ a size budget in CI. Build or report failures appear in the comment with a link 
 
 The **Update size baseline** workflow measures current `main` daily at 03:23 UTC and commits only
 the size baseline back to `main`. It can also be run manually on `main`. Its separate commit job
-needs permission to update that file under the repository's branch protection rules. If `main`
+uses a token of a dedicated GitHub App that may bypass the rulesets protecting `main`. If `main`
 changes during measurement, the update fails rather than committing an outdated result; rerun the
 workflow. Failed or delayed schedules leave the previous baseline in place. Existing PR comments
 refresh on their next measurement run, not automatically when the baseline changes.

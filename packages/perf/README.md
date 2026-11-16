@@ -74,9 +74,10 @@ attached to the measurement run for 14 days. Size changes are informational.
 - `.github/workflows/size-baseline.yml` measures current `main` daily at 03:23 UTC, or manually on
   `main`. A separate job validates the source commit and commits only `baseline/size.json` through
   the GitHub Contents API. The build job has read-only permissions; the write job installs no
-  packages and runs no build commands. Branch protection must permit the bot to update the file.
-  If `main` moves during measurement, the workflow fails and can be rerun. No force push or branch
-  protection bypass is attempted. Failed or delayed schedules leave the previous baseline intact.
+  packages and runs no build commands. It commits with a short-lived token of a dedicated GitHub
+  App, which must be on the bypass list of every ruleset protecting `main`. If `main` moves during
+  measurement, the workflow fails and can be rerun. No force push is attempted. Failed or delayed
+  schedules leave the previous baseline intact.
 - `.github/workflows/size.yml` uses ordinary `pull_request` events, so GitHub's fork approval rules
   apply. It builds the PR merged onto its target branch and uploads one size report. It does not
   rebuild `main`. Repository and cache permissions are read-only, with no supplied secrets.
@@ -93,8 +94,8 @@ attached to the measurement run for 14 days. Size changes are informational.
   conflicts can prevent GitHub from starting the normal PR workflow until resolved.
 
 The workflows must first land on `main` to enable scheduled baseline updates and trusted publishing.
-The bot uses `GITHUB_TOKEN`; its baseline commits do not trigger another push workflow. Existing
-PRs receive reports on their next run. No speed baseline or speed report is updated in CI.
+Baseline commits carry `[skip ci]`, so they do not trigger another push workflow. Existing PRs
+receive reports on their next run. No speed baseline or speed report is updated in CI.
 
 ## Speed report
 

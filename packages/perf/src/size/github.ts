@@ -242,7 +242,7 @@ export async function commitSizeBaseline(
     path: BASELINE_PATH,
     branch: 'main',
     sha: previous.sha,
-    message: 'chore: update size baseline',
+    message: 'chore: update size baseline [skip ci]',
     content: Buffer.from(content).toString('base64'),
   });
 }
