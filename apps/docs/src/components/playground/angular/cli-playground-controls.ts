@@ -143,7 +143,8 @@ import {QrEncodingControls, QrMatrixControls} from './qr-matrix-controls.ts';
               class="block py-2"
               [options]="matrixOptions()"
               [update]="update"
-              [allowSymbols]="false"
+              [allowMicroFallback]="false"
+              [standardQuietZone]="2"
               idPrefix="cli-" />
           </hlm-accordion-content>
         </hlm-accordion-item>

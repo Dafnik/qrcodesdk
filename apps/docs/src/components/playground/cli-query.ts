@@ -17,12 +17,18 @@ const fields = {
   level: 'errorCorrectionLevel',
   version: 'version',
   mask: 'mask',
+  micro: 'micro',
+  'micro-version': 'microVersion',
+  'micro-mask': 'microMask',
+  rmqr: 'rmqr',
+  'rmqr-version': 'rmqrVersion',
   eci: 'eci',
   'optimize-segments': 'optimizeSegments',
   kanji: 'kanji',
 } as const satisfies Record<string, keyof CliPlaygroundOptions>;
 
 const enums = {
+  microVersion: ['M1', 'M2', 'M3', 'M4'],
   launcher: ['npm', 'installed', 'pnpm', 'viteplus', 'bun', 'yarn'],
   format: ['text', 'svg'],
   layout: ['compact', 'full'],
@@ -40,12 +46,26 @@ export function readCliOptionsFromSearchParams(params: URLSearchParams): CliPlay
     if (field in enums) {
       const allowed: readonly string[] = enums[field as keyof typeof enums];
       if (allowed.includes(raw)) Object.assign(options, {[field]: raw});
-    } else if (field === 'eci' || field === 'optimizeSegments' || field === 'kanji') {
-      if (raw === 'true' || raw === 'false') options[field] = raw === 'true';
-    } else if (['moduleSize', 'quietZone', 'version', 'mask'].includes(field)) {
+    } else if (['eci', 'optimizeSegments', 'kanji', 'micro', 'rmqr'].includes(field)) {
+      if (raw === 'true' || raw === 'false') Object.assign(options, {[field]: raw === 'true'});
+    } else if (field === 'rmqrVersion') {
+      if (
+        /^R(?:7|9|11|13|15|17)$/.test(raw) ||
+        /^R(?:7|9|11|13|15|17)x(?:43|59|77|99|139)$/.test(raw) ||
+        /^R(?:11|13)x27$/.test(raw)
+      )
+        Object.assign(options, {[field]: raw});
+    } else if (['moduleSize', 'quietZone', 'version', 'mask', 'microMask'].includes(field)) {
       const number = Number(raw);
-      const minimum = field === 'mask' || field === 'quietZone' ? 0 : 1;
-      const maximum = field === 'version' ? 40 : field === 'mask' ? 7 : Number.MAX_SAFE_INTEGER;
+      const minimum = field === 'mask' || field === 'microMask' || field === 'quietZone' ? 0 : 1;
+      const maximum =
+        field === 'version'
+          ? 40
+          : field === 'mask'
+            ? 7
+            : field === 'microMask'
+              ? 3
+              : Number.MAX_SAFE_INTEGER;
       if (
         /^\d+$/.test(raw) &&
         Number.isSafeInteger(number) &&

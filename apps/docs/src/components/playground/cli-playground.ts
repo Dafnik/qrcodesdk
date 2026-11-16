@@ -9,6 +9,8 @@ import {
   type QRCodeTextRendererOptions,
   qrcode,
 } from '@qrcodesdk/core';
+import {microQR} from '@qrcodesdk/core/micro';
+import {rMQR} from '@qrcodesdk/core/rmqr';
 import {automaticSegmenter} from '@qrcodesdk/core/segmenter';
 
 import {createPackageManagerCommands} from '../../utils/package-manager-commands.mjs';
@@ -18,10 +20,13 @@ import {
   playgroundKanjiTable,
   playgroundUsesKanji,
 } from './playground-kanji.ts';
-import {playgroundOptions} from './playground-options.ts';
+import {type PlaygroundOptions, playgroundOptions} from './playground-options.ts';
 
 export type CliLauncher = 'npm' | 'installed' | 'pnpm' | 'viteplus' | 'bun' | 'yarn';
-export interface CliPlaygroundOptions extends Omit<QRCodeStandardMatrixOptions, 'kanji'> {
+export interface CliPlaygroundOptions
+  extends
+    Omit<QRCodeStandardMatrixOptions, 'kanji'>,
+    Pick<PlaygroundOptions, 'micro' | 'microVersion' | 'microMask' | 'rmqr' | 'rmqrVersion'> {
   optimizeSegments?: boolean;
   /** Adds `--kanji`, so auto mode and optimized segments can use Kanji mode. */
   kanji?: boolean;
@@ -130,16 +135,26 @@ export function quoteShellArgument(value: string): string {
 
 /** Map CLI settings to SVG renderer options without framework styling or center images. */
 export function createCliSVGOptions(options: CliPlaygroundOptions): QRCodeSVGOptions {
+  const commonMatrix = {
+    mode: options.mode,
+    kanji: playgroundUsesKanji(options) ? playgroundKanjiTable() : undefined,
+    errorCorrectionLevel: options.errorCorrectionLevel,
+  };
   return {
-    matrix: {
-      mode: options.mode,
-      segmenter: options.optimizeSegments ? automaticSegmenter : undefined,
-      kanji: playgroundUsesKanji(options) ? playgroundKanjiTable() : undefined,
-      errorCorrectionLevel: options.errorCorrectionLevel,
-      version: options.version,
-      mask: options.mask,
-      eci: options.eci ?? false,
-    },
+    matrix: options.rmqr
+      ? {...commonMatrix, symbol: rMQR({version: options.rmqrVersion})}
+      : options.micro
+        ? {
+            ...commonMatrix,
+            symbol: microQR({version: options.microVersion, mask: options.microMask}),
+          }
+        : {
+            ...commonMatrix,
+            segmenter: options.optimizeSegments ? automaticSegmenter : undefined,
+            version: options.version,
+            mask: options.mask,
+            eci: options.eci ?? false,
+          },
     style: {
       moduleSize: options.moduleSize,
       quietZone: options.quietZone,
@@ -182,14 +197,23 @@ export function generateCliCommand(options: CliPlaygroundOptions): string {
   if (options.format === 'svg')
     args.push('--format', 'svg', '--output', quoteShellArgument(options.outputPath));
   if (options.mode !== undefined) args.push('--mode', options.mode);
-  if (options.optimizeSegments) args.push('--optimize-segments');
+  if (options.rmqr) args.push('--symbol', 'rmqr');
+  else if (options.micro) args.push('--symbol', 'micro');
+  if (!options.micro && !options.rmqr && options.optimizeSegments) args.push('--optimize-segments');
   // `--mode kanji` loads the Kanji table on its own.
   if (options.kanji && options.mode !== 'kanji') args.push('--kanji');
   if (options.errorCorrectionLevel !== undefined && options.errorCorrectionLevel !== 'M')
     args.push('--error-correction', options.errorCorrectionLevel);
-  if (options.version !== undefined) args.push('--version', String(options.version));
-  if (options.mask !== undefined) args.push('--mask', String(options.mask));
-  if (options.eci) args.push('--eci');
+  if (options.rmqr) {
+    if (options.rmqrVersion !== undefined) args.push('--version', options.rmqrVersion);
+  } else if (options.micro) {
+    if (options.microVersion !== undefined) args.push('--version', options.microVersion);
+    if (options.microMask !== undefined) args.push('--mask', String(options.microMask));
+  } else {
+    if (options.version !== undefined) args.push('--version', String(options.version));
+    if (options.mask !== undefined) args.push('--mask', String(options.mask));
+    if (options.eci) args.push('--eci');
+  }
   if (options.moduleSize !== defaultCliOptions.moduleSize)
     args.push('--module-size', String(options.moduleSize));
   if (options.quietZone !== defaultCliOptions.quietZone)

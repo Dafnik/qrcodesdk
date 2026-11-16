@@ -155,9 +155,11 @@ const QUIET_ZONES = {standard: 4, micro: 2, rmqr: 2} as const satisfies Record<
 export function playgroundSymbolPatch(
   current: Pick<PlaygroundOptions, 'quietZone' | 'micro' | 'rmqr' | 'errorCorrectionLevel'>,
   symbol: PlaygroundSymbol,
+  standardQuietZone = 4,
 ): Partial<PlaygroundOptions> {
-  const from = QUIET_ZONES[playgroundSymbol(current)];
-  const to = QUIET_ZONES[symbol];
+  const quietZones = {...QUIET_ZONES, standard: standardQuietZone};
+  const from = quietZones[playgroundSymbol(current)];
+  const to = quietZones[symbol];
   const patch: Partial<PlaygroundOptions> = {micro: symbol === 'micro', rmqr: symbol === 'rmqr'};
   if (current.quietZone === from && from !== to) patch.quietZone = to;
   if (symbol === 'rmqr' && current.errorCorrectionLevel === 'L')

@@ -101,6 +101,38 @@ that draws light modules on a dark background. The code looks inverted and many 
 Keep ANSI on, or pass `--ansi blocks`. ANSI output always paints dark modules with `--foreground`
 and light modules with `--background`.
 
+## Micro QR and rMQR codes
+
+Use `--symbol micro` for Micro QR codes or `--symbol rmqr` for rectangular Micro QR codes.
+The default is `--symbol qr`, a standard QR Code Model 2 symbol. All three symbol types work
+with terminal text and every file format.
+
+```sh
+qrc "12345" --symbol micro
+qrc "12345" --symbol micro --version M1 --output micro.svg
+qrc "HELLO" --symbol micro --version M4 --mask 2 --output micro.png
+qrc "HELLO" --symbol rmqr --version R7x43 --output rectangular.svg
+qrc "HELLO" --symbol rmqr --version R7 --error-correction H
+```
+
+| Symbol  | `--version`                                                                  | `--mask`    | Error correction      |
+| ------- | ---------------------------------------------------------------------------- | ----------- | --------------------- |
+| `qr`    | `1` to `40`                                                                  | `0` to `7`  | L, M, Q, H            |
+| `micro` | `M1` to `M4`                                                                 | `0` to `3`  | L or M; Q requires M4 |
+| `rmqr`  | Exact size such as `R7x43`, or height `R7`, `R9`, `R11`, `R13`, `R15`, `R17` | Unsupported | M or H                |
+
+Version and mask selection are automatic when omitted. Micro QR uses M2 or larger unless you
+request M1 explicitly. M1 accepts only numeric data and detects errors without correcting them.
+For rMQR, a height selector chooses the narrowest width at that height that holds the payload.
+
+Micro QR and rMQR reject `--eci` and `--optimize-segments`. Both support `--kanji` and
+`--mode kanji`. A payload or error-correction level that does not fit fails with an error;
+the CLI does not fall back to a standard QR code. The default two-module quiet zone suits both
+symbol types.
+
+See [Micro QR codes](/guides/micro-qr-codes/) and [rMQR codes](/guides/rmqr-codes/) for capacity
+and scanner compatibility.
+
 ## CLI defaults differ from the library
 
 |             | CLI | Library renderers |
@@ -174,6 +206,9 @@ For colors, module size, quiet zones, and scan reliability, see
 
 ### Version and mask
 
+This example uses the default standard QR symbol. Other symbol types accept the versions and
+masks listed above.
+
 Leave mode, version, and mask automatic. Pin them only when a compatibility target or a layout
 needs a specific mode, symbol size, or mask:
 
@@ -227,15 +262,16 @@ qrc --payload "-42" --output negative.png
 | `-V`                                                 | Print the installed CLI package version.                                    | -           |
 | `--format <text\|svg\|png\|webp\|gif\|jpeg>`         | Output format, in lowercase. Inferred from the output path.                 | `text`      |
 | `-o, --output <path>`                                | Required output path for SVG, PNG, WebP, GIF, and JPEG.                     | -           |
+| `--symbol <qr\|micro\|rmqr>`                         | Symbol type.                                                                | `qr`        |
 | `--mode <auto\|numeric\|alphanumeric\|octet\|kanji>` | QR code mode, in lowercase. `kanji` loads the Kanji table.                  | `auto`      |
 | `--error-correction <L\|M\|Q\|H>`                    | Error correction level. Lowercase letters are accepted.                     | `M`         |
-| `--version <1-40>`                                   | Pin a QR code version.                                                      | Automatic   |
-| `--mask <0-7>`                                       | Pin a QR code mask.                                                         | Automatic   |
-| `--optimize-segments`                                | Optimize mixed-mode segments in auto mode.                                  | off         |
+| `--version <version>`                                | Pin a symbol version or rMQR height.                                        | Automatic   |
+| `--mask <mask>`                                      | Pin a QR mask 0-7 or Micro mask 0-3. Unsupported for rMQR.                  | Automatic   |
+| `--optimize-segments`                                | Optimize mixed-mode segments in auto mode for standard QR codes.            | off         |
 | `--no-optimize-segments`                             | Use single-mode detection in auto mode.                                     | -           |
 | `--kanji`                                            | Encode Shift JIS characters in Kanji mode in auto mode.                     | off         |
 | `--no-kanji`                                         | Encode Japanese text as UTF-8 octets in auto mode.                          | -           |
-| `--eci`                                              | Emit UTF-8 ECI assignment 26 for octet segments.                            | off         |
+| `--eci`                                              | Emit UTF-8 ECI assignment 26 for standard QR octet segments.                | off         |
 | `--no-eci`                                           | Do not emit UTF-8 ECI assignment 26.                                        | -           |
 | `--module-size <number>`                             | Module size as a positive integer.                                          | `1`         |
 | `--quiet-zone <number>`                              | Quiet zone as a non-negative integer.                                       | `2`         |
