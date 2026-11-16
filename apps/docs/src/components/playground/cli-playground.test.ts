@@ -27,6 +27,7 @@ import {readCliOptionsFromSearchParams, writeCliOptionsToSearchParams} from './c
 import {
   defaultPlaygroundOptions,
   playgroundOptions,
+  playgroundSymbolPatch,
   updateQrOptions,
 } from './playground-options.ts';
 import {readQrOptionsFromSearchParams} from './query-sync.ts';
@@ -356,6 +357,81 @@ describe('CLI state and query parameters', () => {
     assert.equal(
       readQrOptionsFromSearchParams(new URLSearchParams('package=vue&module-size=8')).packageName,
       'vue',
+    );
+  });
+});
+
+describe('CLI Micro QR and rMQR showcase', () => {
+  const symbols = [
+    {micro: true},
+    {micro: true, microVersion: 'M1'},
+    {micro: true, microVersion: 'M4', microMask: 0},
+    {rmqr: true},
+    {rmqr: true, rmqrVersion: 'R7'},
+    {rmqr: true, rmqrVersion: 'R7x43'},
+  ] as const;
+  for (const symbol of symbols) {
+    for (const format of ['text', 'svg'] as const) {
+      test(`${JSON.stringify(symbol)} ${format} matches the real CLI`, () => {
+        const directory = mkdtempSync(join(tmpdir(), 'qrcodesdk-cli-symbol-'));
+        try {
+          const options: CliPlaygroundOptions = {
+            ...defaultCliOptions,
+            ...symbol,
+            payload: '12345',
+            format,
+            outputPath: join(directory, 'symbol.svg'),
+            // Stored standard options must not reach a Micro QR or rMQR command or preview.
+            version: 40,
+            mask: 7,
+            eci: true,
+            optimizeSegments: true,
+          };
+          const command = generateCliCommand(options);
+          assert.match(command, /--symbol (micro|rmqr)/);
+          assert.doesNotMatch(command, /--eci|--optimize-segments|--version 40|--mask 7/);
+          const preview = createCliPreview(options);
+          assert.equal(preview.state, 'ready');
+          if (preview.state !== 'ready') return;
+          if (format === 'text') assert.equal(runCommand(options), preview.text);
+          else {
+            assert.equal(runCommand(options), '');
+            const {matrix, ...renderer} = preview.svgOptions;
+            assert.equal(
+              readFileSync(options.outputPath, 'utf8'),
+              qrcode(options.payload).options(matrix).render(QRCodeSVGRenderer(renderer)),
+            );
+          }
+          const params = new URLSearchParams();
+          writeCliOptionsToSearchParams(params, options);
+          assert.deepEqual(readCliOptionsFromSearchParams(params), options);
+        } finally {
+          rmSync(directory, {recursive: true, force: true});
+        }
+      });
+    }
+  }
+  test('switching symbols keeps the CLI quiet zone and restores standard settings', () => {
+    updateCliOptions({payload: '12345', version: 3, mask: 5, eci: true, optimizeSegments: true});
+    for (const symbol of ['micro', 'rmqr', 'standard'] as const) {
+      updateCliOptions(playgroundSymbolPatch(cliPlaygroundOptions.get(), symbol, 2));
+      const options = cliPlaygroundOptions.get();
+      assert.equal(options.quietZone, 2);
+      assert.equal(createCliPreview(options).state, 'ready');
+    }
+    const command = generateCliCommand(cliPlaygroundOptions.get());
+    assert.match(command, /--version 3 --mask 5 --eci/);
+    assert.match(command, /--optimize-segments/);
+    assert.doesNotMatch(command, /--symbol/);
+  });
+  test('invalid symbol URL values fall back to automatic selection', () => {
+    assert.deepEqual(
+      readCliOptionsFromSearchParams(
+        new URLSearchParams(
+          'cli-micro=yes&cli-rmqr=1&cli-micro-version=M5&cli-micro-mask=4&cli-rmqr-version=R7x27',
+        ),
+      ),
+      defaultCliOptions,
     );
   });
 });

@@ -282,24 +282,26 @@ export class QrMatrixControls extends QrOptionsControls {
           </div>
         </div>
 
-        <label
-          class="border-input rounded-md border p-4"
-          [for]="idPrefix() + 'micro-fallback'"
-          hlmField>
-          <div class="flex items-center justify-between gap-4">
-            <div class="grid gap-1">
-              <span hlmFieldLabel>Fall back to a standard QR code</span>
-              <p hlmFieldDescription>
-                Generate a standard QR code when no Micro QR code holds the payload at the error
-                correction level.
-              </p>
+        @if (allowMicroFallback()) {
+          <label
+            class="border-input rounded-md border p-4"
+            [for]="idPrefix() + 'micro-fallback'"
+            hlmField>
+            <div class="flex items-center justify-between gap-4">
+              <div class="grid gap-1">
+                <span hlmFieldLabel>Fall back to a standard QR code</span>
+                <p hlmFieldDescription>
+                  Generate a standard QR code when no Micro QR code holds the payload at the error
+                  correction level.
+                </p>
+              </div>
+              <hlm-switch
+                [checked]="currentOptions().microFallback ?? false"
+                [inputId]="idPrefix() + 'micro-fallback'"
+                (checkedChange)="updateQrOptions({microFallback: $event})" />
             </div>
-            <hlm-switch
-              [checked]="currentOptions().microFallback ?? false"
-              [inputId]="idPrefix() + 'micro-fallback'"
-              (checkedChange)="updateQrOptions({microFallback: $event})" />
-          </div>
-        </label>
+          </label>
+        }
 
         @if (hasUnreliableFinderRing()) {
           <hlm-alert>
@@ -408,8 +410,9 @@ export class QrMatrixControls extends QrOptionsControls {
   `,
 })
 export class QrEncodingControls extends QrOptionsControls {
-  /** The CLI cannot generate Micro QR or rMQR codes, so it hides the symbol choice. */
   readonly allowSymbols = input(true);
+  readonly allowMicroFallback = input(true);
+  readonly standardQuietZone = input(4);
 
   protected readonly VERSION_OPTIONS = Array.from({length: 40}, (_, index) => index + 1);
   protected readonly MASK_OPTIONS = Array.from({length: 8}, (_, index) => index);
@@ -469,6 +472,8 @@ export class QrEncodingControls extends QrOptionsControls {
         : `${version.slice(1)} modules high`;
 
   protected setSymbol(symbol: PlaygroundSymbol): void {
-    this.updateQrOptions(playgroundSymbolPatch(this.currentOptions(), symbol));
+    this.updateQrOptions(
+      playgroundSymbolPatch(this.currentOptions(), symbol, this.standardQuietZone()),
+    );
   }
 }
