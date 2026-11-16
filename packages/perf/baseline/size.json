@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-16T09:27:10.806Z",
-  "commit": "7a0c8c3372ac-dirty",
+  "generatedAt": "2026-11-16T11:50:27.492Z",
+  "commit": "61de1389db3f-dirty",
   "environment": {"os": "Linux 7.2.13-200.fc44.x86_64 x64", "cpu": "AMD Ryzen 7 3700X 8-Core Processor", "cores": 16, "memoryGB": 31, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
@@ -123,25 +123,25 @@
       ],
       "baseline": "empty",
       "vite": {
-        "total": {"min": 10557, "gzip": 4702, "brotli": 4285},
-        "initial": {"min": 10557, "gzip": 4702, "brotli": 4285},
+        "total": {"min": 10701, "gzip": 4775, "brotli": 4362},
+        "initial": {"min": 10701, "gzip": 4775, "brotli": 4362},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 9824,
-        "areas": {"core:matrix": 8506, "core:builder": 1177, "other": 670, "core:error": 141, "app": 63},
+        "sdkBytes": 9968,
+        "areas": {"core:matrix": 8650, "core:builder": 1177, "other": 670, "core:error": 141, "app": 63},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 10557, "gzip": 4702, "brotli": 4285},
+            "sizes": {"min": 10701, "gzip": 4775, "brotli": 4362},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1579},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 947},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 636},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 586},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 492},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 376},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -168,14 +168,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 9981, "gzip": 4529, "brotli": 4114},
-        "initial": {"min": 9981, "gzip": 4529, "brotli": 4114},
+        "total": {"min": 10125, "gzip": 4592, "brotli": 4163},
+        "initial": {"min": 10125, "gzip": 4592, "brotli": 4163},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 9934, "gzip": 4370, "brotli": 3978},
-        "initial": {"min": 9934, "gzip": 4370, "brotli": 3978},
+        "total": {"min": 10082, "gzip": 4437, "brotli": 4067},
+        "initial": {"min": 10082, "gzip": 4437, "brotli": 4067},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -192,25 +192,25 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 10557, "gzip": 4715, "brotli": 4303},
-        "initial": {"min": 10557, "gzip": 4715, "brotli": 4303},
+        "total": {"min": 10701, "gzip": 4786, "brotli": 4353},
+        "initial": {"min": 10701, "gzip": 4786, "brotli": 4353},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 9824,
-        "areas": {"core:matrix": 8506, "core:builder": 1177, "other": 670, "core:error": 141, "app": 63},
+        "sdkBytes": 9968,
+        "areas": {"core:matrix": 8650, "core:builder": 1177, "other": 670, "core:error": 141, "app": 63},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 10557, "gzip": 4715, "brotli": 4303},
+            "sizes": {"min": 10701, "gzip": 4786, "brotli": 4353},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1579},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 946},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 636},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 586},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 492},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -237,14 +237,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 9981, "gzip": 4531, "brotli": 4108},
-        "initial": {"min": 9981, "gzip": 4531, "brotli": 4108},
+        "total": {"min": 10125, "gzip": 4594, "brotli": 4162},
+        "initial": {"min": 10125, "gzip": 4594, "brotli": 4162},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 9934, "gzip": 4370, "brotli": 3978},
-        "initial": {"min": 9934, "gzip": 4370, "brotli": 3978},
+        "total": {"min": 10082, "gzip": 4437, "brotli": 4067},
+        "initial": {"min": 10082, "gzip": 4437, "brotli": 4067},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -261,25 +261,25 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 10623, "gzip": 4722, "brotli": 4287},
-        "initial": {"min": 10623, "gzip": 4722, "brotli": 4287},
+        "total": {"min": 10767, "gzip": 4794, "brotli": 4361},
+        "initial": {"min": 10767, "gzip": 4794, "brotli": 4361},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 9824,
-        "areas": {"core:matrix": 8506, "core:builder": 1177, "other": 670, "core:error": 141, "app": 129},
+        "sdkBytes": 9968,
+        "areas": {"core:matrix": 8650, "core:builder": 1177, "other": 670, "core:error": 141, "app": 129},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 10623, "gzip": 4722, "brotli": 4287},
+            "sizes": {"min": 10767, "gzip": 4794, "brotli": 4361},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1579},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 947},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 636},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 586},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 492},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 376},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -306,14 +306,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 10047, "gzip": 4549, "brotli": 4125},
-        "initial": {"min": 10047, "gzip": 4549, "brotli": 4125},
+        "total": {"min": 10191, "gzip": 4612, "brotli": 4199},
+        "initial": {"min": 10191, "gzip": 4612, "brotli": 4199},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 10000, "gzip": 4390, "brotli": 4009},
-        "initial": {"min": 10000, "gzip": 4390, "brotli": 4009},
+        "total": {"min": 10148, "gzip": 4456, "brotli": 4057},
+        "initial": {"min": 10148, "gzip": 4456, "brotli": 4057},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -331,25 +331,25 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 10570, "gzip": 4708, "brotli": 4302},
-        "initial": {"min": 10570, "gzip": 4708, "brotli": 4302},
+        "total": {"min": 10714, "gzip": 4780, "brotli": 4365},
+        "initial": {"min": 10714, "gzip": 4780, "brotli": 4365},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 9824,
-        "areas": {"core:matrix": 8506, "core:builder": 1177, "other": 670, "core:error": 141, "app": 76},
+        "sdkBytes": 9968,
+        "areas": {"core:matrix": 8650, "core:builder": 1177, "other": 670, "core:error": 141, "app": 76},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 10570, "gzip": 4708, "brotli": 4302},
+            "sizes": {"min": 10714, "gzip": 4780, "brotli": 4365},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1579},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 947},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 636},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 586},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 492},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 376},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -376,14 +376,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 9994, "gzip": 4534, "brotli": 4113},
-        "initial": {"min": 9994, "gzip": 4534, "brotli": 4113},
+        "total": {"min": 10138, "gzip": 4598, "brotli": 4170},
+        "initial": {"min": 10138, "gzip": 4598, "brotli": 4170},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 9947, "gzip": 4376, "brotli": 3982},
-        "initial": {"min": 9947, "gzip": 4376, "brotli": 3982},
+        "total": {"min": 10095, "gzip": 4443, "brotli": 4049},
+        "initial": {"min": 10095, "gzip": 4443, "brotli": 4049},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -402,16 +402,16 @@
       ],
       "baseline": "matrix-auto",
       "vite": {
-        "total": {"min": 11848, "gzip": 5373, "brotli": 4891},
-        "initial": {"min": 11848, "gzip": 5373, "brotli": 4891},
+        "total": {"min": 11992, "gzip": 5445, "brotli": 4952},
+        "initial": {"min": 11992, "gzip": 5445, "brotli": 4952},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 11082,
-        "areas": {"core:matrix": 8516, "core:segmenter": 1248, "core:builder": 1177, "other": 677, "core:error": 141, "app": 89},
+        "sdkBytes": 11226,
+        "areas": {"core:matrix": 8660, "core:segmenter": 1248, "core:builder": 1177, "other": 677, "core:error": 141, "app": 89},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 11848, "gzip": 5373, "brotli": 4891},
+            "sizes": {"min": 11992, "gzip": 5445, "brotli": 4952},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1580},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
@@ -419,9 +419,9 @@
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 950},
               {"path": "(unmapped)", "area": "other", "bytes": 677},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 609},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 305},
@@ -448,14 +448,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 11338, "gzip": 5242, "brotli": 4776},
-        "initial": {"min": 11338, "gzip": 5242, "brotli": 4776},
+        "total": {"min": 11482, "gzip": 5305, "brotli": 4864},
+        "initial": {"min": 11482, "gzip": 5305, "brotli": 4864},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 11232, "gzip": 5025, "brotli": 4595},
-        "initial": {"min": 11232, "gzip": 5025, "brotli": 4595},
+        "total": {"min": 11380, "gzip": 5092, "brotli": 4630},
+        "initial": {"min": 11380, "gzip": 5092, "brotli": 4630},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -474,16 +474,16 @@
       ],
       "baseline": "matrix-auto",
       "vite": {
-        "total": {"min": 22812, "gzip": 14482, "brotli": 13329},
-        "initial": {"min": 22812, "gzip": 14482, "brotli": 13329},
+        "total": {"min": 22956, "gzip": 14563, "brotli": 13397},
+        "initial": {"min": 22956, "gzip": 14563, "brotli": 13397},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 22050,
-        "areas": {"core:kanji-table": 12167, "core:matrix": 8565, "core:builder": 1177, "other": 676, "core:error": 141, "app": 86},
+        "sdkBytes": 22194,
+        "areas": {"core:kanji-table": 12167, "core:matrix": 8709, "core:builder": 1177, "other": 676, "core:error": 141, "app": 86},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 22812, "gzip": 14482, "brotli": 13329},
+            "sizes": {"min": 22956, "gzip": 14563, "brotli": 13397},
             "modules": [
               {"path": "packages/core/src/kanji.ts", "area": "core:kanji-table", "bytes": 11605},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1582},
@@ -491,10 +491,10 @@
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 949},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 636},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 586},
               {"path": "packages/core/src/kanji/decode-table.ts", "area": "core:kanji-table", "bytes": 562},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 492},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/kanji.ts", "area": "core:matrix", "bytes": 317},
@@ -521,14 +521,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 22242, "gzip": 14242, "brotli": 13182},
-        "initial": {"min": 22242, "gzip": 14242, "brotli": 13182},
+        "total": {"min": 22386, "gzip": 14309, "brotli": 13229},
+        "initial": {"min": 22386, "gzip": 14309, "brotli": 13229},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 22195, "gzip": 14100, "brotli": 13026},
-        "initial": {"min": 22195, "gzip": 14100, "brotli": 13026},
+        "total": {"min": 22343, "gzip": 14173, "brotli": 13085},
+        "initial": {"min": 22343, "gzip": 14173, "brotli": 13085},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -548,16 +548,16 @@
       ],
       "baseline": "segmenter",
       "vite": {
-        "total": {"min": 24086, "gzip": 15184, "brotli": 13952},
-        "initial": {"min": 24086, "gzip": 15184, "brotli": 13952},
+        "total": {"min": 24230, "gzip": 15248, "brotli": 14012},
+        "initial": {"min": 24230, "gzip": 15248, "brotli": 14012},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 23304,
-        "areas": {"core:kanji-table": 12166, "core:matrix": 8574, "core:segmenter": 1246, "core:builder": 1177, "other": 683, "core:error": 141, "app": 99},
+        "sdkBytes": 23448,
+        "areas": {"core:kanji-table": 12166, "core:matrix": 8718, "core:segmenter": 1246, "core:builder": 1177, "other": 683, "core:error": 141, "app": 99},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 24086, "gzip": 15184, "brotli": 13952},
+            "sizes": {"min": 24230, "gzip": 15248, "brotli": 14012},
             "modules": [
               {"path": "packages/core/src/kanji.ts", "area": "core:kanji-table", "bytes": 11604},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1582},
@@ -566,10 +566,10 @@
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 949},
               {"path": "(unmapped)", "area": "other", "bytes": 683},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 609},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
               {"path": "packages/core/src/kanji/decode-table.ts", "area": "core:kanji-table", "bytes": 562},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/kanji.ts", "area": "core:matrix", "bytes": 316},
@@ -596,14 +596,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 23586, "gzip": 15025, "brotli": 13846},
-        "initial": {"min": 23586, "gzip": 15025, "brotli": 13846},
+        "total": {"min": 23730, "gzip": 15083, "brotli": 13908},
+        "initial": {"min": 23730, "gzip": 15083, "brotli": 13908},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 23470, "gzip": 14815, "brotli": 13640},
-        "initial": {"min": 23470, "gzip": 14815, "brotli": 13640},
+        "total": {"min": 23618, "gzip": 14888, "brotli": 13684},
+        "initial": {"min": 23618, "gzip": 14888, "brotli": 13684},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -621,16 +621,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 13793, "gzip": 5907, "brotli": 5356},
-        "initial": {"min": 13793, "gzip": 5907, "brotli": 5356},
+        "total": {"min": 13937, "gzip": 5981, "brotli": 5440},
+        "initial": {"min": 13937, "gzip": 5981, "brotli": 5440},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 13037,
-        "areas": {"core:matrix": 8521, "core:micro": 3199, "core:builder": 1176, "other": 670, "core:error": 141, "app": 86},
+        "sdkBytes": 13181,
+        "areas": {"core:matrix": 8665, "core:micro": 3199, "core:builder": 1176, "other": 670, "core:error": 141, "app": 86},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 13793, "gzip": 5907, "brotli": 5356},
+            "sizes": {"min": 13937, "gzip": 5981, "brotli": 5440},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1581},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1283},
@@ -639,9 +639,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 951},
               {"path": "packages/core/src/micro/matrix.ts", "area": "core:micro", "bytes": 900},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 638},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 494},
               {"path": "packages/core/src/micro/encode.ts", "area": "core:micro", "bytes": 402},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -671,14 +671,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 13226, "gzip": 5786, "brotli": 5229},
-        "initial": {"min": 13226, "gzip": 5786, "brotli": 5229},
+        "total": {"min": 13370, "gzip": 5850, "brotli": 5294},
+        "initial": {"min": 13370, "gzip": 5850, "brotli": 5294},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 13155, "gzip": 5546, "brotli": 5043},
-        "initial": {"min": 13155, "gzip": 5546, "brotli": 5043},
+        "total": {"min": 13303, "gzip": 5609, "brotli": 5077},
+        "initial": {"min": 13303, "gzip": 5609, "brotli": 5077},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -696,16 +696,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 15026, "gzip": 6330, "brotli": 5692},
-        "initial": {"min": 15026, "gzip": 6330, "brotli": 5692},
+        "total": {"min": 15170, "gzip": 6402, "brotli": 5766},
+        "initial": {"min": 15170, "gzip": 6402, "brotli": 5766},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 14270,
-        "areas": {"core:matrix": 8524, "core:rmqr": 4428, "core:builder": 1177, "other": 670, "core:error": 141, "app": 86},
+        "sdkBytes": 14414,
+        "areas": {"core:matrix": 8668, "core:rmqr": 4428, "core:builder": 1177, "other": 670, "core:error": 141, "app": 86},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 15026, "gzip": 6330, "brotli": 5692},
+            "sizes": {"min": 15170, "gzip": 6402, "brotli": 5766},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1582},
               {"path": "packages/core/src/rmqr/matrix.ts", "area": "core:rmqr", "bytes": 1581},
@@ -715,9 +715,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 950},
               {"path": "packages/core/src/rmqr/generate.ts", "area": "core:rmqr", "bytes": 887},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/rmqr.ts", "area": "core:rmqr", "bytes": 343},
@@ -746,14 +746,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 14458, "gzip": 6170, "brotli": 5573},
-        "initial": {"min": 14458, "gzip": 6170, "brotli": 5573},
+        "total": {"min": 14602, "gzip": 6231, "brotli": 5604},
+        "initial": {"min": 14602, "gzip": 6231, "brotli": 5604},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 14045, "gzip": 5834, "brotli": 5276},
-        "initial": {"min": 14045, "gzip": 5834, "brotli": 5276},
+        "total": {"min": 14193, "gzip": 5895, "brotli": 5309},
+        "initial": {"min": 14193, "gzip": 5895, "brotli": 5309},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -772,16 +772,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 18314, "gzip": 7358, "brotli": 6656},
-        "initial": {"min": 18314, "gzip": 7358, "brotli": 6656},
+        "total": {"min": 18458, "gzip": 7430, "brotli": 6658},
+        "initial": {"min": 18458, "gzip": 7430, "brotli": 6658},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 17488,
-        "areas": {"core:matrix": 8535, "core:rmqr": 4434, "core:micro": 3202, "core:builder": 1176, "other": 670, "app": 156, "core:error": 141},
+        "sdkBytes": 17632,
+        "areas": {"core:matrix": 8679, "core:rmqr": 4434, "core:micro": 3202, "core:builder": 1176, "other": 670, "app": 156, "core:error": 141},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 18314, "gzip": 7358, "brotli": 6656},
+            "sizes": {"min": 18458, "gzip": 7430, "brotli": 6658},
             "modules": [
               {"path": "packages/core/src/rmqr/matrix.ts", "area": "core:rmqr", "bytes": 1585},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1582},
@@ -793,9 +793,9 @@
               {"path": "packages/core/src/micro/matrix.ts", "area": "core:micro", "bytes": 901},
               {"path": "packages/core/src/rmqr/generate.ts", "area": "core:rmqr", "bytes": 889},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 641},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 614},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 497},
               {"path": "packages/core/src/micro/encode.ts", "area": "core:micro", "bytes": 402},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -827,14 +827,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 17753, "gzip": 7273, "brotli": 6514},
-        "initial": {"min": 17753, "gzip": 7273, "brotli": 6514},
+        "total": {"min": 17897, "gzip": 7337, "brotli": 6541},
+        "initial": {"min": 17897, "gzip": 7337, "brotli": 6541},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 17322, "gzip": 6851, "brotli": 6125},
-        "initial": {"min": 17322, "gzip": 6851, "brotli": 6125},
+        "total": {"min": 17470, "gzip": 6916, "brotli": 6209},
+        "initial": {"min": 17470, "gzip": 6916, "brotli": 6209},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -852,16 +852,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 11424, "gzip": 5062, "brotli": 4609},
-        "initial": {"min": 11424, "gzip": 5062, "brotli": 4609},
+        "total": {"min": 11568, "gzip": 5136, "brotli": 4671},
+        "initial": {"min": 11568, "gzip": 5136, "brotli": 4671},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 10645,
-        "areas": {"core:matrix": 8512, "core:builder": 1177, "core:payload": 815, "other": 670, "core:error": 141, "app": 109},
+        "sdkBytes": 10789,
+        "areas": {"core:matrix": 8656, "core:builder": 1177, "core:payload": 815, "other": 670, "core:error": 141, "app": 109},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 11424, "gzip": 5062, "brotli": 4609},
+            "sizes": {"min": 11568, "gzip": 5136, "brotli": 4671},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1580},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
@@ -869,9 +869,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 950},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
               {"path": "packages/core/src/payload.ts", "area": "core:payload", "bytes": 669},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 636},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 586},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 492},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 376},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -899,14 +899,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 10851, "gzip": 4899, "brotli": 4423},
-        "initial": {"min": 10851, "gzip": 4899, "brotli": 4423},
+        "total": {"min": 10995, "gzip": 4964, "brotli": 4486},
+        "initial": {"min": 10995, "gzip": 4964, "brotli": 4486},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 10794, "gzip": 4735, "brotli": 4322},
-        "initial": {"min": 10794, "gzip": 4735, "brotli": 4322},
+        "total": {"min": 10942, "gzip": 4803, "brotli": 4380},
+        "initial": {"min": 10942, "gzip": 4803, "brotli": 4380},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -924,16 +924,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 13669, "gzip": 6059, "brotli": 5442},
-        "initial": {"min": 13669, "gzip": 6059, "brotli": 5442},
+        "total": {"min": 13813, "gzip": 6132, "brotli": 5531},
+        "initial": {"min": 13813, "gzip": 6132, "brotli": 5531},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 12878,
-        "areas": {"core:matrix": 8522, "core:payload": 3038, "core:builder": 1177, "other": 678, "core:error": 141, "app": 113},
+        "sdkBytes": 13022,
+        "areas": {"core:matrix": 8666, "core:payload": 3038, "core:builder": 1177, "other": 678, "core:error": 141, "app": 113},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 13669, "gzip": 6059, "brotli": 5442},
+            "sizes": {"min": 13813, "gzip": 6132, "brotli": 5531},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
               {"path": "packages/core/src/payload/vcard.ts", "area": "core:payload", "bytes": 1440},
@@ -942,9 +942,9 @@
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 950},
               {"path": "(unmapped)", "area": "other", "bytes": 678},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 588},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -973,14 +973,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 13110, "gzip": 5900, "brotli": 5315},
-        "initial": {"min": 13110, "gzip": 5900, "brotli": 5315},
+        "total": {"min": 13254, "gzip": 5965, "brotli": 5377},
+        "initial": {"min": 13254, "gzip": 5965, "brotli": 5377},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 13054, "gzip": 5741, "brotli": 5178},
-        "initial": {"min": 13054, "gzip": 5741, "brotli": 5178},
+        "total": {"min": 13202, "gzip": 5810, "brotli": 5215},
+        "initial": {"min": 13202, "gzip": 5810, "brotli": 5215},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -998,16 +998,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 13578, "gzip": 6100, "brotli": 5478},
-        "initial": {"min": 13578, "gzip": 6100, "brotli": 5478},
+        "total": {"min": 13722, "gzip": 6174, "brotli": 5559},
+        "initial": {"min": 13722, "gzip": 6174, "brotli": 5559},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 12725,
-        "areas": {"core:matrix": 8520, "core:payload": 2887, "core:builder": 1177, "other": 678, "app": 175, "core:error": 141},
+        "sdkBytes": 12869,
+        "areas": {"core:matrix": 8664, "core:payload": 2887, "core:builder": 1177, "other": 678, "app": 175, "core:error": 141},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 13578, "gzip": 6100, "brotli": 5478},
+            "sizes": {"min": 13722, "gzip": 6174, "brotli": 5559},
             "modules": [
               {"path": "packages/core/src/payload/calendar.ts", "area": "core:payload", "bytes": 1636},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1582},
@@ -1016,9 +1016,9 @@
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 950},
               {"path": "(unmapped)", "area": "other", "bytes": 678},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 588},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 376},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -1046,14 +1046,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 13018, "gzip": 5929, "brotli": 5292},
-        "initial": {"min": 13018, "gzip": 5929, "brotli": 5292},
+        "total": {"min": 13162, "gzip": 5993, "brotli": 5402},
+        "initial": {"min": 13162, "gzip": 5993, "brotli": 5402},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 12948, "gzip": 5764, "brotli": 5189},
-        "initial": {"min": 12948, "gzip": 5764, "brotli": 5189},
+        "total": {"min": 13096, "gzip": 5832, "brotli": 5244},
+        "initial": {"min": 13096, "gzip": 5832, "brotli": 5244},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1071,16 +1071,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 18283, "gzip": 7904, "brotli": 7089},
-        "initial": {"min": 18283, "gzip": 7904, "brotli": 7089},
+        "total": {"min": 18427, "gzip": 7975, "brotli": 7154},
+        "initial": {"min": 18427, "gzip": 7975, "brotli": 7154},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 17036,
-        "areas": {"core:matrix": 8542, "core:payload": 7176, "core:builder": 1177, "other": 976, "app": 271, "core:error": 141},
+        "sdkBytes": 17180,
+        "areas": {"core:matrix": 8686, "core:payload": 7176, "core:builder": 1177, "other": 976, "app": 271, "core:error": 141},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 18283, "gzip": 7904, "brotli": 7089},
+            "sizes": {"min": 18427, "gzip": 7975, "brotli": 7154},
             "modules": [
               {"path": "packages/core/src/payload.ts", "area": "core:payload", "bytes": 2504},
               {"path": "packages/core/src/payload/calendar.ts", "area": "core:payload", "bytes": 1635},
@@ -1091,9 +1091,9 @@
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "(unmapped)", "area": "other", "bytes": 976},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 952},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 614},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -1122,14 +1122,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 17684, "gzip": 7728, "brotli": 6937},
-        "initial": {"min": 17684, "gzip": 7728, "brotli": 6937},
+        "total": {"min": 17828, "gzip": 7792, "brotli": 6983},
+        "initial": {"min": 17828, "gzip": 7792, "brotli": 6983},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 17869, "gzip": 7678, "brotli": 6855},
-        "initial": {"min": 17869, "gzip": 7678, "brotli": 6855},
+        "total": {"min": 18017, "gzip": 7744, "brotli": 6922},
+        "initial": {"min": 18017, "gzip": 7744, "brotli": 6922},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1147,16 +1147,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 12444, "gzip": 5542, "brotli": 5034},
-        "initial": {"min": 12444, "gzip": 5542, "brotli": 5034},
+        "total": {"min": 12588, "gzip": 5615, "brotli": 5093},
+        "initial": {"min": 12588, "gzip": 5615, "brotli": 5093},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 11721,
-        "areas": {"core:matrix": 8516, "core:builder": 1177, "core:text": 1117, "core:styler": 770, "other": 670, "core:error": 141, "app": 53},
+        "sdkBytes": 11865,
+        "areas": {"core:matrix": 8660, "core:builder": 1177, "core:text": 1117, "core:styler": 770, "other": 670, "core:error": 141, "app": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 12444, "gzip": 5542, "brotli": 5034},
+            "sizes": {"min": 12588, "gzip": 5615, "brotli": 5093},
             "modules": [
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
@@ -1165,9 +1165,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 949},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 770},
               {"path": "(unmapped)", "area": "other", "bytes": 670},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 588},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 304},
@@ -1194,14 +1194,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 11918, "gzip": 5388, "brotli": 4891},
-        "initial": {"min": 11918, "gzip": 5388, "brotli": 4891},
+        "total": {"min": 12062, "gzip": 5454, "brotli": 4940},
+        "initial": {"min": 12062, "gzip": 5454, "brotli": 4940},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 11422, "gzip": 4979, "brotli": 4534},
-        "initial": {"min": 11422, "gzip": 4979, "brotli": 4534},
+        "total": {"min": 11570, "gzip": 5046, "brotli": 4597},
+        "initial": {"min": 11570, "gzip": 5046, "brotli": 4597},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1219,16 +1219,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 15997, "gzip": 7109, "brotli": 6441},
-        "initial": {"min": 15997, "gzip": 7109, "brotli": 6441},
+        "total": {"min": 16141, "gzip": 7178, "brotli": 6491},
+        "initial": {"min": 16141, "gzip": 7178, "brotli": 6491},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 15268,
-        "areas": {"core:matrix": 8530, "core:styler": 4139, "core:svg": 1281, "core:builder": 1177, "other": 676, "core:error": 141, "app": 53},
+        "sdkBytes": 15412,
+        "areas": {"core:matrix": 8674, "core:styler": 4139, "core:svg": 1281, "core:builder": 1177, "other": 676, "core:error": 141, "app": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 15997, "gzip": 7109, "brotli": 6441},
+            "sizes": {"min": 16141, "gzip": 7178, "brotli": 6491},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2612},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
@@ -1239,9 +1239,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 592},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 305},
@@ -1269,14 +1269,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 15452, "gzip": 7029, "brotli": 6411},
-        "initial": {"min": 15452, "gzip": 7029, "brotli": 6411},
+        "total": {"min": 15596, "gzip": 7092, "brotli": 6457},
+        "initial": {"min": 15596, "gzip": 7092, "brotli": 6457},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 15337, "gzip": 6745, "brotli": 6120},
-        "initial": {"min": 15337, "gzip": 6745, "brotli": 6120},
+        "total": {"min": 15485, "gzip": 6808, "brotli": 6187},
+        "initial": {"min": 15485, "gzip": 6808, "brotli": 6187},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1294,16 +1294,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 15997, "gzip": 7126, "brotli": 6448},
-        "initial": {"min": 15997, "gzip": 7126, "brotli": 6448},
+        "total": {"min": 16141, "gzip": 7194, "brotli": 6530},
+        "initial": {"min": 16141, "gzip": 7194, "brotli": 6530},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 15268,
-        "areas": {"core:matrix": 8546, "core:styler": 4124, "core:svg": 1280, "core:builder": 1177, "other": 676, "core:error": 141, "app": 53},
+        "sdkBytes": 15412,
+        "areas": {"core:matrix": 8690, "core:styler": 4124, "core:svg": 1280, "core:builder": 1177, "other": 676, "core:error": 141, "app": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 15997, "gzip": 7126, "brotli": 6448},
+            "sizes": {"min": 16141, "gzip": 7194, "brotli": 6530},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2608},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1582},
@@ -1314,9 +1314,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 696},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 663},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 612},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 364},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -1344,14 +1344,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 15452, "gzip": 7052, "brotli": 6382},
-        "initial": {"min": 15452, "gzip": 7052, "brotli": 6382},
+        "total": {"min": 15596, "gzip": 7118, "brotli": 6473},
+        "initial": {"min": 15596, "gzip": 7118, "brotli": 6473},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 15337, "gzip": 6745, "brotli": 6120},
-        "initial": {"min": 15337, "gzip": 6745, "brotli": 6120},
+        "total": {"min": 15485, "gzip": 6808, "brotli": 6187},
+        "initial": {"min": 15485, "gzip": 6808, "brotli": 6187},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1370,16 +1370,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 16529, "gzip": 7365, "brotli": 6698},
-        "initial": {"min": 16529, "gzip": 7365, "brotli": 6698},
+        "total": {"min": 16673, "gzip": 7434, "brotli": 6757},
+        "initial": {"min": 16673, "gzip": 7434, "brotli": 6757},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 15777,
-        "areas": {"core:matrix": 8530, "core:styler": 4140, "core:svg": 1280, "core:builder": 1177, "other": 676, "browser:download": 509, "core:error": 141, "app": 76},
+        "sdkBytes": 15921,
+        "areas": {"core:matrix": 8674, "core:styler": 4140, "core:svg": 1280, "core:builder": 1177, "other": 676, "browser:download": 509, "core:error": 141, "app": 76},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 16529, "gzip": 7365, "brotli": 6698},
+            "sizes": {"min": 16673, "gzip": 7434, "brotli": 6757},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
@@ -1390,9 +1390,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 592},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 305},
@@ -1422,14 +1422,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 15984, "gzip": 7293, "brotli": 6640},
-        "initial": {"min": 15984, "gzip": 7293, "brotli": 6640},
+        "total": {"min": 16128, "gzip": 7357, "brotli": 6726},
+        "initial": {"min": 16128, "gzip": 7357, "brotli": 6726},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 15878, "gzip": 6994, "brotli": 6352},
-        "initial": {"min": 15878, "gzip": 6994, "brotli": 6352},
+        "total": {"min": 16026, "gzip": 7057, "brotli": 6373},
+        "initial": {"min": 16026, "gzip": 7057, "brotli": 6373},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1447,16 +1447,16 @@
       ],
       "baseline": "matrix",
       "vite": {
-        "total": {"min": 15507, "gzip": 6812, "brotli": 6157},
-        "initial": {"min": 15507, "gzip": 6812, "brotli": 6157},
+        "total": {"min": 15651, "gzip": 6880, "brotli": 6259},
+        "initial": {"min": 15651, "gzip": 6880, "brotli": 6259},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 14778,
-        "areas": {"core:matrix": 8522, "core:styler": 4141, "core:builder": 1177, "browser:canvas": 797, "other": 676, "core:error": 141, "app": 53},
+        "sdkBytes": 14922,
+        "areas": {"core:matrix": 8666, "core:styler": 4141, "core:builder": 1177, "browser:canvas": 797, "other": 676, "core:error": 141, "app": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 15507, "gzip": 6812, "brotli": 6157},
+            "sizes": {"min": 15651, "gzip": 6880, "brotli": 6259},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2614},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
@@ -1467,9 +1467,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 611},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 305},
@@ -1497,14 +1497,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 14966, "gzip": 6720, "brotli": 6100},
-        "initial": {"min": 14966, "gzip": 6720, "brotli": 6100},
+        "total": {"min": 15110, "gzip": 6787, "brotli": 6183},
+        "initial": {"min": 15110, "gzip": 6787, "brotli": 6183},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 14832, "gzip": 6424, "brotli": 5837},
-        "initial": {"min": 14832, "gzip": 6424, "brotli": 5837},
+        "total": {"min": 14980, "gzip": 6486, "brotli": 5899},
+        "initial": {"min": 14980, "gzip": 6486, "brotli": 5899},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1523,16 +1523,16 @@
       ],
       "baseline": "canvas",
       "vite": {
-        "total": {"min": 16198, "gzip": 7065, "brotli": 6384},
-        "initial": {"min": 16198, "gzip": 7065, "brotli": 6384},
+        "total": {"min": 16342, "gzip": 7134, "brotli": 6442},
+        "initial": {"min": 16342, "gzip": 7134, "brotli": 6442},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 15469,
-        "areas": {"core:matrix": 8522, "core:styler": 4141, "core:builder": 1177, "browser:canvas": 797, "other": 676, "browser:image": 635, "core:error": 141, "browser:png": 56, "app": 53},
+        "sdkBytes": 15613,
+        "areas": {"core:matrix": 8666, "core:styler": 4141, "core:builder": 1177, "browser:canvas": 797, "other": 676, "browser:image": 635, "core:error": 141, "browser:png": 56, "app": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 16198, "gzip": 7065, "brotli": 6384},
+            "sizes": {"min": 16342, "gzip": 7134, "brotli": 6442},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2614},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
@@ -1543,10 +1543,10 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 611},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 305},
@@ -1575,14 +1575,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 15657, "gzip": 6973, "brotli": 6339},
-        "initial": {"min": 15657, "gzip": 6973, "brotli": 6339},
+        "total": {"min": 15801, "gzip": 7036, "brotli": 6432},
+        "initial": {"min": 15801, "gzip": 7036, "brotli": 6432},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 15546, "gzip": 6691, "brotli": 6068},
-        "initial": {"min": 15546, "gzip": 6691, "brotli": 6068},
+        "total": {"min": 15694, "gzip": 6754, "brotli": 6129},
+        "initial": {"min": 15694, "gzip": 6754, "brotli": 6129},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1601,16 +1601,16 @@
       ],
       "baseline": "canvas",
       "vite": {
-        "total": {"min": 22481, "gzip": 9595, "brotli": 8714},
-        "initial": {"min": 22481, "gzip": 9595, "brotli": 8714},
+        "total": {"min": 22625, "gzip": 9656, "brotli": 8757},
+        "initial": {"min": 22625, "gzip": 9656, "brotli": 8757},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 21722,
-        "areas": {"core:matrix": 8543, "core:webp-encoder": 5469, "core:styler": 4142, "core:builder": 1177, "browser:image": 881, "browser:canvas": 798, "other": 706, "core:raster-shared": 518, "core:error": 141, "browser:webp": 53, "app": 53},
+        "sdkBytes": 21866,
+        "areas": {"core:matrix": 8687, "core:webp-encoder": 5469, "core:styler": 4142, "core:builder": 1177, "browser:image": 881, "browser:canvas": 798, "other": 706, "core:raster-shared": 518, "core:error": 141, "browser:webp": 53, "app": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 22481, "gzip": 9595, "brotli": 8714},
+            "sizes": {"min": 22625, "gzip": 9656, "brotli": 8757},
             "modules": [
               {"path": "packages/core/src/raster/webp.ts", "area": "core:webp-encoder", "bytes": 5469},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2615},
@@ -1622,10 +1622,10 @@
               {"path": "(unmapped)", "area": "other", "bytes": 706},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 380},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 373},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -1657,14 +1657,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 21955, "gzip": 9577, "brotli": 8706},
-        "initial": {"min": 21955, "gzip": 9577, "brotli": 8706},
+        "total": {"min": 22099, "gzip": 9637, "brotli": 8752},
+        "initial": {"min": 22099, "gzip": 9637, "brotli": 8752},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 21918, "gzip": 9186, "brotli": 8328},
-        "initial": {"min": 21918, "gzip": 9186, "brotli": 8328},
+        "total": {"min": 22066, "gzip": 9249, "brotli": 8399},
+        "initial": {"min": 22066, "gzip": 9249, "brotli": 8399},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1683,16 +1683,16 @@
       ],
       "baseline": "canvas",
       "vite": {
-        "total": {"min": 19842, "gzip": 8549, "brotli": 7742},
-        "initial": {"min": 19842, "gzip": 8549, "brotli": 7742},
+        "total": {"min": 19986, "gzip": 8617, "brotli": 7811},
+        "initial": {"min": 19986, "gzip": 8617, "brotli": 7811},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 19098,
-        "areas": {"core:matrix": 8531, "core:styler": 4142, "core:gif-encoder": 2935, "core:builder": 1177, "browser:image": 881, "browser:canvas": 798, "other": 691, "core:raster-shared": 372, "core:error": 141, "browser:gif": 121, "app": 53},
+        "sdkBytes": 19242,
+        "areas": {"core:matrix": 8675, "core:styler": 4142, "core:gif-encoder": 2935, "core:builder": 1177, "browser:image": 881, "browser:canvas": 798, "other": 691, "core:raster-shared": 372, "core:error": 141, "browser:gif": 121, "app": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 19842, "gzip": 8549, "brotli": 7742},
+            "sizes": {"min": 19986, "gzip": 8617, "brotli": 7811},
             "modules": [
               {"path": "packages/core/src/raster/gif.ts", "area": "core:gif-encoder", "bytes": 2935},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2615},
@@ -1704,10 +1704,10 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 691},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 609},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 372},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -1738,14 +1738,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 19332, "gzip": 8531, "brotli": 7748},
-        "initial": {"min": 19332, "gzip": 8531, "brotli": 7748},
+        "total": {"min": 19476, "gzip": 8594, "brotli": 7817},
+        "initial": {"min": 19476, "gzip": 8594, "brotli": 7817},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 19245, "gzip": 8166, "brotli": 7414},
-        "initial": {"min": 19245, "gzip": 8166, "brotli": 7414},
+        "total": {"min": 19393, "gzip": 8227, "brotli": 7437},
+        "initial": {"min": 19393, "gzip": 8227, "brotli": 7437},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1764,16 +1764,16 @@
       ],
       "baseline": "canvas",
       "vite": {
-        "total": {"min": 23336, "gzip": 10134, "brotli": 9176},
-        "initial": {"min": 23336, "gzip": 10134, "brotli": 9176},
+        "total": {"min": 23480, "gzip": 10203, "brotli": 9233},
+        "initial": {"min": 23480, "gzip": 10203, "brotli": 9233},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 22592,
-        "areas": {"core:matrix": 8531, "core:jpeg-encoder": 6171, "core:styler": 4254, "core:builder": 1177, "browser:image": 881, "browser:canvas": 798, "other": 691, "core:raster-shared": 518, "core:error": 141, "browser:jpeg": 121, "app": 53},
+        "sdkBytes": 22736,
+        "areas": {"core:matrix": 8675, "core:jpeg-encoder": 6171, "core:styler": 4254, "core:builder": 1177, "browser:image": 881, "browser:canvas": 798, "other": 691, "core:raster-shared": 518, "core:error": 141, "browser:jpeg": 121, "app": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 23336, "gzip": 10134, "brotli": 9176},
+            "sizes": {"min": 23480, "gzip": 10203, "brotli": 9233},
             "modules": [
               {"path": "packages/core/src/raster/jpeg.ts", "area": "core:jpeg-encoder", "bytes": 6171},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2615},
@@ -1785,10 +1785,10 @@
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 771},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 708},
               {"path": "(unmapped)", "area": "other", "bytes": 691},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 608},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 373},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -1820,14 +1820,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 22823, "gzip": 10123, "brotli": 9184},
-        "initial": {"min": 22823, "gzip": 10123, "brotli": 9184},
+        "total": {"min": 22967, "gzip": 10186, "brotli": 9264},
+        "initial": {"min": 22967, "gzip": 10186, "brotli": 9264},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 22758, "gzip": 9740, "brotli": 8773},
-        "initial": {"min": 22758, "gzip": 9740, "brotli": 8773},
+        "total": {"min": 22906, "gzip": 9802, "brotli": 8845},
+        "initial": {"min": 22906, "gzip": 9802, "brotli": 8845},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1849,16 +1849,16 @@
       ],
       "baseline": "canvas",
       "vite": {
-        "total": {"min": 32089, "gzip": 13452, "brotli": 12137},
-        "initial": {"min": 32089, "gzip": 13452, "brotli": 12137},
+        "total": {"min": 32233, "gzip": 13518, "brotli": 12195},
+        "initial": {"min": 32233, "gzip": 13518, "brotli": 12195},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 31267,
-        "areas": {"core:matrix": 8554, "core:jpeg-encoder": 6181, "core:webp-encoder": 5477, "core:styler": 4255, "core:gif-encoder": 2941, "core:builder": 1180, "browser:image": 879, "browser:canvas": 798, "other": 706, "core:raster-shared": 517, "core:error": 141, "browser:gif": 119, "browser:jpeg": 119, "app": 116, "browser:png": 55, "browser:webp": 51},
+        "sdkBytes": 31411,
+        "areas": {"core:matrix": 8698, "core:jpeg-encoder": 6181, "core:webp-encoder": 5477, "core:styler": 4255, "core:gif-encoder": 2941, "core:builder": 1180, "browser:image": 879, "browser:canvas": 798, "other": 706, "core:raster-shared": 517, "core:error": 141, "browser:gif": 119, "browser:jpeg": 119, "app": 116, "browser:png": 55, "browser:webp": 51},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 32089, "gzip": 13452, "brotli": 12137},
+            "sizes": {"min": 32233, "gzip": 13518, "brotli": 12195},
             "modules": [
               {"path": "packages/core/src/raster/jpeg.ts", "area": "core:jpeg-encoder", "bytes": 6181},
               {"path": "packages/core/src/raster/webp.ts", "area": "core:webp-encoder", "bytes": 5477},
@@ -1872,10 +1872,10 @@
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 772},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 708},
               {"path": "(unmapped)", "area": "other", "bytes": 706},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 634},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 609},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 606},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 380},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 372},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -1910,14 +1910,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 31611, "gzip": 13586, "brotli": 12258},
-        "initial": {"min": 31611, "gzip": 13586, "brotli": 12258},
+        "total": {"min": 31755, "gzip": 13648, "brotli": 12345},
+        "initial": {"min": 31755, "gzip": 13648, "brotli": 12345},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 31666, "gzip": 13024, "brotli": 11732},
-        "initial": {"min": 31666, "gzip": 13024, "brotli": 11732},
+        "total": {"min": 31814, "gzip": 13085, "brotli": 11783},
+        "initial": {"min": 31814, "gzip": 13085, "brotli": 11783},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1940,16 +1940,16 @@
       ],
       "baseline": "image-all",
       "vite": {
-        "total": {"min": 34618, "gzip": 14487, "brotli": 13038},
-        "initial": {"min": 34618, "gzip": 14487, "brotli": 13038},
+        "total": {"min": 34762, "gzip": 14551, "brotli": 13078},
+        "initial": {"min": 34762, "gzip": 14551, "brotli": 13078},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 33432,
-        "areas": {"core:matrix": 8556, "core:jpeg-encoder": 6178, "core:webp-encoder": 5481, "core:styler": 4856, "core:gif-encoder": 2941, "browser:canvas": 1609, "core:builder": 1180, "other": 1109, "browser:image": 879, "browser:download": 750, "core:raster-shared": 517, "core:error": 141, "browser:gif": 119, "browser:jpeg": 119, "app": 77, "browser:png": 55, "browser:webp": 51},
+        "sdkBytes": 33576,
+        "areas": {"core:matrix": 8700, "core:jpeg-encoder": 6178, "core:webp-encoder": 5481, "core:styler": 4856, "core:gif-encoder": 2941, "browser:canvas": 1609, "core:builder": 1180, "other": 1109, "browser:image": 879, "browser:download": 750, "core:raster-shared": 517, "core:error": 141, "browser:gif": 119, "browser:jpeg": 119, "app": 77, "browser:png": 55, "browser:webp": 51},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 34618, "gzip": 14487, "brotli": 13038},
+            "sizes": {"min": 34762, "gzip": 14551, "brotli": 13078},
             "modules": [
               {"path": "packages/core/src/raster/jpeg.ts", "area": "core:jpeg-encoder", "bytes": 6178},
               {"path": "packages/core/src/raster/webp.ts", "area": "core:webp-encoder", "bytes": 5481},
@@ -1963,11 +1963,11 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 949},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 772},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 708},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 634},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 608},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 606},
               {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 601},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 380},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 372},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -2005,14 +2005,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 34096, "gzip": 14573, "brotli": 13186},
-        "initial": {"min": 34096, "gzip": 14573, "brotli": 13186},
+        "total": {"min": 34240, "gzip": 14634, "brotli": 13174},
+        "initial": {"min": 34240, "gzip": 14634, "brotli": 13174},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 34483, "gzip": 14181, "brotli": 12747},
-        "initial": {"min": 34483, "gzip": 14181, "brotli": 12747},
+        "total": {"min": 34631, "gzip": 14244, "brotli": 12801},
+        "initial": {"min": 34631, "gzip": 14244, "brotli": 12801},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2031,16 +2031,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 18030, "gzip": 8014, "brotli": 7250},
-        "initial": {"min": 18030, "gzip": 8014, "brotli": 7250},
+        "total": {"min": 18174, "gzip": 8083, "brotli": 7341},
+        "initial": {"min": 18174, "gzip": 8083, "brotli": 7341},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 17279,
-        "areas": {"core:matrix": 8543, "core:styler": 4140, "core:style-patterns": 1996, "core:svg": 1282, "core:builder": 1177, "other": 676, "core:error": 141, "app": 75},
+        "sdkBytes": 17423,
+        "areas": {"core:matrix": 8687, "core:styler": 4140, "core:style-patterns": 1996, "core:svg": 1282, "core:builder": 1177, "other": 676, "core:error": 141, "app": 75},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 18030, "gzip": 8014, "brotli": 7250},
+            "sizes": {"min": 18174, "gzip": 8083, "brotli": 7341},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 1996},
@@ -2052,9 +2052,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 600},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2082,14 +2082,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 17501, "gzip": 7991, "brotli": 7287},
-        "initial": {"min": 17501, "gzip": 7991, "brotli": 7287},
+        "total": {"min": 17645, "gzip": 8055, "brotli": 7293},
+        "initial": {"min": 17645, "gzip": 8055, "brotli": 7293},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 17426, "gzip": 7655, "brotli": 6918},
-        "initial": {"min": 17426, "gzip": 7655, "brotli": 6918},
+        "total": {"min": 17574, "gzip": 7717, "brotli": 7013},
+        "initial": {"min": 17574, "gzip": 7717, "brotli": 7013},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2108,16 +2108,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 16785, "gzip": 7454, "brotli": 6751},
-        "initial": {"min": 16785, "gzip": 7454, "brotli": 6751},
+        "total": {"min": 16929, "gzip": 7522, "brotli": 6836},
+        "initial": {"min": 16929, "gzip": 7522, "brotli": 6836},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16034,
-        "areas": {"core:matrix": 8537, "core:styler": 4140, "core:svg": 1282, "core:builder": 1177, "core:style-patterns": 757, "other": 676, "core:error": 141, "app": 75},
+        "sdkBytes": 16178,
+        "areas": {"core:matrix": 8681, "core:styler": 4140, "core:svg": 1282, "core:builder": 1177, "core:style-patterns": 757, "other": 676, "core:error": 141, "app": 75},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 16785, "gzip": 7454, "brotli": 6751},
+            "sizes": {"min": 16929, "gzip": 7522, "brotli": 6836},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
@@ -2129,9 +2129,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 597},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2159,14 +2159,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16254, "gzip": 7397, "brotli": 6756},
-        "initial": {"min": 16254, "gzip": 7397, "brotli": 6756},
+        "total": {"min": 16398, "gzip": 7460, "brotli": 6799},
+        "initial": {"min": 16398, "gzip": 7460, "brotli": 6799},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 16077, "gzip": 7057, "brotli": 6380},
-        "initial": {"min": 16077, "gzip": 7057, "brotli": 6380},
+        "total": {"min": 16225, "gzip": 7121, "brotli": 6492},
+        "initial": {"min": 16225, "gzip": 7121, "brotli": 6492},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2185,16 +2185,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 18036, "gzip": 8020, "brotli": 7246},
-        "initial": {"min": 18036, "gzip": 8020, "brotli": 7246},
+        "total": {"min": 18180, "gzip": 8089, "brotli": 7332},
+        "initial": {"min": 18180, "gzip": 8089, "brotli": 7332},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 17285,
-        "areas": {"core:matrix": 8543, "core:styler": 4140, "core:style-patterns": 2002, "core:svg": 1282, "core:builder": 1177, "other": 676, "core:error": 141, "app": 75},
+        "sdkBytes": 17429,
+        "areas": {"core:matrix": 8687, "core:styler": 4140, "core:style-patterns": 2002, "core:svg": 1282, "core:builder": 1177, "other": 676, "core:error": 141, "app": 75},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 18036, "gzip": 8020, "brotli": 7246},
+            "sizes": {"min": 18180, "gzip": 8089, "brotli": 7332},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 2002},
@@ -2206,9 +2206,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 600},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2236,14 +2236,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 17507, "gzip": 7999, "brotli": 7266},
-        "initial": {"min": 17507, "gzip": 7999, "brotli": 7266},
+        "total": {"min": 17651, "gzip": 8064, "brotli": 7305},
+        "initial": {"min": 17651, "gzip": 8064, "brotli": 7305},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 17426, "gzip": 7656, "brotli": 6966},
-        "initial": {"min": 17426, "gzip": 7656, "brotli": 6966},
+        "total": {"min": 17574, "gzip": 7719, "brotli": 7015},
+        "initial": {"min": 17574, "gzip": 7719, "brotli": 7015},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2262,16 +2262,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 19601, "gzip": 8590, "brotli": 7799},
-        "initial": {"min": 19601, "gzip": 8590, "brotli": 7799},
+        "total": {"min": 19745, "gzip": 8656, "brotli": 7817},
+        "initial": {"min": 19745, "gzip": 8656, "brotli": 7817},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 18792,
-        "areas": {"core:matrix": 8555, "core:styler": 4140, "core:style-patterns": 3497, "core:svg": 1282, "core:builder": 1177, "other": 676, "core:error": 141, "app": 133},
+        "sdkBytes": 18936,
+        "areas": {"core:matrix": 8699, "core:styler": 4140, "core:style-patterns": 3497, "core:svg": 1282, "core:builder": 1177, "other": 676, "core:error": 141, "app": 133},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 19601, "gzip": 8590, "brotli": 7799},
+            "sizes": {"min": 19745, "gzip": 8656, "brotli": 7817},
             "modules": [
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 3497},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
@@ -2283,9 +2283,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 616},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 600},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2313,14 +2313,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 19091, "gzip": 8595, "brotli": 7838},
-        "initial": {"min": 19091, "gzip": 8595, "brotli": 7838},
+        "total": {"min": 19235, "gzip": 8657, "brotli": 7832},
+        "initial": {"min": 19235, "gzip": 8657, "brotli": 7832},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 19016, "gzip": 8220, "brotli": 7418},
-        "initial": {"min": 19016, "gzip": 8220, "brotli": 7418},
+        "total": {"min": 19164, "gzip": 8287, "brotli": 7523},
+        "initial": {"min": 19164, "gzip": 8287, "brotli": 7523},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2339,16 +2339,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 19784, "gzip": 8673, "brotli": 7886},
-        "initial": {"min": 19784, "gzip": 8673, "brotli": 7886},
+        "total": {"min": 19928, "gzip": 8739, "brotli": 7916},
+        "initial": {"min": 19928, "gzip": 8739, "brotli": 7916},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 18841,
-        "areas": {"core:matrix": 8558, "core:styler": 4140, "core:style-patterns": 3543, "core:svg": 1282, "core:builder": 1177, "other": 676, "app": 267, "core:error": 141},
+        "sdkBytes": 18985,
+        "areas": {"core:matrix": 8702, "core:styler": 4140, "core:style-patterns": 3543, "core:svg": 1282, "core:builder": 1177, "other": 676, "app": 267, "core:error": 141},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 19784, "gzip": 8673, "brotli": 7886},
+            "sizes": {"min": 19928, "gzip": 8739, "brotli": 7916},
             "modules": [
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 3543},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
@@ -2360,9 +2360,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 616},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 600},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2390,14 +2390,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 19271, "gzip": 8673, "brotli": 7859},
-        "initial": {"min": 19271, "gzip": 8673, "brotli": 7859},
+        "total": {"min": 19415, "gzip": 8736, "brotli": 7934},
+        "initial": {"min": 19415, "gzip": 8736, "brotli": 7934},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 19213, "gzip": 8302, "brotli": 7492},
-        "initial": {"min": 19213, "gzip": 8302, "brotli": 7492},
+        "total": {"min": 19361, "gzip": 8365, "brotli": 7547},
+        "initial": {"min": 19361, "gzip": 8365, "brotli": 7547},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2417,16 +2417,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 18961, "gzip": 8536, "brotli": 7718},
-        "initial": {"min": 18961, "gzip": 8536, "brotli": 7718},
+        "total": {"min": 19105, "gzip": 8603, "brotli": 7772},
+        "initial": {"min": 19105, "gzip": 8603, "brotli": 7772},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 18164,
-        "areas": {"core:matrix": 8531, "core:styler": 4140, "core:custom-shape": 2893, "core:svg": 1282, "core:builder": 1177, "other": 676, "core:error": 141, "app": 121},
+        "sdkBytes": 18308,
+        "areas": {"core:matrix": 8675, "core:styler": 4140, "core:custom-shape": 2893, "core:svg": 1282, "core:builder": 1177, "other": 676, "core:error": 141, "app": 121},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 18961, "gzip": 8536, "brotli": 7718},
+            "sizes": {"min": 19105, "gzip": 8603, "brotli": 7772},
             "modules": [
               {"path": "packages/core/src/shape-path.ts", "area": "core:custom-shape", "bytes": 2713},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
@@ -2438,9 +2438,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 608},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 597},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2469,14 +2469,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 18431, "gzip": 8486, "brotli": 7764},
-        "initial": {"min": 18431, "gzip": 8486, "brotli": 7764},
+        "total": {"min": 18575, "gzip": 8550, "brotli": 7762},
+        "initial": {"min": 18575, "gzip": 8550, "brotli": 7762},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 18365, "gzip": 8162, "brotli": 7379},
-        "initial": {"min": 18365, "gzip": 8162, "brotli": 7379},
+        "total": {"min": 18513, "gzip": 8223, "brotli": 7467},
+        "initial": {"min": 18513, "gzip": 8223, "brotli": 7467},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2495,16 +2495,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 17182, "gzip": 7631, "brotli": 6911},
-        "initial": {"min": 17182, "gzip": 7631, "brotli": 6911},
+        "total": {"min": 17326, "gzip": 7699, "brotli": 6926},
+        "initial": {"min": 17326, "gzip": 7699, "brotli": 6926},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16407,
-        "areas": {"core:matrix": 8534, "core:styler": 4741, "core:svg": 1814, "core:builder": 1177, "other": 676, "core:error": 141, "app": 99},
+        "sdkBytes": 16551,
+        "areas": {"core:matrix": 8678, "core:styler": 4741, "core:svg": 1814, "core:builder": 1177, "other": 676, "core:error": 141, "app": 99},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 17182, "gzip": 7631, "brotli": 6911},
+            "sizes": {"min": 17326, "gzip": 7699, "brotli": 6926},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
               {"path": "packages/core/src/svg.ts", "area": "core:svg", "bytes": 1814},
@@ -2515,10 +2515,10 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 601},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2546,14 +2546,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16638, "gzip": 7559, "brotli": 6850},
-        "initial": {"min": 16638, "gzip": 7559, "brotli": 6850},
+        "total": {"min": 16782, "gzip": 7620, "brotli": 6897},
+        "initial": {"min": 16782, "gzip": 7620, "brotli": 6897},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 16483, "gzip": 7231, "brotli": 6552},
-        "initial": {"min": 16483, "gzip": 7231, "brotli": 6552},
+        "total": {"min": 16631, "gzip": 7294, "brotli": 6629},
+        "initial": {"min": 16631, "gzip": 7294, "brotli": 6629},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2572,16 +2572,16 @@
       ],
       "baseline": "canvas",
       "vite": {
-        "total": {"min": 18777, "gzip": 8202, "brotli": 7420},
-        "initial": {"min": 18777, "gzip": 8202, "brotli": 7420},
+        "total": {"min": 18921, "gzip": 8265, "brotli": 7505},
+        "initial": {"min": 18921, "gzip": 8265, "brotli": 7505},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 17983,
-        "areas": {"core:matrix": 8537, "core:styler": 4142, "core:style-patterns": 3188, "core:builder": 1177, "browser:canvas": 798, "other": 676, "core:error": 141, "app": 118},
+        "sdkBytes": 18127,
+        "areas": {"core:matrix": 8681, "core:styler": 4142, "core:style-patterns": 3188, "core:builder": 1177, "browser:canvas": 798, "other": 676, "core:error": 141, "app": 118},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 18777, "gzip": 8202, "brotli": 7420},
+            "sizes": {"min": 18921, "gzip": 8265, "brotli": 7505},
             "modules": [
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 3188},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2615},
@@ -2593,9 +2593,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 614},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2623,14 +2623,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 18273, "gzip": 8181, "brotli": 7421},
-        "initial": {"min": 18273, "gzip": 8181, "brotli": 7421},
+        "total": {"min": 18417, "gzip": 8243, "brotli": 7480},
+        "initial": {"min": 18417, "gzip": 8243, "brotli": 7480},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 18127, "gzip": 7798, "brotli": 7034},
-        "initial": {"min": 18127, "gzip": 7798, "brotli": 7034},
+        "total": {"min": 18275, "gzip": 7862, "brotli": 7087},
+        "initial": {"min": 18275, "gzip": 7862, "brotli": 7087},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2649,16 +2649,16 @@
       ],
       "baseline": "canvas",
       "vite": {
-        "total": {"min": 16945, "gzip": 7349, "brotli": 6610},
-        "initial": {"min": 16945, "gzip": 7349, "brotli": 6610},
+        "total": {"min": 17089, "gzip": 7417, "brotli": 6669},
+        "initial": {"min": 17089, "gzip": 7417, "brotli": 6669},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16189,
-        "areas": {"core:matrix": 8524, "core:styler": 4741, "browser:canvas": 1606, "core:builder": 1177, "other": 676, "core:error": 141, "app": 80},
+        "sdkBytes": 16333,
+        "areas": {"core:matrix": 8668, "core:styler": 4741, "browser:canvas": 1606, "core:builder": 1177, "other": 676, "core:error": 141, "app": 80},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 16945, "gzip": 7349, "brotli": 6610},
+            "sizes": {"min": 17089, "gzip": 7417, "brotli": 6669},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 1606},
@@ -2669,10 +2669,10 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 601},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 305},
@@ -2700,14 +2700,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16405, "gzip": 7270, "brotli": 6587},
-        "initial": {"min": 16405, "gzip": 7270, "brotli": 6587},
+        "total": {"min": 16549, "gzip": 7332, "brotli": 6644},
+        "initial": {"min": 16549, "gzip": 7332, "brotli": 6644},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 16219, "gzip": 6941, "brotli": 6253},
-        "initial": {"min": 16219, "gzip": 6941, "brotli": 6253},
+        "total": {"min": 16367, "gzip": 7004, "brotli": 6337},
+        "initial": {"min": 16367, "gzip": 7004, "brotli": 6337},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2726,25 +2726,25 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 17753, "gzip": 8170, "brotli": 7424},
-        "initial": {"min": 12275, "gzip": 5427, "brotli": 4940},
+        "total": {"min": 17897, "gzip": 8245, "brotli": 7496},
+        "initial": {"min": 12419, "gzip": 5502, "brotli": 5012},
         "lazy": {"min": 5478, "gzip": 2743, "brotli": 2484},
-        "sdkBytes": 15213,
-        "areas": {"core:matrix": 8508, "core:styler": 4115, "other": 2340, "core:svg": 1272, "core:builder": 1177, "app": 200, "core:error": 141},
+        "sdkBytes": 15357,
+        "areas": {"core:matrix": 8652, "core:styler": 4115, "other": 2340, "core:svg": 1272, "core:builder": 1177, "app": 200, "core:error": 141},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 12275, "gzip": 5427, "brotli": 4940},
+            "sizes": {"min": 12419, "gzip": 5502, "brotli": 5012},
             "modules": [
               {"path": "(unmapped)", "area": "other", "bytes": 2249},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1581},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 947},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 636},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 610},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 586},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 492},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 376},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -2784,20 +2784,20 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16814, "gzip": 8104, "brotli": 7333},
-        "initial": {"min": 10167, "gzip": 4772, "brotli": 4323},
+        "total": {"min": 16958, "gzip": 8163, "brotli": 7387},
+        "initial": {"min": 10311, "gzip": 4831, "brotli": 4377},
         "lazy": {"min": 6647, "gzip": 3332, "brotli": 3010},
         "chunkCount": 3
       },
       "webpack": {
-        "total": {"min": 18383, "gzip": 8509, "brotli": 7670},
-        "initial": {"min": 12774, "gzip": 5718, "brotli": 5135},
+        "total": {"min": 18531, "gzip": 8575, "brotli": 7750},
+        "initial": {"min": 12922, "gzip": 5784, "brotli": 5215},
         "lazy": {"min": 5609, "gzip": 2791, "brotli": 2535},
         "chunkCount": 2
       },
       "problems": [],
       "warnings": [
-        "webpack adds 1.72 kB gzip over svg, Vite adds 1.04 kB"
+        "webpack adds 1.73 kB gzip over svg, Vite adds 1.04 kB"
       ]
     },
     {
@@ -2815,16 +2815,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 27124, "gzip": 12462, "brotli": 11260},
-        "initial": {"min": 18318, "gzip": 8081, "brotli": 7331},
-        "lazy": {"min": 8806, "gzip": 4381, "brotli": 3929},
-        "sdkBytes": 23850,
-        "areas": {"core:matrix": 8534, "core:jpeg-encoder": 6121, "core:styler": 4241, "other": 2820, "core:svg": 1285, "core:builder": 1176, "browser:image": 876, "browser:canvas": 790, "core:raster-shared": 516, "app": 454, "core:error": 141, "browser:jpeg": 116, "browser:png": 54},
+        "total": {"min": 27268, "gzip": 12528, "brotli": 11352},
+        "initial": {"min": 18462, "gzip": 8150, "brotli": 7420},
+        "lazy": {"min": 8806, "gzip": 4378, "brotli": 3932},
+        "sdkBytes": 23994,
+        "areas": {"core:matrix": 8678, "core:jpeg-encoder": 6121, "core:styler": 4241, "other": 2820, "core:svg": 1285, "core:builder": 1176, "browser:image": 876, "browser:canvas": 790, "core:raster-shared": 516, "app": 454, "core:error": 141, "browser:jpeg": 116, "browser:png": 54},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 18318, "gzip": 8081, "brotli": 7331},
+            "sizes": {"min": 18462, "gzip": 8150, "brotli": 7420},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2612},
               {"path": "(unmapped)", "area": "other", "bytes": 2487},
@@ -2835,9 +2835,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 951},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 772},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 698},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/perf/.cache/size/split-image-download/main.js", "area": "app", "bytes": 454},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -2864,7 +2864,7 @@
           {
             "name": "assets/image-base-BPjx5M9z.js",
             "kind": "lazy",
-            "sizes": {"min": 1497, "gzip": 784, "brotli": 666},
+            "sizes": {"min": 1497, "gzip": 782, "brotli": 666},
             "modules": [
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 790},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 631},
@@ -2874,7 +2874,7 @@
           {
             "name": "assets/jpeg.js",
             "kind": "lazy",
-            "sizes": {"min": 7165, "gzip": 3447, "brotli": 3142},
+            "sizes": {"min": 7165, "gzip": 3446, "brotli": 3140},
             "modules": [
               {"path": "packages/core/src/raster/jpeg.ts", "area": "core:jpeg-encoder", "bytes": 6121},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 372},
@@ -2887,7 +2887,7 @@
           {
             "name": "assets/png.js",
             "kind": "lazy",
-            "sizes": {"min": 144, "gzip": 150, "brotli": 121},
+            "sizes": {"min": 144, "gzip": 150, "brotli": 126},
             "modules": [
               {"path": "(unmapped)", "area": "other", "bytes": 90},
               {"path": "packages/browser/src/png.ts", "area": "browser:png", "bytes": 54}
@@ -2897,14 +2897,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 24762, "gzip": 12054, "brotli": 10885},
-        "initial": {"min": 15909, "gzip": 7590, "brotli": 6883},
+        "total": {"min": 24906, "gzip": 12119, "brotli": 10943},
+        "initial": {"min": 16053, "gzip": 7655, "brotli": 6941},
         "lazy": {"min": 8853, "gzip": 4464, "brotli": 4002},
         "chunkCount": 5
       },
       "webpack": {
-        "total": {"min": 29394, "gzip": 13364, "brotli": 11946},
-        "initial": {"min": 18880, "gzip": 8387, "brotli": 7535},
+        "total": {"min": 29542, "gzip": 13428, "brotli": 11986},
+        "initial": {"min": 19028, "gzip": 8451, "brotli": 7575},
         "lazy": {"min": 10514, "gzip": 4977, "brotli": 4411},
         "chunkCount": 3
       },
@@ -2925,16 +2925,16 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 25831, "gzip": 11758, "brotli": 10628},
-        "initial": {"min": 17993, "gzip": 7958, "brotli": 7172},
-        "lazy": {"min": 7838, "gzip": 3800, "brotli": 3456},
-        "sdkBytes": 22810,
-        "areas": {"core:matrix": 8526, "core:rmqr": 4377, "core:styler": 4140, "core:micro": 3160, "other": 2647, "core:svg": 1291, "core:builder": 1175, "app": 374, "core:error": 141},
+        "total": {"min": 25975, "gzip": 11830, "brotli": 10726},
+        "initial": {"min": 18137, "gzip": 8028, "brotli": 7262},
+        "lazy": {"min": 7838, "gzip": 3802, "brotli": 3464},
+        "sdkBytes": 22954,
+        "areas": {"core:matrix": 8670, "core:rmqr": 4377, "core:styler": 4140, "core:micro": 3160, "other": 2647, "core:svg": 1291, "core:builder": 1175, "app": 374, "core:error": 141},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 17993, "gzip": 7958, "brotli": 7172},
+            "sizes": {"min": 18137, "gzip": 8028, "brotli": 7262},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
               {"path": "(unmapped)", "area": "other", "bytes": 2346},
@@ -2945,9 +2945,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 951},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 638},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 614},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 494},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/perf/.cache/size/split-symbols/main.js", "area": "app", "bytes": 374},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -2974,7 +2974,7 @@
           {
             "name": "assets/micro.js",
             "kind": "lazy",
-            "sizes": {"min": 3319, "gzip": 1741, "brotli": 1606},
+            "sizes": {"min": 3319, "gzip": 1741, "brotli": 1602},
             "modules": [
               {"path": "packages/core/src/micro/generate.ts", "area": "core:micro", "bytes": 1263},
               {"path": "packages/core/src/micro/matrix.ts", "area": "core:micro", "bytes": 894},
@@ -2987,7 +2987,7 @@
           {
             "name": "assets/rmqr.js",
             "kind": "lazy",
-            "sizes": {"min": 4519, "gzip": 2059, "brotli": 1850},
+            "sizes": {"min": 4519, "gzip": 2061, "brotli": 1862},
             "modules": [
               {"path": "packages/core/src/rmqr/matrix.ts", "area": "core:rmqr", "bytes": 1567},
               {"path": "packages/core/src/rmqr/tables.ts", "area": "core:rmqr", "bytes": 1259},
@@ -3001,15 +3001,15 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 23950, "gzip": 11773, "brotli": 10742},
-        "initial": {"min": 16048, "gzip": 7928, "brotli": 7236},
-        "lazy": {"min": 7902, "gzip": 3845, "brotli": 3506},
+        "total": {"min": 24094, "gzip": 11833, "brotli": 10804},
+        "initial": {"min": 16192, "gzip": 7989, "brotli": 7292},
+        "lazy": {"min": 7902, "gzip": 3844, "brotli": 3512},
         "chunkCount": 5
       },
       "webpack": {
-        "total": {"min": 27139, "gzip": 12287, "brotli": 11022},
-        "initial": {"min": 19061, "gzip": 8402, "brotli": 7501},
-        "lazy": {"min": 8078, "gzip": 3885, "brotli": 3521},
+        "total": {"min": 27287, "gzip": 12348, "brotli": 11118},
+        "initial": {"min": 19209, "gzip": 8464, "brotli": 7597},
+        "lazy": {"min": 8078, "gzip": 3884, "brotli": 3521},
         "chunkCount": 3
       },
       "problems": [],
@@ -3030,16 +3030,16 @@
       ],
       "baseline": "empty",
       "vite": {
-        "total": {"min": 22902, "gzip": 10687, "brotli": 9612},
-        "initial": {"min": 2550, "gzip": 1240, "brotli": 1100},
-        "lazy": {"min": 20352, "gzip": 9447, "brotli": 8512},
-        "sdkBytes": 19898,
-        "areas": {"core:matrix": 8522, "core:styler": 4140, "core:style-patterns": 3171, "other": 2644, "core:svg": 1272, "core:builder": 1177, "browser:canvas": 790, "browser:image": 631, "app": 360, "core:error": 141, "browser:png": 54},
+        "total": {"min": 23046, "gzip": 10752, "brotli": 9668},
+        "initial": {"min": 2550, "gzip": 1241, "brotli": 1102},
+        "lazy": {"min": 20496, "gzip": 9511, "brotli": 8566},
+        "sdkBytes": 20042,
+        "areas": {"core:matrix": 8666, "core:styler": 4140, "core:style-patterns": 3171, "other": 2644, "core:svg": 1272, "core:builder": 1177, "browser:canvas": 790, "browser:image": 631, "app": 360, "core:error": 141, "browser:png": 54},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 2550, "gzip": 1240, "brotli": 1100},
+            "sizes": {"min": 2550, "gzip": 1241, "brotli": 1102},
             "modules": [
               {"path": "(unmapped)", "area": "other", "bytes": 2356},
               {"path": "packages/perf/.cache/size/split-routes/main.js", "area": "app", "bytes": 194}
@@ -3048,7 +3048,7 @@
           {
             "name": "assets/route-png.js",
             "kind": "lazy",
-            "sizes": {"min": 1630, "gzip": 865, "brotli": 737},
+            "sizes": {"min": 1630, "gzip": 864, "brotli": 731},
             "modules": [
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 790},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 631},
@@ -3060,7 +3060,7 @@
           {
             "name": "assets/route-svg.js",
             "kind": "lazy",
-            "sizes": {"min": 4668, "gzip": 2430, "brotli": 2188},
+            "sizes": {"min": 4668, "gzip": 2430, "brotli": 2186},
             "modules": [
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 3171},
               {"path": "packages/core/src/svg.ts", "area": "core:svg", "bytes": 1272},
@@ -3071,7 +3071,7 @@
           {
             "name": "assets/styler-DoZrtmqs.js",
             "kind": "lazy",
-            "sizes": {"min": 14054, "gzip": 6152, "brotli": 5587},
+            "sizes": {"min": 14198, "gzip": 6217, "brotli": 5649},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1582},
@@ -3080,9 +3080,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 951},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 611},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 495},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 361},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 305},
@@ -3110,15 +3110,15 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 20649, "gzip": 9879, "brotli": 8916},
-        "initial": {"min": 142, "gzip": 139, "brotli": 127},
-        "lazy": {"min": 20507, "gzip": 9740, "brotli": 8789},
+        "total": {"min": 20793, "gzip": 9941, "brotli": 8972},
+        "initial": {"min": 142, "gzip": 139, "brotli": 130},
+        "lazy": {"min": 20651, "gzip": 9802, "brotli": 8842},
         "chunkCount": 4
       },
       "webpack": {
-        "total": {"min": 24158, "gzip": 11256, "brotli": 10083},
-        "initial": {"min": 3080, "gzip": 1593, "brotli": 1391},
-        "lazy": {"min": 21078, "gzip": 9663, "brotli": 8692},
+        "total": {"min": 24306, "gzip": 11315, "brotli": 10129},
+        "initial": {"min": 3080, "gzip": 1590, "brotli": 1389},
+        "lazy": {"min": 21226, "gzip": 9725, "brotli": 8740},
         "chunkCount": 4
       },
       "problems": [],
@@ -3181,16 +3181,16 @@
       ],
       "baseline": "react-empty",
       "vite": {
-        "total": {"min": 235833, "gzip": 74909, "brotli": 64605},
-        "initial": {"min": 235833, "gzip": 74909, "brotli": 64605},
+        "total": {"min": 235977, "gzip": 74972, "brotli": 64620},
+        "initial": {"min": 235977, "gzip": 74972, "brotli": 64620},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16343,
-        "areas": {"framework:react": 218408, "core:matrix": 8635, "core:styler": 4146, "core:svg": 1290, "core:builder": 1177, "other": 993, "browser:download": 509, "adapter:react": 449, "core:error": 137, "app": 89},
+        "sdkBytes": 16487,
+        "areas": {"framework:react": 218408, "core:matrix": 8779, "core:styler": 4146, "core:svg": 1290, "core:builder": 1177, "other": 993, "browser:download": 509, "adapter:react": 449, "core:error": 137, "app": 89},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 235833, "gzip": 74909, "brotli": 64605},
+            "sizes": {"min": 235977, "gzip": 74972, "brotli": 64620},
             "modules": [
               {"path": "node_modules/react-dom/", "area": "framework:react", "bytes": 206784},
               {"path": "node_modules/react/", "area": "framework:react", "bytes": 8119},
@@ -3204,9 +3204,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 959},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 714},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 663},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/react/src/QRCodeSVG.tsx", "area": "adapter:react", "bytes": 373},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 364},
@@ -3238,14 +3238,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 239971, "gzip": 76554, "brotli": 66075},
-        "initial": {"min": 239971, "gzip": 76554, "brotli": 66075},
+        "total": {"min": 240115, "gzip": 76610, "brotli": 66131},
+        "initial": {"min": 240115, "gzip": 76610, "brotli": 66131},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 235097, "gzip": 75465, "brotli": 64362},
-        "initial": {"min": 235097, "gzip": 75465, "brotli": 64362},
+        "total": {"min": 235245, "gzip": 75527, "brotli": 64449},
+        "initial": {"min": 235245, "gzip": 75527, "brotli": 64449},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3265,16 +3265,16 @@
       ],
       "baseline": "react-svg",
       "vite": {
-        "total": {"min": 239111, "gzip": 76279, "brotli": 65877},
-        "initial": {"min": 239111, "gzip": 76279, "brotli": 65877},
+        "total": {"min": 239255, "gzip": 76346, "brotli": 65925},
+        "initial": {"min": 239255, "gzip": 76346, "brotli": 65925},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 19559,
-        "areas": {"framework:react": 218424, "core:matrix": 8635, "core:styler": 4149, "core:style-patterns": 3214, "core:svg": 1291, "core:builder": 1180, "other": 985, "browser:download": 509, "adapter:react": 444, "app": 143, "core:error": 137},
+        "sdkBytes": 19703,
+        "areas": {"framework:react": 218424, "core:matrix": 8779, "core:styler": 4149, "core:style-patterns": 3214, "core:svg": 1291, "core:builder": 1180, "other": 985, "browser:download": 509, "adapter:react": 444, "app": 143, "core:error": 137},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 239111, "gzip": 76279, "brotli": 65877},
+            "sizes": {"min": 239255, "gzip": 76346, "brotli": 65925},
             "modules": [
               {"path": "node_modules/react-dom/", "area": "framework:react", "bytes": 206800},
               {"path": "node_modules/react/", "area": "framework:react", "bytes": 8119},
@@ -3289,9 +3289,9 @@
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 959},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 716},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 663},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/react/src/QRCodeSVG.tsx", "area": "adapter:react", "bytes": 368},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 365},
@@ -3323,14 +3323,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 243307, "gzip": 78035, "brotli": 67402},
-        "initial": {"min": 243307, "gzip": 78035, "brotli": 67402},
+        "total": {"min": 243451, "gzip": 78101, "brotli": 67475},
+        "initial": {"min": 243451, "gzip": 78101, "brotli": 67475},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 238316, "gzip": 76783, "brotli": 65582},
-        "initial": {"min": 238316, "gzip": 76783, "brotli": 65582},
+        "total": {"min": 238464, "gzip": 76845, "brotli": 65654},
+        "initial": {"min": 238464, "gzip": 76845, "brotli": 65654},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3349,16 +3349,16 @@
       ],
       "baseline": "react-empty",
       "vite": {
-        "total": {"min": 234727, "gzip": 74351, "brotli": 64120},
-        "initial": {"min": 234727, "gzip": 74351, "brotli": 64120},
+        "total": {"min": 234871, "gzip": 74414, "brotli": 64171},
+        "initial": {"min": 234871, "gzip": 74414, "brotli": 64171},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 15237,
-        "areas": {"framework:react": 218408, "core:matrix": 8633, "core:styler": 4146, "core:builder": 1180, "other": 993, "browser:canvas": 796, "adapter:react": 345, "core:error": 137, "app": 89},
+        "sdkBytes": 15381,
+        "areas": {"framework:react": 218408, "core:matrix": 8777, "core:styler": 4146, "core:builder": 1180, "other": 993, "browser:canvas": 796, "adapter:react": 345, "core:error": 137, "app": 89},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 234727, "gzip": 74351, "brotli": 64120},
+            "sizes": {"min": 234871, "gzip": 74414, "brotli": 64171},
             "modules": [
               {"path": "node_modules/react-dom/", "area": "framework:react", "bytes": 206784},
               {"path": "node_modules/react/", "area": "framework:react", "bytes": 8119},
@@ -3372,9 +3372,9 @@
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 796},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 714},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 663},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 615},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 365},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -3404,14 +3404,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 238871, "gzip": 75936, "brotli": 65550},
-        "initial": {"min": 238871, "gzip": 75936, "brotli": 65550},
+        "total": {"min": 239015, "gzip": 75998, "brotli": 65516},
+        "initial": {"min": 239015, "gzip": 75998, "brotli": 65516},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 234005, "gzip": 74891, "brotli": 63981},
-        "initial": {"min": 234005, "gzip": 74891, "brotli": 63981},
+        "total": {"min": 234153, "gzip": 74956, "brotli": 63933},
+        "initial": {"min": 234153, "gzip": 74956, "brotli": 63933},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3431,16 +3431,16 @@
       ],
       "baseline": "react-empty",
       "vite": {
-        "total": {"min": 236140, "gzip": 74865, "brotli": 64557},
-        "initial": {"min": 236140, "gzip": 74865, "brotli": 64557},
+        "total": {"min": 236284, "gzip": 74928, "brotli": 64668},
+        "initial": {"min": 236284, "gzip": 74928, "brotli": 64668},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16660,
-        "areas": {"framework:react": 218408, "core:matrix": 8634, "core:styler": 4149, "core:builder": 1180, "other": 985, "browser:canvas": 797, "browser:image": 635, "adapter:react": 543, "browser:download": 529, "core:error": 137, "app": 87, "browser:png": 56},
+        "sdkBytes": 16804,
+        "areas": {"framework:react": 218408, "core:matrix": 8778, "core:styler": 4149, "core:builder": 1180, "other": 985, "browser:canvas": 797, "browser:image": 635, "adapter:react": 543, "browser:download": 529, "core:error": 137, "app": 87, "browser:png": 56},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 236140, "gzip": 74865, "brotli": 64557},
+            "sizes": {"min": 236284, "gzip": 74928, "brotli": 64668},
             "modules": [
               {"path": "node_modules/react-dom/", "area": "framework:react", "bytes": 206784},
               {"path": "node_modules/react/", "area": "framework:react", "bytes": 8119},
@@ -3454,10 +3454,10 @@
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 797},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 716},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 663},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/react/src/create-qrcode-image.tsx", "area": "adapter:react", "bytes": 440},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 365},
@@ -3491,14 +3491,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 240301, "gzip": 76524, "brotli": 66056},
-        "initial": {"min": 240301, "gzip": 76524, "brotli": 66056},
+        "total": {"min": 240445, "gzip": 76574, "brotli": 66098},
+        "initial": {"min": 240445, "gzip": 76574, "brotli": 66098},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 235447, "gzip": 75460, "brotli": 64415},
-        "initial": {"min": 235447, "gzip": 75460, "brotli": 64415},
+        "total": {"min": 235595, "gzip": 75524, "brotli": 64447},
+        "initial": {"min": 235595, "gzip": 75524, "brotli": 64447},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3522,16 +3522,16 @@
       ],
       "baseline": "react-empty",
       "vite": {
-        "total": {"min": 254503, "gzip": 82083, "brotli": 71071},
-        "initial": {"min": 254503, "gzip": 82083, "brotli": 71071},
+        "total": {"min": 254647, "gzip": 82151, "brotli": 71127},
+        "initial": {"min": 254647, "gzip": 82151, "brotli": 71127},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 34717,
-        "areas": {"framework:react": 218412, "core:matrix": 8642, "core:jpeg-encoder": 6225, "core:webp-encoder": 5517, "core:styler": 4249, "core:gif-encoder": 2946, "core:svg": 1290, "adapter:react": 1237, "core:builder": 1180, "other": 1015, "browser:image": 881, "browser:canvas": 798, "browser:download": 747, "core:raster-shared": 518, "app": 359, "core:error": 137, "browser:jpeg": 121, "browser:gif": 120, "browser:png": 56, "browser:webp": 53},
+        "sdkBytes": 34861,
+        "areas": {"framework:react": 218412, "core:matrix": 8786, "core:jpeg-encoder": 6225, "core:webp-encoder": 5517, "core:styler": 4249, "core:gif-encoder": 2946, "core:svg": 1290, "adapter:react": 1237, "core:builder": 1180, "other": 1015, "browser:image": 881, "browser:canvas": 798, "browser:download": 747, "core:raster-shared": 518, "app": 359, "core:error": 137, "browser:jpeg": 121, "browser:gif": 120, "browser:png": 56, "browser:webp": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 254503, "gzip": 82083, "brotli": 71071},
+            "sizes": {"min": 254647, "gzip": 82151, "brotli": 71127},
             "modules": [
               {"path": "node_modules/react-dom/", "area": "framework:react", "bytes": 206796},
               {"path": "node_modules/react/", "area": "framework:react", "bytes": 8115},
@@ -3549,10 +3549,10 @@
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 798},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 766},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 713},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/react/src/create-qrcode-image.tsx", "area": "adapter:react", "bytes": 440},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 373},
@@ -3598,14 +3598,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 258735, "gzip": 84075, "brotli": 72797},
-        "initial": {"min": 258735, "gzip": 84075, "brotli": 72797},
+        "total": {"min": 258879, "gzip": 84138, "brotli": 72837},
+        "initial": {"min": 258879, "gzip": 84138, "brotli": 72837},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 254029, "gzip": 82511, "brotli": 70871},
-        "initial": {"min": 254029, "gzip": 82511, "brotli": 70871},
+        "total": {"min": 254177, "gzip": 82575, "brotli": 70912},
+        "initial": {"min": 254177, "gzip": 82575, "brotli": 70912},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3670,16 +3670,16 @@
       ],
       "baseline": "vue-empty",
       "vite": {
-        "total": {"min": 78159, "gzip": 30932, "brotli": 28177},
-        "initial": {"min": 78159, "gzip": 30932, "brotli": 28177},
+        "total": {"min": 78303, "gzip": 30996, "brotli": 28269},
+        "initial": {"min": 78303, "gzip": 30996, "brotli": 28269},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16566,
-        "areas": {"framework:vue": 60836, "core:matrix": 8656, "core:styler": 4174, "core:svg": 1293, "core:builder": 1183, "other": 676, "adapter:vue": 609, "browser:download": 509, "core:error": 142, "app": 81},
+        "sdkBytes": 16710,
+        "areas": {"framework:vue": 60836, "core:matrix": 8800, "core:styler": 4174, "core:svg": 1293, "core:builder": 1183, "other": 676, "adapter:vue": 609, "browser:download": 509, "core:error": 142, "app": 81},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 78159, "gzip": 30932, "brotli": 28177},
+            "sizes": {"min": 78303, "gzip": 30996, "brotli": 28269},
             "modules": [
               {"path": "node_modules/@vue/runtime-core/", "area": "framework:vue", "bytes": 35771},
               {"path": "node_modules/@vue/reactivity/", "area": "framework:vue", "bytes": 15744},
@@ -3694,9 +3694,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 673},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/vue/src/QRCodeSVG.ts", "area": "adapter:vue", "bytes": 419},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
@@ -3729,14 +3729,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 80170, "gzip": 32525, "brotli": 29471},
-        "initial": {"min": 80170, "gzip": 32525, "brotli": 29471},
+        "total": {"min": 80314, "gzip": 32587, "brotli": 29537},
+        "initial": {"min": 80314, "gzip": 32587, "brotli": 29537},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 78926, "gzip": 30799, "brotli": 27994},
-        "initial": {"min": 78926, "gzip": 30799, "brotli": 27994},
+        "total": {"min": 79074, "gzip": 30866, "brotli": 28072},
+        "initial": {"min": 79074, "gzip": 30866, "brotli": 28072},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3756,16 +3756,16 @@
       ],
       "baseline": "vue-svg",
       "vite": {
-        "total": {"min": 81448, "gzip": 32294, "brotli": 29401},
-        "initial": {"min": 81448, "gzip": 32294, "brotli": 29401},
+        "total": {"min": 81592, "gzip": 32359, "brotli": 29429},
+        "initial": {"min": 81592, "gzip": 32359, "brotli": 29429},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 19778,
-        "areas": {"framework:vue": 60857, "core:matrix": 8653, "core:styler": 4169, "core:style-patterns": 3221, "core:svg": 1293, "core:builder": 1182, "other": 676, "adapter:vue": 609, "browser:download": 509, "core:error": 142, "app": 137},
+        "sdkBytes": 19922,
+        "areas": {"framework:vue": 60857, "core:matrix": 8797, "core:styler": 4169, "core:style-patterns": 3221, "core:svg": 1293, "core:builder": 1182, "other": 676, "adapter:vue": 609, "browser:download": 509, "core:error": 142, "app": 137},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 81448, "gzip": 32294, "brotli": 29401},
+            "sizes": {"min": 81592, "gzip": 32359, "brotli": 29429},
             "modules": [
               {"path": "node_modules/@vue/runtime-core/", "area": "framework:vue", "bytes": 35788},
               {"path": "node_modules/@vue/reactivity/", "area": "framework:vue", "bytes": 15744},
@@ -3781,9 +3781,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 669},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/vue/src/QRCodeSVG.ts", "area": "adapter:vue", "bytes": 419},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
@@ -3816,14 +3816,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 83502, "gzip": 33978, "brotli": 30787},
-        "initial": {"min": 83502, "gzip": 33978, "brotli": 30787},
+        "total": {"min": 83646, "gzip": 34034, "brotli": 30815},
+        "initial": {"min": 83646, "gzip": 34034, "brotli": 30815},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 82260, "gzip": 32171, "brotli": 29218},
-        "initial": {"min": 82260, "gzip": 32171, "brotli": 29218},
+        "total": {"min": 82408, "gzip": 32236, "brotli": 29277},
+        "initial": {"min": 82408, "gzip": 32236, "brotli": 29277},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3842,16 +3842,16 @@
       ],
       "baseline": "vue-empty",
       "vite": {
-        "total": {"min": 77544, "gzip": 30546, "brotli": 27785},
-        "initial": {"min": 77544, "gzip": 30546, "brotli": 27785},
+        "total": {"min": 77688, "gzip": 30611, "brotli": 27833},
+        "initial": {"min": 77688, "gzip": 30611, "brotli": 27833},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 15527,
-        "areas": {"framework:vue": 61260, "core:matrix": 8656, "core:styler": 4174, "core:builder": 1183, "browser:canvas": 799, "other": 676, "adapter:vue": 573, "core:error": 142, "app": 81},
+        "sdkBytes": 15671,
+        "areas": {"framework:vue": 61260, "core:matrix": 8800, "core:styler": 4174, "core:builder": 1183, "browser:canvas": 799, "other": 676, "adapter:vue": 573, "core:error": 142, "app": 81},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 77544, "gzip": 30546, "brotli": 27785},
+            "sizes": {"min": 77688, "gzip": 30611, "brotli": 27833},
             "modules": [
               {"path": "node_modules/@vue/runtime-core/", "area": "framework:vue", "bytes": 35778},
               {"path": "node_modules/@vue/reactivity/", "area": "framework:vue", "bytes": 16157},
@@ -3866,9 +3866,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 673},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/vue/src/QRCodeCanvas.ts", "area": "adapter:vue", "bytes": 383},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
@@ -3899,14 +3899,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 79566, "gzip": 32107, "brotli": 29116},
-        "initial": {"min": 79566, "gzip": 32107, "brotli": 29116},
+        "total": {"min": 79710, "gzip": 32166, "brotli": 29145},
+        "initial": {"min": 79710, "gzip": 32166, "brotli": 29145},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 78303, "gzip": 30398, "brotli": 27643},
-        "initial": {"min": 78303, "gzip": 30398, "brotli": 27643},
+        "total": {"min": 78451, "gzip": 30463, "brotli": 27720},
+        "initial": {"min": 78451, "gzip": 30463, "brotli": 27720},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3926,16 +3926,16 @@
       ],
       "baseline": "vue-empty",
       "vite": {
-        "total": {"min": 78943, "gzip": 31075, "brotli": 28277},
-        "initial": {"min": 78943, "gzip": 31075, "brotli": 28277},
+        "total": {"min": 79087, "gzip": 31139, "brotli": 28340},
+        "initial": {"min": 79087, "gzip": 31139, "brotli": 28340},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16926,
-        "areas": {"framework:vue": 61260, "core:matrix": 8656, "core:styler": 4174, "core:builder": 1183, "browser:canvas": 799, "adapter:vue": 750, "other": 676, "browser:image": 637, "browser:download": 529, "core:error": 142, "app": 81, "browser:png": 56},
+        "sdkBytes": 17070,
+        "areas": {"framework:vue": 61260, "core:matrix": 8800, "core:styler": 4174, "core:builder": 1183, "browser:canvas": 799, "adapter:vue": 750, "other": 676, "browser:image": 637, "browser:download": 529, "core:error": 142, "app": 81, "browser:png": 56},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 78943, "gzip": 31075, "brotli": 28277},
+            "sizes": {"min": 79087, "gzip": 31139, "brotli": 28340},
             "modules": [
               {"path": "node_modules/@vue/runtime-core/", "area": "framework:vue", "bytes": 35788},
               {"path": "node_modules/@vue/reactivity/", "area": "framework:vue", "bytes": 16147},
@@ -3950,11 +3950,11 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 673},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 637},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
               {"path": "packages/vue/src/create-qrcode-image.ts", "area": "adapter:vue", "bytes": 534},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
               {"path": "packages/core/src/matrix/augment-eccs.ts", "area": "core:matrix", "bytes": 306},
@@ -3988,14 +3988,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 80969, "gzip": 32651, "brotli": 29587},
-        "initial": {"min": 80969, "gzip": 32651, "brotli": 29587},
+        "total": {"min": 81113, "gzip": 32714, "brotli": 29683},
+        "initial": {"min": 81113, "gzip": 32714, "brotli": 29683},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 79721, "gzip": 30907, "brotli": 28171},
-        "initial": {"min": 79721, "gzip": 30907, "brotli": 28171},
+        "total": {"min": 79869, "gzip": 30974, "brotli": 28183},
+        "initial": {"min": 79869, "gzip": 30974, "brotli": 28183},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -4019,16 +4019,16 @@
       ],
       "baseline": "vue-empty",
       "vite": {
-        "total": {"min": 97361, "gzip": 38305, "brotli": 34736},
-        "initial": {"min": 97361, "gzip": 38305, "brotli": 34736},
+        "total": {"min": 97505, "gzip": 38371, "brotli": 34789},
+        "initial": {"min": 97505, "gzip": 38371, "brotli": 34789},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 35149,
-        "areas": {"framework:vue": 61270, "core:matrix": 8652, "core:jpeg-encoder": 6223, "core:webp-encoder": 5517, "core:styler": 4278, "core:gif-encoder": 2951, "adapter:vue": 1616, "core:svg": 1292, "core:builder": 1181, "browser:image": 881, "browser:canvas": 798, "browser:download": 750, "other": 706, "core:raster-shared": 518, "app": 236, "core:error": 141, "browser:gif": 121, "browser:jpeg": 121, "browser:png": 56, "browser:webp": 53},
+        "sdkBytes": 35293,
+        "areas": {"framework:vue": 61270, "core:matrix": 8796, "core:jpeg-encoder": 6223, "core:webp-encoder": 5517, "core:styler": 4278, "core:gif-encoder": 2951, "adapter:vue": 1616, "core:svg": 1292, "core:builder": 1181, "browser:image": 881, "browser:canvas": 798, "browser:download": 750, "other": 706, "core:raster-shared": 518, "app": 236, "core:error": 141, "browser:gif": 121, "browser:jpeg": 121, "browser:png": 56, "browser:webp": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 97361, "gzip": 38305, "brotli": 34736},
+            "sizes": {"min": 97505, "gzip": 38371, "brotli": 34789},
             "modules": [
               {"path": "node_modules/@vue/runtime-core/", "area": "framework:vue", "bytes": 35788},
               {"path": "node_modules/@vue/reactivity/", "area": "framework:vue", "bytes": 16157},
@@ -4047,11 +4047,11 @@
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 777},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "(unmapped)", "area": "other", "bytes": 706},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
               {"path": "packages/vue/src/create-qrcode-image.ts", "area": "adapter:vue", "bytes": 534},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/vue/src/QRCodeSVG.ts", "area": "adapter:vue", "bytes": 415},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/vue/src/QRCodeCanvas.ts", "area": "adapter:vue", "bytes": 383},
@@ -4097,14 +4097,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 99463, "gzip": 40142, "brotli": 36365},
-        "initial": {"min": 99463, "gzip": 40142, "brotli": 36365},
+        "total": {"min": 99607, "gzip": 40206, "brotli": 36323},
+        "initial": {"min": 99607, "gzip": 40206, "brotli": 36323},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 98364, "gzip": 38121, "brotli": 34539},
-        "initial": {"min": 98364, "gzip": 38121, "brotli": 34539},
+        "total": {"min": 98512, "gzip": 38189, "brotli": 34610},
+        "initial": {"min": 98512, "gzip": 38189, "brotli": 34610},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -4155,16 +4155,16 @@
       ],
       "baseline": "svelte-empty",
       "vite": {
-        "total": {"min": 53103, "gzip": 21282, "brotli": 19319},
-        "initial": {"min": 53103, "gzip": 21282, "brotli": 19319},
+        "total": {"min": 53247, "gzip": 21349, "brotli": 19369},
+        "initial": {"min": 53247, "gzip": 21349, "brotli": 19369},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16323,
-        "areas": {"framework:svelte": 35898, "core:matrix": 8653, "core:styler": 4169, "core:svg": 1293, "core:builder": 1182, "other": 822, "browser:download": 509, "adapter:svelte": 375, "core:error": 142, "app": 60},
+        "sdkBytes": 16467,
+        "areas": {"framework:svelte": 35898, "core:matrix": 8797, "core:styler": 4169, "core:svg": 1293, "core:builder": 1182, "other": 822, "browser:download": 509, "adapter:svelte": 375, "core:error": 142, "app": 60},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 53103, "gzip": 21282, "brotli": 19319},
+            "sizes": {"min": 53247, "gzip": 21349, "brotli": 19369},
             "modules": [
               {"path": "node_modules/svelte/", "area": "framework:svelte", "bytes": 35535},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2620},
@@ -4176,9 +4176,9 @@
               {"path": "(unmapped)", "area": "other", "bytes": 822},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 669},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
               {"path": "node_modules/clsx/", "area": "framework:svelte", "bytes": 363},
@@ -4226,16 +4226,16 @@
       ],
       "baseline": "svelte-svg",
       "vite": {
-        "total": {"min": 56387, "gzip": 22674, "brotli": 20562},
-        "initial": {"min": 56387, "gzip": 22674, "brotli": 20562},
+        "total": {"min": 56531, "gzip": 22740, "brotli": 20593},
+        "initial": {"min": 56531, "gzip": 22740, "brotli": 20593},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 19535,
-        "areas": {"framework:svelte": 35914, "core:matrix": 8653, "core:styler": 4169, "core:style-patterns": 3212, "core:svg": 1293, "core:builder": 1182, "other": 822, "browser:download": 509, "adapter:svelte": 375, "core:error": 142, "app": 116},
+        "sdkBytes": 19679,
+        "areas": {"framework:svelte": 35914, "core:matrix": 8797, "core:styler": 4169, "core:style-patterns": 3212, "core:svg": 1293, "core:builder": 1182, "other": 822, "browser:download": 509, "adapter:svelte": 375, "core:error": 142, "app": 116},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 56387, "gzip": 22674, "brotli": 20562},
+            "sizes": {"min": 56531, "gzip": 22740, "brotli": 20593},
             "modules": [
               {"path": "node_modules/svelte/", "area": "framework:svelte", "bytes": 35551},
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 3212},
@@ -4248,9 +4248,9 @@
               {"path": "(unmapped)", "area": "other", "bytes": 822},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 669},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
               {"path": "node_modules/clsx/", "area": "framework:svelte", "bytes": 363},
@@ -4297,16 +4297,16 @@
       ],
       "baseline": "svelte-empty",
       "vite": {
-        "total": {"min": 51987, "gzip": 20704, "brotli": 18778},
-        "initial": {"min": 51987, "gzip": 20704, "brotli": 18778},
+        "total": {"min": 52131, "gzip": 20769, "brotli": 18821},
+        "initial": {"min": 52131, "gzip": 20769, "brotli": 18821},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 15242,
-        "areas": {"framework:svelte": 35890, "core:matrix": 8642, "core:styler": 4169, "core:builder": 1180, "browser:canvas": 798, "other": 795, "adapter:svelte": 312, "core:error": 141, "app": 60},
+        "sdkBytes": 15386,
+        "areas": {"framework:svelte": 35890, "core:matrix": 8786, "core:styler": 4169, "core:builder": 1180, "browser:canvas": 798, "other": 795, "adapter:svelte": 312, "core:error": 141, "app": 60},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 51987, "gzip": 20704, "brotli": 18778},
+            "sizes": {"min": 52131, "gzip": 20769, "brotli": 18821},
             "modules": [
               {"path": "node_modules/svelte/", "area": "framework:svelte", "bytes": 35527},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2620},
@@ -4318,9 +4318,9 @@
               {"path": "(unmapped)", "area": "other", "bytes": 795},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 669},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 365},
               {"path": "node_modules/clsx/", "area": "framework:svelte", "bytes": 363},
@@ -4366,16 +4366,16 @@
       ],
       "baseline": "svelte-empty",
       "vite": {
-        "total": {"min": 54477, "gzip": 21509, "brotli": 19479},
-        "initial": {"min": 54477, "gzip": 21509, "brotli": 19479},
+        "total": {"min": 54621, "gzip": 21582, "brotli": 19548},
+        "initial": {"min": 54621, "gzip": 21582, "brotli": 19548},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16712,
-        "areas": {"framework:svelte": 36745, "core:matrix": 8649, "core:styler": 4169, "core:builder": 1180, "other": 960, "browser:canvas": 798, "browser:image": 635, "adapter:svelte": 555, "browser:download": 529, "core:error": 141, "app": 60, "browser:png": 56},
+        "sdkBytes": 16856,
+        "areas": {"framework:svelte": 36745, "core:matrix": 8793, "core:styler": 4169, "core:builder": 1180, "other": 960, "browser:canvas": 798, "browser:image": 635, "adapter:svelte": 555, "browser:download": 529, "core:error": 141, "app": 60, "browser:png": 56},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 54477, "gzip": 21509, "brotli": 19479},
+            "sizes": {"min": 54621, "gzip": 21582, "brotli": 19548},
             "modules": [
               {"path": "node_modules/svelte/", "area": "framework:svelte", "bytes": 36382},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2620},
@@ -4387,10 +4387,10 @@
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 798},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 669},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 365},
               {"path": "node_modules/clsx/", "area": "framework:svelte", "bytes": 363},
@@ -4444,16 +4444,16 @@
       ],
       "baseline": "svelte-empty",
       "vite": {
-        "total": {"min": 74469, "gzip": 29030, "brotli": 26264},
-        "initial": {"min": 74469, "gzip": 29030, "brotli": 26264},
+        "total": {"min": 74613, "gzip": 29095, "brotli": 26337},
+        "initial": {"min": 74613, "gzip": 29095, "brotli": 26337},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 34998,
-        "areas": {"framework:svelte": 37537, "core:matrix": 8649, "core:jpeg-encoder": 6232, "core:webp-encoder": 5517, "core:styler": 4273, "core:gif-encoder": 2951, "other": 1574, "adapter:svelte": 1465, "core:svg": 1292, "core:builder": 1180, "browser:image": 881, "browser:canvas": 798, "browser:download": 750, "core:raster-shared": 518, "app": 360, "core:error": 141, "browser:gif": 121, "browser:jpeg": 121, "browser:png": 56, "browser:webp": 53},
+        "sdkBytes": 35142,
+        "areas": {"framework:svelte": 37537, "core:matrix": 8793, "core:jpeg-encoder": 6232, "core:webp-encoder": 5517, "core:styler": 4273, "core:gif-encoder": 2951, "other": 1574, "adapter:svelte": 1465, "core:svg": 1292, "core:builder": 1180, "browser:image": 881, "browser:canvas": 798, "browser:download": 750, "core:raster-shared": 518, "app": 360, "core:error": 141, "browser:gif": 121, "browser:jpeg": 121, "browser:png": 56, "browser:webp": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 74469, "gzip": 29030, "brotli": 26264},
+            "sizes": {"min": 74613, "gzip": 29095, "brotli": 26337},
             "modules": [
               {"path": "node_modules/svelte/", "area": "framework:svelte", "bytes": 37174},
               {"path": "packages/core/src/raster/jpeg.ts", "area": "core:jpeg-encoder", "bytes": 6232},
@@ -4469,10 +4469,10 @@
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 798},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 773},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 635},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 373},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 365},
@@ -4568,16 +4568,16 @@
       ],
       "baseline": "angular-empty",
       "vite": {
-        "total": {"min": 271759, "gzip": 90368, "brotli": 78207},
-        "initial": {"min": 271759, "gzip": 90368, "brotli": 78207},
+        "total": {"min": 271903, "gzip": 90433, "brotli": 78231},
+        "initial": {"min": 271903, "gzip": 90433, "brotli": 78231},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16752,
-        "areas": {"framework:angular": 254114, "core:matrix": 8656, "core:styler": 4174, "core:svg": 1293, "core:builder": 1183, "adapter:angular": 799, "other": 700, "browser:download": 509, "app": 193, "core:error": 138},
+        "sdkBytes": 16896,
+        "areas": {"framework:angular": 254114, "core:matrix": 8800, "core:styler": 4174, "core:svg": 1293, "core:builder": 1183, "adapter:angular": 799, "other": 700, "browser:download": 509, "app": 193, "core:error": 138},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 271759, "gzip": 90368, "brotli": 78207},
+            "sizes": {"min": 271903, "gzip": 90433, "brotli": 78231},
             "modules": [
               {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229913},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
@@ -4593,9 +4593,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "(unmapped)", "area": "other", "bytes": 700},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 673},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "node_modules/@angular/common/", "area": "framework:angular", "bytes": 411},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
@@ -4642,16 +4642,16 @@
       ],
       "baseline": "angular-svg",
       "vite": {
-        "total": {"min": 275067, "gzip": 91779, "brotli": 79362},
-        "initial": {"min": 275067, "gzip": 91779, "brotli": 79362},
+        "total": {"min": 275211, "gzip": 91842, "brotli": 79395},
+        "initial": {"min": 275211, "gzip": 91842, "brotli": 79395},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 19975,
-        "areas": {"framework:angular": 254129, "core:matrix": 8656, "core:styler": 4174, "core:style-patterns": 3223, "core:svg": 1293, "core:builder": 1183, "adapter:angular": 799, "other": 700, "browser:download": 509, "app": 263, "core:error": 138},
+        "sdkBytes": 20119,
+        "areas": {"framework:angular": 254129, "core:matrix": 8800, "core:styler": 4174, "core:style-patterns": 3223, "core:svg": 1293, "core:builder": 1183, "adapter:angular": 799, "other": 700, "browser:download": 509, "app": 263, "core:error": 138},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 275067, "gzip": 91779, "brotli": 79362},
+            "sizes": {"min": 275211, "gzip": 91842, "brotli": 79395},
             "modules": [
               {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229928},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
@@ -4668,9 +4668,9 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "(unmapped)", "area": "other", "bytes": 700},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 673},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "node_modules/@angular/common/", "area": "framework:angular", "bytes": 411},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
@@ -4716,16 +4716,16 @@
       ],
       "baseline": "angular-empty",
       "vite": {
-        "total": {"min": 270763, "gzip": 89883, "brotli": 77706},
-        "initial": {"min": 270763, "gzip": 89883, "brotli": 77706},
+        "total": {"min": 270907, "gzip": 89945, "brotli": 77817},
+        "initial": {"min": 270907, "gzip": 89945, "brotli": 77817},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 15756,
-        "areas": {"framework:angular": 254114, "core:matrix": 8656, "core:styler": 4174, "core:builder": 1183, "adapter:angular": 806, "browser:canvas": 799, "other": 700, "app": 193, "core:error": 138},
+        "sdkBytes": 15900,
+        "areas": {"framework:angular": 254114, "core:matrix": 8800, "core:styler": 4174, "core:builder": 1183, "adapter:angular": 806, "browser:canvas": 799, "other": 700, "app": 193, "core:error": 138},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 270763, "gzip": 89883, "brotli": 77706},
+            "sizes": {"min": 270907, "gzip": 89945, "brotli": 77817},
             "modules": [
               {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229913},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
@@ -4740,10 +4740,10 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "(unmapped)", "area": "other", "bytes": 700},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 673},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/angular/src/lib/QRCodeCanvas.ts", "area": "adapter:angular", "bytes": 621},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "node_modules/@angular/common/", "area": "framework:angular", "bytes": 411},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
@@ -4789,16 +4789,16 @@
       ],
       "baseline": "angular-empty",
       "vite": {
-        "total": {"min": 272268, "gzip": 90416, "brotli": 78306},
-        "initial": {"min": 272268, "gzip": 90416, "brotli": 78306},
+        "total": {"min": 272412, "gzip": 90481, "brotli": 78252},
+        "initial": {"min": 272412, "gzip": 90481, "brotli": 78252},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 17253,
-        "areas": {"framework:angular": 254114, "core:matrix": 8656, "core:styler": 4174, "core:builder": 1183, "adapter:angular": 1081, "browser:canvas": 799, "other": 708, "browser:image": 637, "browser:download": 529, "app": 193, "core:error": 138, "browser:png": 56},
+        "sdkBytes": 17397,
+        "areas": {"framework:angular": 254114, "core:matrix": 8800, "core:styler": 4174, "core:builder": 1183, "adapter:angular": 1081, "browser:canvas": 799, "other": 708, "browser:image": 637, "browser:download": 529, "app": 193, "core:error": 138, "browser:png": 56},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 272268, "gzip": 90416, "brotli": 78306},
+            "sizes": {"min": 272412, "gzip": 90481, "brotli": 78252},
             "modules": [
               {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229913},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
@@ -4814,10 +4814,10 @@
               {"path": "(unmapped)", "area": "other", "bytes": 708},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 673},
               {"path": "packages/angular/src/lib/qrcode-image-base.ts", "area": "adapter:angular", "bytes": 654},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 637},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "node_modules/@angular/common/", "area": "framework:angular", "bytes": 411},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 366},
@@ -4871,16 +4871,16 @@
       ],
       "baseline": "angular-empty",
       "vite": {
-        "total": {"min": 292695, "gzip": 97828, "brotli": 84644},
-        "initial": {"min": 292695, "gzip": 97828, "brotli": 84644},
+        "total": {"min": 292839, "gzip": 97895, "brotli": 84640},
+        "initial": {"min": 292839, "gzip": 97895, "brotli": 84640},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 36709,
-        "areas": {"framework:angular": 254120, "core:matrix": 8656, "core:jpeg-encoder": 6244, "core:webp-encoder": 5518, "core:styler": 4278, "adapter:angular": 3145, "core:gif-encoder": 2953, "core:svg": 1293, "core:builder": 1183, "app": 1088, "browser:image": 883, "browser:canvas": 799, "other": 778, "browser:download": 750, "core:raster-shared": 518, "core:error": 138, "browser:gif": 121, "browser:jpeg": 121, "browser:png": 56, "browser:webp": 53},
+        "sdkBytes": 36853,
+        "areas": {"framework:angular": 254120, "core:matrix": 8800, "core:jpeg-encoder": 6244, "core:webp-encoder": 5518, "core:styler": 4278, "adapter:angular": 3145, "core:gif-encoder": 2953, "core:svg": 1293, "core:builder": 1183, "app": 1088, "browser:image": 883, "browser:canvas": 799, "other": 778, "browser:download": 750, "core:raster-shared": 518, "core:error": 138, "browser:gif": 121, "browser:jpeg": 121, "browser:png": 56, "browser:webp": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 292695, "gzip": 97828, "brotli": 84644},
+            "sizes": {"min": 292839, "gzip": 97895, "brotli": 84640},
             "modules": [
               {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229919},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
@@ -4902,11 +4902,11 @@
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 720},
               {"path": "packages/angular/src/lib/QRCodeSVG.ts", "area": "adapter:angular", "bytes": 719},
               {"path": "packages/angular/src/lib/qrcode-image-base.ts", "area": "adapter:angular", "bytes": 650},
+              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 637},
               {"path": "packages/angular/src/lib/QRCodeCanvas.ts", "area": "adapter:angular", "bytes": 621},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 617},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 611},
-              {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 498},
               {"path": "node_modules/@angular/common/", "area": "framework:angular", "bytes": 411},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 389},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 373},
@@ -4954,7 +4954,7 @@
     }
   ],
   "packages": [
-    {"name": "@qrcodesdk/core", "version": "0.0.5", "packed": 167886, "unpacked": 552026, "files": 89},
+    {"name": "@qrcodesdk/core", "version": "0.0.5", "packed": 168233, "unpacked": 553171, "files": 89},
     {"name": "@qrcodesdk/browser", "version": "0.0.5", "packed": 16712, "unpacked": 58283, "files": 45},
     {"name": "@qrcodesdk/node", "version": "0.0.5", "packed": 29796, "unpacked": 103994, "files": 8},
     {"name": "@qrcodesdk/react", "version": "0.0.5", "packed": 11827, "unpacked": 47635, "files": 8},

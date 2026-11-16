@@ -15,6 +15,20 @@ export function applyMaskToMatrix(
   n: number,
   mask: QRCodeMask,
 ): Uint8Array {
+  // Small symbols benefit from skipping table setup and writes to function modules.
+  // Larger symbols use the branchless table loop below.
+  if (mask < 3 && n < 64) {
+    const rowStep = mask === 1 ? 2 : 1;
+    const columnStep = mask === 2 ? 3 : mask === 0 ? 2 : 1;
+    for (let i = 0; i < n; i += rowStep) {
+      for (let j = mask === 0 ? i & 1 : 0; j < n; j += columnStep) {
+        const index = i * n + j;
+        if (roles[index] === 0) modules[index]! ^= 1;
+      }
+    }
+    return modules;
+  }
+
   flips ??= createFlips();
   for (let i = 0; i < n; i++) {
     const entry = flips[mask * 12 + (i % 12)]!;
