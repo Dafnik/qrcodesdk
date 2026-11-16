@@ -1,6 +1,18 @@
 import {Buffer} from 'node:buffer';
 import {beforeAll, describe, expect, test, vi} from 'vitest';
 
+import {qrcode} from '@qrcodesdk/core/matrix';
+import {microQR} from '@qrcodesdk/core/micro';
+import {rMQR} from '@qrcodesdk/core/rmqr';
+import {QRCodeSVGRenderer} from '@qrcodesdk/core/svg';
+import {QRCodeTextRenderer} from '@qrcodesdk/core/text';
+import {
+  QRCodeGIFRenderer,
+  QRCodeJPEGRenderer,
+  QRCodePNGRenderer,
+  QRCodeWebPRenderer,
+} from '@qrcodesdk/node';
+
 import packageJson from '../package.json' with {type: 'json'};
 import {type CliRuntime, type WritableTarget, runCli} from '../src/run-cli';
 
@@ -131,6 +143,7 @@ describe('runCli', () => {
     expect(runtime.stdoutText()).toContain('Usage: qrc [payload] [options]');
     expect(runtime.stdoutText()).toContain('--no-eci');
     expect(runtime.stdoutText()).toContain('--version <version>');
+    expect(runtime.stdoutText()).toContain('--symbol <symbol>');
     expect(runtime.stderrText()).toBe('');
     expect(runtime.files).toEqual([]);
   });
@@ -562,4 +575,101 @@ describe('runCli', () => {
 
     expect(runtime.stderrText()).toContain('Missing --output for svg output');
   });
+});
+
+const symbolScenarios = [
+  {
+    name: 'micro',
+    flags: ['--version', 'M4', '--mask', '2'],
+    symbol: microQR({version: 'M4', mask: 2}),
+  },
+  {name: 'rmqr', flags: ['--version', 'R7x43'], symbol: rMQR({version: 'R7x43'})},
+  {name: 'rmqr', flags: ['--version', 'R7'], symbol: rMQR({version: 'R7'})},
+  {name: 'micro', flags: [], symbol: microQR()},
+  {name: 'rmqr', flags: [], symbol: rMQR()},
+] as const;
+
+for (const {name, flags, symbol} of symbolScenarios) {
+  test.each(['text', 'svg', 'png', 'webp', 'gif', 'jpeg'] as const)(
+    `renders ${name} ${flags.join(' ')} as %s using the SDK symbol`,
+    async (format) => {
+      const runtime = createRuntime();
+      const outputFlags = format === 'text' ? ['--ansi', 'off'] : ['--output', `code.${format}`];
+      await expect(
+        runCli(['12345', '--symbol', name, ...flags, ...outputFlags], runtime),
+      ).resolves.toBe(0);
+      const builder = qrcode('12345').options({symbol});
+      const style = {moduleSize: 1, quietZone: 2};
+      if (format === 'text') {
+        expect(runtime.stdoutText()).toBe(
+          `${builder.render(QRCodeTextRenderer({style, ansi: false}))}\n`,
+        );
+      } else if (format === 'svg') {
+        expect(runtime.files[0]!.data).toBe(builder.render(QRCodeSVGRenderer({style})));
+      } else {
+        const renderer = {
+          png: QRCodePNGRenderer,
+          webp: QRCodeWebPRenderer,
+          gif: QRCodeGIFRenderer,
+          jpeg: QRCodeJPEGRenderer,
+        }[format];
+        expect(runtime.files[0]!.data).toEqual(builder.render(renderer({style})));
+      }
+    },
+  );
+}
+
+test('explicit qr symbol preserves the default output', async () => {
+  const implicit = createRuntime();
+  const explicit = createRuntime();
+  await expect(runCli(['HELLO'], implicit)).resolves.toBe(0);
+  await expect(runCli(['HELLO', '--symbol', 'qr'], explicit)).resolves.toBe(0);
+  expect(explicit.stdoutText()).toBe(implicit.stdoutText());
+});
+
+test.each([
+  {flags: ['--symbol', 'invalid'], message: 'Invalid symbol'},
+  {flags: ['--symbol'], message: 'argument missing'},
+  {flags: ['--symbol', 'micro', '--version', '1'], message: 'Invalid version'},
+  {flags: ['--symbol', 'micro', '--mask', '4'], message: 'Invalid mask'},
+  {flags: ['--symbol', 'micro', '--eci'], message: '--eci is not supported'},
+  {
+    flags: ['--symbol', 'micro', '--optimize-segments'],
+    message: '--optimize-segments is not supported',
+  },
+  {flags: ['--symbol', 'micro', '--error-correction', 'H'], message: 'Micro QR'},
+  {flags: ['--symbol', 'rmqr', '--version', 'R7x27'], message: 'rMQR.version'},
+  {flags: ['--symbol', 'rmqr', '--version', '1'], message: 'rMQR.version'},
+  {flags: ['--symbol', 'rmqr', '--mask', '0'], message: '--mask is not supported'},
+  {flags: ['--symbol', 'rmqr', '--eci'], message: '--eci is not supported'},
+  {
+    flags: ['--symbol', 'rmqr', '--optimize-segments'],
+    message: '--optimize-segments is not supported',
+  },
+  {flags: ['--symbol', 'rmqr', '--error-correction', 'L'], message: 'M or H'},
+])('rejects incompatible symbol options $flags', async ({flags, message}) => {
+  const runtime = createRuntime();
+  await expect(runCli(['12345', '--output', 'code.svg', ...flags], runtime)).resolves.toBe(1);
+  expect(runtime.stderrText()).toContain(message);
+  expect(runtime.files).toHaveLength(0);
+  expect(runtime.stdoutText()).toBe('');
+});
+
+test.each(['micro', 'rmqr'])(
+  'supports Kanji mode and disabled standard-only flags for %s',
+  async (symbol) => {
+    const runtime = createRuntime();
+    await expect(
+      runCli(
+        ['東京', '--symbol', symbol, '--mode', 'kanji', '--no-eci', '--no-optimize-segments'],
+        runtime,
+      ),
+    ).resolves.toBe(0);
+  },
+);
+
+test('does not fall back to a standard QR code for an oversized Micro QR payload', async () => {
+  const runtime = createRuntime();
+  await expect(runCli(['a'.repeat(100), '--symbol', 'micro'], runtime)).resolves.toBe(1);
+  expect(runtime.stdoutText()).toBe('');
 });

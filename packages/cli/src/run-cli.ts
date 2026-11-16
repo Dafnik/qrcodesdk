@@ -15,6 +15,7 @@ declare const __QRCODESDK_CLI_VERSION__: string;
 type OutputFormat = 'text' | 'svg' | 'png' | 'webp' | 'gif' | 'jpeg';
 
 type RawCliOptions = {
+  readonly symbol?: string;
   readonly payload?: string;
   readonly format?: string;
   readonly output?: string;
@@ -97,10 +98,11 @@ const stringOptions = [
     'Output format: text, svg, png, webp, gif, or jpeg. Inferred from the output path extension',
   ],
   ['output', 'path', 'Required output path for SVG, PNG, WebP, GIF, and JPEG'],
+  ['symbol', 'symbol', 'Symbol type: qr (default), micro, or rmqr'],
   ['mode', 'mode', 'QR code mode: auto, numeric, alphanumeric, octet, or kanji'],
   ['error-correction', 'level', 'Error correction level: L, M, Q, or H'],
-  ['version', 'version', 'Pin a QR code version from 1 to 40'],
-  ['mask', 'mask', 'Pin a QR code mask from 0 to 7'],
+  ['version', 'version', 'Pin a version: QR 1-40, Micro M1-M4, or rMQR R7x43 / height R7'],
+  ['mask', 'mask', 'Pin a mask: QR 0-7 or Micro 0-3; unsupported for rMQR'],
   ['module-size', 'size', 'Module size as a positive integer'],
   ['quiet-zone', 'size', 'Quiet zone as a non-negative integer'],
   ['layout', 'layout', 'Text layout: compact or full'],
@@ -201,16 +203,16 @@ function helpText(): string {
     description,
   ]);
   options.push(
-    ['    --optimize-segments', 'Optimize mixed-mode segments in auto mode'],
+    ['    --optimize-segments', 'Optimize mixed-mode segments in auto mode (standard QR only)'],
     ['    --no-optimize-segments', 'Use single-mode detection in auto mode (default)'],
     ['    --kanji', 'Encode Shift JIS characters in Kanji mode in auto mode'],
     ['    --no-kanji', 'Encode Japanese text as UTF-8 octets in auto mode (default)'],
-    ['    --eci', 'Emit UTF-8 ECI assignment 26 for octet segments'],
+    ['    --eci', 'Emit UTF-8 ECI assignment 26 for octet segments (standard QR only)'],
     ['    --no-eci', 'Do not emit UTF-8 ECI assignment 26'],
     ['-V', 'Print the installed CLI package version'],
     ['-h, --help', 'Show this help'],
   );
-  return `Usage: qrc [payload] [options]\n\nGenerate QR codes as terminal text, SVG files, or PNG, WebP, GIF, and JPEG files.\n\nOptions:\n${options.map(([flag, description]) => `  ${flag!.padEnd(30)} ${description}`).join('\n')}\n`;
+  return `Usage: qrc [payload] [options]\n\nGenerate QR, Micro QR, and rMQR codes as terminal text, SVG, PNG, WebP, GIF, or JPEG.\n\nOptions:\n${options.map(([flag, description]) => `  ${flag!.padEnd(30)} ${description}`).join('\n')}\n`;
 }
 
 async function resolveCliOptions(
@@ -248,11 +250,9 @@ async function resolveCliOptions(
         ? 'compact'
         : requiredEnum(rawOptions.layout, layouts, 'layout'),
     ansi,
+    ...(await resolveSymbolOptions(rawOptions)),
     mode: optionalEnum(rawOptions.mode, modes, 'mode'),
     errorCorrectionLevel: optionalErrorCorrectionLevel(rawOptions.errorCorrection),
-    version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as
-      QRCodeVersion | undefined,
-    mask: optionalIntegerInRange(rawOptions.mask, 'mask', 0, 7) as QRCodeMask | undefined,
     eci: rawOptions.eci ?? false,
     optimizeSegments: rawOptions.optimizeSegments ?? false,
     kanji: rawOptions.kanji ?? false,
@@ -261,6 +261,41 @@ async function resolveCliOptions(
     matte: optionalOpaqueHexColor(rawOptions.matte, 'matte'),
     ariaLabel: rawOptions.ariaLabel,
     title: rawOptions.title,
+  };
+}
+
+async function resolveSymbolOptions(rawOptions: RawCliOptions): Promise<QRCodeMatrixOptions> {
+  const symbol = requiredEnum(rawOptions.symbol ?? 'qr', ['qr', 'micro', 'rmqr'], 'symbol');
+  if (symbol === 'qr') {
+    return {
+      version: optionalIntegerInRange(rawOptions.version, 'version', 1, 40) as
+        QRCodeVersion | undefined,
+      mask: optionalIntegerInRange(rawOptions.mask, 'mask', 0, 7) as QRCodeMask | undefined,
+    };
+  }
+  if (rawOptions.eci) throw new CliError(`--eci is not supported with --symbol ${symbol}.`);
+  if (rawOptions.optimizeSegments) {
+    throw new CliError(`--optimize-segments is not supported with --symbol ${symbol}.`);
+  }
+  if (symbol === 'micro') {
+    const {microQR} = await import('@qrcodesdk/core/micro');
+    return {
+      symbol: microQR({
+        version: optionalEnum(rawOptions.version, ['M1', 'M2', 'M3', 'M4'], 'version'),
+        mask: optionalIntegerInRange(rawOptions.mask, 'mask', 0, 3) as
+          import('@qrcodesdk/core/micro').QRCodeMicroMask | undefined,
+      }),
+    };
+  }
+  if (rawOptions.mask !== undefined) {
+    throw new CliError('--mask is not supported with --symbol rmqr.');
+  }
+  const {rMQR} = await import('@qrcodesdk/core/rmqr');
+  return {
+    symbol: rMQR({
+      // The factory validates exact versions and height selectors.
+      version: rawOptions.version as import('@qrcodesdk/core/rmqr').QRCodeRMQROptions['version'],
+    }),
   };
 }
 
@@ -403,15 +438,22 @@ async function render(
     options.kanji || options.mode === 'kanji'
       ? (await import('@qrcodesdk/core/kanji')).kanji
       : undefined;
-  const builder = qrcode(options.payload).options({
-    segmenter,
+  const commonOptions = {
     kanji,
     mode: options.mode,
     errorCorrectionLevel: options.errorCorrectionLevel,
-    version: options.version,
-    mask: options.mask,
-    eci: options.eci,
-  });
+  };
+  const builder = qrcode(options.payload).options(
+    options.symbol
+      ? {...commonOptions, symbol: options.symbol}
+      : {
+          ...commonOptions,
+          segmenter,
+          version: options.version,
+          mask: options.mask,
+          eci: options.eci,
+        },
+  );
 
   if (options.format === 'text') {
     const {QRCodeTextRenderer} = await import('@qrcodesdk/core/text');

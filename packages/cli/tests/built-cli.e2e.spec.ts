@@ -63,3 +63,13 @@ test('built executable loads its JPEG renderer on demand', async () => {
     'JFIF\0',
   );
 });
+
+test.each([
+  {symbol: 'micro', version: 'M1', width: 15, height: 15},
+  {symbol: 'rmqr', version: 'R7x43', width: 47, height: 11},
+])('built executable loads $symbol symbols on demand', async ({symbol, version, width, height}) => {
+  await run(['12345', '--symbol', symbol, '--version', version, '--output', 'code.png']);
+  const bytes = await readFile(path.join(directory, 'code.png'));
+  expect(bytes.readUInt32BE(16)).toBe(width);
+  expect(bytes.readUInt32BE(20)).toBe(height);
+});
