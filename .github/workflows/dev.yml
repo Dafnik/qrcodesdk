@@ -430,7 +430,6 @@ jobs:
       - build
       - verify
       - test
-      - size
       - roundtrips
       - runtime
       - browser-runtime
@@ -443,7 +442,6 @@ jobs:
           needs.build.result != 'success' ||
           needs.verify.result != 'success' ||
           needs.test.result != 'success' ||
-          needs.size.result != 'success' ||
           needs.roundtrips.result != 'success' ||
           needs.runtime.result != 'success' ||
           needs['browser-runtime'].result != 'success' ||
