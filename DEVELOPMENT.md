@@ -57,7 +57,11 @@ builds for packages outside the roundtrip suites.
 
 The browser package's tests require Playwright Chromium and its system dependencies.
 Install the browser prerequisites using the same Playwright version as the workspace.
-The CI setup is documented in `.github/actions/setup-playwright/action.yml`.
+The CI setup is documented in `.github/actions/setup-playwright/action.yml`. Chromium CI jobs
+install only the headless shell. Pass `only-shell: 'false'` if a job needs headed Chromium or a
+Chromium channel. The WebKit runtime job uses the official Playwright container instead of
+installing system dependencies; its image tag comes from the installed Playwright version.
+Turbo passes `PLAYWRIGHT_BROWSERS_PATH` through to that runtime task so it finds the image's browsers.
 
 Coverage clears previous reports, runs every package's raw coverage task through Turbo,
 then merges the results. HTML, LCOV, and combined JSON reports are written to `coverage/`.

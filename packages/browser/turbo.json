@@ -3,7 +3,8 @@
   "tasks": {
     "test:browser-runtime": {
       "cache": false,
-      "env": ["QRCODESDK_BROWSER", "QRCODESDK_CONSUMER"]
+      "env": ["QRCODESDK_BROWSER", "QRCODESDK_CONSUMER"],
+      "passThroughEnv": ["PLAYWRIGHT_BROWSERS_PATH"]
     },
     "test:framework-runtime": {
       "cache": false,

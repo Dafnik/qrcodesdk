@@ -5,6 +5,10 @@ inputs:
     description: 'Space-separated Playwright browser names to install'
     required: false
     default: 'chromium'
+  only-shell:
+    description: 'Install only the Chromium headless shell'
+    required: false
+    default: 'true'
 runs:
   using: 'composite'
   steps:
@@ -29,9 +33,8 @@ runs:
       id: playwright-version
       shell: bash
       run: |
-        cd packages/browser
-        echo "PLAYWRIGHT_VERSION=$(jq -r '.devDependencies."playwright"' package.json)" >> $GITHUB_ENV
-        cd -
+        version=$(pnpm --filter @qrcodesdk/browser exec playwright --version)
+        echo "PLAYWRIGHT_VERSION=${version#Version }" >> "$GITHUB_ENV"
 
     - name: Normalize browser cache key
       shell: bash
@@ -48,17 +51,22 @@ runs:
       uses: actions/cache@v6
       with:
         path: ~/.cache/ms-playwright
-        key: playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}-${{ env.PLAYWRIGHT_BROWSER_KEY }}
+        key: playwright-v2-${{ runner.os }}-${{ runner.arch }}-${{ inputs.only-shell }}-${{ env.PLAYWRIGHT_VERSION }}-${{ env.PLAYWRIGHT_BROWSER_KEY }}
 
     - name: Install Playwright dependencies
       shell: bash
       if: steps.playwright-cache.outputs.cache-hit != 'true'
       env:
         PLAYWRIGHT_BROWSERS: ${{ inputs.browsers }}
+        PLAYWRIGHT_ONLY_SHELL: ${{ inputs.only-shell }}
       run: |
         cd packages/browser
         read -r -a browsers <<< "$PLAYWRIGHT_BROWSERS"
-        pnpm exec playwright install --with-deps "${browsers[@]}"
+        options=()
+        if [ "$PLAYWRIGHT_ONLY_SHELL" = 'true' ]; then
+          options+=(--only-shell)
+        fi
+        pnpm exec playwright install --with-deps "${options[@]}" "${browsers[@]}"
 
     # On a cache hit the binary is restored but the apt system deps aren't, so
     # install just those (fast) to avoid missing-library flakiness.
