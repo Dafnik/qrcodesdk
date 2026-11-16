@@ -29,50 +29,66 @@ export function createRGBARenderer(
 
   return (matrix: QRCodeMatrix) => {
     const drawing = draw(matrix);
-    const {moduleSize: scale, outputWidth, outputHeight} = drawing;
-    if (outputWidth * outputHeight > MAX_OUTPUT_PIXELS) {
+    const {moduleSize: scale, outputWidth: width, outputHeight: height} = drawing;
+    if (width * height > MAX_OUTPUT_PIXELS) {
       throw new QRCodeError(
         'INVALID_OPTIONS',
-        `QR code raster output must not exceed ${MAX_OUTPUT_PIXELS} pixels, received ${outputWidth} x ${outputHeight}`,
-        {details: {field: 'dimensions', value: [outputWidth, outputHeight]}},
+        `QR code raster output must not exceed ${MAX_OUTPUT_PIXELS} pixels, received ${width} x ${height}`,
+        {details: {field: 'dimensions', value: [width, height]}},
       );
     }
-    const pixels = new Uint32Array(outputWidth * outputHeight);
-    const image: RGBAImage = {
-      width: outputWidth,
-      height: outputHeight,
-      data: Buffer.from(pixels.buffer),
-    };
-    const background = parseColor(drawing.background);
+    const pixels = new Int32Array(width * height);
+    const image: RGBAImage = {width, height, data: Buffer.from(pixels.buffer)};
     // The image starts transparent, so the background is copied rather than blended.
-    pixels.fill(background.packed);
+    pixels.fill(parseColor(drawing.background).packed);
 
-    let layerCoverage: Float32Array | undefined;
+    // Coverage from 0 upward, which the composite step clears again.
+    let coverage: Float32Array | undefined;
     for (const layer of drawing.layers) {
       const color = parseColor(layer.color);
-      const {rects} = layer;
+      const blend = createBlender(color);
+      const opaque = color.alpha === 255;
+      const {packed} = color;
+      const {rects, tiles} = layer;
       // Fill each color layer once, including where adjacent pieces share a partially covered pixel.
-      const needsCoverage =
-        layer.tiles.length > 0 || rects.some((value) => !Number.isInteger(value * scale));
-      let coveragePixels: Float32Array | undefined;
-      if (needsCoverage) {
-        if (layerCoverage) layerCoverage.fill(0);
-        else layerCoverage = new Float32Array(pixels.length);
-        coveragePixels = layerCoverage;
+      if (tiles.length === 0 && rects.every((value) => Number.isInteger(value * scale))) {
+        for (let index = 0; index < rects.length; index += 4) {
+          const x = rects[index]! * scale;
+          const y = rects[index + 1]! * scale;
+          const startX = Math.max(0, x);
+          const endX = Math.min(width, x + rects[index + 2]! * scale);
+          const endY = Math.min(height, y + rects[index + 3]! * scale);
+          for (let row = Math.max(0, y); row < endY; row++) {
+            for (let pixel = row * width + startX, end = row * width + endX; pixel < end; pixel++) {
+              pixels[pixel] = opaque ? packed : blend(pixels[pixel]!, 1);
+            }
+          }
+        }
+        continue;
       }
+      coverage ??= new Float32Array(pixels.length);
+      // Rows that the layer covers, to composite.
+      let top = height;
+      let bottom = 0;
       for (let index = 0; index < rects.length; index += 4) {
-        fillRect(
-          image,
-          pixels,
+        const y = rects[index + 1]! * scale;
+        const rectHeight = rects[index + 3]! * scale;
+        top = Math.min(top, Math.max(0, Math.floor(y)));
+        bottom = Math.max(bottom, Math.min(height, Math.ceil(y + rectHeight)));
+        coverRect(
+          coverage,
+          width,
+          height,
           rects[index]! * scale,
-          rects[index + 1]! * scale,
+          y,
           rects[index + 2]! * scale,
-          rects[index + 3]! * scale,
-          color,
-          coveragePixels,
+          rectHeight,
         );
       }
-      for (const [path, positions] of layer.tiles) {
+      for (const [path, positions] of tiles) {
+        let tile: Coverage | undefined;
+        let lastX = Number.NaN;
+        let lastY = Number.NaN;
         for (let index = 0; index < positions.length; index += 2) {
           const pixelX = positions[index]! * scale;
           const pixelY = positions[index + 1]! * scale;
@@ -80,20 +96,25 @@ export function createRGBARenderer(
           const originY = Math.floor(pixelY);
           const offsetX = pixelX - originX;
           const offsetY = pixelY - originY;
-          const key = `${path.data}:${offsetX},${offsetY}`;
-          let coverage = coverages.get(key);
-          if (!coverage)
-            coverages.set(key, (coverage = rasterizeShapePath(path.data, scale, offsetX, offsetY)));
-          blitCoverage(image.width, image.height, coveragePixels!, coverage, originX, originY);
+          if (offsetX !== lastX || offsetY !== lastY) {
+            lastX = offsetX;
+            lastY = offsetY;
+            const key = `${path.data}:${offsetX},${offsetY}`;
+            tile = coverages.get(key);
+            if (!tile)
+              coverages.set(key, (tile = rasterizeShapePath(path.data, scale, offsetX, offsetY)));
+          }
+          top = Math.min(top, Math.max(0, originY + tile!.y));
+          bottom = Math.max(bottom, Math.min(height, originY + tile!.y + tile!.height));
+          blitCoverage(width, height, coverage, tile!, originX, originY);
         }
       }
-      if (coveragePixels) {
-        for (let index = 0; index < coveragePixels.length; index++) {
-          const coverage = Math.min(1, coveragePixels[index]!);
-          if (coverage === 0) continue;
-          if (coverage === 1 && color.alpha === 255) pixels[index] = color.packed;
-          else blendPixel(image, index, color, coverage);
-        }
+      for (let index = top * width; index < bottom * width; index++) {
+        const value = coverage[index]!;
+        if (value === 0) continue;
+        coverage[index] = 0;
+        if (value >= 1 && opaque) pixels[index] = packed;
+        else pixels[index] = blend(pixels[index]!, Math.min(1, value));
       }
     }
 
@@ -112,38 +133,60 @@ function parseColor(color: QRCodeColor): PackedColor {
   ]);
   const [red, green, blue, alpha] = bytes as unknown as [number, number, number, number];
   // Reading the bytes back as one word keeps the packed value independent of endianness.
-  return {red, green, blue, alpha, packed: new Uint32Array(bytes.buffer)[0]!};
+  return {red, green, blue, alpha, packed: new Int32Array(bytes.buffer)[0]!};
 }
 
-function fillRect(
-  image: RGBAImage,
-  pixels: Uint32Array,
+/**
+ * Returns a function that blends the color over one packed pixel. Most pixels share few
+ * destination colors, so the result for the last destination is kept for each multiple of 1/16.
+ */
+function createBlender(color: Color): (destination: number, coverage: number) => number {
+  const pixel = new Int32Array(1);
+  const image: RGBAImage = {width: 1, height: 1, data: Buffer.from(pixel.buffer)};
+  const destinations = new Float64Array(17).fill(Number.NaN);
+  const results = new Int32Array(17);
+  return (destination, coverage) => {
+    const sixteenths = coverage * 16;
+    const cached = Number.isInteger(sixteenths);
+    if (cached && destinations[sixteenths] === destination) return results[sixteenths]!;
+    pixel[0] = destination;
+    blendPixel(image, 0, color, coverage);
+    if (cached) {
+      destinations[sixteenths] = destination;
+      results[sixteenths] = pixel[0]!;
+    }
+    return pixel[0]!;
+  };
+}
+
+/** Adds the area of a rectangle in each pixel to the coverage. */
+function coverRect(
+  coverage: Float32Array,
+  imageWidth: number,
+  imageHeight: number,
   x: number,
   y: number,
   width: number,
   height: number,
-  color: PackedColor,
-  coveragePixels: Float32Array | undefined,
 ): void {
   const startX = Math.max(0, Math.floor(x));
   const startY = Math.max(0, Math.floor(y));
-  const endX = Math.min(image.width, Math.ceil(x + width));
-  const endY = Math.min(image.height, Math.ceil(y + height));
-  if (endX <= startX || endY <= startY) return;
-  const aligned = [x, y, width, height].every(Number.isInteger);
+  const endX = Math.min(imageWidth, Math.ceil(x + width));
+  const endY = Math.min(imageHeight, Math.ceil(y + height));
+  const aligned =
+    Number.isInteger(x) &&
+    Number.isInteger(y) &&
+    Number.isInteger(width) &&
+    Number.isInteger(height);
   for (let row = startY; row < endY; row++) {
-    const offset = row * image.width;
-    if (aligned && coveragePixels) {
-      coveragePixels.fill(1, offset + startX, offset + endX);
-    } else if (aligned && color.alpha === 255) {
-      pixels.fill(color.packed, offset + startX, offset + endX);
-    } else {
-      const vertical = Math.min(row + 1, y + height) - Math.max(row, y);
-      for (let column = startX; column < endX; column++) {
-        const horizontal = Math.min(column + 1, x + width) - Math.max(column, x);
-        if (coveragePixels) coveragePixels[offset + column]! += horizontal * vertical;
-        else blendPixel(image, offset + column, color, horizontal * vertical);
-      }
+    const offset = row * imageWidth;
+    const vertical = Math.min(row + 1, y + height) - Math.max(row, y);
+    for (let column = startX; column < endX; column++) {
+      // Whole pixels are covered once, even where adjacent pieces add up to more.
+      if (aligned) coverage[offset + column] = 1;
+      else
+        coverage[offset + column]! +=
+          (Math.min(column + 1, x + width) - Math.max(column, x)) * vertical;
     }
   }
 }
@@ -151,20 +194,20 @@ function fillRect(
 function blitCoverage(
   imageWidth: number,
   imageHeight: number,
-  pixels: Float32Array,
-  coverage: Coverage,
+  target: Float32Array,
+  {x, y, width, height, samples}: Coverage,
   originX: number,
   originY: number,
 ): void {
-  const {width, height, samples} = coverage;
-  for (let row = 0; row < height; row++) {
-    const y = originY + coverage.y + row;
-    if (y < 0 || y >= imageHeight) continue;
-    for (let column = 0; column < width; column++) {
-      const x = originX + coverage.x + column;
-      const count = samples[row * width + column]!;
-      if (count === 0 || x < 0 || x >= imageWidth) continue;
-      pixels[y * imageWidth + x]! += count / 16;
+  const left = originX + x;
+  const top = originY + y;
+  const startColumn = Math.max(0, -left);
+  const endColumn = Math.min(width, imageWidth - left);
+  for (let row = Math.max(0, -top); row < Math.min(height, imageHeight - top); row++) {
+    const offset = (top + row) * imageWidth + left;
+    for (let column = startColumn, source = row * width; column < endColumn; column++) {
+      const count = samples[source + column]!;
+      if (count !== 0) target[offset + column]! += count / 16;
     }
   }
 }

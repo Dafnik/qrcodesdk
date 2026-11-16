@@ -265,15 +265,20 @@ function round(value: number): number {
   return Math.round(value * 1000) / 1000;
 }
 
+// Serialized numbers repeat across shapes. Shape values stay within 7 modules and keep three
+// decimals, which bounds the cache.
+const numbers = new Map<number, string>();
+
 /** Separators are only needed where the next number would extend the previous one. */
 function format(...values: number[]): string {
-  return values
-    .map((value) => String(round(value)).replace(/^(-?)0\./, '$1.'))
-    .reduce((joined, value) =>
-      value[0] === '-' || (value[0] === '.' && /\.\d*$/.test(joined))
-        ? joined + value
-        : `${joined} ${value}`,
-    );
+  let joined = '';
+  for (let value of values) {
+    let text = numbers.get((value = round(value)));
+    if (text === undefined) numbers.set(value, (text = String(value).replace(/^(-?)0\./, '$1.')));
+    joined +=
+      !joined || text[0] === '-' || (text[0] === '.' && /\.\d*$/.test(joined)) ? text : ` ${text}`;
+  }
+  return joined;
 }
 
 type PathBuilder = {

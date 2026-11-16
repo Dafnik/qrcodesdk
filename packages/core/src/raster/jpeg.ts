@@ -1,9 +1,9 @@
 import {QRCodeError} from '../error';
 import {throwInvalid} from '../options';
-import {parseQRCodeColor, validateColor} from '../styling';
+import {parseQRCodeColor, resolveColor} from '../styling';
 import type {QRCodeColor} from '../types';
 import {ByteBuffer} from './byte-buffer';
-import type {RGBAImage} from './types';
+import {type RGBAImage, pixelWords} from './types';
 
 export type JPEGEncodeOptions = {
   /** Quality from 1 to 100. Defaults to 92. */
@@ -15,13 +15,19 @@ export type JPEGEncodeOptions = {
 const MAX_DIMENSION = 65_535;
 const DEFAULT_QUALITY = 92;
 const DEFAULT_MATTE: QRCodeColor = '#ffffff';
+// A pattern holds 16 sample words, its quantized DC value, its first and end token, and its number
+// of blocks.
+const PATTERN_SIZE = 20;
 
-// The zigzag scan order: the natural (row-major) index of each coefficient.
-const ZIGZAG = new Uint8Array([
-  0, 1, 8, 16, 9, 2, 3, 10, 17, 24, 32, 25, 18, 11, 4, 5, 12, 19, 26, 33, 40, 48, 41, 34, 27, 20,
-  13, 6, 7, 14, 21, 28, 35, 42, 49, 56, 57, 50, 43, 36, 29, 22, 15, 23, 30, 37, 44, 51, 58, 59, 52,
-  45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62, 63,
-]);
+// The zigzag scan order: the natural (row-major) index of each coefficient. It runs along the
+// anti-diagonals, alternately up and down.
+const ZIGZAG = new Uint8Array(64);
+for (let sum = 0, index = 0; sum < 15; sum++) {
+  for (let step = 0; step <= sum; step++) {
+    const row = sum & 1 ? step : sum - step;
+    if (row < 8 && sum - row < 8) ZIGZAG[index++] = row * 8 + sum - row;
+  }
+}
 
 // The example quantization tables from ITU T.81 Annex K, in natural order.
 const LUMINANCE_QUANTIZATION = [
@@ -35,21 +41,13 @@ const CHROMINANCE_QUANTIZATION = [
   99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99,
 ];
 
-// Fixed-point constants of libjpeg's integer ("islow") forward DCT, scaled by 2^13.
-const CONST_BITS = 13;
-const PASS1_BITS = 2;
-const FIX_0_298631336 = 2446;
-const FIX_0_390180644 = 3196;
-const FIX_0_541196100 = 4433;
-const FIX_0_765366865 = 6270;
-const FIX_0_899976223 = 7373;
-const FIX_1_175875602 = 9633;
-const FIX_1_501321110 = 12_299;
-const FIX_1_847759065 = 15_137;
-const FIX_1_961570560 = 16_069;
-const FIX_2_053119869 = 16_819;
-const FIX_2_562915447 = 20_995;
-const FIX_3_072711026 = 25_172;
+// libjpeg's integer RGB to YCbCr conversion, scaled by 2^16: the red, green, and blue factors and
+// the offset of Y, Cb, and Cr. The chroma terms add 128 and round down from just below one half, so
+// they stay within 0 to 255. The luminance factors add up to 2^16, so gray pixels keep their value.
+const CONVERSION = [
+  19_595, 38_470, 7471, 32_768, -11_059, -21_709, 32_768, 8_421_375, 32_768, -27_439, -5329,
+  8_421_375,
+];
 
 /** A Huffman table fitted to the symbol frequencies of one image. */
 export type HuffmanTable = {
@@ -64,42 +62,30 @@ export type HuffmanTable = {
   readonly lengths: Uint8Array;
 };
 
-/** Receives the Huffman symbols and extra bits of the entropy-coded data. */
-type EntropyCoder = {
-  symbol(table: HuffmanTable, symbol: number): void;
-  write(value: number, length: number): void;
-};
-
-type Component = {
-  readonly id: number;
-  /** Quantization table index. */
-  readonly table: number;
-  readonly dc: HuffmanTable;
-  readonly ac: HuffmanTable;
-  /** Samples of one row of blocks, with the edges repeated to whole blocks. */
-  readonly samples: Uint8Array;
-  predictor: number;
-};
-
 /** Validates the JPEG quality and matte color and fills in their defaults. */
 export function resolveJPEGOptions(options?: JPEGEncodeOptions): Required<JPEGEncodeOptions> {
   const quality = options?.quality ?? DEFAULT_QUALITY;
   if (!Number.isSafeInteger(quality) || quality < 1 || quality > 100) {
     throwInvalid('quality', 'an integer from 1 to 100', quality);
   }
-  const matte = options?.matte ?? DEFAULT_MATTE;
-  validateColor('transparency.matte', matte);
+  const matte = resolveColor('transparency.matte', options?.matte ?? DEFAULT_MATTE);
   if (parseQRCodeColor(matte)[3] !== 255) {
     throwInvalid('transparency.matte', 'an opaque color', matte);
   }
-  return {quality, matte: matte.toLowerCase() as QRCodeColor};
+  return {quality, matte};
 }
 
 /**
  * Encodes RGBA pixels as a baseline JPEG (JFIF) image without chroma subsampling. JPEG has no
  * alpha channel, so every pixel is blended onto the opaque matte color first. Images whose
  * pixels are all gray are written with a single grayscale channel. The Huffman tables are fitted to
- * the image, so the blocks are transformed twice: once to count symbols and once to write them.
+ * the image, so the blocks are first turned into tokens, which are written once the symbols are
+ * counted.
+ *
+ * Blocks with the same samples share a pattern, which is transformed and tokenized once: QR codes
+ * repeat a few block patterns. A token is `table << 24 | symbol << 16 | extra bits`, and the low
+ * nibble of the symbol is the number of extra bits. Huffman tables 0 and 1 code the luminance DC
+ * and AC values, tables 2 and 3 the chrominance ones.
  *
  * The encoder uses integer arithmetic only, so it produces identical bytes in every JavaScript
  * engine.
@@ -115,77 +101,103 @@ export function encodeJPEG(
     );
   }
   const {quality, matte} = resolveJPEGOptions(options);
-  const [matteRed, matteGreen, matteBlue] = parseQRCodeColor(matte);
-  const pixels = blend(data, width * height, matteRed, matteGreen, matteBlue);
-  const grayscale = isGrayscale(pixels);
+  const pixels = blend({width, height, data}, parseQRCodeColor(matte));
+  const tables = (
+    isGrayscale(pixels)
+      ? [LUMINANCE_QUANTIZATION]
+      : [LUMINANCE_QUANTIZATION, CHROMINANCE_QUANTIZATION]
+  ).map((base) => scaleQuantizationTable(base, quality));
+  const {blocks, patterns, tokens, frequencies} = scan(pixels, width, height, tables);
 
-  const blockColumns = Math.ceil(width / 8);
-  const blockRows = Math.ceil(height / 8);
-  const rowLength = blockColumns * 8;
-  const luminanceTable = scaleQuantizationTable(LUMINANCE_QUANTIZATION, quality);
-  const tables = grayscale
-    ? [luminanceTable]
-    : [luminanceTable, scaleQuantizationTable(CHROMINANCE_QUANTIZATION, quality)];
-  const component = (id: number, table: number, dc: HuffmanTable, ac: HuffmanTable) => ({
-    id,
-    table,
-    dc,
-    ac,
-    samples: new Uint8Array(rowLength * 8),
-    predictor: 0,
-  });
-  const components: Component[] = [component(1, 0, createHuffmanTable(), createHuffmanTable())];
-  if (!grayscale) {
-    // Both chroma components share one DC and one AC table.
-    const dcChrominance = createHuffmanTable();
-    const acChrominance = createHuffmanTable();
-    components.push(
-      component(2, 1, dcChrominance, acChrominance),
-      component(3, 1, dcChrominance, acChrominance),
-    );
-  }
-
-  const encodeScan = (coder: EntropyCoder) => {
-    const block = new Int32Array(64);
-    for (const current of components) current.predictor = 0;
-    for (let blockRow = 0; blockRow < blockRows; blockRow++) {
-      fillSamples(pixels, width, height, blockRow * 8, rowLength, components);
-      for (let blockColumn = 0; blockColumn < blockColumns; blockColumn++) {
-        // Components are interleaved block by block, because none of them is subsampled.
-        for (const current of components) {
-          if (loadBlock(current.samples, rowLength, blockColumn * 8, block)) forwardDCT(block);
-          current.predictor = encodeBlock(
-            coder,
-            block,
-            tables[current.table]!,
-            current.predictor,
-            current.dc,
-            current.ac,
-          );
-        }
-      }
+  // Luminance DC and AC, then chrominance DC and AC, which both chroma components share.
+  const huffman = tables.flatMap(() => [createHuffmanTable(), createHuffmanTable()]);
+  // Codes as `code << 5 | length`, by table and symbol.
+  const codes = new Int32Array(1024);
+  huffman.forEach((table, index) => {
+    table.frequencies.set(frequencies.subarray(index << 8, (index + 1) << 8));
+    assignOptimalCodes(table);
+    for (let symbol = 0; symbol < 256; symbol++) {
+      codes[(index << 8) | symbol] = (table.codes[symbol]! << 5) | table.lengths[symbol]!;
     }
-  };
-
-  // The first pass only counts symbols. Transforming twice keeps memory flat, where storing the
-  // coefficients would need 128 bytes per block and component.
-  encodeScan({
-    symbol: (table, symbol) => table.frequencies[symbol]!++,
-    write: () => {},
   });
-  for (const {dc, ac} of components) {
-    assignOptimalCodes(dc);
-    assignOptimalCodes(ac);
-  }
 
   const output = new ByteBuffer();
-  writeHeaders(output, width, height, tables, components);
-  const writer = new BitWriter(output);
-  encodeScan(writer);
-  writer.flush();
+  writeHeaders(output, width, height, tables, huffman);
+  const writer = new BitWriter(output, codes);
+  writeBlocks(writer, blocks, patterns, tokens);
+  // Pads the last byte with one bits.
+  writer.put(0x7f, 7);
 
   output.pushBytes([0xff, 0xd9]);
   return output.toUint8Array();
+}
+
+/**
+ * Turns every block into its DC token and a pattern, and counts the Huffman symbols. The patterns
+ * are stored in `patterns`, and their AC tokens in `tokens`.
+ */
+function scan(
+  pixels: Uint32Array,
+  width: number,
+  height: number,
+  tables: readonly Uint8Array[],
+): {blocks: Int32Array; patterns: number[]; tokens: number[]; frequencies: Uint32Array} {
+  const rowLength = Math.ceil(width / 8) * 8;
+  // Samples of one row of blocks per component, with the edges repeated to whole blocks.
+  const samples = Array.from({length: tables.length * 2 - 1}, () => new Uint8Array(rowLength * 8));
+  const words = samples.map(({buffer}) => new Int32Array(buffer));
+  const blockCount = (rowLength / 8) * Math.ceil(height / 8) * samples.length;
+  // The DC token and the pattern of every block.
+  const blocks = new Int32Array(blockCount * 2);
+  const patterns: number[] = [];
+  const tokens: number[] = [];
+  // The last pattern of each hash, per quantization table.
+  const known = tables.map(() => new Map<number, number>());
+  const frequencies = new Uint32Array(1024);
+  const predictors = [0, 0, 0];
+  for (let top = 0, length = 0; top < height; top += 8) {
+    fillSamples(pixels, width, height, top, rowLength, samples);
+    for (let left = 0; left < rowLength; left += 8) {
+      // Components are interleaved block by block, because none of them is subsampled.
+      for (let component = 0; component < samples.length; component++) {
+        const table = component && 1;
+        const hash = compareBlock(words[component]!, left, rowLength);
+        let pattern = known[table]!.get(hash) ?? -1;
+        if (pattern < 0 || compareBlock(words[component]!, left, rowLength, patterns, pattern)) {
+          known[table]!.set(hash, (pattern = patterns.length));
+          addPattern(samples[component]!, rowLength, left, tables[table]!, table, patterns, tokens);
+        }
+        patterns[pattern + 19]!++;
+        const token = createToken(table * 2, 0, patterns[pattern + 16]! - predictors[component]!);
+        predictors[component] = patterns[pattern + 16]!;
+        frequencies[token >>> 16]!++;
+        blocks[length++] = token;
+        blocks[length++] = pattern;
+      }
+    }
+  }
+  // The tokens of a pattern count once for every block that uses it.
+  for (let pattern = 0; pattern < patterns.length; pattern += PATTERN_SIZE) {
+    for (let token = patterns[pattern + 17]!; token < patterns[pattern + 18]!; token++) {
+      frequencies[tokens[token]! >>> 16]! += patterns[pattern + 19]!;
+    }
+  }
+  return {blocks, patterns, tokens, frequencies};
+}
+
+function writeBlocks(
+  writer: BitWriter,
+  blocks: Int32Array,
+  patterns: readonly number[],
+  tokens: readonly number[],
+): void {
+  for (let index = 0; index < blocks.length; index += 2) {
+    writer.write(blocks[index]!);
+    const pattern = blocks[index + 1]!;
+    for (let token = patterns[pattern + 17]!; token < patterns[pattern + 18]!; token++) {
+      writer.write(tokens[token]!);
+    }
+  }
 }
 
 function isDimension(value: number): boolean {
@@ -193,40 +205,29 @@ function isDimension(value: number): boolean {
 }
 
 /** Blends every pixel onto the matte color and returns packed `0xRRGGBB` values. */
-function blend(
-  data: RGBAImage['data'],
-  pixelCount: number,
-  red: number,
-  green: number,
-  blue: number,
-): Uint32Array {
-  const matte = (red << 16) | (green << 8) | blue;
-  const pixels = new Uint32Array(pixelCount);
-  for (let index = 0, offset = 0; index < pixelCount; index++, offset += 4) {
-    const alpha = data[offset + 3]!;
-    if (alpha === 255) {
-      pixels[index] = (data[offset]! << 16) | (data[offset + 1]! << 8) | data[offset + 2]!;
-    } else if (alpha === 0) {
-      pixels[index] = matte;
-    } else {
-      const inverse = 255 - alpha;
+function blend(image: RGBAImage, matte: readonly number[]): Uint32Array {
+  const {bytes, words} = pixelWords(image);
+  const pixels = new Uint32Array(words.length);
+  for (let index = 0; index < words.length; index++) {
+    // Pixels repeat in runs, so each run is blended once.
+    if (index > 0 && words[index] === words[index - 1]) {
+      pixels[index] = pixels[index - 1]!;
+      continue;
+    }
+    const alpha = bytes[index * 4 + 3]!;
+    for (let channel = 0; channel < 3; channel++) {
+      const value = bytes[index * 4 + channel]!;
       pixels[index] =
-        (mix(data[offset]!, red, alpha, inverse) << 16) |
-        (mix(data[offset + 1]!, green, alpha, inverse) << 8) |
-        mix(data[offset + 2]!, blue, alpha, inverse);
+        (pixels[index]! << 8) |
+        (alpha < 255 ? (value * alpha + matte[channel]! * (255 - alpha) + 127) / 255 : value);
     }
   }
   return pixels;
 }
 
-function mix(value: number, matte: number, alpha: number, inverse: number): number {
-  return ((value * alpha + matte * inverse + 127) / 255) | 0;
-}
-
 function isGrayscale(pixels: Uint32Array): boolean {
-  for (const pixel of pixels) {
-    const blue = pixel & 0xff;
-    if (((pixel >>> 8) & 0xff) !== blue || pixel >>> 16 !== blue) return false;
+  for (let index = 0; index < pixels.length; index++) {
+    if (pixels[index] !== (pixels[index]! & 0xff) * 0x10101) return false;
   }
   return true;
 }
@@ -252,10 +253,9 @@ export function createHuffmanTable(): HuffmanTable {
 /**
  * Builds the optimal Huffman code for the counted frequencies with at most 16 bits per code, ITU
  * T.81 Annex K.2. This follows libjpeg's `jpeg_gen_optimal_table`, including its tie-breaking, so
- * the tables match libjpeg's optimized output. Tables shared by several components are built once.
+ * the tables match libjpeg's optimized output.
  */
 export function assignOptimalCodes(table: HuffmanTable): void {
-  if (table.symbols.length > 0) return;
   const frequencies = Float64Array.from(table.frequencies);
   const codeSizes = new Int32Array(257);
   const others = new Int32Array(257).fill(-1);
@@ -267,17 +267,13 @@ export function assignOptimalCodes(table: HuffmanTable): void {
     // Merge the two least frequent subtrees. Ties pick the larger symbol.
     let first = -1;
     let second = -1;
-    for (let symbol = 0, minimum = Infinity; symbol <= 256; symbol++) {
+    for (let symbol = 0; symbol <= 256; symbol++) {
       const frequency = frequencies[symbol]!;
-      if (frequency > 0 && frequency <= minimum) {
-        minimum = frequency;
+      if (!frequency) continue;
+      if (first < 0 || frequency <= frequencies[first]!) {
+        second = first;
         first = symbol;
-      }
-    }
-    for (let symbol = 0, minimum = Infinity; symbol <= 256; symbol++) {
-      const frequency = frequencies[symbol]!;
-      if (frequency > 0 && frequency <= minimum && symbol !== first) {
-        minimum = frequency;
+      } else if (second < 0 || frequency <= frequencies[second]!) {
         second = symbol;
       }
     }
@@ -285,18 +281,11 @@ export function assignOptimalCodes(table: HuffmanTable): void {
 
     frequencies[first]! += frequencies[second]!;
     frequencies[second] = 0;
-    // Every symbol in both subtrees gets one bit longer, and the second chain joins the first.
-    codeSizes[first]!++;
-    while (others[first]! >= 0) {
-      first = others[first]!;
-      codeSizes[first]!++;
-    }
-    others[first] = second;
-    codeSizes[second]!++;
-    while (others[second]! >= 0) {
-      second = others[second]!;
-      codeSizes[second]!++;
-    }
+    // The second chain joins the first, and every symbol in both subtrees gets one bit longer.
+    let end = first;
+    while (others[end]! >= 0) end = others[end]!;
+    others[end] = second;
+    for (let symbol = first; symbol >= 0; symbol = others[symbol]!) codeSizes[symbol]!++;
   }
 
   // libjpeg stops at 32 bits, which needs billions of symbols. Any depth is handled here.
@@ -347,54 +336,104 @@ function writeHeaders(
   width: number,
   height: number,
   tables: readonly Uint8Array[],
-  components: readonly Component[],
+  huffman: readonly HuffmanTable[],
 ): void {
-  // Start of image, then a JFIF APP0 segment: version 1.01, 1:1 pixel aspect ratio, no thumbnail.
-  output.pushBytes([0xff, 0xd8, 0xff, 0xe0]);
-  output.pushUint16BE(16);
-  output.pushASCII('JFIF\0');
-  output.pushBytes([1, 1, 0, 0, 1, 0, 1, 0, 0]);
+  // Component ids. The chroma components share the second quantization and Huffman tables.
+  const components = [1, 2, 3].slice(0, tables.length * 2 - 1);
+  // DC tables are class 0 and AC tables class 1.
+  const huffmanTables = huffman.flatMap(({counts, symbols}, index) => [
+    ((index & 1) << 4) | (index >> 1),
+    ...counts,
+    ...symbols,
+  ]);
+  // Values above 255 are pushed modulo 256, which leaves their low byte.
+  output.pushBytes([
+    // Start of image, then a JFIF APP0 segment: version 1.01, 1:1 pixel aspect ratio, no thumbnail.
+    0xff,
+    0xd8,
+    0xff,
+    0xe0,
+    0,
+    16,
+    0x4a,
+    0x46,
+    0x49,
+    0x46,
+    0,
+    1,
+    1,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    // Quantization tables, 8-bit precision, in zigzag order.
+    0xff,
+    0xdb,
+    0,
+    2 + tables.length * 65,
+    ...tables.flatMap((table, index) => [
+      index,
+      ...Array.from(ZIGZAG, (position) => table[position]!),
+    ]),
+    // Baseline frame header with 1 x 1 sampling.
+    0xff,
+    0xc0,
+    0,
+    8 + components.length * 3,
+    8,
+    height >> 8,
+    height,
+    width >> 8,
+    width,
+    components.length,
+    ...components.flatMap((id) => [id, 0x11, +(id > 1)]),
+    // Huffman tables.
+    0xff,
+    0xc4,
+    (huffmanTables.length + 2) >> 8,
+    huffmanTables.length + 2,
+    ...huffmanTables,
+    // Start of scan with all components interleaved, covering coefficients 0 to 63.
+    0xff,
+    0xda,
+    0,
+    6 + components.length * 2,
+    components.length,
+    ...components.flatMap((id) => [id, id > 1 ? 0x11 : 0]),
+    0,
+    63,
+    0,
+  ]);
+}
 
-  // Quantization tables, 8-bit precision, in zigzag order.
-  output.pushBytes([0xff, 0xdb]);
-  output.pushUint16BE(2 + tables.length * 65);
-  tables.forEach((table, index) => {
-    output.push(index);
-    for (const position of ZIGZAG) output.push(table[position]!);
-  });
-
-  // Baseline frame header. Every component uses 1 x 1 sampling.
-  output.pushBytes([0xff, 0xc0]);
-  output.pushUint16BE(8 + components.length * 3);
-  output.push(8);
-  output.pushUint16BE(height);
-  output.pushUint16BE(width);
-  output.push(components.length);
-  for (const {id, table} of components) output.pushBytes([id, 0x11, table]);
-
-  // Huffman tables: DC tables are class 0 and AC tables class 1.
-  const huffmanTables: [number, HuffmanTable][] = [];
-  for (const {table, dc, ac} of components) {
-    if (!huffmanTables.some(([, existing]) => existing === dc)) {
-      huffmanTables.push([table, dc], [0x10 | table, ac]);
+/**
+ * Hashes the block at `left`, or with `patterns`, returns whether it differs from the pattern at
+ * `pattern`.
+ */
+function compareBlock(
+  words: Int32Array,
+  left: number,
+  rowLength: number,
+  patterns?: readonly number[],
+  pattern = 0,
+): number {
+  let hash = 0;
+  for (let offset = left >> 2; offset < rowLength * 2; offset += rowLength >> 2) {
+    if (patterns) {
+      if (patterns[pattern++] !== words[offset] || patterns[pattern++] !== words[offset + 1]) {
+        return 1;
+      }
+    } else {
+      hash = Math.imul(
+        Math.imul(hash ^ words[offset]!, 0x9e3779b1) ^ words[offset + 1]!,
+        0x85ebca6b,
+      );
     }
   }
-  output.pushBytes([0xff, 0xc4]);
-  output.pushUint16BE(
-    2 + huffmanTables.reduce((sum, [, {symbols}]) => sum + 17 + symbols.length, 0),
-  );
-  for (const [classAndId, {counts, symbols}] of huffmanTables) {
-    output.push(classAndId);
-    output.pushBytes(counts);
-    output.pushBytes(symbols);
-  }
-
-  // Start of scan with all components interleaved, covering coefficients 0 to 63.
-  output.pushBytes([0xff, 0xda]);
-  output.pushUint16BE(6 + components.length * 2);
-  output.push(components.length);
-  for (const {id, table} of components) output.pushBytes([id, (table << 4) | table]);
-  output.pushBytes([0, 63, 0]);
+  return hash;
 }
 
 /**
@@ -407,71 +446,100 @@ function fillSamples(
   height: number,
   top: number,
   rowLength: number,
-  components: readonly Component[],
+  samples: readonly Uint8Array[],
 ): void {
-  const [luminance, blueDifference, redDifference] = components;
-  for (let row = 0; row < 8; row++) {
+  for (let row = 0, target = 0; row < 8; row++, target += rowLength) {
     const source = Math.min(top + row, height - 1) * width;
-    for (let column = 0; column < rowLength; column++) {
-      const pixel = pixels[source + Math.min(column, width - 1)]!;
-      const target = row * rowLength + column;
-      const blue = pixel & 0xff;
-      if (!blueDifference || !redDifference) {
-        // Grayscale pixels have equal channels.
-        luminance!.samples[target] = blue;
-        continue;
+    // Pixels repeat in runs, so each run is converted once.
+    for (let column = 0; column < width;) {
+      const pixel = pixels[source + column]!;
+      let end = column + 1;
+      while (end < width && pixels[source + end] === pixel) end++;
+      // The last run extends to whole blocks.
+      if (end === width) end = rowLength;
+      for (let component = 0, factor = 0; component < samples.length; component++, factor += 4) {
+        const value =
+          (CONVERSION[factor]! * (pixel >>> 16) +
+            CONVERSION[factor + 1]! * ((pixel >>> 8) & 0xff) +
+            CONVERSION[factor + 2]! * (pixel & 0xff) +
+            CONVERSION[factor + 3]!) >>
+          16;
+        for (let index = target + column; index < target + end; index++) {
+          samples[component]![index] = value;
+        }
       }
-      const red = pixel >>> 16;
-      const green = (pixel >>> 8) & 0xff;
-      // libjpeg's integer RGB to YCbCr conversion, scaled by 2^16. The chroma terms add 128 and
-      // round down from just below one half, so they stay within 0 to 255.
-      luminance!.samples[target] = (19_595 * red + 38_470 * green + 7471 * blue + 32_768) >> 16;
-      blueDifference.samples[target] =
-        (-11_059 * red - 21_709 * green + 32_768 * blue + 8_421_375) >> 16;
-      redDifference.samples[target] =
-        (32_768 * red - 27_439 * green - 5329 * blue + 8_421_375) >> 16;
+      column = end;
     }
   }
 }
 
 /**
- * Copies one 8 x 8 block and centers its samples around zero. Returns false for a flat block, which
- * it fills with its transform directly: QR codes consist mostly of flat blocks, and the integer DCT
- * of one repeated value is exactly that value scaled by 64 with no other coefficients.
+ * Transforms and quantizes the block at `left` into a new pattern, and adds the tokens of its AC
+ * values.
  */
-function loadBlock(
+function addPattern(
   samples: Uint8Array,
   rowLength: number,
   left: number,
-  block: Int32Array,
-): boolean {
-  const first = samples[left]!;
-  let flat = true;
+  quantization: Uint8Array,
+  table: number,
+  patterns: number[],
+  tokens: number[],
+): void {
+  const words = new Int32Array(samples.buffer);
+  const block = new Int32Array(64);
   for (let row = 0; row < 8; row++) {
-    const offset = row * rowLength + left;
+    patterns.push(
+      words[(row * rowLength + left) >> 2]!,
+      words[((row * rowLength + left) >> 2) + 1]!,
+    );
+    // Center the samples around zero.
     for (let column = 0; column < 8; column++) {
-      const sample = samples[offset + column]!;
-      flat &&= sample === first;
-      block[row * 8 + column] = sample - 128;
+      block[row * 8 + column] = samples[row * rowLength + left + column]! - 128;
     }
   }
-  if (!flat) return true;
-  block.fill(0);
-  block[0] = (first - 128) * 64;
-  return false;
+  forwardDCT(block);
+  patterns.push(quantize(block[0]!, quantization[0]!), tokens.length);
+  let zeros = 0;
+  for (let index = 1; index < 64; index++) {
+    const value = quantize(block[ZIGZAG[index]!]!, quantization[ZIGZAG[index]!]!);
+    if (value === 0) {
+      zeros++;
+      continue;
+    }
+    // A run of 16 zeros has its own symbol.
+    for (; zeros > 15; zeros -= 16) tokens.push(createToken(table * 2 + 1, 0xf0, 0));
+    tokens.push(createToken(table * 2 + 1, zeros << 4, value));
+    zeros = 0;
+  }
+  // End of block.
+  if (zeros > 0) tokens.push(createToken(table * 2 + 1, 0, 0));
+  patterns.push(tokens.length, 0);
 }
 
 /**
- * libjpeg's accurate integer forward DCT (`jpeg_fdct_islow`). The output is scaled up by 8, which
- * the quantization step divides out.
+ * Codes a value after a run of zeros: the symbol is the run and the bit length of the value, and
+ * its bits follow (one's complement if negative).
  */
-function forwardDCT(block: Int32Array): void {
-  // Rows first, keeping PASS1_BITS of extra precision, then columns, which remove it again.
-  for (let row = 0; row < 64; row += 8) transformLine(block, row, 1, true);
-  for (let column = 0; column < 8; column++) transformLine(block, column, 8, false);
+function createToken(table: number, run: number, value: number): number {
+  const magnitude = value < 0 ? -value : value;
+  const size = magnitude && 32 - Math.clz32(magnitude);
+  return (
+    (table << 24) | ((run | size) << 16) | ((value < 0 ? value - 1 : value) & ((1 << size) - 1))
+  );
 }
 
-function transformLine(block: Int32Array, start: number, step: number, rows: boolean): void {
+/**
+ * libjpeg's accurate integer forward DCT (`jpeg_fdct_islow`) with its fixed-point constants, scaled
+ * by 2^13. The output is scaled up by 8, which the quantization step divides out.
+ */
+function forwardDCT(block: Int32Array): void {
+  // Rows first, keeping 2 bits of extra precision, then columns, which remove them again.
+  for (let row = 0; row < 64; row += 8) transformLine(block, row, 1, 11);
+  for (let column = 0; column < 8; column++) transformLine(block, column, 8, 15);
+}
+
+function transformLine(block: Int32Array, start: number, step: number, shift: number): void {
   const i0 = start;
   const i1 = start + step;
   const i2 = start + step * 2;
@@ -488,38 +556,32 @@ function transformLine(block: Int32Array, start: number, step: number, rows: boo
   let tmp5 = block[i2]! - block[i5]!;
   const tmp3 = block[i3]! + block[i4]!;
   let tmp4 = block[i3]! - block[i4]!;
-  const shift = rows ? CONST_BITS - PASS1_BITS : CONST_BITS + PASS1_BITS;
 
-  // Even part.
+  // Even part. Rows scale the DC and middle terms up by 2 bits, and columns back down.
   const tmp10 = tmp0 + tmp3;
   const tmp13 = tmp0 - tmp3;
   const tmp11 = tmp1 + tmp2;
   const tmp12 = tmp1 - tmp2;
-  if (rows) {
-    block[i0] = (tmp10 + tmp11) << PASS1_BITS;
-    block[i4] = (tmp10 - tmp11) << PASS1_BITS;
-  } else {
-    block[i0] = descale(tmp10 + tmp11, PASS1_BITS);
-    block[i4] = descale(tmp10 - tmp11, PASS1_BITS);
-  }
-  const even = (tmp12 + tmp13) * FIX_0_541196100;
-  block[i2] = descale(even + tmp13 * FIX_0_765366865, shift);
-  block[i6] = descale(even - tmp12 * FIX_1_847759065, shift);
+  block[i0] = shift < 15 ? (tmp10 + tmp11) << 2 : descale(tmp10 + tmp11, 2);
+  block[i4] = shift < 15 ? (tmp10 - tmp11) << 2 : descale(tmp10 - tmp11, 2);
+  const even = (tmp12 + tmp13) * 4433; // FIX_0_541196100
+  block[i2] = descale(even + tmp13 * 6270, shift); // FIX_0_765366865
+  block[i6] = descale(even - tmp12 * 15_137, shift); // FIX_1_847759065
 
   // Odd part.
   let z1 = tmp4 + tmp7;
   let z2 = tmp5 + tmp6;
   let z3 = tmp4 + tmp6;
   let z4 = tmp5 + tmp7;
-  const z5 = (z3 + z4) * FIX_1_175875602;
-  tmp4 *= FIX_0_298631336;
-  tmp5 *= FIX_2_053119869;
-  tmp6 *= FIX_3_072711026;
-  tmp7 *= FIX_1_501321110;
-  z1 *= -FIX_0_899976223;
-  z2 *= -FIX_2_562915447;
-  z3 = z3 * -FIX_1_961570560 + z5;
-  z4 = z4 * -FIX_0_390180644 + z5;
+  const z5 = (z3 + z4) * 9633; // FIX_1_175875602
+  tmp4 *= 2446; // FIX_0_298631336
+  tmp5 *= 16_819; // FIX_2_053119869
+  tmp6 *= 25_172; // FIX_3_072711026
+  tmp7 *= 12_299; // FIX_1_501321110
+  z1 *= -7373; // FIX_0_899976223
+  z2 *= -20_995; // FIX_2_562915447
+  z3 = z3 * -16_069 + z5; // FIX_1_961570560
+  z4 = z4 * -3196 + z5; // FIX_0_390180644
   block[i7] = descale(tmp4 + z1 + z3, shift);
   block[i5] = descale(tmp5 + z2 + z4, shift);
   block[i3] = descale(tmp6 + z2 + z3, shift);
@@ -531,82 +593,37 @@ function descale(value: number, shift: number): number {
   return (value + (1 << (shift - 1))) >> shift;
 }
 
-/** Quantizes and Huffman codes one block, and returns its DC value for the next prediction. */
-function encodeBlock(
-  coder: EntropyCoder,
-  block: Int32Array,
-  table: Uint8Array,
-  predictor: number,
-  dc: HuffmanTable,
-  ac: HuffmanTable,
-): number {
-  const value = quantize(block[0]!, table[0]!);
-  writeCoefficient(coder, dc, 0, value - predictor);
-
-  let zeros = 0;
-  for (let index = 1; index < 64; index++) {
-    const position = ZIGZAG[index]!;
-    const coefficient = quantize(block[position]!, table[position]!);
-    if (coefficient === 0) {
-      zeros++;
-      continue;
-    }
-    // A run of 16 zeros has its own symbol.
-    for (; zeros > 15; zeros -= 16) coder.symbol(ac, 0xf0);
-    writeCoefficient(coder, ac, zeros << 4, coefficient);
-    zeros = 0;
-  }
-  // End of block.
-  if (zeros > 0) coder.symbol(ac, 0);
-  return value;
-}
-
 /** Divides a DCT output, which is scaled by 8, by its quantizer and rounds to nearest. */
 function quantize(value: number, quantizer: number): number {
-  const divisor = quantizer << 3;
-  return value < 0
-    ? -Math.floor((-value + (divisor >> 1)) / divisor)
-    : Math.floor((value + (divisor >> 1)) / divisor);
-}
-
-/** Writes the symbol for a value's bit length, then the value's bits (one's complement if negative). */
-function writeCoefficient(
-  coder: EntropyCoder,
-  table: HuffmanTable,
-  run: number,
-  value: number,
-): void {
-  const magnitude = value < 0 ? -value : value;
-  const size = magnitude === 0 ? 0 : 32 - Math.clz32(magnitude);
-  coder.symbol(table, run | size);
-  if (size > 0) coder.write((value < 0 ? value - 1 : value) & ((1 << size) - 1), size);
+  const quantized = (((value < 0 ? -value : value) + quantizer * 4) / (quantizer * 8)) | 0;
+  return value < 0 ? -quantized : quantized;
 }
 
 /** Writes bits most significant first, and stuffs a zero byte after every `0xff` byte. */
-class BitWriter implements EntropyCoder {
+class BitWriter {
+  // Bits above `count` are never read again, so they are not cleared.
   private bits = 0;
   private count = 0;
 
-  constructor(private readonly output: ByteBuffer) {}
+  constructor(
+    private readonly output: ByteBuffer,
+    private readonly codes: Int32Array,
+  ) {}
 
-  symbol(table: HuffmanTable, symbol: number): void {
-    this.write(table.codes[symbol]!, table.lengths[symbol]!);
-  }
-
-  write(value: number, length: number): void {
+  /** Writes up to 24 bits. */
+  put(value: number, length: number): void {
     this.bits = (this.bits << length) | value;
-    this.count += length;
-    while (this.count >= 8) {
-      this.count -= 8;
-      const byte = (this.bits >>> this.count) & 0xff;
+    for (this.count += length; this.count >= 8;) {
+      const byte = (this.bits >>> (this.count -= 8)) & 0xff;
       this.output.push(byte);
       if (byte === 0xff) this.output.push(0);
     }
-    this.bits &= (1 << this.count) - 1;
   }
 
-  /** Pads the last byte with one bits. */
-  flush(): void {
-    if (this.count > 0) this.write((1 << (8 - this.count)) - 1, 8 - this.count);
+  /** Writes a token's Huffman code, then its extra bits. */
+  write(token: number): void {
+    const code = this.codes[token >>> 16]!;
+    this.put(code >>> 5, code & 31);
+    this.put(token & 0xffff, (token >>> 16) & 15);
   }
 }

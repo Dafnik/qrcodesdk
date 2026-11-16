@@ -15,6 +15,7 @@ export const ECC_LEVELS_MAP: Record<QRCodeErrorCorrectionLevel, QRCodeErrorCorre
 };
 
 type GF256LookupTables = {
+  /** Two periods, so the sum of two logarithms indexes it without a modulo. */
   exponents: QRCodeCodewords;
   logarithms: QRCodeCodewords;
 };
@@ -33,6 +34,7 @@ export function getGF256LookupTables(): GF256LookupTables {
       logarithms[value] = i;
       value = (value * 2) ^ (value >= 128 ? 0x11d : 0);
     }
+    exponents.push(...exponents);
     cachedGF256LookupTables = {exponents, logarithms};
   }
   return cachedGF256LookupTables;
@@ -46,7 +48,7 @@ export function getGF256GeneratorPolynomial(degree: number): QRCodePolynomial {
     const polynomial: QRCodePolynomial = [];
     for (let j = 0; j <= i; j++) {
       const a = j < i ? exponents[previousPolynomial[j]!]! : 0;
-      const b = exponents[(i + (previousPolynomial[j - 1] || 0)) % 255]!;
+      const b = exponents[i + (previousPolynomial[j - 1] || 0)]!;
       polynomial.push(logarithms[a ^ b]!);
     }
     generatorPolynomials.push(polynomial);

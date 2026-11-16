@@ -3,25 +3,23 @@
 //
 // Kanji mode encodes double-byte Shift JIS characters from 0x8140 to 0x9FFC and 0xE040 to 0xEBBF
 // as 13-bit values. The table lists every such character that decodes to a single UTF-16 code
-// unit, sorted by 13-bit value, as pairs of printable base-45 varints:
+// unit, sorted by 13-bit value. It starts with the number of characters, followed by three
+// fields per character:
 //
 //   1. the gap to the previous 13-bit value, minus one
-//   2. the zigzag-encoded difference to the previous code unit, minus one
+//   2. whether `d`, the difference to the previous code unit minus one, is negative
+//   3. `d`, or `-d - 1` when it is negative
 //
-// Digits use printable ASCII without quotes, backslash, backtick, and tilde. Digits 45 to 89
-// continue a varint with their value minus 45; digits 0 to 44 end it. Lower digits come first.
+// Level 1 Kanji are sorted by reading, so their code units are close to random. An adaptive
+// binary range coder stores them near their entropy, which a varint table compressed by gzip
+// does not reach. Numbers are a 5-bit length tree followed by the bits below the leading one,
+// each bit with its own adaptive probability. The coder emits base-64 digits as printable ASCII
+// from ( to i without backslash and backtick. src/kanji/decode-table.ts mirrors this file.
 import {writeFileSync} from 'node:fs';
 import process from 'node:process';
 import {URL, fileURLToPath} from 'node:url';
 
 const OUTPUT = fileURLToPath(new URL('../src/kanji/table.ts', import.meta.url));
-const BASE = 45;
-const EXCLUDED = new Set(['"', "'", '\\', '`', '~']);
-const DIGITS = Array.from({length: 0x7f - 0x20}, (_, index) =>
-  String.fromCharCode(0x20 + index),
-).filter((character) => !EXCLUDED.has(character));
-
-if (DIGITS.length !== BASE * 2) throw new Error(`Expected ${BASE * 2} digits`);
 
 /** Returns `[value, codeUnit]` pairs for every Kanji mode character, sorted by 13-bit value. */
 export function readKanjiCharacters() {
@@ -48,27 +46,74 @@ export function readKanjiCharacters() {
   return characters;
 }
 
-function varint(value) {
-  let digits = '';
-  while (value >= BASE) {
-    digits += DIGITS[BASE + (value % BASE)];
-    value = Math.floor(value / BASE);
-  }
-  return digits + DIGITS[value];
-}
+const PROBABILITY_BITS = 12;
+const ADAPTATION_SHIFT = 5;
+const TOP = 2 ** 30;
+const BOTTOM = 2 ** 24;
+// Probability contexts: numbers use 64 from their field offset, the sign uses one.
+const GAP_FIELD = 0;
+const DISTANCE_FIELD = 64;
+const SIGN_CONTEXT = 128;
 
 export function encodeKanjiTable(characters) {
-  let table = '';
+  const probabilities = new Uint16Array(SIGN_CONTEXT + 1).fill(1 << (PROBABILITY_BITS - 1));
+  const digits = [];
+  let low = 0;
+  let range = TOP;
+
+  const bit = (context, value) => {
+    const probability = probabilities[context];
+    const bound = (range >>> PROBABILITY_BITS) * probability;
+    if (value) {
+      low += bound;
+      range -= bound;
+      probabilities[context] = probability - (probability >> ADAPTATION_SHIFT);
+    } else {
+      range = bound;
+      probabilities[context] =
+        probability + (((1 << PROBABILITY_BITS) - probability) >> ADAPTATION_SHIFT);
+    }
+    if (low >= TOP) {
+      low -= TOP;
+      let index = digits.length - 1;
+      while (digits[index] === 63) digits[index--] = 0;
+      digits[index]++;
+    }
+    while (range < BOTTOM) {
+      digits.push(Math.floor(low / BOTTOM));
+      low = (low % BOTTOM) * 64;
+      range *= 64;
+    }
+  };
+
+  const number = (field, value) => {
+    const length = value ? 32 - Math.clz32(value) : 0;
+    for (let index = 4, node = 1; index >= 0; index--) {
+      const branch = (length >> index) & 1;
+      bit(field + node, branch);
+      node = node * 2 + branch;
+    }
+    for (let index = length - 2; index >= 0; index--) {
+      bit(field + 32 + length, (value >> index) & 1);
+    }
+  };
+
+  number(GAP_FIELD, characters.length);
   let previousValue = -1;
   let previousCodeUnit = 0;
   for (const [value, codeUnit] of characters) {
     const difference = codeUnit - previousCodeUnit - 1;
-    table += varint(value - previousValue - 1);
-    table += varint(difference < 0 ? -2 * difference - 1 : 2 * difference);
+    number(GAP_FIELD, value - previousValue - 1);
+    bit(SIGN_CONTEXT, +(difference < 0));
+    number(DISTANCE_FIELD, difference < 0 ? -difference - 1 : difference);
     previousValue = value;
     previousCodeUnit = codeUnit;
   }
-  return table;
+  for (let index = 0; index < 5; index++) {
+    digits.push(Math.floor(low / BOTTOM));
+    low = (low % BOTTOM) * 64;
+  }
+  return String.fromCharCode(...digits.map((digit) => 40 + digit + +(digit > 51) + +(digit > 54)));
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

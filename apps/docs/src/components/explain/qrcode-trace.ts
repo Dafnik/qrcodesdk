@@ -103,7 +103,8 @@ function analyzeStandard(
   }
 
   const {version, levelValue, size} = format;
-  const unmasked = unmaskModules(matrix, format);
+  const roles = matrixRoles(matrix);
+  const unmasked = unmaskModules(matrix, format, roles);
   const placements = createPlacements(matrix, false);
   const blockCount = getErrorCorrectionBlockCount(version, levelValue);
   const errorCorrectionPerBlock = getErrorCorrectionCodewordsPerBlock(version, levelValue);
@@ -142,7 +143,6 @@ function analyzeStandard(
       : undefined,
   );
 
-  const roles = matrixRoles(matrix);
   const candidates = Array.from({length: 8}, (_, index): QRCodeStandardTraceMaskCandidate => {
     const mask = index as QRCodeMask;
     const candidate = applyMaskToMatrix(unmasked.slice(), roles, size, mask);
@@ -189,7 +189,8 @@ function analyzeMicro(
   }
 
   const {versionNumber, symbolNumber, dataBits, size} = format;
-  const unmasked = unmaskModules(matrix, format);
+  const roles = matrixRoles(matrix);
+  const unmasked = unmaskModules(matrix, format, roles);
   const placements = createPlacements(matrix, true);
   const dataCodewordCount = getMicroDataCodewords(versionNumber, symbolNumber);
   const errorCorrectionCount = getMicroErrorCorrectionCodewords(symbolNumber);
@@ -236,7 +237,6 @@ function analyzeMicro(
       : undefined,
   );
 
-  const roles = matrixRoles(matrix);
   const candidates = MICRO_STANDARD_MASKS.map(
     (standardMask, index): QRCodeMicroTraceMaskCandidate => {
       const mask = index as QRCodeMicroMask;

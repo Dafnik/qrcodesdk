@@ -55,17 +55,13 @@ export function resolveQRCodeMatrixOptions(
     resolved = {segments, version: requestedVersion};
   } else {
     // Character count indicator widths change at versions 10 and 27.
-    search: for (const [start, end] of [
-      [1, 9],
-      [10, 26],
-      [27, 40],
-    ] as const) {
-      const segments = forcedSegments ?? segmentsFor(start);
-      for (let version = start; version <= end; version++) {
-        if (segmentsFitVersion(segments, version as QRCodeVersion, errorCorrectionLevel, eci)) {
-          resolved = {segments, version: version as QRCodeVersion};
-          break search;
-        }
+    let segments = forcedSegments!;
+    for (let version = 1 as QRCodeVersion; version <= 40 && !resolved; version++) {
+      if (!forcedSegments && (version === 1 || version === 10 || version === 27)) {
+        segments = segmentsFor(version);
+      }
+      if (segmentsFitVersion(segments, version, errorCorrectionLevel, eci)) {
+        resolved = {segments, version};
       }
     }
     if (!resolved) throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large');

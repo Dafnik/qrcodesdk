@@ -12,23 +12,26 @@ import type {QRCodeCodewords, QRCodePolynomial} from './types';
  *
  * @param {number[]} poly - The array of code words for which ECC words are to be calculated.
  * @param {number[]} genPoly - The generator polynomial used for ECC calculation.
+ * @param {number} start - The first code word of the block in `poly`.
+ * @param {number} end - The end of the block in `poly`.
  * @returns {number[]} The array of calculated ECC code words.
  */
-export function calculateECC(poly: QRCodeCodewords, genPoly: QRCodePolynomial): QRCodeCodewords {
+export function calculateECC(
+  poly: readonly number[],
+  genPoly: QRCodePolynomial,
+  start = 0,
+  end = poly.length,
+): QRCodeCodewords {
   const {exponents, logarithms} = getGF256LookupTables();
-  const modulus = poly.slice(0),
-    polyLength = poly.length,
-    genPolyLength = genPoly.length;
-
-  for (let i = 0; i < genPolyLength; i++) {
-    modulus.push(0);
-  }
-
+  const polyLength = end - start;
+  const modulus = poly.slice(start, end);
+  for (let j = 0; j < genPoly.length; j++) modulus.push(0);
   for (let i = 0; i < polyLength;) {
-    const quotient = logarithms[modulus[i++]!]!;
-    if (quotient >= 0) {
-      for (let j = 0; j < genPolyLength; j++) {
-        modulus[i + j] = modulus[i + j]! ^ exponents[(quotient + genPoly[j]!) % 255]!;
+    const value = modulus[i++]!;
+    if (value) {
+      const quotient = logarithms[value]!;
+      for (let j = 0; j < genPoly.length; j++) {
+        modulus[i + j]! ^= exponents[quotient + genPoly[j]!]!;
       }
     }
   }

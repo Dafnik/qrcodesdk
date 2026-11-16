@@ -13,20 +13,19 @@ export function fillDataInMatrix(
   buffer: QRCodeCodewords,
 ): Uint8Array {
   let k = 0,
-    dir = -1;
+    dir = -1,
+    // The current code word, shifted left once per placed bit, so bit 7 is the next module.
+    codeword = buffer[0]!;
   for (let i = n - 1; i >= 0; i -= 2) {
     if (i == 6) i--; // skip the entire timing pattern column
-    let jj = dir < 0 ? n - 1 : 0;
-    for (let j = 0; j < n; j++) {
-      for (let ii = i; ii > i - 2; --ii) {
-        const index = jj * n + ii;
-        if (roles[index] === DATA_ROLE) {
-          // may overflow, but (undefined >> x) is 0, so it will auto-pad to zero.
-          modules[index] = ((buffer[k >> 3] ?? 0) >> (~k & 7)) & 1;
-          ++k;
+    for (let index = (dir < 0 ? n - 1 : 0) * n + i, j = 0; j < n; j++, index += dir * n) {
+      for (let ii = index; ii > index - 2; ii--) {
+        if (roles[ii] === DATA_ROLE) {
+          modules[ii] = (codeword >> 7) & 1;
+          // Remainder bits after the last code word are 0.
+          codeword = ++k & 7 ? codeword << 1 : (buffer[k >> 3] ?? 0);
         }
       }
-      jj += dir;
     }
     dir = -dir;
   }

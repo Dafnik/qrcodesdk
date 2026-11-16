@@ -118,15 +118,18 @@ describe('matrix construction and mutation helpers', () => {
   });
 
   test.each(QR_CODE_MASKS)('applies mask %s to exactly its data pattern modules', (mask) => {
-    const {size, modules: base, roles} = createBaseMatrix(7);
-    const modules = applyMaskToMatrix(base.slice(), roles, size, mask);
+    for (const version of [1, 7, 10, 11, 12, 40] as const) {
+      const {size, modules: base, roles} = createBaseMatrix(version);
+      const modules = applyMaskToMatrix(base.slice(), roles, size, mask);
+      const expected = base.slice();
 
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) {
-        const index = i * size + j;
-        const toggled = roles[index] === 0 && MASK_FUNCTIONS[mask]!(i, j);
-        expect(modules[index]).toBe(toggled ? base[index]! ^ 1 : base[index]);
+      for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+          const index = i * size + j;
+          if (roles[index] === 0 && MASK_FUNCTIONS[mask]!(i, j)) expected[index]! ^= 1;
+        }
       }
+      expect(modules).toEqual(expected);
     }
   });
 });

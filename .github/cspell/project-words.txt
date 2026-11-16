@@ -69,3 +69,4 @@ VTIMEZONE
 YYYYMMDDTH
 Hmmss
 rmqr
+paeth

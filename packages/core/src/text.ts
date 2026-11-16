@@ -1,9 +1,10 @@
+import {arrayStorage} from './matrix/public-array';
 import {
   calculateQRCodeOutputSize,
   parseQRCodeColor,
+  resolveColor,
   resolveQRCodeTextStyle,
   resolveQuietZone,
-  validateColor,
 } from './styling';
 import type {QRCodeColor, QRCodeMatrix, QRCodeRenderer, QRCodeTextStyle} from './types';
 
@@ -44,8 +45,8 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
   const mode = ansiOptions.mode ?? 'blocks';
   const foregroundColor = ansiOptions.foreground ?? '#000000';
   const backgroundColor = ansiOptions.background ?? '#ffffff';
-  validateColor('ansi.foreground', foregroundColor);
-  validateColor('ansi.background', backgroundColor);
+  resolveColor('ansi.foreground', foregroundColor);
+  resolveColor('ansi.background', backgroundColor);
   const background = compositeANSIColor(parseQRCodeColor(backgroundColor), [255, 255, 255]);
   const foreground = compositeANSIColor(parseQRCodeColor(foregroundColor), background);
   const backgroundOnly = ansi !== false && mode === 'background';
@@ -59,36 +60,37 @@ export function QRCodeTextRenderer(options?: QRCodeTextRendererOptions): QRCodeR
       : '';
   const suffix = ansi === false ? '' : ANSI_RESET;
 
+  // Output pieces by dark modules: upper and lower halves in compact layouts, one module otherwise.
+  const pieces = compact ? [' ', '▀', '▄', '█'] : [light, dark];
+
   return (matrix: QRCodeMatrix) => {
     const quietZone = resolveQuietZone(requestedQuietZone, matrix);
     const {width, height} = calculateQRCodeOutputSize(matrix, {moduleSize, quietZone});
+    const data = arrayStorage.get(matrix.modules) ?? matrix.modules;
+    // Rows in the quiet zone, and the row after the last in compact layouts, share an empty row.
+    const empty = new Uint8Array(width);
     const darkModules = (scaledRow: number): Uint8Array => {
-      const modules = new Uint8Array(width);
       const row = Math.floor(scaledRow / moduleSize) - quietZone;
-      if (row < 0 || row >= matrix.height) return modules;
+      if (row < 0 || row >= matrix.height) return empty;
+      const modules = new Uint8Array(width);
       for (let column = 0; column < width; column++) {
         const matrixColumn = Math.floor(column / moduleSize) - quietZone;
         if (matrixColumn >= 0 && matrixColumn < matrix.width) {
-          modules[column] = matrix.modules[row * matrix.width + matrixColumn]!;
+          modules[column] = data[row * matrix.width + matrixColumn]!;
         }
       }
       return modules;
     };
-    const rows: string[] = [];
+    let text = '';
     for (let row = 0; row < height; row += compact ? 2 : 1) {
       const upper = darkModules(row);
-      const lower = compact ? darkModules(row + 1) : upper;
-      let line = prefix;
+      const lower = compact ? darkModules(row + 1) : empty;
+      text += row ? `${suffix}\n${prefix}` : prefix;
       for (let column = 0; column < width; column++) {
-        line += compact
-          ? ' ▀▄█'[upper[column]! | (lower[column]! << 1)]
-          : upper[column]
-            ? dark
-            : light;
+        text += pieces[upper[column]! | (lower[column]! << 1)]!;
       }
-      rows.push(line + suffix);
     }
-    return rows.join('\n');
+    return text + suffix;
   };
 }
 

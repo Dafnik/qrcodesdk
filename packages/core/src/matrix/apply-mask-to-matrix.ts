@@ -1,5 +1,10 @@
 import type {QRCodeMask} from '../types';
-import {DATA_ROLE} from './create-base-matrix';
+
+// Flipped columns by mask and row, as `step << 6 | columns`: bit j of `columns` flips columns j,
+// j + step, and so on. Every mask predicate (JIS X 0510:2004 Table 20) repeats every 12 rows and 6
+// columns, and the step is the shortest period of the row: 1, 2, 3, or 6.
+// Entries need nine bits to hold a step of 6 above the six column bits.
+let flips: Uint16Array | undefined;
 
 /**
  * Applies a QR mask to the data modules of a matrix.
@@ -10,40 +15,67 @@ export function applyMaskToMatrix(
   n: number,
   mask: QRCodeMask,
 ): Uint8Array {
-  if (mask < 3) {
+  // Small symbols benefit from skipping table setup and writes to function modules.
+  // Larger symbols use the branchless table loop below.
+  if (mask < 3 && n < 64) {
     const rowStep = mask === 1 ? 2 : 1;
     const columnStep = mask === 2 ? 3 : mask === 0 ? 2 : 1;
     for (let i = 0; i < n; i += rowStep) {
-      const columnStart = mask === 0 ? i & 1 : 0;
-      for (let j = columnStart; j < n; j += columnStep) {
+      for (let j = mask === 0 ? i & 1 : 0; j < n; j += columnStep) {
         const index = i * n + j;
-        if (roles[index] === DATA_ROLE) modules[index]! ^= 1;
+        if (roles[index] === 0) modules[index]! ^= 1;
       }
     }
     return modules;
   }
 
-  // Inline the remaining predicates (JIS X 0510:2004 Table 20). Calling MASK_FUNCTIONS
-  // here sees five closures at one call site, which V8 cannot inline.
+  flips ??= createFlips();
   for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      const index = i * n + j;
-      const product = i * j;
-      if (
-        roles[index] === DATA_ROLE &&
-        (mask === 3
-          ? (i + j) % 3 === 0
-          : mask === 4
-            ? (((i >> 1) + ((j / 3) | 0)) & 1) === 0
-            : mask === 5
-              ? product % 6 === 0
-              : mask === 6
-                ? (((product & 1) + (product % 3)) & 1) === 0
-                : ((((i + j) & 1) + (product % 3)) & 1) === 0)
+    const entry = flips[mask * 12 + (i % 12)]!;
+    for (let j = 0, columns = entry & 63; columns; j++, columns >>= 1) {
+      for (
+        let index = i * n + j, end = i * n + n;
+        columns & 1 && index < end;
+        index += entry >> 6
       ) {
-        modules[index]! ^= 1;
+        // Only data modules (role 0) are masked: `role - 1 >>> 31` is 1 for them and 0 otherwise.
+        modules[index]! ^= (roles[index]! - 1) >>> 31;
       }
     }
   }
   return modules;
+}
+
+function createFlips(): Uint16Array {
+  const result = new Uint16Array(96);
+  for (let row = 0; row < 96; row++) {
+    const i = row % 12;
+    const mask = (row / 12) | 0;
+    let columns = 0;
+    for (let j = 0; j < 6; j++) {
+      const product = i * j;
+      const keep =
+        mask === 0
+          ? (i + j) % 2
+          : mask === 1
+            ? i % 2
+            : mask === 2
+              ? j % 3
+              : mask === 3
+                ? (i + j) % 3
+                : mask === 4
+                  ? ((i >> 1) + ((j / 3) | 0)) % 2
+                  : mask === 5
+                    ? product % 6
+                    : mask === 6
+                      ? ((product % 2) + (product % 3)) % 2
+                      : (((i + j) % 2) + (product % 3)) % 2;
+      if (!keep) columns |= 1 << j;
+    }
+    // The shortest step whose first columns repeat across all 6.
+    let step = 1;
+    while (6 % step || ((columns >> step) ^ columns) & ((1 << (6 - step)) - 1)) step++;
+    result[row] = (step << 6) | (columns & ((1 << step) - 1));
+  }
+  return result;
 }
