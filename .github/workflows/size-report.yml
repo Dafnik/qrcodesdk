@@ -1,0 +1,64 @@
+name: Publish size reports
+
+on:
+  workflow_run:
+    workflows: [Size measurements]
+    types: [requested, completed]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+cache-mode: none
+
+concurrency:
+  group: size-publisher-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-24.04
+    steps:
+      # Only trusted main code and its committed baseline. No install or PR execution.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Identify PR and validate report artifact
+        id: prepare
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const {prepareSizeComment} = await import(`${process.env.GITHUB_WORKSPACE}/packages/perf/src/size/github.ts`);
+            const result = await prepareSizeComment(github, context.repo, context.payload.workflow_run, context.payload.action);
+            if (result) {
+              core.setOutput('pr', result.pr);
+              core.setOutput('artifact', result.artifact ?? '');
+            }
+
+      - name: Download measurement data
+        if: steps.prepare.outputs.artifact != ''
+        continue-on-error: true # Missing or invalid reports get an explanatory comment.
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          artifact-ids: ${{ steps.prepare.outputs.artifact }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/size-report
+          merge-multiple: true
+
+      - name: Compare committed baseline and update PR comment
+        if: steps.prepare.outputs.pr != ''
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          SIZE_PR: ${{ steps.prepare.outputs.pr }}
+          SIZE_REPORT: ${{ runner.temp }}/size-report/size.json
+        with:
+          script: |
+            const {publishSizeReport} = await import(`${process.env.GITHUB_WORKSPACE}/packages/perf/src/size/github.ts`);
+            await publishSizeReport(github, context.repo, context.payload.workflow_run,
+              Number(process.env.SIZE_PR), process.env.SIZE_REPORT,
+              `${process.env.GITHUB_WORKSPACE}/packages/perf/baseline/size.json`);

@@ -51,7 +51,8 @@ Sizes are minified, gzip at level 6, and Brotli at quality 11.
 
 `check:size` builds the scenarios with Vite and compares each total gzip size with
 `baseline/size.json`. It fails when a scenario grows by more than 1% (at least 64 bytes), has an
-inclusion problem, or is missing from the baseline. CI runs it in the **Bundle size** job.
+inclusion problem, or is missing from the baseline. This is an optional local check. CI does not
+enforce size budgets.
 
 To accept a change, regenerate the baseline with every bundler and commit it:
 
@@ -59,8 +60,41 @@ To accept a change, regenerate the baseline with every bundler and commit it:
 pnpm turbo run report:size --filter=@repo/perf -- --update-baseline
 ```
 
-Dependency updates of a bundler or framework can change sizes too. Update the baseline in the same
-pull request.
+Dependency updates of a bundler or framework can change sizes too. Update the local baseline when
+you want the docs and local checks to use those new sizes.
+
+### PR reports
+
+Every PR gets one bot comment comparing its size report with `baseline/size.json` committed on `main`.
+The report includes all scenarios and supported bundlers, Vite initial and lazy gzip sizes, and
+packed and unpacked package sizes. Changed measurements appear first; unchanged measurements are
+collapsed. New and removed scenarios and measurement problems are explicit. Full JSON reports are
+attached to the measurement run for 14 days. Size changes are informational.
+
+- `.github/workflows/size-baseline.yml` measures current `main` daily at 03:23 UTC, or manually on
+  `main`. A separate job validates the source commit and commits only `baseline/size.json` through
+  the GitHub Contents API. The build job has read-only permissions; the write job installs no
+  packages and runs no build commands. Branch protection must permit the bot to update the file.
+  If `main` moves during measurement, the workflow fails and can be rerun. No force push or branch
+  protection bypass is attempted. Failed or delayed schedules leave the previous baseline intact.
+- `.github/workflows/size.yml` uses ordinary `pull_request` events, so GitHub's fork approval rules
+  apply. It builds the PR merged onto its target branch and uploads one size report. It does not
+  rebuild `main`. Repository and cache permissions are read-only, with no supplied secrets.
+- `.github/workflows/size-report.yml` runs trusted code and reads the baseline from `main`. It marks
+  old results as outdated when a measurement starts and updates the same comment on completion.
+  It associates runs with PRs using GitHub API repository, branch, and commit identities, validates
+  artifact names and sizes before download, and parses reports as data. It never executes PR code
+  or installs dependencies. PRs cannot replace the baseline by changing their own baseline file.
+- The measurement environment is Ubuntu 24.04 and Node.js 26.13.1 for both daily and PR builds.
+  Comments include the baseline's source commit and date so its age is visible. Baseline updates
+  do not automatically rerun open PRs; the next PR measurement uses the new committed baseline.
+- Old runs and attempts cannot replace newer comments. Superseded measurement runs are cancelled.
+  Build failures, missing reports, and invalid baselines receive an explanatory comment. Merge
+  conflicts can prevent GitHub from starting the normal PR workflow until resolved.
+
+The workflows must first land on `main` to enable scheduled baseline updates and trusted publishing.
+The bot uses `GITHUB_TOKEN`; its baseline commits do not trigger another push workflow. Existing
+PRs receive reports on their next run. No speed baseline or speed report is updated in CI.
 
 ## Speed report
 
@@ -106,7 +140,7 @@ pnpm turbo run report:speed --filter=@repo/perf -- --update-baseline
 pnpm turbo run report:speed:browser --filter=@repo/perf -- --update-baseline
 ```
 
-Speed is not checked in CI, because shared runners are too noisy.
+Speed reports run only on developer machines. No speed measurements or comparisons run in CI.
 
 ## Adding a feature
 
