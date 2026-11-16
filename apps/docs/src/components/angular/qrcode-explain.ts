@@ -552,15 +552,11 @@ export class QRCodeExplain {
     const explanation = this.explanation();
     if (selection === undefined || explanation === undefined || selection.role === 'quiet-zone')
       return [];
-    return explanation.modules.filter(({role}) => role === selection.role);
+    return explanation.groups.get(selection.role)?.modules ?? [];
   });
   protected readonly legendItems = computed<readonly LegendItem[]>(() => {
     const explanation = this.explanation();
     if (explanation === undefined) return [];
-    const counts = new Map<QRCodeExplainRole, number>();
-    for (const module of explanation.modules) {
-      counts.set(module.role, (counts.get(module.role) ?? 0) + 1);
-    }
     const items: LegendItem[] =
       explanation.quietZone > 0
         ? [
@@ -573,7 +569,7 @@ export class QRCodeExplain {
           ]
         : [];
     for (const role of QR_CODE_EXPLAIN_ROLE_ORDER) {
-      const count = counts.get(role) ?? 0;
+      const count = explanation.groups.get(role)?.modules.length ?? 0;
       if (count > 0) {
         items.push({
           id: `role:${role}`,

@@ -1,6 +1,6 @@
 import type {QRCodeEncodingMode, QRCodeMode, QRCodePayload, QRCodeVersion} from '../types';
 import type {QRCodeKanjiLookup} from './kanji';
-import type {QRCodeEncodedPayload, QRCodeSupportedModeIndicator} from './types';
+import type {QRCodeCodewords, QRCodeEncodedPayload, QRCodeSupportedModeIndicator} from './types';
 
 export const MODE_NUMERIC = 1,
   MODE_ALPHANUMERIC = 2,
@@ -24,6 +24,14 @@ const NUMERIC_REGEXP = /^\d*$/;
 const ALPHANUMERIC_REGEXP = /^[A-Z0-9 $%*+\-./:]*$/;
 
 type PackBits = (value: number, bitCount: number) => void;
+/**
+ * Packs bit fields of up to 24 bits into code words, most significant bit first: the code words,
+ * a function that appends the low `bitCount` bits of a value (no-op for 0 bits), and a function
+ * that returns the number of bits written. The last code word is partial until it is full; its
+ * unwritten low bits are 0.
+ */
+export type QRCodeBitBuffer = readonly [QRCodeCodewords, PackBits, () => number];
+
 type TextEncoderConstructor = new () => {
   encode(payload?: string): Uint8Array;
 };
@@ -44,6 +52,25 @@ export function getPayloadBitLength(mode: QRCodeSupportedModeIndicator, length: 
   if (mode === MODE_NUMERIC) return ((length / 3) | 0) * 10 + [0, 4, 7][length % 3]!;
   if (mode === MODE_ALPHANUMERIC) return ((length / 2) | 0) * 11 + (length % 2) * 6;
   return length * (mode === MODE_KANJI ? 13 : 8);
+}
+
+export function createBitBuffer(): QRCodeBitBuffer {
+  const buffer: QRCodeCodewords = [];
+  let bitLength = 0;
+  return [
+    buffer,
+    (value, bitCount) => {
+      for (; bitCount > 0;) {
+        const free = 8 - (bitLength & 7);
+        const count = Math.min(free, bitCount);
+        if (free === 8) buffer.push(0);
+        buffer[buffer.length - 1]! |=
+          ((value >> (bitCount -= count)) & ((1 << count) - 1)) << (free - count);
+        bitLength += count;
+      }
+    },
+    () => bitLength,
+  ];
 }
 
 export function encodePayload(

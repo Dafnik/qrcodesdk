@@ -4,6 +4,7 @@ import {
   ECI_UTF8_ASSIGNMENT,
   MODE_ECI,
   MODE_OCTET,
+  createBitBuffer,
   encodePayload,
   getCharacterCountBits,
 } from './mode';
@@ -25,21 +26,8 @@ export function encode(
   maxBufferLength: number,
   eci: boolean,
 ): QRCodeCodewords {
-  const buffer: QRCodeCodewords = [];
+  const [buffer, pack, bitLength] = createBitBuffer();
   const capacity = maxBufferLength * 8;
-  let bits = 0,
-    remaining = 8;
-
-  // this function is intentionally no-op when n=0.
-  const pack = function (x: number, n: number): void {
-    if (n >= remaining) {
-      buffer.push(bits | (x >> (n -= remaining)));
-      while (n >= 8) buffer.push((x >> (n -= 8)) & 255);
-      bits = 0;
-      remaining = 8;
-    }
-    if (n > 0) bits |= (x & ((1 << n) - 1)) << (remaining -= n);
-  };
 
   let hasWrittenUTF8ECI = false;
   for (const segment of segments) {
@@ -53,7 +41,7 @@ export function encode(
     encodePayload(segment.mode, segment.payload, pack);
   }
 
-  const encodedDataBitLength = buffer.length * 8 + (8 - remaining);
+  const encodedDataBitLength = bitLength();
   if (encodedDataBitLength > capacity) {
     throw new QRCodeError('PAYLOAD_TOO_LARGE', 'QRCode: Payload too large', {
       details: {encodedDataBitLength, capacity},
@@ -65,17 +53,9 @@ export function encode(
   // be valid as the truncated terminator mode bits and padding is
   // identical in appearance (cf. JIS X 0510:2004 sec 8.4.8).
   pack(0, 4);
-  if (remaining < 8) {
-    buffer.push(bits);
-  }
 
   // the padding to fill up the remaining space. we should not add any
   // words when the overflow already occurred.
-  while (buffer.length + 1 < maxBufferLength) {
-    buffer.push(0xec, 0x11);
-  }
-  if (buffer.length < maxBufferLength) {
-    buffer.push(0xec);
-  }
+  for (let pad = 0xec; buffer.length < maxBufferLength; pad ^= 0xec ^ 0x11) buffer.push(pad);
   return buffer.slice(0, maxBufferLength);
 }

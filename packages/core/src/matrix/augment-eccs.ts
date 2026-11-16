@@ -20,46 +20,22 @@ export function augmentECCs(
   blockNumber: number,
   genPoly: QRCodePolynomial,
 ): QRCodeCodewords {
-  const subSizes: number[] = [],
-    subSize: number = (poly.length / blockNumber) | 0,
-    pivot: number = blockNumber - (poly.length % blockNumber),
-    eccs: QRCodeCodewords[] = [];
+  const subSize = (poly.length / blockNumber) | 0,
+    pivot = blockNumber - (poly.length % blockNumber),
+    // Blocks from the pivot on hold one more code word.
+    blockStart = (block: number) => block * subSize + Math.max(0, block - pivot),
+    eccs: QRCodeCodewords[] = [],
+    result: QRCodeCodewords = [];
 
-  let subSize0 = 0;
-
-  for (let i = 0; i < pivot; i++) {
-    subSizes.push(subSize0);
-    subSize0 += subSize;
+  for (let j = 0; j < blockNumber; j++) {
+    eccs.push(calculateECC(poly, genPoly, blockStart(j), blockStart(j + 1)));
   }
-  for (let i = pivot; i < blockNumber; i++) {
-    subSizes.push(subSize0);
-    subSize0 += subSize + 1;
+  for (let i = 0; i < subSize; i++) {
+    for (let j = 0; j < blockNumber; j++) result.push(poly[blockStart(j) + i]!);
   }
-  subSizes.push(subSize0);
-
-  for (let i = 0; i < blockNumber; i++) {
-    eccs.push(calculateECC(poly.slice(subSizes[i]!, subSizes[i + 1]!), genPoly));
-  }
-
-  const result: QRCodeCodewords = [];
-  const pushDataCodeword = (sourceCodewordIndex: number): void => {
-    result.push(poly[sourceCodewordIndex]!);
-  };
-
-  const numberOfItemsPerBlock = (poly.length / blockNumber) | 0;
-  for (let i = 0; i < numberOfItemsPerBlock; i++) {
-    for (let j = 0; j < blockNumber; j++) {
-      pushDataCodeword(subSizes[j]! + i);
-    }
-  }
-  for (let j = pivot; j < blockNumber; j++) {
-    pushDataCodeword(subSizes[j + 1]! - 1);
-  }
-
+  for (let j = pivot; j < blockNumber; j++) result.push(poly[blockStart(j + 1) - 1]!);
   for (let i = 0; i < genPoly.length; i++) {
-    for (let j = 0; j < blockNumber; j++) {
-      result.push(eccs[j]![i]!);
-    }
+    for (let j = 0; j < blockNumber; j++) result.push(eccs[j]![i]!);
   }
   return result;
 }

@@ -152,30 +152,39 @@ function microLevel(
 export function createPlacements({width: size, roles}: QRCodeMatrix, micro: boolean): number[] {
   const placements: number[] = [];
   const dataRole = QR_CODE_MODULE_ROLES.data;
-  let direction = -1;
+  let upward = true;
   for (let right = size - 1; micro ? right > 0 : right >= 0; right -= 2) {
     if (!micro && right === 6) right--;
-    let row = direction < 0 ? size - 1 : 0;
+    const left = right - 1;
     for (let step = 0; step < size; step++) {
-      for (let column = right; column > right - 2; column--) {
-        const index = row * size + column;
-        if (roles[index] === dataRole) placements.push(index);
-      }
-      row += direction;
+      const rowStart = (upward ? size - 1 - step : step) * size;
+      if (roles[rowStart + right] === dataRole) placements.push(rowStart + right);
+      if (roles[rowStart + left] === dataRole) placements.push(rowStart + left);
     }
-    direction = -direction;
+    upward = !upward;
   }
   return placements;
 }
 
 /** Copies the matrix and removes the selected mask from its data modules. */
-export function unmaskModules(matrix: QRCodeMatrix, format: QRCodeSymbolFormat): Uint8Array {
-  const modules = Uint8Array.from(matrix.modules);
-  return applyMaskToMatrix(modules, matrixRoles(matrix), matrix.width, format.standardMask);
+export function unmaskModules(
+  matrix: QRCodeMatrix,
+  format: QRCodeSymbolFormat,
+  roles: Uint8Array = matrixRoles(matrix),
+): Uint8Array {
+  return applyMaskToMatrix(toBytes(matrix.modules), roles, matrix.width, format.standardMask);
 }
 
 export function matrixRoles(matrix: QRCodeMatrix): Uint8Array {
-  return Uint8Array.from(matrix.roles);
+  return toBytes(matrix.roles);
+}
+
+/** Copies module values. A plain loop is much faster than `Uint8Array.from()` on frozen arrays. */
+function toBytes(values: readonly number[]): Uint8Array {
+  const length = values.length;
+  const bytes = new Uint8Array(length);
+  for (let index = 0; index < length; index++) bytes[index] = values[index]!;
+  return bytes;
 }
 
 /**

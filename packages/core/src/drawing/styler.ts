@@ -55,7 +55,18 @@ export function createQRCodeStyler(
         for (const role of roles) claimedRoles |= 1 << role;
       },
       claimArea(x, y, width, height) {
-        validateRectangle('claimArea', x, y, width, height);
+        if (
+          ![x, y, width, height, x + width, y + height].every(Number.isFinite) ||
+          width < 0 ||
+          height < 0
+        ) {
+          throwInvalid('claimArea', 'finite coordinates and non-negative dimensions', [
+            x,
+            y,
+            width,
+            height,
+          ]);
+        }
         if (width === 0 || height === 0) return;
         const startX = Math.floor(x);
         const startY = Math.floor(y);
@@ -98,7 +109,7 @@ export function createQRCodeStyler(
       outputHeight: outputSize.height,
       background,
       layers: [...layers.values()]
-        .filter(({rects, tiles}) => rects.length > 0 || tiles.size > 0)
+        .filter(({rects, tiles}) => rects.length || tiles.size)
         .map(({color, rects, tiles}): QRCodeDrawingLayer => ({
           color,
           rects,
@@ -142,22 +153,6 @@ function createLayer(color: QRCodeColor, offset: number): Layer {
       tile[1].push(x + offset, y + offset);
     },
   };
-}
-
-function validateRectangle(
-  field: string,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-): void {
-  if (
-    ![x, y, width, height, x + width, y + height].every(Number.isFinite) ||
-    width < 0 ||
-    height < 0
-  ) {
-    throwInvalid(field, 'finite coordinates and non-negative dimensions', [x, y, width, height]);
-  }
 }
 
 /**

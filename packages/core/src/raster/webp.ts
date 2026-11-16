@@ -1,6 +1,6 @@
 import {QRCodeError} from '../error';
 import {ByteBuffer} from './byte-buffer';
-import type {RGBAImage} from './types';
+import {type RGBAImage, pixelWords} from './types';
 
 const MAX_DIMENSION = 16_384;
 const LITERAL_CODES = 256;
@@ -30,15 +30,8 @@ export function encodeWebP({width, height, data}: RGBAImage): Uint8Array {
       `WebP output must be 1 to ${MAX_DIMENSION} pixels wide and high, received ${width} x ${height}`,
     );
   }
-  let pixels: Uint32Array = new Uint32Array(width * height);
-  let alphaIsUsed = false;
-  for (let index = 0, offset = 0; index < pixels.length; index++, offset += 4) {
-    const alpha = data[offset + 3]!;
-    if (alpha !== 255) alphaIsUsed = true;
-    pixels[index] =
-      (alpha << 24) | (data[offset]! << 16) | (data[offset + 1]! << 8) | data[offset + 2]!;
-  }
-
+  const {bytes, words} = pixelWords({width, height, data});
+  const [colors, alphaIsUsed] = collectColors(bytes, words);
   const writer = new BitWriter();
   writer.write(0x2f, 8);
   writer.write(width - 1, 14);
@@ -47,13 +40,14 @@ export function encodeWebP({width, height, data}: RGBAImage): Uint8Array {
   writer.write(0, 3);
 
   let xsize = width;
-  const palette = collectPalette(pixels, 256);
-  if (palette) {
+  let pixels: Int32Array;
+  if (colors) {
+    const palette = new Int32Array(Uint32Array.from(colors).sort().buffer);
     // Color-indexing transform. The color table is stored as differences between entries.
     writer.write(1, 1);
     writer.write(3, 2);
     writer.write(palette.length - 1, 8);
-    const table = new Uint32Array(palette.length);
+    const table = new Int32Array(palette.length);
     for (let index = 0; index < palette.length; index++) {
       table[index] = subtractPixels(palette[index]!, index === 0 ? 0 : palette[index - 1]!);
     }
@@ -61,13 +55,14 @@ export function encodeWebP({width, height, data}: RGBAImage): Uint8Array {
     // Up to 16 colors pack several indices into one pixel.
     const bits = palette.length <= 2 ? 3 : palette.length <= 4 ? 2 : palette.length <= 16 ? 1 : 0;
     xsize = (width + (1 << bits) - 1) >> bits;
-    pixels = bundlePixels(pixels, width, height, palette, bits);
+    pixels = bundlePixels(bytes, words, width, height, palette, bits);
   } else {
     // Subtract-green transform.
     writer.write(1, 1);
     writer.write(2, 2);
+    pixels = new Int32Array(words.length);
     for (let index = 0; index < pixels.length; index++) {
-      const pixel = pixels[index]!;
+      const pixel = colorAt(bytes, index);
       const green = (pixel >>> 8) & 0xff;
       pixels[index] =
         (pixel & 0xff00ff00) |
@@ -80,65 +75,99 @@ export function encodeWebP({width, height, data}: RGBAImage): Uint8Array {
 
   const bitstream = writer.finish();
   const padding = bitstream.length & 1;
-  const output = new ByteBuffer();
-  output.pushASCII('RIFF');
-  output.pushUint32LE(12 + bitstream.length + padding);
-  output.pushASCII('WEBP');
-  output.pushASCII('VP8L');
-  output.pushUint32LE(bitstream.length);
-  output.pushBytes(bitstream);
-  if (padding) output.push(0);
-  return output.toUint8Array();
+  // A RIFF file with a `WEBP` form and one `VP8L` chunk, padded to an even length.
+  const output = new Uint8Array(20 + bitstream.length + padding);
+  const uint32 = (value: number) => [value, value >> 8, value >> 16, value >> 24];
+  output.set([
+    0x52,
+    0x49,
+    0x46,
+    0x46,
+    ...uint32(output.length - 8),
+    0x57,
+    0x45,
+    0x42,
+    0x50,
+    0x56,
+    0x50,
+    0x38,
+    0x4c,
+    ...uint32(bitstream.length),
+  ]);
+  output.set(bitstream, 20);
+  return output;
 }
 
 function isDimension(value: number): boolean {
   return Number.isSafeInteger(value) && value >= 1 && value <= MAX_DIMENSION;
 }
 
-function collectPalette(pixels: Uint32Array, limit: number): Uint32Array | undefined {
-  const colors = new Set<number>();
-  let previous = -1;
-  for (const pixel of pixels) {
-    if (pixel === previous) continue;
-    previous = pixel;
-    colors.add(pixel);
-    if (colors.size > limit) return undefined;
+/**
+ * Collects the colors unless there are more than 256, and checks for transparent pixels. The colors
+ * are signed integers, which are small integers for opaque colors.
+ */
+function collectColors(
+  bytes: RGBAImage['data'],
+  words: Int32Array,
+): [colors: Set<number> | undefined, alphaIsUsed: boolean] {
+  let colors: Set<number> | undefined = new Set();
+  let alphaIsUsed = false;
+  for (let index = 0, previous = ~words[0]!; index < words.length; index++) {
+    // Pixels repeat in runs, so each run is read once.
+    if (words[index] === previous) continue;
+    previous = words[index]!;
+    const color = colorAt(bytes, index);
+    alphaIsUsed ||= color >>> 24 !== 255;
+    if (colors && colors.add(color).size > 256) colors = undefined;
   }
-  return Uint32Array.from(colors).sort();
+  return [colors, alphaIsUsed];
+}
+
+/** Returns the pixel at `index` with alpha in the top byte, as a signed integer. */
+function colorAt(bytes: RGBAImage['data'], index: number): number {
+  const offset = index * 4;
+  return (
+    (bytes[offset + 3]! << 24) |
+    (bytes[offset]! << 16) |
+    (bytes[offset + 1]! << 8) |
+    bytes[offset + 2]!
+  );
 }
 
 function subtractPixels(left: number, right: number): number {
-  let result = 0;
-  for (let shift = 0; shift < 32; shift += 8) {
-    result |= ((((left >>> shift) & 0xff) - ((right >>> shift) & 0xff)) & 0xff) << shift;
-  }
-  return result >>> 0;
+  // Subtracts each byte modulo 256: the high bits are set on the left and cleared on the right, so
+  // no byte borrows from the next one, and are fixed afterwards.
+  return ((left | 0x80808080) - (right & 0x7f7f7f7f)) ^ ((left ^ ~right) & 0x80808080);
 }
 
 /** Replaces pixels with palette indices in the green channel, packing `8 >> bits` bits each. */
 function bundlePixels(
-  pixels: Uint32Array,
+  bytes: RGBAImage['data'],
+  words: Int32Array,
   width: number,
   height: number,
-  palette: Uint32Array,
+  palette: Int32Array,
   bits: number,
-): Uint32Array {
+): Int32Array {
   const indices = new Map<number, number>();
   palette.forEach((color, index) => indices.set(color, index));
   const xsize = (width + (1 << bits) - 1) >> bits;
   const bitsPerPixel = 8 >> bits;
-  const mask = (1 << bits) - 1;
-  const bundled = new Uint32Array(xsize * height).fill(0xff000000);
-  let previousColor = -1;
+  const bundled = new Int32Array(xsize * height);
+  let previous = ~words[0]!;
   let previousIndex = 0;
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const color = pixels[y * width + x]!;
-      if (color !== previousColor) {
-        previousColor = color;
-        previousIndex = indices.get(color)!;
+  for (let source = 0, target = 0; target < bundled.length; source += width) {
+    for (let x = 0; x < width; target++) {
+      // Opaque black with the indices in the green channel.
+      let packed = 0xff000000 | 0;
+      for (let shift = 8; shift < 16 && x < width; shift += bitsPerPixel, x++) {
+        if (words[source + x] !== previous) {
+          previous = words[source + x]!;
+          previousIndex = indices.get(colorAt(bytes, source + x))!;
+        }
+        packed |= previousIndex << shift;
       }
-      bundled[y * xsize + (x >> bits)]! |= previousIndex << (8 + bitsPerPixel * (x & mask));
+      bundled[target] = packed;
     }
   }
   return bundled;
@@ -146,7 +175,7 @@ function bundlePixels(
 
 function writeEntropyCodedImage(
   writer: BitWriter,
-  pixels: Uint32Array,
+  pixels: Int32Array,
   xsize: number,
   isMainImage: boolean,
 ): void {
@@ -162,8 +191,8 @@ function writeEntropyCodedImage(
   const alpha = new Uint32Array(LITERAL_CODES);
   const distance = new Uint32Array(DISTANCE_CODES);
   for (let index = 0; index < tokens.length; index += 2) {
-    const length = tokens.values[index]!;
-    const value = tokens.values[index + 1]!;
+    const length = tokens[index]!;
+    const value = tokens[index + 1]!;
     if (length === 0) {
       green[(value >>> 8) & 0xff]!++;
       red[(value >>> 16) & 0xff]!++;
@@ -181,8 +210,8 @@ function writeEntropyCodedImage(
   const distanceCode = writePrefixCode(writer, distance);
 
   for (let index = 0; index < tokens.length; index += 2) {
-    const length = tokens.values[index]!;
-    const value = tokens.values[index + 1]!;
+    const length = tokens[index]!;
+    const value = tokens[index + 1]!;
     if (length === 0) {
       writeSymbol(writer, greenCode, (value >>> 8) & 0xff);
       writeSymbol(writer, redCode, (value >>> 16) & 0xff);
@@ -203,9 +232,9 @@ function writeEntropyCodedImage(
  * Greedy LZ77 over the pixel stream. Tokens are `[0, pixel]` literals or `[length, distance
  * code]` copies.
  */
-function findBackwardReferences(pixels: Uint32Array, xsize: number): TokenList {
+function findBackwardReferences(pixels: Int32Array, xsize: number): number[] {
   const count = pixels.length;
-  const tokens = new TokenList();
+  const tokens: number[] = [];
   const head = new Int32Array(1 << HASH_BITS).fill(-1);
   const chain = new Int32Array(Math.min(count, WINDOW_MASK + 1));
   // Hashes two pixels; matches are verified pixel by pixel.
@@ -225,6 +254,8 @@ function findBackwardReferences(pixels: Uint32Array, xsize: number): TokenList {
     let bestDistance = 0;
     const consider = (distance: number) => {
       const source = position - distance;
+      // Only a longer match counts, which needs the pixel after the best length to match.
+      if (pixels[source + bestLength] !== pixels[position + bestLength]) return;
       let length = 0;
       while (length < maxLength && pixels[source + length] === pixels[position + length]) length++;
       if (length > bestLength) {
@@ -457,21 +488,6 @@ function createPrefixCode(lengths: Uint8Array): PrefixCode {
   }
   // Decoders read a code with only one symbol without consuming bits.
   return {codes, lengths: used === 1 ? new Uint8Array(lengths.length) : lengths};
-}
-
-class TokenList {
-  values = new Uint32Array(1024);
-  length = 0;
-
-  push(length: number, value: number): void {
-    if (this.length + 2 > this.values.length) {
-      const values = new Uint32Array(this.values.length * 2);
-      values.set(this.values);
-      this.values = values;
-    }
-    this.values[this.length++] = length;
-    this.values[this.length++] = value;
-  }
 }
 
 /** Writes bits least significant bit first. */

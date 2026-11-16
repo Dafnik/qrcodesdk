@@ -62,8 +62,11 @@ export function encodeGIF(
   const tableBits = Math.max(1, Math.ceil(Math.log2(palette.length + (transparent ? 1 : 0))));
 
   const indices = new Uint8Array(pixelCount);
+  // Runs alternate between few colors, so the indices of the last two are kept.
   let previousColor = -1;
   let previousIndex = 0;
+  let otherColor = -1;
+  let otherIndex = 0;
   for (let index = 0, offset = 0; index < pixelCount; index++, offset += 4) {
     if (data[offset + 3]! < threshold) {
       indices[index] = transparentIndex;
@@ -71,41 +74,47 @@ export function encodeGIF(
     }
     const color = (data[offset]! << 16) | (data[offset + 1]! << 8) | data[offset + 2]!;
     if (color !== previousColor) {
-      previousColor = color;
-      let paletteIndex = indexOf.get(color);
+      let paletteIndex = color === otherColor ? otherIndex : indexOf.get(color);
       if (paletteIndex === undefined) {
         paletteIndex = nearestColor(palette, color);
         indexOf.set(color, paletteIndex);
       }
+      otherColor = previousColor;
+      otherIndex = previousIndex;
+      previousColor = color;
       previousIndex = paletteIndex;
     }
     indices[index] = previousIndex;
   }
 
   const output = new ByteBuffer();
-  output.pushASCII('GIF89a');
-  output.pushUint16LE(width);
-  output.pushUint16LE(height);
-  // Global color table with 8-bit color resolution.
-  output.push(0xf0 | (tableBits - 1));
-  output.push(0);
-  output.push(0);
+  // The signature `GIF89a`, then the screen size with a global color table of 8-bit colors. Values
+  // above 255 are pushed modulo 256, which leaves their low byte.
+  output.pushBytes([
+    0x47,
+    0x49,
+    0x46,
+    0x38,
+    0x39,
+    0x61,
+    width,
+    width >> 8,
+    height,
+    height >> 8,
+    0xf0 | (tableBits - 1),
+    0,
+    0,
+  ]);
   for (let index = 0; index < 1 << tableBits; index++) {
     const color = palette[index] ?? 0;
-    output.push((color >>> 16) & 0xff);
-    output.push((color >>> 8) & 0xff);
-    output.push(color & 0xff);
+    output.pushBytes([color >> 16, color >> 8, color]);
   }
   if (transparent) {
     // Graphic control extension with a transparent color index.
     output.pushBytes([0x21, 0xf9, 0x04, 0x01, 0, 0, transparentIndex, 0]);
   }
-  output.push(0x2c);
-  output.pushUint16LE(0);
-  output.pushUint16LE(0);
-  output.pushUint16LE(width);
-  output.pushUint16LE(height);
-  output.push(0);
+  // The image descriptor covers the whole screen.
+  output.pushBytes([0x2c, 0, 0, 0, 0, width, width >> 8, height, height >> 8, 0]);
   writeLZW(output, indices, Math.max(2, tableBits));
   output.push(0x3b);
   return output.toUint8Array();
@@ -218,9 +227,9 @@ function writeLZW(output: ByteBuffer, indices: Uint8Array, minimumCodeSize: numb
   const stream = new ByteBuffer();
   const clearCode = 1 << minimumCodeSize;
   const endCode = clearCode + 1;
-  // Maps `prefix code << 8 | index` to the code of that string. Codes 0 to `endCode` are never
-  // stored, so 0 means no entry.
-  const table = new Uint16Array(MAX_CODE << 8);
+  // Maps `prefix code << minimumCodeSize | index` to the code of that string. Codes 0 to `endCode`
+  // are never stored, so 0 means no entry.
+  const table = new Uint16Array(MAX_CODE << minimumCodeSize);
   const keys = new Int32Array(MAX_CODE);
   let keyCount = 0;
   let nextCode = endCode + 1;
@@ -241,7 +250,7 @@ function writeLZW(output: ByteBuffer, indices: Uint8Array, minimumCodeSize: numb
   let current = indices[0]!;
   for (let index = 1; index < indices.length; index++) {
     const value = indices[index]!;
-    const key = (current << 8) | value;
+    const key = (current << minimumCodeSize) | value;
     const code = table[key]!;
     if (code !== 0) {
       current = code;

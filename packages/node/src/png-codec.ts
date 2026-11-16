@@ -15,37 +15,48 @@ const PASSES: readonly (readonly [number, number, number, number])[] = [
 ];
 let crcTable: Int32Array | undefined;
 
+// Filter results of one pixel, which depend only on the pixel and its left, upper, and upper-left
+// neighbors. QR codes have few colors, so few such pixel combinations repeat across the image.
+const CACHE_BITS = 10;
+// Per 16-word entry: the pixel and neighbor words, the absolute differences for None, Sub, Up,
+// Average, and Paeth, then the Sub, Up, Average, and Paeth bytes as words. Zeros are a valid entry.
+const cache = new Int32Array(16 << CACHE_BITS);
+const pixelWords = new Int32Array(8);
+const pixelBytes = new Uint8Array(pixelWords.buffer);
+
 /** Encodes 8-bit RGBA pixels with adaptive per-row filtering. */
 export function encodePNG({width, height, data}: RGBAImage, level: number): Buffer {
   const byteWidth = width * 4;
+  // Pixels are compared as 32-bit words. The renderer allocates them aligned.
+  const words = new Int32Array(data.buffer, data.byteOffset, width * height);
+  // The row above the first row reads as zeros.
+  const zeros = new Int32Array(width);
+  // The row filtered with Sub, Up, Average, and Paeth.
+  const rows = new Int32Array(width * 4);
+  const rowBytes = new Uint8Array(rows.buffer);
   const filtered = Buffer.alloc((byteWidth + 1) * height);
   for (let y = 0, position = 0; y < height; y++, position += byteWidth) {
+    const row = y * (byteWidth + 1);
     // Module rows repeat for the module size. The Up filter turns a repeated row into zeros,
     // which `filtered` already holds.
     if (
       y > 0 &&
       data.compare(data, position - byteWidth, position, position, position + byteWidth) === 0
     ) {
-      filtered[y * (byteWidth + 1)] = 2;
+      filtered[row] = 2;
       continue;
     }
-    let filter = 0;
-    let minimum = Infinity;
-    for (let type = 0; type < 5; type++) {
-      let sum = 0;
-      for (let x = 0; x < byteWidth; x++) {
-        sum += Math.abs(filterDelta(type, data, position, x, byteWidth, 4, y > 0));
-      }
-      if (sum < minimum) {
-        filter = type;
-        minimum = sum;
-      }
-    }
-    const row = y * (byteWidth + 1);
+    const filter = filterRow(
+      words,
+      y * width,
+      y > 0 ? words : zeros,
+      y > 0 ? (y - 1) * width : 0,
+      width,
+      rows,
+    );
     filtered[row] = filter;
-    for (let x = 0; x < byteWidth; x++) {
-      filtered[row + 1 + x] = filterDelta(filter, data, position, x, byteWidth, 4, y > 0);
-    }
+    if (filter === 0) data.copy(filtered, row + 1, position, position + byteWidth);
+    else filtered.set(rowBytes.subarray((filter - 1) * byteWidth, filter * byteWidth), row + 1);
   }
   const header = Buffer.alloc(13);
   header.writeUInt32BE(width, 0);
@@ -195,33 +206,169 @@ export function decodePNG(source: Buffer): RGBAImage {
   return {width, height, data: pixels};
 }
 
-function filterDelta(
-  type: number,
-  data: Buffer,
-  position: number,
-  x: number,
-  byteWidth: number,
-  bytesPerPixel: number,
-  hasPrevious: boolean,
+/**
+ * Filters one row with every filter except None into `rows` and returns the filter with the
+ * smallest sum of absolute signed differences, preferring the lower filter type on ties.
+ */
+function filterRow(
+  words: Int32Array,
+  start: number,
+  previous: Int32Array,
+  above: number,
+  width: number,
+  rows: Int32Array,
 ): number {
-  const left = x >= bytesPerPixel ? data[position + x - bytesPerPixel]! : 0;
-  const up = hasPrevious ? data[position + x - byteWidth]! : 0;
-  const upLeft =
-    hasPrevious && x >= bytesPerPixel ? data[position + x - byteWidth - bytesPerPixel]! : 0;
-  return data[position + x]! - predict(type, left, up, upLeft);
+  let none = 0;
+  let sub = 0;
+  let up = 0;
+  let average = 0;
+  let paeth = 0;
+  let left = 0;
+  let upLeft = 0;
+  for (let pixel = 0; pixel < width;) {
+    const value = words[start + pixel]!;
+    const upper = previous[above + pixel]!;
+    let end = pixel + 1;
+    while (end < width && words[start + end] === value && previous[above + end] === upper) end++;
+    // In a run of equal pixels below equal pixels, only the first pixel has other neighbors.
+    let entry = cacheEntry(value, left, upper, upLeft);
+    none += cache[entry + 4]!;
+    sub += cache[entry + 5]!;
+    up += cache[entry + 6]!;
+    average += cache[entry + 7]!;
+    paeth += cache[entry + 8]!;
+    rows[pixel] = cache[entry + 9]!;
+    rows[width + pixel] = cache[entry + 10]!;
+    rows[width * 2 + pixel] = cache[entry + 11]!;
+    rows[width * 3 + pixel] = cache[entry + 12]!;
+    pixel++;
+    const count = end - pixel;
+    let filteredSub = 0;
+    let filteredUp = 0;
+    let filteredAverage = 0;
+    let filteredPaeth = 0;
+    if (count > 0 && value === upper) {
+      // Every filter except None turns the pixel into zeros.
+      none +=
+        ((value & 255) + ((value >> 8) & 255) + ((value >> 16) & 255) + (value >>> 24)) * count;
+    } else if (count > 0) {
+      entry = cacheEntry(value, value, upper, upper);
+      none += cache[entry + 4]! * count;
+      sub += cache[entry + 5]! * count;
+      up += cache[entry + 6]! * count;
+      average += cache[entry + 7]! * count;
+      paeth += cache[entry + 8]! * count;
+      filteredSub = cache[entry + 9]!;
+      filteredUp = cache[entry + 10]!;
+      filteredAverage = cache[entry + 11]!;
+      filteredPaeth = cache[entry + 12]!;
+    }
+    for (; pixel < end; pixel++) {
+      rows[pixel] = filteredSub;
+      rows[width + pixel] = filteredUp;
+      rows[width * 2 + pixel] = filteredAverage;
+      rows[width * 3 + pixel] = filteredPaeth;
+    }
+    left = value;
+    upLeft = upper;
+  }
+  let filter = 0;
+  let minimum = none;
+  if (sub < minimum) {
+    filter = 1;
+    minimum = sub;
+  }
+  if (up < minimum) {
+    filter = 2;
+    minimum = up;
+  }
+  if (average < minimum) {
+    filter = 3;
+    minimum = average;
+  }
+  return paeth < minimum ? 4 : filter;
+}
+
+/** Returns the cache offset of a pixel's filter results, computing them on a miss. */
+function cacheEntry(value: number, left: number, up: number, upLeft: number): number {
+  let hash =
+    Math.imul(value, -1640531535) ^
+    Math.imul(left, -2048144777) ^
+    Math.imul(up, -1028477379) ^
+    Math.imul(upLeft, 668265263);
+  hash = Math.imul(hash ^ (hash >>> 15), 739982445);
+  const entry = (hash >>> (32 - CACHE_BITS)) << 4;
+  if (
+    value === cache[entry] &&
+    left === cache[entry + 1] &&
+    up === cache[entry + 2] &&
+    upLeft === cache[entry + 3]
+  ) {
+    return entry;
+  }
+  return computeEntry(entry, value, left, up, upLeft);
+}
+
+function computeEntry(
+  entry: number,
+  value: number,
+  left: number,
+  up: number,
+  upLeft: number,
+): number {
+  pixelWords[0] = value;
+  pixelWords[1] = left;
+  pixelWords[2] = up;
+  pixelWords[3] = upLeft;
+  let none = 0;
+  let sub = 0;
+  let upSum = 0;
+  let average = 0;
+  let paeth = 0;
+  for (let channel = 0; channel < 4; channel++) {
+    const x = pixelBytes[channel]!;
+    const a = pixelBytes[4 + channel]!;
+    const b = pixelBytes[8 + channel]!;
+    const c = pixelBytes[12 + channel]!;
+    const prediction = paethPredictor(a, b, c);
+    none += x;
+    sub += Math.abs(x - a);
+    upSum += Math.abs(x - b);
+    average += Math.abs(x - ((a + b) >> 1));
+    paeth += Math.abs(x - prediction);
+    pixelBytes[16 + channel] = x - a;
+    pixelBytes[20 + channel] = x - b;
+    pixelBytes[24 + channel] = x - ((a + b) >> 1);
+    pixelBytes[28 + channel] = x - prediction;
+  }
+  pixelWords[0] = none;
+  pixelWords[1] = sub;
+  pixelWords[2] = upSum;
+  pixelWords[3] = average;
+  cache.set(pixelWords.subarray(0, 4), entry + 4);
+  cache[entry + 8] = paeth;
+  cache.set(pixelWords.subarray(4), entry + 9);
+  cache[entry] = value;
+  cache[entry + 1] = left;
+  cache[entry + 2] = up;
+  cache[entry + 3] = upLeft;
+  return entry;
+}
+
+function paethPredictor(left: number, up: number, upLeft: number): number {
+  const leftDistance = up > upLeft ? up - upLeft : upLeft - up;
+  const upDistance = left > upLeft ? left - upLeft : upLeft - left;
+  const estimate = left + up - upLeft - upLeft;
+  const upLeftDistance = estimate < 0 ? -estimate : estimate;
+  if (leftDistance <= upDistance && leftDistance <= upLeftDistance) return left;
+  return upDistance <= upLeftDistance ? up : upLeft;
 }
 
 function predict(type: number, left: number, up: number, upLeft: number): number {
   if (type === 1) return left;
   if (type === 2) return up;
   if (type === 3) return (left + up) >> 1;
-  if (type !== 4) return 0;
-  const estimate = left + up - upLeft;
-  const leftDistance = Math.abs(estimate - left);
-  const upDistance = Math.abs(estimate - up);
-  const upLeftDistance = Math.abs(estimate - upLeft);
-  if (leftDistance <= upDistance && leftDistance <= upLeftDistance) return left;
-  return upDistance <= upLeftDistance ? up : upLeft;
+  return type === 4 ? paethPredictor(left, up, upLeft) : 0;
 }
 
 function chunk(type: string, data: Buffer): Buffer {

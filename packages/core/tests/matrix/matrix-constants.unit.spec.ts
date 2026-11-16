@@ -149,10 +149,12 @@ describe('matrix constants', () => {
     const {exponents, logarithms} = getGF256LookupTables();
     const generatorPolynomials = getGF256GeneratorPolynomials();
 
-    expect(exponents).toHaveLength(255);
+    // Two periods, so sums of two logarithms need no modulo.
+    expect(exponents).toHaveLength(510);
+    expect(exponents.slice(255)).toEqual(exponents.slice(0, 255));
     expect(logarithms[0]).toBe(-1);
     for (let value = 1; value < 256; value++) {
-      expect(exponents[logarithms[value]]).toBe(value);
+      expect(exponents[logarithms[value]!]).toBe(value);
     }
     expect(generatorPolynomials).toHaveLength(31);
     expect(generatorPolynomials.map((polynomial) => polynomial.length)).toEqual(

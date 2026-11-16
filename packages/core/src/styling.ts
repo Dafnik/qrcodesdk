@@ -1,4 +1,3 @@
-import {QRCodeError} from './error';
 import {throwInvalid} from './options';
 import type {QRCodeColor, QRCodeMatrix, QRCodeTextStyle} from './types';
 
@@ -40,11 +39,7 @@ export function calculateQRCodeOutputSize(
   const height = style.moduleSize * (matrix.height + 2 * style.quietZone);
   for (const value of [width, height]) {
     if (!Number.isSafeInteger(value) || value <= 0) {
-      throw new QRCodeError(
-        'INVALID_OPTIONS',
-        `QR code dimensions must be positive safe integers, received ${String(value)}`,
-        {details: {field: 'dimensions', value}},
-      );
+      throwInvalid('dimensions', 'positive safe integers', value);
     }
   }
   return {width, height};
@@ -55,14 +50,8 @@ export function parseQRCodeColor(color: QRCodeColor): QRCodeRGBA {
   return [value(1), value(3), value(5), color.length === 9 ? value(7) : 255];
 }
 
-export function validateColor(field: string, value: QRCodeColor): void {
-  if (!COLOR_PATTERN.test(value)) {
-    throwInvalid(field, 'an RGB or RGBA hex color', value);
-  }
-}
-
 /** Validates a color and lowercases it, so equal colors share one drawing layer. */
 export function resolveColor(field: string, value: QRCodeColor): QRCodeColor {
-  validateColor(field, value);
+  if (!COLOR_PATTERN.test(value)) throwInvalid(field, 'an RGB or RGBA hex color', value);
   return value.toLowerCase() as QRCodeColor;
 }

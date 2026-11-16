@@ -27,4 +27,5 @@ export default defineConfig({
   platform: 'neutral',
   sourcemap: true,
   target: 'es2020',
+  inputOptions: {optimization: {inlineConst: {mode: 'all', pass: 2}}},
 });

@@ -1,13 +1,16 @@
 import type {QRCodeDrawingLayer} from './types';
 
-// Serialized moves and rectangle commands are shared across calls. Only integer values up to the
-// largest QR symbol are cached, so caller-supplied geometry cannot grow the cache. Rows cover
-// `dy` 0 and 1, the steps between consecutive module rectangles.
+// Rectangle commands are shared across calls, by vertical move, horizontal move, height, and
+// width. Only integer values up to the largest QR symbol are cached, so caller-supplied geometry
+// cannot grow the cache. Vertical moves cover 0 and 1, the steps between consecutive module
+// rectangles, and horizontal moves are offset to stay array indexes.
 const MAX_CACHED_DIMENSION = 177;
 // Process-wide limit. Once reached, further commands are serialized without caching.
-const MAX_CACHED_COMMANDS = 1024;
-type Move = {data: string; rectangles?: string[][]};
-const moves: Record<number, Move>[] = [{}, {}];
+const MAX_CACHED_COMMANDS = 2048;
+const commands: string[][][][] = [[], []];
+// Tile commands by path data and horizontal move. Most tiles follow one in the same row, so only
+// commands without a vertical move are cached.
+const tileCommands: Record<string, Map<number, string>> = {};
 let commandCount = 0;
 
 /**
@@ -26,28 +29,16 @@ export function toQRCodePathData({rects, tiles}: QRCodeDrawingLayer): string {
     const height = rects[index + 3]!;
     const dx = x - currentX;
     const dy = y - currentY;
-    const row = moves[dy];
-    let move = row?.[dx];
-    if (move === undefined) {
-      move = {data: `m${dx} ${dy}`};
-      if (row && Math.abs(dx) <= MAX_CACHED_DIMENSION && Number.isInteger(dx)) {
-        move.rectangles = [];
-        row[dx] = move;
-      }
-    }
-    let command = move.rectangles?.[height]?.[width];
+    const column = dx + MAX_CACHED_DIMENSION;
+    // Only 0 and 1 equal their squares.
+    const cached =
+      dy * dy === dy && small(column, 2 * MAX_CACHED_DIMENSION) && small(width) && small(height);
+    let command = cached ? commands[dy]![column]?.[height]?.[width] : undefined;
     if (command === undefined) {
-      command = `${move.data}h${width}v${height}h-${width}z`;
-      if (
-        move.rectangles &&
-        commandCount < MAX_CACHED_COMMANDS &&
-        width >>> 0 === width &&
-        height >>> 0 === height &&
-        width <= MAX_CACHED_DIMENSION &&
-        height <= MAX_CACHED_DIMENSION
-      ) {
-        (move.rectangles[height] ??= [])[width] = command;
-        commandCount++;
+      command = `m${dx} ${dy}h${width}v${height}h-${width}z`;
+      if (cached && commandCount++ < MAX_CACHED_COMMANDS) {
+        const byHeight = (commands[dy]![column] ||= []);
+        (byHeight[height] ||= [])[width] = command;
       }
     }
     path += command;
@@ -55,17 +46,28 @@ export function toQRCodePathData({rects, tiles}: QRCodeDrawingLayer): string {
     currentY = y;
   }
   for (const [tile, positions] of tiles) {
+    const moves = tileCommands[tile.data] || new Map<number, string>();
+    if (commandCount < MAX_CACHED_COMMANDS) tileCommands[tile.data] = moves;
     for (let index = 0; index < positions.length; index += 2) {
-      const x = positions[index]!;
-      const y = positions[index + 1]!;
-      const moveX = round(x - currentX);
-      const moveY = round(y - currentY);
-      path += `m${moveX} ${moveY}${tile.data}`;
+      // Moves keep six decimals, so their integer millionths make exact and fast keys.
+      const keyX = Math.round((positions[index]! - currentX) * 1_000_000);
+      const moveX = keyX / 1_000_000;
+      const moveY = round(positions[index + 1]! - currentY);
+      let command = moves.get(keyX);
+      if (moveY || command === undefined) {
+        command = `m${moveX} ${moveY}${tile.data}`;
+        if (!moveY && commandCount++ < MAX_CACHED_COMMANDS) moves.set(keyX, command);
+      }
+      path += command;
       currentX += moveX + tile.endX;
       currentY += moveY + tile.endY;
     }
   }
   return path;
+}
+
+function small(value: number, max = MAX_CACHED_DIMENSION): boolean {
+  return value >>> 0 === value && value <= max;
 }
 
 function round(value: number): number {

@@ -137,36 +137,68 @@ export function explainQRCode(options: QRCodeExplainOptions): QRCodeExplanation 
     format.family === 'micro' ? placements.length : Math.floor(placements.length / 8) * 8;
   const unmasked = unmaskModules(matrix, format);
   const toCodewordBit = createCodewordBitMapper(format);
-  const placementByIndex = new Map(
-    placements.map((index, placementBitIndex) => [index, placementBitIndex]),
-  );
-  const moduleGrid = Array.from({length: size}, (_, row) =>
-    Array.from({length: size}, (_, column): QRCodeExplainModule => {
+  const placementByIndex = new Int32Array(size * size).fill(-1);
+  for (let placementBitIndex = 0; placementBitIndex < placements.length; placementBitIndex++) {
+    placementByIndex[placements[placementBitIndex]!] = placementBitIndex;
+  }
+  const values = matrix.modules;
+  const moduleGrid: QRCodeExplainModule[][] = [];
+  const modules: QRCodeExplainModule[] = [];
+  const modulesByRole: Record<QRCodeExplainRole, QRCodeExplainModule[]> = {
+    functional: [],
+    encoded: [],
+    remainder: [],
+  };
+  // The literals keep one property order per role, so every module of a role shares one shape.
+  for (let row = 0; row < size; row++) {
+    const gridRow: QRCodeExplainModule[] = [];
+    const keyPrefix = `${String(row)}:`;
+    for (let column = 0; column < size; column++) {
       const index = row * size + column;
-      const value = matrix.modules[index] as QRCodeExplainModuleValue;
-      const placementBitIndex = placementByIndex.get(index);
-      if (placementBitIndex === undefined) {
-        return createModule(row, column, value, 'functional');
+      const key = keyPrefix + String(column);
+      const value = values[index] as QRCodeExplainModuleValue;
+      const placementBitIndex = placementByIndex[index]!;
+      let module: QRCodeExplainModule;
+      if (placementBitIndex < 0) {
+        module = {key, row, column, value, role: 'functional', groupId: 'functional'};
+        modulesByRole.functional.push(module);
+      } else if (placementBitIndex >= codewordBitCount) {
+        module = {
+          key,
+          row,
+          column,
+          value,
+          role: 'remainder',
+          groupId: 'remainder',
+          placementBitIndex,
+        };
+        modulesByRole.remainder.push(module);
+      } else {
+        const codewordBit = toCodewordBit(placementBitIndex);
+        module = {
+          key,
+          row,
+          column,
+          value,
+          role: 'encoded',
+          groupId: 'encoded',
+          sourceValue: unmasked[index] as QRCodeExplainModuleValue,
+          placementBitIndex,
+          codewordIndex: codewordBit >> 3,
+          codewordBitIndex: codewordBit & 7,
+        };
+        modulesByRole.encoded.push(module);
       }
-      if (placementBitIndex >= codewordBitCount) {
-        return {...createModule(row, column, value, 'remainder'), placementBitIndex};
-      }
-      const codewordBit = toCodewordBit(placementBitIndex);
-      return {
-        ...createModule(row, column, value, 'encoded'),
-        sourceValue: unmasked[index] as QRCodeExplainModuleValue,
-        placementBitIndex,
-        codewordIndex: codewordBit >> 3,
-        codewordBitIndex: codewordBit & 7,
-      };
-    }),
-  );
-  const modules = moduleGrid.flat();
+      gridRow.push(module);
+      modules.push(module);
+    }
+    moduleGrid.push(gridRow);
+  }
   return {
     matrix,
     modules,
     moduleGrid,
-    groups: createGroups(modules),
+    groups: createGroups(modulesByRole),
     symbol: format.family,
     version: format.version,
     mode: resolveMode(options, format, segmenterCalls, (bitCount) =>
@@ -298,17 +330,8 @@ function createTraceRequest(
   };
 }
 
-function createModule(
-  row: number,
-  column: number,
-  value: QRCodeExplainModuleValue,
-  role: QRCodeExplainRole,
-): QRCodeExplainModule {
-  return {key: `${row}:${column}`, row, column, value, role, groupId: role};
-}
-
 function createGroups(
-  modules: readonly QRCodeExplainModule[],
+  modulesByRole: Readonly<Record<QRCodeExplainRole, readonly QRCodeExplainModule[]>>,
 ): ReadonlyMap<string, QRCodeExplainGroup> {
   const groups = new Map<string, QRCodeExplainGroup>();
   for (const role of QR_CODE_EXPLAIN_ROLE_ORDER) {
@@ -317,7 +340,7 @@ function createGroups(
       ...details,
       id: role,
       role,
-      modules: modules.filter((module) => module.role === role),
+      modules: modulesByRole[role],
     });
   }
   groups.set('quiet-zone', {
