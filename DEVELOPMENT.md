@@ -139,15 +139,27 @@ pnpm turbo run report:speed:browser --filter=@repo/perf
   `/devtools/size` and `/devtools/speed`, next to the committed baseline in
   `packages/perf/baseline/`.
 
-CI runs `check:size`, which fails when a scenario grows by more than 1% (at least 64 bytes) gzip
-over the baseline or bundles a feature it does not use. To accept a change, update the baseline
-and commit it:
+Every PR receives an informational size report against `packages/perf/baseline/size.json` on
+`main`. The PR workflow builds the PR merged onto its target branch and measures every scenario
+with Vite, esbuild, and webpack where supported, plus published package sizes. It does not rebuild
+`main`. A separate trusted workflow compares the report with the committed baseline and updates
+one bot comment, including the baseline's source commit and measurement date. Growth does not fail
+a size budget in CI. Build or report failures appear in the comment with a link to the run logs.
+
+The **Update size baseline** workflow measures current `main` daily at 03:23 UTC and commits only
+the size baseline back to `main`. It can also be run manually on `main`. Its separate commit job
+needs permission to update that file under the repository's branch protection rules. If `main`
+changes during measurement, the update fails rather than committing an outdated result; rerun the
+workflow. Failed or delayed schedules leave the previous baseline in place. Existing PR comments
+refresh on their next measurement run, not automatically when the baseline changes.
+
+The committed baseline is also used by local reports and the docs. To update it locally:
 
 ```sh
 pnpm turbo run report:size --filter=@repo/perf -- --update-baseline
 ```
 
-Speed is not checked in CI, because shared runners are too noisy. Timings only compare with the
+Speed measurements run only on developer machines. Timings only compare with the
 baseline when they come from the same machine and runtime. To compare with another commit on any
 machine, build it and run both builds interleaved:
 
