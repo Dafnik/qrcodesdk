@@ -65,6 +65,8 @@ jobs:
   build:
     name: Build and package monorepo
     runs-on: ubuntu-latest
+    outputs:
+      playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -78,6 +80,13 @@ jobs:
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@760158c05c47e7a764f78e9a22ca3b5a6ed8c52e # v2.5.2
+
+      - name: Resolve Playwright image version
+        id: playwright-version
+        shell: bash
+        run: |
+          version=$(pnpm --filter @qrcodesdk/browser exec playwright --version)
+          echo "version=${version#Version }" >> "$GITHUB_OUTPUT"
 
       - name: Build everything
         run: pnpm turbo run build
@@ -320,6 +329,12 @@ jobs:
     name: Browser package on ${{ matrix.browser }}
     needs: build
     runs-on: ubuntu-latest
+    # WebKit's system dependency installation costs more than pulling the image.
+    # Resolve the image tag from the installed package to keep browsers in sync.
+    container: ${{ matrix.browser == 'webkit' && format('mcr.microsoft.com/playwright:v{0}-noble', needs.build.outputs.playwright-version) || '' }}
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -338,6 +353,7 @@ jobs:
           install-ignore-scripts: true
 
       - name: Setup Playwright
+        if: matrix.browser != 'webkit'
         uses: ./.github/actions/setup-playwright
         with:
           browsers: ${{ matrix.browser }}

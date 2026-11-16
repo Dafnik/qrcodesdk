@@ -8,8 +8,7 @@
     },
     "test:framework-runtime": {
       "cache": false,
-      "env": ["QRCODESDK_FRAMEWORK", "QRCODESDK_FRAMEWORK_VERSION", "QRCODESDK_PACKAGES"],
-      "passThroughEnv": ["PLAYWRIGHT_BROWSERS_PATH"]
+      "env": ["QRCODESDK_FRAMEWORK", "QRCODESDK_FRAMEWORK_VERSION", "QRCODESDK_PACKAGES"]
     },
     "update:runtime-fixtures": {
       "cache": false
