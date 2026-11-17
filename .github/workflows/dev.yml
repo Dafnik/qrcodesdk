@@ -471,6 +471,7 @@ jobs:
 
   native-ios:
     name: Native rendering on iOS
+    needs: build
     runs-on: macos-26
     timeout-minutes: 60
     steps:
@@ -482,6 +483,9 @@ jobs:
         uses: dafnik/setup-node-pnpm@18e728bc3a6d51ee4c93cfd96394aa6cc711b970 # v5
         with:
           install-ignore-scripts: true
+
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@760158c05c47e7a764f78e9a22ca3b5a6ed8c52e # v2.5.2
 
       - name: Setup Java for Maestro
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
@@ -509,6 +513,7 @@ jobs:
 
   native-android:
     name: Native rendering on Android
+    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -520,6 +525,9 @@ jobs:
         uses: dafnik/setup-node-pnpm@18e728bc3a6d51ee4c93cfd96394aa6cc711b970 # v5
         with:
           install-ignore-scripts: true
+
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@760158c05c47e7a764f78e9a22ca3b5a6ed8c52e # v2.5.2
 
       - name: Setup Java
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
