@@ -35,3 +35,8 @@ vite
 esbuild
 jridgewell
 hermesc
+Pressable
+xcrun
+simctl
+bootstatus
+udid

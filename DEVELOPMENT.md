@@ -67,6 +67,17 @@ Installed-package smoke tests have separate consumer and browser prerequisites. 
 The React Native smoke test bundles with Metro and runs in Hermes. See
 [the React Native runtime test guide](packages/react-native/runtime/README.md).
 
+For real iOS and Android rendering, use the [native example and simulator tests](apps/native-example/README.md).
+The Development workflow runs both platforms and checks QR payloads decoded from simulator screenshots:
+
+```sh
+pnpm turbo run native:tools --filter=native-example
+pnpm turbo run test:native:ios --filter=native-example
+pnpm turbo run test:native:android --filter=native-example
+```
+
+These tasks require native build tools and simulators. They run separately from `test` and `check`.
+
 ### Docs
 
 Run the documentation site locally:

@@ -1,0 +1,36 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "android": {"cache": false, "dependsOn": ["^build"], "interactive": true, "persistent": true},
+    "build": {"dependsOn": ["^build"], "outputs": ["dist/**"]},
+    "ios": {"cache": false, "dependsOn": ["^build"], "interactive": true, "persistent": true},
+    "native:boot:ios": {"cache": false},
+    "native:tools": {"cache": false},
+    "start": {"cache": false, "dependsOn": ["^build"], "interactive": true, "persistent": true},
+    "test": {"dependsOn": ["^build"]},
+    "test:native:android": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "passThroughEnv": [
+        "CI",
+        "JAVA_HOME",
+        "ANDROID_HOME",
+        "ANDROID_SDK_ROOT",
+        "ANDROID_SERIAL",
+        "MAESTRO_DRIVER_STARTUP_TIMEOUT",
+        "QRCODESDK_NATIVE_DEVICE"
+      ]
+    },
+    "test:native:ios": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "passThroughEnv": [
+        "CI",
+        "JAVA_HOME",
+        "MAESTRO_DRIVER_STARTUP_TIMEOUT",
+        "QRCODESDK_NATIVE_DEVICE",
+        "DEVELOPER_DIR"
+      ]
+    }
+  }
+}
