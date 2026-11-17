@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-16T16:21:12.572Z",
-  "commit": "0a71520e7a28",
-  "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "INTEL(R) XEON(R) PLATINUM 8573C", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
+  "generatedAt": "2026-11-17T11:59:54.169Z",
+  "commit": "03c9599760fb",
+  "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "AMD EPYC 9V74 80-Core Processor", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
     {"id": "matrix", "title": "Matrix generation"},
@@ -4961,6 +4961,6 @@
     {"name": "@qrcodesdk/vue", "version": "0.0.5", "packed": 11707, "unpacked": 49777, "files": 8},
     {"name": "@qrcodesdk/svelte", "version": "0.0.5", "packed": 11338, "unpacked": 42137, "files": 34},
     {"name": "@qrcodesdk/angular", "version": "0.0.5", "packed": 12288, "unpacked": 59157, "files": 7},
-    {"name": "@qrcodesdk/cli", "version": "0.0.5", "packed": 12358, "unpacked": 40378, "files": 6}
+    {"name": "@qrcodesdk/cli", "version": "0.0.5", "packed": 13339, "unpacked": 43799, "files": 6}
   ]
 }
