@@ -14,7 +14,8 @@
     "test:native:ios": "node scripts/test-native.mjs ios",
     "test:native:android": "node scripts/test-native.mjs android",
     "native:tools": "node scripts/install-maestro.mjs",
-    "native:boot:ios": "node scripts/boot-ios.mjs"
+    "native:boot:ios": "node scripts/boot-ios.mjs",
+    "native:cache:ios": "node scripts/prepare-ios-cache.mjs"
   },
   "dependencies": {
     "@qrcodesdk/react-native": "workspace:*",

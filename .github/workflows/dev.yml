@@ -474,6 +474,10 @@ jobs:
     needs: build
     runs-on: macos-26
     timeout-minutes: 60
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/apps/native-example/.tools/ccache
+      CCACHE_MAXSIZE: 500M
+      USE_CCACHE: '1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -493,6 +497,27 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Prepare iOS compiler cache
+        id: ios-cache
+        run: pnpm turbo run native:cache:ios --filter=native-example
+
+      - name: Cache native dependency downloads
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods/repos
+            ~/Library/Caches/ReactNative
+          key: native-ios-downloads-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.ios-cache.outputs.toolchain }}-${{ hashFiles('pnpm-lock.yaml', 'apps/native-example/app.json') }}
+
+      - name: Cache native compilation
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: apps/native-example/.tools/ccache
+          key: native-ios-compiler-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.ios-cache.outputs.toolchain }}-${{ hashFiles('pnpm-lock.yaml', 'apps/native-example/app.json') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            native-ios-compiler-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.ios-cache.outputs.toolchain }}-${{ hashFiles('pnpm-lock.yaml', 'apps/native-example/app.json') }}-
+
       - name: Install Maestro
         run: pnpm turbo run native:tools --filter=native-example
 
@@ -510,6 +535,10 @@ jobs:
           path: apps/native-example/artifacts/ios
           if-no-files-found: warn
           retention-days: 7
+
+      - name: Report compiler cache statistics
+        if: always() && steps.ios-cache.outcome == 'success'
+        run: pnpm turbo run native:cache:ios --filter=native-example -- --stats
 
   native-android:
     name: Native rendering on Android

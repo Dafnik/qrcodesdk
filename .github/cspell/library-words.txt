@@ -40,3 +40,9 @@ xcrun
 simctl
 bootstatus
 udid
+xcconfig
+archs
+iphonesimulator
+maxsize
+plutil
+lipo

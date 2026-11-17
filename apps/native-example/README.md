@@ -64,6 +64,23 @@ just because the surrounding QR code remains readable.
 Image export checks exercise all four raster refs. Tests need no Expo account, cloud build
 service, signing credentials, Metro server, or network image assets.
 
+The iOS release build targets only the host's simulator architecture, `arm64` on Apple silicon or
+`x86_64` on Intel. Its generated Xcode settings apply to the app, Pods, and nested framework builds.
+Before each build, Expo reapplies the native app configuration. JavaScript and assets are bundled
+for every build, and the test task always runs Maestro and screenshot decoding.
+
+To enable the optional compiler cache locally, prepare ccache with Homebrew installed:
+
+```sh
+pnpm turbo run native:cache:ios --filter=native-example
+USE_CCACHE=1 pnpm turbo run test:native:ios --filter=native-example
+pnpm turbo run native:cache:ios --filter=native-example -- --stats
+```
+
+`expo-build-properties` enables ccache when it is installed. `USE_CCACHE=1` also clears the counters
+before the automated build, so the reported statistics describe that run. `CCACHE_DIR` and
+`CCACHE_MAXSIZE` can configure its location and storage limit.
+
 To rerun the flow against an already installed app without rebuilding, append `-- --skip-build`.
 Reinstall after app or library changes before using this option. CI always builds the app.
 
@@ -89,3 +106,10 @@ The Development workflow runs the same native tasks on an iPhone simulator on ma
 API 35 emulator on Linux for pull requests and pushes to `main` and `develop`. Both jobs are part
 of the existing `required` gate. They upload screenshots and reports even when tests fail, with
 seven-day retention. Native tasks disable Turbo caching so a cached result never skips a device run.
+
+The iOS job caches CocoaPods downloads and metadata, React Native and Hermes downloads, and a
+separate 500 MB ccache directory. Keys include the runner OS and architecture, Xcode and ccache
+versions, dependency lockfile, and native app configuration. The compiler cache restores the latest
+matching entry and saves a new entry per run so newly compiled objects remain available. CI reports
+cache statistics after testing. The final app binary and simulator test results are always rebuilt
+and checked.

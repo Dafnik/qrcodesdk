@@ -5,6 +5,10 @@
     "build": {"dependsOn": ["^build"], "outputs": ["dist/**"]},
     "ios": {"cache": false, "dependsOn": ["^build"], "interactive": true, "persistent": true},
     "native:boot:ios": {"cache": false},
+    "native:cache:ios": {
+      "cache": false,
+      "passThroughEnv": ["CCACHE_DIR", "CCACHE_MAXSIZE", "GITHUB_OUTPUT", "DEVELOPER_DIR"]
+    },
     "native:tools": {"cache": false},
     "start": {"cache": false, "dependsOn": ["^build"], "interactive": true, "persistent": true},
     "test": {"dependsOn": ["^build"]},
@@ -25,6 +29,9 @@
       "cache": false,
       "dependsOn": ["^build"],
       "passThroughEnv": [
+        "CCACHE_DIR",
+        "CCACHE_MAXSIZE",
+        "USE_CCACHE",
         "CI",
         "JAVA_HOME",
         "MAESTRO_DRIVER_STARTUP_TIMEOUT",
