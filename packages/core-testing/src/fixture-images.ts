@@ -1,3 +1,5 @@
+import {SQUARE_LOGO, WIDE_LOGO} from './fixture-logo-images';
+
 /** Deterministic RGBA pixels for center-image fixtures. */
 export type QRCodeFixtureImage = {
   readonly name: string;
@@ -28,6 +30,19 @@ export const LOGO_IMAGE = createImage('logo', 32, 32, (x, y) => {
   if ((x >= 13 && x <= 18) || (y >= 13 && y <= 18)) return [255, 255, 255, 255];
   return [220, 38, 38, 255];
 });
+
+function logoImage(name: string, logo: typeof SQUARE_LOGO | typeof WIDE_LOGO): QRCodeFixtureImage {
+  return createImage(name, logo.width, logo.height, (x, y) => {
+    const index = Number.parseInt(logo.rows[y]![x]!, 16);
+    return logo.palette[index]!;
+  });
+}
+
+/** The square QRCodeSDK brand asset, shared by SVG, raster, and canvas renderers. */
+export const QRCODESDK_LOGO_IMAGE = logoImage('qrcodesdk-logo-square', SQUARE_LOGO);
+
+/** The landscape QRCodeSDK brand asset at its original 5:2 aspect ratio. */
+export const QRCODESDK_WIDE_LOGO_IMAGE = logoImage('qrcodesdk-logo-wide', WIDE_LOGO);
 
 /** A landscape image with vertical stripes, centered vertically inside the square box. */
 export const WIDE_IMAGE = createImage('wide', 48, 16, (x) =>

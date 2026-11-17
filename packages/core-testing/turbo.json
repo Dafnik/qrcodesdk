@@ -5,8 +5,12 @@
       "inputs": [
         "$TURBO_EXTENDS$",
         "!scripts/verify-package-artifact.mjs",
-        "!scripts/generate-rmqr-fixtures.mjs"
+        "!scripts/generate-rmqr-fixtures.mjs",
+        "!scripts/generate-fixture-logos.mjs"
       ]
+    },
+    "generate:fixture-logos": {
+      "cache": false
     },
     "generate:rmqr-fixtures": {
       "cache": false
