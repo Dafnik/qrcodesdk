@@ -107,12 +107,7 @@ test('core exports style factories, internal drawing helpers, and encoders', asy
   assert.equal(typeof webp.ɵencodeWebP, 'function');
   const raster = await importTarget(packageJson.exports['./internal/raster']);
   const zlib = await importTarget(packageJson.exports['./internal/zlib']);
-  for (const name of [
-    'ɵcreateRasterCenterImage',
-    'ɵcreateRGBARenderer',
-    'ɵdecodePNG',
-    'ɵencodePNG',
-  ]) {
+  for (const name of ['ɵcreateRasterCenterImage', 'ɵcreateRGBARenderer', 'ɵencodePNG']) {
     assert.equal(typeof raster[name], 'function');
   }
   assert.equal(typeof zlib.ɵzlibDeflate, 'function');

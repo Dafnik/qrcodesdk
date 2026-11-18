@@ -25,18 +25,18 @@ A center image covers some of the encoded modules. To keep the code readable:
 
 - Install the package for your output. See [Choose your setup](/getting-started/choose-your-setup/).
 - Load the image yourself. QRCodeSDK does not fetch URLs or read files.
-  - SVG output takes an embedded `data:image/...` URL.
+  - Core SVG output takes an embedded `data:image/...` URL.
   - Node.js output takes PNG bytes as a `Uint8Array` or `Buffer`.
   - Browser output takes a same-origin or CORS-enabled image.
-  - React Native SVG output also takes bundled assets and `{uri}` sources, which react-native-svg
-    loads.
+  - React Native SVG output takes a raster image in a bundled asset, `{uri}` source, or embedded
+    raster data URL.
 - Prefer a simple logo with a transparent or solid background. Photos and fine detail are hard to
   recognize at this size.
 
 ## Configure the center image
 
-Create the center image with the factory for your output. This example embeds a small SVG logo as a
-data URL:
+Create the center image with the factory for your output. This core SVG example embeds a small SVG
+logo as a data URL:
 
 ```ts
 import {type QRCodeDataImageURL, QRCodeSVGRenderer, qrcode, svgCenterImage} from '@qrcodesdk/core';
@@ -322,8 +322,9 @@ export class QRCodeWithLogo {
 
 `@qrcodesdk/react-native` cannot load browser images. Its components take their own factories:
 
-- `QRCodeSVG` takes `svgCenterImage()` with a bundled asset, such as `require('./logo.png')`, a
-  `{uri}` object, or an embedded data URL.
+- `QRCodeSVG` takes `svgCenterImage()` with a raster image supported by the native image loader.
+  Pass a bundled asset such as `require('./logo.png')`, a `{uri}` object, or an embedded raster data
+  URL. An embedded SVG data URL throws `INVALID_IMAGE_SOURCE`.
 - The PNG, WebP, GIF, and JPEG components take `rasterCenterImage()` with PNG bytes, like Node.js
   output.
 

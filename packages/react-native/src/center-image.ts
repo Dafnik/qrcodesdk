@@ -33,9 +33,11 @@ export const svgCenterImages = createCenterImageStore<{
 }>();
 export const rasterCenterImages = createCenterImageStore<RasterCenterImageRenderer>();
 
+const SVG_DATA_URL = /^data:image\/svg\+xml(?:[;,]|$)/i;
+
 /**
- * Creates a center image for `QRCodeSVG` from an image source, such as `require('./logo.png')`,
- * `{uri: 'https://…'}`, or an embedded `data:image` URL. react-native-svg loads the image.
+ * Creates a center image for `QRCodeSVG` from a raster image source, such as `require('./logo.png')`,
+ * `{uri: 'https://…'}`, or an embedded PNG data URL. react-native-svg loads the image.
  */
 export function svgCenterImage(
   source: number | ImageURISource | QRCodeDataImageURL,
@@ -44,7 +46,7 @@ export function svgCenterImage(
   if (!isImageSource(source)) {
     throw new QRCodeError(
       'INVALID_IMAGE_SOURCE',
-      'QR code SVG image source must be an image source or an embedded data:image URL',
+      'QR code SVG center image requires a raster image source or an embedded raster image data URL',
       {details: {source}},
     );
   }
@@ -66,17 +68,11 @@ export function rasterCenterImage(
 }
 
 function isImageSource(source: unknown): boolean {
-  if (typeof source === 'string') return source.startsWith('data:image/');
+  if (typeof source === 'string')
+    return source.startsWith('data:image/') && !SVG_DATA_URL.test(source);
   // Bundled assets from require() are numeric asset IDs.
   if (typeof source === 'number') return true;
-  if (Array.isArray(source)) return false;
-  return isURISource(source);
-}
-
-function isURISource(source: unknown): boolean {
-  return (
-    typeof source === 'object' &&
-    source !== null &&
-    typeof (source as {uri?: unknown}).uri === 'string'
-  );
+  if (typeof source !== 'object' || source === null || Array.isArray(source)) return false;
+  const uri = (source as {uri?: unknown}).uri;
+  return typeof uri === 'string' && !SVG_DATA_URL.test(uri.trim());
 }

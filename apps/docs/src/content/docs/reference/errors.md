@@ -260,13 +260,14 @@ A center-image source cannot be used.
 
 | Thrown by                                      | When                                                                                       | `details` / `cause`                         |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------- |
-| `svgCenterImage()`                             | The source is not an embedded `data:image/...` URL                                         | `details.source` holds the rejected value   |
+| Core `svgCenterImage()`                        | The source is not an embedded `data:image/...` URL                                         | `details.source` holds the rejected value   |
+| React Native `svgCenterImage()`                | The source has an invalid shape or uses an embedded SVG data URL                           | `details.source` holds the rejected value   |
 | `rasterCenterImage()`                          | The bytes are not a valid PNG, exceed 16 MiB, or exceed 16,777,216 pixels (width × height) | `cause` holds the decoder error for bad PNG |
 | Canvas and Image renderers, during `.render()` | The `canvasCenterImage()` source is not loaded yet or has no positive intrinsic size       | `{}`                                        |
 
-**Fix:** Embed SVG center images as data URLs, pass valid PNG bytes to `rasterCenterImage()`, and
-wait for browser images to load before rendering. See
-[Add a center image](/guides/center-images/).
+**Fix:** Use a data URL for core SVG output and a supported raster image for React Native SVG
+output. Pass valid PNG bytes to `rasterCenterImage()`. Wait for browser images to load before
+rendering. See [Add a center image](/guides/center-images/).
 
 ### RENDER_FAILED
 

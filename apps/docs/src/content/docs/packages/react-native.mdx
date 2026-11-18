@@ -100,8 +100,9 @@ Use `QRCodeSVG` or `QRCodePNG` if you do not need GIF or WebP.
 
 ## Center images
 
-`QRCodeSVG` takes `svgCenterImage()`. Its source can be a bundled asset, a `{uri}` object, or an
-embedded `data:image` URL. react-native-svg loads it.
+`QRCodeSVG` takes `svgCenterImage()` with a raster image supported by the native image loader. Pass a
+bundled asset, a `{uri}` object, or an embedded raster data URL such as `data:image/png;base64,...`.
+An embedded SVG data URL throws `INVALID_IMAGE_SOURCE`.
 
 ```tsx
 import {QRCodeSVG, type QRCodeSVGOptions, svgCenterImage} from '@qrcodesdk/react-native';

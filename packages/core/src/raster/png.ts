@@ -1,4 +1,4 @@
-import type {RGBAImage} from './types';
+import {type RGBAImage, pixelWords as viewPixelWords} from './types';
 
 /** Compresses filtered PNG rows into a zlib stream. */
 export type Deflate = (data: Uint8Array) => Uint8Array;
@@ -15,6 +15,13 @@ export type DecodedImage = {
 export const MAX_PNG_PIXELS = 16_777_216;
 
 const SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+const BIT_DEPTHS_BY_COLOR_TYPE: Readonly<Partial<Record<number, readonly number[]>>> = {
+  0: [1, 2, 4, 8, 16],
+  2: [8, 16],
+  3: [1, 2, 4, 8],
+  4: [8, 16],
+  6: [8, 16],
+};
 // Adam7 passes as [x start, y start, x step, y step].
 const PASSES: readonly (readonly [number, number, number, number])[] = [
   [0, 0, 8, 8],
@@ -37,10 +44,10 @@ const pixelWords = new Int32Array(8);
 const pixelBytes = new Uint8Array(pixelWords.buffer);
 
 /** Encodes 8-bit RGBA pixels with adaptive per-row filtering. */
-export function encodePNG({width, height, data}: RGBAImage, deflate: Deflate): Uint8Array {
+export function encodePNG(image: RGBAImage, deflate: Deflate): Uint8Array {
+  const {width, height, data} = image;
   const byteWidth = width * 4;
-  // Pixels are compared as 32-bit words. The renderer allocates them aligned.
-  const words = new Int32Array(data.buffer, data.byteOffset, width * height);
+  const {words} = viewPixelWords(image);
   // The row above the first row reads as zeros.
   const zeros = new Int32Array(width);
   // The row filtered with Sub, Up, Average, and Paeth.
@@ -113,8 +120,7 @@ export function decodePNG(source: Uint8Array, inflate: Inflate): DecodedImage {
       colorType = data[9]!;
       interlaced = data[12] === 1;
       if (
-        ![1, 2, 4, 8, 16].includes(depth) ||
-        ![0, 2, 3, 4, 6].includes(colorType) ||
+        !BIT_DEPTHS_BY_COLOR_TYPE[colorType]?.includes(depth) ||
         data[10] !== 0 ||
         data[11] !== 0 ||
         data[12]! > 1

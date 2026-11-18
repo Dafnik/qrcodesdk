@@ -154,6 +154,14 @@ describe('PNG allocation limits', () => {
 });
 
 describe('PNG codec', () => {
+  test.each([
+    {colorType: 2, depth: 1},
+    {colorType: 3, depth: 16},
+  ])('rejects color type $colorType at $depth bits', ({colorType, depth}) => {
+    const source = createPNG({width: 1, height: 1, colorType, depth, interlaced: false, seed: 1});
+    expect(() => decodeWith(source, nodeInflate)).toThrow('Unsupported PNG header');
+  });
+
   test.each(
     FORMATS.flatMap((format) => [
       {...format, interlaced: false},
@@ -215,6 +223,14 @@ describe('PNG codec', () => {
     const encoded = Buffer.from(encodePNG(image, deflate));
     expect(decodePNG(encoded).data.equals(image.data)).toBe(true);
     expect((await decodeReference(encoded)).equals(image.data)).toBe(true);
+  });
+
+  test('encodes RGBA pixels from an unaligned byte view', () => {
+    const pixels = randomBytes(3 * 2 * 4, 42);
+    const data = new Uint8Array(pixels.length + 1).subarray(1);
+    data.set(pixels);
+    const encoded = Buffer.from(encodePNG({width: 3, height: 2, data}, zlibDeflate));
+    expect(decodePNG(encoded).data.equals(pixels)).toBe(true);
   });
 
   test('keeps encoded output stable', () => {
