@@ -1,13 +1,9 @@
-import {execFileSync} from 'node:child_process';
 import process from 'node:process';
-import {pathToFileURL} from 'node:url';
 
-import {run} from './process.mjs';
+import {read, run} from './process.mjs';
 
 export function bootIOS() {
-  const {devices} = JSON.parse(
-    execFileSync('xcrun', ['simctl', 'list', 'devices', 'available', '--json'], {encoding: 'utf8'}),
-  );
+  const {devices} = JSON.parse(read('xcrun', ['simctl', 'list', 'devices', 'available', '--json']));
   const phones = Object.values(devices)
     .flat()
     .filter((device) => device.name.startsWith('iPhone'));
@@ -23,5 +19,3 @@ export function bootIOS() {
   run('xcrun', ['simctl', 'bootstatus', device.udid, '-b']);
   return device.udid;
 }
-
-if (import.meta.url === pathToFileURL(process.argv[1]).href) bootIOS();

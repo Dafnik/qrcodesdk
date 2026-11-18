@@ -510,13 +510,17 @@ jobs:
             ~/Library/Caches/ReactNative
           key: native-ios-downloads-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.ios-cache.outputs.toolchain }}-${{ hashFiles('pnpm-lock.yaml', 'apps/native-example/app.json') }}
 
-      - name: Cache native compilation
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+      # ccache looks objects up by content, so any entry for the same toolchain is safe to restore.
+      # Prefer one built from the same dependencies, then fall back to the latest for the toolchain.
+      - name: Restore native compilation cache
+        id: compiler-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: apps/native-example/.tools/ccache
           key: native-ios-compiler-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.ios-cache.outputs.toolchain }}-${{ hashFiles('pnpm-lock.yaml', 'apps/native-example/app.json') }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             native-ios-compiler-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.ios-cache.outputs.toolchain }}-${{ hashFiles('pnpm-lock.yaml', 'apps/native-example/app.json') }}-
+            native-ios-compiler-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.ios-cache.outputs.toolchain }}-
 
       - name: Install Maestro
         run: pnpm turbo run native:tools --filter=native-example
@@ -539,6 +543,15 @@ jobs:
       - name: Report compiler cache statistics
         if: always() && steps.ios-cache.outcome == 'success'
         run: pnpm turbo run native:cache:ios --filter=native-example -- --stats
+
+      # Each entry can hold up to 500 MB. Only pushes to main and develop save one, so pull request
+      # runs cannot evict other caches. Pull requests restore entries saved by their base branch.
+      - name: Save native compilation cache
+        if: always() && github.event_name == 'push' && steps.compiler-cache.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: apps/native-example/.tools/ccache
+          key: ${{ steps.compiler-cache.outputs.cache-primary-key }}
 
   native-android:
     name: Native rendering on Android

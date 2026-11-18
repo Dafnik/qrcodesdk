@@ -2,9 +2,8 @@
   "extends": ["//"],
   "tasks": {
     "android": {"cache": false, "dependsOn": ["^build"], "interactive": true, "persistent": true},
-    "build": {"dependsOn": ["^build"], "outputs": ["dist/**"]},
+    "generate:center-logo": {"cache": false},
     "ios": {"cache": false, "dependsOn": ["^build"], "interactive": true, "persistent": true},
-    "native:boot:ios": {"cache": false},
     "native:cache:ios": {
       "cache": false,
       "passThroughEnv": ["CCACHE_DIR", "CCACHE_MAXSIZE", "GITHUB_OUTPUT", "DEVELOPER_DIR"]
@@ -33,6 +32,7 @@
         "CCACHE_MAXSIZE",
         "USE_CCACHE",
         "CI",
+        "PATH",
         "JAVA_HOME",
         "MAESTRO_DRIVER_STARTUP_TIMEOUT",
         "QRCODESDK_NATIVE_DEVICE",

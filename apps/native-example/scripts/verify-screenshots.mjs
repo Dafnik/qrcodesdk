@@ -64,11 +64,9 @@ export async function verifyScreenshots(directory, cases = screenshotCases) {
       1,
       `Expected exactly one screenshot for ${fixture.screenshot}, found ${matches.length}`,
     );
-    const result = await verifyScreenshot(
-      path.join(directory, matches[0]),
-      fixture.payload,
-      fixture,
-    );
+    const result = await verifyScreenshot(path.join(directory, matches[0]), fixture.payload, {
+      logo: fixture.logo,
+    });
     results.push({screenshot: matches[0], ...result});
   }
   return results;

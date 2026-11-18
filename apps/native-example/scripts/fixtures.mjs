@@ -1,15 +1,38 @@
 import {readFile} from 'node:fs/promises';
 
-export const fixtures = JSON.parse(
+const {cases, update} = JSON.parse(
   await readFile(new URL('../fixtures.json', import.meta.url), 'utf8'),
 );
+
+/** Every case the app can render, in the order of its controls. */
+export const fixtures = cases;
+const updated = fixtures.find((fixture) => fixture.id === update.case);
+/** The case whose payload the flow changes after its first render. */
+export const updatedFixture = {...updated, payload: updated.payload + update.suffix};
+
+const isImage = (fixture) => fixture.format !== 'svg';
+
+/** Every screenshot the flow takes, in order, with the payload it must decode to. */
 export const screenshotCases = [
-  ...fixtures.map((fixture) => ({...fixture, screenshot: fixture.id})),
-  {
-    ...fixtures.find((fixture) => fixture.id === 'png'),
-    screenshot: 'png-updated',
-    payload: fixtures.find((fixture) => fixture.id === 'png').payload + '?updated=1',
-  },
+  ...fixtures.flatMap((fixture) => [
+    {...fixture, screenshot: fixture.id},
+    // Image components also show the bytes returned by toDataURL(), so the export decodes too.
+    ...(isImage(fixture) ? [{...fixture, screenshot: `${fixture.id}-export`}] : []),
+  ]),
+  {...updatedFixture, screenshot: `${updatedFixture.id}-updated`},
+];
+
+const scrollTo = (id, direction) => [
+  '- scrollUntilVisible:',
+  `    element: {id: ${JSON.stringify(id)}}`,
+  `    direction: ${direction}`,
+];
+const screenshot = (caption, name) => [
+  '- assertVisible:',
+  '    id: fixture-name',
+  `    text: ${JSON.stringify(caption)}`,
+  '- waitForAnimationToEnd',
+  `- takeScreenshot: ${name}`,
 ];
 
 /** Generate the Maestro flow from the same fixture list the app renders. */
@@ -22,46 +45,27 @@ export function createFlow() {
   ];
   for (const fixture of fixtures) {
     lines.push(
-      '- scrollUntilVisible:',
-      `    element: {id: "select-${fixture.id}"}`,
-      '    direction: UP',
-      `- tapOn: {id: "select-${fixture.id}"}`,
-      '- assertVisible:',
-      `    id: fixture-name`,
-      `    text: ${JSON.stringify(fixture.label)}`,
-      '- waitForAnimationToEnd',
-      `- takeScreenshot: ${fixture.id}`,
+      ...scrollTo(`select-${fixture.id}`, 'UP'),
+      `- tapOn: {id: ${JSON.stringify(`select-${fixture.id}`)}}`,
+      ...screenshot(fixture.label, fixture.id),
     );
-    if (fixture.format !== 'svg') {
+    if (isImage(fixture)) {
       lines.push(
-        '- scrollUntilVisible:',
-        '    element: {id: export-image}',
-        '    direction: DOWN',
+        ...scrollTo('export-image', 'DOWN'),
         '- tapOn: {id: export-image}',
-        '- scrollUntilVisible:',
-        '    element: {id: export-success}',
-        '    direction: DOWN',
-        '- assertVisible: {id: export-success}',
+        // The preview replaces the live component with the exported data URL.
+        ...scrollTo('exported-image', 'UP'),
+        ...screenshot(`${fixture.label} exported`, `${fixture.id}-export`),
       );
     }
   }
   lines.push(
-    '- scrollUntilVisible:',
-    '    element: {id: select-png}',
-    '    direction: UP',
-    '- tapOn: {id: select-png}',
-    '- scrollUntilVisible:',
-    '    element: {id: update-payload}',
-    '    direction: DOWN',
+    ...scrollTo(`select-${updatedFixture.id}`, 'UP'),
+    `- tapOn: {id: ${JSON.stringify(`select-${updatedFixture.id}`)}}`,
+    ...scrollTo('update-payload', 'DOWN'),
     '- tapOn: {id: update-payload}',
-    '- assertVisible:',
-    '    id: fixture-name',
-    '    text: PNG updated',
-    '- scrollUntilVisible:',
-    '    element: {id: select-png}',
-    '    direction: UP',
-    '- waitForAnimationToEnd',
-    '- takeScreenshot: png-updated',
+    ...scrollTo(`select-${updatedFixture.id}`, 'UP'),
+    ...screenshot(`${updatedFixture.label} updated`, `${updatedFixture.id}-updated`),
   );
   return lines.join('\n') + '\n';
 }

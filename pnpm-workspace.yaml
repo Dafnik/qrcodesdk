@@ -37,6 +37,8 @@ catalog:
   qrcode-generator: 2.0.4
   react: 19.3.1
   react-dom: 19.3.1
+  react-native: 0.88.1
+  react-native-svg: 15.16.1
   vue: 3.5.44
   zxing-wasm: 3.1.6
   sharp: 0.35.5
@@ -76,11 +78,3 @@ patchedDependencies:
 
 overrides:
   '@phenomnomnominal/tsquery@6.2.0>typescript': 'npm:typescript@6.0.3'
-
-minimumReleaseAgeExclude:
-  - '@expo/cli@58.1.21'
-  - '@expo/metro-config@58.0.23'
-  - '@expo/router-server@58.0.23'
-  - babel-preset-expo@58.0.26
-  - expo-file-system@58.0.14
-  - expo@58.0.26

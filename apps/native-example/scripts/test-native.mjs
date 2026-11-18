@@ -1,4 +1,4 @@
-import {execFileSync} from 'node:child_process';
+import {existsSync} from 'node:fs';
 import {mkdir, readdir, rm, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -6,21 +6,23 @@ import {fileURLToPath} from 'node:url';
 
 import {bootIOS} from './boot-ios.mjs';
 import {createFlow} from './fixtures.mjs';
-import {run} from './process.mjs';
+import {minute, read, run} from './process.mjs';
+import {ccache, maestro} from './tools.mjs';
 import {verifyScreenshots} from './verify-screenshots.mjs';
 
 const platform = process.argv[2];
 if (!['ios', 'android'].includes(platform)) throw new Error('Expected ios or android');
 const root = fileURLToPath(new URL('../', import.meta.url));
 const artifacts = path.join(root, 'artifacts', platform);
-const maestro = path.join(root, '.tools/maestro/bin/maestro');
 const expo = path.join(root, 'node_modules/.bin/expo');
+// A cold release build compiles React Native and every pod from source.
+const buildTimeout = 45 * minute;
 run(maestro, ['--version']);
 let device = process.env.QRCODESDK_NATIVE_DEVICE;
 if (platform === 'ios') {
   device = bootIOS();
 } else {
-  const devices = execFileSync('adb', ['devices'], {encoding: 'utf8'})
+  const devices = read('adb', ['devices'])
     .split('\n')
     .filter((line) => /^emulator-\d+\s+device$/.test(line))
     .map((line) => line.split(/\s+/)[0]);
@@ -50,10 +52,14 @@ if (!process.argv.includes('--skip-build')) {
     await writeFile(settings, `ARCHS[sdk=iphonesimulator*] = ${architecture}\n`);
     const buildOptions = {cwd: root, env: {...process.env, XCODE_XCCONFIG_FILE: settings}};
     if (process.env.USE_CCACHE === '1') {
-      // Compiler tool invocations need this in their inherited environment too. A user-defined
-      // Xcode build setting alone is not exported to every compiler invocation.
-      buildOptions.env.CCACHE_BINARY = execFileSync('which', ['ccache'], {encoding: 'utf8'}).trim();
-      run('ccache', ['--zero-stats']);
+      if (!existsSync(ccache))
+        throw new Error('Install the pinned compiler cache first with the native:cache:ios task.');
+      // CocoaPods enables ccache only when it is on PATH. Compiler tool invocations also need
+      // CCACHE_BINARY in their inherited environment; a user-defined Xcode build setting alone is
+      // not exported to every compiler invocation.
+      buildOptions.env.PATH = `${path.dirname(ccache)}${path.delimiter}${process.env.PATH}`;
+      buildOptions.env.CCACHE_BINARY = ccache;
+      run(ccache, ['--zero-stats']);
     }
     // Apply app.json native settings to existing projects too, including ccacheEnabled.
     run(expo, ['prebuild', '--platform', 'ios', '--no-install'], buildOptions);
@@ -69,20 +75,21 @@ if (!process.argv.includes('--skip-build')) {
         '--output',
         output,
       ],
-      buildOptions,
+      {...buildOptions, timeout: buildTimeout},
     );
     const apps = (await readdir(output)).filter((file) => file.endsWith('.app'));
     if (apps.length !== 1)
       throw new Error(`Expected one iOS app in ${output}, found ${apps.length}`);
     const binary = path.join(output, apps[0]);
-    const executable = execFileSync(
-      'plutil',
-      ['-extract', 'CFBundleExecutable', 'raw', '-o', '-', path.join(binary, 'Info.plist')],
-      {encoding: 'utf8'},
-    ).trim();
-    const builtArchitecture = execFileSync('lipo', ['-archs', path.join(binary, executable)], {
-      encoding: 'utf8',
-    }).trim();
+    const executable = read('plutil', [
+      '-extract',
+      'CFBundleExecutable',
+      'raw',
+      '-o',
+      '-',
+      path.join(binary, 'Info.plist'),
+    ]);
+    const builtArchitecture = read('lipo', ['-archs', path.join(binary, executable)]);
     if (builtArchitecture !== architecture)
       throw new Error(`Expected only ${architecture}, built ${builtArchitecture}`);
     process.stdout.write(`Built iOS simulator app for ${builtArchitecture}.\n`);
@@ -90,6 +97,7 @@ if (!process.argv.includes('--skip-build')) {
   } else {
     run(expo, ['run:android', '--device', device, '--variant', 'release', '--no-bundler'], {
       cwd: root,
+      timeout: buildTimeout,
     });
   }
 }
@@ -111,7 +119,7 @@ run(
     path.join(artifacts, 'junit.xml'),
     flow,
   ],
-  {cwd: root},
+  {cwd: root, timeout: 20 * minute},
 );
 const results = await verifyScreenshots(artifacts);
 await writeFile(path.join(artifacts, 'decoded.json'), JSON.stringify(results, null, 2) + '\n');

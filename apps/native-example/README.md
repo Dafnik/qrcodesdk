@@ -1,8 +1,18 @@
 # React Native example and simulator tests
 
 This Expo app renders the local `@qrcodesdk/react-native` package with real native views. It
-includes SVG, PNG, WebP, GIF, JPEG, rounded modules, and a bundled QRCodeSDK logo as a center image. The controls
-also exercise payload updates and the image components' `toDataURL()` refs.
+includes SVG, PNG, WebP, GIF, JPEG, and rounded modules. Every format also renders with the
+QRCodeSDK logo as a center image. The controls also exercise payload updates and the image
+components' `toDataURL()` refs.
+
+The cases come from `fixtures.json`, which the app, the generated Maestro flow, and the screenshot
+verifier share. SVG uses the bundled logo asset. The image components need PNG bytes, so
+`center-logo.ts` embeds a 128 px copy of the same logo. A unit test fails when it no longer matches
+the asset. After changing the logo, regenerate it:
+
+```sh
+pnpm turbo run generate:center-logo --filter=native-example
+```
 
 Run every command below from the workspace root. Install workspace dependencies with `pnpm install`
 first. Expo SDK 58 uses React Native 0.88.1. Keep the app's React and native dependencies aligned
@@ -58,18 +68,24 @@ serial explicitly, set `QRCODESDK_NATIVE_DEVICE` on the command. Android also ac
 The task installs a release build with embedded JavaScript, runs a generated Maestro flow, then
 decodes every screenshot with the repository's ZXing decoder. It fails for missing screenshots,
 unreadable codes, or incorrect payloads, including stale rendering after a payload update.
-The decoder scans multiple symbols because the logo contains its own QR code. The center-image
-screenshot must also contain the logo's yellow color, so an unloaded logo cannot pass
+The decoder scans multiple symbols because the logo contains its own QR code. Center-image
+screenshots must also contain the logo's yellow color, so an unloaded logo cannot pass
 just because the surrounding QR code remains readable.
-Image export checks exercise all four raster refs. Tests need no Expo account, cloud build
-service, signing credentials, Metro server, or network image assets.
+For each image component, the app then replaces the live component with an `Image` of the data URL
+returned by `toDataURL()`. That screenshot must decode to the same payload, so the exported bytes
+are checked as well as their MIME type. Tests need no Expo account, cloud build service, signing
+credentials, Metro server, or network image assets.
+
+Every command has a deadline: 45 minutes for native builds, 20 minutes for the Maestro flow, and
+10 minutes or less for other steps. A hung simulator, emulator, or build fails the task.
 
 The iOS release build targets only the host's simulator architecture, `arm64` on Apple silicon or
 `x86_64` on Intel. Its generated Xcode settings apply to the app, Pods, and nested framework builds.
 Before each build, Expo reapplies the native app configuration. JavaScript and assets are bundled
 for every build, and the test task always runs Maestro and screenshot decoding.
 
-To enable the optional compiler cache locally, prepare ccache with Homebrew installed:
+To enable the optional compiler cache locally, install the pinned ccache release. The task
+verifies its SHA-256 checksum and installs it into the app's ignored `.tools/bin` directory:
 
 ```sh
 pnpm turbo run native:cache:ios --filter=native-example
@@ -77,8 +93,9 @@ USE_CCACHE=1 pnpm turbo run test:native:ios --filter=native-example
 pnpm turbo run native:cache:ios --filter=native-example -- --stats
 ```
 
-`expo-build-properties` enables ccache when it is installed. `USE_CCACHE=1` also clears the counters
-before the automated build, so the reported statistics describe that run. `CCACHE_DIR` and
+`expo-build-properties` enables ccache when it is on `PATH`. `USE_CCACHE=1` puts the pinned binary
+on `PATH` for the build and clears the counters first, so the reported statistics describe that
+run. `CCACHE_DIR` and
 `CCACHE_MAXSIZE` can configure its location and storage limit.
 
 To rerun the flow against an already installed app without rebuilding, append `-- --skip-build`.
@@ -110,6 +127,8 @@ seven-day retention. Native tasks disable Turbo caching so a cached result never
 The iOS job caches CocoaPods downloads and metadata, React Native and Hermes downloads, and a
 separate 500 MB ccache directory. Keys include the runner OS and architecture, Xcode and ccache
 versions, dependency lockfile, and native app configuration. The compiler cache restores the latest
-matching entry and saves a new entry per run so newly compiled objects remain available. CI reports
-cache statistics after testing. The final app binary and simulator test results are always rebuilt
-and checked.
+entry for the same dependencies, or else the latest for the same toolchain. ccache finds objects by
+content, so an older entry cannot produce stale objects. Only pushes to `main` and `develop` save a
+new entry, so pull request runs cannot evict other caches. Pull requests restore their base branch's
+entries. CI reports cache statistics after testing. The final app binary and simulator test results
+are always rebuilt and checked.
