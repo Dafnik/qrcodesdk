@@ -8,3 +8,8 @@ PLAN.md
 /packages/perf/baseline/
 /packages/perf/.cache/
 /packages/perf/reports/
+/apps/native-example/.expo/
+/apps/native-example/.tools/
+/apps/native-example/artifacts/
+/apps/native-example/android/
+/apps/native-example/ios/

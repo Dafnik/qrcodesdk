@@ -1,0 +1,62 @@
+{
+  "cases": [
+    {"format": "svg", "id": "svg", "label": "SVG", "payload": "https://qrcodesdk.dev/native/svg"},
+    {"format": "png", "id": "png", "label": "PNG", "payload": "https://qrcodesdk.dev/native/png"},
+    {
+      "format": "webp",
+      "id": "webp",
+      "label": "WebP",
+      "payload": "https://qrcodesdk.dev/native/webp"
+    },
+    {"format": "gif", "id": "gif", "label": "GIF", "payload": "https://qrcodesdk.dev/native/gif"},
+    {
+      "format": "jpeg",
+      "id": "jpeg",
+      "label": "JPEG",
+      "payload": "https://qrcodesdk.dev/native/jpeg"
+    },
+    {
+      "format": "svg",
+      "id": "styled",
+      "label": "Rounded",
+      "payload": "https://qrcodesdk.dev/native/styled",
+      "rounded": true
+    },
+    {
+      "format": "svg",
+      "id": "svg-logo",
+      "label": "SVG logo",
+      "logo": true,
+      "payload": "https://qrcodesdk.dev/native/svg-logo"
+    },
+    {
+      "format": "png",
+      "id": "png-logo",
+      "label": "PNG logo",
+      "logo": true,
+      "payload": "https://qrcodesdk.dev/native/png-logo"
+    },
+    {
+      "format": "webp",
+      "id": "webp-logo",
+      "label": "WebP logo",
+      "logo": true,
+      "payload": "https://qrcodesdk.dev/native/webp-logo"
+    },
+    {
+      "format": "gif",
+      "id": "gif-logo",
+      "label": "GIF logo",
+      "logo": true,
+      "payload": "https://qrcodesdk.dev/native/gif-logo"
+    },
+    {
+      "format": "jpeg",
+      "id": "jpeg-logo",
+      "label": "JPEG logo",
+      "logo": true,
+      "payload": "https://qrcodesdk.dev/native/jpeg-logo"
+    }
+  ],
+  "update": {"case": "png", "suffix": "?updated=1"}
+}

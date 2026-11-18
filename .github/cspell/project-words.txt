@@ -76,3 +76,4 @@ bitstreams
 deflater
 inflater
 inflaters
+nativeexample

@@ -10,6 +10,8 @@ React Native consumer, then uses the consumer's own Metro and Hermes compiler:
 3. It bundles a real app for Android and iOS and compiles it to Hermes bytecode.
 
 No simulator or device runs. Native rendering by react-native-svg and `Image` is not covered.
+The separate [native example and simulator tests](../../../apps/native-example/README.md) cover
+native rendering on iOS and Android by decoding screenshots from the running app.
 
 Each React Native version in `fixtures/` has exact dependency versions and an npm lockfile. React
 Native packages declare `react-native: *` peers, so the fixtures use legacy peer resolution.
