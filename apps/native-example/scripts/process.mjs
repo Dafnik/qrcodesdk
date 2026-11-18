@@ -7,10 +7,20 @@ export const minute = 60_000;
  * emulator, or build fails this task instead of waiting for the CI job timeout.
  */
 export function run(command, args, {timeout = 10 * minute, ...options} = {}) {
-  return execFileSync(command, args, {stdio: 'inherit', timeout, ...options});
+  return execFileSync(command, args, {
+    stdio: 'inherit',
+    timeout,
+    ...options,
+    killSignal: 'SIGKILL',
+  });
 }
 
 /** Run a short command and return its trimmed standard output. */
 export function read(command, args, {timeout = minute, ...options} = {}) {
-  return execFileSync(command, args, {encoding: 'utf8', timeout, ...options}).trim();
+  return execFileSync(command, args, {
+    encoding: 'utf8',
+    timeout,
+    ...options,
+    killSignal: 'SIGKILL',
+  }).trim();
 }
