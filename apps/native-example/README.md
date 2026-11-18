@@ -76,6 +76,10 @@ returned by `toDataURL()`. That screenshot must decode to the same payload, so t
 are checked as well as their MIME type. Tests need no Expo account, cloud build service, signing
 credentials, Metro server, or network image assets.
 
+On Android, the task hides system error dialogs on the emulator. The flow also taps **Wait** on
+any "isn't responding" dialog, because a stalled system app such as the launcher can otherwise
+cover the app on a slow emulator.
+
 Every command has a deadline: 45 minutes for native builds, 20 minutes for the Maestro flow, and
 10 minutes or less for other steps. A hung simulator, emulator, or build fails the task.
 

@@ -35,8 +35,21 @@ const screenshot = (caption, name) => [
   `- takeScreenshot: ${name}`,
 ];
 
+// Android shows "<app> isn't responding" when a system app stalls on a slow emulator. Waiting
+// keeps that app running and returns to this app.
+const dismissSystemDialogs = (platform) =>
+  platform === 'android'
+    ? [
+        '- runFlow:',
+        '    when:',
+        `      visible: ${JSON.stringify(".*isn't responding")}`,
+        '    commands:',
+        '      - tapOn: Wait',
+      ]
+    : [];
+
 /** Generate the Maestro flow from the same fixture list the app renders. */
-export function createFlow() {
+export function createFlow(platform) {
   const lines = [
     'appId: dev.qrcodesdk.nativeexample',
     '---',
@@ -45,6 +58,7 @@ export function createFlow() {
   ];
   for (const fixture of fixtures) {
     lines.push(
+      ...dismissSystemDialogs(platform),
       ...scrollTo(`select-${fixture.id}`, 'UP'),
       `- tapOn: {id: ${JSON.stringify(`select-${fixture.id}`)}}`,
       ...screenshot(fixture.label, fixture.id),
@@ -60,6 +74,7 @@ export function createFlow() {
     }
   }
   lines.push(
+    ...dismissSystemDialogs(platform),
     ...scrollTo(`select-${updatedFixture.id}`, 'UP'),
     `- tapOn: {id: ${JSON.stringify(`select-${updatedFixture.id}`)}}`,
     ...scrollTo('update-payload', 'DOWN'),

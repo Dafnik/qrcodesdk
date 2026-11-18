@@ -31,6 +31,9 @@ if (platform === 'ios') {
     throw new Error(
       'Start one Android emulator, or select a running emulator with QRCODESDK_NATIVE_DEVICE.',
     );
+  // A slow emulator can report the launcher or another system app as not responding. Its dialog
+  // would cover the app, so hide system error dialogs. The flow also dismisses any that appear.
+  run('adb', ['-s', device, 'shell', 'settings', 'put', 'global', 'hide_error_dialogs', '1']);
 }
 
 await rm(artifacts, {recursive: true, force: true});
@@ -102,7 +105,7 @@ if (!process.argv.includes('--skip-build')) {
   }
 }
 const flow = path.join(artifacts, 'flow.yaml');
-await writeFile(flow, createFlow());
+await writeFile(flow, createFlow(platform));
 run(
   maestro,
   [
