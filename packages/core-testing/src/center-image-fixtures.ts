@@ -9,6 +9,8 @@ import {alignment, circle, finder, rounded} from '@qrcodesdk/core/style';
 import {
   GRADIENT_IMAGE,
   LOGO_IMAGE,
+  QRCODESDK_LOGO_IMAGE,
+  QRCODESDK_WIDE_LOGO_IMAGE,
   type QRCodeFixtureImage,
   TALL_IMAGE,
   TRANSLUCENT_IMAGE,
@@ -42,6 +44,8 @@ function fixture(
 }
 
 export const QR_CODE_CENTER_IMAGE_FIXTURES: readonly QRCodeCenterImageFixture[] = [
+  fixture('qrcodesdk-logo-square', QRCODESDK_LOGO_IMAGE),
+  fixture('qrcodesdk-logo-wide', QRCODESDK_WIDE_LOGO_IMAGE),
   fixture('default-layout', LOGO_IMAGE),
   fixture('small-no-padding', LOGO_IMAGE, {size: 0.16, padding: 0}),
   fixture('fractional-padding', LOGO_IMAGE, {size: 0.2, padding: 0.5}),
@@ -92,6 +96,8 @@ function rmqrFixture(
  * the taller versions keep enough modules to scan.
  */
 export const QR_CODE_RMQR_CENTER_IMAGE_FIXTURES: readonly QRCodeRMQRCenterImageFixture[] = [
+  rmqrFixture('rmqr-r17x139-qrcodesdk-logo-square', 'R17x139', QRCODESDK_LOGO_IMAGE),
+  rmqrFixture('rmqr-r17x139-qrcodesdk-logo-wide', 'R17x139', QRCODESDK_WIDE_LOGO_IMAGE),
   rmqrFixture('rmqr-r11x77-default-layout', 'R11x77', LOGO_IMAGE),
   rmqrFixture('rmqr-r13x99-default-layout', 'R13x99', LOGO_IMAGE),
   rmqrFixture('rmqr-r15x139-default-layout', 'R15x139', LOGO_IMAGE),
@@ -101,6 +107,7 @@ export const QR_CODE_RMQR_CENTER_IMAGE_FIXTURES: readonly QRCodeRMQRCenterImageF
     clearBackground: false,
   }),
   rmqrFixture('rmqr-r17x139-wide-image', 'R17x139', WIDE_IMAGE),
+  rmqrFixture('rmqr-r17x139-tall-image', 'R17x139', TALL_IMAGE),
   rmqrFixture('rmqr-r17x139-many-colors', 'R17x139', GRADIENT_IMAGE),
   rmqrFixture('rmqr-r17x139-styled', 'R17x139', LOGO_IMAGE, undefined, {
     ...rmqrStyle,

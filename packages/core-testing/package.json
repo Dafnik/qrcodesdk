@@ -22,6 +22,7 @@
     "check-types": "tsc --noEmit && tsc -p tsconfig.spec.json",
     "lint": "eslint scripts src tests --max-warnings 0",
     "clean": "rm -rf .turbo dist",
+    "generate:fixture-logos": "node scripts/generate-fixture-logos.mjs",
     "generate:rmqr-fixtures": "node scripts/generate-rmqr-fixtures.mjs",
     "test:snapshots": "vitest run tests/svg/svg-renderer.snapshot.e2e.spec.ts tests/text/text-renderer.snapshot.e2e.spec.ts"
   },

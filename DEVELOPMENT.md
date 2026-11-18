@@ -188,6 +188,13 @@ pnpm turbo run report:speed --filter=@repo/perf -- --against=main
 
 ### Updating snapshots
 
+Center-image fixtures share rasterized copies of the square and landscape QRCodeSDK logos.
+After changing the logo assets, regenerate their pixels before updating the snapshots:
+
+```sh
+pnpm turbo run generate:fixture-logos --filter=@repo/core-testing
+```
+
 Snapshot tasks build the required packages first and always execute, including when updating
 tracked snapshot files. Without the update flags, they compare against the existing snapshots.
 
