@@ -29,6 +29,22 @@ runs:
       shell: bash
       run: sudo apt-get --yes remove --purge man-db
 
+    # The runner image's mirror list points at the EC2 Ubuntu mirror, which downloads
+    # Playwright's system packages at around 100-150 kB/s (4-8 minutes per job). Prefer
+    # the Azure mirror and keep the main archive as a fallback. `playwright install`
+    # runs `apt-get update` itself, so the new list applies to the install steps below.
+    - name: Use Azure Ubuntu mirror
+      shell: bash
+      run: |
+        mirrors=/etc/apt/apt-mirrors.txt
+        if [ ! -f "$mirrors" ]; then
+          echo "No $mirrors on this runner; keeping the default apt sources."
+          exit 0
+        fi
+        printf '%s\tpriority:1\n%s\tpriority:2\n' \
+          http://azure.archive.ubuntu.com/ubuntu/ \
+          http://archive.ubuntu.com/ubuntu/ | sudo tee "$mirrors"
+
     - name: Extract Playwright version
       id: playwright-version
       shell: bash
