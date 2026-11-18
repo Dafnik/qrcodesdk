@@ -1,5 +1,6 @@
 // Rasterize the existing brand assets once so every renderer uses the same portable RGBA pixels.
 import {writeFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import sharp from 'sharp';
 
 const logos = [
@@ -14,7 +15,7 @@ const output = [
 
 for (const [name, source, width, height] of logos) {
   // A small palette keeps the checked-in pixels readable and independent of PNG decoders.
-  const png = await sharp(new globalThis.URL(source, import.meta.url).pathname)
+  const png = await sharp(fileURLToPath(new globalThis.URL(source, import.meta.url)))
     .resize(width, height)
     .png({palette: true, colours: 16, dither: 0})
     .toBuffer();
