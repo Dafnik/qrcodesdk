@@ -1,9 +1,5 @@
-import type {QRCodeShapePath} from '@qrcodesdk/core';
-import {
-  ɵarcPoint as arcPoint,
-  ɵparseShapePath as parseShapePath,
-  ɵresolveArc as resolveArc,
-} from '@qrcodesdk/core/internal';
+import {arcPoint, parseShapePath, resolveArc} from '../shape-path';
+import type {QRCodeShapePath} from '../types';
 
 /** Coverage of one shape path in 4x4 samples per pixel, from 0 to 16. */
 export type Coverage = {

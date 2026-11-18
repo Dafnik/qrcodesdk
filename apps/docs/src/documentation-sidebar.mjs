@@ -27,6 +27,7 @@ export const DOCUMENTATION_SIDEBAR = [
       {label: 'Browser', slug: 'packages/browser'},
       {label: 'Node.js', slug: 'packages/node'},
       {label: 'React & Next.js', slug: 'packages/react'},
+      {label: 'React Native', slug: 'packages/react-native'},
       {label: 'Vue', slug: 'packages/vue'},
       {label: 'Svelte', slug: 'packages/svelte'},
       {label: 'Angular', slug: 'packages/angular'},

@@ -60,6 +60,10 @@ jobs:
               package_name="@qrcodesdk/react"
               package_dir="packages/react"
               ;;
+            react-native)
+              package_name="@qrcodesdk/react-native"
+              package_dir="packages/react-native"
+              ;;
             vue)
               package_name="@qrcodesdk/vue"
               package_dir="packages/vue"

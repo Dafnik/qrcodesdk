@@ -1,0 +1,15 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test:react-native-runtime": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "env": [
+        "QRCODESDK_HERMES",
+        "QRCODESDK_METRO_MODE",
+        "QRCODESDK_PACKAGES",
+        "QRCODESDK_REACT_NATIVE_VERSION"
+      ]
+    }
+  }
+}

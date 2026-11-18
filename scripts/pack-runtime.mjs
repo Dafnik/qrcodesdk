@@ -11,7 +11,17 @@ assert.ok(
 );
 await mkdir(directory, {recursive: true});
 
-for (const name of ['core', 'browser', 'node', 'cli', 'react', 'angular', 'vue', 'svelte']) {
+for (const name of [
+  'core',
+  'browser',
+  'node',
+  'cli',
+  'react',
+  'react-native',
+  'angular',
+  'vue',
+  'svelte',
+]) {
   const result = spawnSync(
     'pnpm',
     ['--dir', `packages/${name}`, 'pack', '--pack-destination', directory],

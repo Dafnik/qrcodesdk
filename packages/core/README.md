@@ -95,7 +95,7 @@ See [Customize appearance](https://qrcodesdk.dev/guides/customize/) for every st
 ## Encode common values
 
 Typed [payload helpers](https://qrcodesdk.dev/reference/payloads/) turn contact, calendar, email, phone, SMS, geographic, and Wi-Fi data
-into payload strings. Import them from `@qrcodesdk/core/payload`. The React, Vue, Svelte, and Angular
+into payload strings. Import them from `@qrcodesdk/core/payload`. The React, React Native, Vue, Svelte, and Angular
 packages re-export them.
 
 ## Runtime compatibility
@@ -122,15 +122,16 @@ Module format:
 
 Add a runtime or framework package for other outputs:
 
-| Package                                                         | Use it for                                                                 | Return value                                       |
-| --------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------- |
-| [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) | Canvas element, PNG, WebP, GIF, and JPEG Image elements, browser downloads | `HTMLCanvasElement`, `HTMLImageElement`, `void`    |
-| [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)       | PNG, WebP, GIF, and JPEG bytes                                             | `Buffer`                                           |
-| [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)         | Command line generation from terminals and scripts                         | Terminal text, SVG, PNG, WebP, GIF, and JPEG files |
-| [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)     | React SVG, PNG, WebP, GIF, JPEG, and Canvas components                     | React element                                      |
-| [`@qrcodesdk/vue`](https://qrcodesdk.dev/packages/vue/)         | Vue SVG, PNG, WebP, GIF, JPEG, and Canvas components                       | Vue component                                      |
-| [`@qrcodesdk/svelte`](https://qrcodesdk.dev/packages/svelte/)   | Svelte SVG, PNG, WebP, GIF, JPEG, and Canvas components                    | Svelte component                                   |
-| [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/) | Angular SVG, PNG, WebP, GIF, JPEG, and Canvas components                   | Angular component                                  |
+| Package                                                                   | Use it for                                                                 | Return value                                       |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------- |
+| [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/)           | Canvas element, PNG, WebP, GIF, and JPEG Image elements, browser downloads | `HTMLCanvasElement`, `HTMLImageElement`, `void`    |
+| [`@qrcodesdk/node`](https://qrcodesdk.dev/packages/node/)                 | PNG, WebP, GIF, and JPEG bytes                                             | `Buffer`                                           |
+| [`@qrcodesdk/cli`](https://qrcodesdk.dev/packages/cli/)                   | Command line generation from terminals and scripts                         | Terminal text, SVG, PNG, WebP, GIF, and JPEG files |
+| [`@qrcodesdk/react`](https://qrcodesdk.dev/packages/react/)               | React SVG, PNG, WebP, GIF, JPEG, and Canvas components                     | React element                                      |
+| [`@qrcodesdk/react-native`](https://qrcodesdk.dev/packages/react-native/) | React Native SVG, PNG, WebP, GIF, and JPEG components                      | React Native element                               |
+| [`@qrcodesdk/vue`](https://qrcodesdk.dev/packages/vue/)                   | Vue SVG, PNG, WebP, GIF, JPEG, and Canvas components                       | Vue component                                      |
+| [`@qrcodesdk/svelte`](https://qrcodesdk.dev/packages/svelte/)             | Svelte SVG, PNG, WebP, GIF, JPEG, and Canvas components                    | Svelte component                                   |
+| [`@qrcodesdk/angular`](https://qrcodesdk.dev/packages/angular/)           | Angular SVG, PNG, WebP, GIF, JPEG, and Canvas components                   | Angular component                                  |
 
 Compare every built-in output in [Renderer outputs](https://qrcodesdk.dev/reference/renderers/).
 

@@ -1,0 +1,15 @@
+{
+  "name": "qrcodesdk-react-native-0.79-consumer",
+  "private": true,
+  "dependencies": {
+    "react": "19.0.0",
+    "react-native": "0.79.7",
+    "react-native-svg": "15.15.5"
+  },
+  "devDependencies": {
+    "@react-native/babel-preset": "0.79.7",
+    "@react-native/metro-config": "0.79.7",
+    "metro": "0.82.5",
+    "react-dom": "19.0.0"
+  }
+}

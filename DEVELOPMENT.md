@@ -68,6 +68,19 @@ then merges the results. HTML, LCOV, and combined JSON reports are written to `c
 
 Installed-package smoke tests have separate consumer and browser prerequisites. See
 [the runtime test guide](packages/browser/runtime/README.md) for their commands.
+The React Native smoke test bundles with Metro and runs in Hermes. See
+[the React Native runtime test guide](packages/react-native/runtime/README.md).
+
+For real iOS and Android rendering, use the [native example and simulator tests](apps/native-example/README.md).
+The Development workflow runs both platforms and checks QR payloads decoded from simulator screenshots:
+
+```sh
+pnpm turbo run native:tools --filter=native-example
+pnpm turbo run test:native:ios --filter=native-example
+pnpm turbo run test:native:android --filter=native-example
+```
+
+These tasks require native build tools and simulators. They run separately from `test` and `check`.
 
 ### Docs
 
@@ -178,8 +191,8 @@ pnpm turbo run report:speed --filter=@repo/perf -- --against=main
   for example [`packages/core.mdx`](apps/docs/src/content/docs/packages/core.mdx#public-api). The
   `exports` field of each package's `package.json` lists every published subpath.
 - Exports that exist only for other `@qrcodesdk` packages live in `@qrcodesdk/core/internal`,
-  `@qrcodesdk/core/internal/gif`, `@qrcodesdk/core/internal/jpeg`, and
-  `@qrcodesdk/core/internal/webp`. Their names start with `ɵ`, as [AGENTS.md](./AGENTS.md) requires.
+  `@qrcodesdk/core/internal/gif`, `@qrcodesdk/core/internal/jpeg`, `@qrcodesdk/core/internal/raster`,
+  `@qrcodesdk/core/internal/webp`, and `@qrcodesdk/core/internal/zlib`. Their names start with `ɵ`, as [AGENTS.md](./AGENTS.md) requires.
   [`verify-package-artifact.mjs`](packages/core-testing/scripts/verify-package-artifact.mjs) checks
   the published entry points and the dependency policy between packages.
 - The breaking styling API changes, including the move to `@qrcodesdk/core/style` factories and

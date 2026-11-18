@@ -1,8 +1,25 @@
-import {crc32, deflateSync} from 'node:zlib';
+import {crc32, deflateSync, inflateSync} from 'node:zlib';
 import sharp from 'sharp';
-import {describe, expect, test} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 
-import {decodePNG, encodePNG} from '../../src/png-codec';
+import {createRasterCenterImage} from '../../src/raster/center-image';
+import {type Inflate, decodePNG as decodeWith, encodePNG} from '../../src/raster/png';
+import {zlibDeflate, zlibInflate} from '../../src/raster/zlib';
+
+const nodeInflate: Inflate = (data, maxOutputLength) => inflateSync(data, {maxOutputLength});
+const nodeDeflate = (level: number) => (data: Uint8Array) =>
+  deflateSync(data, {chunkSize: 32 * 1024, level, strategy: 3});
+const INFLATERS = [
+  {name: 'node:zlib', inflate: nodeInflate},
+  {name: 'the bundled inflater', inflate: zlibInflate},
+];
+
+/** Decodes with both inflaters and checks that they agree. */
+function decodePNG(source: Buffer) {
+  const results = INFLATERS.map(({inflate}) => decodeWith(source, inflate));
+  expect(Buffer.from(results[1]!.data).equals(Buffer.from(results[0]!.data))).toBe(true);
+  return {...results[0]!, data: Buffer.from(results[0]!.data)};
+}
 
 const PASSES = [
   [0, 0, 8, 8],
@@ -102,7 +119,49 @@ function expectPixelsToMatchReference(actual: Buffer, expected: Buffer, depth: n
   }
 }
 
+describe('PNG allocation limits', () => {
+  const header = (width: number, height: number, length = 13) => {
+    const bytes = Buffer.alloc(Math.max(13, length));
+    bytes.writeUInt32BE(width, 0);
+    bytes.writeUInt32BE(height, 4);
+    bytes[8] = 8;
+    bytes[9] = 6;
+    return chunk('IHDR', bytes.subarray(0, length));
+  };
+  const signature = Buffer.from('89504e470d0a1a0a', 'hex');
+  const sources = [
+    {name: 'duplicate headers', chunks: [header(1, 1), header(8192, 8192)]},
+    {name: 'an extended header', chunks: [header(8192, 8192, 14)]},
+    {name: 'a short header', chunks: [header(1, 1, 12)]},
+    {name: 'too many pixels', chunks: [header(4097, 4096)]},
+    {name: 'zero width', chunks: [header(0, 1)]},
+    {name: 'zero height', chunks: [header(1, 0)]},
+    {name: 'a missing header', chunks: []},
+  ];
+
+  test.each(sources)('rejects $name before inflating', ({chunks}) => {
+    const source = Buffer.concat([signature, ...chunks, chunk('IEND', Buffer.alloc(0))]);
+    const inflate = vi.fn(() => {
+      throw new Error('Unexpected inflate call');
+    });
+    expect(() => decodeWith(source, inflate)).toThrow();
+    expect(inflate).not.toHaveBeenCalled();
+    expect(() => createRasterCenterImage(source, undefined, inflate)).toThrow(
+      expect.objectContaining({code: 'INVALID_IMAGE_SOURCE'}),
+    );
+    expect(inflate).not.toHaveBeenCalled();
+  });
+});
+
 describe('PNG codec', () => {
+  test.each([
+    {colorType: 2, depth: 1},
+    {colorType: 3, depth: 16},
+  ])('rejects color type $colorType at $depth bits', ({colorType, depth}) => {
+    const source = createPNG({width: 1, height: 1, colorType, depth, interlaced: false, seed: 1});
+    expect(() => decodeWith(source, nodeInflate)).toThrow('Unsupported PNG header');
+  });
+
   test.each(
     FORMATS.flatMap((format) => [
       {...format, interlaced: false},
@@ -152,17 +211,31 @@ describe('PNG codec', () => {
     expect([...decodePNG(transparent).data]).toEqual([0, 0, 0, 0]);
   });
 
-  test.each([0, 3, 6, 9])('encodes RGBA pixels losslessly at level %i', async (level) => {
-    const image = {width: 17, height: 11, data: randomBytes(17 * 11 * 4, level + 1)};
+  test.each([
+    ...[0, 3, 6, 9].map((level) => ({
+      name: `node:zlib at level ${level}`,
+      deflate: nodeDeflate(level),
+    })),
+    {name: 'the bundled deflater', deflate: zlibDeflate},
+  ])('encodes RGBA pixels losslessly with $name', async ({deflate}) => {
+    const image = {width: 17, height: 11, data: randomBytes(17 * 11 * 4, 4)};
     image.data.fill(255, 0, 200);
-    const encoded = encodePNG(image, level);
+    const encoded = Buffer.from(encodePNG(image, deflate));
     expect(decodePNG(encoded).data.equals(image.data)).toBe(true);
     expect((await decodeReference(encoded)).equals(image.data)).toBe(true);
   });
 
+  test('encodes RGBA pixels from an unaligned byte view', () => {
+    const pixels = randomBytes(3 * 2 * 4, 42);
+    const data = new Uint8Array(pixels.length + 1).subarray(1);
+    data.set(pixels);
+    const encoded = Buffer.from(encodePNG({width: 3, height: 2, data}, zlibDeflate));
+    expect(decodePNG(encoded).data.equals(pixels)).toBe(true);
+  });
+
   test('keeps encoded output stable', () => {
     const image = {width: 3, height: 2, data: randomBytes(3 * 2 * 4, 42)};
-    expect(encodePNG(image, 9).toString('base64')).toMatchInlineSnapshot(
+    expect(Buffer.from(encodePNG(image, nodeDeflate(9))).toString('base64')).toMatchInlineSnapshot(
       `"iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAYAAACddGYaAAAAI0lEQVR4AWPs7JTJv71t+v/HO0QNmFLTzBL+PRLhr2L7YAIAo94LsPxq/PcAAAAASUVORK5CYII="`,
     );
   });
@@ -216,7 +289,7 @@ describe('PNG codec', () => {
       shortData,
       badFilterData,
     ]) {
-      expect(() => decodePNG(source)).toThrow();
+      for (const {inflate} of INFLATERS) expect(() => decodeWith(source, inflate)).toThrow();
     }
   });
 });

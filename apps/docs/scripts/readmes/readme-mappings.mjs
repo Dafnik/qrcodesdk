@@ -45,6 +45,12 @@ export const README_MAPPINGS = [
     codeLanguage: 'tsx',
   },
   {
+    id: 'react-native',
+    source: 'src/content/docs/packages/react-native.mdx',
+    output: '../../packages/react-native/README.md',
+    codeLanguage: 'tsx',
+  },
+  {
     id: 'node',
     source: 'src/content/docs/packages/node.mdx',
     output: '../../packages/node/README.md',

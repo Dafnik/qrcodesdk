@@ -74,6 +74,21 @@ describe('encodeWebP', () => {
     },
   );
 
+  test('builds the color table where typed array from() ignores iterables, as in Hermes', async () => {
+    const image = createImage(9, 7, 5);
+    const from = Uint32Array.from;
+    const fromArrayLike = from as (source: ArrayLike<number>) => Uint32Array;
+    // Hermes only reads array-likes, so a Set becomes an empty array.
+    Uint32Array.from = ((source: ArrayLike<number> | Iterable<number>) =>
+      fromArrayLike.call(Uint32Array, 'length' in source ? source : [])) as typeof from;
+    try {
+      const decoded = await decode(encodeWebP(image));
+      expect(Buffer.from(decoded.data).equals(Buffer.from(image.data))).toBe(true);
+    } finally {
+      Uint32Array.from = from;
+    }
+  });
+
   test('writes a RIFF container with an even-sized VP8L chunk', () => {
     const bytes = Buffer.from(encodeWebP(createImage(3, 3, 2)));
     expect(bytes.toString('latin1', 0, 4)).toBe('RIFF');

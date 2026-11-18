@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "lib": ["es2023", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false
+  },
+  "extends": "./tsconfig.json",
+  "include": ["tests"]
+}

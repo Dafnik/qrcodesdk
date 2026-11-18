@@ -15,7 +15,9 @@ export default defineConfig({
     internal: 'src/internal.ts',
     'internal/gif': 'src/internal-gif.ts',
     'internal/jpeg': 'src/internal-jpeg.ts',
+    'internal/raster': 'src/internal-raster.ts',
     'internal/webp': 'src/internal-webp.ts',
+    'internal/zlib': 'src/internal-zlib.ts',
     payload: 'src/payload.ts',
   },
   dts: {

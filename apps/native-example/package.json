@@ -1,0 +1,40 @@
+{
+  "name": "native-example",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "build": "expo export --platform all",
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint App.tsx center-logo.ts index.js scripts tests --max-warnings 0",
+    "test": "node --test tests/*.test.mjs",
+    "test:native:ios": "node scripts/test-native.mjs ios",
+    "test:native:android": "node scripts/test-native.mjs android",
+    "native:tools": "node scripts/install-maestro.mjs",
+    "native:cache:ios": "node scripts/prepare-ios-cache.mjs",
+    "generate:center-logo": "node scripts/generate-center-logo.mjs"
+  },
+  "dependencies": {
+    "@qrcodesdk/react-native": "workspace:*",
+    "expo": "58.0.25",
+    "expo-build-properties": "58.0.12",
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "react-native-safe-area-context": "5.11.1",
+    "react-native-svg": "catalog:"
+  },
+  "devDependencies": {
+    "@qrcodesdk/core": "workspace:*",
+    "@qrcodesdk/node": "workspace:*",
+    "@repo/core-testing": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@types/react": "catalog:",
+    "eslint": "catalog:",
+    "sharp": "catalog:",
+    "typescript": "catalog:",
+    "zxing-wasm": "catalog:"
+  }
+}

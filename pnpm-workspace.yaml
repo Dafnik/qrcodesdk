@@ -37,6 +37,8 @@ catalog:
   qrcode-generator: 2.0.4
   react: 19.3.1
   react-dom: 19.3.1
+  react-native: 0.88.1
+  react-native-svg: 15.16.1
   vue: 3.5.44
   zxing-wasm: 3.1.6
   sharp: 0.35.5

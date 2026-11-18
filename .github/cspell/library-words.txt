@@ -34,3 +34,15 @@ zint
 vite
 esbuild
 jridgewell
+hermesc
+Pressable
+xcrun
+simctl
+bootstatus
+udid
+xcconfig
+archs
+iphonesimulator
+maxsize
+plutil
+lipo
