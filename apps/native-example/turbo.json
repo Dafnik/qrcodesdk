@@ -17,6 +17,7 @@
       "passThroughEnv": [
         "CI",
         "JAVA_HOME",
+        "GRADLE_USER_HOME",
         "ANDROID_HOME",
         "ANDROID_SDK_ROOT",
         "ANDROID_SERIAL",
