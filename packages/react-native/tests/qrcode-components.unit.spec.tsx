@@ -12,14 +12,13 @@ import {afterEach, describe, expect, expectTypeOf, test} from 'vitest';
 
 import {QRCodeSVGRenderer, qrcode, svgCenterImage as coreSVGCenterImage} from '@qrcodesdk/core';
 import {QRCodeError} from '@qrcodesdk/core/error';
-import {rMQR} from '@qrcodesdk/core/rmqr';
 import {ɵcreateRGBARenderer as createRGBARenderer} from '@qrcodesdk/core/internal/raster';
 
 import * as api from '../src';
 import {encodeBase64} from '../src/base64';
 import {hostProps} from './mocks/host';
 
-const {QRCodeGIF, QRCodeJPEG, QRCodePNG, QRCodeSVG, QRCodeWebP} = api;
+const {QRCodeGIF, QRCodeJPEG, QRCodePNG, QRCodeSVG, QRCodeWebP, rMQR} = api;
 const IMAGE_COMPONENTS = [
   {name: 'PNG', mimeType: 'image/png', Component: QRCodePNG, lossless: true},
   {name: 'WebP', mimeType: 'image/webp', Component: QRCodeWebP, lossless: true},
@@ -340,6 +339,7 @@ describe('package exports', () => {
       'rounded',
       'automaticSegmenter',
       'microQR',
+      'rMQR',
       'calendarPayload',
       'vcardPayload',
     ] as const) {

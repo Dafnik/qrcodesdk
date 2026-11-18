@@ -8,4 +8,4 @@ Add `@qrcodesdk/react-native`, which renders QR codes in Expo and bare React Nat
 
 `QRCodeSVG` takes `svgCenterImage()` with a bundled asset, a `{uri}` object, or an embedded raster data URL; an embedded SVG data URL throws `QRCodeError` with code `INVALID_IMAGE_SOURCE`. The image components take `rasterCenterImage()` with PNG bytes in a `Uint8Array`. Components throw `QRCodeError` during rendering for invalid payloads and options.
 
-The package re-exports the style helpers, `kanji`, `automaticSegmenter`, `microQR`, and the payload helpers, together with their types, from `@qrcodesdk/core`.
+The package re-exports the style helpers, `kanji`, `automaticSegmenter`, `microQR`, `rMQR`, and the payload helpers, together with their types, from `@qrcodesdk/core`.

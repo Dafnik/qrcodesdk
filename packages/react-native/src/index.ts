@@ -65,6 +65,8 @@ export type {
   QRCodeSymbol,
   QRCodeSymbolMatrixOptions,
 } from '@qrcodesdk/core/micro';
+export {rMQR} from '@qrcodesdk/core/rmqr';
+export type {QRCodeRMQRHeight, QRCodeRMQROptions, QRCodeRMQRVersion} from '@qrcodesdk/core/rmqr';
 export type {
   QRCodeAlignmentCenterShape,
   QRCodeAlignmentOptions,
