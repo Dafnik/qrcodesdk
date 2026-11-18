@@ -1,0 +1,17 @@
+---
+import {
+  QRCodeSymbolPreviews as QRCodeSymbolPreviewsComponent,
+  type QRCodeSymbolPreviewSetName,
+} from '../angular/qrcode-symbol-previews.ts';
+
+type Props = {set: QRCodeSymbolPreviewSetName};
+
+// Astro types Angular components without inputs; the Angular renderer passes `set` as an input.
+const QRCodeSymbolPreviews = QRCodeSymbolPreviewsComponent as unknown as (props: Props) => unknown;
+
+const {set} = Astro.props;
+---
+
+<div class="qr-preview-surface not-content my-6 overflow-hidden rounded-lg border border-(--sl-color-gray-5) px-4 py-8">
+  <QRCodeSymbolPreviews set={set} />
+</div>

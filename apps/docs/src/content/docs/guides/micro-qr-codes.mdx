@@ -10,12 +10,18 @@ related:
   - ../learn/how-qr-codes-work.mdx
 ---
 
+import SymbolPreviews from '../../../components/astro/qrcode-symbol-previews.astro';
+
 A Micro QR code is a smaller relative of the standard QR code, with one finder pattern instead of
 three. It is 11 to 17 modules wide and needs a quiet zone of only 2 modules, so it fits where a
 standard QR code does not, such as on small parts, labels, and printed circuit boards.
 
 Micro QR codes hold little data: at most 35 digits, 21 alphanumeric characters, 15 UTF-8 bytes, or
 9 Kanji characters.
+
+The four Micro QR versions, from the smallest to the largest:
+
+<SymbolPreviews set="micro-versions" />
 
 :::caution[Check your scanners first]
 Many phone camera apps cannot read Micro QR codes. Industrial scanners and libraries such as ZXing
@@ -127,8 +133,12 @@ qrcode('https://qrcodesdk.dev').options({symbol}).matrix().width; // 25: a stand
 ```
 
 The fallback uses the same `mode` and `errorCorrectionLevel`, including level `H`, with automatic
-version and mask. It adds almost nothing to your bundle because the standard encoder is already
-part of it.
+version and mask.
+
+The short payload fits a Micro QR code, and the URL falls back to a standard QR code:
+
+<SymbolPreviews set="micro-fallback" />
+It adds almost nothing to your bundle because the standard encoder is already part of it.
 
 ## Styling
 
@@ -137,6 +147,10 @@ differences:
 
 - The default quiet zone is 2 modules instead of 4. Set `style.quietZone` to override it.
 - `finder()` styles the single finder pattern, and `alignment()` has nothing to style.
+
+These styles shape the modules and the finder center, and keep the finder ring square:
+
+<SymbolPreviews set="micro-styles" />
 
 :::caution[Keep the finder ring sharp]
 Scanners locate a Micro QR code from its one finder pattern. ZXing cannot find finder rings with a

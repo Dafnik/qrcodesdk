@@ -5,10 +5,12 @@ docType: guide
 
 related:
   - ../reference/builder.mdx
-  - ./micro-qr-codes.md
+  - ./micro-qr-codes.mdx
   - ./customize.md
   - ../reference/custom-renderers.md
 ---
+
+import SymbolPreviews from '../../../components/astro/qrcode-symbol-previews.astro';
 
 A rectangular Micro QR code, or rMQR code (ISO/IEC 23941), is a QR code for long, narrow spaces. It
 is 7 to 17 modules high and 27 to 139 modules wide, has one finder pattern, and needs a quiet zone
@@ -17,6 +19,8 @@ packaging.
 
 rMQR codes hold up to 361 digits, 219 alphanumeric characters, 150 UTF-8 bytes, or 92 Kanji
 characters.
+
+<SymbolPreviews set="rmqr-intro" />
 
 :::caution[Check your scanners first]
 Many phone camera apps cannot read rMQR codes. Decoders such as ZXing-C++ can, and so can scanners
@@ -81,6 +85,10 @@ The matrix reports its size as `width` and `height` in modules. When no version 
 height or size holds the payload, generation throws `QRCodeError` with code `PAYLOAD_TOO_LARGE`.
 `rMQR()` checks its own option when you call it, so create the symbol once and reuse it.
 
+The same payload with no version, the `R7` height, and the exact version `R7x139`:
+
+<SymbolPreviews set="rmqr-sizes" />
+
 ## Error correction and other options
 
 rMQR codes support the error-correction levels `M`, the default, and `H`. Level `H` recovers more
@@ -90,6 +98,8 @@ damage and needs a larger symbol:
 qrcode('https://qrcodesdk.dev').options({symbol: rMQR()}).matrix(); // 43 × 13
 qrcode('https://qrcodesdk.dev').options({symbol: rMQR(), errorCorrectionLevel: 'H'}).matrix(); // 77 × 11
 ```
+
+<SymbolPreviews set="rmqr-error-correction" />
 
 The matrix options `mode`, `kanji`, and `errorCorrectionLevel` apply as usual. rMQR codes do not
 support the levels `L` and `Q`, or `version`, `mask`, `eci`, or `segmenter` in the matrix options.
@@ -153,6 +163,11 @@ differences:
   the module shape.
 - A center image is a square sized from the height of the code, in the middle of it. Use level `H`
   and a small image, because rMQR codes have little room for error correction.
+
+These styles shape the modules and the finder center, and keep the finder ring and the finder
+sub-pattern square:
+
+<SymbolPreviews set="rmqr-styles" />
 
 :::caution[Keep the finder ring and sub-pattern center square]
 Scanners locate an rMQR code from its finder pattern and finder sub-pattern. ZXing cannot reliably
