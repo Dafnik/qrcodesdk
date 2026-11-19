@@ -4,13 +4,13 @@ import {
 } from '@qrcodesdk/core/internal/gif';
 
 import {type QRCodeImageOptions, createQRCodeImageComponent} from './create-qrcode-image';
-import type {QRCodeBaseProps} from './types';
+import type {QRCodeImageProps} from './types';
 
 export type QRCodeGIFImageOptions = QRCodeImageOptions & {
   /** Pixels with an alpha value below `threshold` become transparent. Defaults to 128. */
   readonly transparency?: {readonly threshold?: number};
 };
-export type QRCodeGIFProps = QRCodeBaseProps<QRCodeGIFImageOptions>;
+export type QRCodeGIFProps = QRCodeImageProps<QRCodeGIFImageOptions>;
 
 /**
  * Renders the QR code as an image backed by a single-frame GIF data URL. GIF supports 256 colors

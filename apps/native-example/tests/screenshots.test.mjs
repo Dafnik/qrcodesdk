@@ -94,6 +94,14 @@ test('the flow captures every fixture, image export, and an updated payload', ()
   );
   assert.match(flow, /clearState: true/);
   assert.match(flow, /tapOn: \{id: update-payload\}/);
+  assert.deepEqual(
+    [
+      ...flow.matchAll(
+        /^- extendedWaitUntil:\n {4}visible:\n {6}id: fixture-name\n {6}text: .+\n {4}timeout: \d+\n- waitForAnimationToEnd\n- takeScreenshot: (.+)$/gm,
+      ),
+    ].map((match) => match[1]),
+    screenshotCases.map((fixture) => fixture.screenshot),
+  );
   assert.equal(
     updatedFixture.payload,
     fixtures.find(({id}) => id === 'png').payload + '?updated=1',

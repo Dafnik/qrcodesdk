@@ -1,4 +1,4 @@
-import type {ViewProps} from 'react-native';
+import type {ImageProps, ViewProps} from 'react-native';
 
 import type {QRCodePayload} from '@qrcodesdk/core';
 
@@ -6,6 +6,11 @@ import type {QRCodePayload} from '@qrcodesdk/core';
 export type QRCodeBaseProps<TOptions> = Omit<ViewProps, 'children'> & {
   payload: QRCodePayload;
   options?: TOptions;
+};
+
+export type QRCodeImageProps<TOptions> = QRCodeBaseProps<TOptions> & {
+  /** Called when the native image loads successfully. */
+  onLoad?: ImageProps['onLoad'];
 };
 
 export type QRCodeSVGAccessibilityOptions = {

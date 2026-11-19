@@ -108,6 +108,9 @@ module, so its size depends on the symbol version and quiet zone.
 | `ref`     | `QRCodeImageHandle`, image components only | Reads the encoded `data:` URL       |
 | Other     | `ViewProps`                                | Applied to the wrapper `View`       |
 
+The image components also accept React Native's `Image` `onLoad` callback, which fires when the
+native image loads successfully.
+
 ## Choose an output
 
 - `QRCodeSVG` draws vector paths. It stays sharp at any size and is the fastest component, so prefer

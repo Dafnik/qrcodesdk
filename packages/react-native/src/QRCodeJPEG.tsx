@@ -5,7 +5,7 @@ import {
 } from '@qrcodesdk/core/internal/jpeg';
 
 import {type QRCodeImageOptions, createQRCodeImageComponent} from './create-qrcode-image';
-import type {QRCodeBaseProps} from './types';
+import type {QRCodeImageProps} from './types';
 
 export type QRCodeJPEGImageOptions = QRCodeImageOptions & {
   /** JPEG quality from 1 to 100. Defaults to 92. */
@@ -13,7 +13,7 @@ export type QRCodeJPEGImageOptions = QRCodeImageOptions & {
   /** Opaque color that transparent pixels are blended onto. Defaults to `#ffffff`. */
   readonly transparency?: {readonly matte?: QRCodeColor};
 };
-export type QRCodeJPEGProps = QRCodeBaseProps<QRCodeJPEGImageOptions>;
+export type QRCodeJPEGProps = QRCodeImageProps<QRCodeJPEGImageOptions>;
 
 /**
  * Renders the QR code as an image backed by a baseline JPEG data URL. JPEG is lossy and has no

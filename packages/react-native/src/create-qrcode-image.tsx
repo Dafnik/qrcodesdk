@@ -21,7 +21,7 @@ import {accessibilityProps} from './accessibility';
 import {encodeBase64} from './base64';
 import {type QRCodeRasterCenterImage, rasterCenterImages} from './center-image';
 import {splitOptions} from './split-options';
-import type {QRCodeBaseProps, QRCodeImageAccessibilityOptions, QRCodeImageHandle} from './types';
+import type {QRCodeImageAccessibilityOptions, QRCodeImageHandle, QRCodeImageProps} from './types';
 
 /** Options shared by the PNG, WebP, GIF, and JPEG components. */
 export type QRCodeImageOptions = {
@@ -43,9 +43,9 @@ export function createQRCodeImageComponent<TOptions extends QRCodeImageOptions>(
   createEncoder: (
     options: Omit<TOptions, 'matrix'> | undefined,
   ) => (image: RGBAImage) => Uint8Array,
-): ForwardRefExoticComponent<QRCodeBaseProps<TOptions> & RefAttributes<QRCodeImageHandle>> {
-  const component = forwardRef<QRCodeImageHandle, QRCodeBaseProps<TOptions>>(function QRCodeImage(
-    {payload, options, ...viewProps},
+): ForwardRefExoticComponent<QRCodeImageProps<TOptions> & RefAttributes<QRCodeImageHandle>> {
+  const component = forwardRef<QRCodeImageHandle, QRCodeImageProps<TOptions>>(function QRCodeImage(
+    {payload, options, onLoad, ...viewProps},
     ref,
   ) {
     const [matrixOptions, rendererOptions] = useMemo(() => splitOptions(options), [options]);
@@ -74,6 +74,7 @@ export function createQRCodeImageComponent<TOptions extends QRCodeImageOptions>(
     return (
       <View {...accessibilityProps(rendererOptions?.accessibility?.ariaLabel)} {...viewProps}>
         <Image
+          onLoad={onLoad}
           source={{uri: image.uri, width: image.width, height: image.height}}
           style={{width: image.width, height: image.height}}
         />

@@ -28,9 +28,11 @@ const scrollTo = (id, direction) => [
   `    direction: ${direction}`,
 ];
 const screenshot = (caption, name) => [
-  '- assertVisible:',
-  '    id: fixture-name',
-  `    text: ${JSON.stringify(caption)}`,
+  '- extendedWaitUntil:',
+  '    visible:',
+  '      id: fixture-name',
+  `      text: ${JSON.stringify(caption)}`,
+  '    timeout: 15000',
   '- waitForAnimationToEnd',
   `- takeScreenshot: ${name}`,
 ];

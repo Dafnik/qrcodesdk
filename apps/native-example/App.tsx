@@ -58,6 +58,10 @@ export default function App() {
   const [exported, setExported] = useState<string>();
   const image = useRef<QRCodeImageHandle>(null);
   const payload = selected.payload + (updated ? update.suffix : '');
+  // Tie the load event to this preview so the previous image cannot make the next one ready.
+  const previewSource = useMemo(() => ({payload, exported}), [payload, exported]);
+  const [loadedPreview, setLoadedPreview] = useState<typeof previewSource>();
+  const onImageLoad = () => setLoadedPreview(previewSource);
   const options = useMemo(() => {
     const shared = {
       matrix: {errorCorrectionLevel: 'H'},
@@ -70,6 +74,7 @@ export default function App() {
     };
   }, [selected]);
   const Renderer = selected.format === 'svg' ? undefined : renderers[selected.format];
+  const previewReady = !Renderer || loadedPreview === previewSource;
 
   return (
     <SafeAreaProvider>
@@ -107,17 +112,23 @@ export default function App() {
               <Image
                 testID="exported-image"
                 accessibilityLabel={`Exported ${selected.label} image`}
-                source={{uri: exported}}
+                source={{uri: previewSource.exported}}
+                onLoad={onImageLoad}
                 resizeMode="contain"
                 style={styles.exported}
               />
             ) : Renderer ? (
-              <Renderer ref={image} payload={payload} options={options.image} />
+              <Renderer
+                ref={image}
+                payload={previewSource.payload}
+                options={options.image}
+                onLoad={onImageLoad}
+              />
             ) : (
               <QRCodeSVG payload={payload} options={options.svg} />
             )}
           </View>
-          <Text testID="fixture-name" style={styles.caption}>
+          <Text testID={previewReady ? 'fixture-name' : undefined} style={styles.caption}>
             {selected.label}
             {updated ? ' updated' : ''}
             {exported ? ' exported' : ''}
