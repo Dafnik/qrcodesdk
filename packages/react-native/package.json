@@ -1,7 +1,7 @@
 {
   "name": "@qrcodesdk/react-native",
   "type": "module",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "@qrcodesdk/react-native provides React Native components for rendering QR codes with react-native-svg or as PNG, WebP, GIF, and JPEG images.",
   "sideEffects": false,
   "private": false,

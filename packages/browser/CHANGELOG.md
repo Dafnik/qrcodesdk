@@ -1,5 +1,17 @@
 # @qrcodesdk/browser
 
+## 0.0.6
+
+### Patch Changes
+
+- 526d0e6: The Canvas, Image element, PNG, WebP, GIF, and JPEG renderers draw rectangular matrices, such as rMQR codes, with separate output widths and heights. When Node.js raster output exceeds the pixel budget, `QRCodeError.details.value` now holds the output width and height instead of a single side length.
+- Updated dependencies [61b4d56]
+- Updated dependencies [0d39229]
+- Updated dependencies [cb8c78a]
+- Updated dependencies [526d0e6]
+- Updated dependencies [526d0e6]
+  - @qrcodesdk/core@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes

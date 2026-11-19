@@ -1,5 +1,20 @@
 # @qrcodesdk/cli
 
+## 0.0.6
+
+### Patch Changes
+
+- 61b4d56: Add Kanji mode. `--mode kanji` forces Kanji mode, and `--kanji` lets auto mode and `--optimize-segments` encode Shift JIS characters in Kanji mode. `--no-kanji` keeps the default UTF-8 octet encoding for Japanese text.
+- Updated dependencies [61b4d56]
+- Updated dependencies [0d39229]
+- Updated dependencies [cb8c78a]
+- Updated dependencies [9b0889b]
+- Updated dependencies [526d0e6]
+- Updated dependencies [526d0e6]
+- Updated dependencies [526d0e6]
+  - @qrcodesdk/core@0.0.6
+  - @qrcodesdk/node@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes

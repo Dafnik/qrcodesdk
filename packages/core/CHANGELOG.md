@@ -1,5 +1,37 @@
 # @qrcodesdk/core
 
+## 0.0.6
+
+### Patch Changes
+
+- 61b4d56: Add opt-in QR code Kanji mode, which packs each double-byte Shift JIS character into 13 bits instead of UTF-8 bytes, so Japanese text fits smaller symbols. Import the Shift JIS table from the new `@qrcodesdk/core/kanji` entry point and pass it as the `kanji` matrix option or with `.kanji(kanji)`. The table adds about 13 kB gzipped and stays out of bundles that don't import it.
+
+  With the table, `mode: 'kanji'` forces Kanji mode, `auto` mode picks Kanji mode when every character fits, and `automaticSegmenter` combines Kanji segments with numeric, alphanumeric, and octet segments. Custom segmenters receive the table as `kanji` in their options and can return `{mode: 'kanji'}` segments. Kanji mode only accepts characters that decode back unchanged, and Kanji segments never get an ECI header.
+
+  Kanji mode or Kanji segments without the table throw `QRCodeError` with code `INVALID_OPTIONS`; characters outside the table throw `INVALID_PAYLOAD`. `QRCodeEncodingMode` and `QRCodeMode` now include `'kanji'`, so exhaustive `switch` statements over them need a new case. The new `QRCodeKanji` type describes the table.
+
+- 0d39229: Add Micro QR codes (M1 to M4) through the new `@qrcodesdk/core/micro` entry point. Pass `microQR()` as the `symbol` matrix option, such as `qrcode('12345').options({symbol: microQR()})`, to generate the smallest Micro QR code that holds the payload. `microQR()` accepts `version` (`'M1'` to `'M4'`), `mask` (`0` to `3`), and `fallback`, which generates a standard QR code when no Micro QR code can hold the payload. Applications that do not import `@qrcodesdk/core/micro` do not bundle the Micro QR encoder.
+
+  Micro QR codes support numeric, alphanumeric, octet, and, with the `kanji` table from `@qrcodesdk/core/kanji`, Kanji mode in M3 and M4. They support levels `L` and `M`, and `Q` in M4. M1 only detects errors, so it is used only when requested with `version: 'M1'`. Setting `version`, `mask`, `eci`, or `segmenter` next to a Micro QR symbol throws `QRCodeError` with code `INVALID_OPTIONS`.
+
+  `QRCodeMatrixOptions` is now the union of `QRCodeStandardMatrixOptions` and `QRCodeSymbolMatrixOptions`. Interfaces can no longer extend `QRCodeMatrixOptions`; extend `QRCodeStandardMatrixOptions` instead, and use it when deriving types with `Omit` or `Pick`. Add the `QRCodeSymbol`, `QRCodeMicroVersion`, `QRCodeMicroMask`, and `QRCodeMicroOptions` types.
+
+  The default `style.quietZone` of the built-in renderers is now 2 modules for Micro QR codes and stays 4 modules for standard QR codes. `finder()` styles only the finder patterns that a symbol contains.
+
+- cb8c78a: Add the `vcardPayload()` and `calendarPayload()` payload helpers to `@qrcodesdk/core/payload`. `vcardPayload()` serializes a contact as a vCard 3.0 payload with a formatted name and optional structured name, organization, title, phones, emails, addresses, URL, and note. `calendarPayload()` serializes an event as an iCalendar 2.0 `VEVENT` with a UID, timestamp, summary, start, end, and optional location, description, and URL. Set `allDay: true` to pass `YYYY-MM-DD` dates instead of date-times; the end is exclusive.
+
+  Both helpers escape text values, fold long lines, and throw `QRCodeError` with code `INVALID_PAYLOAD` for invalid fields, such as line breaks in single-line fields, unsupported control characters, non-HTTP(S) URLs, date-times without seconds or an explicit offset, or an end that is not later than the start. Errors for nested fields use paths such as `addresses[0].postalCode` in `details.field`. URL fields require the standard `URL` API. Add the `QRCodeVCardPayload`, `QRCodeVCardName`, `QRCodeVCardPhone`, `QRCodeVCardEmail`, `QRCodeVCardAddress`, and `QRCodeCalendarPayload` types.
+
+- 526d0e6: Breaking: `QRCodeMatrix` describes its dimensions with `width` (modules per row) and `height` (rows) instead of `size`. Standard and Micro QR matrices are square, so both values are equal, and the module at column `x` and row `y` is at index `y * width + x`. Replace `matrix.size` with `matrix.width`, and loop over `height` for rows in custom renderers so they also draw rectangular symbols.
+
+  The SVG and text renderers draw rectangular matrices, the default `style.quietZone` is 2 modules for every symbol shorter than 21 modules, and a center image is a square sized from the shorter side of the symbol and centered on both axes. The `dimensions` check of the built-in renderers applies to the output width and height separately.
+
+- 526d0e6: Add rectangular Micro QR (rMQR) codes (ISO/IEC 23941) through the new `@qrcodesdk/core/rmqr` entry point. Pass `rMQR()` as the `symbol` matrix option, such as `qrcode('LOT-2026-0042').options({symbol: rMQR()})`, to generate the rMQR code with the fewest modules that holds the payload. `rMQR({version: 'R7'})` selects the narrowest code of a height, from `'R7'` to `'R17'`, and `rMQR({version: 'R7x59'})` selects an exact version, from `'R7x43'` to `'R17x139'`. Applications that do not import `@qrcodesdk/core/rmqr` do not bundle the rMQR encoder.
+
+  rMQR codes are 7 to 17 modules high and 27 to 139 modules wide and hold up to 361 digits, 219 alphanumeric characters, 150 bytes, or 92 Kanji characters. They encode one numeric, alphanumeric, octet, or, with the `kanji` table, Kanji segment at the error-correction levels `M` and `H`. Levels `L` and `Q`, and `version`, `mask`, `eci`, or `segmenter` next to an rMQR symbol, throw `QRCodeError` with code `INVALID_OPTIONS`. Add the `QRCodeRMQRVersion`, `QRCodeRMQRHeight`, and `QRCodeRMQROptions` types.
+
+  rMQR codes reuse the standard module roles: the finder sub-pattern has the alignment roles, so `alignment()` styles it, and it stays square when `modules` has a shape, because scanners locate the code with it.
+
 ## 0.0.5
 
 ### Patch Changes

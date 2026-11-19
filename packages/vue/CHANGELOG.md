@@ -1,5 +1,22 @@
 # @qrcodesdk/vue
 
+## 0.0.6
+
+### Patch Changes
+
+- 61b4d56: Re-export the `kanji` Shift JIS table and the `QRCodeKanji` type from `@qrcodesdk/core/kanji`. Pass `kanji` as `options.matrix.kanji` to enable Kanji mode in every component.
+- 0d39229: Expose `microQR` together with the `QRCodeMicroVersion`, `QRCodeMicroMask`, `QRCodeMicroOptions`, `QRCodeSymbol`, `QRCodeStandardMatrixOptions`, and `QRCodeSymbolMatrixOptions` types directly from each framework package. Render a Micro QR code by passing the symbol in the component's matrix options, such as `options={{matrix: {symbol: microQR()}}}`.
+- cb8c78a: Re-export the payload helpers `calendarPayload`, `emailPayload`, `geoPayload`, `phonePayload`, `smsPayload`, `vcardPayload`, and `wifiPayload` together with their types from `@qrcodesdk/core/payload`, so framework projects no longer need to add Core to build payloads such as `wifiPayload({ssid: 'Office', password: 'secret'})`.
+- 526d0e6: Expose `rMQR` together with the `QRCodeRMQRVersion`, `QRCodeRMQRHeight`, and `QRCodeRMQROptions` types directly from each framework package. Render an rMQR code by passing the symbol in the component's matrix options, such as `options={{matrix: {symbol: rMQR()}}}`.
+- Updated dependencies [61b4d56]
+- Updated dependencies [0d39229]
+- Updated dependencies [cb8c78a]
+- Updated dependencies [526d0e6]
+- Updated dependencies [526d0e6]
+- Updated dependencies [526d0e6]
+  - @qrcodesdk/core@0.0.6
+  - @qrcodesdk/browser@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes
