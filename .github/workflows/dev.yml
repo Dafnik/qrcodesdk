@@ -499,10 +499,29 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup Node and pnpm
-        uses: dafnik/setup-node-pnpm@18e728bc3a6d51ee4c93cfd96394aa6cc711b970 # v5
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
-          install-ignore-scripts: true
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6
+
+      - name: Resolve pnpm store path
+        id: pnpm-store
+        run: |
+          store_path=$(pnpm store path)
+          echo "path=$store_path" >> "$GITHUB_OUTPUT"
+
+      - name: Cache the native workspace pnpm store
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: native-ios-pnpm-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml', 'pnpm-workspace.yaml', 'package.json') }}
+
+      - name: Install native workspace dependencies
+        run: pnpm --filter native-example... --filter qrcodesdk install --frozen-lockfile --ignore-scripts
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@760158c05c47e7a764f78e9a22ca3b5a6ed8c52e # v2.5.2
@@ -544,8 +563,18 @@ jobs:
       - name: Build and test on an iPhone simulator
         env:
           CI: '1'
+          EXPO_PROFILE: '1'
           MAESTRO_DRIVER_STARTUP_TIMEOUT: '120000'
-        run: pnpm turbo run test:native:ios --filter=native-example
+        run: pnpm turbo run test:native:ios --filter=native-example --log-order=stream
+
+      # Expo formats the build output and leaves the timing summary in the raw log.
+      - name: Report Xcode build timings
+        if: always()
+        run: |
+          log=apps/native-example/.expo/xcodebuild.log
+          if [ -f "$log" ]; then
+            sed -n '/^Build Timing Summary/,/^\*\* BUILD/p' "$log"
+          fi
 
       - name: Upload native screenshots and test reports
         if: always()
@@ -610,6 +639,7 @@ jobs:
         env:
           CI: '1'
           MAESTRO_DRIVER_STARTUP_TIMEOUT: '120000'
+          ORG_GRADLE_PROJECT_reactNativeArchitectures: x86_64
         with:
           api-level: 35
           target: google_apis

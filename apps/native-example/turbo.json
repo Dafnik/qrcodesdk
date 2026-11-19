@@ -22,7 +22,9 @@
         "ANDROID_SDK_ROOT",
         "ANDROID_SERIAL",
         "MAESTRO_DRIVER_STARTUP_TIMEOUT",
-        "QRCODESDK_NATIVE_DEVICE"
+        "ORG_GRADLE_PROJECT_reactNativeArchitectures",
+        "QRCODESDK_NATIVE_DEVICE",
+        "RUNNER_ENVIRONMENT"
       ]
     },
     "test:native:ios": {
@@ -37,7 +39,9 @@
         "JAVA_HOME",
         "MAESTRO_DRIVER_STARTUP_TIMEOUT",
         "QRCODESDK_NATIVE_DEVICE",
-        "DEVELOPER_DIR"
+        "DEVELOPER_DIR",
+        "EXPO_PROFILE",
+        "RUNNER_ENVIRONMENT"
       ]
     }
   }

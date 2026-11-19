@@ -62,9 +62,10 @@ pnpm turbo run test:native:ios --filter=native-example
 pnpm turbo run test:native:android --filter=native-example
 ```
 
-The iOS task boots an available iPhone simulator and installs its build with `simctl`. It does not
-need to open the Simulator window or control System Events with AppleScript. To select an iPhone UDID or Android emulator
-serial explicitly, set `QRCODESDK_NATIVE_DEVICE` on the command. Android also accepts `ANDROID_SERIAL`.
+The iOS task boots an available iPhone simulator while building the app, then installs it with
+`simctl`. It works without opening the Simulator window or controlling System Events with
+AppleScript. To select an iPhone UDID or Android emulator serial explicitly, set
+`QRCODESDK_NATIVE_DEVICE` on the command. Android also accepts `ANDROID_SERIAL`.
 The task installs a release build with embedded JavaScript, runs a generated Maestro flow, then
 decodes every screenshot with the repository's ZXing decoder. It fails for missing screenshots,
 unreadable codes, or incorrect payloads, including stale rendering after a payload update.
@@ -76,7 +77,7 @@ returned by `toDataURL()`. That screenshot must decode to the same payload, so t
 are checked as well as their MIME type. Tests need no Expo account, cloud build service, signing
 credentials, Metro server, or network image assets.
 
-On Android, the task hides system error dialogs on the emulator. The flow also taps **Wait** on
+On Android, the task hides system error dialogs on the emulator. The local flow also taps **Wait** on
 any "isn't responding" dialog, because a stalled system app such as the launcher can otherwise
 cover the app on a slow emulator.
 
@@ -128,8 +129,14 @@ API 35 emulator on Linux for pull requests and pushes to `main` and `develop`. B
 of the existing `required` gate. They upload screenshots and reports even when tests fail, with
 seven-day retention. Native tasks disable Turbo caching so a cached result never skips a device run.
 
-The iOS job caches CocoaPods downloads and metadata, React Native and Hermes downloads, and a
-separate 500 MB ccache directory. Keys include the runner OS and architecture, Xcode and ccache
+The Android job builds only the emulator's `x86_64` ABI. On the fresh macOS runner, Maestro uses
+the app installed by the test task without clearing its state again. CI streams iOS build and
+simulator logs and enables Expo build profiling.
+
+The iOS job installs the native example, its workspace dependencies, and the root tooling into a
+separately cached pnpm store. It also caches CocoaPods downloads and metadata, React Native and
+Hermes downloads, and a separate 500 MB ccache directory. Native cache keys include the runner OS
+and architecture, Xcode and ccache
 versions, dependency lockfile, and native app configuration. The compiler cache restores the latest
 entry for the same dependencies, or else the latest for the same toolchain. ccache finds objects by
 content, so an older entry cannot produce stale objects. Only pushes to `main` and `develop` save a
