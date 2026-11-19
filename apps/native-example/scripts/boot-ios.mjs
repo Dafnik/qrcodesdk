@@ -1,9 +1,13 @@
 import process from 'node:process';
 
-import {read, run} from './process.mjs';
+import {minute, read, run} from './process.mjs';
 
 export function bootIOS() {
-  const {devices} = JSON.parse(read('xcrun', ['simctl', 'list', 'devices', 'available', '--json']));
+  // The first simctl call can take minutes while CoreSimulator mounts runtimes on a cold runner.
+  // https://github.com/actions/runner-images/issues/15247
+  const {devices} = JSON.parse(
+    read('xcrun', ['simctl', 'list', 'devices', 'available', '--json'], {timeout: 5 * minute}),
+  );
   const phones = Object.values(devices)
     .flat()
     .filter((device) => device.name.startsWith('iPhone'));
