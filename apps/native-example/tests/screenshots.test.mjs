@@ -111,17 +111,23 @@ test('the flow captures every fixture, image export, and an updated payload', ()
   }
 });
 
-test('the Android flow dismisses system not-responding dialogs before each case', () => {
+test('only the local Android flow probes for system not-responding dialogs', () => {
   const android = createFlow('android');
   assert.equal(
     [...android.matchAll(/visible: "\.\*isn't responding"/g)].length,
     fixtures.length + 1,
   );
-  assert.deepEqual(
-    [...android.matchAll(/^- takeScreenshot: (.+)$/gm)].map((match) => match[1]),
-    screenshotCases.map((fixture) => fixture.screenshot),
-  );
+  const androidCI = createFlow('android', {dismissAndroidDialogs: false});
+  assert.doesNotMatch(androidCI, /isn't responding/);
   assert.doesNotMatch(createFlow('ios'), /isn't responding/);
+  const iosCI = createFlow('ios', {clearState: false});
+  assert.match(iosCI, /clearState: false/);
+  for (const flow of [android, androidCI, iosCI]) {
+    assert.deepEqual(
+      [...flow.matchAll(/^- takeScreenshot: (.+)$/gm)].map((match) => match[1]),
+      screenshotCases.map((fixture) => fixture.screenshot),
+    );
+  }
 });
 
 test('every output format renders with and without the center logo', () => {
