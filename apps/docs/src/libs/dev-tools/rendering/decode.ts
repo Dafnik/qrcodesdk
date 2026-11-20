@@ -1,3 +1,4 @@
+import {largestQRCode} from '@repo/core-testing';
 import zxingWasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url';
 
 /**
@@ -107,17 +108,17 @@ export async function decodeRaster(
 const DECODE: Readonly<Record<DecoderId, (pixels: Pixels) => Promise<string | undefined>>> = {
   async zxing(pixels) {
     const {readBarcodes} = await loadZXing();
-    const [code] = await readBarcodes(
+    const codes = await readBarcodes(
       {...pixels, colorSpace: 'srgb'},
       // The same options as the roundtrip tests in `@repo/core-testing/decoder`.
       {
         formats: ['QRCodeModel2', 'MicroQRCode', 'RMQRCode'],
         tryHarder: true,
         tryInvert: false,
-        maxNumberOfSymbols: 1,
+        maxNumberOfSymbols: 0,
       },
     );
-    return code?.isValid ? code.text : undefined;
+    return largestQRCode(codes)?.text;
   },
 };
 

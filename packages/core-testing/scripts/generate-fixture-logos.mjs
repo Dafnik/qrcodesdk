@@ -4,7 +4,7 @@ import {fileURLToPath} from 'node:url';
 import sharp from 'sharp';
 
 const logos = [
-  ['SQUARE_LOGO', '../../../apps/docs/public/logo-square.svg', 64, 64],
+  ['SQUARE_LOGO', '../../../apps/docs/public/logo-square.svg', 128, 128],
   ['WIDE_LOGO', '../../../apps/docs/src/assets/logo.svg', 160, 64],
 ];
 const output = [

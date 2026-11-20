@@ -1,3 +1,4 @@
+export {largestQRCode} from './decoder/largest-qrcode';
 export {
   getAllMicroQRCodeCombinations,
   getAllQRCodeAutoMaskCombinations,

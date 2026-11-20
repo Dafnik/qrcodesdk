@@ -157,7 +157,9 @@ import {DecodeBadge} from './decode-badge';
                 class="block h-auto max-w-none object-contain"
                 [style.max-height]="zoom() === 1 ? '60dvh' : null"
                 [style.width.%]="zoom() * 100"
-                [style.image-rendering]="renderer() === 'svg' ? 'auto' : 'pixelated'"
+                [style.image-rendering]="
+                  renderer() === 'svg' || fixture().centerImage ? 'auto' : 'pixelated'
+                "
                 [src]="source"
                 [alt]="fixture().name" />
             </div>
