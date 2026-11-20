@@ -18,6 +18,7 @@ export type {
 } from './types';
 export type {
   QRCodeDataImageURL,
+  QRCodeSVGCenterImageLayout,
   QRCodeErrorCorrectionLevel,
   QRCodeMask,
   QRCodeMatrixOptions,

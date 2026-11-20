@@ -93,12 +93,16 @@ function rmqrFixture(
 }
 
 /**
- * rMQR center images at level H. The square image box is sized from the height of the code, so only
+ * rMQR center images at level H. The image size limit comes from the height of the code, so only
  * the taller versions keep enough modules to scan.
  */
 export const QR_CODE_RMQR_CENTER_IMAGE_FIXTURES: readonly QRCodeRMQRCenterImageFixture[] = [
   rmqrFixture('rmqr-r17x139-qrcodesdk-logo-square', 'R17x139', QRCODESDK_LOGO_IMAGE),
   rmqrFixture('rmqr-r17x139-qrcodesdk-logo-wide', 'R17x139', QRCODESDK_WIDE_LOGO_IMAGE),
+  rmqrFixture('rmqr-r17x139-qrcodesdk-logo-wide-no-padding', 'R17x139', QRCODESDK_WIDE_LOGO_IMAGE, {
+    size: 1,
+    padding: 0,
+  }),
   {
     ...rmqrFixture('rmqr-r17x139-qrcodesdk-logo-wide-slash', 'R17x139', QRCODESDK_WIDE_LOGO_IMAGE),
     payload: '/',

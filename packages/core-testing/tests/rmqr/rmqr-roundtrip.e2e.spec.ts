@@ -103,7 +103,10 @@ describe('rMQR roundtrips', () => {
         .render(
           QRCodeSVGRenderer({
             style: fixture.style,
-            centerImage: svgCenterImage(fixtureImageDataURL(fixture.image), fixture.layout),
+            centerImage: svgCenterImage(fixtureImageDataURL(fixture.image), {
+              ...fixture.layout,
+              aspectRatio: fixture.image.width / fixture.image.height,
+            }),
           }),
         );
       await expect(decodeRMQRCodeSvg(svg)).resolves.toMatchObject({

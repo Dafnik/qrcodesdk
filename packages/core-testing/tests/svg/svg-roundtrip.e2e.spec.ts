@@ -25,7 +25,10 @@ describe('SVG QR roundtrips', () => {
             .render(
               QRCodeSVGRenderer({
                 style: fixture.style,
-                centerImage: svgCenterImage(fixtureImageDataURL(fixture.image), fixture.layout),
+                centerImage: svgCenterImage(fixtureImageDataURL(fixture.image), {
+                  ...fixture.layout,
+                  aspectRatio: fixture.image.width / fixture.image.height,
+                }),
               }),
             ),
         ),

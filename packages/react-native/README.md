@@ -266,6 +266,7 @@ import {
   QRCodeSVG,
   type QRCodeSVGAccessibilityOptions,
   type QRCodeSVGCenterImage,
+  type QRCodeSVGCenterImageLayout,
   type QRCodeSVGOptions,
   type QRCodeSVGProps,
   type QRCodeSegment,

@@ -1,6 +1,10 @@
 import type {ImageURISource} from 'react-native';
 
-import type {QRCodeCenterImageLayout, QRCodeDataImageURL} from '@qrcodesdk/core';
+import type {
+  QRCodeCenterImageLayout,
+  QRCodeDataImageURL,
+  QRCodeSVGCenterImageLayout,
+} from '@qrcodesdk/core';
 import {QRCodeError} from '@qrcodesdk/core/error';
 import {
   type ɵQRCodeDrawing as QRCodeDrawing,
@@ -22,14 +26,11 @@ declare const rasterCenterImageBrand: unique symbol;
 /** A center image for the PNG, WebP, GIF, and JPEG components, created with `rasterCenterImage()`. */
 export type QRCodeRasterCenterImage = {readonly [rasterCenterImageBrand]: true};
 
-/** A square box in view coordinates. */
-type Box = {readonly x: number; readonly y: number; readonly size: number};
-
 // Kept private so published declarations do not reference internal drawing types.
 export const svgCenterImages = createCenterImageStore<{
   readonly part: QRCodeStylePart;
   readonly source: number | ImageURISource | QRCodeDataImageURL;
-  place(drawing: QRCodeDrawing): Box;
+  place(drawing: QRCodeDrawing): {x: number; y: number; width: number; height: number};
 }>();
 export const rasterCenterImages = createCenterImageStore<RasterCenterImageRenderer>();
 
@@ -41,7 +42,7 @@ const SVG_DATA_URL = /^data:image\/svg\+xml(?:[;,]|$)/i;
  */
 export function svgCenterImage(
   source: number | ImageURISource | QRCodeDataImageURL,
-  layout?: QRCodeCenterImageLayout,
+  layout?: QRCodeSVGCenterImageLayout,
 ): QRCodeSVGCenterImage {
   if (!isImageSource(source)) {
     throw new QRCodeError(
@@ -50,7 +51,7 @@ export function svgCenterImage(
       {details: {source}},
     );
   }
-  const {part, place} = createQRCodeCenterImagePlacement(layout);
+  const {part, place} = createQRCodeCenterImagePlacement(layout, layout?.aspectRatio);
   return svgCenterImages.create({part, source, place}) as QRCodeSVGCenterImage;
 }
 

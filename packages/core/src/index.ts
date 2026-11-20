@@ -48,6 +48,7 @@ export {
   type QRCodeDataImageURL,
   type QRCodeSVGAccessibilityOptions,
   type QRCodeSVGCenterImage,
+  type QRCodeSVGCenterImageLayout,
   type QRCodeSVGOptions,
   type QRCodeSVGRendererOptions,
   QRCodeSVGRenderer,

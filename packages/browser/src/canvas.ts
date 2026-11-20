@@ -80,21 +80,15 @@ export function canvasCenterImage(
   source: CanvasImageSource,
   layout?: QRCodeCenterImageLayout,
 ): QRCodeCanvasCenterImage {
-  const {part, place} = createQRCodeCenterImagePlacement(layout);
+  const {part, place} = createQRCodeCenterImagePlacement(layout, undefined, () => {
+    const {width, height} = getCanvasImageSourceSize(source);
+    return width / height;
+  });
   return centerImages.create({
     part,
     draw(context, drawing) {
-      const {width, height} = getCanvasImageSourceSize(source);
-      const box = place(drawing);
-      // The context draws in module units; fit the image inside its box.
-      const scale = Math.min(box.size / width, box.size / height);
-      context.drawImage(
-        source,
-        box.x + (box.size - width * scale) / 2,
-        box.y + (box.size - height * scale) / 2,
-        width * scale,
-        height * scale,
-      );
+      const {x, y, width, height} = place(drawing);
+      context.drawImage(source, x, y, width, height);
     },
   }) as QRCodeCanvasCenterImage;
 }
