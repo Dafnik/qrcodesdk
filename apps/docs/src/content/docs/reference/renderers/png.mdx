@@ -106,7 +106,7 @@ const png = qrcode('https://qrcodesdk.dev')
 | `layout.clearBackground` | `boolean`    | `true`   | Removes every module the image or its padding touches     |
 
 The image keeps its aspect ratio and is composited with alpha. It fits inside the configured square
-without cropping.
+without cropping. The cutout follows the fitted image and its padding.
 
 ## Constraints
 

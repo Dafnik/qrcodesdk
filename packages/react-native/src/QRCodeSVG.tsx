@@ -63,8 +63,8 @@ function createSVGRenderer(
             href={centerImage.source}
             x={box.x}
             y={box.y}
-            width={box.size}
-            height={box.size}
+            width={box.width}
+            height={box.height}
             preserveAspectRatio="xMidYMid meet"
           />
         ) : null}

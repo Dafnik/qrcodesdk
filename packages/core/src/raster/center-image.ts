@@ -1,4 +1,4 @@
-import {createQRCodeCenterImagePlacement} from '../drawing/center-image';
+import {type QRCodeCenterImageBox, createQRCodeCenterImagePlacement} from '../drawing/center-image';
 import type {QRCodeDrawing, QRCodeStylePart} from '../drawing/types';
 import {QRCodeError} from '../error';
 import type {QRCodeCenterImageLayout} from '../types';
@@ -23,14 +23,16 @@ export function createRasterCenterImage(
   layout: QRCodeCenterImageLayout | undefined,
   inflate: Inflate,
 ): RasterCenterImageRenderer {
-  const {part, place} = createQRCodeCenterImagePlacement(layout);
+  const {part, place} = createQRCodeCenterImagePlacement(
+    layout,
+    undefined,
+    () => image.width / image.height,
+  );
   const image = decodeImageSource(source, inflate);
   return {
     part,
     draw(target, drawing) {
-      const box = place(drawing);
-      const scale = drawing.moduleSize;
-      compositeImage(target, image, box.x * scale, box.y * scale, box.size * scale);
+      compositeImage(target, image, place(drawing), drawing.moduleSize);
     },
   };
 }
@@ -72,19 +74,19 @@ function assertImageDimensions(width: number, height: number): void {
   }
 }
 
-/** Draws an image into a square box, keeping its aspect ratio. */
+/** Composites the fitted image into the output pixels. */
 function compositeImage(
   target: RGBAImage,
   source: DecodedImage,
-  boxX: number,
-  boxY: number,
-  boxSize: number,
+  box: QRCodeCenterImageBox,
+  moduleSize: number,
 ): void {
-  const scale = Math.min(boxSize / source.width, boxSize / source.height);
-  const width = Math.max(1, Math.round(source.width * scale));
-  const height = Math.max(1, Math.round(source.height * scale));
-  const startX = Math.round(boxX + (boxSize - width) / 2);
-  const startY = Math.round(boxY + (boxSize - height) / 2);
+  const fittedWidth = box.width * moduleSize;
+  const fittedHeight = box.height * moduleSize;
+  const width = Math.max(1, Math.round(fittedWidth));
+  const height = Math.max(1, Math.round(fittedHeight));
+  const startX = Math.round(box.x * moduleSize + (fittedWidth - width) / 2);
+  const startY = Math.round(box.y * moduleSize + (fittedHeight - height) / 2);
   for (let y = 0; y < height; y++) {
     const targetY = startY + y;
     if (targetY < 0 || targetY >= target.height) continue;

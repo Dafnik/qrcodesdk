@@ -69,7 +69,10 @@ export function svgOptions(fixture: DevFixture): QRCodeSVGOptions {
       matrix: fixture.matrix,
       style: fixture.style,
       centerImage: centerImage
-        ? svgCenterImage(imageDataURL(centerImage.image), centerImage.layout)
+        ? svgCenterImage(imageDataURL(centerImage.image), {
+            ...centerImage.layout,
+            aspectRatio: centerImage.image.width / centerImage.image.height,
+          })
         : undefined,
     };
     svgOptionsCache.set(fixture, options);

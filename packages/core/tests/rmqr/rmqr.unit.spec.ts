@@ -564,13 +564,14 @@ describe('rMQR rendering', () => {
     expect(standardTiles.some((value, index) => index % 2 === 0 && value === 16)).toBe(true);
   });
 
-  test('centers a square center image sized from the height', () => {
+  test('centers a wide image sized from the symbol height', () => {
     const matrix = rmqr('1', {version: 'R11x43'});
-    const {part, place} = createQRCodeCenterImagePlacement({size: 0.5, padding: 0});
+    const {part, place} = createQRCodeCenterImagePlacement({size: 0.5, padding: 0}, 2);
     expect(place({moduleWidth: 43, moduleHeight: 11, quietZone: 2})).toEqual({
       x: 2 + (43 - 5.5) / 2,
-      y: 2 + (11 - 5.5) / 2,
-      size: 5.5,
+      y: 2 + (11 - 2.75) / 2,
+      width: 5.5,
+      height: 2.75,
     });
     const areas: number[][] = [];
     part({
@@ -580,7 +581,7 @@ describe('rMQR rendering', () => {
       isAreaCleared: () => false,
       layer: () => ({rect: () => undefined, tile: () => undefined}),
     });
-    expect(areas).toEqual([[18, 2, 7, 7]]);
+    expect(areas).toEqual([[18, 4, 7, 3]]);
   });
 
   test('types the options', () => {

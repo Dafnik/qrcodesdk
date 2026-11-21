@@ -64,13 +64,17 @@ All factories share these layout options:
 
 Factories validate these values when you call them. Invalid values throw `INVALID_OPTIONS`.
 
-The image is scaled to fit the centered square. It is never cropped. In
-[rMQR codes](/guides/rmqr-codes/), which are wider than they are high, the square is sized from the
-height and centered on both axes.
+The image fits inside a centered square without cropping. The square sets the maximum width and
+height. For [rMQR codes](/guides/rmqr-codes/), the limit comes from the symbol height.
+
+Canvas and raster renderers read the source dimensions and clear around the fitted image. For SVG
+output, including React Native, pass the source width divided by its height as `aspectRatio`. For
+example, use `svgCenterImage(logo, {aspectRatio: 2.5, padding: 0})` for a 5:2 logo. SVG uses the
+square for clearing when you omit `aspectRatio`.
 
 ### How clearing works
 
-- Clearing removes whole modules. The cleared area can be slightly larger than the image box plus
+- Clearing removes whole modules. The cleared area can be slightly larger than the fitted image plus
   padding.
 - Finder and alignment patterns styled with `finder()` or `alignment()` are cleared as a unit. A
   pattern is only left out when every one of its modules is covered. A partly covered pattern is

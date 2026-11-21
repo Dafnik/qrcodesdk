@@ -44,12 +44,12 @@ export const QRCODESDK_LOGO_IMAGE = logoImage('qrcodesdk-logo-square', SQUARE_LO
 /** The landscape QRCodeSDK brand asset at its original 5:2 aspect ratio. */
 export const QRCODESDK_WIDE_LOGO_IMAGE = logoImage('qrcodesdk-logo-wide', WIDE_LOGO);
 
-/** A landscape image with vertical stripes, centered vertically inside the square box. */
+/** A landscape image with vertical stripes. */
 export const WIDE_IMAGE = createImage('wide', 48, 16, (x) =>
   Math.floor(x / 8) % 2 ? [29, 78, 216, 255] : [249, 115, 22, 255],
 );
 
-/** A portrait image with a vertical gradient, centered horizontally inside the square box. */
+/** A portrait image with a vertical gradient. */
 export const TALL_IMAGE = createImage('tall', 16, 40, (_x, y) => [
   22,
   Math.round(80 + (y / 39) * 160),

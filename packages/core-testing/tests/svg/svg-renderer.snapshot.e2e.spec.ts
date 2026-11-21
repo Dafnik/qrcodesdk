@@ -20,7 +20,10 @@ describe('QRCodeSVGRenderer snapshots', () => {
           QRCodeSVGRenderer({
             style: fixture.style,
             centerImage: centerImage
-              ? svgCenterImage(fixtureImageDataURL(centerImage.image), centerImage.layout)
+              ? svgCenterImage(fixtureImageDataURL(centerImage.image), {
+                  ...centerImage.layout,
+                  aspectRatio: centerImage.image.width / centerImage.image.height,
+                })
               : undefined,
           }),
         ),

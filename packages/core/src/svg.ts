@@ -17,6 +17,10 @@ import type {
 export type {QRCodeCenterImageLayout} from './types';
 
 export type QRCodeDataImageURL = `data:image/${string}`;
+export type QRCodeSVGCenterImageLayout = QRCodeCenterImageLayout & {
+  /** Image width divided by height. Defaults to a square box when omitted. */
+  readonly aspectRatio?: number;
+};
 declare const svgCenterImageBrand: unique symbol;
 /** A center image for SVG output, created with `svgCenterImage()`. */
 export type QRCodeSVGCenterImage = {readonly [svgCenterImageBrand]: true};
@@ -67,7 +71,7 @@ export function QRCodeSVGRenderer(options?: QRCodeSVGRendererOptions): QRCodeRen
 /** Creates an SVG center image from an embedded `data:image` URL. */
 export function svgCenterImage(
   source: QRCodeDataImageURL,
-  layout?: QRCodeCenterImageLayout,
+  layout?: QRCodeSVGCenterImageLayout,
 ): QRCodeSVGCenterImage {
   if (!isValidImageDataURL(source) || !isXMLString(source)) {
     throw new QRCodeError(
@@ -76,13 +80,13 @@ export function svgCenterImage(
       {details: {source}},
     );
   }
-  const {part, place} = createQRCodeCenterImagePlacement(layout);
+  const {part, place} = createQRCodeCenterImagePlacement(layout, layout?.aspectRatio);
   const href = escapeXML(source, true);
   return centerImages.create({
     part,
     markup(drawing) {
-      const {x, y, size} = place(drawing);
-      return `<image href="${href}" x="${formatNumber(x)}" y="${formatNumber(y)}" width="${formatNumber(size)}" height="${formatNumber(size)}" preserveAspectRatio="xMidYMid meet"/>`;
+      const {x, y, width, height} = place(drawing);
+      return `<image href="${href}" x="${formatNumber(x)}" y="${formatNumber(y)}" width="${formatNumber(width)}" height="${formatNumber(height)}" preserveAspectRatio="xMidYMid meet"/>`;
     },
   }) as QRCodeSVGCenterImage;
 }

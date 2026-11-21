@@ -32,7 +32,10 @@ export type QRCodeCenterImageFixture = {
 
 const payload = 'https://qrcodesdk.dev/guides/center-images/';
 const matrixOptions: QRCodeMatrixOptions = {version: 6, errorCorrectionLevel: 'H', mask: 2};
-const style: QRCodeVisualStyle = {moduleSize: 6, quietZone: 4};
+// Keep logo details visible when raster outputs are enlarged in the dev tools.
+const style: QRCodeVisualStyle = {moduleSize: 12, quietZone: 4};
+// At higher resolutions, scanners can pick up the QR code drawn inside the brand logo.
+const brandLogoStyle: QRCodeVisualStyle = {...style, moduleSize: 6};
 
 function fixture(
   name: string,
@@ -45,7 +48,13 @@ function fixture(
 
 export const QR_CODE_CENTER_IMAGE_FIXTURES: readonly QRCodeCenterImageFixture[] = [
   fixture('qrcodesdk-logo-square', QRCODESDK_LOGO_IMAGE),
-  fixture('qrcodesdk-logo-wide', QRCODESDK_WIDE_LOGO_IMAGE),
+  fixture('qrcodesdk-logo-wide', QRCODESDK_WIDE_LOGO_IMAGE, undefined, brandLogoStyle),
+  fixture(
+    'qrcodesdk-logo-wide-no-padding',
+    QRCODESDK_WIDE_LOGO_IMAGE,
+    {padding: 0},
+    brandLogoStyle,
+  ),
   fixture('default-layout', LOGO_IMAGE),
   fixture('small-no-padding', LOGO_IMAGE, {size: 0.16, padding: 0}),
   fixture('fractional-padding', LOGO_IMAGE, {size: 0.2, padding: 0.5}),
@@ -71,7 +80,7 @@ export type QRCodeRMQRCenterImageFixture = QRCodeCenterImageFixture & {
 
 const rmqrPayload = 'https://qrcodesdk.dev';
 /** rMQR codes keep the default quiet zone of 2 modules. */
-const rmqrStyle: QRCodeVisualStyle = {moduleSize: 6};
+const rmqrStyle: QRCodeVisualStyle = {moduleSize: 16};
 
 function rmqrFixture(
   name: string,
@@ -92,12 +101,20 @@ function rmqrFixture(
 }
 
 /**
- * rMQR center images at level H. The square image box is sized from the height of the code, so only
+ * rMQR center images at level H. The image size limit comes from the height of the code, so only
  * the taller versions keep enough modules to scan.
  */
 export const QR_CODE_RMQR_CENTER_IMAGE_FIXTURES: readonly QRCodeRMQRCenterImageFixture[] = [
   rmqrFixture('rmqr-r17x139-qrcodesdk-logo-square', 'R17x139', QRCODESDK_LOGO_IMAGE),
   rmqrFixture('rmqr-r17x139-qrcodesdk-logo-wide', 'R17x139', QRCODESDK_WIDE_LOGO_IMAGE),
+  rmqrFixture('rmqr-r17x139-qrcodesdk-logo-wide-no-padding', 'R17x139', QRCODESDK_WIDE_LOGO_IMAGE, {
+    size: 1,
+    padding: 0,
+  }),
+  {
+    ...rmqrFixture('rmqr-r17x139-qrcodesdk-logo-wide-slash', 'R17x139', QRCODESDK_WIDE_LOGO_IMAGE),
+    payload: '/',
+  },
   rmqrFixture('rmqr-r11x77-default-layout', 'R11x77', LOGO_IMAGE),
   rmqrFixture('rmqr-r13x99-default-layout', 'R13x99', LOGO_IMAGE),
   rmqrFixture('rmqr-r15x139-default-layout', 'R15x139', LOGO_IMAGE),

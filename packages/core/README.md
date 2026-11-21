@@ -165,6 +165,7 @@ import {
   type QRCodeErrorOptions,
   type QRCodeSVGAccessibilityOptions,
   type QRCodeSVGCenterImage,
+  type QRCodeSVGCenterImageLayout,
   type QRCodeSVGOptions,
   QRCodeSVGRenderer,
   type QRCodeSVGRendererOptions,

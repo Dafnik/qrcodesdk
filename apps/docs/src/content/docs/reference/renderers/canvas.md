@@ -95,7 +95,7 @@ const canvas = qrcode('https://qrcodesdk.dev')
 | `layout.clearBackground` | `boolean`           | `true`   | Removes every module the image or its padding touches     |
 
 The source can be any ready `CanvasImageSource`, such as an `HTMLImageElement`, another canvas, or
-an `ImageBitmap`.
+an `ImageBitmap`. The cutout follows the fitted image and its padding.
 
 ## Constraints
 

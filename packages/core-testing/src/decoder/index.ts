@@ -2,6 +2,8 @@ import {type ReadResult, readBarcodes} from 'zxing-wasm/reader';
 
 import type {QRCodeMatrix} from '@qrcodesdk/core';
 
+import {largestQRCode} from './largest-qrcode';
+
 /**
  * Decodes QR codes, Micro QR codes, and rMQR codes with ZXing-C++. Prepare the WebAssembly binary first: Node.js
  * tests import `@repo/core-testing/decoder/node`, and browser tests call `prepareZXingModule()` with
@@ -22,17 +24,18 @@ export async function decodeQRCode(
   height: number,
   format: QRCodeScanFormat = 'QRCodeModel2',
 ): Promise<QRCodeScan> {
-  const [result] = await readBarcodes(
+  const results = await readBarcodes(
     {data, width, height, colorSpace: 'srgb'},
     {
       formats: [format],
       tryHarder: true,
       tryInvert: false,
-      maxNumberOfSymbols: 1,
+      maxNumberOfSymbols: 0,
       textMode: 'Plain',
     },
   );
-  if (!result?.isValid) {
+  const result = largestQRCode(results);
+  if (!result) {
     throw new Error(`Unable to decode ${format} rendered to ${width}x${height} pixels`);
   }
   const {text, version, ecLevel, isMirrored} = result;

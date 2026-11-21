@@ -99,6 +99,7 @@ const svg = qrcode('https://qrcodesdk.dev')
 | ------------------------ | -------------------- | -------- | --------------------------------------------------------- |
 | `source`                 | `QRCodeDataImageURL` | required | Embeds a prepared `data:image/...` URL                    |
 | `layout.size`            | `number`             | `0.3`    | Square image box as a fraction of the shorter matrix side |
+| `layout.aspectRatio`     | `number`             | `1`      | Source width divided by height, used to fit the cutout    |
 | `layout.padding`         | `number`             | `1`      | Cleared border around the image, in modules               |
 | `layout.clearBackground` | `boolean`            | `true`   | Removes every module the image or its padding touches     |
 
@@ -111,7 +112,8 @@ const svg = qrcode('https://qrcodesdk.dev')
 - **Uploaded images.** `svgCenterImage()` checks the URL format, not the embedded image. Validate
   uploads before you create the data URL.
 - **Center image layout.** `size` must be finite, greater than `0`, and at most `1`. `padding` must
-  be finite and non-negative. `svgCenterImage()` validates both when it is called.
+  be finite and non-negative. `aspectRatio` must be finite and positive. `svgCenterImage()`
+  validates these values when it is called.
 - **Labels.** `ariaLabel` and `title` must contain only characters that XML allows. Control
   characters other than tab, line feed, and carriage return throw `QRCodeError` with code
   `INVALID_OPTIONS` when `QRCodeSVGRenderer()` is called. `details.field` is

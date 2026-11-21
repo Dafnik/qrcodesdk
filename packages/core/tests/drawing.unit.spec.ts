@@ -212,26 +212,36 @@ describe('createQRCodeCenterImagePlacement', () => {
     expect(createQRCodeCenterImagePlacement({size: 0.4}).place(drawing)).toEqual({
       x: 10.3,
       y: 10.3,
-      size: 8.4,
+      width: 8.4,
+      height: 8.4,
     });
   });
 
-  test('clears every module the image or its padding touches', () => {
-    const matrix = qrcode('image').matrix();
-    const {part} = createQRCodeCenterImagePlacement({size: 0.4, padding: 1});
-    const drawing = createQRCodeStyler({quietZone: 0}, [part])(matrix);
-    // The image spans 6.3 to 14.7, so padding clears modules 5 through 15.
-    let cleared = 0;
-    for (let y = 5; y <= 15; y++) {
-      for (let x = 5; x <= 15; x++) cleared += matrix.modules[y * matrix.width + x]!;
-    }
+  test.each([
+    [1, 5, 5],
+    [2, 5, 7],
+    [0.5, 7, 5],
+  ])(
+    'clears the fitted image and its padding at aspect ratio %s',
+    (aspectRatio, startX, startY) => {
+      const matrix = qrcode('image').matrix();
+      const {part} = createQRCodeCenterImagePlacement({size: 0.4, padding: 1}, aspectRatio);
+      const drawing = createQRCodeStyler({quietZone: 0}, [part])(matrix);
+      // The long axis clears modules 5 through 15 and the short axis clears 7 through 13.
+      let cleared = 0;
+      for (let y = startY; y < matrix.height - startY; y++) {
+        for (let x = startX; x < matrix.width - startX; x++) {
+          cleared += matrix.modules[y * matrix.width + x]!;
+        }
+      }
 
-    expect(area(drawing.layers[0]!.rects)).toBe(countDark(matrix) - cleared);
-    const kept = createQRCodeStyler({quietZone: 0}, [
-      createQRCodeCenterImagePlacement({clearBackground: false}).part,
-    ])(matrix);
-    expect(area(kept.layers[0]!.rects)).toBe(countDark(matrix));
-  });
+      expect(area(drawing.layers[0]!.rects)).toBe(countDark(matrix) - cleared);
+      const kept = createQRCodeStyler({quietZone: 0}, [
+        createQRCodeCenterImagePlacement({clearBackground: false}).part,
+      ])(matrix);
+      expect(area(kept.layers[0]!.rects)).toBe(countDark(matrix));
+    },
+  );
 
   test('skips alignment patterns behind the image', () => {
     const matrix = qrcode('alignment behind image').version(7).matrix();

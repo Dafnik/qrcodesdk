@@ -195,4 +195,16 @@ describe('svgCenterImage', () => {
       );
     }
   });
+
+  test.each([0, -1, NaN, Infinity])(
+    'rejects an invalid image aspect ratio of %s',
+    (aspectRatio) => {
+      expect(() => svgCenterImage('data:image/png;base64,a', {aspectRatio})).toThrowError(
+        expect.objectContaining({
+          code: 'INVALID_OPTIONS',
+          details: expect.objectContaining({field: 'centerImage.aspectRatio'}),
+        }),
+      );
+    },
+  );
 });
