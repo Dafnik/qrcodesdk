@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-21T09:00:26.117Z",
-  "commit": "dd1cb706f1b3",
-  "environment": {"os": "Linux 7.0.0-1014-aws x64", "cpu": "Intel(R) Xeon(R) 6975P-C", "cores": 4, "memoryGB": 15, "node": "v26.13.1"},
+  "generatedAt": "2026-11-22T09:07:43.998Z",
+  "commit": "a81e597b5fb6",
+  "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "INTEL(R) XEON(R) PLATINUM 8573C", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
     {"id": "matrix", "title": "Matrix generation"},
@@ -1269,8 +1269,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 15596, "gzip": 7091, "brotli": 6453},
-        "initial": {"min": 15596, "gzip": 7091, "brotli": 6453},
+        "total": {"min": 15596, "gzip": 7093, "brotli": 6470},
+        "initial": {"min": 15596, "gzip": 7093, "brotli": 6470},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1344,8 +1344,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 15596, "gzip": 7112, "brotli": 6452},
-        "initial": {"min": 15596, "gzip": 7112, "brotli": 6452},
+        "total": {"min": 15596, "gzip": 7111, "brotli": 6484},
+        "initial": {"min": 15596, "gzip": 7111, "brotli": 6484},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1422,8 +1422,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16128, "gzip": 7357, "brotli": 6692},
-        "initial": {"min": 16128, "gzip": 7357, "brotli": 6692},
+        "total": {"min": 16128, "gzip": 7357, "brotli": 6714},
+        "initial": {"min": 16128, "gzip": 7357, "brotli": 6714},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1497,8 +1497,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 15110, "gzip": 6787, "brotli": 6186},
-        "initial": {"min": 15110, "gzip": 6787, "brotli": 6186},
+        "total": {"min": 15110, "gzip": 6786, "brotli": 6191},
+        "initial": {"min": 15110, "gzip": 6786, "brotli": 6191},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1658,8 +1658,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 22270, "gzip": 9673, "brotli": 8810},
-        "initial": {"min": 22270, "gzip": 9673, "brotli": 8810},
+        "total": {"min": 22270, "gzip": 9673, "brotli": 8808},
+        "initial": {"min": 22270, "gzip": 9673, "brotli": 8808},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1739,8 +1739,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 19476, "gzip": 8594, "brotli": 7812},
-        "initial": {"min": 19476, "gzip": 8594, "brotli": 7812},
+        "total": {"min": 19476, "gzip": 8594, "brotli": 7824},
+        "initial": {"min": 19476, "gzip": 8594, "brotli": 7824},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1821,8 +1821,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 22967, "gzip": 10186, "brotli": 9249},
-        "initial": {"min": 22967, "gzip": 10186, "brotli": 9249},
+        "total": {"min": 22967, "gzip": 10185, "brotli": 9238},
+        "initial": {"min": 22967, "gzip": 10185, "brotli": 9238},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1912,8 +1912,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 31926, "gzip": 13673, "brotli": 12426},
-        "initial": {"min": 31926, "gzip": 13673, "brotli": 12426},
+        "total": {"min": 31926, "gzip": 13673, "brotli": 12436},
+        "initial": {"min": 31926, "gzip": 13673, "brotli": 12436},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -1942,35 +1942,35 @@
       ],
       "baseline": "image-all",
       "vite": {
-        "total": {"min": 34929, "gzip": 14594, "brotli": 13122},
-        "initial": {"min": 34929, "gzip": 14594, "brotli": 13122},
+        "total": {"min": 35093, "gzip": 14652, "brotli": 13181},
+        "initial": {"min": 35093, "gzip": 14652, "brotli": 13181},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 33743,
-        "areas": {"core:matrix": 8700, "core:jpeg-encoder": 6178, "core:styler": 4856, "core:webp-encoder": 4354, "core:gif-encoder": 2941, "core:raster-shared": 1811, "browser:canvas": 1609, "core:builder": 1180, "other": 1109, "browser:image": 879, "browser:download": 750, "core:error": 141, "browser:gif": 119, "browser:jpeg": 119, "app": 77, "browser:png": 55, "browser:webp": 51},
+        "sdkBytes": 33907,
+        "areas": {"core:matrix": 8700, "core:jpeg-encoder": 6178, "core:styler": 5036, "core:webp-encoder": 4354, "core:gif-encoder": 2941, "core:raster-shared": 1811, "browser:canvas": 1593, "core:builder": 1180, "other": 1109, "browser:image": 879, "browser:download": 750, "core:error": 141, "browser:gif": 119, "browser:jpeg": 119, "app": 77, "browser:png": 55, "browser:webp": 51},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 34929, "gzip": 14594, "brotli": 13122},
+            "sizes": {"min": 35093, "gzip": 14652, "brotli": 13181},
             "modules": [
               {"path": "packages/core/src/raster/jpeg.ts", "area": "core:jpeg-encoder", "bytes": 6178},
               {"path": "packages/core/src/raster/webp.ts", "area": "core:webp-encoder", "bytes": 4354},
               {"path": "packages/core/src/raster/gif.ts", "area": "core:gif-encoder", "bytes": 2941},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2615},
-              {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 1609},
+              {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 1593},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1591},
               {"path": "packages/core/src/raster/huffman.ts", "area": "core:raster-shared", "bytes": 1294},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
               {"path": "(unmapped)", "area": "other", "bytes": 1109},
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1052},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 949},
+              {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 781},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 772},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 708},
               {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 642},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 634},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 608},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 606},
-              {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 601},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 380},
               {"path": "packages/core/src/raster/byte-buffer.ts", "area": "core:raster-shared", "bytes": 372},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -2008,14 +2008,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 34411, "gzip": 14662, "brotli": 13238},
-        "initial": {"min": 34411, "gzip": 14662, "brotli": 13238},
+        "total": {"min": 34575, "gzip": 14724, "brotli": 13283},
+        "initial": {"min": 34575, "gzip": 14724, "brotli": 13283},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 34802, "gzip": 14282, "brotli": 12846},
-        "initial": {"min": 34802, "gzip": 14282, "brotli": 12846},
+        "total": {"min": 34968, "gzip": 14342, "brotli": 12888},
+        "initial": {"min": 34968, "gzip": 14342, "brotli": 12888},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2085,8 +2085,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 17645, "gzip": 8054, "brotli": 7332},
-        "initial": {"min": 17645, "gzip": 8054, "brotli": 7332},
+        "total": {"min": 17645, "gzip": 8055, "brotli": 7317},
+        "initial": {"min": 17645, "gzip": 8055, "brotli": 7317},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2162,8 +2162,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16398, "gzip": 7461, "brotli": 6792},
-        "initial": {"min": 16398, "gzip": 7461, "brotli": 6792},
+        "total": {"min": 16398, "gzip": 7461, "brotli": 6774},
+        "initial": {"min": 16398, "gzip": 7461, "brotli": 6774},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2239,8 +2239,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 17651, "gzip": 8063, "brotli": 7323},
-        "initial": {"min": 17651, "gzip": 8063, "brotli": 7323},
+        "total": {"min": 17651, "gzip": 8064, "brotli": 7335},
+        "initial": {"min": 17651, "gzip": 8064, "brotli": 7335},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2316,8 +2316,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 19235, "gzip": 8660, "brotli": 7843},
-        "initial": {"min": 19235, "gzip": 8660, "brotli": 7843},
+        "total": {"min": 19235, "gzip": 8659, "brotli": 7856},
+        "initial": {"min": 19235, "gzip": 8659, "brotli": 7856},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2393,8 +2393,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 19415, "gzip": 8736, "brotli": 7932},
-        "initial": {"min": 19415, "gzip": 8736, "brotli": 7932},
+        "total": {"min": 19415, "gzip": 8735, "brotli": 7929},
+        "initial": {"min": 19415, "gzip": 8735, "brotli": 7929},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2472,8 +2472,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 18575, "gzip": 8549, "brotli": 7760},
-        "initial": {"min": 18575, "gzip": 8549, "brotli": 7760},
+        "total": {"min": 18575, "gzip": 8547, "brotli": 7809},
+        "initial": {"min": 18575, "gzip": 8547, "brotli": 7809},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2498,29 +2498,29 @@
       ],
       "baseline": "svg",
       "vite": {
-        "total": {"min": 17326, "gzip": 7700, "brotli": 6956},
-        "initial": {"min": 17326, "gzip": 7700, "brotli": 6956},
+        "total": {"min": 17531, "gzip": 7772, "brotli": 7031},
+        "initial": {"min": 17531, "gzip": 7772, "brotli": 7031},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16551,
-        "areas": {"core:matrix": 8678, "core:styler": 4741, "core:svg": 1814, "core:builder": 1177, "other": 676, "core:error": 141, "app": 99},
+        "sdkBytes": 16756,
+        "areas": {"core:matrix": 8678, "core:styler": 4921, "core:svg": 1839, "core:builder": 1177, "other": 676, "core:error": 141, "app": 99},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 17326, "gzip": 7700, "brotli": 6956},
+            "sizes": {"min": 17531, "gzip": 7772, "brotli": 7031},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2613},
-              {"path": "packages/core/src/svg.ts", "area": "core:svg", "bytes": 1814},
+              {"path": "packages/core/src/svg.ts", "area": "core:svg", "bytes": 1839},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 951},
+              {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 781},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
               {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
-              {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 601},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 594},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 378},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -2549,14 +2549,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16782, "gzip": 7622, "brotli": 6895},
-        "initial": {"min": 16782, "gzip": 7622, "brotli": 6895},
+        "total": {"min": 16987, "gzip": 7702, "brotli": 6966},
+        "initial": {"min": 16987, "gzip": 7702, "brotli": 6966},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 16627, "gzip": 7294, "brotli": 6628},
-        "initial": {"min": 16627, "gzip": 7294, "brotli": 6628},
+        "total": {"min": 16919, "gzip": 7386, "brotli": 6680},
+        "initial": {"min": 16919, "gzip": 7386, "brotli": 6680},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2626,8 +2626,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 18417, "gzip": 8243, "brotli": 7481},
-        "initial": {"min": 18417, "gzip": 8243, "brotli": 7481},
+        "total": {"min": 18417, "gzip": 8243, "brotli": 7509},
+        "initial": {"min": 18417, "gzip": 8243, "brotli": 7509},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2652,29 +2652,29 @@
       ],
       "baseline": "canvas",
       "vite": {
-        "total": {"min": 17089, "gzip": 7418, "brotli": 6679},
-        "initial": {"min": 17089, "gzip": 7418, "brotli": 6679},
+        "total": {"min": 17253, "gzip": 7477, "brotli": 6723},
+        "initial": {"min": 17253, "gzip": 7477, "brotli": 6723},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
-        "sdkBytes": 16333,
-        "areas": {"core:matrix": 8668, "core:styler": 4742, "browser:canvas": 1605, "core:builder": 1177, "other": 676, "core:error": 141, "app": 80},
+        "sdkBytes": 16497,
+        "areas": {"core:matrix": 8668, "core:styler": 4922, "browser:canvas": 1589, "core:builder": 1177, "other": 676, "core:error": 141, "app": 80},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 17089, "gzip": 7418, "brotli": 6679},
+            "sizes": {"min": 17253, "gzip": 7477, "brotli": 6723},
             "modules": [
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2615},
-              {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 1605},
+              {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 1589},
               {"path": "packages/core/src/matrix/resolve-matrix-options.ts", "area": "core:matrix", "bytes": 1583},
               {"path": "packages/core/src/matrix/mode.ts", "area": "core:matrix", "bytes": 1281},
               {"path": "packages/core/src/qrcode-builder.ts", "area": "core:builder", "bytes": 1049},
               {"path": "packages/core/src/matrix/create-base-matrix.ts", "area": "core:matrix", "bytes": 950},
+              {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 780},
               {"path": "packages/core/src/drawing/path-data.ts", "area": "core:styler", "bytes": 699},
               {"path": "(unmapped)", "area": "other", "bytes": 676},
               {"path": "packages/core/src/styling.ts", "area": "core:styler", "bytes": 668},
               {"path": "packages/core/src/matrix/apply-mask-to-matrix.ts", "area": "core:matrix", "bytes": 639},
               {"path": "packages/core/src/matrix/version-config.ts", "area": "core:matrix", "bytes": 613},
-              {"path": "packages/core/src/drawing/center-image.ts", "area": "core:styler", "bytes": 600},
               {"path": "packages/core/src/matrix/evaluate-matrix.ts", "area": "core:matrix", "bytes": 590},
               {"path": "packages/core/src/matrix/error-correction.ts", "area": "core:matrix", "bytes": 377},
               {"path": "packages/core/src/matrix/encode.ts", "area": "core:matrix", "bytes": 362},
@@ -2703,14 +2703,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16549, "gzip": 7336, "brotli": 6655},
-        "initial": {"min": 16549, "gzip": 7336, "brotli": 6655},
+        "total": {"min": 16713, "gzip": 7393, "brotli": 6716},
+        "initial": {"min": 16713, "gzip": 7393, "brotli": 6716},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
       "webpack": {
-        "total": {"min": 16363, "gzip": 7003, "brotli": 6341},
-        "initial": {"min": 16363, "gzip": 7003, "brotli": 6341},
+        "total": {"min": 16619, "gzip": 7088, "brotli": 6421},
+        "initial": {"min": 16619, "gzip": 7088, "brotli": 6421},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -2787,14 +2787,14 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 16958, "gzip": 8162, "brotli": 7393},
-        "initial": {"min": 10311, "gzip": 4833, "brotli": 4387},
-        "lazy": {"min": 6647, "gzip": 3329, "brotli": 3006},
+        "total": {"min": 17163, "gzip": 8243, "brotli": 7441},
+        "initial": {"min": 10311, "gzip": 4832, "brotli": 4370},
+        "lazy": {"min": 6852, "gzip": 3411, "brotli": 3071},
         "chunkCount": 3
       },
       "webpack": {
-        "total": {"min": 18531, "gzip": 8567, "brotli": 7720},
-        "initial": {"min": 12922, "gzip": 5784, "brotli": 5196},
+        "total": {"min": 18531, "gzip": 8568, "brotli": 7716},
+        "initial": {"min": 12922, "gzip": 5785, "brotli": 5192},
         "lazy": {"min": 5609, "gzip": 2783, "brotli": 2524},
         "chunkCount": 2
       },
@@ -2900,15 +2900,15 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 24906, "gzip": 12118, "brotli": 10948},
-        "initial": {"min": 16053, "gzip": 7654, "brotli": 6943},
-        "lazy": {"min": 8853, "gzip": 4464, "brotli": 4005},
+        "total": {"min": 24906, "gzip": 12121, "brotli": 10962},
+        "initial": {"min": 16053, "gzip": 7654, "brotli": 6957},
+        "lazy": {"min": 8853, "gzip": 4467, "brotli": 4005},
         "chunkCount": 5
       },
       "webpack": {
-        "total": {"min": 29587, "gzip": 13444, "brotli": 12013},
-        "initial": {"min": 19059, "gzip": 8456, "brotli": 7592},
-        "lazy": {"min": 10528, "gzip": 4988, "brotli": 4421},
+        "total": {"min": 29583, "gzip": 13437, "brotli": 11997},
+        "initial": {"min": 19057, "gzip": 8455, "brotli": 7577},
+        "lazy": {"min": 10526, "gzip": 4982, "brotli": 4420},
         "chunkCount": 3
       },
       "problems": [],
@@ -3004,8 +3004,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 24094, "gzip": 11830, "brotli": 10797},
-        "initial": {"min": 16192, "gzip": 7986, "brotli": 7285},
+        "total": {"min": 24094, "gzip": 11830, "brotli": 10801},
+        "initial": {"min": 16192, "gzip": 7986, "brotli": 7289},
         "lazy": {"min": 7902, "gzip": 3844, "brotli": 3512},
         "chunkCount": 5
       },
@@ -3033,16 +3033,16 @@
       ],
       "baseline": "empty",
       "vite": {
-        "total": {"min": 23051, "gzip": 10752, "brotli": 9680},
-        "initial": {"min": 2550, "gzip": 1241, "brotli": 1102},
-        "lazy": {"min": 20501, "gzip": 9511, "brotli": 8578},
+        "total": {"min": 23051, "gzip": 10746, "brotli": 9671},
+        "initial": {"min": 2550, "gzip": 1237, "brotli": 1096},
+        "lazy": {"min": 20501, "gzip": 9509, "brotli": 8575},
         "sdkBytes": 20042,
         "areas": {"core:matrix": 8666, "core:styler": 4140, "core:style-patterns": 3171, "other": 2649, "core:svg": 1272, "core:builder": 1177, "browser:canvas": 790, "browser:image": 631, "app": 360, "core:error": 141, "browser:png": 54},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 2550, "gzip": 1241, "brotli": 1102},
+            "sizes": {"min": 2550, "gzip": 1237, "brotli": 1096},
             "modules": [
               {"path": "(unmapped)", "area": "other", "bytes": 2356},
               {"path": "packages/perf/.cache/size/split-routes/main.js", "area": "app", "bytes": 194}
@@ -3051,7 +3051,7 @@
           {
             "name": "assets/route-png.js",
             "kind": "lazy",
-            "sizes": {"min": 1635, "gzip": 865, "brotli": 730},
+            "sizes": {"min": 1635, "gzip": 864, "brotli": 728},
             "modules": [
               {"path": "packages/browser/src/canvas.ts", "area": "browser:canvas", "bytes": 790},
               {"path": "packages/browser/src/image-base.ts", "area": "browser:image", "bytes": 631},
@@ -3063,7 +3063,7 @@
           {
             "name": "assets/route-svg.js",
             "kind": "lazy",
-            "sizes": {"min": 4668, "gzip": 2431, "brotli": 2196},
+            "sizes": {"min": 4668, "gzip": 2430, "brotli": 2195},
             "modules": [
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 3171},
               {"path": "packages/core/src/svg.ts", "area": "core:svg", "bytes": 1272},
@@ -3072,7 +3072,7 @@
             ]
           },
           {
-            "name": "assets/styler-BT7aDyzU.js",
+            "name": "assets/styler-CVuWrXNa.js",
             "kind": "lazy",
             "sizes": {"min": 14198, "gzip": 6215, "brotli": 5652},
             "modules": [
@@ -3113,15 +3113,15 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 20793, "gzip": 9946, "brotli": 8961},
+        "total": {"min": 20793, "gzip": 9948, "brotli": 8957},
         "initial": {"min": 142, "gzip": 139, "brotli": 106},
-        "lazy": {"min": 20651, "gzip": 9807, "brotli": 8855},
+        "lazy": {"min": 20651, "gzip": 9809, "brotli": 8851},
         "chunkCount": 4
       },
       "webpack": {
-        "total": {"min": 24344, "gzip": 11340, "brotli": 10194},
-        "initial": {"min": 3080, "gzip": 1594, "brotli": 1389},
-        "lazy": {"min": 21264, "gzip": 9746, "brotli": 8805},
+        "total": {"min": 24341, "gzip": 11335, "brotli": 10134},
+        "initial": {"min": 3080, "gzip": 1595, "brotli": 1385},
+        "lazy": {"min": 21261, "gzip": 9740, "brotli": 8749},
         "chunkCount": 4
       },
       "problems": [],
@@ -3241,8 +3241,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 240115, "gzip": 76610, "brotli": 66136},
-        "initial": {"min": 240115, "gzip": 76610, "brotli": 66136},
+        "total": {"min": 240115, "gzip": 76609, "brotli": 66154},
+        "initial": {"min": 240115, "gzip": 76609, "brotli": 66154},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3326,8 +3326,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 243451, "gzip": 78103, "brotli": 67498},
-        "initial": {"min": 243451, "gzip": 78103, "brotli": 67498},
+        "total": {"min": 243451, "gzip": 78100, "brotli": 67479},
+        "initial": {"min": 243451, "gzip": 78100, "brotli": 67479},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3602,8 +3602,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 259050, "gzip": 84168, "brotli": 72960},
-        "initial": {"min": 259050, "gzip": 84168, "brotli": 72960},
+        "total": {"min": 259050, "gzip": 84166, "brotli": 72954},
+        "initial": {"min": 259050, "gzip": 84166, "brotli": 72954},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3733,8 +3733,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 80314, "gzip": 32588, "brotli": 29559},
-        "initial": {"min": 80314, "gzip": 32588, "brotli": 29559},
+        "total": {"min": 80314, "gzip": 32589, "brotli": 29555},
+        "initial": {"min": 80314, "gzip": 32589, "brotli": 29555},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3903,8 +3903,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 79710, "gzip": 32169, "brotli": 29163},
-        "initial": {"min": 79710, "gzip": 32169, "brotli": 29163},
+        "total": {"min": 79710, "gzip": 32169, "brotli": 29121},
+        "initial": {"min": 79710, "gzip": 32169, "brotli": 29121},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -3992,8 +3992,8 @@
         "duplicates": []
       },
       "esbuild": {
-        "total": {"min": 81113, "gzip": 32715, "brotli": 29638},
-        "initial": {"min": 81113, "gzip": 32715, "brotli": 29638},
+        "total": {"min": 81113, "gzip": 32715, "brotli": 29673},
+        "initial": {"min": 81113, "gzip": 32715, "brotli": 29673},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "chunkCount": 1
       },
@@ -4961,8 +4961,8 @@
     }
   ],
   "packages": [
-    {"name": "@qrcodesdk/core", "version": "0.0.6", "packed": 205574, "unpacked": 693074, "files": 103},
-    {"name": "@qrcodesdk/browser", "version": "0.0.6", "packed": 16880, "unpacked": 58817, "files": 45},
+    {"name": "@qrcodesdk/core", "version": "0.0.6", "packed": 205964, "unpacked": 694632, "files": 103},
+    {"name": "@qrcodesdk/browser", "version": "0.0.6", "packed": 16737, "unpacked": 58436, "files": 45},
     {"name": "@qrcodesdk/node", "version": "0.0.6", "packed": 8401, "unpacked": 28643, "files": 8},
     {"name": "@qrcodesdk/react", "version": "0.0.6", "packed": 12232, "unpacked": 49084, "files": 8},
     {"name": "@qrcodesdk/vue", "version": "0.0.6", "packed": 12127, "unpacked": 51226, "files": 8},
