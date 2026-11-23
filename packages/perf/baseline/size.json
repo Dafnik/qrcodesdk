@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-22T09:07:43.998Z",
-  "commit": "a81e597b5fb6",
+  "generatedAt": "2026-11-23T10:01:36.351Z",
+  "commit": "16afd6614011",
   "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "INTEL(R) XEON(R) PLATINUM 8573C", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
