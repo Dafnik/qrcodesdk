@@ -30,12 +30,6 @@ pnpm add @qrcodesdk/angular
 vp add @qrcodesdk/angular
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/angular
-```
-
 **bun**
 
 ```sh

@@ -30,12 +30,6 @@ pnpm add @qrcodesdk/core
 vp add @qrcodesdk/core
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/core
-```
-
 **bun**
 
 ```sh
@@ -106,7 +100,6 @@ Node.js, DOM, filesystem, or framework dependency.
 | Runtime                         | Support policy                                          |
 | ------------------------------- | ------------------------------------------------------- |
 | Node.js                         | 22.0.0 or newer; tested on 22, 24, and 26               |
-| Deno                            | Current stable major                                    |
 | Bun                             | Current stable release                                  |
 | Browsers                        | Current evergreen browser families                      |
 | Other runtimes and edge workers | Native ESM, ES2020, and a global `TextEncoder` required |

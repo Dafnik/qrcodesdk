@@ -18,7 +18,7 @@ const executable = path.join(
   'bin.mjs',
 );
 const outputDirectory = await mkdtemp(path.join(tmpdir(), 'qrcodesdk-cli-runtime-'));
-// CI runs this script directly with Node, Deno, or Bun, outside Turbo.
+// CI runs this script directly with Node or Bun, outside Turbo.
 // eslint-disable-next-line turbo/no-undeclared-env-vars
 const runtime = process.env['QRCODESDK_RUNTIME'] ?? 'node';
 
@@ -30,16 +30,6 @@ function runtimeCommand(args) {
   switch (runtime) {
     case 'node':
       return {command: process.execPath, args: [executable, ...args]};
-    case 'deno': {
-      const command = globalThis.Deno?.execPath();
-      if (!command) {
-        throw new Error('Unsupported or missing CLI runtime binary: deno');
-      }
-      return {
-        command,
-        args: ['run', '-A', '--node-modules-dir=manual', executable, ...args],
-      };
-    }
     case 'bun': {
       const command = globalThis.Bun?.which('bun');
       if (!command) {

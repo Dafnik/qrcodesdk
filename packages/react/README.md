@@ -30,12 +30,6 @@ pnpm add @qrcodesdk/react
 vp add @qrcodesdk/react
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/react
-```
-
 **bun**
 
 ```sh

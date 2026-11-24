@@ -30,12 +30,6 @@ pnpm add @qrcodesdk/core @qrcodesdk/node
 vp add @qrcodesdk/core @qrcodesdk/node
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/core npm:@qrcodesdk/node
-```
-
 **bun**
 
 ```sh
@@ -112,8 +106,7 @@ File sizes for a default QR code for `https://qrcodesdk.dev`:
 ## Runtime requirements
 
 - Node.js 22.0.0 or newer; tested on 22, 24, and 26.
-- Deno (current stable major) and Bun (current stable release), through their Node.js compatibility
-  layers.
+- Bun (current stable release), through its Node.js compatibility layer.
 - Not for browsers: use [`@qrcodesdk/browser`](https://qrcodesdk.dev/packages/browser/) there. Edge workers are untested.
 - TypeScript: the public API uses Node's global `Buffer` type. Add `@types/node` to your development
   dependencies and enable Node types in your TypeScript options.

@@ -30,12 +30,6 @@ pnpm add @qrcodesdk/vue
 vp add @qrcodesdk/vue
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/vue
-```
-
 **bun**
 
 ```sh

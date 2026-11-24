@@ -35,7 +35,7 @@ describe('package manager commands', () => {
 
     assert.deepEqual(
       commands.map(({id}) => id),
-      ['npm', 'pnpm', 'viteplus', 'deno', 'bun'],
+      ['npm', 'pnpm', 'viteplus', 'bun'],
     );
     assert.ok(commands.every(({command}) => !command.includes('yarn global')));
   });

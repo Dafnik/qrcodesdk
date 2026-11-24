@@ -30,12 +30,6 @@ pnpm add @qrcodesdk/svelte
 vp add @qrcodesdk/svelte
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/svelte
-```
-
 **bun**
 
 ```sh

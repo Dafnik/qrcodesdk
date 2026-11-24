@@ -32,12 +32,6 @@ pnpm add @qrcodesdk/react-native react-native-svg
 vp add @qrcodesdk/react-native react-native-svg
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/react-native npm:react-native-svg
-```
-
 **bun**
 
 ```sh
