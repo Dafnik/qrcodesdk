@@ -1,4 +1,11 @@
-import {ChangeDetectionStrategy, Component, computed, linkedSignal, model} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  forwardRef,
+  linkedSignal,
+  model,
+} from '@angular/core';
 
 import {classes} from '@spartan-ng/helm/utils';
 
@@ -11,7 +18,7 @@ const DEFAULT_COLOR: ColorPickerHsva = {h: 258, s: 62, v: 85, a: 1};
 
 @Component({
   selector: 'sim-color-picker',
-  providers: [provideColorPicker(ColorPickerComponent)],
+  providers: [provideColorPicker(forwardRef(() => ColorPickerComponent))],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     'data-slot': 'color-picker',

@@ -7,16 +7,22 @@
     "angular": {
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "development": {
+              "compilationMode": "full",
               "tsConfig": "tsconfig.lib.json"
             },
             "production": {
               "tsConfig": "tsconfig.lib.prod.json"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "allowedNonPeerDependencies": ["@qrcodesdk/browser", "@qrcodesdk/core"],
+            "assets": ["CHANGELOG.md"],
+            "outputPath": "dist/angular"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",

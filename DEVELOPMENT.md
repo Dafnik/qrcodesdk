@@ -117,7 +117,8 @@ coupled to private core source:
   import the option resolver or the Kanji registry; matrices still come from the public builder.
 - Renaming or changing those core helpers can break the docs. The docs `build`, `check-types`, and
   `test` tasks list `packages/core/src` as an input, so Turbo reruns them after core source changes.
-- The Angular type check in `apps/docs/tsconfig.app.json` also checks that core source. Its
+- The Analog NGP compiler uses `apps/docs/tsconfig.app.json` to check Angular code and templates
+  during the docs build. That configuration also includes the imported core source. Its
   `rootDir` is the workspace root, and its `lib` leaves out `es2022.error`: core targets ES2020,
   and under the ES2022 `Error` type, `noImplicitOverride` rejects `QRCodeError.cause`.
 - The explanation tests run in Vitest, because the core source imports modules without file

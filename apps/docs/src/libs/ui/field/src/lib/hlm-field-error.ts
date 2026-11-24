@@ -1,9 +1,9 @@
-import {BooleanInput} from '@angular/cdk/coercion';
+import type {BooleanInput} from '@angular/cdk/coercion';
 import {
   ChangeDetectionStrategy,
   Component,
-  EffectRef,
-  OnDestroy,
+  type EffectRef,
+  type OnDestroy,
   booleanAttribute,
   computed,
   effect,
