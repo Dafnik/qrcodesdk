@@ -38,12 +38,6 @@ pnpm add -g @qrcodesdk/cli
 vp install -g @qrcodesdk/cli
 ```
 
-**deno**
-
-```sh
-deno install --global --allow-read --allow-write --allow-env --name qrc npm:@qrcodesdk/cli
-```
-
 **bun**
 
 ```sh
@@ -52,8 +46,6 @@ bun add -g @qrcodesdk/cli
 
 </details>
 
-- **Deno** grants no permissions by default. Its commands allow reading, writing output files, and
-  reading environment variables such as `NO_COLOR`. The global install also names the command `qrc`.
 - **Yarn 2 and newer** have no global install. Use a project dependency or `yarn dlx` instead.
 
 Or add it to a project and run it from there:
@@ -73,12 +65,6 @@ pnpm add -D @qrcodesdk/cli
 
 ```sh
 vp add -D @qrcodesdk/cli
-```
-
-**deno**
-
-```sh
-deno add --dev npm:@qrcodesdk/cli
 ```
 
 **bun**
@@ -112,12 +98,6 @@ pnpm exec qrc "https://qrcodesdk.dev"
 vp exec qrc "https://qrcodesdk.dev"
 ```
 
-**deno**
-
-```sh
-deno x --allow-read --allow-write --allow-env npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"
-```
-
 **bun**
 
 ```sh
@@ -149,12 +129,6 @@ pnpm dlx @qrcodesdk/cli "https://qrcodesdk.dev"
 
 ```sh
 vp dlx @qrcodesdk/cli "https://qrcodesdk.dev"
-```
-
-**deno**
-
-```sh
-deno x --allow-read --allow-write --allow-env npm:@qrcodesdk/cli/qrc "https://qrcodesdk.dev"
 ```
 
 **bun**

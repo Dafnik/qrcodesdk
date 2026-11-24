@@ -23,12 +23,6 @@ pnpm add @qrcodesdk/core
 vp add @qrcodesdk/core
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/core
-```
-
 **bun**
 
 ```sh

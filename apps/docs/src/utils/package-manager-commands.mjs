@@ -34,15 +34,6 @@ export const PACKAGE_MANAGERS = {
     exec: 'vp exec',
     dlx: 'vp dlx',
   },
-  deno: {
-    label: 'deno',
-    add: 'deno add',
-    addDev: 'deno add --dev',
-    // Deno grants no permissions by default. The CLI reads NO_COLOR and writes output files.
-    addGlobal: 'deno install --global --allow-read --allow-write --allow-env',
-    exec: 'deno x --allow-read --allow-write --allow-env',
-    dlx: 'deno x --allow-read --allow-write --allow-env',
-  },
   bun: {
     label: 'bun',
     add: 'bun add',
@@ -93,30 +84,11 @@ export function createPackageManagerCommands({packages, mode, command, args = []
 
     if (prefix === undefined) return [];
 
-    let target = commandTarget;
-    let name = '';
-
-    if (id === 'deno') {
-      // Deno resolves unprefixed names as npm packages only since 2.8, so always use npm:.
-      const npmPackages = packages.map((name) => `npm:${name}`);
-
-      if ((mode === 'exec' || mode === 'dlx') && packages.length === 1 && command !== undefined) {
-        target = `${npmPackages[0]}/${command}`;
-      } else if (mode !== 'exec') {
-        target = npmPackages.join(' ');
-      }
-
-      // Without --name, Deno derives the executable name from the package name instead of its bin.
-      if (mode === 'addGlobal' && command !== undefined) {
-        name = `--name ${command}`;
-      }
-    }
-
     return [
       {
         id,
         label: commands.label,
-        command: [prefix, name, target, commandArguments]
+        command: [prefix, commandTarget, commandArguments]
           .filter((part) => part !== undefined && part.length > 0)
           .join(' '),
       },

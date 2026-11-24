@@ -26,7 +26,6 @@
     "module",
     "node",
     "browser",
-    "deno",
     "bun"
   ],
   "homepage": "https://qrcodesdk.dev/packages/core",

@@ -30,12 +30,6 @@ pnpm add @qrcodesdk/core @qrcodesdk/browser
 vp add @qrcodesdk/core @qrcodesdk/browser
 ```
 
-**deno**
-
-```sh
-deno add npm:@qrcodesdk/core npm:@qrcodesdk/browser
-```
-
 **bun**
 
 ```sh

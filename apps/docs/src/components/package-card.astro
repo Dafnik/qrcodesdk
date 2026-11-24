@@ -36,17 +36,16 @@ const iconClass = 'shrink-0 text-[var(--sl-color-gray-3)]';
 const rowIconClass = `${iconClass} hidden @[14rem]:block`;
 const valueClass = 'ml-auto font-medium text-[var(--sl-color-white)] tabular-nums';
 
-const WORKS_WITH: Record<string, {label: string; group: string; invertInDark?: boolean}> = {
+const WORKS_WITH: Record<string, {label: string; group: string}> = {
   googlechrome: {label: 'Google Chrome', group: 'browser'},
   firefox: {label: 'Firefox', group: 'browser'},
   safari: {label: 'Safari', group: 'browser'},
   node: {label: 'Node.js', group: 'runtime'},
   bun: {label: 'Bun', group: 'runtime'},
-  deno: {label: 'Deno', group: 'runtime', invertInDark: true},
 };
 
 // Consecutive logos of the same kind (browsers, runtimes) are stacked, the first one on top.
-const worksWithGroups: {id: string; label: string; invertInDark?: boolean}[][] = [];
+const worksWithGroups: {id: string; label: string}[][] = [];
 let previousGroup: string | undefined;
 for (const env of worksWith ?? []) {
   const id = env.toLowerCase();
@@ -150,17 +149,14 @@ for (const env of worksWith ?? []) {
           <div class="ml-auto flex shrink-0 items-center gap-2.5">
             {worksWithGroups.map((group) => (
               <div class="flex items-center">
-                {group.map(({id, label, invertInDark}, index) => (
+                {group.map(({id, label}, index) => (
                   <img
                     src={`/logos/${id}.svg`}
                     width="20"
                     height="20"
                     alt={`Works with ${label}`}
                     title={label}
-                    class:list={[
-                      'relative size-5 rounded-full bg-[var(--sl-color-bg-nav)] object-contain ring-2 ring-[var(--sl-color-bg-nav)] select-none not-first:-ml-1.5',
-                      invertInDark && 'dark:invert',
-                    ]}
+                    class="relative size-5 rounded-full bg-[var(--sl-color-bg-nav)] object-contain ring-2 ring-[var(--sl-color-bg-nav)] select-none not-first:-ml-1.5"
                     style={{zIndex: group.length - index}}
                   />
                 ))}

@@ -45,8 +45,8 @@ exact versions:
 | `@qrcodesdk/cli`     | Node.js 22.12.0 or newer (`engines.node: ">=22.12.0"`)                                                                                                    |
 | Framework packages   | The [framework versions](#framework-versions) below. Image and Canvas components also need the browser requirements. `QRCodeSVG` can render on the server |
 
-See [Runtime compatibility](/packages/core/#runtime-compatibility) for Core's Node.js, Deno, Bun,
-and browser support policy.
+See [Runtime compatibility](/packages/core/#runtime-compatibility) for Core's Node.js, Bun, and
+browser support policy.
 
 ## Framework versions
 

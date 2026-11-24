@@ -7,7 +7,6 @@ packageName: '@qrcodesdk/cli'
 worksWith:
   - 'node'
   - 'bun'
-  - 'deno'
 
 related:
   - ../getting-started/choose-your-setup.mdx
@@ -35,8 +34,6 @@ Install it globally to use `qrc` anywhere:
 
 <PackageManagerTabs packages={['@qrcodesdk/cli']} mode="addGlobal" command="qrc" />
 
-- **Deno** grants no permissions by default. Its commands allow reading, writing output files, and
-  reading environment variables such as `NO_COLOR`. The global install also names the command `qrc`.
 - **Yarn 2 and newer** have no global install. Use a project dependency or `yarn dlx` instead.
 
 Or add it to a project and run it from there:

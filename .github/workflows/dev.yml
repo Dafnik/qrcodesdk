@@ -175,9 +175,6 @@ jobs:
             runtime: node
             version: 26.x
           - package: core
-            runtime: deno
-            version: v2.x
-          - package: core
             runtime: bun
             version: latest
           - package: node
@@ -190,9 +187,6 @@ jobs:
             runtime: node
             version: 26.x
           - package: node
-            runtime: deno
-            version: v2.x
-          - package: node
             runtime: bun
             version: latest
           - package: cli
@@ -204,9 +198,6 @@ jobs:
           - package: cli
             runtime: node
             version: 26.x
-          - package: cli
-            runtime: deno
-            version: v2.x
           - package: cli
             runtime: bun
             version: latest
@@ -221,19 +212,6 @@ jobs:
         with:
           node-version: ${{ matrix.version }}
           package-manager-cache: false
-
-      - name: Setup Node for package installation
-        if: matrix.runtime == 'deno'
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-        with:
-          node-version: '24'
-          package-manager-cache: false
-
-      - name: Setup Deno
-        if: matrix.runtime == 'deno'
-        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
-        with:
-          deno-version: ${{ matrix.version }}
 
       - name: Setup Bun
         if: matrix.runtime == 'bun'
@@ -307,18 +285,13 @@ jobs:
             ' -- "${package_specs[@]}"
             bun install --ignore-scripts --no-save
           else
-            if [ "$RUNTIME" = 'node' ]; then
-              npm config set engine-strict true --location=project
-            fi
+            npm config set engine-strict true --location=project
             npm install --ignore-scripts --no-audit --no-fund --package-lock=false "${tarballs[@]}"
           fi
 
           case "$RUNTIME" in
             node)
               QRCODESDK_RUNTIME=node node smoke-package.mjs
-              ;;
-            deno)
-              QRCODESDK_RUNTIME=deno deno run -A --node-modules-dir=manual smoke-package.mjs
               ;;
             bun)
               QRCODESDK_RUNTIME=bun bun run smoke-package.mjs
@@ -381,7 +354,7 @@ jobs:
         run: pnpm turbo run test:browser-runtime --filter=@qrcodesdk/browser
 
   framework-runtime:
-    name: ${{ matrix.framework }} ${{ matrix.version }} consumer
+    name: ${{ matrix.framework }} consumer
     needs: build
     runs-on: ubuntu-latest
     strategy:
@@ -389,27 +362,15 @@ jobs:
       matrix:
         include:
           - framework: react
-            version: '18'
-          - framework: react
-            version: '19'
+            versions: '18 19'
           - framework: next
-            version: '15'
-          - framework: next
-            version: '16'
+            versions: '15 16'
           - framework: angular
-            version: '20'
-          - framework: angular
-            version: '21'
-          - framework: angular
-            version: '22'
+            versions: '20 21 22'
           - framework: vue
-            version: '3.3'
-          - framework: vue
-            version: '3.5'
+            versions: '3.3 3.5'
           - framework: svelte
-            version: '5.0'
-          - framework: svelte
-            version: '5.56'
+            versions: '5.0 5.56'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -431,23 +392,27 @@ jobs:
           name: runtime-packages
           path: ${{ runner.temp }}/runtime-packages
 
-      - name: Test framework consumer
+      - name: Test framework versions
+        shell: bash
         env:
           QRCODESDK_FRAMEWORK: ${{ matrix.framework }}
-          QRCODESDK_FRAMEWORK_VERSION: ${{ matrix.version }}
+          FRAMEWORK_VERSIONS: ${{ matrix.versions }}
           QRCODESDK_PACKAGES: ${{ runner.temp }}/runtime-packages
-        run: pnpm turbo run test:framework-runtime --filter=@qrcodesdk/browser
+        run: |
+          read -r -a versions <<< "$FRAMEWORK_VERSIONS"
+          status=0
+          for version in "${versions[@]}"; do
+            echo "::group::$QRCODESDK_FRAMEWORK $version"
+            QRCODESDK_FRAMEWORK_VERSION="$version" \
+              pnpm turbo run test:framework-runtime --filter=@qrcodesdk/browser || status=1
+            echo "::endgroup::"
+          done
+          exit "$status"
 
   react-native-runtime:
-    name: React Native ${{ matrix.version }} consumer
+    name: React Native consumer
     needs: build
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        version:
-          - '0.79'
-          - '0.88'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -478,12 +443,20 @@ jobs:
           name: runtime-packages
           path: ${{ runner.temp }}/runtime-packages
 
-      - name: Test React Native consumer
+      - name: Test React Native versions
+        shell: bash
         env:
           QRCODESDK_HERMES: ${{ runner.temp }}/hermes/hermes
           QRCODESDK_PACKAGES: ${{ runner.temp }}/runtime-packages
-          QRCODESDK_REACT_NATIVE_VERSION: ${{ matrix.version }}
-        run: pnpm turbo run test:react-native-runtime --filter=@qrcodesdk/react-native
+        run: |
+          status=0
+          for version in 0.79 0.88; do
+            echo "::group::React Native $version"
+            QRCODESDK_REACT_NATIVE_VERSION="$version" \
+              pnpm turbo run test:react-native-runtime --filter=@qrcodesdk/react-native || status=1
+            echo "::endgroup::"
+          done
+          exit "$status"
 
   native-ios:
     name: Native rendering on iOS

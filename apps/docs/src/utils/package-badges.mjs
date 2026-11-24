@@ -12,7 +12,7 @@ const BUNDLE_EXTERNALS =
 
 /** @param {string} packageName */
 export function createBundleJsUrl(packageName) {
-  return `https://deno.bundlejs.com?q=${packageName}&treeshake=[*]&config={%22esbuild%22:{%22external%22:[${BUNDLE_EXTERNALS}]}}`;
+  return `https://edge.bundlejs.com?q=${packageName}&treeshake=[*]&config={%22esbuild%22:{%22external%22:[${BUNDLE_EXTERNALS}]}}`;
 }
 
 /**
