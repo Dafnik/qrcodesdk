@@ -52,9 +52,12 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch false && node ../core-testing/scripts/verify-package-artifact.mjs",
     "test:coverage:raw": "ng test --coverage --watch false",
-    "check-types": "ngc -p tsconfig.lib.prod.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
+    "check-types": "tsc -p tsconfig.spec.json --noEmit",
     "lint": "eslint src runtime --max-warnings 0",
     "clean": "rm -rf .turbo dist .angular"
+  },
+  "exports": {
+    ".": "./src/public-api.ts"
   },
   "peerDependencies": {
     "@angular/common": "^20.0.0 || ^21.0.0 || ^22.0.0",
@@ -81,7 +84,6 @@
     "@repo/typescript-config": "workspace:*",
     "angular-eslint": "22.6.0",
     "jsdom": "catalog:",
-    "ng-packagr": "22.2.5",
     "typescript": "catalog:angular-typescript",
     "vitest": "catalog:"
   }

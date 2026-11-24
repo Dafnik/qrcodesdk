@@ -9,7 +9,6 @@
     "check-readmes": "node scripts/readmes/generate-readmes.mjs --check",
     "generate-readmes": "node scripts/readmes/generate-readmes.mjs --write",
     "preview": "astro preview",
-    "check-types": "astro check && ngc -p tsconfig.app.json --noEmit",
     "lint": "eslint *.mjs scripts src --ext .js,.mjs,.ts --max-warnings 0",
     "test": "node --test scripts/readmes/*.test.mjs src/components/playground/*.test.ts src/utils/*.test.mjs && vitest run",
     "astro": "astro",
@@ -66,13 +65,12 @@
     "zxing-wasm": "catalog:"
   },
   "devDependencies": {
-    "@analogjs/astro-angular": "3.0.0-beta.18",
+    "@analogjs/astro-angular": "3.0.0",
     "@angular/animations": "catalog:",
     "@angular/build": "catalog:",
     "@angular/compiler": "catalog:",
     "@angular/compiler-cli": "catalog:",
     "@angular/language-service": "catalog:",
-    "@astrojs/check": "0.9.12",
     "@astrojs/starlight": "0.42.7",
     "@repo/eslint-config": "workspace:*",
     "@repo/perf": "workspace:*",

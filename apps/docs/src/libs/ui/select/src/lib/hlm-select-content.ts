@@ -1,4 +1,4 @@
-import {BooleanInput} from '@angular/cdk/coercion';
+import type {BooleanInput} from '@angular/cdk/coercion';
 import {ChangeDetectionStrategy, Component, booleanAttribute, computed, input} from '@angular/core';
 
 import {BrnSelectContent} from '@spartan-ng/brain/select';

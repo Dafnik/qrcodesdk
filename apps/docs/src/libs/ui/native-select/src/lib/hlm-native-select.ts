@@ -31,7 +31,7 @@ export const HLM_NATIVE_SELECT_VALUE_ACCESSOR = {
   providers: [
     HLM_NATIVE_SELECT_VALUE_ACCESSOR,
     provideIcons({lucideChevronDown}),
-    provideBrnLabelable(HlmNativeSelect),
+    provideBrnLabelable(forwardRef(() => HlmNativeSelect)),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [BrnFieldControl],

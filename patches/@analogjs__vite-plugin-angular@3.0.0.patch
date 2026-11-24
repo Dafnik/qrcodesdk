@@ -1,0 +1,16 @@
+diff --git a/src/lib/utils/lsp-type-checker.js b/src/lib/utils/lsp-type-checker.js
+index 3056c1f5ec0a2dfc1ff439d5e414ff7ea21a49c7..3b2850b3d346edcb137e9e061f3de990644306f3 100644
+--- a/src/lib/utils/lsp-type-checker.js
++++ b/src/lib/utils/lsp-type-checker.js
+@@ -207,8 +207,9 @@ function relocateTcb(filePath, tcbCode, hostDir, fileIdx, sharedImports) {
+ 		aliasMap.set(alias, sharedAliasFor(spec, sharedImports));
+ 	}
+ 	const ms = new MagicString(tcbCode);
+-	for (const node of identifiers) if (TCB_LOCAL_NAME.test(node.name)) ms.overwrite(node.start, node.end, `_f${fileIdx}_${node.name}`);
+-	else if (aliasMap.has(node.name)) ms.overwrite(node.start, node.end, aliasMap.get(node.name));
++	// An identifier's AST range can include its type annotation.
++	for (const node of identifiers) if (TCB_LOCAL_NAME.test(node.name)) ms.overwrite(node.start, node.start + node.name.length, `_f${fileIdx}_${node.name}`);
++	else if (aliasMap.has(node.name)) ms.overwrite(node.start, node.start + node.name.length, aliasMap.get(node.name));
+ 	if (thisTypes.length > 0) {
+ 		const selfAlias = sharedAliasFor(hostRelativeSpecifier(resolve(filePath).replace(/\.[cm]?tsx?$/, ""), hostDir), sharedImports);
+ 		for (const { node, exportProp } of thisTypes) ms.overwrite(node.start, node.end, `${selfAlias}.${exportProp}`);

@@ -7,6 +7,9 @@ import vue from '@astrojs/vue';
 import tailwindcss from '@tailwindcss/vite';
 import mermaidIntegration from 'astro-mermaid';
 import {defineConfig} from 'astro/config';
+import {createRequire} from 'node:module';
+import {dirname, join} from 'node:path';
+import {URL} from 'node:url';
 import starlightChangelogs from 'starlight-changelogs';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightLlmsTxt from 'starlight-llms-txt';
@@ -14,6 +17,13 @@ import starlightPageContextAction from 'starlight-page-context-action';
 
 import {STARLIGHT_SIDEBAR} from './src/starlight-sidebar.mjs';
 import {includeContentPlugin} from './src/utils/index.js';
+
+// Angular's CLI peers use TypeScript 6. NGP uses the workspace's TypeScript 7 checker.
+const requireFromWorkspace = createRequire(new URL('../../package.json', import.meta.url));
+const typeScript7 = join(
+  dirname(requireFromWorkspace.resolve('typescript/package.json')),
+  'bin/tsc',
+);
 
 /** @returns {import('vite').Plugin} */
 function suppressAngularSourcemapWarnings() {
@@ -190,7 +200,11 @@ export default defineConfig({
         ); // <- only transform Angular TypeScript files
       },
       vite: {
-        fastCompile: true,
+        compilation: 'ngp',
+        typeChecker: {
+          command: process.execPath,
+          args: [typeScript7, '--lsp', '--stdio'],
+        },
       },
     }),
     useProductionJsx(),
