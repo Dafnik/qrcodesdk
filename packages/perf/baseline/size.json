@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-24T11:52:28.878Z",
-  "commit": "dbd4e80ced33",
-  "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "AMD EPYC 9V74 80-Core Processor", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
+  "generatedAt": "2026-11-25T10:44:10.644Z",
+  "commit": "87ecd00c81d1",
+  "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "AMD EPYC 7763 64-Core Processor", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
     {"id": "matrix", "title": "Matrix generation"},
@@ -4536,18 +4536,18 @@
         "angular"
       ],
       "vite": {
-        "total": {"min": 251235, "gzip": 81907, "brotli": 70910},
-        "initial": {"min": 251235, "gzip": 81907, "brotli": 70910},
+        "total": {"min": 250997, "gzip": 81790, "brotli": 70708},
+        "initial": {"min": 250997, "gzip": 81790, "brotli": 70708},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "sdkBytes": 0,
-        "areas": {"framework:angular": 250502, "other": 686, "app": 47},
+        "areas": {"framework:angular": 250264, "other": 686, "app": 47},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 251235, "gzip": 81907, "brotli": 70910},
+            "sizes": {"min": 250997, "gzip": 81790, "brotli": 70708},
             "modules": [
-              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 226338},
+              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 226100},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
               {"path": "node_modules/rxjs/", "area": "framework:angular", "bytes": 10470},
               {"path": "node_modules/tslib/", "area": "framework:angular", "bytes": 1225},
@@ -4574,18 +4574,18 @@
       ],
       "baseline": "angular-empty",
       "vite": {
-        "total": {"min": 271903, "gzip": 90450, "brotli": 78293},
-        "initial": {"min": 271903, "gzip": 90450, "brotli": 78293},
+        "total": {"min": 271674, "gzip": 90348, "brotli": 78152},
+        "initial": {"min": 271674, "gzip": 90348, "brotli": 78152},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "sdkBytes": 16896,
-        "areas": {"framework:angular": 254114, "core:matrix": 8800, "core:styler": 4174, "core:svg": 1293, "core:builder": 1183, "adapter:angular": 799, "other": 700, "browser:download": 509, "app": 193, "core:error": 138},
+        "areas": {"framework:angular": 253885, "core:matrix": 8800, "core:styler": 4174, "core:svg": 1293, "core:builder": 1183, "adapter:angular": 799, "other": 700, "browser:download": 509, "app": 193, "core:error": 138},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 271903, "gzip": 90450, "brotli": 78293},
+            "sizes": {"min": 271674, "gzip": 90348, "brotli": 78152},
             "modules": [
-              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229913},
+              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229684},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
               {"path": "node_modules/rxjs/", "area": "framework:angular", "bytes": 10470},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2621},
@@ -4648,18 +4648,18 @@
       ],
       "baseline": "angular-svg",
       "vite": {
-        "total": {"min": 275211, "gzip": 91834, "brotli": 79494},
-        "initial": {"min": 275211, "gzip": 91834, "brotli": 79494},
+        "total": {"min": 274982, "gzip": 91755, "brotli": 79427},
+        "initial": {"min": 274982, "gzip": 91755, "brotli": 79427},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "sdkBytes": 20119,
-        "areas": {"framework:angular": 254129, "core:matrix": 8800, "core:styler": 4174, "core:style-patterns": 3223, "core:svg": 1293, "core:builder": 1183, "adapter:angular": 799, "other": 700, "browser:download": 509, "app": 263, "core:error": 138},
+        "areas": {"framework:angular": 253900, "core:matrix": 8800, "core:styler": 4174, "core:style-patterns": 3223, "core:svg": 1293, "core:builder": 1183, "adapter:angular": 799, "other": 700, "browser:download": 509, "app": 263, "core:error": 138},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 275211, "gzip": 91834, "brotli": 79494},
+            "sizes": {"min": 274982, "gzip": 91755, "brotli": 79427},
             "modules": [
-              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229928},
+              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229699},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
               {"path": "node_modules/rxjs/", "area": "framework:angular", "bytes": 10470},
               {"path": "packages/core/src/style/patterns.ts", "area": "core:style-patterns", "bytes": 3223},
@@ -4722,18 +4722,18 @@
       ],
       "baseline": "angular-empty",
       "vite": {
-        "total": {"min": 270907, "gzip": 89943, "brotli": 77745},
-        "initial": {"min": 270907, "gzip": 89943, "brotli": 77745},
+        "total": {"min": 270678, "gzip": 89832, "brotli": 77611},
+        "initial": {"min": 270678, "gzip": 89832, "brotli": 77611},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "sdkBytes": 15900,
-        "areas": {"framework:angular": 254114, "core:matrix": 8800, "core:styler": 4174, "core:builder": 1183, "adapter:angular": 806, "browser:canvas": 799, "other": 700, "app": 193, "core:error": 138},
+        "areas": {"framework:angular": 253885, "core:matrix": 8800, "core:styler": 4174, "core:builder": 1183, "adapter:angular": 806, "browser:canvas": 799, "other": 700, "app": 193, "core:error": 138},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 270907, "gzip": 89943, "brotli": 77745},
+            "sizes": {"min": 270678, "gzip": 89832, "brotli": 77611},
             "modules": [
-              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229913},
+              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229684},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
               {"path": "node_modules/rxjs/", "area": "framework:angular", "bytes": 10470},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2621},
@@ -4795,18 +4795,18 @@
       ],
       "baseline": "angular-empty",
       "vite": {
-        "total": {"min": 272412, "gzip": 90475, "brotli": 78337},
-        "initial": {"min": 272412, "gzip": 90475, "brotli": 78337},
+        "total": {"min": 272183, "gzip": 90398, "brotli": 78181},
+        "initial": {"min": 272183, "gzip": 90398, "brotli": 78181},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "sdkBytes": 17397,
-        "areas": {"framework:angular": 254114, "core:matrix": 8800, "core:styler": 4174, "core:builder": 1183, "adapter:angular": 1081, "browser:canvas": 799, "other": 708, "browser:image": 637, "browser:download": 529, "app": 193, "core:error": 138, "browser:png": 56},
+        "areas": {"framework:angular": 253885, "core:matrix": 8800, "core:styler": 4174, "core:builder": 1183, "adapter:angular": 1081, "browser:canvas": 799, "other": 708, "browser:image": 637, "browser:download": 529, "app": 193, "core:error": 138, "browser:png": 56},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 272412, "gzip": 90475, "brotli": 78337},
+            "sizes": {"min": 272183, "gzip": 90398, "brotli": 78181},
             "modules": [
-              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229913},
+              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229684},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
               {"path": "node_modules/rxjs/", "area": "framework:angular", "bytes": 10470},
               {"path": "packages/core/src/drawing/styler.ts", "area": "core:styler", "bytes": 2621},
@@ -4877,18 +4877,18 @@
       ],
       "baseline": "angular-empty",
       "vite": {
-        "total": {"min": 293010, "gzip": 97921, "brotli": 84720},
-        "initial": {"min": 293010, "gzip": 97921, "brotli": 84720},
+        "total": {"min": 292781, "gzip": 97826, "brotli": 84586},
+        "initial": {"min": 292781, "gzip": 97826, "brotli": 84586},
         "lazy": {"min": 0, "gzip": 0, "brotli": 0},
         "sdkBytes": 37028,
-        "areas": {"framework:angular": 254116, "core:matrix": 8800, "core:jpeg-encoder": 6249, "core:webp-encoder": 4390, "core:styler": 4278, "adapter:angular": 3145, "core:gif-encoder": 2956, "core:raster-shared": 1813, "core:svg": 1293, "core:builder": 1183, "app": 1088, "browser:image": 883, "browser:canvas": 799, "other": 778, "browser:download": 750, "core:error": 138, "browser:gif": 121, "browser:jpeg": 121, "browser:png": 56, "browser:webp": 53},
+        "areas": {"framework:angular": 253887, "core:matrix": 8800, "core:jpeg-encoder": 6249, "core:webp-encoder": 4390, "core:styler": 4278, "adapter:angular": 3145, "core:gif-encoder": 2956, "core:raster-shared": 1813, "core:svg": 1293, "core:builder": 1183, "app": 1088, "browser:image": 883, "browser:canvas": 799, "other": 778, "browser:download": 750, "core:error": 138, "browser:gif": 121, "browser:jpeg": 121, "browser:png": 56, "browser:webp": 53},
         "chunks": [
           {
             "name": "assets/index.js",
             "kind": "initial",
-            "sizes": {"min": 293010, "gzip": 97921, "brotli": 84720},
+            "sizes": {"min": 292781, "gzip": 97826, "brotli": 84586},
             "modules": [
-              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229915},
+              {"path": "node_modules/@angular/core/", "area": "framework:angular", "bytes": 229686},
               {"path": "node_modules/@angular/platform-browser/", "area": "framework:angular", "bytes": 12095},
               {"path": "node_modules/rxjs/", "area": "framework:angular", "bytes": 10470},
               {"path": "packages/core/src/raster/jpeg.ts", "area": "core:jpeg-encoder", "bytes": 6249},
@@ -4961,13 +4961,13 @@
     }
   ],
   "packages": [
-    {"name": "@qrcodesdk/core", "version": "0.0.6", "packed": 205964, "unpacked": 694632, "files": 103},
-    {"name": "@qrcodesdk/browser", "version": "0.0.6", "packed": 16737, "unpacked": 58436, "files": 45},
-    {"name": "@qrcodesdk/node", "version": "0.0.6", "packed": 8401, "unpacked": 28643, "files": 8},
-    {"name": "@qrcodesdk/react", "version": "0.0.6", "packed": 12232, "unpacked": 49084, "files": 8},
-    {"name": "@qrcodesdk/vue", "version": "0.0.6", "packed": 12127, "unpacked": 51226, "files": 8},
-    {"name": "@qrcodesdk/svelte", "version": "0.0.6", "packed": 11687, "unpacked": 43586, "files": 34},
-    {"name": "@qrcodesdk/angular", "version": "0.0.6", "packed": 12736, "unpacked": 60606, "files": 7},
-    {"name": "@qrcodesdk/cli", "version": "0.0.6", "packed": 13467, "unpacked": 44342, "files": 6}
+    {"name": "@qrcodesdk/core", "version": "0.0.6", "packed": 205933, "unpacked": 694476, "files": 103},
+    {"name": "@qrcodesdk/browser", "version": "0.0.6", "packed": 16719, "unpacked": 58363, "files": 45},
+    {"name": "@qrcodesdk/node", "version": "0.0.6", "packed": 8370, "unpacked": 28536, "files": 8},
+    {"name": "@qrcodesdk/react", "version": "0.0.6", "packed": 12219, "unpacked": 49033, "files": 8},
+    {"name": "@qrcodesdk/vue", "version": "0.0.6", "packed": 12112, "unpacked": 51177, "files": 8},
+    {"name": "@qrcodesdk/svelte", "version": "0.0.6", "packed": 11677, "unpacked": 43534, "files": 34},
+    {"name": "@qrcodesdk/angular", "version": "0.0.6", "packed": 12738, "unpacked": 60649, "files": 7},
+    {"name": "@qrcodesdk/cli", "version": "0.0.6", "packed": 13332, "unpacked": 43747, "files": 6}
   ]
 }
