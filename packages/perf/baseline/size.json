@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-25T10:44:10.644Z",
-  "commit": "87ecd00c81d1",
+  "generatedAt": "2026-11-26T10:15:28.518Z",
+  "commit": "666ad5377d8f",
   "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "AMD EPYC 7763 64-Core Processor", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
