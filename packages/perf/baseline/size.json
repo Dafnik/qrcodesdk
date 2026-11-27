@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "kind": "size",
-  "generatedAt": "2026-11-26T10:15:28.518Z",
-  "commit": "666ad5377d8f",
-  "environment": {"os": "Linux 7.0.0-1017-azure x64", "cpu": "AMD EPYC 7763 64-Core Processor", "cores": 4, "memoryGB": 16, "node": "v26.13.1"},
+  "generatedAt": "2026-11-27T10:21:31.411Z",
+  "commit": "b88f24e7eafb",
+  "environment": {"os": "Linux 7.0.0-1018-aws x64", "cpu": "Intel(R) Xeon(R) 6975P-C", "cores": 4, "memoryGB": 15, "node": "v26.13.1"},
   "tools": {"vite": "8.3.5", "esbuild": "0.28.2", "webpack": "5.112.2"},
   "features": [
     {"id": "matrix", "title": "Matrix generation"},
